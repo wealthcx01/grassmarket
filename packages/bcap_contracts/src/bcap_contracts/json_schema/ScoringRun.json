@@ -1,0 +1,133 @@
+{
+  "$defs": {
+    "UncertaintyRating": {
+      "description": "Assessment Uncertainty Rating (Methodology §7), Morningstar pattern.",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Very High"
+      ],
+      "title": "UncertaintyRating",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "An immutable, versioned scoring run (Methodology, CLAUDE.md non-negotiable #6).\n\nLoop 0 ships the *shape* (append-only, hashed, version-stamped). The engine that fills\n`v_index` etc. is Loop 1. Finalisation locks inputs; scenarios stay editable.",
+  "properties": {
+    "assessment_id": {
+      "format": "uuid",
+      "title": "Assessment Id",
+      "type": "string"
+    },
+    "coefficient_version": {
+      "title": "Coefficient Version",
+      "type": "string"
+    },
+    "content_hash": {
+      "description": "SHA-256 over inputs + versions — the immutability seal.",
+      "title": "Content Hash",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "engine_version": {
+      "title": "Engine Version",
+      "type": "string"
+    },
+    "finalised": {
+      "default": false,
+      "title": "Finalised",
+      "type": "boolean"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "methodology_version": {
+      "title": "Methodology Version",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "uncertainty_rating": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/UncertaintyRating"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    },
+    "v_index": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "V Index"
+    },
+    "v_p10": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "V P10"
+    },
+    "v_p90": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "V P90"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "assessment_id",
+    "engine_version",
+    "methodology_version",
+    "coefficient_version",
+    "content_hash"
+  ],
+  "title": "ScoringRun",
+  "type": "object"
+}

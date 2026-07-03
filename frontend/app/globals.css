@@ -1,0 +1,86 @@
+/*
+ * Bruntsfield Advisor Studio — design tokens (single source of truth).
+ * Palette/fonts from the Bruntsfield website design system (see CLAUDE.md).
+ * Font family variables (--font-serif / --font-sans / --font-mono) are injected
+ * by next/font in app/layout.tsx; the fallbacks below keep things sane pre-hydration.
+ */
+
+:root {
+  /* Palette — paper/ink with Bottle Green accent */
+  --color-paper: #faf8f3; /* background: light cream / off-white */
+  --color-paper-raised: #ffffff; /* cards, panels */
+  --color-ink: #1a1a1a; /* text: near-black */
+  --color-ink-muted: #5a5a54; /* secondary text */
+  --color-accent: #1a3b26; /* Bottle Green */
+  --color-accent-contrast: #faf8f3; /* text on accent */
+  --color-border: #e4e0d6; /* hairlines on paper */
+
+  /* Semantic status (health widget, form errors) */
+  --color-ok: #1a3b26;
+  --color-warn: #8a5a00;
+  --color-error: #8a2020;
+
+  /* Typography — provided by next/font, with graceful fallbacks */
+  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+
+  /* Spacing / chrome */
+  --topbar-height: 3.25rem;
+  --content-max: 68rem;
+  --radius: 4px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0 0 0.5em;
+  letter-spacing: -0.01em;
+}
+
+code,
+kbd,
+samp,
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+a {
+  color: var(--color-accent);
+  text-underline-offset: 2px;
+}
+
+button {
+  font-family: inherit;
+}

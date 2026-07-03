@@ -1,0 +1,132 @@
+{
+  "$defs": {
+    "EvidenceGrade": {
+      "description": "Evidence-strength grade (Methodology §3.3). Drives uncertainty (§7), not the point score.",
+      "enum": [
+        "E1",
+        "E2",
+        "E3",
+        "E4"
+      ],
+      "title": "EvidenceGrade",
+      "type": "string"
+    },
+    "MaturityLevel": {
+      "description": "The four maturity levels (Methodology §3.1).\n\nThe numeric ``index`` is for computation only; clients see the label. These four indices\nare the ONLY legal subcomponent indices — any other value is a contract violation, not a\ndatum to clamp or round (ADR-0001 §1).",
+      "enum": [
+        "Basic",
+        "Developing",
+        "Advanced",
+        "Frontier"
+      ],
+      "title": "MaturityLevel",
+      "type": "string"
+    },
+    "NonScoreState": {
+      "description": "First-class non-score states (Methodology §3.2). Never imputed, never scored as zero.\n\nAn unassessed subcomponent contributes to NO score — the empty-module → q_m = 0.0\nbehaviour of the prototype (defect D9) is prohibited by construction.",
+      "enum": [
+        "Not Applicable",
+        "Not Assessed"
+      ],
+      "title": "NonScoreState",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One subcomponent's rating: a maturity level OR a first-class non-score state, never both.\n\nModelling this as an exclusive union is how \"Not Assessed\" stays distinct from a score of\nzero (defect D9) — an unassessed subcomponent carries `state`, not `level`, and contributes\nto no computation.",
+  "properties": {
+    "consensus": {
+      "default": false,
+      "title": "Consensus",
+      "type": "boolean"
+    },
+    "dissent_note": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Dissent Note"
+    },
+    "evidence_grade": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EvidenceGrade"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "evidence_refs": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Refs",
+      "type": "array"
+    },
+    "level": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MaturityLevel"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "module_key": {
+      "title": "Module Key",
+      "type": "string"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "rater_ids": {
+      "default": [],
+      "items": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "title": "Rater Ids",
+      "type": "array"
+    },
+    "state": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NonScoreState"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "subcomponent_key": {
+      "title": "Subcomponent Key",
+      "type": "string"
+    }
+  },
+  "required": [
+    "module_key",
+    "subcomponent_key"
+  ],
+  "title": "SubcomponentRating",
+  "type": "object"
+}

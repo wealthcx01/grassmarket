@@ -1,0 +1,49 @@
+"""FastAPI application factory.
+
+`create_app` builds the engine + session factory from settings, bootstraps the schema
+(Loop 0: `create_all`; Alembic becomes the source of truth as the schema grows), wires CORS to
+the frontend origin, and mounts the routers. Tests call `create_app(settings=..., engine=...)`
+with an isolated in-memory database — the same factory, no special test path.
+"""
+
+from __future__ import annotations
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import Engine
+
+from grassmarket import __version__
+from grassmarket.config import Settings, get_settings
+from grassmarket.data.database import create_all, make_engine, make_session_factory
+from grassmarket.web.routers import auth, health, prospects
+
+
+def create_app(settings: Settings | None = None, *, engine: Engine | None = None) -> FastAPI:
+    settings = settings or get_settings()
+    engine = engine or make_engine(settings.database_url)
+    session_factory = make_session_factory(engine)
+
+    # Loop 0 schema bootstrap. Documented in the ticket: Alembic migrations take over in Loop 1+.
+    create_all(engine)
+
+    app = FastAPI(
+        title="Grassmarket — Bruntsfield Advisor Studio",
+        version=__version__,
+        summary="Advisor platform for the Bruntsfield Advisory Network (Loop 0 scaffold).",
+    )
+    app.state.settings = settings
+    app.state.engine = engine
+    app.state.session_factory = session_factory
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[settings.frontend_origin],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    app.include_router(health.router)
+    app.include_router(auth.router)
+    app.include_router(prospects.router)
+    return app

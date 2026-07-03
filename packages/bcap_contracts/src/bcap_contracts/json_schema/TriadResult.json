@@ -1,0 +1,51 @@
+{
+  "$defs": {
+    "StrengthRating": {
+      "description": "Power strength and triad rating — ordinal with falsifiable duration semantics (§8).\n\nReported as a rating, NEVER as a decimal. Establishing this as an enum (not a float) is the\nADR-0002 guarantee that no decimal leaks into a triad figure.",
+      "enum": [
+        "None",
+        "Emerging",
+        "Established",
+        "Wide"
+      ],
+      "title": "StrengthRating",
+      "type": "string"
+    },
+    "TriadDimension": {
+      "description": "The Platform Power triad (Methodology §2), reported as ordinal StrengthRatings.",
+      "enum": [
+        "economic_value",
+        "perceived_value",
+        "defence_value"
+      ],
+      "title": "TriadDimension",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A derived Platform Power triad rating — ordinal in, ordinal out (ADR-0002).",
+  "properties": {
+    "committee_approved": {
+      "default": false,
+      "title": "Committee Approved",
+      "type": "boolean"
+    },
+    "dimension": {
+      "$ref": "#/$defs/TriadDimension"
+    },
+    "rating": {
+      "$ref": "#/$defs/StrengthRating"
+    },
+    "rationale": {
+      "title": "Rationale",
+      "type": "string"
+    }
+  },
+  "required": [
+    "dimension",
+    "rating",
+    "rationale"
+  ],
+  "title": "TriadResult",
+  "type": "object"
+}

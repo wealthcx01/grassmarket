@@ -1,0 +1,69 @@
+{
+  "$defs": {
+    "WeightMethod": {
+      "description": "Elicitation method recorded in a Weight Provenance Record (Methodology §6).",
+      "enum": [
+        "swing_weighting",
+        "ahp",
+        "delphi",
+        "cooke_classical",
+        "direct"
+      ],
+      "title": "WeightMethod",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "dispersion": {
+      "description": "Recorded dispersion across the panel (e.g. 'IQR 0.04', 'CR 0.07', 'κ_w 0.81') — the spread that the stability interval (§7) is drawn from.",
+      "minLength": 1,
+      "title": "Dispersion",
+      "type": "string"
+    },
+    "method": {
+      "$ref": "#/$defs/WeightMethod",
+      "description": "Elicitation method (§6)."
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional rationale / dissent summary.",
+      "title": "Notes"
+    },
+    "review_due": {
+      "description": "When this weight is next reviewed (§6 publication).",
+      "format": "date",
+      "title": "Review Due",
+      "type": "string"
+    },
+    "set_by": {
+      "description": "Who set the weight (panel id or named expert).",
+      "minLength": 1,
+      "title": "Set By",
+      "type": "string"
+    },
+    "set_on": {
+      "description": "When it was set.",
+      "format": "date",
+      "title": "Set On",
+      "type": "string"
+    }
+  },
+  "required": [
+    "set_by",
+    "set_on",
+    "method",
+    "dispersion",
+    "review_due"
+  ],
+  "title": "WeightProvenanceRecord",
+  "type": "object"
+}

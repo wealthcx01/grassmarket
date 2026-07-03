@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.uv/
+uv.lock.tmp
+
+# Test / type / lint caches
+.pytest_cache/
+.ruff_cache/
+.pyright/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# Env / secrets — never commit
+.env
+.env.*
+!.env.example
+!.env.local.example
+*.pem
+*.key
+secrets/
+
+# Node / Next.js (frontend/)
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+.turbo/
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Local databases / run artefacts
+*.sqlite3
+*.db
+local.db
+
+# Railway
+.railway/

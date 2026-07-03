@@ -1,0 +1,53 @@
+{
+  "additionalProperties": false,
+  "description": "A spaced-repetition Power Drill result (PRD §6).",
+  "properties": {
+    "correct": {
+      "minimum": 0,
+      "title": "Correct",
+      "type": "integer"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "topic": {
+      "minLength": 1,
+      "title": "Topic",
+      "type": "string"
+    },
+    "total": {
+      "exclusiveMinimum": 0,
+      "title": "Total",
+      "type": "integer"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "topic",
+    "correct",
+    "total"
+  ],
+  "title": "DrillResult",
+  "type": "object"
+}

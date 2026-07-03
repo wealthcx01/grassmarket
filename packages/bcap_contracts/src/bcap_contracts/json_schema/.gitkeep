@@ -1,0 +1,2 @@
+# Generated JSON Schemas land here (scripts/generate_schemas.py). Kept in git as a mirror of
+# the Pydantic models; the schema-validate pre-commit hook enforces parity.

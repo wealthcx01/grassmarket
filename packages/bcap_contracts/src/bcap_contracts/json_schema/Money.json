@@ -1,0 +1,38 @@
+{
+  "$defs": {
+    "Currency": {
+      "enum": [
+        "GBP",
+        "USD",
+        "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A currency amount that cannot exist without an explicit currency and a reference to the\nassumption register that justifies it (Methodology §10, ADR-0002 compliance test).\n\nA lever NPV or remediation cost is only meaningful under stated assumptions; a `Money`\nwithout an ``assumption_register_ref`` is not constructible.",
+  "properties": {
+    "amount_minor": {
+      "description": "Amount in integer minor units (e.g. pence).",
+      "title": "Amount Minor",
+      "type": "integer"
+    },
+    "assumption_register_ref": {
+      "description": "Reference to the assumption-register entry that justifies this figure. Mandatory: currency claims are never made without stated assumptions (Methodology §10).",
+      "minLength": 1,
+      "title": "Assumption Register Ref",
+      "type": "string"
+    },
+    "currency": {
+      "$ref": "#/$defs/Currency"
+    }
+  },
+  "required": [
+    "amount_minor",
+    "currency",
+    "assumption_register_ref"
+  ],
+  "title": "Money",
+  "type": "object"
+}

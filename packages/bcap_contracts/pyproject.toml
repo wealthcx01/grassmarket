@@ -1,0 +1,25 @@
+[project]
+name = "bcap-contracts"
+version = "0.0.1"
+description = "Shared Bruntsfield Capital contracts (Pydantic v2 + JSON Schema) — the future Holy Corner API surface, shared by Grassmarket, Holy Corner and Viewforth."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Proprietary" }
+
+dependencies = [
+    "pydantic>=2.7",
+    "email-validator>=2.1",
+    "pyyaml>=6.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/bcap_contracts"]
+
+# Ship the registry YAML and generated JSON Schemas inside the wheel.
+[tool.hatch.build.targets.wheel.force-include]
+"src/bcap_contracts/registry_data" = "bcap_contracts/registry_data"
+"src/bcap_contracts/json_schema" = "bcap_contracts/json_schema"

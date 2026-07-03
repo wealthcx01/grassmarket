@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+# The gate the kickoff mandates: ruff + pyright + pytest must pass. Runs fully offline — no live
+# calls (CLAUDE.md quality standard). No --no-verify equivalent: this is the same gate as the
+# pre-commit hooks, enforced server-side.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (ruff · pyright · pytest)
+    runs-on: ubuntu-latest
+    env:
+      # Tests construct Settings explicitly; this is only so any incidental Settings() succeeds.
+      GM_JWT_SECRET: ci-secret-that-is-more-than-thirty-two-characters-long
+      GM_ENV: ci
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: Sync dependencies
+        run: uv sync --all-extras
+
+      - name: Ruff lint
+        run: uv run ruff check .
+
+      - name: Ruff format check
+        run: uv run ruff format --check .
+
+      - name: Schemas mirror the models (parity)
+        run: |
+          uv run python scripts/generate_schemas.py
+          git diff --exit-code -- packages/bcap_contracts/src/bcap_contracts/json_schema \
+            || (echo "JSON Schemas are out of date — run scripts/generate_schemas.py" && exit 1)
+
+      - name: Pyright
+        run: uv run pyright
+
+      - name: Pytest
+        run: uv run pytest -q
+
+  frontend:
+    name: Frontend (type-check · lint)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install
+        run: npm install --no-audit --no-fund
+
+      - name: Type-check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint

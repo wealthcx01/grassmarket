@@ -1,0 +1,178 @@
+{
+  "$defs": {
+    "WeightMethod": {
+      "description": "Elicitation method recorded in a Weight Provenance Record (Methodology §6).",
+      "enum": [
+        "swing_weighting",
+        "ahp",
+        "delphi",
+        "cooke_classical",
+        "direct"
+      ],
+      "title": "WeightMethod",
+      "type": "string"
+    },
+    "WeightProvenanceRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "dispersion": {
+          "description": "Recorded dispersion across the panel (e.g. 'IQR 0.04', 'CR 0.07', 'κ_w 0.81') — the spread that the stability interval (§7) is drawn from.",
+          "minLength": 1,
+          "title": "Dispersion",
+          "type": "string"
+        },
+        "method": {
+          "$ref": "#/$defs/WeightMethod",
+          "description": "Elicitation method (§6)."
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional rationale / dissent summary.",
+          "title": "Notes"
+        },
+        "review_due": {
+          "description": "When this weight is next reviewed (§6 publication).",
+          "format": "date",
+          "title": "Review Due",
+          "type": "string"
+        },
+        "set_by": {
+          "description": "Who set the weight (panel id or named expert).",
+          "minLength": 1,
+          "title": "Set By",
+          "type": "string"
+        },
+        "set_on": {
+          "description": "When it was set.",
+          "format": "date",
+          "title": "Set On",
+          "type": "string"
+        }
+      },
+      "required": [
+        "set_by",
+        "set_on",
+        "method",
+        "dispersion",
+        "review_due"
+      ],
+      "title": "WeightProvenanceRecord",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A versioned, provenance-carrying set of every coefficient the engine needs.\n\nConstruction enforces the invariants that DON'T need the registry (Σθ=1, α∈[0,1], provenance\npresent). :meth:`validate_against` enforces the ones that DO (every weight family is exactly\nthe registry's key set for its dimension) and refuses empty dimensions. Neither failure is\never swallowed.",
+  "properties": {
+    "alpha_l": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Alpha L",
+      "type": "number"
+    },
+    "alpha_module": {
+      "additionalProperties": {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "type": "number"
+      },
+      "title": "Alpha Module",
+      "type": "object"
+    },
+    "critical_modules_for_l": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Critical Modules For L",
+      "type": "array"
+    },
+    "delta": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "description": "Module weights δ_m for the L blend.",
+      "title": "Delta",
+      "type": "object"
+    },
+    "lambda_loadings": {
+      "additionalProperties": {
+        "additionalProperties": {
+          "type": "number"
+        },
+        "type": "object"
+      },
+      "description": "Per-module subcomponent loadings λ_{m,c}.",
+      "title": "Lambda Loadings",
+      "type": "object"
+    },
+    "methodology_version": {
+      "minLength": 1,
+      "title": "Methodology Version",
+      "type": "string"
+    },
+    "provenance": {
+      "additionalProperties": {
+        "$ref": "#/$defs/WeightProvenanceRecord"
+      },
+      "title": "Provenance",
+      "type": "object"
+    },
+    "theta_b": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Theta B",
+      "type": "number"
+    },
+    "theta_l": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Theta L",
+      "type": "number"
+    },
+    "theta_p": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Theta P",
+      "type": "number"
+    },
+    "version": {
+      "minLength": 1,
+      "title": "Version",
+      "type": "string"
+    },
+    "w_metric": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "description": "Metric weights w_k.",
+      "title": "W Metric",
+      "type": "object"
+    },
+    "w_power": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "description": "Power weights w_j.",
+      "title": "W Power",
+      "type": "object"
+    }
+  },
+  "required": [
+    "version",
+    "methodology_version",
+    "theta_b",
+    "theta_p",
+    "theta_l",
+    "alpha_l"
+  ],
+  "title": "CoefficientSet",
+  "type": "object"
+}

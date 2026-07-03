@@ -1,0 +1,28 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "full_name": {
+      "minLength": 1,
+      "title": "Full Name",
+      "type": "string"
+    },
+    "password": {
+      "description": "Minimum 12 characters (fail-loud on weak).",
+      "minLength": 12,
+      "title": "Password",
+      "type": "string"
+    },
+    "token": {
+      "minLength": 1,
+      "title": "Token",
+      "type": "string"
+    }
+  },
+  "required": [
+    "token",
+    "full_name",
+    "password"
+  ],
+  "title": "AcceptInvitationRequest",
+  "type": "object"
+}

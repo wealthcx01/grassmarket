@@ -1,0 +1,57 @@
+# The 9 infrastructure modules (the L index, Methodology §2).
+#
+# STATUS: the module KEYS below are harvested from the prototype data model (feasibility §6
+# sanctions harvesting the data model) and ship as registry STRUCTURE in Loop 0. Their
+# SUBCOMPONENTS (51 across the 9 modules), criticality flags, and rubric anchors are Loop 1
+# content — authored via expert elicitation and the anchor-writing sprints (PRD §9, Loop 1).
+#
+# Because every module below has an empty `subcomponents` list, a CoefficientSet's λ cannot yet
+# validate against these modules: the loader raises EmptyDimensionError (ADR-0001 scope note).
+# That refusal is intentional and correct for Loop 0 — the engine does not score until Loop 1
+# populates the subcomponents. Renaming a key is an ADR, never a silent edit.
+
+modules:
+  - key: FRONTEND
+    name: Front End
+    description: Client- and advisor-facing UI, workflows, and presentation layer.
+    subcomponents: []
+
+  - key: APP_SERVER
+    name: Application Server
+    description: Core application/business-logic tier and service orchestration runtime.
+    subcomponents: []
+
+  - key: MARKET_DATA
+    name: Market Data
+    description: Reference, pricing, and market-data ingestion, distribution, and quality.
+    subcomponents: []
+
+  - key: ORCHESTRATION
+    name: Orchestration
+    description: Workflow, scheduling, and inter-service orchestration and resilience.
+    subcomponents: []
+
+  - key: CMS
+    name: Client Management System
+    description: Client/account records, onboarding, KYC, and relationship data.
+    subcomponents: []
+
+  - key: BACKOFFICE
+    name: Back Office
+    description: Settlement, reconciliation, custody, corporate actions, and reporting.
+    subcomponents: []
+
+  - key: OEMS
+    name: Order & Execution Management
+    description: Order lifecycle, smart order routing, and execution management (see §4 example).
+    subcomponents: []
+
+  - key: EMS_GATEWAY
+    name: EMS Gateway
+    description: Execution-venue gateways, FIX connectivity, and session management.
+    subcomponents: []
+
+  - key: LIQ_CONNECT
+    name: Liquidity & Connectivity
+    description: Venue/liquidity connectivity, network infrastructure, and co-location.
+    subcomponents: []

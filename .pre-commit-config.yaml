@@ -1,0 +1,43 @@
+# Pre-commit gate (CLAUDE.md non-negotiable #10): ruff, format, schema-validate, secret-scan.
+# Never bypassed. No `--no-verify`, ever.
+minimum_pre_commit_version: "3.7.0"
+default_language_version:
+  python: python3.12
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        name: ruff (lint)
+        args: [--fix]
+      - id: ruff-format
+        name: ruff (format)
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: check-merge-conflict
+      - id: detect-private-key   # first line of secret defence
+
+  - repo: local
+    hooks:
+      - id: schema-validate
+        name: schema-validate (contracts ↔ JSON Schema parity)
+        entry: uv run python scripts/validate_contracts.py
+        language: system
+        pass_filenames: false
+        files: ^packages/bcap_contracts/.*\.(py|json)$
+
+      - id: secret-scan
+        name: secret-scan (staged files)
+        entry: uv run python scripts/secret_scan.py
+        language: system
+        pass_filenames: true
