@@ -176,6 +176,14 @@ def _interpolate(metric: MetricDef, raw: float) -> float:
 _RANK_BAND = {1: "Basic", 2: "Developing", 3: "Advanced", 4: "Frontier"}
 
 
+def _evidence_rank(evidence: str | None) -> int:
+    """Fail-loud evidence lookup — an assessed subcomponent that reaches the gate MUST carry an
+    evidence grade. No `ev or "E1"` default (that was the banned defensive-default species, A6)."""
+    if evidence is None:
+        raise ValueError("Assessed subcomponent reached the gate without an evidence grade.")
+    return EVIDENCE_RANK[evidence]
+
+
 def _rating_gate(
     critical_inputs: list[tuple[str, str | None]], all_assessed_ranks: list[int]
 ) -> tuple[str, bool, str]:
@@ -194,23 +202,31 @@ def _rating_gate(
     """
     assessed_crit = [(lvl, ev) for (lvl, ev) in critical_inputs if lvl in LEVEL_INDEX]
     blocked = any(lvl == NOT_ASSESSED for (lvl, _) in critical_inputs)
+    crit_ranks = [LEVEL_RANK[lvl] for (lvl, _) in assessed_crit]
     if not assessed_crit and not blocked:
         ceiling_rank, ceiling_note = 4, "no critical subcomponent in scope"
     elif blocked:
         ceiling_rank, ceiling_note = 2, "gate blocked: a critical subcomponent is Not Assessed"
-    elif all(
-        LEVEL_RANK[lvl] >= 3 and EVIDENCE_RANK[ev or "E1"] >= 3 for (lvl, ev) in assessed_crit
-    ):
+    elif all(LEVEL_RANK[lvl] >= 3 and _evidence_rank(ev) >= 3 for (lvl, ev) in assessed_crit):
         ceiling_rank, ceiling_note = 4, "all critical Advanced+ at E3+"
-    elif min(LEVEL_RANK[lvl] for (lvl, _) in assessed_crit) >= 2:
+    elif min(crit_ranks) >= 2:
         ceiling_rank, ceiling_note = 3, "no critical is Basic"
+    elif max(crit_ranks) == 1:
+        ceiling_rank, ceiling_note = 1, "every critical is Basic"
     else:
         ceiling_rank, ceiling_note = 2, "a critical subcomponent is Basic"
 
-    # floor_rank>=3 (all assessed Advanced+) permits Frontier; a Developing floor caps at
-    # Advanced; any Basic caps at Developing.
+    # FLOOR (overall bottleneck): all assessed Advanced+ permits Frontier; a Developing minimum
+    # caps at Advanced; a single Basic caps at Developing; ALL-Basic floors the band at Basic.
     floor_rank = min(all_assessed_ranks) if all_assessed_ranks else 1
-    floor_cap = 4 if floor_rank >= 3 else (3 if floor_rank == 2 else 2)
+    if floor_rank >= 3:
+        floor_cap = 4
+    elif floor_rank == 2:
+        floor_cap = 3
+    elif all(r == 1 for r in all_assessed_ranks):
+        floor_cap = 1  # every assessed subcomponent is Basic → the module is Basic (now reachable)
+    else:
+        floor_cap = 2
 
     band_rank = min(ceiling_rank, floor_cap)
     if band_rank == ceiling_rank and ceiling_rank <= floor_cap:
@@ -269,7 +285,7 @@ def compute(registry: Registry) -> dict[str, Any]:
         band, blocked, note = _rating_gate(critical_inputs, all_assessed_ranks)
         coverage = n_assessed / n_applicable if n_applicable else None
 
-        q_by_module[module.key] = q_m if q_m is not None else 0.0
+        q_by_module[module.key] = q_m  # None if the module is fully unassessed — never 0.0 (D9)
         modules_out.append(
             {
                 "key": module.key,
@@ -290,10 +306,17 @@ def compute(registry: Registry) -> dict[str, Any]:
             }
         )
 
-    # L = α_L·(Σδ·q_m/Σδ) + (1−α_L)·min(q_critical_modules). δ uniform = 1.0.
-    q_values = [q_by_module[m.key] for m in registry.modules]
-    l_weighted = sum(q_values) / len(q_values)
-    l_min = min(q_by_module[k] for k in CRITICAL_MODULES_FOR_L)
+    # L = α_L·(Σδ·q_m/Σδ) + (1−α_L)·min(q_critical_modules). δ uniform = 1.0. A fully-unassessed
+    # module (q_m None) is EXCLUDED from both terms — never zero-filled (D9). δ renormalises over
+    # the assessed modules; the critical-module min ranges only over assessed critical modules.
+    assessed_q = {k: v for k, v in q_by_module.items() if v is not None}
+    if not assessed_q:
+        raise ValueError("Cannot compute L: no module has any assessed subcomponent.")
+    l_weighted = sum(assessed_q.values()) / len(assessed_q)
+    crit_q = [q_by_module[k] for k in CRITICAL_MODULES_FOR_L if q_by_module[k] is not None]
+    if not crit_q:
+        raise ValueError("Cannot compute L min term: no critical-for-L module is assessed.")
+    l_min = min(crit_q)
     L = ALPHA_L * l_weighted + (1 - ALPHA_L) * l_min
 
     # B = Σ w·n_k(raw)/Σw. w uniform = 1.0.
@@ -329,6 +352,11 @@ def compute(registry: Registry) -> dict[str, Any]:
             "subject": SUBJECT,
             "methodology_version": METHODOLOGY_VERSION,
             "status": FIXTURE_STATUS,
+            "display_convention": (
+                "Indices are stored on [0,1] to 6 dp; the 0–100 display is the STORED V × 100 "
+                "(ADR-0001 §4). Narrative may round further (e.g. 47.86) — the fixture value "
+                "(47.8586) is authoritative."
+            ),
             "note": (
                 "Reference computation of Methodology §5. Coefficients, the power-strength "
                 "encoding, and the rating-gate rule are DRAFT pending John's ratification and the "

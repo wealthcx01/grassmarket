@@ -7,6 +7,8 @@ Accepted — a change is a new ADR that supersedes the old one (never a silent e
 |---|---|---|
 | [ADR-0001](ADR-0001-scale-system-and-key-registry.md) | Scale system and the single key registry | Accepted |
 | [ADR-0002](ADR-0002-value-layer-two-track-scoring-and-value-bridge.md) | The value layer: two-track scoring and the three-layer value bridge | Accepted |
+| [ADR-0003](ADR-0003-module-rating-gate.md) | The module rating gate (operationalising §5.2) | Proposed |
+| [ADR-0004](ADR-0004-power-strength-encoding.md) | Numeric encoding of ordinal power strength for the P index | Proposed |
 
 Both derive from `docs/ATLAS-Methodology-v1.md`, which is normative for the scoring engine.
 Where an ADR and the Methodology disagree, the Methodology wins and the ADR is a defect.

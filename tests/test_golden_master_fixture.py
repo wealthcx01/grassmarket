@@ -74,10 +74,11 @@ def test_no_module_is_frontier_with_a_basic_part(gm: dict) -> None:
 
 def test_L_recomputes(gm: dict) -> None:
     alpha_l = gm["coefficients"]["alpha_l"]
-    q = {m["key"]: (m["q_m"] if m["q_m"] is not None else 0.0) for m in gm["modules"]}
-    weighted = sum(q.values()) / len(q)
-    crit = gm["coefficients"]["critical_modules_for_l"]
-    min_term = min(q[k] for k in crit)
+    # Fully-unassessed modules (q_m None) are EXCLUDED from both terms — never zero-filled (D9).
+    assessed = {m["key"]: m["q_m"] for m in gm["modules"] if m["q_m"] is not None}
+    weighted = sum(assessed.values()) / len(assessed)
+    crit = [assessed[k] for k in gm["coefficients"]["critical_modules_for_l"] if k in assessed]
+    min_term = min(crit)
     L = alpha_l * weighted + (1 - alpha_l) * min_term
     assert math.isclose(gm["L"]["value"], L, abs_tol=1e-6)
     assert math.isclose(gm["L"]["weighted_term"], weighted, abs_tol=1e-6)

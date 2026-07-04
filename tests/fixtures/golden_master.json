@@ -4,6 +4,7 @@
     "subject": "Meridian Securities (composite mid-tier retail brokerage)",
     "methodology_version": "1.0",
     "status": "draft-pending-ratification",
+    "display_convention": "Indices are stored on [0,1] to 6 dp; the 0–100 display is the STORED V × 100 (ADR-0001 §4). Narrative may round further (e.g. 47.86) — the fixture value (47.8586) is authoritative.",
     "note": "Reference computation of Methodology §5. Coefficients, the power-strength encoding, and the rating-gate rule are DRAFT pending John's ratification and the elicitation panel. The engine (GRS-0004) must reproduce these values exactly."
   },
   "coefficients": {
