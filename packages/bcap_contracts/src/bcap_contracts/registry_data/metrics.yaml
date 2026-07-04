@@ -1,0 +1,10 @@
+# The business-metric register (the B index, Methodology §5.3).
+#
+# STATUS: EMPTY in Loop 0 by design. Each metric needs a declared unit (captured in the UI,
+# never inferred), a direction, and an explicit normalisation spec n_k with documented anchor
+# points. Authoring that register — and retiring the prototype's unit-sensitive log heuristic
+# (defect D5) — is Loop 1 content. Until a metric is registered here, a CoefficientSet's
+# w_metric cannot validate against the metric dimension: the loader raises EmptyDimensionError
+# (ADR-0001 scope note). That refusal is intentional for Loop 0.
+
+metrics: []

@@ -1,0 +1,16 @@
+# Railway deploy config (Loop 0 skeleton).
+#
+# Railway provisions managed Postgres and injects DATABASE_URL; config.py reads it (and refuses
+# to boot in production on SQLite or a placeholder GM_JWT_SECRET). Set GM_JWT_SECRET and GM_ENV
+# in the Railway service variables. The schema is bootstrapped by create_all at app startup for
+# Loop 0; Loop 1 switches the start command to `alembic upgrade head` before uvicorn.
+
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "uv run uvicorn grassmarket.web.main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/health"
+healthcheckTimeout = 120
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5

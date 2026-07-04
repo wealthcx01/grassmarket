@@ -1,0 +1,89 @@
+{
+  "$defs": {
+    "ConsultantTier": {
+      "description": "Advisory Network tier (PRD §2).",
+      "enum": [
+        "venture_associate",
+        "advisor",
+        "consultant"
+      ],
+      "title": "ConsultantTier",
+      "type": "string"
+    },
+    "Role": {
+      "description": "Coarse RBAC role. Data scoping is by ownership (repository layer), not by role;\nADMIN and COMMITTEE_MEMBER widen *visibility* only where the Methodology requires it.",
+      "enum": [
+        "consultant",
+        "committee_member",
+        "admin"
+      ],
+      "title": "Role",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "An invitation to join the network. Signup is invitation-only (PRD §2). The raw token is\nnever stored — only its hash — and is delivered out of band.",
+  "properties": {
+    "accepted_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Accepted At"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "email": {
+      "format": "email",
+      "title": "Email",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "invited_by_consultant_id": {
+      "format": "uuid",
+      "title": "Invited By Consultant Id",
+      "type": "string"
+    },
+    "role": {
+      "$ref": "#/$defs/Role"
+    },
+    "tier": {
+      "$ref": "#/$defs/ConsultantTier"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "email",
+    "role",
+    "tier",
+    "invited_by_consultant_id",
+    "expires_at"
+  ],
+  "title": "Invitation",
+  "type": "object"
+}

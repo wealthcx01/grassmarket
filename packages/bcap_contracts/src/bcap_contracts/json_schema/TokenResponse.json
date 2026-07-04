@@ -1,0 +1,19 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "access_token": {
+      "title": "Access Token",
+      "type": "string"
+    },
+    "token_type": {
+      "default": "bearer",
+      "title": "Token Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "access_token"
+  ],
+  "title": "TokenResponse",
+  "type": "object"
+}

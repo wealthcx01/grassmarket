@@ -1,0 +1,91 @@
+{
+  "$defs": {
+    "AssessorLevel": {
+      "description": "Certification ladder (Methodology §9). High-stakes ratings require CERTIFIED_LEAD.",
+      "enum": [
+        "trained",
+        "shadow",
+        "observed_lead",
+        "certified_lead"
+      ],
+      "title": "AssessorLevel",
+      "type": "string"
+    },
+    "ConsultantTier": {
+      "description": "Advisory Network tier (PRD §2).",
+      "enum": [
+        "venture_associate",
+        "advisor",
+        "consultant"
+      ],
+      "title": "ConsultantTier",
+      "type": "string"
+    },
+    "Role": {
+      "description": "Coarse RBAC role. Data scoping is by ownership (repository layer), not by role;\nADMIN and COMMITTEE_MEMBER widen *visibility* only where the Methodology requires it.",
+      "enum": [
+        "consultant",
+        "committee_member",
+        "admin"
+      ],
+      "title": "Role",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Decoded access-token claims. `sub` is the consultant id — the principal the repository\nlayer scopes every query to.",
+  "properties": {
+    "assessor_level": {
+      "$ref": "#/$defs/AssessorLevel"
+    },
+    "aud": {
+      "description": "Audience, e.g. bruntsfield.",
+      "title": "Aud",
+      "type": "string"
+    },
+    "email": {
+      "format": "email",
+      "title": "Email",
+      "type": "string"
+    },
+    "exp": {
+      "description": "Expiry (unix seconds).",
+      "title": "Exp",
+      "type": "integer"
+    },
+    "iat": {
+      "description": "Issued-at (unix seconds).",
+      "title": "Iat",
+      "type": "integer"
+    },
+    "iss": {
+      "description": "Issuer, e.g. advisors.bruntsfieldcapital.com.",
+      "title": "Iss",
+      "type": "string"
+    },
+    "role": {
+      "$ref": "#/$defs/Role"
+    },
+    "sub": {
+      "description": "Subject: the consultant id (stringified UUID).",
+      "title": "Sub",
+      "type": "string"
+    },
+    "tier": {
+      "$ref": "#/$defs/ConsultantTier"
+    }
+  },
+  "required": [
+    "sub",
+    "email",
+    "role",
+    "tier",
+    "assessor_level",
+    "iss",
+    "aud",
+    "iat",
+    "exp"
+  ],
+  "title": "JWTClaims",
+  "type": "object"
+}

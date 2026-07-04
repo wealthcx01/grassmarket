@@ -1,0 +1,97 @@
+{
+  "$defs": {
+    "ApprovalStatus": {
+      "enum": [
+        "draft",
+        "pending_approval",
+        "approved",
+        "rejected"
+      ],
+      "title": "ApprovalStatus",
+      "type": "string"
+    },
+    "DeliverableType": {
+      "enum": [
+        "executive_summary",
+        "platform_power_report",
+        "infrastructure_heatmap",
+        "modernisation_roadmap",
+        "technical_appendix",
+        "workshop_output",
+        "score_evolution"
+      ],
+      "title": "DeliverableType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "ai_generated": {
+      "default": false,
+      "title": "Ai Generated",
+      "type": "boolean"
+    },
+    "approval_status": {
+      "$ref": "#/$defs/ApprovalStatus",
+      "default": "draft"
+    },
+    "approved_by_consultant_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Approved By Consultant Id"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "engagement_id": {
+      "format": "uuid",
+      "title": "Engagement Id",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "type": {
+      "$ref": "#/$defs/DeliverableType"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "engagement_id",
+    "type",
+    "title"
+  ],
+  "title": "Deliverable",
+  "type": "object"
+}

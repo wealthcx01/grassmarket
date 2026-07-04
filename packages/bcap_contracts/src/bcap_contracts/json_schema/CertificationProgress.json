@@ -1,0 +1,76 @@
+{
+  "$defs": {
+    "CertificationModule": {
+      "enum": [
+        "bruntsfield_playbook",
+        "atlas_methodology",
+        "workshop_delivery"
+      ],
+      "title": "CertificationModule",
+      "type": "string"
+    },
+    "ModuleProgressStatus": {
+      "enum": [
+        "not_started",
+        "in_progress",
+        "passed"
+      ],
+      "title": "ModuleProgressStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "exam_score": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Exam Score"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "module": {
+      "$ref": "#/$defs/CertificationModule"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/ModuleProgressStatus",
+      "default": "not_started"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "module"
+  ],
+  "title": "CertificationProgress",
+  "type": "object"
+}

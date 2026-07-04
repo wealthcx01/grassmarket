@@ -1,0 +1,57 @@
+# The Seven Powers (Hamilton Helmer) — SETTLED content, fixed by ATLAS Methodology §8.
+# Each power is dual (Benefit + Barrier) and acquirable in a specific Power Progression window.
+# These keys are normative and ratified in Loop 0. Do NOT rename a key without an ADR — every
+# CoefficientSet's w_power validates against exactly this set (ADR-0001).
+#
+# lifecycle_stage encodes Helmer's Power Progression (§8): a claimed power inconsistent with the
+# firm's stage is challenged automatically by the engine (Loop 1).
+
+powers:
+  - key: SCALE_ECONOMIES
+    name: Scale Economies
+    lifecycle_stage: takeoff
+    description: >-
+      Per-unit cost declines as volume grows; incumbents enjoy a cost position a sub-scale
+      challenger cannot match. Barrier: the challenger would have to buy share at a loss.
+
+  - key: NETWORK_ECONOMIES
+    name: Network Economies
+    lifecycle_stage: takeoff
+    description: >-
+      The value of the platform to each user rises as others join; the leader's value compounds.
+      Barrier: a challenger must match the installed base to match the value proposition.
+
+  - key: COUNTER_POSITIONING
+    name: Counter-Positioning
+    lifecycle_stage: origination
+    description: >-
+      A newcomer adopts a superior business model the incumbent cannot mirror without damaging
+      its existing business. Barrier: the incumbent's own economics deter imitation.
+
+  - key: SWITCHING_COSTS
+    name: Switching Costs
+    lifecycle_stage: takeoff
+    description: >-
+      The value a customer forgoes by moving to an alternative. Barrier: rivals must compensate
+      the customer for switching, eroding their own economics.
+
+  - key: BRANDING
+    name: Branding
+    lifecycle_stage: stability
+    description: >-
+      A durable attribution of higher value to an otherwise comparable offering, built over time.
+      Barrier: brand is slow and uncertain to replicate; affective/heuristic and hysteretic.
+
+  - key: CORNERED_RESOURCE
+    name: Cornered Resource
+    lifecycle_stage: origination
+    description: >-
+      Preferential access to a coveted asset (talent, IP, deposit, licence) on attractive terms.
+      Barrier: the resource is, by definition, not available to rivals.
+
+  - key: PROCESS_POWER
+    name: Process Power
+    lifecycle_stage: stability
+    description: >-
+      Embedded company organisation and activity sets that yield superior products/costs and
+      that rivals can only match through an extended commitment. Barrier: hysteresis + opacity.

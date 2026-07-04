@@ -1,0 +1,116 @@
+{
+  "$defs": {
+    "CommissionKind": {
+      "enum": [
+        "engagement",
+        "workshop_recovery_fee",
+        "retainer"
+      ],
+      "title": "CommissionKind",
+      "type": "string"
+    },
+    "Currency": {
+      "enum": [
+        "GBP",
+        "USD",
+        "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "description": "A currency amount that cannot exist without an explicit currency and a reference to the\nassumption register that justifies it (Methodology §10, ADR-0002 compliance test).\n\nA lever NPV or remediation cost is only meaningful under stated assumptions; a `Money`\nwithout an ``assumption_register_ref`` is not constructible.",
+      "properties": {
+        "amount_minor": {
+          "description": "Amount in integer minor units (e.g. pence).",
+          "title": "Amount Minor",
+          "type": "integer"
+        },
+        "assumption_register_ref": {
+          "description": "Reference to the assumption-register entry that justifies this figure. Mandatory: currency claims are never made without stated assumptions (Methodology §10).",
+          "minLength": 1,
+          "title": "Assumption Register Ref",
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        }
+      },
+      "required": [
+        "amount_minor",
+        "currency",
+        "assumption_register_ref"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "PaymentStatus": {
+      "enum": [
+        "pending",
+        "invoiced",
+        "paid"
+      ],
+      "title": "PaymentStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "amount": {
+      "$ref": "#/$defs/Money",
+      "description": "Computed commission amount (currency; assumptions attached)."
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "engagement_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Engagement Id"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "kind": {
+      "$ref": "#/$defs/CommissionKind"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "payment_status": {
+      "$ref": "#/$defs/PaymentStatus",
+      "default": "pending"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "kind",
+    "amount"
+  ],
+  "title": "CommissionLine",
+  "type": "object"
+}

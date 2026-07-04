@@ -1,0 +1,77 @@
+{
+  "$defs": {
+    "StrengthRating": {
+      "description": "Power strength and triad rating — ordinal with falsifiable duration semantics (§8).\n\nReported as a rating, NEVER as a decimal. Establishing this as an enum (not a float) is the\nADR-0002 guarantee that no decimal leaks into a triad figure.",
+      "enum": [
+        "None",
+        "Emerging",
+        "Established",
+        "Wide"
+      ],
+      "title": "StrengthRating",
+      "type": "string"
+    },
+    "TrendDirection": {
+      "enum": [
+        "improving",
+        "stable",
+        "eroding"
+      ],
+      "title": "TrendDirection",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Per-power evidence (Methodology §8): dual Benefit + Barrier, strength, trend, lifecycle.",
+  "properties": {
+    "barrier_evidence": {
+      "title": "Barrier Evidence",
+      "type": "string"
+    },
+    "benefit_evidence": {
+      "title": "Benefit Evidence",
+      "type": "string"
+    },
+    "committee_approved": {
+      "default": false,
+      "title": "Committee Approved",
+      "type": "boolean"
+    },
+    "committee_rationale": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Committee Rationale"
+    },
+    "lifecycle_plausible": {
+      "title": "Lifecycle Plausible",
+      "type": "boolean"
+    },
+    "power_key": {
+      "title": "Power Key",
+      "type": "string"
+    },
+    "strength": {
+      "$ref": "#/$defs/StrengthRating"
+    },
+    "trend": {
+      "$ref": "#/$defs/TrendDirection"
+    }
+  },
+  "required": [
+    "power_key",
+    "benefit_evidence",
+    "barrier_evidence",
+    "strength",
+    "trend",
+    "lifecycle_plausible"
+  ],
+  "title": "PowerAssessment",
+  "type": "object"
+}

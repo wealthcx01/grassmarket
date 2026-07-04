@@ -1,0 +1,90 @@
+{
+  "$defs": {
+    "AssessorLevel": {
+      "description": "Certification ladder (Methodology §9). High-stakes ratings require CERTIFIED_LEAD.",
+      "enum": [
+        "trained",
+        "shadow",
+        "observed_lead",
+        "certified_lead"
+      ],
+      "title": "AssessorLevel",
+      "type": "string"
+    },
+    "ConsultantTier": {
+      "description": "Advisory Network tier (PRD §2).",
+      "enum": [
+        "venture_associate",
+        "advisor",
+        "consultant"
+      ],
+      "title": "ConsultantTier",
+      "type": "string"
+    },
+    "Role": {
+      "description": "Coarse RBAC role. Data scoping is by ownership (repository layer), not by role;\nADMIN and COMMITTEE_MEMBER widen *visibility* only where the Methodology requires it.",
+      "enum": [
+        "consultant",
+        "committee_member",
+        "admin"
+      ],
+      "title": "Role",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Public consultant resource — NO password material.",
+  "properties": {
+    "assessor_level": {
+      "$ref": "#/$defs/AssessorLevel",
+      "default": "trained"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "email": {
+      "format": "email",
+      "title": "Email",
+      "type": "string"
+    },
+    "full_name": {
+      "minLength": 1,
+      "title": "Full Name",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "is_active": {
+      "default": true,
+      "title": "Is Active",
+      "type": "boolean"
+    },
+    "role": {
+      "$ref": "#/$defs/Role",
+      "default": "consultant"
+    },
+    "tier": {
+      "$ref": "#/$defs/ConsultantTier",
+      "default": "venture_associate"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "email",
+    "full_name"
+  ],
+  "title": "Consultant",
+  "type": "object"
+}

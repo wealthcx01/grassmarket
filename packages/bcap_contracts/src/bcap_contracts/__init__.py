@@ -1,0 +1,118 @@
+"""bcap-contracts — shared Bruntsfield Capital contracts (the future Holy Corner API surface).
+
+Import the scale vocabulary, the registry, and the resource models from here. Two invariants
+this package guarantees structurally: ADR-0001 (one scale, one registry; unknown key = refusal)
+and ADR-0002 (score and currency never mix).
+"""
+
+from __future__ import annotations
+
+from bcap_contracts.assessments import (
+    CoefficientSet,
+    PowerAssessment,
+    ScoringRun,
+    SubcomponentRating,
+    TriadResult,
+)
+from bcap_contracts.auth import (
+    AcceptInvitationRequest,
+    Consultant,
+    Invitation,
+    JWTClaims,
+    LoginRequest,
+    TokenResponse,
+)
+from bcap_contracts.commissions import CommissionKind, CommissionLine, PaymentStatus
+from bcap_contracts.common import (
+    AssessorLevel,
+    ConsultantTier,
+    EvidenceGrade,
+    MaturityLevel,
+    NonScoreState,
+    PowerLifecycleStage,
+    Role,
+    Score,
+    StrengthRating,
+    TrendDirection,
+    TriadDimension,
+    UncertaintyRating,
+    UnitInterval,
+    WeightMethod,
+)
+from bcap_contracts.deliverables import ApprovalStatus, Deliverable, DeliverableType
+from bcap_contracts.engagements import Engagement, EngagementStatus, Workshop
+from bcap_contracts.entities import PipelineStage, Prospect
+from bcap_contracts.learning import CertificationProgress, DrillResult
+from bcap_contracts.money import Currency, Money
+from bcap_contracts.provenance import WeightProvenanceRecord
+from bcap_contracts.registry import (
+    EmptyDimensionError,
+    MissingKeyError,
+    ModuleDef,
+    PowerDef,
+    Registry,
+    RegistryError,
+    SubcomponentDef,
+    UnknownKeyError,
+    load_registry,
+)
+
+__all__ = [
+    # scale vocabulary
+    "Score",
+    "UnitInterval",
+    "MaturityLevel",
+    "NonScoreState",
+    "EvidenceGrade",
+    "StrengthRating",
+    "TrendDirection",
+    "TriadDimension",
+    "UncertaintyRating",
+    "PowerLifecycleStage",
+    "WeightMethod",
+    "Role",
+    "ConsultantTier",
+    "AssessorLevel",
+    # money (ADR-0002)
+    "Currency",
+    "Money",
+    # provenance
+    "WeightProvenanceRecord",
+    # registry (ADR-0001)
+    "Registry",
+    "RegistryError",
+    "UnknownKeyError",
+    "MissingKeyError",
+    "EmptyDimensionError",
+    "ModuleDef",
+    "PowerDef",
+    "SubcomponentDef",
+    "load_registry",
+    # assessments
+    "CoefficientSet",
+    "SubcomponentRating",
+    "PowerAssessment",
+    "TriadResult",
+    "ScoringRun",
+    # resources
+    "Prospect",
+    "PipelineStage",
+    "Engagement",
+    "EngagementStatus",
+    "Workshop",
+    "Deliverable",
+    "DeliverableType",
+    "ApprovalStatus",
+    "CommissionLine",
+    "CommissionKind",
+    "PaymentStatus",
+    "CertificationProgress",
+    "DrillResult",
+    # auth
+    "JWTClaims",
+    "Consultant",
+    "Invitation",
+    "LoginRequest",
+    "TokenResponse",
+    "AcceptInvitationRequest",
+]
