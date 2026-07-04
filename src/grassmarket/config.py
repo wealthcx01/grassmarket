@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import functools
 
-from pydantic import AliasChoices, Field, model_validator
+from pydantic import AliasChoices, Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # The exact placeholder shipped in .env.example; production refuses to boot with it (below).
@@ -50,6 +50,17 @@ class Settings(BaseSettings):
     frontend_origin: str = Field(
         default="http://localhost:3000", validation_alias="GM_FRONTEND_ORIGIN"
     )
+
+    @field_validator("database_url", mode="after")
+    @classmethod
+    def _normalise_db_scheme(cls, value: str) -> str:
+        """Managed Postgres providers (Railway, Heroku) inject `postgres://` / `postgresql://`.
+        We use psycopg 3, which SQLAlchemy only selects for the `postgresql+psycopg://` scheme —
+        so rewrite the bare schemes rather than fail loud on a URL that is otherwise correct."""
+        for prefix in ("postgresql://", "postgres://"):
+            if value.startswith(prefix):
+                return "postgresql+psycopg://" + value[len(prefix) :]
+        return value
 
     @property
     def is_production(self) -> bool:
