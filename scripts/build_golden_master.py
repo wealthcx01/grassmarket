@@ -46,10 +46,15 @@ EVIDENCE_RANK = {"E1": 1, "E2": 2, "E3": 3, "E4": 4}
 NOT_APPLICABLE = "NOT_APPLICABLE"
 NOT_ASSESSED = "NOT_ASSESSED"
 
-# DRAFT: numeric encoding of the ordinal power strength for the continuous P index (§5.4 uses
-# strength_j numerically but leaves the encoding to implementation). Flagged for ratification —
-# likely an ADR. The triad ratings themselves stay ordinal (ADR-0002); this feeds only P.
+# Numeric encoding of the ordinal power strength for the continuous P index (ADR-0004). The triad
+# ratings themselves stay ordinal (ADR-0002); this feeds only P.
 STRENGTH_VALUE = {"None": 0.0, "Emerging": 0.4, "Established": 0.7, "Wide": 1.0}
+STRENGTH_RANK = {"None": 0, "Emerging": 1, "Established": 2, "Wide": 3}
+# numeric-aggregate → ordinal band thresholds for the derived triad ratings (ADR-0007, draft).
+_TRIAD_THRESHOLDS = (("Wide", 0.85), ("Established", 0.55), ("Emerging", 0.2), ("None", 0.0))
+
+# Draft group weights for the B index (ADR-0006): scale metrics count as ONE group, not ~4× (B1).
+GROUP_WEIGHTS = {"scale": 1.0, "unit_economics": 1.0, "momentum": 1.0}
 
 # --- DRAFT coefficients (uniform; pending elicitation) ----------------------------------
 ALPHA_MODULE = 0.7  # per-module blend α (uniform draft)
@@ -125,8 +130,9 @@ SUBCOMPONENTS: dict[str, tuple[str, str | None]] = {
     "SETTLEMENT_CLEARING": ("Advanced", "E3"),
 }
 
-# Business metric raw values (in each metric's declared unit).
-METRIC_RAW: dict[str, float] = {
+# Business metric raw values (declared unit), OR a non-score state string (NOT_APPLICABLE /
+# NOT_ASSESSED) — metrics now support §3.2 states with renormalisation (review B4).
+METRIC_RAW: dict[str, float | str] = {
     "AUA": 1_800_000_000,
     "ACTIVE_CLIENTS": 180_000,
     "NET_REVENUE": 85_000_000,
@@ -135,19 +141,23 @@ METRIC_RAW: dict[str, float] = {
     "COST_TO_SERVE": 140,
     "NET_REVENUE_RETENTION": 104,
     "CLIENT_GROWTH_RATE": 14,
-    "TAKE_RATE_DURABILITY": 22,
+    "TAKE_RATE_LEVEL": 22,  # renamed from TAKE_RATE_DURABILITY (review B3)
     "CAC_PAYBACK_MONTHS": 18,
 }
 
-# Power strengths (ordinal).
-POWER_STRENGTH: dict[str, str] = {
-    "SCALE_ECONOMIES": "Emerging",
-    "NETWORK_ECONOMIES": "None",
-    "COUNTER_POSITIONING": "None",
-    "SWITCHING_COSTS": "Established",
-    "BRANDING": "Emerging",
-    "CORNERED_RESOURCE": "None",
-    "PROCESS_POWER": "Emerging",
+# Powers now carry a BENEFIT strength and a BARRIER strength (Helmer: a power needs both; review
+# B8) — or the whole power is NOT_APPLICABLE (structurally irrelevant to this business; review B4).
+# Per-power strength = the weaker of Benefit/Barrier; the triad (§2) is derived from the two sides.
+# Meridian: Network Economies and Counter-Positioning are marked N/A — a mid-tier retail brokerage
+# is not a marketplace/network business and is not counter-positioning an incumbent. (John's call.)
+POWER_ASSESSMENT: dict[str, tuple[str, str] | str] = {
+    "SCALE_ECONOMIES": ("Emerging", "Emerging"),
+    "NETWORK_ECONOMIES": NOT_APPLICABLE,
+    "COUNTER_POSITIONING": NOT_APPLICABLE,
+    "SWITCHING_COSTS": ("Established", "Established"),
+    "BRANDING": ("Emerging", "Emerging"),
+    "CORNERED_RESOURCE": ("None", "None"),
+    "PROCESS_POWER": ("Emerging", "Emerging"),
 }
 
 
@@ -236,6 +246,40 @@ def _rating_gate(
     return (_RANK_BAND[band_rank], blocked, note)
 
 
+def _to_ordinal(value: float) -> str:
+    """Map a numeric aggregate in [0,1] to an ordinal triad rating (ADR-0007, draft thresholds)."""
+    for label, threshold in _TRIAD_THRESHOLDS:
+        if value >= threshold:
+            return label
+    return "None"  # pragma: no cover — thresholds include 0.0
+
+
+def _compute_triad(
+    power_rows: list[dict[str, Any]], group_means: dict[str, float]
+) -> dict[str, Any]:
+    """Derive the Platform Power triad (Methodology §2) from the split Benefit/Barrier power data.
+
+    Ordinal OUT (ADR-0002): each dimension reports a `rating`; the numeric `score` is shown only for
+    audit. Economic = B's scale + unit-economics signal; Perceived = Benefit-side of Branding +
+    Switching Costs; Defence = the Barrier-side aggregate across applicable powers (the moat)."""
+    applicable = [p for p in power_rows if p.get("state") is None]
+    barriers = [STRENGTH_VALUE[p["barrier"]] for p in applicable]
+    defence = sum(barriers) / len(barriers)
+    perceived_src = [p for p in applicable if p["key"] in ("BRANDING", "SWITCHING_COSTS")]
+    perceived = (
+        sum(STRENGTH_VALUE[p["benefit"]] for p in perceived_src) / len(perceived_src)
+        if perceived_src
+        else 0.0
+    )
+    econ_src = [group_means[g] for g in ("scale", "unit_economics") if g in group_means]
+    economic = sum(econ_src) / len(econ_src) if econ_src else 0.0
+    return {
+        "economic_value": {"rating": _to_ordinal(economic), "score": _round(economic)},
+        "perceived_value": {"rating": _to_ordinal(perceived), "score": _round(perceived)},
+        "defence_value": {"rating": _to_ordinal(defence), "score": _round(defence)},
+    }
+
+
 def compute(registry: Registry) -> dict[str, Any]:
     """Compute the whole assessment. Fail-loud on any input/registry mismatch."""
     _assert_inputs_cover_registry(registry)
@@ -319,30 +363,62 @@ def compute(registry: Registry) -> dict[str, Any]:
     l_min = min(crit_q)
     L = ALPHA_L * l_weighted + (1 - ALPHA_L) * l_min
 
-    # B = Σ w·n_k(raw)/Σw. w uniform = 1.0.
+    # B = group-weighted mean (ADR-0006). Each metric's n_k feeds its group's mean; groups are
+    # then combined with GROUP_WEIGHTS so collinear scale metrics count once (review B1). Metrics
+    # in a NOT_APPLICABLE / NOT_ASSESSED state are excluded and their group renormalises (B4).
     metric_rows: list[dict[str, Any]] = []
+    group_ns: dict[str, list[float]] = {}
     for metric in registry.metrics:
         raw = METRIC_RAW[metric.key]
-        n_k = _interpolate(metric, raw)
+        state = raw if isinstance(raw, str) else None
+        n_k = None if state else _interpolate(metric, float(raw))
         metric_rows.append(
             {
                 "key": metric.key,
-                "raw": raw,
+                "raw": None if state else raw,
                 "unit": metric.unit,
                 "direction": metric.direction,
-                "n_k": _round(n_k),
+                "group": metric.group,
+                "state": state,
+                "n_k": _round(n_k) if n_k is not None else None,
             }
         )
-    B = sum(r["n_k"] for r in metric_rows) / len(metric_rows)
+        if n_k is not None:
+            group_ns.setdefault(metric.group or "ungrouped", []).append(n_k)
+    group_means = {g: sum(v) / len(v) for g, v in group_ns.items()}
+    b_num = sum(GROUP_WEIGHTS[g] * mean for g, mean in group_means.items())
+    b_den = sum(GROUP_WEIGHTS[g] for g in group_means)
+    B = b_num / b_den
 
-    # P = Σ w·strength_j/Σw. w uniform = 1.0.
+    # P = mean over APPLICABLE powers of each power's strength, where a power's strength is the
+    # WEAKER of its Benefit and Barrier (Helmer: a power needs both; review B8). NOT_APPLICABLE
+    # powers are dropped and P renormalises (review B4).
     power_rows: list[dict[str, Any]] = []
+    applicable_values: list[float] = []
     for power in registry.powers:
-        strength = POWER_STRENGTH[power.key]
+        assessment = POWER_ASSESSMENT[power.key]
+        if assessment == NOT_APPLICABLE:
+            power_rows.append({"key": power.key, "state": NOT_APPLICABLE})
+            continue
+        benefit, barrier = assessment
+        strength = benefit if STRENGTH_RANK[benefit] <= STRENGTH_RANK[barrier] else barrier
+        value = STRENGTH_VALUE[strength]
+        applicable_values.append(value)
         power_rows.append(
-            {"key": power.key, "strength": strength, "value": STRENGTH_VALUE[strength]}
+            {
+                "key": power.key,
+                "benefit": benefit,
+                "barrier": barrier,
+                "strength": strength,  # the weaker side (Helmer both-required)
+                "value": value,
+                "state": None,
+            }
         )
-    P = sum(r["value"] for r in power_rows) / len(power_rows)
+    if not applicable_values:
+        raise ValueError("Cannot compute P: no power is applicable.")
+    P = sum(applicable_values) / len(applicable_values)
+
+    triad = _compute_triad(power_rows, group_means)
 
     V = THETA["B"] * B + THETA["P"] * P + THETA["L"] * L
 
@@ -370,14 +446,21 @@ def compute(registry: Registry) -> dict[str, Any]:
             "critical_modules_for_l": list(CRITICAL_MODULES_FOR_L),
             "lambda": "uniform 1.0 per subcomponent (draft)",
             "delta": "uniform 1.0 per module (draft)",
-            "w_metric": "uniform 1.0 (draft)",
-            "w_power": "uniform 1.0 (draft)",
+            "w_metric": "uniform within group (draft)",
+            "group_weights": GROUP_WEIGHTS,
+            "w_power": "uniform 1.0 over applicable powers (draft)",
             "strength_encoding": STRENGTH_VALUE,
+            "triad_thresholds": {label: t for label, t in _TRIAD_THRESHOLDS},
         },
         "modules": modules_out,
         "L": {"weighted_term": _round(l_weighted), "min_term": _round(l_min), "value": _round(L)},
-        "business": {"metrics": metric_rows, "B": _round(B)},
+        "business": {
+            "metrics": metric_rows,
+            "group_means": {g: _round(m) for g, m in group_means.items()},
+            "B": _round(B),
+        },
         "powers": {"powers": power_rows, "P": _round(P)},
+        "triad": triad,
         "composite": {"B": _round(B), "P": _round(P), "L": _round(L), "V": _round(V)},
         "two_track": {
             # Display is derived from the STORED (rounded) V so the 0–100 figure equals V×100
@@ -397,8 +480,12 @@ def _assert_inputs_cover_registry(registry: Registry) -> None:
             f"Missing: {sorted(reg_subs - given_subs)}; extra: {sorted(given_subs - reg_subs)}"
         )
     if registry.metric_keys() != set(METRIC_RAW):
-        raise ValueError("Metric inputs must cover the registry exactly.")
-    if registry.power_keys() != set(POWER_STRENGTH):
+        raise ValueError(
+            f"Metric inputs must cover the registry exactly. "
+            f"Missing: {sorted(registry.metric_keys() - set(METRIC_RAW))}; "
+            f"extra: {sorted(set(METRIC_RAW) - registry.metric_keys())}"
+        )
+    if registry.power_keys() != set(POWER_ASSESSMENT):
         raise ValueError("Power inputs must cover the registry exactly.")
 
 
@@ -497,13 +584,14 @@ def write_workbook(registry: Registry, result: dict[str, Any], path: Path) -> No
         mr += 1
     _autofit(ws_mod, {1: 16, 6: 12})
 
-    # --- Business (B live from piecewise n_k) ---
+    # --- Business (B = group-weighted mean; n_k live piecewise; metric states supported) ---
     ws_b = wb.create_sheet("Business")
     _header(
         ws_b,
         1,
         [
             "Metric",
+            "Group",
             "Raw",
             "Unit",
             "Direction",
@@ -526,56 +614,91 @@ def write_workbook(registry: Registry, result: dict[str, Any], path: Path) -> No
                 f"Workbook piecewise formula expects 4 anchors; {metric.key} has {len(anchors)}."
             )
         ws_b.cell(row=br, column=1, value=metric.key)
-        ws_b.cell(row=br, column=2, value=METRIC_RAW[metric.key])
-        ws_b.cell(row=br, column=3, value=metric.unit)
-        ws_b.cell(row=br, column=4, value=metric.direction)
+        ws_b.cell(row=br, column=2, value=metric.group)
+        ws_b.cell(row=br, column=3, value=METRIC_RAW[metric.key])  # number or state string
+        ws_b.cell(row=br, column=4, value=metric.unit)
+        ws_b.cell(row=br, column=5, value=metric.direction)
         for i, a in enumerate(anchors):
-            ws_b.cell(row=br, column=5 + i, value=a.raw)
-            ws_b.cell(row=br, column=9 + i, value=a.normalised)
+            ws_b.cell(row=br, column=6 + i, value=a.raw)  # x1..x4 → F..I
+            ws_b.cell(row=br, column=10 + i, value=a.normalised)  # y1..y4 → J..M
+        # n_k (col N): blank when Raw is a non-numeric state; else piecewise-linear, clamped.
         ws_b.cell(
             row=br,
-            column=13,
+            column=14,
             value=(
-                f"=IF($B{br}<=$E{br},$I{br},IF($B{br}>=$H{br},$L{br},"
-                f"IF($B{br}<=$F{br},$I{br}+($B{br}-$E{br})/($F{br}-$E{br})*($J{br}-$I{br}),"
-                f"IF($B{br}<=$G{br},$J{br}+($B{br}-$F{br})/($G{br}-$F{br})*($K{br}-$J{br}),"
-                f"$K{br}+($B{br}-$G{br})/($H{br}-$G{br})*($L{br}-$K{br}))))))"
+                f'=IF(NOT(ISNUMBER($C{br})),"",'
+                f"IF($C{br}<=$F{br},$J{br},IF($C{br}>=$I{br},$M{br},"
+                f"IF($C{br}<=$G{br},$J{br}+($C{br}-$F{br})/($G{br}-$F{br})*($K{br}-$J{br}),"
+                f"IF($C{br}<=$H{br},$K{br}+($C{br}-$G{br})/($H{br}-$G{br})*($L{br}-$K{br}),"
+                f"$L{br}+($C{br}-$H{br})/($I{br}-$H{br})*($M{br}-$L{br}))))))"
             ),
         )
         br += 1
-    b_cell = f"Business!$M${br}"
-    ws_b.cell(row=br, column=12, value="B =")
-    ws_b.cell(row=br, column=13, value=f"=AVERAGE($M$2:$M${br - 1})").font = Font(bold=True)
-    _autofit(ws_b, {1: 22})
+    last_metric = br - 1
+    ws_b.cell(row=br, column=13, value="Group means (group-weighted B, ADR-0006):")
+    gm_cells = []
+    for gi, group in enumerate(("scale", "unit_economics", "momentum")):
+        gr = br + 1 + gi
+        ws_b.cell(row=gr, column=13, value=group)
+        ws_b.cell(
+            row=gr,
+            column=14,
+            value=f'=AVERAGEIF($B$2:$B${last_metric},"{group}",$N$2:$N${last_metric})',
+        )
+        gm_cells.append(f"$N${gr}")
+    b_row = br + 4
+    ws_b.cell(row=b_row, column=13, value="B =")
+    ws_b.cell(row=b_row, column=14, value=f"=AVERAGE({','.join(gm_cells)})").font = Font(bold=True)
+    b_cell = f"Business!$N${b_row}"
+    _autofit(ws_b, {1: 24, 2: 15})
 
-    # --- Powers (P live from strength encoding) ---
+    # --- Powers (Benefit/Barrier; strength = the weaker; N/A dropped; P = mean over applicable) ---
     ws_p = wb.create_sheet("Powers")
-    _header(ws_p, 1, ["Power", "Strength", "Value"])
+    _header(ws_p, 1, ["Power", "Benefit", "Barrier", "Strength (weaker)", "Value", "State"])
+
+    def _rank(col: str, row: int) -> str:
+        c = f"${col}{row}"
+        return f'IF({c}="None",0,IF({c}="Emerging",1,IF({c}="Established",2,3)))'
+
     pr = 2
     for power in registry.powers:
+        assessment = POWER_ASSESSMENT[power.key]
         ws_p.cell(row=pr, column=1, value=power.key)
-        ws_p.cell(row=pr, column=2, value=POWER_STRENGTH[power.key])
-        ws_p.cell(
-            row=pr,
-            column=3,
-            value=(
-                f'=IF($B{pr}="None",0,IF($B{pr}="Emerging",0.4,'
-                f'IF($B{pr}="Established",0.7,IF($B{pr}="Wide",1,""))))'
-            ),
-        )
+        if assessment == NOT_APPLICABLE:
+            ws_p.cell(row=pr, column=6, value="NOT_APPLICABLE")
+        else:
+            benefit, barrier = assessment
+            ws_p.cell(row=pr, column=2, value=benefit)
+            ws_p.cell(row=pr, column=3, value=barrier)
+            # Strength = the weaker of Benefit/Barrier (Helmer both-required), live.
+            ws_p.cell(
+                row=pr,
+                column=4,
+                value=f"=IF(({_rank('B', pr)})<=({_rank('C', pr)}),$B{pr},$C{pr})",
+            )
+            ws_p.cell(
+                row=pr,
+                column=5,
+                value=(
+                    f'=IF($D{pr}="","",IF($D{pr}="None",0,IF($D{pr}="Emerging",0.4,'
+                    f'IF($D{pr}="Established",0.7,IF($D{pr}="Wide",1,"")))))'
+                ),
+            )
         pr += 1
-    p_cell = f"Powers!$C${pr}"
-    ws_p.cell(row=pr, column=2, value="P =")
-    ws_p.cell(row=pr, column=3, value=f"=AVERAGE($C$2:$C${pr - 1})").font = Font(bold=True)
-    _autofit(ws_p, {1: 22})
+    last_power = pr - 1
+    ws_p.cell(row=pr, column=4, value="P =")
+    ws_p.cell(row=pr, column=5, value=f"=AVERAGE($E$2:$E${last_power})").font = Font(bold=True)
+    p_cell = f"Powers!$E${pr}"
+    _autofit(ws_p, {1: 22, 4: 18})
 
-    # --- Composite (L, V live) ---
+    # --- Composite (L, V live; triad ordinal) ---
     ws_v = wb.create_sheet("Composite")
     ws_v.cell(
         row=1, column=1, value="ATLAS Composite — V = θ_B·B + θ_P·P + θ_L·L"
     ).font = _TITLE_FONT
     qm_all = ",".join(module_qm_cell[m.key] for m in registry.modules)
     qm_crit = ",".join(module_qm_cell[k] for k in CRITICAL_MODULES_FOR_L)
+    triad = result["triad"]
     rows = [
         ("alpha_L", ALPHA_L, None),
         ("L weighted term (mean q_m)", None, f"=AVERAGE({qm_all})"),
@@ -588,13 +711,16 @@ def write_workbook(registry: Registry, result: dict[str, Any], path: Path) -> No
         ("theta_L", THETA["L"], None),
         ("V", None, "=$B9*$C7+$B10*$C8+$B11*$C6"),
         ("V (display 0–100)", None, "=$C12*100"),
+        ("", None, None),
+        ("— Platform Power Triad (ordinal, ADR-0007) —", None, None),
+        ("Economic Value", None, triad["economic_value"]["rating"]),
+        ("Perceived Value", None, triad["perceived_value"]["rating"]),
+        ("Defence Value", None, triad["defence_value"]["rating"]),
     ]
-    ws_v.cell(row=2, column=1, value="Item").font = _HEADER_FONT
-    ws_v.cell(row=2, column=1).fill = _HEADER_FILL
-    ws_v.cell(row=2, column=2, value="Coefficient").font = _HEADER_FONT
-    ws_v.cell(row=2, column=2).fill = _HEADER_FILL
-    ws_v.cell(row=2, column=3, value="Value").font = _HEADER_FONT
-    ws_v.cell(row=2, column=3).fill = _HEADER_FILL
+    for col, text in ((1, "Item"), (2, "Coefficient"), (3, "Value")):
+        cell = ws_v.cell(row=2, column=col, value=text)
+        cell.font = _HEADER_FONT
+        cell.fill = _HEADER_FILL
     for i, (label, coeff, formula) in enumerate(rows, start=3):
         ws_v.cell(row=i, column=1, value=label)
         if coeff is not None:
@@ -603,33 +729,38 @@ def write_workbook(registry: Registry, result: dict[str, Any], path: Path) -> No
             ws_v.cell(row=i, column=3, value=formula)
     ws_v.cell(row=12, column=1).font = Font(bold=True)
     ws_v.cell(row=12, column=3).font = Font(bold=True)
-    _autofit(ws_v, {1: 30, 2: 14, 3: 14})
+    _autofit(ws_v, {1: 34, 2: 14, 3: 14})
 
     # --- Overview (read me) ---
     ws_o = wb.create_sheet("Overview", 0)
     ws_o.cell(row=1, column=1, value="ATLAS Golden Master — Meridian Securities").font = _TITLE_FONT
+    c = result["composite"]
+    t = result["triad"]
     lines = [
         f"Subject: {SUBJECT}",
         f"Methodology: v{METHODOLOGY_VERSION}  |  Status: {FIXTURE_STATUS}",
         "",
         "This workbook computes one complete assessment with LIVE formulas. Edit a Level on the",
-        "Subcomponents sheet (Basic/Developing/Advanced/Frontier, or blank + a State of",
-        "NOT_APPLICABLE / NOT_ASSESSED) and q_m, L, B, P and V recompute. Rating-gate bands are",
-        "rule-based (non-arithmetic, Methodology §5.2) and shown as computed values on Modules.",
+        "Subcomponents sheet (or set a State: NOT_APPLICABLE / NOT_ASSESSED) and q_m, L, B, P, V",
+        "recompute. B is a group-weighted mean (scale/unit-econ/momentum, ADR-0006); powers carry",
+        "Benefit + Barrier and the weaker gates (Helmer); N/A powers drop from P. Gate bands",
+        "and the triad are rule-based/derived (computed values, regenerated by Python).",
         "",
-        "DRAFT judgement calls for John to ratify: the subcomponent levels/evidence; the critical",
-        "flags; the uniform draft coefficients (α, δ, λ, θ, weights); the power-strength encoding",
-        "(None=0, Emerging=0.4, Established=0.7, Wide=1.0); and the rating-gate rule. After an",
-        "edit, save, then run scripts/regen_golden_master_json.py to refresh the JSON fixture.",
+        "DRAFT judgement calls for John (GRS-0003 review): subcomponent levels/evidence; critical",
+        "flags; the N/A powers (Network Economies, Counter-Positioning); the draft coefficients",
+        "(α, δ, λ, θ, group weights); the strength encoding (ADR-0004); the gate rule (ADR-0003);",
+        "B/P range comparability (ADR-0005). Edit, save, then run",
+        "scripts/regen_golden_master_json.py to refresh the JSON fixture.",
         "",
-        f"Computed headline: B={result['composite']['B']}  P={result['composite']['P']}  "
-        f"L={result['composite']['L']}  →  V={result['composite']['V']} "
+        f"Headline: B={c['B']}  P={c['P']}  L={c['L']}  →  V={c['V']} "
         f"(display {result['two_track']['continuous']['V_display_0_100']}).",
+        f"Triad: Economic {t['economic_value']['rating']}  ·  Perceived "
+        f"{t['perceived_value']['rating']}  ·  Defence {t['defence_value']['rating']}.",
     ]
     for i, text in enumerate(lines, start=3):
-        c = ws_o.cell(row=i, column=1, value=text)
+        cell = ws_o.cell(row=i, column=1, value=text)
         if text.startswith(("DRAFT", "This workbook")):
-            c.font = _NOTE_FONT
+            cell.font = _NOTE_FONT
     ws_o.column_dimensions["A"].width = 100
 
     path.parent.mkdir(parents=True, exist_ok=True)

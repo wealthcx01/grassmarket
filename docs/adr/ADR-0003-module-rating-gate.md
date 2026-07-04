@@ -57,10 +57,14 @@ grade raises (no `E1` default — review A6).
   are Advanced/E3+). "Basic" is now a reachable band (fixes A2).
 - **Cost:** this is stricter than the literal §5.2 text. On acceptance it becomes Methodology
   v1.1 §5.2a.
-- **Open question for ratification:** is the floor rule too strict? "Any single Basic caps the
-  band at Developing" is defensible (bottleneck) but means one weak non-critical item can hold a
-  broadly-Advanced module at Developing. Alternative: only *critical* Basics, or ≥2 Basics, cap
-  the band. **John to decide before the golden master is frozen** — every engine test pins to it.
+- **Resolved (2026-07-04, John delegated the recommendation):** keep the **strict floor** — any
+  single Basic subcomponent caps the band at Developing. Rationale: ATLAS is bottleneck-driven
+  throughout (the `min` term in q_m and the critical-module `min` in L), so a headline that let a
+  module average past a Basic part would contradict the method and drift from q_m (FRONTEND's
+  q_m = 0.445 → "Developing" is honest; "Advanced" would mislead). Criticals still gate hardest —
+  a critical Basic also caps and a critical Not-Assessed blocks. The alternatives considered
+  (only-critical-Basics cap; ≥2-Basics cap) are recorded here should a future engagement warrant
+  a softer headline; changing this is a new ADR.
 
 ## Compliance
 

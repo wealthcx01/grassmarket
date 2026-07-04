@@ -9,6 +9,9 @@ Accepted — a change is a new ADR that supersedes the old one (never a silent e
 | [ADR-0002](ADR-0002-value-layer-two-track-scoring-and-value-bridge.md) | The value layer: two-track scoring and the three-layer value bridge | Accepted |
 | [ADR-0003](ADR-0003-module-rating-gate.md) | The module rating gate (operationalising §5.2) | Proposed |
 | [ADR-0004](ADR-0004-power-strength-encoding.md) | Numeric encoding of ordinal power strength for the P index | Proposed |
+| [ADR-0005](ADR-0005-index-range-comparability.md) | Comparability of the B / P / L index ranges at composition | Proposed |
+| [ADR-0006](ADR-0006-business-metric-grouping.md) | Group-weighted Business index (B) | Proposed |
+| [ADR-0007](ADR-0007-powers-benefit-barrier-triad.md) | Powers carry Benefit + Barrier; the triad is derived; N/A powers | Proposed |
 
 Both derive from `docs/ATLAS-Methodology-v1.md`, which is normative for the scoring engine.
 Where an ADR and the Methodology disagree, the Methodology wins and the ADR is a defect.

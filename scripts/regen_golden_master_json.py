@@ -20,7 +20,11 @@ _ROOT = Path(__file__).resolve().parents[1]
 _XLSX = _ROOT / "fixtures" / "golden-master.xlsx"
 
 
-def _read_inputs() -> tuple[dict[str, tuple[str, str | None]], dict[str, float], dict[str, str]]:
+def _read_inputs() -> (
+    tuple[
+        dict[str, tuple[str, str | None]], dict[str, float | str], dict[str, tuple[str, str] | str]
+    ]
+):
     wb = openpyxl.load_workbook(_XLSX, data_only=False)
 
     subs: dict[str, tuple[str, str | None]] = {}
@@ -34,21 +38,28 @@ def _read_inputs() -> tuple[dict[str, tuple[str, str | None]], dict[str, float],
         state = (ws.cell(row, 7).value or "").strip()
         subs[key] = (state, None) if state else (level, evidence)
 
-    metrics: dict[str, float] = {}
+    metrics: dict[str, float | str] = {}
     wb_b = wb["Business"]
     for row in range(2, wb_b.max_row + 1):
         key = wb_b.cell(row, 1).value
-        raw = wb_b.cell(row, 2).value
-        if key and isinstance(raw, int | float):
-            metrics[key] = float(raw)
+        raw = wb_b.cell(row, 3).value  # Raw is column C (Group is column B)
+        if not key:
+            continue
+        metrics[key] = float(raw) if isinstance(raw, int | float) else str(raw).strip()
 
-    powers: dict[str, str] = {}
+    powers: dict[str, tuple[str, str] | str] = {}
     wb_p = wb["Powers"]
     for row in range(2, wb_p.max_row + 1):
         key = wb_p.cell(row, 1).value
-        strength = wb_p.cell(row, 2).value
-        if key and strength:
-            powers[key] = str(strength).strip()
+        if not key:
+            continue
+        state = (wb_p.cell(row, 6).value or "").strip()
+        if state:
+            powers[key] = state
+        else:
+            benefit = (wb_p.cell(row, 2).value or "").strip()
+            barrier = (wb_p.cell(row, 3).value or "").strip()
+            powers[key] = (benefit, barrier)
     return subs, metrics, powers
 
 
@@ -57,7 +68,7 @@ def main() -> None:
     # Inject the workbook-read inputs into the reference generator, then recompute + rewrite JSON.
     bgm.SUBCOMPONENTS = subs
     bgm.METRIC_RAW = metrics
-    bgm.POWER_STRENGTH = powers
+    bgm.POWER_ASSESSMENT = powers
     result = bgm.compute(bgm.load_registry())
     bgm.write_json(result)
     c = result["composite"]

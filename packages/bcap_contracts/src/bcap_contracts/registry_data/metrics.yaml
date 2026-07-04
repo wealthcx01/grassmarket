@@ -1,20 +1,26 @@
 # The business-metric register (the B index, Methodology §5.3).
 #
-# STATUS: draft-pending-ratification (GRS-0002). Each metric declares a unit (captured, never
-# inferred — retiring defect D5's unit-sensitive heuristic), a direction, and a piecewise-linear
-# normalisation n_k mapping raw → [0,1]. The ANCHOR VALUES here are DOCUMENTED PLACEHOLDERS for a
-# mid-tier retail brokerage, pending Stage-1 expert judgement; from Stage 2 (≥10 engagements) the
-# method becomes percentile-vs-benchmark-population (§11). Anchors are ordered by ascending raw;
-# `direction` records intent (normalised ascends for higher_is_better, descends for lower).
-# This register is a DRAFT for John's ratification — see docs/tickets/GRS-0002-registry-content.md.
+# STATUS: draft-pending-ratification (GRS-0002, revised GRS-0003). Each metric declares a unit, a
+# direction, a piecewise-linear normalisation n_k mapping raw → [0,1], and a GROUP. B is a
+# GROUP-WEIGHTED mean (ADR-0006): the within-group mean of each group, then a weighted mean across
+# groups — so the collinear scale metrics (AUA ≈ clients ≈ revenue) count once as a group rather
+# than ~4× of 10 (review B1). Group weights are uniform draft (1/3 each) pending elicitation.
+#
+# Groups: scale | unit_economics | momentum. ANCHOR VALUES are documented placeholders for a
+# mid-tier retail brokerage pending Stage-1 judgement (percentile-vs-benchmark from Stage 2, §11).
+# Anchors ascend by raw; direction records intent. A DRAFT for John — see GRS-0003 ticket.
 
 status: draft-pending-ratification
+
+# Group MEMBERSHIP (below, per metric) is registry structure. Group WEIGHTS are draft coefficients
+# and live with the other coefficients (uniform 1/3 each pending elicitation) — not in the registry.
 
 metrics:
   - key: AUA
     name: Assets Under Administration
     unit: GBP
     direction: higher_is_better
+    group: scale
     status: draft-pending-ratification
     normalisation:
       method: piecewise_linear
@@ -29,6 +35,7 @@ metrics:
     name: Active Clients
     unit: count
     direction: higher_is_better
+    group: scale
     status: draft-pending-ratification
     normalisation:
       method: piecewise_linear
@@ -43,6 +50,7 @@ metrics:
     name: Net Revenue (TTM)
     unit: GBP
     direction: higher_is_better
+    group: scale
     status: draft-pending-ratification
     normalisation:
       method: piecewise_linear
@@ -57,6 +65,7 @@ metrics:
     name: Revenue per Active Client (ARPU)
     unit: GBP_per_year
     direction: higher_is_better
+    group: unit_economics
     status: draft-pending-ratification
     normalisation:
       method: piecewise_linear
@@ -71,6 +80,7 @@ metrics:
     name: Gross Margin
     unit: percent
     direction: higher_is_better
+    group: unit_economics
     status: draft-pending-ratification
     normalisation:
       method: piecewise_linear
@@ -85,6 +95,7 @@ metrics:
     name: Cost to Serve per Client
     unit: GBP_per_year
     direction: lower_is_better
+    group: unit_economics
     status: draft-pending-ratification
     normalisation:
       method: piecewise_linear
@@ -95,10 +106,30 @@ metrics:
         - {raw: 200, normalised: 0.5}
         - {raw: 400, normalised: 0.2}
 
+  - key: TAKE_RATE_LEVEL
+    name: Take Rate (level)
+    unit: bps
+    direction: higher_is_better
+    group: unit_economics
+    status: draft-pending-ratification
+    normalisation:
+      method: piecewise_linear
+      note: >-
+        Renamed from TAKE_RATE_DURABILITY (review B3): this measures take-rate LEVEL, not
+        durability. NB a high take rate can signal fee-compression RISK — the panel should decide
+        whether to keep level here or replace with a durability measure (3-yr take-rate trend, or
+        % of revenue from at-risk lines).
+      anchors:
+        - {raw: 5, normalised: 0.2}
+        - {raw: 15, normalised: 0.5}
+        - {raw: 30, normalised: 0.8}
+        - {raw: 60, normalised: 1.0}
+
   - key: NET_REVENUE_RETENTION
     name: Net Revenue Retention
     unit: percent
     direction: higher_is_better
+    group: momentum
     status: draft-pending-ratification
     normalisation:
       method: piecewise_linear
@@ -113,6 +144,7 @@ metrics:
     name: YoY Active-Client Growth
     unit: percent
     direction: higher_is_better
+    group: momentum
     status: draft-pending-ratification
     normalisation:
       method: piecewise_linear
@@ -123,24 +155,11 @@ metrics:
         - {raw: 25, normalised: 0.8}
         - {raw: 50, normalised: 1.0}
 
-  - key: TAKE_RATE_DURABILITY
-    name: Take Rate
-    unit: bps
-    direction: higher_is_better
-    status: draft-pending-ratification
-    normalisation:
-      method: piecewise_linear
-      note: Placeholder anchors; feeds the Economic Value triad (take-rate durability, §2).
-      anchors:
-        - {raw: 5, normalised: 0.2}
-        - {raw: 15, normalised: 0.5}
-        - {raw: 30, normalised: 0.8}
-        - {raw: 60, normalised: 1.0}
-
   - key: CAC_PAYBACK_MONTHS
     name: CAC Payback Period
     unit: months
     direction: lower_is_better
+    group: momentum
     status: draft-pending-ratification
     normalisation:
       method: piecewise_linear

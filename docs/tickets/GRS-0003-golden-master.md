@@ -26,12 +26,28 @@ and the JSON the engine tests against.
   consistent (q_m = blend+min; N/A & Not-Assessed excluded; L, B, P, V recompose; no Frontier over
   a Basic part; display = V×100).
 
-## Computed headline (Meridian Securities)
+## Revision (GRS-0003 review — "Suggested Changes", 4 Jul 2026)
+
+Acted on the review before ratification. **Defects fixed** (numerically neutral): A1 (D9
+regression — unassessed modules no longer zero-fill L), A2 (gate can now reach Basic), A6 (removed
+the banned `ev or "E1"` evidence default), A7 (display convention recorded). **Content revised**
+(changes B/P/V/triad): B1 (group-weighted B — scale metrics no longer count ~4×), B3 (renamed
+`TAKE_RATE_DURABILITY` → `TAKE_RATE_LEVEL`), B4 (metrics and powers now support N/A / Not-Assessed
+with renormalisation), B8 (powers carry **Benefit + Barrier**, the weaker gates, and the **triad is
+now derived** — Economic/Perceived/Defence). **Governance:** the gate rule, strength encoding, index
+comparability, metric grouping, and the Benefit/Barrier+triad model are now ADR-0003…ADR-0007
+(all Proposed). C-index (customer proposition) deferred to Methodology v2 / a new loop, per John.
+
+## Computed headline (Meridian Securities, revised)
 
 | | B | P | L | **V** |
 |---|---|---|---|---|
-| index [0,1] | 0.679 | 0.271 | 0.484 | **0.479** |
-| display 0–100 | | | | **47.86** |
+| index [0,1] | 0.679 | 0.380 | 0.484 | **0.511** |
+| display 0–100 | | | | **51.11** |
+
+**Triad (derived, ordinal):** Economic Value **Established** · Perceived Value **Established** ·
+Defence Value **Emerging**. (P rose 0.271 → 0.380 because Network Economies and Counter-Positioning
+are now marked N/A for a non-marketplace brokerage — a judgement call for your ratification.)
 
 Module ratings (two-track — continuous q_m for priority, rule-based gate for the word):
 

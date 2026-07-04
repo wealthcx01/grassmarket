@@ -84,19 +84,47 @@ def test_L_recomputes(gm: dict) -> None:
     assert math.isclose(gm["L"]["weighted_term"], weighted, abs_tol=1e-6)
 
 
-def test_B_and_normalisation_in_range(gm: dict) -> None:
+def test_B_is_group_weighted(gm: dict) -> None:
+    # B = uniform-weighted mean of group means (ADR-0006); state metrics excluded (B4).
+    groups: dict[str, list[float]] = {}
     for r in gm["business"]["metrics"]:
+        if r["n_k"] is None:  # NOT_APPLICABLE / NOT_ASSESSED metric
+            assert r["state"] in ("NOT_APPLICABLE", "NOT_ASSESSED")
+            continue
         assert 0.0 <= r["n_k"] <= 1.0
-    b = sum(r["n_k"] for r in gm["business"]["metrics"]) / len(gm["business"]["metrics"])
+        groups.setdefault(r["group"], []).append(r["n_k"])
+    means = {g: sum(v) / len(v) for g, v in groups.items()}
+    for g, mean in means.items():
+        assert math.isclose(gm["business"]["group_means"][g], mean, abs_tol=1e-6)
+    b = sum(means.values()) / len(means)  # uniform group weights (draft)
     assert math.isclose(gm["business"]["B"], b, abs_tol=1e-6)
 
 
-def test_P_from_strength_encoding(gm: dict) -> None:
+def test_P_uses_weaker_of_benefit_barrier_over_applicable(gm: dict) -> None:
     enc = gm["coefficients"]["strength_encoding"]
-    for r in gm["powers"]["powers"]:
-        assert r["value"] == enc[r["strength"]]
-    p = sum(r["value"] for r in gm["powers"]["powers"]) / len(gm["powers"]["powers"])
-    assert math.isclose(gm["powers"]["P"], p, abs_tol=1e-6)
+    rank = {"None": 0, "Emerging": 1, "Established": 2, "Wide": 3}
+    applicable = [p for p in gm["powers"]["powers"] if p.get("state") is None]
+    assert applicable, "at least one power must be applicable"
+    for p in applicable:
+        weaker = p["benefit"] if rank[p["benefit"]] <= rank[p["barrier"]] else p["barrier"]
+        assert p["strength"] == weaker  # Helmer: a power is only as strong as its weaker side
+        assert p["value"] == enc[weaker]
+    # N/A powers carry no value and are excluded from P.
+    p_index = sum(p["value"] for p in applicable) / len(applicable)
+    assert math.isclose(gm["powers"]["P"], p_index, abs_tol=1e-6)
+
+
+def test_triad_is_ordinal(gm: dict) -> None:
+    ordinals = {"None", "Emerging", "Established", "Wide"}
+    for dim in ("economic_value", "perceived_value", "defence_value"):
+        assert gm["triad"][dim]["rating"] in ordinals  # ordinal out (ADR-0002)
+        assert 0.0 <= gm["triad"][dim]["score"] <= 1.0
+    # Defence Value is the barrier-side aggregate across applicable powers (§2).
+    applicable = [p for p in gm["powers"]["powers"] if p.get("state") is None]
+    barriers = [gm["coefficients"]["strength_encoding"][p["barrier"]] for p in applicable]
+    assert math.isclose(
+        gm["triad"]["defence_value"]["score"], sum(barriers) / len(barriers), abs_tol=1e-6
+    )
 
 
 def test_V_recomputes_and_display(gm: dict) -> None:

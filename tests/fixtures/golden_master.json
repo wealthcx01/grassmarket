@@ -22,13 +22,24 @@
     ],
     "lambda": "uniform 1.0 per subcomponent (draft)",
     "delta": "uniform 1.0 per module (draft)",
-    "w_metric": "uniform 1.0 (draft)",
-    "w_power": "uniform 1.0 (draft)",
+    "w_metric": "uniform within group (draft)",
+    "group_weights": {
+      "scale": 1.0,
+      "unit_economics": 1.0,
+      "momentum": 1.0
+    },
+    "w_power": "uniform 1.0 over applicable powers (draft)",
     "strength_encoding": {
       "None": 0.0,
       "Emerging": 0.4,
       "Established": 0.7,
       "Wide": 1.0
+    },
+    "triad_thresholds": {
+      "Wide": 0.85,
+      "Established": 0.55,
+      "Emerging": 0.2,
+      "None": 0.0
     }
   },
   "modules": [
@@ -615,6 +626,8 @@
         "raw": 1800000000,
         "unit": "GBP",
         "direction": "higher_is_better",
+        "group": "scale",
+        "state": null,
         "n_k": 0.765714
       },
       {
@@ -622,6 +635,8 @@
         "raw": 180000,
         "unit": "count",
         "direction": "higher_is_better",
+        "group": "scale",
+        "state": null,
         "n_k": 0.706667
       },
       {
@@ -629,6 +644,8 @@
         "raw": 85000000,
         "unit": "GBP",
         "direction": "higher_is_better",
+        "group": "scale",
+        "state": null,
         "n_k": 0.75
       },
       {
@@ -636,6 +653,8 @@
         "raw": 472,
         "unit": "GBP_per_year",
         "direction": "higher_is_better",
+        "group": "unit_economics",
+        "state": null,
         "n_k": 0.704
       },
       {
@@ -643,6 +662,8 @@
         "raw": 58,
         "unit": "percent",
         "direction": "higher_is_better",
+        "group": "unit_economics",
+        "state": null,
         "n_k": 0.695
       },
       {
@@ -650,13 +671,26 @@
         "raw": 140,
         "unit": "GBP_per_year",
         "direction": "lower_is_better",
+        "group": "unit_economics",
+        "state": null,
         "n_k": 0.68
+      },
+      {
+        "key": "TAKE_RATE_LEVEL",
+        "raw": 22,
+        "unit": "bps",
+        "direction": "higher_is_better",
+        "group": "unit_economics",
+        "state": null,
+        "n_k": 0.64
       },
       {
         "key": "NET_REVENUE_RETENTION",
         "raw": 104,
         "unit": "percent",
         "direction": "higher_is_better",
+        "group": "momentum",
+        "state": null,
         "n_k": 0.62
       },
       {
@@ -664,75 +698,104 @@
         "raw": 14,
         "unit": "percent",
         "direction": "higher_is_better",
+        "group": "momentum",
+        "state": null,
         "n_k": 0.58
-      },
-      {
-        "key": "TAKE_RATE_DURABILITY",
-        "raw": 22,
-        "unit": "bps",
-        "direction": "higher_is_better",
-        "n_k": 0.64
       },
       {
         "key": "CAC_PAYBACK_MONTHS",
         "raw": 18,
         "unit": "months",
         "direction": "lower_is_better",
+        "group": "momentum",
+        "state": null,
         "n_k": 0.65
       }
     ],
-    "B": 0.679138
+    "group_means": {
+      "scale": 0.740794,
+      "unit_economics": 0.67975,
+      "momentum": 0.616667
+    },
+    "B": 0.67907
   },
   "powers": {
     "powers": [
       {
         "key": "SCALE_ECONOMIES",
+        "benefit": "Emerging",
+        "barrier": "Emerging",
         "strength": "Emerging",
-        "value": 0.4
+        "value": 0.4,
+        "state": null
       },
       {
         "key": "NETWORK_ECONOMIES",
-        "strength": "None",
-        "value": 0.0
+        "state": "NOT_APPLICABLE"
       },
       {
         "key": "COUNTER_POSITIONING",
-        "strength": "None",
-        "value": 0.0
+        "state": "NOT_APPLICABLE"
       },
       {
         "key": "SWITCHING_COSTS",
+        "benefit": "Established",
+        "barrier": "Established",
         "strength": "Established",
-        "value": 0.7
+        "value": 0.7,
+        "state": null
       },
       {
         "key": "BRANDING",
+        "benefit": "Emerging",
+        "barrier": "Emerging",
         "strength": "Emerging",
-        "value": 0.4
+        "value": 0.4,
+        "state": null
       },
       {
         "key": "CORNERED_RESOURCE",
+        "benefit": "None",
+        "barrier": "None",
         "strength": "None",
-        "value": 0.0
+        "value": 0.0,
+        "state": null
       },
       {
         "key": "PROCESS_POWER",
+        "benefit": "Emerging",
+        "barrier": "Emerging",
         "strength": "Emerging",
-        "value": 0.4
+        "value": 0.4,
+        "state": null
       }
     ],
-    "P": 0.271429
+    "P": 0.38
+  },
+  "triad": {
+    "economic_value": {
+      "rating": "Established",
+      "score": 0.710272
+    },
+    "perceived_value": {
+      "rating": "Established",
+      "score": 0.55
+    },
+    "defence_value": {
+      "rating": "Emerging",
+      "score": 0.38
+    }
   },
   "composite": {
-    "B": 0.679138,
-    "P": 0.271429,
+    "B": 0.67907,
+    "P": 0.38,
     "L": 0.483539,
-    "V": 0.478586
+    "V": 0.511137
   },
   "two_track": {
     "continuous": {
-      "V": 0.478586,
-      "V_display_0_100": 47.8586
+      "V": 0.511137,
+      "V_display_0_100": 51.1137
     },
     "gates": {
       "FRONTEND": "Developing",
