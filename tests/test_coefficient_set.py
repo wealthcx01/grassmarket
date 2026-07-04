@@ -13,9 +13,11 @@ from bcap_contracts.assessments import CoefficientSet
 from bcap_contracts.common import PowerLifecycleStage, WeightMethod
 from bcap_contracts.provenance import WeightProvenanceRecord
 from bcap_contracts.registry import (
+    AnchorPoint,
     MetricDef,
     MissingKeyError,
     ModuleDef,
+    NormalisationSpec,
     PowerDef,
     Registry,
     SubcomponentDef,
@@ -230,5 +232,18 @@ def _full_tiny_registry(two_modules: bool = False) -> Registry:
             ),
         ),
         modules=tuple(modules),
-        metrics=(MetricDef(key="K1", name="Metric 1", unit="count", direction="higher_is_better"),),
+        metrics=(
+            MetricDef(
+                key="K1",
+                name="Metric 1",
+                unit="count",
+                direction="higher_is_better",
+                normalisation=NormalisationSpec(
+                    anchors=(
+                        AnchorPoint(raw=0, normalised=0.2),
+                        AnchorPoint(raw=1, normalised=0.8),
+                    )
+                ),
+            ),
+        ),
     )

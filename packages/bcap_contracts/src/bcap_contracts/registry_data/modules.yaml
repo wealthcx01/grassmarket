@@ -1,11 +1,14 @@
 # The 9 infrastructure modules and their 51 subcomponents (the L index, Methodology §2).
 #
-# STATUS: draft-pending-ratification (GRS-0002). The 9 module KEYS are settled structure. The
-# 51 SUBCOMPONENTS below are populated from the prototype's authoritative draft
-# (bruntsfield_advisory_assessment_wizard_v2/config/modules_subcomponents.yaml): labels are
+# STATUS: draft-pending-ratification (GRS-0002; keys normalised GRS-0002a). The 9 module KEYS are
+# settled structure. The 51 SUBCOMPONENTS below are populated from the prototype's authoritative
+# draft (bruntsfield_advisory_assessment_wizard_v2/config/modules_subcomponents.yaml): labels are
 # verbatim; descriptions are verbatim where the draft gave one and drafted from the label +
-# domain otherwise. The `critical` flags (which subcomponents gate a module's rating, §5.2) are
-# a DRAFT PROPOSAL for John's ratification — see docs/tickets/GRS-0002-registry-content.md.
+# domain otherwise. Every subcomponent KEY is fully qualified to <MODULE_KEY>_<LEAF> (GRS-0002a):
+# the module-echo is stripped from the leaf before prefixing and an immediately-repeated token is
+# collapsed (MARKET_DATA + DATA_DEPTH_QUALITY -> MARKET_DATA_DEPTH_QUALITY). Keys are GLOBALLY
+# unique, enforced at load time. The `critical` flags (which subcomponents gate a module's rating,
+# §5.2) are a DRAFT PROPOSAL for John's ratification — see docs/tickets/GRS-0002-registry-content.md.
 # Rubric anchors (204) and the elicited weights are separate content tracks; renaming a key is
 # an ADR, never a silent edit.
 
@@ -16,24 +19,24 @@ modules:
     name: Front End
     description: Client- and advisor-facing UI, workflows, and presentation layer.
     subcomponents:
-      - key: PERFORMANCE
+      - key: FRONTEND_PERFORMANCE
         name: Performance & Responsiveness
         description: Core Web Vitals, p95 load, responsiveness across devices.
         critical: true
-      - key: UX_NAVIGATION
+      - key: FRONTEND_UX_NAVIGATION
         name: UX Coherence & Navigation
         description: Task flows for trade, deposit, support; user testing success.
         critical: true
-      - key: DEVICE_COVERAGE
+      - key: FRONTEND_DEVICE_COVERAGE
         name: Device & Channel Coverage
         description: Mobile apps, web, feature parity.
-      - key: PERSONALISATION
+      - key: FRONTEND_PERSONALISATION
         name: Personalisation & Recommendations
         description: Personalised dashboards, watchlists, suggestions.
-      - key: ACCESSIBILITY_LOCALISATION
+      - key: FRONTEND_ACCESSIBILITY_LOCALISATION
         name: Accessibility & Localisation
         description: WCAG compliance, language/local formats.
-      - key: EXPERIMENTATION_ANALYTICS
+      - key: FRONTEND_EXPERIMENTATION_ANALYTICS
         name: Experimentation & Product Analytics
         description: AB testing, product analytics, event tracking.
 
@@ -41,27 +44,27 @@ modules:
     name: Application Server
     description: Core application/business-logic tier and service orchestration runtime.
     subcomponents:
-      - key: HOSTING_ELASTICITY
+      - key: APP_SERVER_HOSTING_ELASTICITY
         name: Hosting & Elasticity
         description: Cloud/on-prem, autoscaling, regional redundancy.
-      - key: RESILIENCE_DR
+      - key: APP_SERVER_RESILIENCE_DR
         name: Resilience & Disaster Recovery
         description: Failover, backups, RTO/RPO targets, tested DR runbooks.
         critical: true
-      - key: API_DESIGN
+      - key: APP_SERVER_API_DESIGN
         name: API Design & Integration
         description: API standards, versioning, and the partner/integration surface.
-      - key: SECURITY_COMPLIANCE
+      - key: APP_SERVER_SECURITY_COMPLIANCE
         name: Security & Compliance
         description: AuthN/Z, encryption, vulnerability management, audit trails.
         critical: true
-      - key: DEVOPS_DEPLOYMENT
+      - key: APP_SERVER_DEVOPS_DEPLOYMENT
         name: DevOps & Deployment
         description: CI/CD, release cadence, rollback, environment parity.
-      - key: DATA_ARCHITECTURE
+      - key: APP_SERVER_DATA_ARCHITECTURE
         name: Data Architecture & Domain Model
         description: Domain-model coherence, data ownership, lineage.
-      - key: OBSERVABILITY
+      - key: APP_SERVER_OBSERVABILITY
         name: Observability & Monitoring
         description: Metrics, logs, traces, alerting, SLO coverage.
 
@@ -69,27 +72,27 @@ modules:
     name: Market Data
     description: Reference, pricing, and market-data ingestion, distribution, and quality.
     subcomponents:
-      - key: EXCHANGE_COVERAGE
+      - key: MARKET_DATA_EXCHANGE_COVERAGE
         name: Exchange & Venue Coverage
         description: Breadth of exchanges and venues covered.
-      - key: INSTRUMENT_UNIVERSE
+      - key: MARKET_DATA_INSTRUMENT_UNIVERSE
         name: Instrument Universe
         description: Asset classes and instruments referenced.
-      - key: DATA_DEPTH_QUALITY
+      - key: MARKET_DATA_DEPTH_QUALITY
         name: Depth & Quality of Data
         description: Order-book depth, corrections, reference-data accuracy.
         critical: true
-      - key: LATENCY_TIMELINESS
+      - key: MARKET_DATA_LATENCY_TIMELINESS
         name: Latency & Timeliness
         description: Feed latency and timeliness versus source.
         critical: true
-      - key: HISTORY_DEPTH
+      - key: MARKET_DATA_HISTORY_DEPTH
         name: History Depth
         description: Depth of historical data available.
-      - key: VENDOR_REDUNDANCY
+      - key: MARKET_DATA_VENDOR_REDUNDANCY
         name: Vendor Redundancy & Entitlements
         description: Multi-vendor redundancy and entitlement management.
-      - key: VALUE_ADD_SERVICES
+      - key: MARKET_DATA_VALUE_ADD_SERVICES
         name: Widgets / AI / Video Services
         description: Value-add data services — widgets, AI, video.
 
@@ -97,20 +100,20 @@ modules:
     name: Orchestration
     description: Workflow, scheduling, and inter-service orchestration and resilience.
     subcomponents:
-      - key: WORKFLOW_ENGINE
+      - key: ORCHESTRATION_WORKFLOW_ENGINE
         name: Workflow Engine Maturity
         description: Maturity of the workflow/orchestration engine.
         critical: true
-      - key: ROUTING_LOGIC
+      - key: ORCHESTRATION_ROUTING_LOGIC
         name: Routing Logic & Rules
         description: Routing rules and decision logic.
-      - key: EVENT_DRIVEN
+      - key: ORCHESTRATION_EVENT_DRIVEN
         name: Event-driven Architecture
         description: Event-driven patterns, messaging, idempotency.
-      - key: CONFIG_VS_CODE
+      - key: ORCHESTRATION_CONFIG_VS_CODE
         name: Config vs Code
         description: Balance of configuration-driven versus hard-coded behaviour.
-      - key: ORCH_MONITORING
+      - key: ORCHESTRATION_MONITORING
         name: Monitoring & Control
         description: Orchestration monitoring and operational control.
 
@@ -118,23 +121,23 @@ modules:
     name: Client Management System
     description: Client/account records, onboarding, KYC, research/CRM, and relationship data.
     subcomponents:
-      - key: RESEARCH_AUTHORING
+      - key: CMS_RESEARCH_AUTHORING
         name: Research Authoring & Tagging
         description: Authoring, tagging, and metadata for research content.
-      - key: RESEARCH_DISTRIBUTION
+      - key: CMS_RESEARCH_DISTRIBUTION
         name: Research Distribution & Targeting
         description: Distribution and targeting of research to segments.
-      - key: EMAIL_CAMPAIGNS
+      - key: CMS_EMAIL_CAMPAIGNS
         name: Email & Campaign Engine
         description: Email/campaign engine and lifecycle messaging.
-      - key: CRM_MODEL
+      - key: CMS_CRM_MODEL
         name: CRM Data Model & Integration
         description: CRM data-model coherence and system integration.
         critical: true
-      - key: STATEMENTS
+      - key: CMS_STATEMENTS
         name: Consolidated Statements
         description: Consolidated client-statement generation.
-      - key: CONTENT_SEARCH_PERSONALISATION
+      - key: CMS_CONTENT_SEARCH_PERSONALISATION
         name: Search & Personalisation
         description: Content search and personalisation.
 
@@ -142,23 +145,23 @@ modules:
     name: Back Office
     description: Settlement, reconciliation, custody, corporate actions, and reporting.
     subcomponents:
-      - key: CUSTODY
+      - key: BACKOFFICE_CUSTODY
         name: Custody & Asset Servicing
         description: Custody, asset servicing, corporate actions.
         critical: true
-      - key: PAYMENTS_FUNDING
+      - key: BACKOFFICE_PAYMENTS_FUNDING
         name: Payments & Funding
         description: Payments, funding, and reconciliations.
-      - key: KYC_ONBOARDING
+      - key: BACKOFFICE_KYC_ONBOARDING
         name: KYC & Onboarding
         description: KYC/AML checks and client onboarding.
-      - key: PORTFOLIO_MGMT
+      - key: BACKOFFICE_PORTFOLIO_MGMT
         name: Portfolio Management
         description: Portfolio accounting and management.
-      - key: CREDIT_RISK
+      - key: BACKOFFICE_CREDIT_RISK
         name: Credit & Risk Engine
         description: Credit exposure and risk engine.
-      - key: REG_REPORTING
+      - key: BACKOFFICE_REG_REPORTING
         name: Regulatory Reporting
         description: Regulatory-reporting completeness and timeliness.
         critical: true
@@ -167,17 +170,17 @@ modules:
     name: Order & Execution Management
     description: Order lifecycle, smart order routing, and execution management (see §4 example).
     subcomponents:
-      - key: ASSET_COVERAGE
+      - key: OEMS_ASSET_COVERAGE
         name: Coverage by Asset Class
         description: Order/execution coverage across asset classes.
-      - key: EXEC_ALGOS
+      - key: OEMS_EXEC_ALGOS
         name: Execution Algo Sophistication
         description: Execution-algorithm sophistication.
-      - key: PRE_TRADE_RISK
+      - key: OEMS_PRE_TRADE_RISK
         name: Pre-trade Risk & Compliance
         description: Pre-trade risk and compliance checks.
         critical: true
-      - key: ORDER_TYPES
+      - key: OEMS_ORDER_TYPES
         name: Order Types & Complexity
         description: Supported order types and complexity.
       - key: OEMS_LATENCY_RELIABILITY
@@ -191,17 +194,17 @@ modules:
     name: EMS Gateway
     description: Execution-venue gateways, FIX connectivity, and session management.
     subcomponents:
-      - key: EMS_CONNECTIVITY
+      - key: EMS_GATEWAY_CONNECTIVITY
         name: Connectivity Breadth
         description: Breadth of venue/FIX connectivity.
-      - key: EMS_ROUTING_POLICY
+      - key: EMS_GATEWAY_ROUTING_POLICY
         name: Routing Policy Sophistication
         description: Sophistication of routing policy.
-      - key: EMS_RISK_THROTTLING
+      - key: EMS_GATEWAY_RISK_THROTTLING
         name: Risk & Throttling
         description: Gateway risk controls and throttling.
         critical: true
-      - key: EMS_MONITORING
+      - key: EMS_GATEWAY_MONITORING
         name: Monitoring & Diagnostics
         description: Gateway monitoring and diagnostics.
 
@@ -209,17 +212,17 @@ modules:
     name: Liquidity & Connectivity
     description: Venue/liquidity connectivity, network infrastructure, and settlement links.
     subcomponents:
-      - key: LOCAL_EXCHANGES
+      - key: LIQ_CONNECT_LOCAL_EXCHANGES
         name: Local Exchange Connectivity
         description: Connectivity to local exchanges.
         critical: true
-      - key: FOREIGN_BROKERS
+      - key: LIQ_CONNECT_FOREIGN_BROKERS
         name: Foreign Broker Relationships
         description: Foreign-broker relationships and reach.
-      - key: FUND_HOUSES
+      - key: LIQ_CONNECT_FUND_HOUSES
         name: Fund House Connectivity
         description: Connectivity to fund houses.
-      - key: SETTLEMENT_CLEARING
+      - key: LIQ_CONNECT_SETTLEMENT_CLEARING
         name: Settlement & Clearing Links
         description: Settlement and clearing linkages.
         critical: true
