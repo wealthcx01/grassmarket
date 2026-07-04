@@ -13,7 +13,6 @@ from bcap_contracts.assessments import CoefficientSet
 from bcap_contracts.common import PowerLifecycleStage, WeightMethod
 from bcap_contracts.provenance import WeightProvenanceRecord
 from bcap_contracts.registry import (
-    EmptyDimensionError,
     MetricDef,
     MissingKeyError,
     ModuleDef,
@@ -136,12 +135,12 @@ def test_validate_against_missing_module_key_raises() -> None:
         cs.validate_against(registry)
 
 
-def test_validate_against_real_registry_refuses_empty_dimensions() -> None:
+def test_validate_against_real_registry_missing_subcomponents_raises() -> None:
     from bcap_contracts.registry import load_registry
 
-    # The REAL Loop 0 registry has empty subcomponent and metric dimensions (Loop 1 content). A
-    # coefficient set covering the 9 modules and 7 powers still cannot validate: each module's
-    # subcomponent set is empty, so the loader refuses (ADR-0001 scope note) rather than passing.
+    # GRS-0002 populated the registry, so a coefficient set that covers the 9 modules and 7 powers
+    # but leaves each module's λ empty no longer trips EmptyDimensionError — it fails loud with
+    # MissingKeyError because the 51 registered subcomponents are not covered. Still a refusal.
     registry = load_registry()
     cs = CoefficientSet(
         version="v1",
@@ -156,8 +155,36 @@ def test_validate_against_real_registry_refuses_empty_dimensions() -> None:
         w_power={k: 1.0 for k in registry.power_keys()},
         provenance=_prov("theta", "alpha_l", "alpha_module", "lambda", "delta", "w_power"),
     )
-    with pytest.raises(EmptyDimensionError):
+    with pytest.raises(MissingKeyError):
         cs.validate_against(registry)
+
+
+def test_validate_against_real_registry_full_coverage_passes() -> None:
+    """A coefficient set that fully and correctly covers every populated registry dimension now
+    validates against the real registry — proof the registry is internally consistent and
+    coverable. (Uniform weights here; the real elicited weights arrive in GRS-0004.)"""
+    from bcap_contracts.registry import load_registry
+
+    registry = load_registry()
+    cs = CoefficientSet(
+        version="draft-coverage",
+        methodology_version="1.0",
+        theta_b=0.34,
+        theta_p=0.33,
+        theta_l=0.33,
+        alpha_l=0.7,
+        delta={k: 1.0 for k in registry.module_keys()},
+        alpha_module={k: 0.6 for k in registry.module_keys()},
+        lambda_loadings={
+            k: {s: 1.0 for s in registry.subcomponent_keys(k)} for k in registry.module_keys()
+        },
+        w_power={k: 1.0 for k in registry.power_keys()},
+        w_metric={k: 1.0 for k in registry.metric_keys()},
+        provenance=_prov(
+            "theta", "alpha_l", "alpha_module", "lambda", "delta", "w_power", "w_metric"
+        ),
+    )
+    cs.validate_against(registry)  # must not raise
 
 
 def _valid_theta_only() -> CoefficientSet:
@@ -203,5 +230,5 @@ def _full_tiny_registry(two_modules: bool = False) -> Registry:
             ),
         ),
         modules=tuple(modules),
-        metrics=(MetricDef(key="K1", name="Metric 1", direction="higher_is_better"),),
+        metrics=(MetricDef(key="K1", name="Metric 1", unit="count", direction="higher_is_better"),),
     )

@@ -1,10 +1,152 @@
 # The business-metric register (the B index, Methodology §5.3).
 #
-# STATUS: EMPTY in Loop 0 by design. Each metric needs a declared unit (captured in the UI,
-# never inferred), a direction, and an explicit normalisation spec n_k with documented anchor
-# points. Authoring that register — and retiring the prototype's unit-sensitive log heuristic
-# (defect D5) — is Loop 1 content. Until a metric is registered here, a CoefficientSet's
-# w_metric cannot validate against the metric dimension: the loader raises EmptyDimensionError
-# (ADR-0001 scope note). That refusal is intentional for Loop 0.
+# STATUS: draft-pending-ratification (GRS-0002). Each metric declares a unit (captured, never
+# inferred — retiring defect D5's unit-sensitive heuristic), a direction, and a piecewise-linear
+# normalisation n_k mapping raw → [0,1]. The ANCHOR VALUES here are DOCUMENTED PLACEHOLDERS for a
+# mid-tier retail brokerage, pending Stage-1 expert judgement; from Stage 2 (≥10 engagements) the
+# method becomes percentile-vs-benchmark-population (§11). Anchors are ordered by ascending raw;
+# `direction` records intent (normalised ascends for higher_is_better, descends for lower).
+# This register is a DRAFT for John's ratification — see docs/tickets/GRS-0002-registry-content.md.
 
-metrics: []
+status: draft-pending-ratification
+
+metrics:
+  - key: AUA
+    name: Assets Under Administration
+    unit: GBP
+    direction: higher_is_better
+    status: draft-pending-ratification
+    normalisation:
+      method: piecewise_linear
+      note: Placeholder anchors for a mid-tier retail brokerage; pending Stage-1 judgement.
+      anchors:
+        - {raw: 0, normalised: 0.2}
+        - {raw: 250000000, normalised: 0.5}
+        - {raw: 2000000000, normalised: 0.8}
+        - {raw: 20000000000, normalised: 1.0}
+
+  - key: ACTIVE_CLIENTS
+    name: Active Clients
+    unit: count
+    direction: higher_is_better
+    status: draft-pending-ratification
+    normalisation:
+      method: piecewise_linear
+      note: Placeholder anchors; pending Stage-1 judgement.
+      anchors:
+        - {raw: 0, normalised: 0.2}
+        - {raw: 25000, normalised: 0.5}
+        - {raw: 250000, normalised: 0.8}
+        - {raw: 2000000, normalised: 1.0}
+
+  - key: NET_REVENUE
+    name: Net Revenue (TTM)
+    unit: GBP
+    direction: higher_is_better
+    status: draft-pending-ratification
+    normalisation:
+      method: piecewise_linear
+      note: Placeholder anchors; pending Stage-1 judgement.
+      anchors:
+        - {raw: 0, normalised: 0.2}
+        - {raw: 10000000, normalised: 0.5}
+        - {raw: 100000000, normalised: 0.8}
+        - {raw: 1000000000, normalised: 1.0}
+
+  - key: REVENUE_PER_CLIENT
+    name: Revenue per Active Client (ARPU)
+    unit: GBP_per_year
+    direction: higher_is_better
+    status: draft-pending-ratification
+    normalisation:
+      method: piecewise_linear
+      note: Placeholder anchors; pending Stage-1 judgement.
+      anchors:
+        - {raw: 50, normalised: 0.2}
+        - {raw: 200, normalised: 0.5}
+        - {raw: 600, normalised: 0.8}
+        - {raw: 2000, normalised: 1.0}
+
+  - key: GROSS_MARGIN
+    name: Gross Margin
+    unit: percent
+    direction: higher_is_better
+    status: draft-pending-ratification
+    normalisation:
+      method: piecewise_linear
+      note: Placeholder anchors; pending Stage-1 judgement.
+      anchors:
+        - {raw: 20, normalised: 0.2}
+        - {raw: 45, normalised: 0.5}
+        - {raw: 65, normalised: 0.8}
+        - {raw: 80, normalised: 1.0}
+
+  - key: COST_TO_SERVE
+    name: Cost to Serve per Client
+    unit: GBP_per_year
+    direction: lower_is_better
+    status: draft-pending-ratification
+    normalisation:
+      method: piecewise_linear
+      note: Placeholder anchors (lower is better; normalised descends with raw).
+      anchors:
+        - {raw: 40, normalised: 1.0}
+        - {raw: 100, normalised: 0.8}
+        - {raw: 200, normalised: 0.5}
+        - {raw: 400, normalised: 0.2}
+
+  - key: NET_REVENUE_RETENTION
+    name: Net Revenue Retention
+    unit: percent
+    direction: higher_is_better
+    status: draft-pending-ratification
+    normalisation:
+      method: piecewise_linear
+      note: Placeholder anchors; pending Stage-1 judgement.
+      anchors:
+        - {raw: 80, normalised: 0.2}
+        - {raw: 100, normalised: 0.5}
+        - {raw: 110, normalised: 0.8}
+        - {raw: 130, normalised: 1.0}
+
+  - key: CLIENT_GROWTH_RATE
+    name: YoY Active-Client Growth
+    unit: percent
+    direction: higher_is_better
+    status: draft-pending-ratification
+    normalisation:
+      method: piecewise_linear
+      note: Placeholder anchors; pending Stage-1 judgement.
+      anchors:
+        - {raw: 0, normalised: 0.2}
+        - {raw: 10, normalised: 0.5}
+        - {raw: 25, normalised: 0.8}
+        - {raw: 50, normalised: 1.0}
+
+  - key: TAKE_RATE_DURABILITY
+    name: Take Rate
+    unit: bps
+    direction: higher_is_better
+    status: draft-pending-ratification
+    normalisation:
+      method: piecewise_linear
+      note: Placeholder anchors; feeds the Economic Value triad (take-rate durability, §2).
+      anchors:
+        - {raw: 5, normalised: 0.2}
+        - {raw: 15, normalised: 0.5}
+        - {raw: 30, normalised: 0.8}
+        - {raw: 60, normalised: 1.0}
+
+  - key: CAC_PAYBACK_MONTHS
+    name: CAC Payback Period
+    unit: months
+    direction: lower_is_better
+    status: draft-pending-ratification
+    normalisation:
+      method: piecewise_linear
+      note: Placeholder anchors (lower is better; normalised descends with raw).
+      anchors:
+        - {raw: 6, normalised: 1.0}
+        - {raw: 12, normalised: 0.8}
+        - {raw: 24, normalised: 0.5}
+        - {raw: 48, normalised: 0.2}

@@ -20,7 +20,7 @@ from importlib import resources
 from typing import Any
 
 import yaml
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from bcap_contracts.common import PowerLifecycleStage
 
@@ -80,6 +80,7 @@ class SubcomponentDef(BaseModel):
     key: str
     name: str
     module_key: str
+    description: str | None = None
     critical: bool = False  # critical subcomponents drive the rating gate (§5.2)
 
 
@@ -89,8 +90,8 @@ class ModuleDef(BaseModel):
     key: str
     name: str
     description: str
-    # Subcomponents are Loop 1 content (elicited). Empty until then — a coefficient set cannot
-    # validate against a module with no subcomponents (EmptyDimensionError).
+    # Populated with the 51-subcomponent draft in GRS-0002 (status draft-pending-ratification).
+    # A module with no subcomponents cannot be covered by a coefficient set (EmptyDimensionError).
     subcomponents: tuple[SubcomponentDef, ...] = ()
 
 
@@ -103,14 +104,40 @@ class PowerDef(BaseModel):
     description: str
 
 
+class AnchorPoint(BaseModel):
+    """One point in a metric's normalisation curve: a raw value maps to a normalised score in
+    [0,1] (Methodology §5.3). Anchor points are documented in the register, never inferred."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    raw: float = Field(description="A raw metric value in the metric's declared unit.")
+    normalised: float = Field(ge=0.0, le=1.0, description="Its normalised score in [0,1].")
+
+
+class NormalisationSpec(BaseModel):
+    """The normalisation n_k for a business metric (Methodology §5.3).
+
+    Stage 1 uses documented piecewise-linear anchor points; from Stage 2 (≥10 engagements) this
+    becomes percentile-vs-benchmark-population. The prototype's unit-sensitive log heuristic
+    (defect D5) is retired — the unit is declared, never inferred."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    method: str = "piecewise_linear"  # "piecewise_linear" | "percentile" (Stage 2+)
+    anchors: tuple[AnchorPoint, ...] = ()
+    note: str | None = None  # provenance / "placeholder pending judgement" markers
+
+
 class MetricDef(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     key: str
     name: str
-    # Declared unit is captured in the UI, never inferred (Methodology §5.3). The full metric
-    # register with normalisation specs is Loop 1 content.
+    # The declared unit is captured explicitly, never inferred (Methodology §5.3).
+    unit: str
     direction: str  # "higher_is_better" | "lower_is_better"
+    normalisation: NormalisationSpec = Field(default_factory=NormalisationSpec)
+    status: str = "settled"  # e.g. "draft-pending-ratification" for the Loop 1 draft register
 
 
 class Registry(BaseModel):
@@ -125,6 +152,12 @@ class Registry(BaseModel):
     powers: tuple[PowerDef, ...] = ()
     modules: tuple[ModuleDef, ...] = ()
     metrics: tuple[MetricDef, ...] = ()
+
+    # Ratification status of the authored content. Powers are "settled" (Methodology §8); the
+    # Loop 1 subcomponent set and metric register ship "draft-pending-ratification" until John
+    # ratifies them and the elicitation panel runs (ADR-0001 scope note, GRS-0002 ticket).
+    subcomponent_status: str = "settled"
+    metric_status: str = "settled"
 
     # --- Key sets (frozen) ---
     def power_keys(self) -> frozenset[str]:
@@ -213,15 +246,47 @@ def load_registry() -> Registry:
             key=m["key"],
             name=m["name"],
             description=m["description"],
-            subcomponents=tuple(SubcomponentDef(**s) for s in m.get("subcomponents", [])),
+            subcomponents=tuple(
+                # module_key is injected from the parent — the YAML nests subcomponents under
+                # their module, so it is never repeated per row (and cannot drift from it).
+                SubcomponentDef(module_key=m["key"], **s)
+                for s in m.get("subcomponents", [])
+            ),
         )
         for m in modules_raw.get("modules", [])
     )
-    metrics = tuple(MetricDef(**m) for m in metrics_raw.get("metrics", []))
+    metrics = tuple(_parse_metric(m) for m in metrics_raw.get("metrics", []))
 
-    registry = Registry(powers=powers, modules=modules, metrics=metrics)
+    registry = Registry(
+        powers=powers,
+        modules=modules,
+        metrics=metrics,
+        subcomponent_status=modules_raw.get("status", "settled"),
+        metric_status=metrics_raw.get("status", "settled"),
+    )
     _assert_unique_keys(registry)
     return registry
+
+
+def _parse_metric(raw: dict[str, Any]) -> MetricDef:
+    norm_raw = raw.get("normalisation")
+    normalisation = (
+        NormalisationSpec(
+            method=norm_raw.get("method", "piecewise_linear"),
+            anchors=tuple(AnchorPoint(**a) for a in norm_raw.get("anchors", [])),
+            note=norm_raw.get("note"),
+        )
+        if norm_raw
+        else NormalisationSpec()
+    )
+    return MetricDef(
+        key=raw["key"],
+        name=raw["name"],
+        unit=raw["unit"],
+        direction=raw["direction"],
+        normalisation=normalisation,
+        status=raw.get("status", "settled"),
+    )
 
 
 def _assert_unique_keys(registry: Registry) -> None:

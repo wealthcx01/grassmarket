@@ -34,15 +34,31 @@ def test_settled_powers_are_the_seven() -> None:
     }
 
 
-def test_nine_module_keys_present_with_empty_subcomponents() -> None:
+def test_nine_modules_with_fifty_one_subcomponents() -> None:
     r = load_registry()
     assert len(r.module_keys()) == 9
-    # Subcomponents are Loop 1 content — empty for now, by design.
-    assert r.all_subcomponent_keys() == frozenset()
+    # GRS-0002 populated the 51-subcomponent draft (6+7+7+5+6+6+6+4+4).
+    assert len(r.all_subcomponent_keys()) == 51
+    assert r.subcomponent_status == "draft-pending-ratification"
+    # Every module has at least one critical subcomponent (needed by the rating gate, §5.2).
+    for m in r.modules:
+        assert any(s.critical for s in m.subcomponents), f"{m.key} has no critical subcomponent"
+    # Descriptions are carried through for wizard guidance.
+    assert r.require_subcomponent("FRONTEND", "PERFORMANCE").description
 
 
-def test_metric_register_is_empty_in_loop0() -> None:
-    assert load_registry().metric_keys() == frozenset()
+def test_metric_register_is_populated_draft() -> None:
+    r = load_registry()
+    assert len(r.metric_keys()) == 10
+    assert r.metric_status == "draft-pending-ratification"
+    metric = r.require_metric("COST_TO_SERVE")
+    assert metric.unit == "GBP_per_year"
+    assert metric.direction == "lower_is_better"
+    # Anchors are ordered by ascending raw; lower_is_better → normalised descends.
+    raws = [a.raw for a in metric.normalisation.anchors]
+    norms = [a.normalised for a in metric.normalisation.anchors]
+    assert raws == sorted(raws)
+    assert norms == sorted(norms, reverse=True)
 
 
 def test_require_unknown_power_raises() -> None:
@@ -76,9 +92,11 @@ def test_assert_covers_missing_key_raises() -> None:
 
 
 def test_assert_covers_empty_dimension_raises() -> None:
-    r = load_registry()
+    # The real registry's dimensions are now populated, so build one with a genuinely empty
+    # metric dimension to exercise the refusal (ADR-0001 scope note).
+    r = Registry(metrics=())
     with pytest.raises(EmptyDimensionError):
-        r.assert_covers_keys("metric", r.metric_keys(), set())  # metric dimension is empty
+        r.assert_covers_keys("metric", r.metric_keys(), set())
 
 
 def test_duplicate_keys_rejected_at_construction() -> None:
@@ -122,5 +140,5 @@ def _tiny_registry(extra_module: bool = False) -> Registry:
             ),
         ),
         modules=tuple(modules),
-        metrics=(MetricDef(key="K1", name="Metric 1", direction="higher_is_better"),),
+        metrics=(MetricDef(key="K1", name="Metric 1", unit="count", direction="higher_is_better"),),
     )

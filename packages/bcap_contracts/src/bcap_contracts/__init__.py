@@ -46,9 +46,12 @@ from bcap_contracts.learning import CertificationProgress, DrillResult
 from bcap_contracts.money import Currency, Money
 from bcap_contracts.provenance import WeightProvenanceRecord
 from bcap_contracts.registry import (
+    AnchorPoint,
     EmptyDimensionError,
+    MetricDef,
     MissingKeyError,
     ModuleDef,
+    NormalisationSpec,
     PowerDef,
     Registry,
     RegistryError,
@@ -87,6 +90,9 @@ __all__ = [
     "ModuleDef",
     "PowerDef",
     "SubcomponentDef",
+    "MetricDef",
+    "AnchorPoint",
+    "NormalisationSpec",
     "load_registry",
     # assessments
     "CoefficientSet",
