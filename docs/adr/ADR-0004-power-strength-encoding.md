@@ -1,6 +1,8 @@
 # ADR-0004 — Numeric encoding of ordinal power strength for the P index
 
-- **Status:** Proposed (values to be ratified by the weight-elicitation panel)
+- **Status:** Accepted (2026-07-04; folded into Methodology v1.1 §5.4). The specific encoding
+  *values* remain draft-pending-elicitation (ratified by the θ/α panel), carried with a Weight
+  Provenance Record.
 - **Date:** 2026-07-04
 - **Deciders:** Founder + engineering + elicitation panel (Loop 1)
 - **Normative source:** `docs/ATLAS-Methodology-v1.md` §2, §5.4, §8; ADR-0002.
@@ -35,16 +37,15 @@ picked one in a script constant; that decision must be an ADR.
 
 - **Encoding floor asymmetry (review B2).** The maturity scale floors at 0.2 (Basic), so B and L
   never go below 0.2, but this encoding floors P at 0.0 (None). With equal θ, B ∈ [0.2, 1] and
-  P ∈ [0, 1] are **not on comparable effective ranges**, which distorts V. Resolve by either (a)
-  rescaling the indices to a common range before composition, or (b) dropping the metric/maturity
-  bottom anchors to 0. This is itself an ADR (proposed ADR-0005) — flagged here because it and the
-  P encoding must be decided together.
-- **Incumbent drag (review B4).** Most incumbent brokerages structurally lack the
-  origination/takeoff powers, so a uniform mean pulls P down (Meridian P = 0.271 despite an
-  Established switching-costs moat). The panel should decide whether power weights `w_j` are
-  uniform or reflect which powers are *achievable/relevant* for the business's stage (§8 Power
-  Progression), and whether "structurally-not-applicable" powers get a Not-Applicable state that
-  renormalises (as subcomponents do) rather than scoring None = 0.
+  P ∈ [0, 1] are **not on comparable effective ranges**, which distorts V. Resolved by ADR-0005
+  (accepted): do not rescale — swing-weighted θ prices the ranges. Flagged here because it and the
+  P encoding were decided together.
+- **Incumbent drag (review B4) — RESOLVED by ADR-0007.** Most incumbent brokerages structurally lack
+  the origination/takeoff powers, so a uniform mean pulls P down (Meridian P = 0.271). This is now
+  the accepted, honest result: powers are **never** Not Applicable (all 7 in scope, comparable
+  denominator), a weak power scores a real low strength, and swing-weighted θ (ADR-0005) prices the
+  low-P range. The panel may still set non-uniform power weights `w_j` reflecting stage-achievable
+  powers (§8), but N/A renormalisation is explicitly rejected.
 
 ## Consequences
 

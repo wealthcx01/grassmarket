@@ -1,6 +1,6 @@
 # ADR-0003 — The module rating gate (operationalising Methodology §5.2)
 
-- **Status:** Proposed (awaiting John's ratification)
+- **Status:** Accepted (2026-07-04; folded into Methodology v1.1 §5.2a)
 - **Date:** 2026-07-04
 - **Deciders:** Founder + engineering (Loop 1)
 - **Normative source:** `docs/ATLAS-Methodology-v1.md` §5.2. This ADR *extends* the Methodology

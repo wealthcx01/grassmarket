@@ -19,12 +19,14 @@ import openpyxl
 _ROOT = Path(__file__).resolve().parents[1]
 _XLSX = _ROOT / "fixtures" / "golden-master.xlsx"
 
+# Short aliases so the signature stays on one line — a formatting fixed point both the project ruff
+# and the pinned pre-commit ruff agree on (their multi-line-annotation styles differ otherwise).
+_SubsInput = dict[str, tuple[str, str | None]]
+_MetricsInput = dict[str, float | str]
+_PowersInput = dict[str, tuple[str, str]]
 
-def _read_inputs() -> (
-    tuple[
-        dict[str, tuple[str, str | None]], dict[str, float | str], dict[str, tuple[str, str] | str]
-    ]
-):
+
+def _read_inputs() -> tuple[_SubsInput, _MetricsInput, _PowersInput]:
     wb = openpyxl.load_workbook(_XLSX, data_only=False)
 
     subs: dict[str, tuple[str, str | None]] = {}
@@ -47,19 +49,16 @@ def _read_inputs() -> (
             continue
         metrics[key] = float(raw) if isinstance(raw, int | float) else str(raw).strip()
 
-    powers: dict[str, tuple[str, str] | str] = {}
+    # Powers are never N/A (Methodology v1.1 §8): every row carries a Benefit and a Barrier.
+    powers: dict[str, tuple[str, str]] = {}
     wb_p = wb["Powers"]
     for row in range(2, wb_p.max_row + 1):
         key = wb_p.cell(row, 1).value
         if not key:
             continue
-        state = (wb_p.cell(row, 6).value or "").strip()
-        if state:
-            powers[key] = state
-        else:
-            benefit = (wb_p.cell(row, 2).value or "").strip()
-            barrier = (wb_p.cell(row, 3).value or "").strip()
-            powers[key] = (benefit, barrier)
+        benefit = (wb_p.cell(row, 2).value or "").strip()
+        barrier = (wb_p.cell(row, 3).value or "").strip()
+        powers[key] = (benefit, barrier)
     return subs, metrics, powers
 
 

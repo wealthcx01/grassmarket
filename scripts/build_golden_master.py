@@ -35,7 +35,7 @@ _ROOT = Path(__file__).resolve().parents[1]
 _JSON_OUT = _ROOT / "tests" / "fixtures" / "golden_master.json"
 _XLSX_OUT = _ROOT / "fixtures" / "golden-master.xlsx"
 
-METHODOLOGY_VERSION = "1.0"
+METHODOLOGY_VERSION = "1.1"  # folds the golden-master extensions into the Methodology (ADR-0003..7)
 FIXTURE_STATUS = "draft-pending-ratification"
 SUBJECT = "Meridian Securities (composite mid-tier retail brokerage)"
 
@@ -50,7 +50,10 @@ NOT_ASSESSED = "NOT_ASSESSED"
 # ratings themselves stay ordinal (ADR-0002); this feeds only P.
 STRENGTH_VALUE = {"None": 0.0, "Emerging": 0.4, "Established": 0.7, "Wide": 1.0}
 STRENGTH_RANK = {"None": 0, "Emerging": 1, "Established": 2, "Wide": 3}
-# numeric-aggregate → ordinal band thresholds for the derived triad ratings (ADR-0007, draft).
+# numeric-aggregate → ordinal band thresholds for the derived triad ratings (ADR-0007, accepted).
+# These are NOT free parameters: each is the MIDPOINT between adjacent STRENGTH_VALUE anchors, i.e.
+# nearest-named-level discretisation — (0.0+0.4)/2=0.2, (0.4+0.7)/2=0.55, (0.7+1.0)/2=0.85. If the
+# encoding is re-elicited, regenerate these midpoints from it rather than tuning them independently.
 _TRIAD_THRESHOLDS = (("Wide", 0.85), ("Established", 0.55), ("Emerging", 0.2), ("None", 0.0))
 
 # Draft group weights for the B index (ADR-0006): scale metrics count as ONE group, not ~4× (B1).
@@ -69,65 +72,65 @@ CRITICAL_MODULES_FOR_L = ("APP_SERVER", "BACKOFFICE", "OEMS")  # draft: brokerag
 # and one Not-Applicable case exercise §3.2.
 SUBCOMPONENTS: dict[str, tuple[str, str | None]] = {
     # FRONTEND
-    "PERFORMANCE": ("Advanced", "E3"),
-    "UX_NAVIGATION": ("Advanced", "E4"),
-    "DEVICE_COVERAGE": ("Developing", "E2"),
-    "PERSONALISATION": ("Developing", "E2"),
-    "ACCESSIBILITY_LOCALISATION": ("Basic", "E2"),
-    "EXPERIMENTATION_ANALYTICS": ("Developing", "E3"),
+    "FRONTEND_PERFORMANCE": ("Advanced", "E3"),
+    "FRONTEND_UX_NAVIGATION": ("Advanced", "E4"),
+    "FRONTEND_DEVICE_COVERAGE": ("Developing", "E2"),
+    "FRONTEND_PERSONALISATION": ("Developing", "E2"),
+    "FRONTEND_ACCESSIBILITY_LOCALISATION": ("Basic", "E2"),
+    "FRONTEND_EXPERIMENTATION_ANALYTICS": ("Developing", "E3"),
     # APP_SERVER
-    "HOSTING_ELASTICITY": ("Advanced", "E3"),
-    "RESILIENCE_DR": ("Developing", "E3"),
-    "API_DESIGN": ("Advanced", "E3"),
-    "SECURITY_COMPLIANCE": ("Advanced", "E4"),
-    "DEVOPS_DEPLOYMENT": ("Developing", "E2"),
-    "DATA_ARCHITECTURE": ("Developing", "E2"),
-    "OBSERVABILITY": ("Advanced", "E3"),
+    "APP_SERVER_HOSTING_ELASTICITY": ("Advanced", "E3"),
+    "APP_SERVER_RESILIENCE_DR": ("Developing", "E3"),
+    "APP_SERVER_API_DESIGN": ("Advanced", "E3"),
+    "APP_SERVER_SECURITY_COMPLIANCE": ("Advanced", "E4"),
+    "APP_SERVER_DEVOPS_DEPLOYMENT": ("Developing", "E2"),
+    "APP_SERVER_DATA_ARCHITECTURE": ("Developing", "E2"),
+    "APP_SERVER_OBSERVABILITY": ("Advanced", "E3"),
     # MARKET_DATA
-    "EXCHANGE_COVERAGE": ("Advanced", "E3"),
-    "INSTRUMENT_UNIVERSE": ("Advanced", "E2"),
-    "DATA_DEPTH_QUALITY": ("Advanced", "E3"),
-    "LATENCY_TIMELINESS": ("Developing", "E3"),
-    "HISTORY_DEPTH": ("Developing", "E2"),
-    "VENDOR_REDUNDANCY": ("Basic", "E2"),
-    "VALUE_ADD_SERVICES": (NOT_ASSESSED, None),
+    "MARKET_DATA_EXCHANGE_COVERAGE": ("Advanced", "E3"),
+    "MARKET_DATA_INSTRUMENT_UNIVERSE": ("Advanced", "E2"),
+    "MARKET_DATA_DEPTH_QUALITY": ("Advanced", "E3"),
+    "MARKET_DATA_LATENCY_TIMELINESS": ("Developing", "E3"),
+    "MARKET_DATA_HISTORY_DEPTH": ("Developing", "E2"),
+    "MARKET_DATA_VENDOR_REDUNDANCY": ("Basic", "E2"),
+    "MARKET_DATA_VALUE_ADD_SERVICES": (NOT_ASSESSED, None),
     # ORCHESTRATION
-    "WORKFLOW_ENGINE": ("Developing", "E3"),
-    "ROUTING_LOGIC": ("Developing", "E2"),
-    "EVENT_DRIVEN": ("Basic", "E2"),
-    "CONFIG_VS_CODE": ("Developing", "E2"),
-    "ORCH_MONITORING": ("Developing", "E3"),
+    "ORCHESTRATION_WORKFLOW_ENGINE": ("Developing", "E3"),
+    "ORCHESTRATION_ROUTING_LOGIC": ("Developing", "E2"),
+    "ORCHESTRATION_EVENT_DRIVEN": ("Basic", "E2"),
+    "ORCHESTRATION_CONFIG_VS_CODE": ("Developing", "E2"),
+    "ORCHESTRATION_MONITORING": ("Developing", "E3"),
     # CMS
-    "RESEARCH_AUTHORING": ("Advanced", "E3"),
-    "RESEARCH_DISTRIBUTION": ("Developing", "E2"),
-    "EMAIL_CAMPAIGNS": ("Advanced", "E3"),
-    "CRM_MODEL": ("Developing", "E3"),
-    "STATEMENTS": ("Advanced", "E3"),
-    "CONTENT_SEARCH_PERSONALISATION": ("Basic", "E2"),
+    "CMS_RESEARCH_AUTHORING": ("Advanced", "E3"),
+    "CMS_RESEARCH_DISTRIBUTION": ("Developing", "E2"),
+    "CMS_EMAIL_CAMPAIGNS": ("Advanced", "E3"),
+    "CMS_CRM_MODEL": ("Developing", "E3"),
+    "CMS_STATEMENTS": ("Advanced", "E3"),
+    "CMS_CONTENT_SEARCH_PERSONALISATION": ("Basic", "E2"),
     # BACKOFFICE
-    "CUSTODY": ("Advanced", "E4"),
-    "PAYMENTS_FUNDING": ("Advanced", "E3"),
-    "KYC_ONBOARDING": ("Advanced", "E3"),
-    "PORTFOLIO_MGMT": ("Developing", "E2"),
-    "CREDIT_RISK": ("Developing", "E2"),
-    "REG_REPORTING": ("Advanced", "E4"),
+    "BACKOFFICE_CUSTODY": ("Advanced", "E4"),
+    "BACKOFFICE_PAYMENTS_FUNDING": ("Advanced", "E3"),
+    "BACKOFFICE_KYC_ONBOARDING": ("Advanced", "E3"),
+    "BACKOFFICE_PORTFOLIO_MGMT": ("Developing", "E2"),
+    "BACKOFFICE_CREDIT_RISK": ("Developing", "E2"),
+    "BACKOFFICE_REG_REPORTING": ("Advanced", "E4"),
     # OEMS
-    "ASSET_COVERAGE": ("Developing", "E2"),
-    "EXEC_ALGOS": ("Basic", "E2"),
-    "PRE_TRADE_RISK": ("Advanced", "E3"),
-    "ORDER_TYPES": ("Developing", "E2"),
+    "OEMS_ASSET_COVERAGE": ("Developing", "E2"),
+    "OEMS_EXEC_ALGOS": ("Basic", "E2"),
+    "OEMS_PRE_TRADE_RISK": ("Advanced", "E3"),
+    "OEMS_ORDER_TYPES": ("Developing", "E2"),
     "OEMS_LATENCY_RELIABILITY": ("Developing", "E3"),
     "OEMS_APIS_COLOCATION": (NOT_APPLICABLE, None),
     # EMS_GATEWAY
-    "EMS_CONNECTIVITY": ("Developing", "E2"),
-    "EMS_ROUTING_POLICY": ("Developing", "E2"),
-    "EMS_RISK_THROTTLING": ("Advanced", "E3"),
-    "EMS_MONITORING": ("Developing", "E2"),
+    "EMS_GATEWAY_CONNECTIVITY": ("Developing", "E2"),
+    "EMS_GATEWAY_ROUTING_POLICY": ("Developing", "E2"),
+    "EMS_GATEWAY_RISK_THROTTLING": ("Advanced", "E3"),
+    "EMS_GATEWAY_MONITORING": ("Developing", "E2"),
     # LIQ_CONNECT
-    "LOCAL_EXCHANGES": ("Advanced", "E3"),
-    "FOREIGN_BROKERS": ("Developing", "E2"),
-    "FUND_HOUSES": (NOT_ASSESSED, None),
-    "SETTLEMENT_CLEARING": ("Advanced", "E3"),
+    "LIQ_CONNECT_LOCAL_EXCHANGES": ("Advanced", "E3"),
+    "LIQ_CONNECT_FOREIGN_BROKERS": ("Developing", "E2"),
+    "LIQ_CONNECT_FUND_HOUSES": (NOT_ASSESSED, None),
+    "LIQ_CONNECT_SETTLEMENT_CLEARING": ("Advanced", "E3"),
 }
 
 # Business metric raw values (declared unit), OR a non-score state string (NOT_APPLICABLE /
@@ -145,15 +148,23 @@ METRIC_RAW: dict[str, float | str] = {
     "CAC_PAYBACK_MONTHS": 18,
 }
 
-# Powers now carry a BENEFIT strength and a BARRIER strength (Helmer: a power needs both; review
-# B8) — or the whole power is NOT_APPLICABLE (structurally irrelevant to this business; review B4).
+# Powers carry a BENEFIT strength and a BARRIER strength (Helmer: a power needs both; review B8).
 # Per-power strength = the weaker of Benefit/Barrier; the triad (§2) is derived from the two sides.
-# Meridian: Network Economies and Counter-Positioning are marked N/A — a mid-tier retail brokerage
-# is not a marketplace/network business and is not counter-positioning an incumbent. (John's call.)
-POWER_ASSESSMENT: dict[str, tuple[str, str] | str] = {
+# N/A is NOT a legal state for a power — all 7 powers are always in scope (Methodology v1.1 §8;
+# ADR-0007 revised). A power that is structurally weak for this business scores a real LOW level,
+# not N/A: absent-because-weak is a genuine None/Emerging reading, and Helmer's both-required test
+# already collapses a one-sided power to its weaker (often None) side.
+#
+# Meridian (draft, John to ratify): Network Economies is weak — some social/referral sharing gives
+# an Emerging benefit, but there is no installed-base lock-in, so the Barrier is None (a challenger
+# need not match a network to compete). Counter-Positioning is weak vs traditional banks — the
+# digital, low-fee model is a genuine Emerging benefit, but incumbents are not structurally deterred
+# from launching rival digital brokerages, so the Barrier is None. Both therefore score strength
+# None (the weaker side) — real, low, and honest rather than dropped.
+POWER_ASSESSMENT: dict[str, tuple[str, str]] = {
     "SCALE_ECONOMIES": ("Emerging", "Emerging"),
-    "NETWORK_ECONOMIES": NOT_APPLICABLE,
-    "COUNTER_POSITIONING": NOT_APPLICABLE,
+    "NETWORK_ECONOMIES": ("Emerging", "None"),
+    "COUNTER_POSITIONING": ("Emerging", "None"),
     "SWITCHING_COSTS": ("Established", "Established"),
     "BRANDING": ("Emerging", "Emerging"),
     "CORNERED_RESOURCE": ("None", "None"),
@@ -261,11 +272,11 @@ def _compute_triad(
 
     Ordinal OUT (ADR-0002): each dimension reports a `rating`; the numeric `score` is shown only for
     audit. Economic = B's scale + unit-economics signal; Perceived = Benefit-side of Branding +
-    Switching Costs; Defence = the Barrier-side aggregate across applicable powers (the moat)."""
-    applicable = [p for p in power_rows if p.get("state") is None]
-    barriers = [STRENGTH_VALUE[p["barrier"]] for p in applicable]
+    Switching Costs; Defence = the Barrier-side aggregate across ALL 7 powers (the moat) — powers
+    are never N/A (Methodology v1.1 §8), so this is the literal §2 across-all-powers aggregate."""
+    barriers = [STRENGTH_VALUE[p["barrier"]] for p in power_rows]
     defence = sum(barriers) / len(barriers)
-    perceived_src = [p for p in applicable if p["key"] in ("BRANDING", "SWITCHING_COSTS")]
+    perceived_src = [p for p in power_rows if p["key"] in ("BRANDING", "SWITCHING_COSTS")]
     perceived = (
         sum(STRENGTH_VALUE[p["benefit"]] for p in perceived_src) / len(perceived_src)
         if perceived_src
@@ -390,20 +401,17 @@ def compute(registry: Registry) -> dict[str, Any]:
     b_den = sum(GROUP_WEIGHTS[g] for g in group_means)
     B = b_num / b_den
 
-    # P = mean over APPLICABLE powers of each power's strength, where a power's strength is the
-    # WEAKER of its Benefit and Barrier (Helmer: a power needs both; review B8). NOT_APPLICABLE
-    # powers are dropped and P renormalises (review B4).
+    # P = mean over ALL 7 powers of each power's strength, where a power's strength is the WEAKER
+    # of its Benefit and Barrier (Helmer: a power needs both; review B8). N/A is not a legal power
+    # state (Methodology v1.1 §8) — every power is in scope, and a structurally weak power scores a
+    # real low strength (often None via the weaker side) rather than being dropped.
     power_rows: list[dict[str, Any]] = []
-    applicable_values: list[float] = []
+    power_values: list[float] = []
     for power in registry.powers:
-        assessment = POWER_ASSESSMENT[power.key]
-        if assessment == NOT_APPLICABLE:
-            power_rows.append({"key": power.key, "state": NOT_APPLICABLE})
-            continue
-        benefit, barrier = assessment
+        benefit, barrier = POWER_ASSESSMENT[power.key]
         strength = benefit if STRENGTH_RANK[benefit] <= STRENGTH_RANK[barrier] else barrier
         value = STRENGTH_VALUE[strength]
-        applicable_values.append(value)
+        power_values.append(value)
         power_rows.append(
             {
                 "key": power.key,
@@ -411,16 +419,19 @@ def compute(registry: Registry) -> dict[str, Any]:
                 "barrier": barrier,
                 "strength": strength,  # the weaker side (Helmer both-required)
                 "value": value,
-                "state": None,
+                "state": None,  # retained for output-shape stability; always None (no N/A powers)
             }
         )
-    if not applicable_values:
-        raise ValueError("Cannot compute P: no power is applicable.")
-    P = sum(applicable_values) / len(applicable_values)
+    P = sum(power_values) / len(power_values)
 
     triad = _compute_triad(power_rows, group_means)
 
     V = THETA["B"] * B + THETA["P"] * P + THETA["L"] * L
+    # Display is derived from the STORED (rounded) V so 0–100 == V×100 exactly (ADR-0001 §4). Build
+    # the convention string from the computed value so it can never go stale (review defect: it once
+    # cited a V from a superseded power model).
+    v_stored = _round(V)
+    v_display = _round(v_stored * 100)
 
     return {
         "metadata": {
@@ -429,14 +440,16 @@ def compute(registry: Registry) -> dict[str, Any]:
             "methodology_version": METHODOLOGY_VERSION,
             "status": FIXTURE_STATUS,
             "display_convention": (
-                "Indices are stored on [0,1] to 6 dp; the 0–100 display is the STORED V × 100 "
-                "(ADR-0001 §4). Narrative may round further (e.g. 47.86) — the fixture value "
-                "(47.8586) is authoritative."
+                f"Indices are stored on [0,1] to 6 dp; the 0–100 display is the STORED V × 100 "
+                f"(ADR-0001 §4). Narrative may round further (e.g. {v_display:.2f}) — the fixture "
+                f"value ({v_display}) is authoritative."
             ),
             "note": (
-                "Reference computation of Methodology §5. Coefficients, the power-strength "
-                "encoding, and the rating-gate rule are DRAFT pending John's ratification and the "
-                "elicitation panel. The engine (GRS-0004) must reproduce these values exactly."
+                "Reference computation of Methodology v1.1 §5. Coefficients and the power-strength "
+                "encoding are DRAFT pending John's ratification and the elicitation panel; the "
+                "gate rule, metric grouping, power-strength = min(Benefit, Barrier), and "
+                "powers-never-N/A are now Methodology v1.1 (ADR-0003..0007). The engine (GRS-0004) "
+                "must reproduce these values exactly."
             ),
         },
         "coefficients": {
@@ -652,9 +665,9 @@ def write_workbook(registry: Registry, result: dict[str, Any], path: Path) -> No
     b_cell = f"Business!$N${b_row}"
     _autofit(ws_b, {1: 24, 2: 15})
 
-    # --- Powers (Benefit/Barrier; strength = the weaker; N/A dropped; P = mean over applicable) ---
+    # --- Powers (Benefit/Barrier; strength = the weaker; all 7 in scope; P = mean over all 7) ---
     ws_p = wb.create_sheet("Powers")
-    _header(ws_p, 1, ["Power", "Benefit", "Barrier", "Strength (weaker)", "Value", "State"])
+    _header(ws_p, 1, ["Power", "Benefit", "Barrier", "Strength (weaker)", "Value"])
 
     def _rank(col: str, row: int) -> str:
         c = f"${col}{row}"
@@ -662,28 +675,24 @@ def write_workbook(registry: Registry, result: dict[str, Any], path: Path) -> No
 
     pr = 2
     for power in registry.powers:
-        assessment = POWER_ASSESSMENT[power.key]
+        benefit, barrier = POWER_ASSESSMENT[power.key]  # never N/A (Methodology v1.1 §8)
         ws_p.cell(row=pr, column=1, value=power.key)
-        if assessment == NOT_APPLICABLE:
-            ws_p.cell(row=pr, column=6, value="NOT_APPLICABLE")
-        else:
-            benefit, barrier = assessment
-            ws_p.cell(row=pr, column=2, value=benefit)
-            ws_p.cell(row=pr, column=3, value=barrier)
-            # Strength = the weaker of Benefit/Barrier (Helmer both-required), live.
-            ws_p.cell(
-                row=pr,
-                column=4,
-                value=f"=IF(({_rank('B', pr)})<=({_rank('C', pr)}),$B{pr},$C{pr})",
-            )
-            ws_p.cell(
-                row=pr,
-                column=5,
-                value=(
-                    f'=IF($D{pr}="","",IF($D{pr}="None",0,IF($D{pr}="Emerging",0.4,'
-                    f'IF($D{pr}="Established",0.7,IF($D{pr}="Wide",1,"")))))'
-                ),
-            )
+        ws_p.cell(row=pr, column=2, value=benefit)
+        ws_p.cell(row=pr, column=3, value=barrier)
+        # Strength = the weaker of Benefit/Barrier (Helmer both-required), live.
+        ws_p.cell(
+            row=pr,
+            column=4,
+            value=f"=IF(({_rank('B', pr)})<=({_rank('C', pr)}),$B{pr},$C{pr})",
+        )
+        ws_p.cell(
+            row=pr,
+            column=5,
+            value=(
+                f'=IF($D{pr}="","",IF($D{pr}="None",0,IF($D{pr}="Emerging",0.4,'
+                f'IF($D{pr}="Established",0.7,IF($D{pr}="Wide",1,"")))))'
+            ),
+        )
         pr += 1
     last_power = pr - 1
     ws_p.cell(row=pr, column=4, value="P =")
@@ -741,15 +750,17 @@ def write_workbook(registry: Registry, result: dict[str, Any], path: Path) -> No
         f"Methodology: v{METHODOLOGY_VERSION}  |  Status: {FIXTURE_STATUS}",
         "",
         "This workbook computes one complete assessment with LIVE formulas. Edit a Level on the",
-        "Subcomponents sheet (or set a State: NOT_APPLICABLE / NOT_ASSESSED) and q_m, L, B, P, V",
-        "recompute. B is a group-weighted mean (scale/unit-econ/momentum, ADR-0006); powers carry",
-        "Benefit + Barrier and the weaker gates (Helmer); N/A powers drop from P. Gate bands",
-        "and the triad are rule-based/derived (computed values, regenerated by Python).",
+        "Subcomponents sheet (or set a subcomponent/metric State: NOT_APPLICABLE / NOT_ASSESSED)",
+        "and q_m, L, B, P, V recompute. B is a group-weighted mean (scale/unit-econ/momentum,",
+        "ADR-0006); powers carry Benefit + Barrier and the weaker side gates (Helmer). All 7",
+        "powers are always in scope — N/A is not a legal power state (Methodology v1.1 §8). Gate",
+        "bands and the triad are rule-based/derived (computed values, regenerated by Python).",
         "",
         "DRAFT judgement calls for John (GRS-0003 review): subcomponent levels/evidence; critical",
-        "flags; the N/A powers (Network Economies, Counter-Positioning); the draft coefficients",
-        "(α, δ, λ, θ, group weights); the strength encoding (ADR-0004); the gate rule (ADR-0003);",
-        "B/P range comparability (ADR-0005). Edit, save, then run",
+        "flags; the Network Economies / Counter-Positioning strengths (now real LOW levels, not",
+        "N/A); the draft coefficients (α, δ, λ, θ, group weights); the strength encoding",
+        "(ADR-0004); the gate rule (ADR-0003); B/P range comparability (ADR-0005). Edit, save,",
+        "then run",
         "scripts/regen_golden_master_json.py to refresh the JSON fixture.",
         "",
         f"Headline: B={c['B']}  P={c['P']}  L={c['L']}  →  V={c['V']} "

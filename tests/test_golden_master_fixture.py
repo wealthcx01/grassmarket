@@ -26,7 +26,7 @@ def gm() -> dict:
 
 def test_fixture_is_draft_flagged(gm: dict) -> None:
     assert gm["metadata"]["status"] == "draft-pending-ratification"
-    assert gm["metadata"]["methodology_version"] == "1.0"
+    assert gm["metadata"]["methodology_version"] == "1.1"
 
 
 def test_covers_the_registry_exactly(gm: dict) -> None:
@@ -100,17 +100,25 @@ def test_B_is_group_weighted(gm: dict) -> None:
     assert math.isclose(gm["business"]["B"], b, abs_tol=1e-6)
 
 
-def test_P_uses_weaker_of_benefit_barrier_over_applicable(gm: dict) -> None:
+def test_all_seven_powers_in_scope_never_na(gm: dict) -> None:
+    # Powers are never N/A (Methodology v1.1 §8): all 7 carry a Benefit + Barrier, none is dropped.
+    powers = gm["powers"]["powers"]
+    assert len(powers) == 7
+    for p in powers:
+        assert p.get("state") is None  # no NOT_APPLICABLE power state
+        assert p["benefit"] and p["barrier"]
+
+
+def test_P_uses_weaker_of_benefit_barrier_over_all_powers(gm: dict) -> None:
     enc = gm["coefficients"]["strength_encoding"]
     rank = {"None": 0, "Emerging": 1, "Established": 2, "Wide": 3}
-    applicable = [p for p in gm["powers"]["powers"] if p.get("state") is None]
-    assert applicable, "at least one power must be applicable"
-    for p in applicable:
+    powers = gm["powers"]["powers"]
+    for p in powers:
         weaker = p["benefit"] if rank[p["benefit"]] <= rank[p["barrier"]] else p["barrier"]
         assert p["strength"] == weaker  # Helmer: a power is only as strong as its weaker side
         assert p["value"] == enc[weaker]
-    # N/A powers carry no value and are excluded from P.
-    p_index = sum(p["value"] for p in applicable) / len(applicable)
+    # P is the mean over ALL 7 powers (no renormalisation — no power is dropped).
+    p_index = sum(p["value"] for p in powers) / len(powers)
     assert math.isclose(gm["powers"]["P"], p_index, abs_tol=1e-6)
 
 
@@ -119,9 +127,9 @@ def test_triad_is_ordinal(gm: dict) -> None:
     for dim in ("economic_value", "perceived_value", "defence_value"):
         assert gm["triad"][dim]["rating"] in ordinals  # ordinal out (ADR-0002)
         assert 0.0 <= gm["triad"][dim]["score"] <= 1.0
-    # Defence Value is the barrier-side aggregate across applicable powers (§2).
-    applicable = [p for p in gm["powers"]["powers"] if p.get("state") is None]
-    barriers = [gm["coefficients"]["strength_encoding"][p["barrier"]] for p in applicable]
+    # Defence Value is the barrier-side aggregate across ALL 7 powers (§2 — powers never N/A).
+    powers = gm["powers"]["powers"]
+    barriers = [gm["coefficients"]["strength_encoding"][p["barrier"]] for p in powers]
     assert math.isclose(
         gm["triad"]["defence_value"]["score"], sum(barriers) / len(barriers), abs_tol=1e-6
     )

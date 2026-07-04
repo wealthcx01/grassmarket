@@ -1,6 +1,7 @@
 # ADR-0005 — Comparability of the B / P / L index ranges at composition
 
-- **Status:** Proposed (awaiting John / elicitation panel)
+- **Status:** Accepted (2026-07-04; folded into Methodology v1.1 §5.4). The θ *values* remain
+  draft-pending-elicitation (swing-weighted by the panel).
 - **Date:** 2026-07-04
 - **Deciders:** Founder + engineering + elicitation panel (Loop 1)
 - **Normative source:** `docs/ATLAS-Methodology-v1.md` §5.4, §6; ADR-0001.

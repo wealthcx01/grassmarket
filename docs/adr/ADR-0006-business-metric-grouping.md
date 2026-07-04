@@ -1,6 +1,7 @@
 # ADR-0006 — Group-weighted Business index (B)
 
-- **Status:** Proposed (group weights to be ratified by the elicitation panel)
+- **Status:** Accepted (2026-07-04; folded into Methodology v1.1 §5.3). The group *weights* remain
+  draft-pending-elicitation (swing-weighted by the panel).
 - **Date:** 2026-07-04
 - **Deciders:** Founder + engineering + elicitation panel (Loop 1)
 - **Normative source:** `docs/ATLAS-Methodology-v1.md` §5.3.

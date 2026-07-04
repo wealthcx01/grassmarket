@@ -2,10 +2,10 @@
   "metadata": {
     "fixture": "atlas-golden-master",
     "subject": "Meridian Securities (composite mid-tier retail brokerage)",
-    "methodology_version": "1.0",
+    "methodology_version": "1.1",
     "status": "draft-pending-ratification",
-    "display_convention": "Indices are stored on [0,1] to 6 dp; the 0–100 display is the STORED V × 100 (ADR-0001 §4). Narrative may round further (e.g. 47.86) — the fixture value (47.8586) is authoritative.",
-    "note": "Reference computation of Methodology §5. Coefficients, the power-strength encoding, and the rating-gate rule are DRAFT pending John's ratification and the elicitation panel. The engine (GRS-0004) must reproduce these values exactly."
+    "display_convention": "Indices are stored on [0,1] to 6 dp; the 0–100 display is the STORED V × 100 (ADR-0001 §4). Narrative may round further (e.g. 47.86) — the fixture value (47.8565) is authoritative.",
+    "note": "Reference computation of Methodology v1.1 §5. Coefficients and the power-strength encoding are DRAFT pending John's ratification and the elicitation panel; the gate rule, metric grouping, power-strength = min(Benefit, Barrier), and powers-never-N/A are now Methodology v1.1 (ADR-0003..0007). The engine (GRS-0004) must reproduce these values exactly."
   },
   "coefficients": {
     "alpha_module": 0.7,
@@ -48,7 +48,7 @@
       "name": "Front End",
       "subcomponents": [
         {
-          "key": "PERFORMANCE",
+          "key": "FRONTEND_PERFORMANCE",
           "critical": true,
           "level": "Advanced",
           "index": 0.8,
@@ -56,7 +56,7 @@
           "state": null
         },
         {
-          "key": "UX_NAVIGATION",
+          "key": "FRONTEND_UX_NAVIGATION",
           "critical": true,
           "level": "Advanced",
           "index": 0.8,
@@ -64,7 +64,7 @@
           "state": null
         },
         {
-          "key": "DEVICE_COVERAGE",
+          "key": "FRONTEND_DEVICE_COVERAGE",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -72,7 +72,7 @@
           "state": null
         },
         {
-          "key": "PERSONALISATION",
+          "key": "FRONTEND_PERSONALISATION",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -80,7 +80,7 @@
           "state": null
         },
         {
-          "key": "ACCESSIBILITY_LOCALISATION",
+          "key": "FRONTEND_ACCESSIBILITY_LOCALISATION",
           "critical": false,
           "level": "Basic",
           "index": 0.2,
@@ -88,7 +88,7 @@
           "state": null
         },
         {
-          "key": "EXPERIMENTATION_ANALYTICS",
+          "key": "FRONTEND_EXPERIMENTATION_ANALYTICS",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -103,7 +103,7 @@
       "alpha": 0.7,
       "weighted_avg": 0.55,
       "min_term": 0.2,
-      "bottleneck_subcomponent": "ACCESSIBILITY_LOCALISATION",
+      "bottleneck_subcomponent": "FRONTEND_ACCESSIBILITY_LOCALISATION",
       "q_m": 0.445,
       "gate_band": "Developing",
       "gate_blocked": false,
@@ -114,7 +114,7 @@
       "name": "Application Server",
       "subcomponents": [
         {
-          "key": "HOSTING_ELASTICITY",
+          "key": "APP_SERVER_HOSTING_ELASTICITY",
           "critical": false,
           "level": "Advanced",
           "index": 0.8,
@@ -122,7 +122,7 @@
           "state": null
         },
         {
-          "key": "RESILIENCE_DR",
+          "key": "APP_SERVER_RESILIENCE_DR",
           "critical": true,
           "level": "Developing",
           "index": 0.5,
@@ -130,7 +130,7 @@
           "state": null
         },
         {
-          "key": "API_DESIGN",
+          "key": "APP_SERVER_API_DESIGN",
           "critical": false,
           "level": "Advanced",
           "index": 0.8,
@@ -138,7 +138,7 @@
           "state": null
         },
         {
-          "key": "SECURITY_COMPLIANCE",
+          "key": "APP_SERVER_SECURITY_COMPLIANCE",
           "critical": true,
           "level": "Advanced",
           "index": 0.8,
@@ -146,7 +146,7 @@
           "state": null
         },
         {
-          "key": "DEVOPS_DEPLOYMENT",
+          "key": "APP_SERVER_DEVOPS_DEPLOYMENT",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -154,7 +154,7 @@
           "state": null
         },
         {
-          "key": "DATA_ARCHITECTURE",
+          "key": "APP_SERVER_DATA_ARCHITECTURE",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -162,7 +162,7 @@
           "state": null
         },
         {
-          "key": "OBSERVABILITY",
+          "key": "APP_SERVER_OBSERVABILITY",
           "critical": false,
           "level": "Advanced",
           "index": 0.8,
@@ -177,7 +177,7 @@
       "alpha": 0.7,
       "weighted_avg": 0.671429,
       "min_term": 0.5,
-      "bottleneck_subcomponent": "RESILIENCE_DR",
+      "bottleneck_subcomponent": "APP_SERVER_RESILIENCE_DR",
       "q_m": 0.62,
       "gate_band": "Advanced",
       "gate_blocked": false,
@@ -188,7 +188,7 @@
       "name": "Market Data",
       "subcomponents": [
         {
-          "key": "EXCHANGE_COVERAGE",
+          "key": "MARKET_DATA_EXCHANGE_COVERAGE",
           "critical": false,
           "level": "Advanced",
           "index": 0.8,
@@ -196,7 +196,7 @@
           "state": null
         },
         {
-          "key": "INSTRUMENT_UNIVERSE",
+          "key": "MARKET_DATA_INSTRUMENT_UNIVERSE",
           "critical": false,
           "level": "Advanced",
           "index": 0.8,
@@ -204,7 +204,7 @@
           "state": null
         },
         {
-          "key": "DATA_DEPTH_QUALITY",
+          "key": "MARKET_DATA_DEPTH_QUALITY",
           "critical": true,
           "level": "Advanced",
           "index": 0.8,
@@ -212,7 +212,7 @@
           "state": null
         },
         {
-          "key": "LATENCY_TIMELINESS",
+          "key": "MARKET_DATA_LATENCY_TIMELINESS",
           "critical": true,
           "level": "Developing",
           "index": 0.5,
@@ -220,7 +220,7 @@
           "state": null
         },
         {
-          "key": "HISTORY_DEPTH",
+          "key": "MARKET_DATA_HISTORY_DEPTH",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -228,7 +228,7 @@
           "state": null
         },
         {
-          "key": "VENDOR_REDUNDANCY",
+          "key": "MARKET_DATA_VENDOR_REDUNDANCY",
           "critical": false,
           "level": "Basic",
           "index": 0.2,
@@ -236,7 +236,7 @@
           "state": null
         },
         {
-          "key": "VALUE_ADD_SERVICES",
+          "key": "MARKET_DATA_VALUE_ADD_SERVICES",
           "critical": false,
           "level": null,
           "index": null,
@@ -251,7 +251,7 @@
       "alpha": 0.7,
       "weighted_avg": 0.6,
       "min_term": 0.2,
-      "bottleneck_subcomponent": "VENDOR_REDUNDANCY",
+      "bottleneck_subcomponent": "MARKET_DATA_VENDOR_REDUNDANCY",
       "q_m": 0.48,
       "gate_band": "Developing",
       "gate_blocked": false,
@@ -262,7 +262,7 @@
       "name": "Orchestration",
       "subcomponents": [
         {
-          "key": "WORKFLOW_ENGINE",
+          "key": "ORCHESTRATION_WORKFLOW_ENGINE",
           "critical": true,
           "level": "Developing",
           "index": 0.5,
@@ -270,7 +270,7 @@
           "state": null
         },
         {
-          "key": "ROUTING_LOGIC",
+          "key": "ORCHESTRATION_ROUTING_LOGIC",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -278,7 +278,7 @@
           "state": null
         },
         {
-          "key": "EVENT_DRIVEN",
+          "key": "ORCHESTRATION_EVENT_DRIVEN",
           "critical": false,
           "level": "Basic",
           "index": 0.2,
@@ -286,7 +286,7 @@
           "state": null
         },
         {
-          "key": "CONFIG_VS_CODE",
+          "key": "ORCHESTRATION_CONFIG_VS_CODE",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -294,7 +294,7 @@
           "state": null
         },
         {
-          "key": "ORCH_MONITORING",
+          "key": "ORCHESTRATION_MONITORING",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -309,7 +309,7 @@
       "alpha": 0.7,
       "weighted_avg": 0.44,
       "min_term": 0.2,
-      "bottleneck_subcomponent": "EVENT_DRIVEN",
+      "bottleneck_subcomponent": "ORCHESTRATION_EVENT_DRIVEN",
       "q_m": 0.368,
       "gate_band": "Developing",
       "gate_blocked": false,
@@ -320,7 +320,7 @@
       "name": "Client Management System",
       "subcomponents": [
         {
-          "key": "RESEARCH_AUTHORING",
+          "key": "CMS_RESEARCH_AUTHORING",
           "critical": false,
           "level": "Advanced",
           "index": 0.8,
@@ -328,7 +328,7 @@
           "state": null
         },
         {
-          "key": "RESEARCH_DISTRIBUTION",
+          "key": "CMS_RESEARCH_DISTRIBUTION",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -336,7 +336,7 @@
           "state": null
         },
         {
-          "key": "EMAIL_CAMPAIGNS",
+          "key": "CMS_EMAIL_CAMPAIGNS",
           "critical": false,
           "level": "Advanced",
           "index": 0.8,
@@ -344,7 +344,7 @@
           "state": null
         },
         {
-          "key": "CRM_MODEL",
+          "key": "CMS_CRM_MODEL",
           "critical": true,
           "level": "Developing",
           "index": 0.5,
@@ -352,7 +352,7 @@
           "state": null
         },
         {
-          "key": "STATEMENTS",
+          "key": "CMS_STATEMENTS",
           "critical": false,
           "level": "Advanced",
           "index": 0.8,
@@ -360,7 +360,7 @@
           "state": null
         },
         {
-          "key": "CONTENT_SEARCH_PERSONALISATION",
+          "key": "CMS_CONTENT_SEARCH_PERSONALISATION",
           "critical": false,
           "level": "Basic",
           "index": 0.2,
@@ -375,7 +375,7 @@
       "alpha": 0.7,
       "weighted_avg": 0.6,
       "min_term": 0.2,
-      "bottleneck_subcomponent": "CONTENT_SEARCH_PERSONALISATION",
+      "bottleneck_subcomponent": "CMS_CONTENT_SEARCH_PERSONALISATION",
       "q_m": 0.48,
       "gate_band": "Developing",
       "gate_blocked": false,
@@ -386,7 +386,7 @@
       "name": "Back Office",
       "subcomponents": [
         {
-          "key": "CUSTODY",
+          "key": "BACKOFFICE_CUSTODY",
           "critical": true,
           "level": "Advanced",
           "index": 0.8,
@@ -394,7 +394,7 @@
           "state": null
         },
         {
-          "key": "PAYMENTS_FUNDING",
+          "key": "BACKOFFICE_PAYMENTS_FUNDING",
           "critical": false,
           "level": "Advanced",
           "index": 0.8,
@@ -402,7 +402,7 @@
           "state": null
         },
         {
-          "key": "KYC_ONBOARDING",
+          "key": "BACKOFFICE_KYC_ONBOARDING",
           "critical": false,
           "level": "Advanced",
           "index": 0.8,
@@ -410,7 +410,7 @@
           "state": null
         },
         {
-          "key": "PORTFOLIO_MGMT",
+          "key": "BACKOFFICE_PORTFOLIO_MGMT",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -418,7 +418,7 @@
           "state": null
         },
         {
-          "key": "CREDIT_RISK",
+          "key": "BACKOFFICE_CREDIT_RISK",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -426,7 +426,7 @@
           "state": null
         },
         {
-          "key": "REG_REPORTING",
+          "key": "BACKOFFICE_REG_REPORTING",
           "critical": true,
           "level": "Advanced",
           "index": 0.8,
@@ -441,7 +441,7 @@
       "alpha": 0.7,
       "weighted_avg": 0.7,
       "min_term": 0.5,
-      "bottleneck_subcomponent": "PORTFOLIO_MGMT",
+      "bottleneck_subcomponent": "BACKOFFICE_PORTFOLIO_MGMT",
       "q_m": 0.64,
       "gate_band": "Advanced",
       "gate_blocked": false,
@@ -452,7 +452,7 @@
       "name": "Order & Execution Management",
       "subcomponents": [
         {
-          "key": "ASSET_COVERAGE",
+          "key": "OEMS_ASSET_COVERAGE",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -460,7 +460,7 @@
           "state": null
         },
         {
-          "key": "EXEC_ALGOS",
+          "key": "OEMS_EXEC_ALGOS",
           "critical": false,
           "level": "Basic",
           "index": 0.2,
@@ -468,7 +468,7 @@
           "state": null
         },
         {
-          "key": "PRE_TRADE_RISK",
+          "key": "OEMS_PRE_TRADE_RISK",
           "critical": true,
           "level": "Advanced",
           "index": 0.8,
@@ -476,7 +476,7 @@
           "state": null
         },
         {
-          "key": "ORDER_TYPES",
+          "key": "OEMS_ORDER_TYPES",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -507,7 +507,7 @@
       "alpha": 0.7,
       "weighted_avg": 0.5,
       "min_term": 0.2,
-      "bottleneck_subcomponent": "EXEC_ALGOS",
+      "bottleneck_subcomponent": "OEMS_EXEC_ALGOS",
       "q_m": 0.41,
       "gate_band": "Developing",
       "gate_blocked": false,
@@ -518,7 +518,7 @@
       "name": "EMS Gateway",
       "subcomponents": [
         {
-          "key": "EMS_CONNECTIVITY",
+          "key": "EMS_GATEWAY_CONNECTIVITY",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -526,7 +526,7 @@
           "state": null
         },
         {
-          "key": "EMS_ROUTING_POLICY",
+          "key": "EMS_GATEWAY_ROUTING_POLICY",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -534,7 +534,7 @@
           "state": null
         },
         {
-          "key": "EMS_RISK_THROTTLING",
+          "key": "EMS_GATEWAY_RISK_THROTTLING",
           "critical": true,
           "level": "Advanced",
           "index": 0.8,
@@ -542,7 +542,7 @@
           "state": null
         },
         {
-          "key": "EMS_MONITORING",
+          "key": "EMS_GATEWAY_MONITORING",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -557,7 +557,7 @@
       "alpha": 0.7,
       "weighted_avg": 0.575,
       "min_term": 0.5,
-      "bottleneck_subcomponent": "EMS_CONNECTIVITY",
+      "bottleneck_subcomponent": "EMS_GATEWAY_CONNECTIVITY",
       "q_m": 0.5525,
       "gate_band": "Advanced",
       "gate_blocked": false,
@@ -568,7 +568,7 @@
       "name": "Liquidity & Connectivity",
       "subcomponents": [
         {
-          "key": "LOCAL_EXCHANGES",
+          "key": "LIQ_CONNECT_LOCAL_EXCHANGES",
           "critical": true,
           "level": "Advanced",
           "index": 0.8,
@@ -576,7 +576,7 @@
           "state": null
         },
         {
-          "key": "FOREIGN_BROKERS",
+          "key": "LIQ_CONNECT_FOREIGN_BROKERS",
           "critical": false,
           "level": "Developing",
           "index": 0.5,
@@ -584,7 +584,7 @@
           "state": null
         },
         {
-          "key": "FUND_HOUSES",
+          "key": "LIQ_CONNECT_FUND_HOUSES",
           "critical": false,
           "level": null,
           "index": null,
@@ -592,7 +592,7 @@
           "state": "NOT_ASSESSED"
         },
         {
-          "key": "SETTLEMENT_CLEARING",
+          "key": "LIQ_CONNECT_SETTLEMENT_CLEARING",
           "critical": true,
           "level": "Advanced",
           "index": 0.8,
@@ -607,7 +607,7 @@
       "alpha": 0.7,
       "weighted_avg": 0.7,
       "min_term": 0.5,
-      "bottleneck_subcomponent": "FOREIGN_BROKERS",
+      "bottleneck_subcomponent": "LIQ_CONNECT_FOREIGN_BROKERS",
       "q_m": 0.64,
       "gate_band": "Advanced",
       "gate_blocked": false,
@@ -731,11 +731,19 @@
       },
       {
         "key": "NETWORK_ECONOMIES",
-        "state": "NOT_APPLICABLE"
+        "benefit": "Emerging",
+        "barrier": "None",
+        "strength": "None",
+        "value": 0.0,
+        "state": null
       },
       {
         "key": "COUNTER_POSITIONING",
-        "state": "NOT_APPLICABLE"
+        "benefit": "Emerging",
+        "barrier": "None",
+        "strength": "None",
+        "value": 0.0,
+        "state": null
       },
       {
         "key": "SWITCHING_COSTS",
@@ -770,7 +778,7 @@
         "state": null
       }
     ],
-    "P": 0.38
+    "P": 0.271429
   },
   "triad": {
     "economic_value": {
@@ -783,19 +791,19 @@
     },
     "defence_value": {
       "rating": "Emerging",
-      "score": 0.38
+      "score": 0.271429
     }
   },
   "composite": {
     "B": 0.67907,
-    "P": 0.38,
+    "P": 0.271429,
     "L": 0.483539,
-    "V": 0.511137
+    "V": 0.478565
   },
   "two_track": {
     "continuous": {
-      "V": 0.511137,
-      "V_display_0_100": 51.1137
+      "V": 0.478565,
+      "V_display_0_100": 47.8565
     },
     "gates": {
       "FRONTEND": "Developing",
