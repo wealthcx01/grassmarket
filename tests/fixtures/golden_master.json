@@ -1,0 +1,748 @@
+{
+  "metadata": {
+    "fixture": "atlas-golden-master",
+    "subject": "Meridian Securities (composite mid-tier retail brokerage)",
+    "methodology_version": "1.0",
+    "status": "draft-pending-ratification",
+    "note": "Reference computation of Methodology §5. Coefficients, the power-strength encoding, and the rating-gate rule are DRAFT pending John's ratification and the elicitation panel. The engine (GRS-0004) must reproduce these values exactly."
+  },
+  "coefficients": {
+    "alpha_module": 0.7,
+    "alpha_l": 0.7,
+    "theta": {
+      "B": 0.3,
+      "P": 0.3,
+      "L": 0.4
+    },
+    "critical_modules_for_l": [
+      "APP_SERVER",
+      "BACKOFFICE",
+      "OEMS"
+    ],
+    "lambda": "uniform 1.0 per subcomponent (draft)",
+    "delta": "uniform 1.0 per module (draft)",
+    "w_metric": "uniform 1.0 (draft)",
+    "w_power": "uniform 1.0 (draft)",
+    "strength_encoding": {
+      "None": 0.0,
+      "Emerging": 0.4,
+      "Established": 0.7,
+      "Wide": 1.0
+    }
+  },
+  "modules": [
+    {
+      "key": "FRONTEND",
+      "name": "Front End",
+      "subcomponents": [
+        {
+          "key": "PERFORMANCE",
+          "critical": true,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "UX_NAVIGATION",
+          "critical": true,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E4",
+          "state": null
+        },
+        {
+          "key": "DEVICE_COVERAGE",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "PERSONALISATION",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "ACCESSIBILITY_LOCALISATION",
+          "critical": false,
+          "level": "Basic",
+          "index": 0.2,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "EXPERIMENTATION_ANALYTICS",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E3",
+          "state": null
+        }
+      ],
+      "n_applicable": 6,
+      "n_assessed": 6,
+      "n_not_applicable": 0,
+      "coverage": 1.0,
+      "alpha": 0.7,
+      "weighted_avg": 0.55,
+      "min_term": 0.2,
+      "bottleneck_subcomponent": "ACCESSIBILITY_LOCALISATION",
+      "q_m": 0.445,
+      "gate_band": "Developing",
+      "gate_blocked": false,
+      "gate_note": "all critical Advanced+ at E3+; capped by bottleneck (Basic)"
+    },
+    {
+      "key": "APP_SERVER",
+      "name": "Application Server",
+      "subcomponents": [
+        {
+          "key": "HOSTING_ELASTICITY",
+          "critical": false,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "RESILIENCE_DR",
+          "critical": true,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "API_DESIGN",
+          "critical": false,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "SECURITY_COMPLIANCE",
+          "critical": true,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E4",
+          "state": null
+        },
+        {
+          "key": "DEVOPS_DEPLOYMENT",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "DATA_ARCHITECTURE",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "OBSERVABILITY",
+          "critical": false,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E3",
+          "state": null
+        }
+      ],
+      "n_applicable": 7,
+      "n_assessed": 7,
+      "n_not_applicable": 0,
+      "coverage": 1.0,
+      "alpha": 0.7,
+      "weighted_avg": 0.671429,
+      "min_term": 0.5,
+      "bottleneck_subcomponent": "RESILIENCE_DR",
+      "q_m": 0.62,
+      "gate_band": "Advanced",
+      "gate_blocked": false,
+      "gate_note": "no critical is Basic"
+    },
+    {
+      "key": "MARKET_DATA",
+      "name": "Market Data",
+      "subcomponents": [
+        {
+          "key": "EXCHANGE_COVERAGE",
+          "critical": false,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "INSTRUMENT_UNIVERSE",
+          "critical": false,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "DATA_DEPTH_QUALITY",
+          "critical": true,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "LATENCY_TIMELINESS",
+          "critical": true,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "HISTORY_DEPTH",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "VENDOR_REDUNDANCY",
+          "critical": false,
+          "level": "Basic",
+          "index": 0.2,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "VALUE_ADD_SERVICES",
+          "critical": false,
+          "level": null,
+          "index": null,
+          "evidence": null,
+          "state": "NOT_ASSESSED"
+        }
+      ],
+      "n_applicable": 7,
+      "n_assessed": 6,
+      "n_not_applicable": 0,
+      "coverage": 0.857143,
+      "alpha": 0.7,
+      "weighted_avg": 0.6,
+      "min_term": 0.2,
+      "bottleneck_subcomponent": "VENDOR_REDUNDANCY",
+      "q_m": 0.48,
+      "gate_band": "Developing",
+      "gate_blocked": false,
+      "gate_note": "no critical is Basic; capped by bottleneck (Basic)"
+    },
+    {
+      "key": "ORCHESTRATION",
+      "name": "Orchestration",
+      "subcomponents": [
+        {
+          "key": "WORKFLOW_ENGINE",
+          "critical": true,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "ROUTING_LOGIC",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "EVENT_DRIVEN",
+          "critical": false,
+          "level": "Basic",
+          "index": 0.2,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "CONFIG_VS_CODE",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "ORCH_MONITORING",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E3",
+          "state": null
+        }
+      ],
+      "n_applicable": 5,
+      "n_assessed": 5,
+      "n_not_applicable": 0,
+      "coverage": 1.0,
+      "alpha": 0.7,
+      "weighted_avg": 0.44,
+      "min_term": 0.2,
+      "bottleneck_subcomponent": "EVENT_DRIVEN",
+      "q_m": 0.368,
+      "gate_band": "Developing",
+      "gate_blocked": false,
+      "gate_note": "no critical is Basic; capped by bottleneck (Basic)"
+    },
+    {
+      "key": "CMS",
+      "name": "Client Management System",
+      "subcomponents": [
+        {
+          "key": "RESEARCH_AUTHORING",
+          "critical": false,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "RESEARCH_DISTRIBUTION",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "EMAIL_CAMPAIGNS",
+          "critical": false,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "CRM_MODEL",
+          "critical": true,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "STATEMENTS",
+          "critical": false,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "CONTENT_SEARCH_PERSONALISATION",
+          "critical": false,
+          "level": "Basic",
+          "index": 0.2,
+          "evidence": "E2",
+          "state": null
+        }
+      ],
+      "n_applicable": 6,
+      "n_assessed": 6,
+      "n_not_applicable": 0,
+      "coverage": 1.0,
+      "alpha": 0.7,
+      "weighted_avg": 0.6,
+      "min_term": 0.2,
+      "bottleneck_subcomponent": "CONTENT_SEARCH_PERSONALISATION",
+      "q_m": 0.48,
+      "gate_band": "Developing",
+      "gate_blocked": false,
+      "gate_note": "no critical is Basic; capped by bottleneck (Basic)"
+    },
+    {
+      "key": "BACKOFFICE",
+      "name": "Back Office",
+      "subcomponents": [
+        {
+          "key": "CUSTODY",
+          "critical": true,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E4",
+          "state": null
+        },
+        {
+          "key": "PAYMENTS_FUNDING",
+          "critical": false,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "KYC_ONBOARDING",
+          "critical": false,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "PORTFOLIO_MGMT",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "CREDIT_RISK",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "REG_REPORTING",
+          "critical": true,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E4",
+          "state": null
+        }
+      ],
+      "n_applicable": 6,
+      "n_assessed": 6,
+      "n_not_applicable": 0,
+      "coverage": 1.0,
+      "alpha": 0.7,
+      "weighted_avg": 0.7,
+      "min_term": 0.5,
+      "bottleneck_subcomponent": "PORTFOLIO_MGMT",
+      "q_m": 0.64,
+      "gate_band": "Advanced",
+      "gate_blocked": false,
+      "gate_note": "all critical Advanced+ at E3+; capped by bottleneck (Developing)"
+    },
+    {
+      "key": "OEMS",
+      "name": "Order & Execution Management",
+      "subcomponents": [
+        {
+          "key": "ASSET_COVERAGE",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "EXEC_ALGOS",
+          "critical": false,
+          "level": "Basic",
+          "index": 0.2,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "PRE_TRADE_RISK",
+          "critical": true,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "ORDER_TYPES",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "OEMS_LATENCY_RELIABILITY",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "OEMS_APIS_COLOCATION",
+          "critical": false,
+          "level": null,
+          "index": null,
+          "evidence": null,
+          "state": "NOT_APPLICABLE"
+        }
+      ],
+      "n_applicable": 5,
+      "n_assessed": 5,
+      "n_not_applicable": 1,
+      "coverage": 1.0,
+      "alpha": 0.7,
+      "weighted_avg": 0.5,
+      "min_term": 0.2,
+      "bottleneck_subcomponent": "EXEC_ALGOS",
+      "q_m": 0.41,
+      "gate_band": "Developing",
+      "gate_blocked": false,
+      "gate_note": "all critical Advanced+ at E3+; capped by bottleneck (Basic)"
+    },
+    {
+      "key": "EMS_GATEWAY",
+      "name": "EMS Gateway",
+      "subcomponents": [
+        {
+          "key": "EMS_CONNECTIVITY",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "EMS_ROUTING_POLICY",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "EMS_RISK_THROTTLING",
+          "critical": true,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "EMS_MONITORING",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E2",
+          "state": null
+        }
+      ],
+      "n_applicable": 4,
+      "n_assessed": 4,
+      "n_not_applicable": 0,
+      "coverage": 1.0,
+      "alpha": 0.7,
+      "weighted_avg": 0.575,
+      "min_term": 0.5,
+      "bottleneck_subcomponent": "EMS_CONNECTIVITY",
+      "q_m": 0.5525,
+      "gate_band": "Advanced",
+      "gate_blocked": false,
+      "gate_note": "all critical Advanced+ at E3+; capped by bottleneck (Developing)"
+    },
+    {
+      "key": "LIQ_CONNECT",
+      "name": "Liquidity & Connectivity",
+      "subcomponents": [
+        {
+          "key": "LOCAL_EXCHANGES",
+          "critical": true,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E3",
+          "state": null
+        },
+        {
+          "key": "FOREIGN_BROKERS",
+          "critical": false,
+          "level": "Developing",
+          "index": 0.5,
+          "evidence": "E2",
+          "state": null
+        },
+        {
+          "key": "FUND_HOUSES",
+          "critical": false,
+          "level": null,
+          "index": null,
+          "evidence": null,
+          "state": "NOT_ASSESSED"
+        },
+        {
+          "key": "SETTLEMENT_CLEARING",
+          "critical": true,
+          "level": "Advanced",
+          "index": 0.8,
+          "evidence": "E3",
+          "state": null
+        }
+      ],
+      "n_applicable": 4,
+      "n_assessed": 3,
+      "n_not_applicable": 0,
+      "coverage": 0.75,
+      "alpha": 0.7,
+      "weighted_avg": 0.7,
+      "min_term": 0.5,
+      "bottleneck_subcomponent": "FOREIGN_BROKERS",
+      "q_m": 0.64,
+      "gate_band": "Advanced",
+      "gate_blocked": false,
+      "gate_note": "all critical Advanced+ at E3+; capped by bottleneck (Developing)"
+    }
+  ],
+  "L": {
+    "weighted_term": 0.515056,
+    "min_term": 0.41,
+    "value": 0.483539
+  },
+  "business": {
+    "metrics": [
+      {
+        "key": "AUA",
+        "raw": 1800000000,
+        "unit": "GBP",
+        "direction": "higher_is_better",
+        "n_k": 0.765714
+      },
+      {
+        "key": "ACTIVE_CLIENTS",
+        "raw": 180000,
+        "unit": "count",
+        "direction": "higher_is_better",
+        "n_k": 0.706667
+      },
+      {
+        "key": "NET_REVENUE",
+        "raw": 85000000,
+        "unit": "GBP",
+        "direction": "higher_is_better",
+        "n_k": 0.75
+      },
+      {
+        "key": "REVENUE_PER_CLIENT",
+        "raw": 472,
+        "unit": "GBP_per_year",
+        "direction": "higher_is_better",
+        "n_k": 0.704
+      },
+      {
+        "key": "GROSS_MARGIN",
+        "raw": 58,
+        "unit": "percent",
+        "direction": "higher_is_better",
+        "n_k": 0.695
+      },
+      {
+        "key": "COST_TO_SERVE",
+        "raw": 140,
+        "unit": "GBP_per_year",
+        "direction": "lower_is_better",
+        "n_k": 0.68
+      },
+      {
+        "key": "NET_REVENUE_RETENTION",
+        "raw": 104,
+        "unit": "percent",
+        "direction": "higher_is_better",
+        "n_k": 0.62
+      },
+      {
+        "key": "CLIENT_GROWTH_RATE",
+        "raw": 14,
+        "unit": "percent",
+        "direction": "higher_is_better",
+        "n_k": 0.58
+      },
+      {
+        "key": "TAKE_RATE_DURABILITY",
+        "raw": 22,
+        "unit": "bps",
+        "direction": "higher_is_better",
+        "n_k": 0.64
+      },
+      {
+        "key": "CAC_PAYBACK_MONTHS",
+        "raw": 18,
+        "unit": "months",
+        "direction": "lower_is_better",
+        "n_k": 0.65
+      }
+    ],
+    "B": 0.679138
+  },
+  "powers": {
+    "powers": [
+      {
+        "key": "SCALE_ECONOMIES",
+        "strength": "Emerging",
+        "value": 0.4
+      },
+      {
+        "key": "NETWORK_ECONOMIES",
+        "strength": "None",
+        "value": 0.0
+      },
+      {
+        "key": "COUNTER_POSITIONING",
+        "strength": "None",
+        "value": 0.0
+      },
+      {
+        "key": "SWITCHING_COSTS",
+        "strength": "Established",
+        "value": 0.7
+      },
+      {
+        "key": "BRANDING",
+        "strength": "Emerging",
+        "value": 0.4
+      },
+      {
+        "key": "CORNERED_RESOURCE",
+        "strength": "None",
+        "value": 0.0
+      },
+      {
+        "key": "PROCESS_POWER",
+        "strength": "Emerging",
+        "value": 0.4
+      }
+    ],
+    "P": 0.271429
+  },
+  "composite": {
+    "B": 0.679138,
+    "P": 0.271429,
+    "L": 0.483539,
+    "V": 0.478586
+  },
+  "two_track": {
+    "continuous": {
+      "V": 0.478586,
+      "V_display_0_100": 47.8586
+    },
+    "gates": {
+      "FRONTEND": "Developing",
+      "APP_SERVER": "Advanced",
+      "MARKET_DATA": "Developing",
+      "ORCHESTRATION": "Developing",
+      "CMS": "Developing",
+      "BACKOFFICE": "Advanced",
+      "OEMS": "Developing",
+      "EMS_GATEWAY": "Advanced",
+      "LIQ_CONNECT": "Advanced"
+    }
+  }
+}

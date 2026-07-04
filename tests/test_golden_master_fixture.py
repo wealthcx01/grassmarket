@@ -1,0 +1,110 @@
+"""Golden-master fixture tests (GRS-0003).
+
+These assert the fixture is well-formed and INTERNALLY CONSISTENT — the recorded intermediates
+actually compose into the recorded finals per Methodology §5. The full test that the *engine*
+reproduces this fixture exactly is GRS-0004 (the engine doesn't exist yet).
+"""
+
+from __future__ import annotations
+
+import json
+import math
+from pathlib import Path
+
+import pytest
+from bcap_contracts import load_registry
+
+_FIXTURE = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "golden_master.json"
+_LEVEL_INDEX = {"Basic": 0.2, "Developing": 0.5, "Advanced": 0.8, "Frontier": 1.0}
+_BANDS = {"Basic", "Developing", "Advanced", "Frontier", "Not Rated"}
+
+
+@pytest.fixture(scope="module")
+def gm() -> dict:
+    return json.loads(_FIXTURE.read_text(encoding="utf-8"))
+
+
+def test_fixture_is_draft_flagged(gm: dict) -> None:
+    assert gm["metadata"]["status"] == "draft-pending-ratification"
+    assert gm["metadata"]["methodology_version"] == "1.0"
+
+
+def test_covers_the_registry_exactly(gm: dict) -> None:
+    registry = load_registry()
+    sub_keys = {s["key"] for m in gm["modules"] for s in m["subcomponents"]}
+    assert sub_keys == registry.all_subcomponent_keys()
+    assert len(sub_keys) == 51
+    assert {m["key"] for m in gm["business"]["metrics"]} == registry.metric_keys()
+    assert {p["key"] for p in gm["powers"]["powers"]} == registry.power_keys()
+
+
+def test_exercises_non_score_states(gm: dict) -> None:
+    states = [s["state"] for m in gm["modules"] for s in m["subcomponents"] if s["state"]]
+    assert "NOT_APPLICABLE" in states
+    assert "NOT_ASSESSED" in states
+    # A Not-Applicable subcomponent is excluded from its module's applicable count.
+    for m in gm["modules"]:
+        n_na = sum(1 for s in m["subcomponents"] if s["state"] == "NOT_APPLICABLE")
+        assert m["n_not_applicable"] == n_na
+
+
+def test_module_qm_recomputes_from_blend_and_min(gm: dict) -> None:
+    alpha = gm["coefficients"]["alpha_module"]
+    for m in gm["modules"]:
+        if m["q_m"] is None:
+            continue
+        assert math.isclose(
+            m["q_m"], alpha * m["weighted_avg"] + (1 - alpha) * m["min_term"], abs_tol=1e-6
+        )
+        # Not-Assessed and N/A never contribute: weighted_avg is the mean of assessed indices only.
+        assessed = [_LEVEL_INDEX[s["level"]] for s in m["subcomponents"] if s["level"]]
+        assert math.isclose(m["weighted_avg"], sum(assessed) / len(assessed), abs_tol=1e-6)
+        assert math.isclose(m["min_term"], min(assessed), abs_tol=1e-6)
+        assert 0.0 <= m["q_m"] <= 1.0
+        assert m["gate_band"] in _BANDS
+
+
+def test_no_module_is_frontier_with_a_basic_part(gm: dict) -> None:
+    # The rating gate must not report Frontier for a module that has any Basic assessed part.
+    for m in gm["modules"]:
+        has_basic = any(s["level"] == "Basic" for s in m["subcomponents"])
+        if has_basic:
+            assert m["gate_band"] != "Frontier"
+
+
+def test_L_recomputes(gm: dict) -> None:
+    alpha_l = gm["coefficients"]["alpha_l"]
+    q = {m["key"]: (m["q_m"] if m["q_m"] is not None else 0.0) for m in gm["modules"]}
+    weighted = sum(q.values()) / len(q)
+    crit = gm["coefficients"]["critical_modules_for_l"]
+    min_term = min(q[k] for k in crit)
+    L = alpha_l * weighted + (1 - alpha_l) * min_term
+    assert math.isclose(gm["L"]["value"], L, abs_tol=1e-6)
+    assert math.isclose(gm["L"]["weighted_term"], weighted, abs_tol=1e-6)
+
+
+def test_B_and_normalisation_in_range(gm: dict) -> None:
+    for r in gm["business"]["metrics"]:
+        assert 0.0 <= r["n_k"] <= 1.0
+    b = sum(r["n_k"] for r in gm["business"]["metrics"]) / len(gm["business"]["metrics"])
+    assert math.isclose(gm["business"]["B"], b, abs_tol=1e-6)
+
+
+def test_P_from_strength_encoding(gm: dict) -> None:
+    enc = gm["coefficients"]["strength_encoding"]
+    for r in gm["powers"]["powers"]:
+        assert r["value"] == enc[r["strength"]]
+    p = sum(r["value"] for r in gm["powers"]["powers"]) / len(gm["powers"]["powers"])
+    assert math.isclose(gm["powers"]["P"], p, abs_tol=1e-6)
+
+
+def test_V_recomputes_and_display(gm: dict) -> None:
+    theta = gm["coefficients"]["theta"]
+    assert math.isclose(theta["B"] + theta["P"] + theta["L"], 1.0, abs_tol=1e-9)
+    c = gm["composite"]
+    V = theta["B"] * c["B"] + theta["P"] * c["P"] + theta["L"] * c["L"]
+    assert math.isclose(c["V"], V, abs_tol=1e-6)
+    assert 0.0 <= c["V"] <= 1.0
+    assert math.isclose(
+        gm["two_track"]["continuous"]["V_display_0_100"], c["V"] * 100, abs_tol=1e-6
+    )

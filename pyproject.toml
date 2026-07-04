@@ -34,6 +34,8 @@ dev = [
     "pyright>=1.1",
     "pre-commit>=3.7",
     "httpx>=0.27",
+    # Golden-master workbook authoring (GRS-0003): live-formula xlsx + JSON export.
+    "openpyxl>=3.1.5",
 ]
 
 [tool.uv.workspace]
