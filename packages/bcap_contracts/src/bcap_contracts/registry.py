@@ -17,12 +17,21 @@ from __future__ import annotations
 import functools
 from collections.abc import Set as AbstractSet
 from importlib import resources
-from typing import Any
+from typing import Any, Literal
 
 import yaml
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from bcap_contracts.common import PowerLifecycleStage
+
+# --- Closed key-like value sets (ADR-0001: a typo is a load-time refusal, never a default) -----
+# These are the legal *values* of the key-like string fields on registry entries. They are closed
+# sets: a value outside them is a typo and must refuse to load, exactly as an unknown key does.
+# Encoded as Literal types so Pydantic rejects a stray value at construction and the JSON Schema /
+# TS mirror carries the enum (schemas win, non-negotiable #4).
+MetricDirection = Literal["higher_is_better", "lower_is_better"]
+NormalisationMethod = Literal["piecewise_linear", "percentile"]
+MetricGroup = Literal["scale", "unit_economics", "momentum"]
 
 
 class RegistryError(Exception):
@@ -80,6 +89,7 @@ class SubcomponentDef(BaseModel):
     key: str
     name: str
     module_key: str
+    description: str | None = None
     critical: bool = False  # critical subcomponents drive the rating gate (§5.2)
 
 
@@ -89,8 +99,8 @@ class ModuleDef(BaseModel):
     key: str
     name: str
     description: str
-    # Subcomponents are Loop 1 content (elicited). Empty until then — a coefficient set cannot
-    # validate against a module with no subcomponents (EmptyDimensionError).
+    # Populated with the 51-subcomponent draft in GRS-0002 (status draft-pending-ratification).
+    # A module with no subcomponents cannot be covered by a coefficient set (EmptyDimensionError).
     subcomponents: tuple[SubcomponentDef, ...] = ()
 
 
@@ -103,14 +113,99 @@ class PowerDef(BaseModel):
     description: str
 
 
+class AnchorPoint(BaseModel):
+    """One point in a metric's normalisation curve: a raw value maps to a normalised score in
+    [0,1] (Methodology §5.3). Anchor points are documented in the register, never inferred."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    raw: float = Field(description="A raw metric value in the metric's declared unit.")
+    normalised: float = Field(ge=0.0, le=1.0, description="Its normalised score in [0,1].")
+
+
+class NormalisationSpec(BaseModel):
+    """The normalisation n_k for a business metric (Methodology §5.3).
+
+    Stage 1 uses documented piecewise-linear anchor points; from Stage 2 (≥10 engagements) this
+    becomes percentile-vs-benchmark-population. The prototype's unit-sensitive log heuristic
+    (defect D5) is retired — the unit is declared, never inferred."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    method: NormalisationMethod = "piecewise_linear"  # closed set (Stage 2+ adds "percentile")
+    anchors: tuple[AnchorPoint, ...] = ()
+    note: str | None = None  # provenance / "placeholder pending judgement" markers
+
+    @model_validator(mode="after")
+    def _check_anchor_curve(self) -> NormalisationSpec:
+        """The anchor curve is a well-formed monotone interpolation table — enforced on the SPEC,
+        not on one golden-master test row (review). A malformed curve is a load-time refusal.
+
+        - a ``piecewise_linear`` spec MUST carry anchors (an empty curve cannot normalise anything);
+        - raw values are STRICTLY ASCENDING (interpolation needs distinct, ordered breakpoints);
+        - normalised values are MONOTONIC (non-decreasing or non-increasing — never a zig-zag). The
+          direction they move (up for higher_is_better, down for lower_is_better) is cross-checked
+          against ``MetricDef.direction`` on the parent, which is where the direction lives.
+        """
+        if self.method == "piecewise_linear" and not self.anchors:
+            raise RegistryError(
+                "A piecewise_linear normalisation must declare at least one anchor."
+            )
+        if not self.anchors:
+            return self
+        raws = [a.raw for a in self.anchors]
+        if any(b <= a for a, b in zip(raws, raws[1:], strict=False)):
+            raise RegistryError(
+                f"Normalisation anchors must be strictly ascending by raw; got {raws}."
+            )
+        norms = [a.normalised for a in self.anchors]
+        non_decreasing = all(b >= a for a, b in zip(norms, norms[1:], strict=False))
+        non_increasing = all(b <= a for a, b in zip(norms, norms[1:], strict=False))
+        if not (non_decreasing or non_increasing):
+            raise RegistryError(
+                f"Normalisation anchors must be monotonic in normalised value; got {norms}."
+            )
+        return self
+
+
 class MetricDef(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     key: str
     name: str
-    # Declared unit is captured in the UI, never inferred (Methodology §5.3). The full metric
-    # register with normalisation specs is Loop 1 content.
-    direction: str  # "higher_is_better" | "lower_is_better"
+    # The declared unit is captured explicitly, never inferred (Methodology §5.3).
+    unit: str
+    direction: MetricDirection  # closed set: higher_is_better | lower_is_better
+    # Metric group for the B index (ADR-0006): a closed set, or None until grouped. B is a
+    # group-weighted mean, so collinear scale metrics don't quadruple-count (review B1). The group
+    # ASSIGNMENTS are content (GRS-0003); this field + its closed set are registry machinery.
+    group: MetricGroup | None = None
+    # Required, not defaulted: a metric with no normalisation cannot be scored, so an omitted
+    # normalisation is a load-time refusal (ADR-0001), not an empty placeholder that scores wrong.
+    normalisation: NormalisationSpec
+    status: str = "settled"  # e.g. "draft-pending-ratification" for the Loop 1 draft register
+
+    @model_validator(mode="after")
+    def _normalisation_agrees_with_direction(self) -> MetricDef:
+        """The anchor curve must slope the way ``direction`` says. NormalisationSpec guarantees the
+        curve is monotonic; here — where both direction and the curve are visible — we refuse a
+        curve whose slope contradicts the declared direction (a higher_is_better metric whose
+        normalised score falls as raw rises is a data error, not a default to paper over)."""
+        anchors = self.normalisation.anchors
+        if len(anchors) < 2:
+            return self
+        norms = [a.normalised for a in anchors]
+        rises = norms[-1] > norms[0]
+        falls = norms[-1] < norms[0]
+        if self.direction == "higher_is_better" and falls:
+            raise RegistryError(
+                f"Metric {self.key!r} is higher_is_better but its normalisation descends with raw."
+            )
+        if self.direction == "lower_is_better" and rises:
+            raise RegistryError(
+                f"Metric {self.key!r} is lower_is_better but its normalisation ascends with raw."
+            )
+        return self
 
 
 class Registry(BaseModel):
@@ -125,6 +220,12 @@ class Registry(BaseModel):
     powers: tuple[PowerDef, ...] = ()
     modules: tuple[ModuleDef, ...] = ()
     metrics: tuple[MetricDef, ...] = ()
+
+    # Ratification status of the authored content. Powers are "settled" (Methodology §8); the
+    # Loop 1 subcomponent set and metric register ship "draft-pending-ratification" until John
+    # ratifies them and the elicitation panel runs (ADR-0001 scope note, GRS-0002 ticket).
+    subcomponent_status: str = "settled"
+    metric_status: str = "settled"
 
     # --- Key sets (frozen) ---
     def power_keys(self) -> frozenset[str]:
@@ -195,6 +296,21 @@ def _load_yaml(filename: str) -> Any:
             return yaml.safe_load(fh)
 
 
+def _require(mapping: Any, key: str, context: str) -> Any:
+    """Bracket-style required access: a missing key is a load-time refusal, never a default.
+
+    This is the datasets' side of ADR-0001's fail-loud rule — the banned species is
+    ``mapping.get(key, default)``, which lets an omitted field slip through as a plausible value.
+    A dataset that forgets ``status:`` must refuse to load, not silently become ``"settled"``.
+    """
+    if not isinstance(mapping, dict) or key not in mapping:
+        raise RegistryError(
+            f"Required field {key!r} is missing from {context}. It must be supplied explicitly "
+            f"(no default — ADR-0001)."
+        )
+    return mapping[key]
+
+
 @functools.lru_cache(maxsize=1)
 def load_registry() -> Registry:
     """Load the canonical registry from ``registry_data/*.yaml``, once, cached.
@@ -206,22 +322,61 @@ def load_registry() -> Registry:
     powers_raw = _load_yaml("powers.yaml") or {}
     modules_raw = _load_yaml("modules.yaml") or {}
     metrics_raw = _load_yaml("metrics.yaml") or {}
+    return _build_registry(powers_raw, modules_raw, metrics_raw)
 
+
+def _build_registry(
+    powers_raw: dict[str, Any], modules_raw: dict[str, Any], metrics_raw: dict[str, Any]
+) -> Registry:
+    """Assemble a Registry from parsed YAML mappings. Split out from :func:`load_registry` so the
+    fail-loud requirements (required ``status``, closed sets, anchor invariants) are unit-testable
+    without round-tripping a temp file. ``status`` is REQUIRED on the module set and the metric
+    set — a status-less dataset refuses to load (bracket access, not ``.get(..., "settled")``)."""
     powers = tuple(PowerDef(**p) for p in powers_raw.get("powers", []))
     modules = tuple(
         ModuleDef(
             key=m["key"],
             name=m["name"],
             description=m["description"],
-            subcomponents=tuple(SubcomponentDef(**s) for s in m.get("subcomponents", [])),
+            subcomponents=tuple(
+                # module_key is injected from the parent — the YAML nests subcomponents under
+                # their module, so it is never repeated per row (and cannot drift from it).
+                SubcomponentDef(module_key=m["key"], **s)
+                for s in m.get("subcomponents", [])
+            ),
         )
         for m in modules_raw.get("modules", [])
     )
-    metrics = tuple(MetricDef(**m) for m in metrics_raw.get("metrics", []))
+    metrics = tuple(_parse_metric(m) for m in metrics_raw.get("metrics", []))
 
-    registry = Registry(powers=powers, modules=modules, metrics=metrics)
+    registry = Registry(
+        powers=powers,
+        modules=modules,
+        metrics=metrics,
+        subcomponent_status=_require(modules_raw, "status", "modules.yaml"),
+        metric_status=_require(metrics_raw, "status", "metrics.yaml"),
+    )
     _assert_unique_keys(registry)
     return registry
+
+
+def _parse_metric(raw: dict[str, Any]) -> MetricDef:
+    key = raw.get("key", "<unknown>")
+    norm_raw = _require(raw, "normalisation", f"metric {key!r}")
+    normalisation = NormalisationSpec(
+        method=norm_raw.get("method", "piecewise_linear"),
+        anchors=tuple(AnchorPoint(**a) for a in norm_raw.get("anchors", [])),
+        note=norm_raw.get("note"),
+    )
+    return MetricDef(
+        key=raw["key"],
+        name=raw["name"],
+        unit=raw["unit"],
+        direction=raw["direction"],
+        group=raw.get("group"),  # optional: None until the metric is grouped (ADR-0006)
+        normalisation=normalisation,
+        status=_require(raw, "status", f"metric {key!r}"),
+    )
 
 
 def _assert_unique_keys(registry: Registry) -> None:
@@ -236,9 +391,16 @@ def _assert_unique_keys(registry: Registry) -> None:
             if k in seen:
                 raise RegistryError(f"Duplicate {dimension} key {k!r} in registry data.")
             seen.add(k)
+    # Subcomponent keys are GLOBALLY unique (not merely unique within a module). Now that every key
+    # is fully qualified to <MODULE_KEY>_<LEAF> (GRS-0002a), a collision across modules would signal
+    # a naming mistake — and the engine and coefficient sets address subcomponents by key alone, so
+    # a global duplicate would let one shadow another. Refuse it at load time.
+    global_seen: dict[str, str] = {}
     for m in registry.modules:
-        seen_sub: set[str] = set()
         for s in m.subcomponents:
-            if s.key in seen_sub:
-                raise RegistryError(f"Duplicate subcomponent key {s.key!r} in module {m.key!r}.")
-            seen_sub.add(s.key)
+            if s.key in global_seen:
+                raise RegistryError(
+                    f"Duplicate subcomponent key {s.key!r} in module {m.key!r} — already defined "
+                    f"in module {global_seen[s.key]!r}. Subcomponent keys must be globally unique."
+                )
+            global_seen[s.key] = m.key
