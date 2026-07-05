@@ -6,9 +6,8 @@ band + note, group means, L terms, B, P, the triad) and the final V = 0.478565. 
 script (``scripts/build_golden_master.py``) was the spec; this proves the independent engine agrees.
 
 Inputs are reconstructed FROM the fixture; the coefficient set is the shipped v1 draft (uniform).
-The one representational alias — the fixture stores non-score states as the enum NAMES
-(``NOT_APPLICABLE``) while the engine emits the contract enum VALUES (``Not Applicable``) — is
-normalised on load; every number is compared exactly.
+The fixture and the engine share ONE vocabulary — the contract enum VALUES ("Not Applicable" /
+"Not Assessed", D8) — so states are compared directly, no alias (GRS-0005 precursor).
 """
 
 from __future__ import annotations
@@ -32,11 +31,6 @@ def gm() -> dict:
     return json.loads(_FIXTURE.read_text(encoding="utf-8"))
 
 
-def _state_value(fixture_state: str | None) -> str | None:
-    """The fixture stores the enum NAME (NOT_APPLICABLE); the contract value is 'Not Applicable'."""
-    return NonScoreState[fixture_state].value if fixture_state else None
-
-
 def _inputs_from_fixture(gm: dict) -> AssessmentInputs:
     subs: list[SubcomponentRating] = []
     for m in gm["modules"]:
@@ -46,7 +40,7 @@ def _inputs_from_fixture(gm: dict) -> AssessmentInputs:
                     SubcomponentRating(
                         module_key=m["key"],
                         subcomponent_key=s["key"],
-                        state=NonScoreState[s["state"]],
+                        state=NonScoreState(s["state"]),
                     )
                 )
             else:
@@ -62,7 +56,7 @@ def _inputs_from_fixture(gm: dict) -> AssessmentInputs:
         MetricObservation(
             metric_key=r["key"],
             raw=None if r["state"] else r["raw"],
-            state=NonScoreState[r["state"]] if r["state"] else None,
+            state=NonScoreState(r["state"]) if r["state"] else None,
         )
         for r in gm["business"]["metrics"]
     ]
@@ -121,7 +115,7 @@ def test_every_module_reproduced_field_by_field(result, gm: dict) -> None:
             assert es.level == fs["level"]
             assert es.index == fs["index"]
             assert es.evidence == fs["evidence"]
-            assert es.state == _state_value(fs["state"])
+            assert es.state == fs["state"]
 
 
 def test_l_terms_reproduced(result, gm: dict) -> None:
@@ -141,7 +135,7 @@ def test_business_reproduced_field_by_field(result, gm: dict) -> None:
         assert er.unit == fr["unit"]
         assert er.direction == fr["direction"]
         assert er.group == fr["group"]
-        assert er.state == _state_value(fr["state"])
+        assert er.state == fr["state"]
         assert er.n_k == fr["n_k"]
 
 

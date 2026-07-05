@@ -241,7 +241,7 @@
           "level": null,
           "index": null,
           "evidence": null,
-          "state": "NOT_ASSESSED"
+          "state": "Not Assessed"
         }
       ],
       "n_applicable": 7,
@@ -497,7 +497,7 @@
           "level": null,
           "index": null,
           "evidence": null,
-          "state": "NOT_APPLICABLE"
+          "state": "Not Applicable"
         }
       ],
       "n_applicable": 5,
@@ -589,7 +589,7 @@
           "level": null,
           "index": null,
           "evidence": null,
-          "state": "NOT_ASSESSED"
+          "state": "Not Assessed"
         },
         {
           "key": "LIQ_CONNECT_SETTLEMENT_CLEARING",

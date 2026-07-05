@@ -40,11 +40,11 @@ def test_covers_the_registry_exactly(gm: dict) -> None:
 
 def test_exercises_non_score_states(gm: dict) -> None:
     states = [s["state"] for m in gm["modules"] for s in m["subcomponents"] if s["state"]]
-    assert "NOT_APPLICABLE" in states
-    assert "NOT_ASSESSED" in states
+    assert "Not Applicable" in states  # contract enum VALUES (D8), not the enum names
+    assert "Not Assessed" in states
     # A Not-Applicable subcomponent is excluded from its module's applicable count.
     for m in gm["modules"]:
-        n_na = sum(1 for s in m["subcomponents"] if s["state"] == "NOT_APPLICABLE")
+        n_na = sum(1 for s in m["subcomponents"] if s["state"] == "Not Applicable")
         assert m["n_not_applicable"] == n_na
 
 
@@ -88,8 +88,8 @@ def test_B_is_group_weighted(gm: dict) -> None:
     # B = uniform-weighted mean of group means (ADR-0006); state metrics excluded (B4).
     groups: dict[str, list[float]] = {}
     for r in gm["business"]["metrics"]:
-        if r["n_k"] is None:  # NOT_APPLICABLE / NOT_ASSESSED metric
-            assert r["state"] in ("NOT_APPLICABLE", "NOT_ASSESSED")
+        if r["n_k"] is None:  # Not Applicable / Not Assessed metric
+            assert r["state"] in ("Not Applicable", "Not Assessed")
             continue
         assert 0.0 <= r["n_k"] <= 1.0
         groups.setdefault(r["group"], []).append(r["n_k"])

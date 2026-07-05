@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import Any
 
 from bcap_contracts import load_registry
+from bcap_contracts.common import NonScoreState
 from bcap_contracts.registry import MetricDef, Registry
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
@@ -43,8 +44,10 @@ SUBJECT = "Meridian Securities (composite mid-tier retail brokerage)"
 LEVEL_INDEX = {"Basic": 0.2, "Developing": 0.5, "Advanced": 0.8, "Frontier": 1.0}
 LEVEL_RANK = {"Basic": 1, "Developing": 2, "Advanced": 3, "Frontier": 4}
 EVIDENCE_RANK = {"E1": 1, "E2": 2, "E3": 3, "E4": 4}
-NOT_APPLICABLE = "NOT_APPLICABLE"
-NOT_ASSESSED = "NOT_ASSESSED"
+# The non-score state strings are the CONTRACT enum VALUES (D8 single vocabulary) — the same
+# strings the engine emits, so the fixture is a contract-vocabulary oracle (GRS-0005 precursor).
+NOT_APPLICABLE = NonScoreState.NOT_APPLICABLE.value  # "Not Applicable"
+NOT_ASSESSED = NonScoreState.NOT_ASSESSED.value  # "Not Assessed"
 
 # Numeric encoding of the ordinal power strength for the continuous P index (ADR-0004). The triad
 # ratings themselves stay ordinal (ADR-0002); this feeds only P.
