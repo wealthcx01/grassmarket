@@ -1,16 +1,25 @@
-"""ATLAS scoring engine — Loop 1 (GRS-0004).
+"""ATLAS scoring engine — Loop 1 (GRS-0004 deterministic kernel, GRS-0005 uncertainty).
 
 Implements ``docs/ATLAS-Methodology-v1.1.md`` §5 exactly: two-track aggregation (continuous
 q_m/L/B/P/V + rule-based rating gate), the derived Platform Power triad (ordinal out, ADR-0002),
-against a registry-validated `CoefficientSet`. Pure and fail-loud — no DB, no I/O, no clock, no
-randomness (persistence and Monte Carlo are later boundaries). The golden-master fixture and the
-property tests gate every line (CLAUDE.md testing rules).
+against a registry-validated `CoefficientSet`. `score()` is pure and fail-loud — no DB, no I/O, no
+clock, no randomness. The Monte Carlo uncertainty engine (§7) WRAPS `score()`; its only randomness
+comes from an injected, seeded RNG, so the golden-master determinism guarantee is preserved.
 """
 
 from __future__ import annotations
 
 from grassmarket.atlas.engine import ENGINE_VERSION, score
 from grassmarket.atlas.inputs import AssessmentInputs, MetricObservation, PowerObservation
+from grassmarket.atlas.montecarlo import (
+    DEFAULT_DRAWS,
+    Band,
+    TornadoEntry,
+    UncertaintyResult,
+    WeightStabilityInterval,
+    draft_v1_uncertainty_model,
+    run_monte_carlo,
+)
 from grassmarket.atlas.results import (
     AtlasResult,
     BusinessResult,
@@ -42,4 +51,12 @@ __all__ = [
     "SubcomponentRow",
     "TriadDimensionResult",
     "TriadResult",
+    # Uncertainty engine (GRS-0005)
+    "DEFAULT_DRAWS",
+    "Band",
+    "TornadoEntry",
+    "UncertaintyResult",
+    "WeightStabilityInterval",
+    "draft_v1_uncertainty_model",
+    "run_monte_carlo",
 ]
