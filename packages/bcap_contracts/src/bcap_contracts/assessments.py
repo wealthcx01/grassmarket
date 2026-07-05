@@ -41,7 +41,14 @@ _PROVENANCE_FAMILIES = (
     "delta",
     "w_power",
     "w_metric",
+    "group_weights",  # W_g for the group-weighted B (ADR-0006)
+    "strength_encoding",  # ordinal power strength → numeric encoding for P (ADR-0004)
 )
+
+# Closed value sets for the non-registry-keyed coefficient families (ADR-0004, ADR-0006). Kept as
+# frozensets of the enum/literal *values* so a typo is a construction-time refusal, not a default.
+_LEGAL_METRIC_GROUPS = frozenset({"scale", "unit_economics", "momentum"})
+_LEGAL_STRENGTHS = frozenset(s.value for s in StrengthRating)
 
 
 class CoefficientSet(BaseModel):
@@ -78,6 +85,19 @@ class CoefficientSet(BaseModel):
     w_power: dict[str, float] = Field(default_factory=dict, description="Power weights w_j.")
     w_metric: dict[str, float] = Field(default_factory=dict, description="Metric weights w_k.")
 
+    # Group weights W_g for the group-weighted Business index B (ADR-0006), keyed by metric group
+    # (scale | unit_economics | momentum). Empty until the register is grouped.
+    group_weights: dict[str, float] = Field(default_factory=dict)
+    # Ordinal power-strength → numeric encoding for the continuous P index (ADR-0004), keyed by
+    # StrengthRating value (None / Emerging / Established / Wide). The triad stays ordinal out
+    # (ADR-0002); it feeds only P. The engine derives the triad band thresholds from it (ADR-0007).
+    strength_encoding: dict[str, float] = Field(default_factory=dict)
+
+    # A draft set (weights not yet elicited) is loadable for tests but MUST NOT price a client
+    # deliverable. Ratified/elicited sets flip this true; deliverable generation (later loop) gates
+    # on it. Default False — a set is not client-usable until someone says so (fail-safe).
+    client_usable: bool = False
+
     # Every coefficient family present must carry provenance (Methodology §6).
     provenance: dict[str, WeightProvenanceRecord] = Field(default_factory=dict)
 
@@ -106,6 +126,10 @@ class CoefficientSet(BaseModel):
             populated.add("w_power")
         if self.w_metric:
             populated.add("w_metric")
+        if self.group_weights:
+            populated.add("group_weights")
+        if self.strength_encoding:
+            populated.add("strength_encoding")
         missing = populated - set(self.provenance)
         if missing:
             raise ValueError(
@@ -118,6 +142,26 @@ class CoefficientSet(BaseModel):
             raise ValueError(
                 f"Unknown provenance family key(s) {sorted(unknown)}; legal families: "
                 f"{list(_PROVENANCE_FAMILIES)}."
+            )
+        return self
+
+    @model_validator(mode="after")
+    def _enforce_closed_set_keys(self) -> CoefficientSet:
+        """group_weights and strength_encoding are keyed by CLOSED value sets, not registry keys
+        (ADR-0004/0006). A stray key is a typo and refuses to construct. strength_encoding, when
+        present, must cover ALL four StrengthRatings — a partial encoding would silently drop a
+        level to nothing at score time. (Registry-keyed completeness stays in validate_against;
+        their *presence* is enforced fail-loud by the engine where it reads them.)"""
+        unknown_groups = set(self.group_weights) - _LEGAL_METRIC_GROUPS
+        if unknown_groups:
+            raise ValueError(
+                f"group_weights has unknown group key(s) {sorted(unknown_groups)}; legal groups: "
+                f"{sorted(_LEGAL_METRIC_GROUPS)} (ADR-0006)."
+            )
+        if self.strength_encoding and set(self.strength_encoding) != _LEGAL_STRENGTHS:
+            raise ValueError(
+                f"strength_encoding must cover exactly the four StrengthRatings "
+                f"{sorted(_LEGAL_STRENGTHS)}; got {sorted(self.strength_encoding)} (ADR-0004)."
             )
         return self
 
@@ -158,6 +202,14 @@ class CoefficientSet(BaseModel):
         # Powers (w_power) and metrics (w_metric) must be exactly the registry sets.
         registry.assert_covers_keys("power (w_power)", registry.power_keys(), set(self.w_power))
         registry.assert_covers_keys("metric (w_metric)", registry.metric_keys(), set(self.w_metric))
+
+        # Group weights (W_g) must cover exactly the distinct metric groups the registry declares
+        # (ADR-0006). If the register isn't grouped yet there is nothing to cover.
+        groups_present = frozenset(m.group for m in registry.metrics if m.group is not None)
+        if groups_present:
+            registry.assert_covers_keys(
+                "metric_group (group_weights)", groups_present, set(self.group_weights)
+            )
 
 
 # --- Assessment resources (PRD §3.1) — the data model the wizard/Path B fill (Loop 2+) ---

@@ -182,11 +182,85 @@ def test_validate_against_real_registry_full_coverage_passes() -> None:
         },
         w_power={k: 1.0 for k in registry.power_keys()},
         w_metric={k: 1.0 for k in registry.metric_keys()},
+        group_weights={"scale": 1.0, "unit_economics": 1.0, "momentum": 1.0},
+        strength_encoding={"None": 0.0, "Emerging": 0.4, "Established": 0.7, "Wide": 1.0},
+        provenance=_prov(
+            "theta",
+            "alpha_l",
+            "alpha_module",
+            "lambda",
+            "delta",
+            "w_power",
+            "w_metric",
+            "group_weights",
+            "strength_encoding",
+        ),
+    )
+    cs.validate_against(registry)  # must not raise
+
+
+# --- GRS-0004: group_weights / strength_encoding / client_usable ---------------------------
+
+
+def test_unknown_group_weight_key_rejected() -> None:
+    with pytest.raises(ValidationError):
+        CoefficientSet(
+            version="v1",
+            methodology_version="1.1",
+            theta_b=0.34,
+            theta_p=0.33,
+            theta_l=0.33,
+            alpha_l=0.7,
+            group_weights={"scaale": 1.0},  # typo — not a legal metric group
+            provenance=_prov("theta", "alpha_l", "group_weights"),
+        )
+
+
+def test_partial_strength_encoding_rejected() -> None:
+    # A strength encoding missing a level would silently drop that level to nothing at score time.
+    with pytest.raises(ValidationError):
+        CoefficientSet(
+            version="v1",
+            methodology_version="1.1",
+            theta_b=0.34,
+            theta_p=0.33,
+            theta_l=0.33,
+            alpha_l=0.7,
+            strength_encoding={"None": 0.0, "Emerging": 0.4, "Established": 0.7},  # Wide missing
+            provenance=_prov("theta", "alpha_l", "strength_encoding"),
+        )
+
+
+def test_validate_against_real_registry_missing_group_weights_raises() -> None:
+    from bcap_contracts.registry import load_registry
+
+    registry = load_registry()  # its metrics are grouped, so group_weights must cover the groups
+    cs = CoefficientSet(
+        version="v1",
+        methodology_version="1.1",
+        theta_b=0.34,
+        theta_p=0.33,
+        theta_l=0.33,
+        alpha_l=0.7,
+        delta={k: 1.0 for k in registry.module_keys()},
+        alpha_module={k: 0.6 for k in registry.module_keys()},
+        lambda_loadings={
+            k: {s: 1.0 for s in registry.subcomponent_keys(k)} for k in registry.module_keys()
+        },
+        w_power={k: 1.0 for k in registry.power_keys()},
+        w_metric={k: 1.0 for k in registry.metric_keys()},
+        # group_weights omitted → the group-weighted B is undefined → refuse.
         provenance=_prov(
             "theta", "alpha_l", "alpha_module", "lambda", "delta", "w_power", "w_metric"
         ),
     )
-    cs.validate_against(registry)  # must not raise
+    with pytest.raises(MissingKeyError):
+        cs.validate_against(registry)
+
+
+def test_client_usable_defaults_false() -> None:
+    # A set is not client-usable until someone ratifies it (fail-safe default).
+    assert _valid_theta_only().client_usable is False
 
 
 def _valid_theta_only() -> CoefficientSet:

@@ -4,13 +4,13 @@ Grassmarket is the advisor platform for the Bruntsfield Advisory Network: pipeli
 
 Normative documents (read before any engine work):
 - `docs/Grassmarket-PRD-v2.md` — the product spec.
-- `docs/ATLAS-Methodology-v1.md` — normative for the scoring engine. Where PRD and Methodology disagree, **Methodology wins**.
+- `docs/ATLAS-Methodology-v1.1.md` — normative for the scoring engine (supersedes v1.0). Where PRD and Methodology disagree, **Methodology wins**.
 - `docs/ATLAS-Feasibility-Deep-Dive-v1.md` — the prototype audit and defect register D1–D9. The scaffold must make those defects structurally impossible.
 
 ## Non-negotiables
 
 1. **This repo lives at `C:\dev\Grassmarket`, off OneDrive.** OneDrive corruption is the failure mode SD3 exists to escape. Same rule here. The OneDrive Technology folder is documents-only.
-2. **The methodology is settled: implement it, don't re-invent.** ATLAS scoring implements `docs/ATLAS-Methodology-v1.md` exactly. Changes to scoring are ADRs + new methodology versions, never silent edits.
+2. **The methodology is settled: implement it, don't re-invent.** ATLAS scoring implements `docs/ATLAS-Methodology-v1.1.md` exactly. Changes to scoring are ADRs + new methodology versions, never silent edits.
 3. **Fail loud, never silently fall back.** A missing required input, unknown key, or unvalidated coefficient refuses to score. No `.get(key, default)` anywhere in the scoring path. Nothing is fabricated, null-filled, or defaulted around. (Defects D1–D7 in the prototype were all silent fallbacks.)
 4. **Contract-typed everything.** Pydantic v2 models + JSON Schemas in `bcap-contracts` for every API resource and scoring output, mirrored to TypeScript. Schemas win on conflict. All module/subcomponent/power/metric keys validate against a single registry at load time (ADR-0001).
 5. **All persistence through the repository layer** (`src/grassmarket/data/repository.py`). No scattered queries. The interface is shaped like Holy Corner's future API resources so the backing store can swap from local Postgres to the Holy Corner API without touching feature code.
