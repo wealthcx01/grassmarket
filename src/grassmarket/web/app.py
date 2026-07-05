@@ -14,7 +14,7 @@ from sqlalchemy import Engine
 
 from grassmarket import __version__
 from grassmarket.config import Settings, get_settings
-from grassmarket.data.database import create_all, make_engine, make_session_factory
+from grassmarket.data.database import make_engine, make_session_factory, run_migrations
 from grassmarket.web.routers import auth, health, prospects
 
 
@@ -23,8 +23,8 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
     engine = engine or make_engine(settings.database_url)
     session_factory = make_session_factory(engine)
 
-    # Loop 0 schema bootstrap. Documented in the ticket: Alembic migrations take over in Loop 1+.
-    create_all(engine)
+    # Schema is the Alembic migrations (GRS-0006 retired create_all from the app path).
+    run_migrations(engine)
 
     app = FastAPI(
         title="Grassmarket — Bruntsfield Advisor Studio",

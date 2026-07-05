@@ -13,7 +13,7 @@ from uuid import UUID, uuid4
 
 from bcap_contracts.common import AssessorLevel, ConsultantTier, Role
 from bcap_contracts.entities import PipelineStage
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, Uuid
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 
 from grassmarket.data.database import Base
@@ -84,3 +84,45 @@ class ProspectORM(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_now, onupdate=_now
     )
+
+
+class ScoringRunORM(Base):
+    """An immutable, versioned, content-hashed scoring run (CLAUDE.md non-negotiable #6).
+
+    Append-only: rows are inserted, never updated — the ONE exception is finalisation, which flips
+    ``finalised`` False→True and locks the inputs. The full inputs and result (every intermediate)
+    are stored as JSON text so a run is reproducible and tamper-evident: the content hash is taken
+    over inputs + the three versions, and can be recomputed from the stored inputs to prove the row
+    was not altered. Scoped by ``owner_consultant_id`` like every owned resource.
+    """
+
+    __tablename__ = "scoring_runs"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    # THE scoping column — every read/list is filtered by this in the repository layer.
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    assessment_id: Mapped[UUID] = mapped_column(Uuid, index=True, nullable=False)
+
+    # Version stamps — a run is only meaningful against the code + coefficients that produced it.
+    engine_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    methodology_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    coefficient_version: Mapped[str] = mapped_column(String(128), nullable=False)
+
+    # The immutability seal: SHA-256 over the canonical inputs + the three versions. Indexed (not
+    # unique — a legitimate re-run of identical inputs is a new append-only row with the same hash).
+    content_hash: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
+
+    # The immutable record: canonical JSON of the inputs and the full result (every intermediate).
+    inputs_json: Mapped[str] = mapped_column(Text, nullable=False)
+    result_json: Mapped[str] = mapped_column(Text, nullable=False)
+
+    # Denormalised score-domain summary for cheap listing/querying (also present in result_json).
+    v_index: Mapped[float | None] = mapped_column(Float, nullable=True)
+    v_p10: Mapped[float | None] = mapped_column(Float, nullable=True)
+    v_p90: Mapped[float | None] = mapped_column(Float, nullable=True)
+    uncertainty_rating: Mapped[str | None] = mapped_column(String(16), nullable=True)
+
+    finalised: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)

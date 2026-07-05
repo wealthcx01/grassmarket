@@ -1,8 +1,9 @@
 """SQLAlchemy engine/session plumbing.
 
 The app uses managed Postgres on Railway (via `DATABASE_URL`) and SQLite locally / in CI.
-Schema for Loop 0 is created with `create_all`; Alembic migrations become the source of truth
-as the schema grows (Loop 1+). Kept deliberately small — the interesting logic is in
+**Alembic migrations are the schema source of truth** (GRS-0006): the app applies them at startup
+via :func:`run_migrations`. `create_all` remains only for throwaway in-memory test databases where a
+migration round-trip would add nothing. Kept deliberately small — the interesting logic is in
 `repository.py`, not here.
 """
 
@@ -10,9 +11,14 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from contextlib import contextmanager
+from pathlib import Path
 
+from alembic import command
+from alembic.config import Config
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+
+_ALEMBIC_INI = Path(__file__).resolve().parents[3] / "alembic.ini"
 
 
 class Base(DeclarativeBase):
@@ -33,11 +39,22 @@ def make_session_factory(engine: Engine) -> sessionmaker[Session]:
 
 
 def create_all(engine: Engine) -> None:
-    """Create every table. Loop 0 bootstrap and the test fixture path."""
+    """Create every table directly from the models. Retained ONLY for throwaway in-memory test
+    databases; the app and real deployments apply the schema via :func:`run_migrations`."""
     # Import models for their side effect of registering on Base.metadata.
     from grassmarket.data import models  # noqa: F401
 
     Base.metadata.create_all(engine)
+
+
+def run_migrations(engine: Engine) -> None:
+    """Bring a database to the latest schema by applying the Alembic migrations — the source of
+    truth (GRS-0006, replacing `create_all` on the app path). Runs on the GIVEN engine's connection,
+    so it works with any store the app uses, including the shared in-memory SQLite in tests."""
+    config = Config(str(_ALEMBIC_INI))
+    with engine.begin() as connection:
+        config.attributes["connection"] = connection
+        command.upgrade(config, "head")
 
 
 @contextmanager
