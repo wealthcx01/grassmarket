@@ -1,8 +1,8 @@
-"""The uncertainty engine — Monte Carlo over the deterministic kernel (Methodology v1.1 §7).
+"""The uncertainty engine — Monte Carlo over the deterministic kernel (Methodology v1.2 §7).
 
 Monte Carlo **wraps** `score()`; it never reimplements scoring. Each draw perturbs the *inputs*
-(subcomponent maturity levels, by evidence grade) and runs the untouched deterministic engine, so
-the point estimate and every band come from one code path.
+(subcomponent levels and power strengths by evidence grade; metric raws by source grade) and runs
+the untouched deterministic engine, so the point estimate and every band come from one code path.
 
 Randomness is the first in the codebase, and it is contained: the RNG is **injected and seeded**
 (a `random.Random` or a numpy `Generator` — both satisfy the `.random()` protocol), never module
@@ -10,10 +10,12 @@ Randomness is the first in the codebase, and it is contained: the RNG is **injec
 guarantee that protects the golden master is preserved. Draws consume the RNG in a fixed registry
 order for exact reproducibility.
 
-§7 mechanism (this ticket): the input distribution is evidence-grade-driven, which the methodology
-defines only for subcomponents. Metric and power inputs carry no evidence grade, so B and P are held
-at their point values (reported as degenerate bands) until their own input-uncertainty models —
-financial measurement error, committee confidence — are added. V and L carry real ranges.
+§7 mechanism (Methodology v1.2, ADR-0008): every input that carries a confidence signal gets a
+distribution — subcomponents and powers by an ordinal evidence grade (adjacent-level categorical),
+metrics by a source/recency grade (relative spread on the raw). An input with NO grade is not
+modelled: it is held at its point value and its index band is LABELLED a point estimate
+(`Band.modelled = False`), never rendered as a tight band. So a zero-width band is never presented
+as confidence — it is presented as "uncertainty not modelled".
 """
 
 from __future__ import annotations
@@ -28,6 +30,7 @@ from bcap_contracts.common import (
     MaturityLevel,
     NonScoreState,
     Score,
+    StrengthRating,
     UncertaintyRating,
     WeightMethod,
 )
@@ -37,7 +40,7 @@ from bcap_contracts.uncertainty import UncertaintyModel
 from pydantic import BaseModel, ConfigDict
 
 from grassmarket.atlas.engine import score
-from grassmarket.atlas.inputs import AssessmentInputs
+from grassmarket.atlas.inputs import AssessmentInputs, MetricObservation, PowerObservation
 from grassmarket.atlas.results import AtlasResult
 
 DEFAULT_DRAWS = 2000
@@ -48,6 +51,14 @@ _LEVELS_BY_RANK: tuple[MaturityLevel, ...] = (
     MaturityLevel.DEVELOPING,
     MaturityLevel.ADVANCED,
     MaturityLevel.FRONTIER,
+)
+
+# Power strength levels ordered weakest→strongest (the adjacency the power sampler walks).
+_STRENGTHS_BY_RANK: tuple[StrengthRating, ...] = (
+    StrengthRating.NONE,
+    StrengthRating.EMERGING,
+    StrengthRating.ESTABLISHED,
+    StrengthRating.WIDE,
 )
 
 # Assessment Uncertainty Rating bands on the confidence score (coverage × evidence factor). These
@@ -71,14 +82,19 @@ class SupportsRandom(Protocol):
 
 
 class Band(BaseModel):
-    """A P10/P50/P90 uncertainty band (Methodology §7). Degenerate (all equal) when the input has
-    no modelled uncertainty."""
+    """A P10/P50/P90 uncertainty band (Methodology §7).
+
+    ``modelled`` is the honesty flag (ADR-0008): True when the index's inputs carried a confidence
+    grade and the width is a real modelled range; False when uncertainty was NOT modelled, in which
+    case P10 = P50 = P90 is a **point estimate** — a renderer must show it as a point, never as a
+    tight (falsely confident) band."""
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     p10: Score
     p50: Score
     p90: Score
+    modelled: bool
 
 
 class TornadoEntry(BaseModel):
@@ -122,13 +138,19 @@ class UncertaintyResult(BaseModel):
 
 
 def draft_v1_uncertainty_model() -> UncertaintyModel:
-    """The v1 DRAFT evidence-grade widths — documented placeholders, NOT client-usable. Ratified by
-    the same elicitation as θ/α (§6). E4 tight (2% leaves the point level) → E1 wide (50%, so an
-    E1 rating genuinely spans the adjacent level)."""
+    """The v1 DRAFT input-distribution widths — documented placeholders, NOT client-usable. Ratified
+    by the same elicitation as θ/α (§6). Evidence grades: E4 tight (2% leaves the point level) → E1
+    wide (50%). Metric source grades: audited tight (±2% on the raw) → estimated wide (±40%)."""
     return UncertaintyModel(
         version="v1-draft-pending-elicitation",
-        methodology_version="1.1",
+        methodology_version="1.2",
         evidence_spreads={"E1": 0.50, "E2": 0.25, "E3": 0.10, "E4": 0.02},
+        metric_spreads={
+            "estimated": 0.40,
+            "self_reported": 0.20,
+            "management_reported": 0.08,
+            "audited": 0.02,
+        },
         client_usable=False,
         provenance=WeightProvenanceRecord(
             set_by="draft-pending-elicitation",
@@ -177,14 +199,21 @@ def run_monte_carlo(
             if mr.q_m is not None:
                 qm_s[mr.key].append(mr.q_m)
 
-    module_qm = {k: _band(v) for k, v in qm_s.items() if v}
+    # Honest labelling (ADR-0008): B/P are modelled only if at least one metric/power carried a
+    # confidence grade. Subcomponents always carry evidence grades, so V, L and q_m are always
+    # modelled. An unmodelled band is a point estimate, never a tight band.
+    b_modelled = any(m.confidence is not None for m in inputs.metrics if m.state is None)
+    p_modelled = any(
+        p.benefit_grade is not None or p.barrier_grade is not None for p in inputs.powers
+    )
+    module_qm = {k: _band(v, modelled=True) for k, v in qm_s.items() if v}
     overall_rating, module_ratings = _uncertainty_ratings(point, subs_by_key, registry)
     return UncertaintyResult(
         draws=draws,
-        v_band=_band(v_s),
-        l_band=_band(l_s),
-        b_band=_band(b_s),
-        p_band=_band(p_s),
+        v_band=_band(v_s, modelled=True),
+        l_band=_band(l_s, modelled=True),
+        b_band=_band(b_s, modelled=b_modelled),
+        p_band=_band(p_s, modelled=p_modelled),
         module_qm=module_qm,
         overall_uncertainty=overall_rating,
         module_uncertainty=module_ratings,
@@ -203,8 +232,9 @@ def _perturb(
     model: UncertaintyModel,
     rng: SupportsRandom,
 ) -> AssessmentInputs:
-    """Draw one perturbed assessment. Subcomponents are sampled in registry order (fixed RNG
-    consumption). Metrics and powers pass through unchanged (no §7 distribution in v1)."""
+    """Draw one perturbed assessment. Inputs are sampled in a FIXED order (subcomponents in registry
+    order, then metrics, then powers) so the RNG stream is exactly reproducible. An input with no
+    confidence grade consumes NO RNG and passes through at its point value (honest labelling)."""
     new_subs: list[SubcomponentRating] = []
     for module in registry.modules:
         for sub in module.subcomponents:
@@ -227,7 +257,8 @@ def _perturb(
                 )
                 continue
             assert rating.level is not None and rating.evidence_grade is not None
-            level = _sample_level(rng, rating.level, rating.evidence_grade, model)
+            spread = model.evidence_spreads[rating.evidence_grade.value]
+            level = _sample_ordinal(rng, rating.level, _LEVELS_BY_RANK, spread)
             new_subs.append(
                 SubcomponentRating(
                     module_key=module.key,
@@ -236,28 +267,58 @@ def _perturb(
                     evidence_grade=rating.evidence_grade,
                 )
             )
-    return AssessmentInputs(
-        subcomponents=tuple(new_subs), metrics=inputs.metrics, powers=inputs.powers
-    )
+    new_metrics = tuple(_perturb_metric(m, model, rng) for m in inputs.metrics)
+    new_powers = tuple(_perturb_power(p, model, rng) for p in inputs.powers)
+    return AssessmentInputs(subcomponents=tuple(new_subs), metrics=new_metrics, powers=new_powers)
 
 
-def _sample_level(
-    rng: SupportsRandom, level: MaturityLevel, grade: EvidenceGrade, model: UncertaintyModel
-) -> MaturityLevel:
-    """Adjacent-level categorical: `1 − spread` on the point level, the rest on the adjacent
-    level(s). Endpoints (Basic/Frontier) put all adjacent mass on their single neighbour."""
-    spread = model.evidence_spreads[grade.value]
-    rank = level.rank  # 1..4
-    lower = rank - 1 >= 1
-    upper = rank + 1 <= 4
-    weighted: list[tuple[MaturityLevel, float]] = [(level, 1.0 - spread)]
+def _perturb_metric(
+    obs: MetricObservation, model: UncertaintyModel, rng: SupportsRandom
+) -> MetricObservation:
+    """A graded, observed metric gets a relative perturbation on its raw — a symmetric
+    multiplicative spread whose half-width is the metric's source grade (ADR-0008). Ungraded or
+    state metrics pass through and consume no RNG (unmodelled → held at point)."""
+    if obs.state is not None or obs.confidence is None or obs.raw is None:
+        return obs
+    half = model.metric_spreads[obs.confidence.value]
+    factor = 1.0 + (2.0 * rng.random() - 1.0) * half
+    return obs.model_copy(update={"raw": max(0.0, obs.raw * factor)})
+
+
+def _perturb_power(
+    obs: PowerObservation, model: UncertaintyModel, rng: SupportsRandom
+) -> PowerObservation:
+    """Each graded side of a power (Benefit / Barrier) gets an adjacent-strength categorical draw by
+    its evidence grade; the engine still takes the weaker side. An ungraded side passes through and
+    consumes no RNG (unmodelled → held at point)."""
+    benefit = obs.benefit
+    barrier = obs.barrier
+    if obs.benefit_grade is not None:
+        benefit = _sample_ordinal(
+            rng, obs.benefit, _STRENGTHS_BY_RANK, model.evidence_spreads[obs.benefit_grade.value]
+        )
+    if obs.barrier_grade is not None:
+        barrier = _sample_ordinal(
+            rng, obs.barrier, _STRENGTHS_BY_RANK, model.evidence_spreads[obs.barrier_grade.value]
+        )
+    return obs.model_copy(update={"benefit": benefit, "barrier": barrier})
+
+
+def _sample_ordinal[T](rng: SupportsRandom, current: T, ordered: tuple[T, ...], spread: float) -> T:
+    """Adjacent-level categorical over any ordinal scale (maturity levels, power strengths):
+    `1 − spread` on the point level, the rest on the adjacent level(s). Endpoints put all adjacent
+    mass on their single neighbour. One RNG draw, so the stream is identical to the v1.1 sampler."""
+    idx = ordered.index(current)
+    lower = idx - 1 >= 0
+    upper = idx + 1 < len(ordered)
+    weighted: list[tuple[T, float]] = [(current, 1.0 - spread)]
     if lower and upper:
-        weighted.append((_LEVELS_BY_RANK[rank - 2], spread / 2))
-        weighted.append((_LEVELS_BY_RANK[rank], spread / 2))
+        weighted.append((ordered[idx - 1], spread / 2))
+        weighted.append((ordered[idx + 1], spread / 2))
     elif lower:
-        weighted.append((_LEVELS_BY_RANK[rank - 2], spread))
-    else:  # upper only (Basic)
-        weighted.append((_LEVELS_BY_RANK[rank], spread))
+        weighted.append((ordered[idx - 1], spread))
+    else:  # upper only (the weakest end)
+        weighted.append((ordered[idx + 1], spread))
     return _weighted_choice(rng, weighted)
 
 
@@ -265,9 +326,7 @@ def _uniform_level(rng: SupportsRandom) -> MaturityLevel:
     return _LEVELS_BY_RANK[min(3, int(rng.random() * 4))]
 
 
-def _weighted_choice(
-    rng: SupportsRandom, weighted: list[tuple[MaturityLevel, float]]
-) -> MaturityLevel:
+def _weighted_choice[T](rng: SupportsRandom, weighted: list[tuple[T, float]]) -> T:
     total = math.fsum(w for _, w in weighted)
     x = rng.random() * total
     cumulative = 0.0
@@ -295,12 +354,13 @@ def _percentile(sorted_values: list[float], q: float) -> float:
     return sorted_values[low] + (sorted_values[high] - sorted_values[low]) * (idx - low)
 
 
-def _band(values: list[float]) -> Band:
+def _band(values: list[float], *, modelled: bool) -> Band:
     ordered = sorted(values)
     return Band(
         p10=round(_percentile(ordered, 0.10), 6),
         p50=round(_percentile(ordered, 0.50), 6),
         p90=round(_percentile(ordered, 0.90), 6),
+        modelled=modelled,
     )
 
 

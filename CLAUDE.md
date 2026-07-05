@@ -4,7 +4,7 @@ Grassmarket is the advisor platform for the Bruntsfield Advisory Network: pipeli
 
 Normative documents (read before any engine work):
 - `docs/Grassmarket-PRD-v2.md` — the product spec.
-- `docs/ATLAS-Methodology-v1.1.md` — normative for the scoring engine (supersedes v1.0). Where PRD and Methodology disagree, **Methodology wins**.
+- `docs/ATLAS-Methodology-v1.2.md` — normative for the scoring engine (supersedes v1.1; amends §3.3/§7 for uncertainty. §5 deterministic scores are unchanged from v1.1). Where PRD and Methodology disagree, **Methodology wins**.
 - `docs/ATLAS-Feasibility-Deep-Dive-v1.md` — the prototype audit and defect register D1–D9. The scaffold must make those defects structurally impossible.
 
 ## Non-negotiables

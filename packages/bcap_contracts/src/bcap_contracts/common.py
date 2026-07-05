@@ -92,6 +92,27 @@ class EvidenceGrade(StrEnum):
         return {"E1": 1, "E2": 2, "E3": 3, "E4": 4}[self.value]
 
 
+class MetricConfidence(StrEnum):
+    """Source/recency grade for a business-metric observation (Methodology v1.2 §7, ADR-0008).
+
+    Drives the Monte Carlo distribution width on a metric's raw value the way an evidence grade
+    drives a subcomponent's — a coarse read of how much the reported number could move under a
+    better source or fresher data. Audited/current is tight; an estimate is wide. Reported as a
+    grade, never a decimal (the width is a coefficient, ADR-0008)."""
+
+    ESTIMATED = "estimated"  # derived / stale — widest
+    SELF_REPORTED = "self_reported"
+    MANAGEMENT = "management_reported"  # management accounts
+    AUDITED = "audited"  # audited / current filings — tightest
+
+    @property
+    def rank(self) -> int:
+        """Ordinal rank 1..4 (estimated weakest → audited strongest), mirroring EvidenceGrade."""
+        return {"estimated": 1, "self_reported": 2, "management_reported": 3, "audited": 4}[
+            self.value
+        ]
+
+
 class StrengthRating(StrEnum):
     """Power strength and triad rating — ordinal with falsifiable duration semantics (§8).
 
