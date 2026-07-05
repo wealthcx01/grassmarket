@@ -37,7 +37,7 @@ def test_all_advanced_e3_criticals_can_be_frontier() -> None:
 
 
 def test_not_assessed_critical_blocks_at_developing() -> None:
-    band, blocked, _ = _bgm._rating_gate([("NOT_ASSESSED", None)], [3, 3])
+    band, blocked, _ = _bgm._rating_gate([(_bgm.NOT_ASSESSED, None)], [3, 3])
     assert band == "Developing"
     assert blocked is True
 
