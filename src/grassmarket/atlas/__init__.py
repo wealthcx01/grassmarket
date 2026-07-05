@@ -1,12 +1,45 @@
-"""ATLAS scoring engine — Loop 1 (NOT this loop).
+"""ATLAS scoring engine — Loop 1 (GRS-0004).
 
-Deliberately empty of computation. The engine implements `docs/ATLAS-Methodology-v1.md` exactly:
-the registry-validated `CoefficientSet` (see `bcap_contracts.assessments`), two-track aggregation
-(§5), Monte Carlo ranges (§7), and the three-layer value bridge (§10, ADR-0002). Loop 0 ships
-only the contracts and invariants that make the prototype's defects (D1–D9) structurally
-impossible; no scoring code exists here yet, and the golden-master fixture (CLAUDE.md testing
-rules) gates the first line of it.
-
-Do not add scoring here without: (1) the hand-computed golden-master fixture, and (2) the
-property tests (monotonicity, bottleneck, N/A renormalisation, Not-Assessed exclusion).
+Implements ``docs/ATLAS-Methodology-v1.1.md`` §5 exactly: two-track aggregation (continuous
+q_m/L/B/P/V + rule-based rating gate), the derived Platform Power triad (ordinal out, ADR-0002),
+against a registry-validated `CoefficientSet`. Pure and fail-loud — no DB, no I/O, no clock, no
+randomness (persistence and Monte Carlo are later boundaries). The golden-master fixture and the
+property tests gate every line (CLAUDE.md testing rules).
 """
+
+from __future__ import annotations
+
+from grassmarket.atlas.engine import ENGINE_VERSION, score
+from grassmarket.atlas.inputs import AssessmentInputs, MetricObservation, PowerObservation
+from grassmarket.atlas.results import (
+    AtlasResult,
+    BusinessResult,
+    CompositeResult,
+    LResult,
+    MetricRow,
+    ModuleResult,
+    PowerRow,
+    PowersResult,
+    SubcomponentRow,
+    TriadDimensionResult,
+    TriadResult,
+)
+
+__all__ = [
+    "ENGINE_VERSION",
+    "score",
+    "AssessmentInputs",
+    "MetricObservation",
+    "PowerObservation",
+    "AtlasResult",
+    "BusinessResult",
+    "CompositeResult",
+    "LResult",
+    "MetricRow",
+    "ModuleResult",
+    "PowerRow",
+    "PowersResult",
+    "SubcomponentRow",
+    "TriadDimensionResult",
+    "TriadResult",
+]

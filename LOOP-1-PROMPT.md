@@ -4,11 +4,11 @@ Prerequisite: PR #1 (GRS-0001 scaffold) is merged to `main`.
 
 ```
 Continue the Grassmarket project at C:\dev\Grassmarket. This session is Loop 1: the
-ATLAS scoring engine, to ATLAS Methodology v1 exactly. No wizard UI (that's Loop 2).
+ATLAS scoring engine, to ATLAS Methodology v1.1 exactly. No wizard UI (that's Loop 2).
 
 CONTEXT: Loop 0 shipped the contracts package (registry, CoefficientSet invariants,
 Money/Score ADR-0002 boundary), repository layer with scoping, auth, CI. Read your
-project memories, CLAUDE.md, docs/ATLAS-Methodology-v1.md (normative), and
+project memories, CLAUDE.md, docs/ATLAS-Methodology-v1.1.md (normative), and
 docs/Grassmarket-PRD-v2.md §3 before writing code. Pull latest main first.
 
 WORK AS TICKETS, in this order (one ticket = one branch = one PR):
@@ -72,7 +72,7 @@ pyright/pytest/pre-commit green; CI green on every PR; registry populated (draft
 flagged); Monte Carlo produces ranges on the golden-master case; value bridge runs
 on a worked example with its assumption register rendered.
 
-Non-negotiables: Methodology v1 is normative — deviations require an ADR; fail loud;
+Non-negotiables: Methodology v1.1 is normative — deviations require an ADR; fail loud;
 no .get(key, default) in scoring paths; pure functions in the engine (DB access only
 at the persistence boundary); propose-not-execute for anything AI-generated.
 ```

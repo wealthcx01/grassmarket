@@ -86,6 +86,11 @@
       "title": "Alpha Module",
       "type": "object"
     },
+    "client_usable": {
+      "default": false,
+      "title": "Client Usable",
+      "type": "boolean"
+    },
     "critical_modules_for_l": {
       "default": [],
       "items": {
@@ -100,6 +105,13 @@
       },
       "description": "Module weights δ_m for the L blend.",
       "title": "Delta",
+      "type": "object"
+    },
+    "group_weights": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Group Weights",
       "type": "object"
     },
     "lambda_loadings": {
@@ -123,6 +135,13 @@
         "$ref": "#/$defs/WeightProvenanceRecord"
       },
       "title": "Provenance",
+      "type": "object"
+    },
+    "strength_encoding": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Strength Encoding",
       "type": "object"
     },
     "theta_b": {
