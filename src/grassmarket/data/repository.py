@@ -15,17 +15,35 @@ Fail-loud throughout: a missing row raises `NotFoundError`; a cross-owner access
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
+from bcap_contracts.assessments import ScoringRun
 from bcap_contracts.auth import Consultant
-from bcap_contracts.common import AssessorLevel, ConsultantTier, Role
+from bcap_contracts.common import AssessorLevel, ConsultantTier, Role, UncertaintyRating
 from bcap_contracts.entities import PipelineStage, Prospect
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from grassmarket.data.models import ConsultantORM, InvitationORM, ProspectORM
+from grassmarket.atlas import AssessmentInputs, AtlasResult
+from grassmarket.data.models import ConsultantORM, InvitationORM, ProspectORM, ScoringRunORM
+
+
+def content_hash_for(
+    inputs: AssessmentInputs,
+    engine_version: str,
+    methodology_version: str,
+    coefficient_version: str,
+) -> str:
+    """SHA-256 over the canonical inputs + the three versions — the immutability seal of a scoring
+    run (CLAUDE.md non-negotiable #6). Deterministic: identical inputs and versions always hash the
+    same, so a stored hash can be recomputed to prove the row was not altered."""
+    canonical = "|".join(
+        [engine_version, methodology_version, coefficient_version, inputs.model_dump_json()]
+    )
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 class RepositoryError(Exception):
@@ -85,6 +103,24 @@ class StoredConsultant:
             created_at=self.created_at,
             updated_at=self.updated_at,
         )
+
+
+@dataclass(frozen=True)
+class StoredScoringRun:
+    """The full immutable scoring-run record, including the stored inputs/result JSON — used to
+    verify integrity (recompute the content hash) and to re-score. Not returned from the API as-is;
+    the public shape is the `ScoringRun` contract."""
+
+    id: UUID
+    owner_consultant_id: UUID
+    assessment_id: UUID
+    engine_version: str
+    methodology_version: str
+    coefficient_version: str
+    content_hash: str
+    inputs_json: str
+    result_json: str
+    finalised: bool
 
 
 class Repository:
@@ -237,7 +273,118 @@ class Repository:
         self._session.flush()
         return self._to_prospect(row)
 
+    # ------------------------------------------------------------------ scoring runs (SCOPED)
+    def create_scoring_run(
+        self,
+        principal: Principal,
+        *,
+        assessment_id: UUID,
+        inputs: AssessmentInputs,
+        result: AtlasResult,
+        v_p10: float | None = None,
+        v_p90: float | None = None,
+        uncertainty_rating: str | None = None,
+    ) -> ScoringRun:
+        """Append an immutable scoring run owned by the principal. Versions are read from the result
+        (the engine stamps them), the content hash is computed over inputs + versions, and the full
+        inputs and result are stored. The owner is the principal — never caller-supplied."""
+        digest = content_hash_for(
+            inputs,
+            result.engine_version,
+            result.methodology_version,
+            result.coefficient_version,
+        )
+        row = ScoringRunORM(
+            owner_consultant_id=principal.consultant_id,
+            assessment_id=assessment_id,
+            engine_version=result.engine_version,
+            methodology_version=result.methodology_version,
+            coefficient_version=result.coefficient_version,
+            content_hash=digest,
+            inputs_json=inputs.model_dump_json(),
+            result_json=result.model_dump_json(),
+            v_index=result.composite.v_index,
+            v_p10=v_p10,
+            v_p90=v_p90,
+            uncertainty_rating=uncertainty_rating,
+            finalised=False,
+        )
+        self._session.add(row)
+        self._session.flush()
+        return self._to_scoring_run(row)
+
+    def get_scoring_run(self, principal: Principal, run_id: UUID) -> ScoringRun:
+        row = self._require_scoring_run(principal, run_id)
+        return self._to_scoring_run(row)
+
+    def list_scoring_runs(self, principal: Principal) -> list[ScoringRun]:
+        stmt = select(ScoringRunORM)
+        if not principal.is_admin:
+            stmt = stmt.where(ScoringRunORM.owner_consultant_id == principal.consultant_id)
+        rows = self._session.execute(stmt.order_by(ScoringRunORM.created_at)).scalars().all()
+        result: list[ScoringRun] = []
+        for row in rows:
+            self._assert_can_access(principal, row.owner_consultant_id)  # belt and braces
+            result.append(self._to_scoring_run(row))
+        return result
+
+    def finalise_scoring_run(self, principal: Principal, run_id: UUID) -> ScoringRun:
+        """Lock a run's inputs (finalised False→True) — the ONE permitted state change on an
+        otherwise append-only row. Re-finalising is a conflict; inputs/result/hash never change."""
+        row = self._require_scoring_run(principal, run_id)
+        if row.finalised:
+            raise ConflictError(f"Scoring run {run_id} is already finalised; runs are immutable.")
+        row.finalised = True
+        self._session.add(row)
+        self._session.flush()
+        return self._to_scoring_run(row)
+
+    def get_scoring_run_record(self, principal: Principal, run_id: UUID) -> StoredScoringRun:
+        """The full immutable record (inputs + result JSON + hash) — for integrity verification and
+        re-scoring. Scoped like every read."""
+        row = self._require_scoring_run(principal, run_id)
+        return StoredScoringRun(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            assessment_id=row.assessment_id,
+            engine_version=row.engine_version,
+            methodology_version=row.methodology_version,
+            coefficient_version=row.coefficient_version,
+            content_hash=row.content_hash,
+            inputs_json=row.inputs_json,
+            result_json=row.result_json,
+            finalised=row.finalised,
+        )
+
+    def _require_scoring_run(self, principal: Principal, run_id: UUID) -> ScoringRunORM:
+        row = self._session.get(ScoringRunORM, run_id)
+        if row is None:
+            raise NotFoundError(f"Scoring run {run_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        return row
+
     # ------------------------------------------------------------------ mappers
+    @staticmethod
+    def _to_scoring_run(row: ScoringRunORM) -> ScoringRun:
+        return ScoringRun(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            assessment_id=row.assessment_id,
+            engine_version=row.engine_version,
+            methodology_version=row.methodology_version,
+            coefficient_version=row.coefficient_version,
+            content_hash=row.content_hash,
+            finalised=row.finalised,
+            v_index=row.v_index,
+            v_p10=row.v_p10,
+            v_p90=row.v_p90,
+            uncertainty_rating=(
+                UncertaintyRating(row.uncertainty_rating) if row.uncertainty_rating else None
+            ),
+            created_at=row.created_at,
+            updated_at=row.created_at,  # immutable — updated == created (there are no updates)
+        )
+
     @staticmethod
     def _to_stored_consultant(row: ConsultantORM) -> StoredConsultant:
         return StoredConsultant(

@@ -20,7 +20,7 @@ from sqlalchemy.pool import StaticPool
 
 from grassmarket.auth.security import create_access_token, hash_password
 from grassmarket.config import Settings
-from grassmarket.data.database import create_all
+from grassmarket.data.database import run_migrations
 from grassmarket.data.repository import Principal, Repository, StoredConsultant
 from grassmarket.web.app import create_app
 
@@ -45,7 +45,7 @@ def engine() -> Iterator[Engine]:
         poolclass=StaticPool,
         future=True,
     )
-    create_all(eng)
+    run_migrations(eng)  # schema via Alembic — the same path the app uses (GRS-0006)
     yield eng
     eng.dispose()
 

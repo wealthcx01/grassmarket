@@ -23,6 +23,8 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 _SCAN_DIRS = [
     _REPO_ROOT / "packages" / "bcap_contracts" / "src" / "bcap_contracts",
     _REPO_ROOT / "src" / "grassmarket" / "atlas",
+    # The value layer is exactly where prototype D2 mixed pounds and score-points — scan it hardest.
+    _REPO_ROOT / "src" / "grassmarket" / "value",
 ]
 _SCORE = re.compile(r"\bScore\b")
 _MONEY = re.compile(r"\bMoney\b")
