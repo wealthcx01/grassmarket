@@ -10,6 +10,8 @@ before any client sees a number.
 from __future__ import annotations
 
 import math
+from datetime import datetime
+from enum import StrEnum
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -18,6 +20,7 @@ from bcap_contracts.base import OwnedResource
 from bcap_contracts.common import (
     EvidenceGrade,
     MaturityLevel,
+    MetricConfidence,
     NonScoreState,
     Score,
     StrengthRating,
@@ -285,6 +288,8 @@ class ScoringRun(OwnedResource):
     engine_version: str
     methodology_version: str
     coefficient_version: str
+    # Which uncertainty model produced the band (§7, ADR-0008). Null for a point-only run.
+    uncertainty_version: str | None = None
     content_hash: str = Field(description="SHA-256 over inputs + versions — the immutability seal.")
     finalised: bool = False
 
@@ -293,3 +298,121 @@ class ScoringRun(OwnedResource):
     v_p10: Score | None = None
     v_p90: Score | None = None
     uncertainty_rating: UncertaintyRating | None = None
+
+
+# --- The intermediate schema (Path A wizard + later Path B feed this ONE document) ------
+
+
+class MetricEntry(BaseModel):
+    """A business-metric entry in the intermediate document: a raw value in the declared unit OR a
+    non-score state, with an OPTIONAL source/recency confidence (drives §7 uncertainty, ADR-0008).
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    metric_key: str
+    raw: float | None = None
+    state: NonScoreState | None = None
+    confidence: MetricConfidence | None = None
+
+    @model_validator(mode="after")
+    def _exactly_one_of_raw_or_state(self) -> MetricEntry:
+        if (self.raw is None) == (self.state is None):
+            raise ValueError(f"Metric {self.metric_key!r} carries exactly one of `raw` or `state`.")
+        return self
+
+
+class PowerEntry(BaseModel):
+    """A power entry: dual Benefit + Barrier strengths (Helmer, §8), each with OPTIONAL evidence
+    grade (drives §7 uncertainty, ADR-0008) and evidence text. Powers are never N/A (§8)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    power_key: str
+    benefit: StrengthRating
+    barrier: StrengthRating
+    benefit_grade: EvidenceGrade | None = None
+    barrier_grade: EvidenceGrade | None = None
+    benefit_evidence: str | None = None
+    barrier_evidence: str | None = None
+    trend: TrendDirection | None = None
+
+
+class AssessmentDocument(BaseModel):
+    """The single intermediate schema BOTH Path A (wizard) and Path B (meeting intelligence) feed.
+
+    It is **partial by design**: a half-filled document is valid and persistable (autosave). It is
+    NOT the engine input — the engine requires exact registry coverage; the live-score service
+    completes the missing subcomponents/metrics to Not Assessed (first-class, never zero-filled)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    subject: str = ""
+    subcomponents: tuple[SubcomponentRating, ...] = ()
+    metrics: tuple[MetricEntry, ...] = ()
+    powers: tuple[PowerEntry, ...] = ()
+    notes: str | None = None
+
+
+class AssessmentState(StrEnum):
+    """The assessment lifecycle. Finalisation locks inputs (CLAUDE.md non-negotiable #6)."""
+
+    DRAFT = "draft"  # created, not yet edited
+    IN_PROGRESS = "in_progress"  # being filled (autosaved)
+    FINALISED = "finalised"  # inputs locked; an immutable scoring run exists
+
+
+class Assessment(OwnedResource):
+    """A scoped, lifecycle-managed assessment wrapping the intermediate document. When finalised it
+    is version-stamped and linked to its immutable scoring run (GRS-0006)."""
+
+    subject: str = ""
+    state: AssessmentState = AssessmentState.DRAFT
+    document: AssessmentDocument
+    finalised_at: datetime | None = None
+    scoring_run_id: UUID | None = None
+    # Version stamps recorded at finalisation (null while editable).
+    engine_version: str | None = None
+    methodology_version: str | None = None
+    coefficient_version: str | None = None
+    uncertainty_version: str | None = None
+
+
+# --- Live-score response (the wizard's live panel) --------------------------------------
+
+
+class IndexBand(BaseModel):
+    """A P10/P50/P90 band for one index with the ADR-0008 honesty flag. `modelled = False` ⟹ a
+    point estimate (P10=P50=P90) — the client shows a point labelled 'uncertainty not modelled',
+    never a tight band."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    p10: Score
+    p50: Score
+    p90: Score
+    modelled: bool
+
+
+class LiveScore(BaseModel):
+    """The live-score panel output for a (possibly partial) document. When `scoreable`, the bands
+    are present; else `blocking` says what is still needed. Not Assessed inputs flow through as
+    first-class (excluded, never zero) and are reflected in `coverage`."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    scoreable: bool
+    blocking: tuple[str, ...] = ()
+    v: IndexBand | None = None
+    b: IndexBand | None = None
+    p: IndexBand | None = None
+    l_index: IndexBand | None = None
+    module_qm: dict[str, IndexBand] = Field(default_factory=dict)
+    overall_uncertainty: UncertaintyRating | None = None
+    subcomponents_assessed: int = 0
+    subcomponents_total: int = 0
+    coverage: Score | None = None
+    engine_version: str
+    methodology_version: str
+    coefficient_version: str
+    uncertainty_version: str

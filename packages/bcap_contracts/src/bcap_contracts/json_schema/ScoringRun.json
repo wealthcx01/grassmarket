@@ -69,6 +69,18 @@
       ],
       "default": null
     },
+    "uncertainty_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Uncertainty Version"
+    },
     "updated_at": {
       "format": "date-time",
       "title": "Updated At",

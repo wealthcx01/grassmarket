@@ -15,7 +15,7 @@ from sqlalchemy import Engine
 from grassmarket import __version__
 from grassmarket.config import Settings, get_settings
 from grassmarket.data.database import make_engine, make_session_factory, run_migrations
-from grassmarket.web.routers import auth, health, prospects
+from grassmarket.web.routers import assessments, auth, guidance, health, prospects
 
 
 def create_app(settings: Settings | None = None, *, engine: Engine | None = None) -> FastAPI:
@@ -46,4 +46,6 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
     app.include_router(health.router)
     app.include_router(auth.router)
     app.include_router(prospects.router)
+    app.include_router(assessments.router)
+    app.include_router(guidance.router)
     return app
