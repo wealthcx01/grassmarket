@@ -1,0 +1,131 @@
+# The rubric anchor library — 204 anchors (51 subcomponents × 4 maturity levels), Methodology §4.
+#
+# STATUS: draft-pending-ratification (GRS-0008). CONTENT IS JOHN'S TO AUTHOR AND RATIFY. The
+# prototype provided no anchor content (only subcomponent labels, already in the registry), so the
+# ONLY authoritative seed is the Methodology §4 worked example — Smart Order Routing — authored here
+# for OEMS_EXEC_ALGOS across all four levels. Every OTHER subcomponent is listed under
+# `todo_all_levels`: all four of its levels are EXPLICITLY not-yet-authored. Nothing is fabricated;
+# the loader refuses to load if any (subcomponent, level) pair is neither present nor explicitly TODO.
+#
+# Keys are the fully-qualified <MODULE_KEY>_<LEAF> subcomponent keys (GRS-0002a) — never the
+# prototype's old short keys.
+
+status: draft-pending-ratification
+
+# --- Authored anchors (Methodology §4 worked example: OEMS Smart Order Routing) -----------
+anchors:
+  - subcomponent_key: OEMS_EXEC_ALGOS
+    level: Basic
+    status: authored
+    statement: >-
+      Orders route to a single default venue, or a human chooses the venue per order. There is no
+      automated multi-venue routing.
+    required_evidence:
+      - Order-flow / routing configuration
+      - Venue fill reports
+    differentiator_questions:
+      - Can any order reach more than one venue without a human deciding?
+    misgrading_notes: >-
+      A manual venue picker is Basic even if several venues are technically reachable — reachability
+      is not routing.
+
+  - subcomponent_key: OEMS_EXEC_ALGOS
+    level: Developing
+    status: authored
+    statement: >-
+      Static rule-based routing (e.g. by instrument or size). Routing rules change by software
+      release, not adapted from live execution data.
+    required_evidence:
+      - Routing rule set
+      - Rule change log
+    differentiator_questions:
+      - Are routing rules changed by release, or adapted from live execution data?
+    misgrading_notes: >-
+      Vendors often demo dynamic routing that is disabled in production — verify the production
+      config (E3+), not the sales environment.
+
+  - subcomponent_key: OEMS_EXEC_ALGOS
+    level: Advanced
+    status: authored
+    statement: >-
+      Data-driven routing with venue cost/fill models, monitored fill-quality KPIs, and at least
+      quarterly recalibration.
+    required_evidence:
+      - Smart-order-routing model documentation
+      - Fill-quality dashboard
+      - Recalibration records
+    differentiator_questions:
+      - Is routing driven by a cost/fill model whose parameters are recalibrated on a schedule?
+    misgrading_notes: >-
+      Recalibration must be evidenced by records, not asserted; a stale model that is "data-driven"
+      in principle is still Developing.
+
+  - subcomponent_key: OEMS_EXEC_ALGOS
+    level: Frontier
+    status: authored
+    statement: >-
+      Adaptive routing with real-time venue analytics and a measurable execution-quality advantage
+      versus benchmark.
+    required_evidence:
+      - Real-time venue analytics
+      - Execution-quality benchmark comparison
+    differentiator_questions:
+      - Is there a measured execution-quality advantage versus a benchmark, not just adaptivity?
+    misgrading_notes: >-
+      Frontier is rational for flow-heavy multi-venue brokers; it is NOT economically rational for a
+      single-market wealth platform — do not treat it as the target there (§3.1).
+
+# --- Explicitly not-yet-authored (all four levels TODO) -----------------------------------
+# Each subcomponent below has all four levels explicitly marked TODO. Authoring one moves it out of
+# this list into `anchors:` above. This list is the explicit acknowledgement of the content gap.
+todo_all_levels:
+  - APP_SERVER_API_DESIGN
+  - APP_SERVER_DATA_ARCHITECTURE
+  - APP_SERVER_DEVOPS_DEPLOYMENT
+  - APP_SERVER_HOSTING_ELASTICITY
+  - APP_SERVER_OBSERVABILITY
+  - APP_SERVER_RESILIENCE_DR
+  - APP_SERVER_SECURITY_COMPLIANCE
+  - BACKOFFICE_CREDIT_RISK
+  - BACKOFFICE_CUSTODY
+  - BACKOFFICE_KYC_ONBOARDING
+  - BACKOFFICE_PAYMENTS_FUNDING
+  - BACKOFFICE_PORTFOLIO_MGMT
+  - BACKOFFICE_REG_REPORTING
+  - CMS_CONTENT_SEARCH_PERSONALISATION
+  - CMS_CRM_MODEL
+  - CMS_EMAIL_CAMPAIGNS
+  - CMS_RESEARCH_AUTHORING
+  - CMS_RESEARCH_DISTRIBUTION
+  - CMS_STATEMENTS
+  - EMS_GATEWAY_CONNECTIVITY
+  - EMS_GATEWAY_MONITORING
+  - EMS_GATEWAY_RISK_THROTTLING
+  - EMS_GATEWAY_ROUTING_POLICY
+  - FRONTEND_ACCESSIBILITY_LOCALISATION
+  - FRONTEND_DEVICE_COVERAGE
+  - FRONTEND_EXPERIMENTATION_ANALYTICS
+  - FRONTEND_PERFORMANCE
+  - FRONTEND_PERSONALISATION
+  - FRONTEND_UX_NAVIGATION
+  - LIQ_CONNECT_FOREIGN_BROKERS
+  - LIQ_CONNECT_FUND_HOUSES
+  - LIQ_CONNECT_LOCAL_EXCHANGES
+  - LIQ_CONNECT_SETTLEMENT_CLEARING
+  - MARKET_DATA_DEPTH_QUALITY
+  - MARKET_DATA_EXCHANGE_COVERAGE
+  - MARKET_DATA_HISTORY_DEPTH
+  - MARKET_DATA_INSTRUMENT_UNIVERSE
+  - MARKET_DATA_LATENCY_TIMELINESS
+  - MARKET_DATA_VALUE_ADD_SERVICES
+  - MARKET_DATA_VENDOR_REDUNDANCY
+  - OEMS_APIS_COLOCATION
+  - OEMS_ASSET_COVERAGE
+  - OEMS_LATENCY_RELIABILITY
+  - OEMS_ORDER_TYPES
+  - OEMS_PRE_TRADE_RISK
+  - ORCHESTRATION_CONFIG_VS_CODE
+  - ORCHESTRATION_EVENT_DRIVEN
+  - ORCHESTRATION_MONITORING
+  - ORCHESTRATION_ROUTING_LOGIC
+  - ORCHESTRATION_WORKFLOW_ENGINE
