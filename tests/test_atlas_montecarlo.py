@@ -15,7 +15,13 @@ from pathlib import Path
 
 import pytest
 from bcap_contracts.assessments import SubcomponentRating
-from bcap_contracts.common import EvidenceGrade, MaturityLevel, NonScoreState, StrengthRating
+from bcap_contracts.common import (
+    EvidenceGrade,
+    MaturityLevel,
+    MetricConfidence,
+    NonScoreState,
+    StrengthRating,
+)
 from bcap_contracts.registry import Registry, load_registry
 from bcap_contracts.uncertainty import UncertaintyModel
 from pydantic import ValidationError
@@ -94,6 +100,8 @@ def _uniform_inputs(
     level: MaturityLevel = _ADV,
     evidence: EvidenceGrade = _E4,
     overrides: dict[str, SubOverride] | None = None,
+    metric_confidence: MetricConfidence | None = None,
+    power_grade: EvidenceGrade | None = None,
 ) -> AssessmentInputs:
     overrides = overrides or {}
     subs: list[SubcomponentRating] = []
@@ -123,12 +131,20 @@ def _uniform_inputs(
                     )
                 )
     metrics = [
-        MetricObservation(metric_key=m.key, raw=float(m.normalisation.anchors[1].raw))
+        MetricObservation(
+            metric_key=m.key,
+            raw=float(m.normalisation.anchors[1].raw),
+            confidence=metric_confidence,
+        )
         for m in registry.metrics
     ]
     powers = [
         PowerObservation(
-            power_key=p.key, benefit=StrengthRating.EMERGING, barrier=StrengthRating.EMERGING
+            power_key=p.key,
+            benefit=StrengthRating.EMERGING,
+            barrier=StrengthRating.EMERGING,
+            benefit_grade=power_grade,
+            barrier_grade=power_grade,
         )
         for p in registry.powers
     ]
@@ -187,11 +203,53 @@ def test_all_e4_is_strictly_narrower_than_all_e1(registry, coeffs, model) -> Non
     assert r1.overall_uncertainty.value in {"High", "Very High"}
 
 
-def test_business_and_power_bands_are_degenerate_in_v1(registry, coeffs, model) -> None:
-    # v1 scope: metrics/powers carry no evidence grade → B and P are point-degenerate (documented).
+def test_unmodelled_b_and_p_are_labelled_point_estimates(registry, coeffs, model) -> None:
+    # Meridian carries no metric confidence or power grades → B and P are NOT modelled. They must be
+    # degenerate AND flagged modelled=False — a point estimate, never a (falsely confident) band.
     res = run_monte_carlo(_meridian_inputs(), coeffs, registry, model, random.Random(5), draws=400)
     assert res.b_band.p10 == res.b_band.p50 == res.b_band.p90
     assert res.p_band.p10 == res.p_band.p50 == res.p_band.p90
+    assert res.b_band.modelled is False
+    assert res.p_band.modelled is False
+    # V and L are always modelled (subcomponents drive them).
+    assert res.v_band.modelled is True
+    assert res.l_band.modelled is True
+
+
+def test_unmodelled_bands_are_always_flagged_points(registry, coeffs, model) -> None:
+    # The honesty invariant: an UNMODELLED band (modelled=False) is ALWAYS a point (p10=p50=p90) —
+    # it is never handed a spurious width, and the flag tells a renderer to show it as a point,
+    # never a (falsely confident) tight band. On Meridian, B and P are the unmodelled indices.
+    res = run_monte_carlo(_meridian_inputs(), coeffs, registry, model, random.Random(6), draws=1000)
+    for band in (res.v_band, res.l_band, res.b_band, res.p_band, *res.module_qm.values()):
+        if not band.modelled:
+            assert band.p10 == band.p50 == band.p90, "an unmodelled band was given spurious width"
+    assert res.b_band.modelled is False
+    assert res.p_band.modelled is False
+
+
+def test_metric_confidence_drives_b_width(registry, coeffs, model) -> None:
+    audited = _uniform_inputs(registry, metric_confidence=MetricConfidence.AUDITED)
+    estimated = _uniform_inputs(registry, metric_confidence=MetricConfidence.ESTIMATED)
+    r_aud = run_monte_carlo(audited, coeffs, registry, model, random.Random(8), draws=1500)
+    r_est = run_monte_carlo(estimated, coeffs, registry, model, random.Random(8), draws=1500)
+    assert r_aud.b_band.modelled and r_est.b_band.modelled
+    assert _width(r_aud.b_band) < _width(r_est.b_band)  # weaker source → wider B
+
+
+def test_power_evidence_drives_p_width(registry, coeffs, model) -> None:
+    strong = _uniform_inputs(registry, power_grade=EvidenceGrade.E4_OBSERVED)
+    weak = _uniform_inputs(registry, power_grade=EvidenceGrade.E1_SELF_REPORTED)
+    r_strong = run_monte_carlo(strong, coeffs, registry, model, random.Random(9), draws=1500)
+    r_weak = run_monte_carlo(weak, coeffs, registry, model, random.Random(9), draws=1500)
+    assert r_strong.p_band.modelled and r_weak.p_band.modelled
+    assert _width(r_strong.p_band) < _width(r_weak.p_band)  # weaker evidence → wider P
+
+
+def test_uncertainty_model_rejects_incomplete_metric_spreads() -> None:
+    m = draft_v1_uncertainty_model()
+    with pytest.raises(ValidationError):
+        m.model_validate({**m.model_dump(), "metric_spreads": {"audited": 0.02}})
 
 
 # --- Tornado ranks a known high-leverage input on top -----------------------------------
