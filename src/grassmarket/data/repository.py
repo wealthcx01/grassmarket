@@ -20,7 +20,12 @@ from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
-from bcap_contracts.assessments import ScoringRun
+from bcap_contracts.assessments import (
+    Assessment,
+    AssessmentDocument,
+    AssessmentState,
+    ScoringRun,
+)
 from bcap_contracts.auth import Consultant
 from bcap_contracts.common import AssessorLevel, ConsultantTier, Role, UncertaintyRating
 from bcap_contracts.entities import PipelineStage, Prospect
@@ -28,7 +33,13 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from grassmarket.atlas import AssessmentInputs, AtlasResult
-from grassmarket.data.models import ConsultantORM, InvitationORM, ProspectORM, ScoringRunORM
+from grassmarket.data.models import (
+    AssessmentORM,
+    ConsultantORM,
+    InvitationORM,
+    ProspectORM,
+    ScoringRunORM,
+)
 
 
 def content_hash_for(
@@ -284,6 +295,7 @@ class Repository:
         v_p10: float | None = None,
         v_p90: float | None = None,
         uncertainty_rating: str | None = None,
+        uncertainty_version: str | None = None,
     ) -> ScoringRun:
         """Append an immutable scoring run owned by the principal. Versions are read from the result
         (the engine stamps them), the content hash is computed over inputs + versions, and the full
@@ -300,6 +312,7 @@ class Repository:
             engine_version=result.engine_version,
             methodology_version=result.methodology_version,
             coefficient_version=result.coefficient_version,
+            uncertainty_version=uncertainty_version,
             content_hash=digest,
             inputs_json=inputs.model_dump_json(),
             result_json=result.model_dump_json(),
@@ -363,6 +376,104 @@ class Repository:
         self._assert_can_access(principal, row.owner_consultant_id)
         return row
 
+    # ------------------------------------------------------------------ assessments (SCOPED)
+    def create_assessment(self, principal: Principal, *, subject: str = "") -> Assessment:
+        """Create an empty draft assessment owned by the principal (owner never caller-supplied)."""
+        row = AssessmentORM(
+            owner_consultant_id=principal.consultant_id,
+            subject=subject,
+            state=AssessmentState.DRAFT.value,
+            document_json=AssessmentDocument(subject=subject).model_dump_json(),
+        )
+        self._session.add(row)
+        self._session.flush()
+        return self._to_assessment(row)
+
+    def get_assessment(self, principal: Principal, assessment_id: UUID) -> Assessment:
+        return self._to_assessment(self._require_assessment(principal, assessment_id))
+
+    def list_assessments(self, principal: Principal) -> list[Assessment]:
+        stmt = select(AssessmentORM)
+        if not principal.is_admin:
+            stmt = stmt.where(AssessmentORM.owner_consultant_id == principal.consultant_id)
+        rows = self._session.execute(stmt.order_by(AssessmentORM.created_at)).scalars().all()
+        out: list[Assessment] = []
+        for row in rows:
+            self._assert_can_access(principal, row.owner_consultant_id)  # belt and braces
+            out.append(self._to_assessment(row))
+        return out
+
+    def update_assessment(
+        self, principal: Principal, assessment_id: UUID, *, document: AssessmentDocument
+    ) -> Assessment:
+        """Autosave: replace the intermediate document. A partial document is valid and saved
+        without scoring. A FINALISED assessment refuses edits (its inputs are locked)."""
+        row = self._require_assessment(principal, assessment_id)
+        if row.state == AssessmentState.FINALISED.value:
+            raise ConflictError(
+                f"Assessment {assessment_id} is finalised; its inputs are locked (#6)."
+            )
+        row.document_json = document.model_dump_json()
+        row.subject = document.subject
+        row.state = AssessmentState.IN_PROGRESS.value
+        self._session.add(row)
+        self._session.flush()
+        return self._to_assessment(row)
+
+    def finalise_assessment(
+        self,
+        principal: Principal,
+        assessment_id: UUID,
+        *,
+        scoring_run_id: UUID,
+        engine_version: str,
+        methodology_version: str,
+        coefficient_version: str,
+        uncertainty_version: str,
+        finalised_at: datetime,
+    ) -> Assessment:
+        """Lock the assessment's inputs: state → FINALISED, stamped and linked to its immutable
+        scoring run. Re-finalising is refused. (The run is created by the caller in the same
+        transaction — see the live-score / finalise service.)"""
+        row = self._require_assessment(principal, assessment_id)
+        if row.state == AssessmentState.FINALISED.value:
+            raise ConflictError(f"Assessment {assessment_id} is already finalised.")
+        row.state = AssessmentState.FINALISED.value
+        row.finalised_at = finalised_at
+        row.scoring_run_id = scoring_run_id
+        row.engine_version = engine_version
+        row.methodology_version = methodology_version
+        row.coefficient_version = coefficient_version
+        row.uncertainty_version = uncertainty_version
+        self._session.add(row)
+        self._session.flush()
+        return self._to_assessment(row)
+
+    def _require_assessment(self, principal: Principal, assessment_id: UUID) -> AssessmentORM:
+        row = self._session.get(AssessmentORM, assessment_id)
+        if row is None:
+            raise NotFoundError(f"Assessment {assessment_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        return row
+
+    @staticmethod
+    def _to_assessment(row: AssessmentORM) -> Assessment:
+        return Assessment(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            subject=row.subject,
+            state=AssessmentState(row.state),
+            document=AssessmentDocument.model_validate_json(row.document_json),
+            finalised_at=row.finalised_at,
+            scoring_run_id=row.scoring_run_id,
+            engine_version=row.engine_version,
+            methodology_version=row.methodology_version,
+            coefficient_version=row.coefficient_version,
+            uncertainty_version=row.uncertainty_version,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
     # ------------------------------------------------------------------ mappers
     @staticmethod
     def _to_scoring_run(row: ScoringRunORM) -> ScoringRun:
@@ -373,6 +484,7 @@ class Repository:
             engine_version=row.engine_version,
             methodology_version=row.methodology_version,
             coefficient_version=row.coefficient_version,
+            uncertainty_version=row.uncertainty_version,
             content_hash=row.content_hash,
             finalised=row.finalised,
             v_index=row.v_index,

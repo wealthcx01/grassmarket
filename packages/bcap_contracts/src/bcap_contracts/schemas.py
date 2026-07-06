@@ -12,7 +12,10 @@ from pathlib import Path
 from pydantic import BaseModel
 
 from bcap_contracts.assessments import (
+    Assessment,
+    AssessmentDocument,
     CoefficientSet,
+    LiveScore,
     PowerAssessment,
     ScoringRun,
     SubcomponentRating,
@@ -33,6 +36,7 @@ from bcap_contracts.entities import Prospect
 from bcap_contracts.learning import CertificationProgress, DrillResult
 from bcap_contracts.money import Money
 from bcap_contracts.provenance import WeightProvenanceRecord
+from bcap_contracts.rubric import RubricAnchor
 
 # The exported surface. Adding a resource means adding it here and regenerating — deliberate
 # friction so the contract surface is always explicit and mirrored.
@@ -44,6 +48,10 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "PowerAssessment": PowerAssessment,
     "TriadResult": TriadResult,
     "ScoringRun": ScoringRun,
+    "AssessmentDocument": AssessmentDocument,
+    "Assessment": Assessment,
+    "LiveScore": LiveScore,
+    "RubricAnchor": RubricAnchor,
     "Prospect": Prospect,
     "Engagement": Engagement,
     "Workshop": Workshop,

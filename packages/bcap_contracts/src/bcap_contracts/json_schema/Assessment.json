@@ -1,0 +1,473 @@
+{
+  "$defs": {
+    "AssessmentDocument": {
+      "additionalProperties": false,
+      "description": "The single intermediate schema BOTH Path A (wizard) and Path B (meeting intelligence) feed.\n\nIt is **partial by design**: a half-filled document is valid and persistable (autosave). It is\nNOT the engine input — the engine requires exact registry coverage; the live-score service\ncompletes the missing subcomponents/metrics to Not Assessed (first-class, never zero-filled).",
+      "properties": {
+        "metrics": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MetricEntry"
+          },
+          "title": "Metrics",
+          "type": "array"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "powers": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PowerEntry"
+          },
+          "title": "Powers",
+          "type": "array"
+        },
+        "subcomponents": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SubcomponentRating"
+          },
+          "title": "Subcomponents",
+          "type": "array"
+        },
+        "subject": {
+          "default": "",
+          "title": "Subject",
+          "type": "string"
+        }
+      },
+      "title": "AssessmentDocument",
+      "type": "object"
+    },
+    "AssessmentState": {
+      "description": "The assessment lifecycle. Finalisation locks inputs (CLAUDE.md non-negotiable #6).",
+      "enum": [
+        "draft",
+        "in_progress",
+        "finalised"
+      ],
+      "title": "AssessmentState",
+      "type": "string"
+    },
+    "EvidenceGrade": {
+      "description": "Evidence-strength grade (Methodology §3.3). Drives uncertainty (§7), not the point score.",
+      "enum": [
+        "E1",
+        "E2",
+        "E3",
+        "E4"
+      ],
+      "title": "EvidenceGrade",
+      "type": "string"
+    },
+    "MaturityLevel": {
+      "description": "The four maturity levels (Methodology §3.1).\n\nThe numeric ``index`` is for computation only; clients see the label. These four indices\nare the ONLY legal subcomponent indices — any other value is a contract violation, not a\ndatum to clamp or round (ADR-0001 §1).",
+      "enum": [
+        "Basic",
+        "Developing",
+        "Advanced",
+        "Frontier"
+      ],
+      "title": "MaturityLevel",
+      "type": "string"
+    },
+    "MetricConfidence": {
+      "description": "Source/recency grade for a business-metric observation (Methodology v1.2 §7, ADR-0008).\n\nDrives the Monte Carlo distribution width on a metric's raw value the way an evidence grade\ndrives a subcomponent's — a coarse read of how much the reported number could move under a\nbetter source or fresher data. Audited/current is tight; an estimate is wide. Reported as a\ngrade, never a decimal (the width is a coefficient, ADR-0008).",
+      "enum": [
+        "estimated",
+        "self_reported",
+        "management_reported",
+        "audited"
+      ],
+      "title": "MetricConfidence",
+      "type": "string"
+    },
+    "MetricEntry": {
+      "additionalProperties": false,
+      "description": "A business-metric entry in the intermediate document: a raw value in the declared unit OR a\nnon-score state, with an OPTIONAL source/recency confidence (drives §7 uncertainty, ADR-0008).",
+      "properties": {
+        "confidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MetricConfidence"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "metric_key": {
+          "title": "Metric Key",
+          "type": "string"
+        },
+        "raw": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Raw"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonScoreState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "metric_key"
+      ],
+      "title": "MetricEntry",
+      "type": "object"
+    },
+    "NonScoreState": {
+      "description": "First-class non-score states (Methodology §3.2). Never imputed, never scored as zero.\n\nAn unassessed subcomponent contributes to NO score — the empty-module → q_m = 0.0\nbehaviour of the prototype (defect D9) is prohibited by construction.",
+      "enum": [
+        "Not Applicable",
+        "Not Assessed"
+      ],
+      "title": "NonScoreState",
+      "type": "string"
+    },
+    "PowerEntry": {
+      "additionalProperties": false,
+      "description": "A power entry: dual Benefit + Barrier strengths (Helmer, §8), each with OPTIONAL evidence\ngrade (drives §7 uncertainty, ADR-0008) and evidence text. Powers are never N/A (§8).",
+      "properties": {
+        "barrier": {
+          "$ref": "#/$defs/StrengthRating"
+        },
+        "barrier_evidence": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Barrier Evidence"
+        },
+        "barrier_grade": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceGrade"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "benefit": {
+          "$ref": "#/$defs/StrengthRating"
+        },
+        "benefit_evidence": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Benefit Evidence"
+        },
+        "benefit_grade": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceGrade"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "power_key": {
+          "title": "Power Key",
+          "type": "string"
+        },
+        "trend": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrendDirection"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "power_key",
+        "benefit",
+        "barrier"
+      ],
+      "title": "PowerEntry",
+      "type": "object"
+    },
+    "StrengthRating": {
+      "description": "Power strength and triad rating — ordinal with falsifiable duration semantics (§8).\n\nReported as a rating, NEVER as a decimal. Establishing this as an enum (not a float) is the\nADR-0002 guarantee that no decimal leaks into a triad figure.",
+      "enum": [
+        "None",
+        "Emerging",
+        "Established",
+        "Wide"
+      ],
+      "title": "StrengthRating",
+      "type": "string"
+    },
+    "SubcomponentRating": {
+      "additionalProperties": false,
+      "description": "One subcomponent's rating: a maturity level OR a first-class non-score state, never both.\n\nModelling this as an exclusive union is how \"Not Assessed\" stays distinct from a score of\nzero (defect D9) — an unassessed subcomponent carries `state`, not `level`, and contributes\nto no computation.",
+      "properties": {
+        "consensus": {
+          "default": false,
+          "title": "Consensus",
+          "type": "boolean"
+        },
+        "dissent_note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dissent Note"
+        },
+        "evidence_grade": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EvidenceGrade"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "level": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MaturityLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "module_key": {
+          "title": "Module Key",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "rater_ids": {
+          "default": [],
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Rater Ids",
+          "type": "array"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonScoreState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "subcomponent_key": {
+          "title": "Subcomponent Key",
+          "type": "string"
+        }
+      },
+      "required": [
+        "module_key",
+        "subcomponent_key"
+      ],
+      "title": "SubcomponentRating",
+      "type": "object"
+    },
+    "TrendDirection": {
+      "enum": [
+        "improving",
+        "stable",
+        "eroding"
+      ],
+      "title": "TrendDirection",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A scoped, lifecycle-managed assessment wrapping the intermediate document. When finalised it\nis version-stamped and linked to its immutable scoring run (GRS-0006).",
+  "properties": {
+    "coefficient_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Coefficient Version"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "document": {
+      "$ref": "#/$defs/AssessmentDocument"
+    },
+    "engine_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Engine Version"
+    },
+    "finalised_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Finalised At"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "methodology_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Methodology Version"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "scoring_run_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Scoring Run Id"
+    },
+    "state": {
+      "$ref": "#/$defs/AssessmentState",
+      "default": "draft"
+    },
+    "subject": {
+      "default": "",
+      "title": "Subject",
+      "type": "string"
+    },
+    "uncertainty_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Uncertainty Version"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "document"
+  ],
+  "title": "Assessment",
+  "type": "object"
+}

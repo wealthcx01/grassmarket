@@ -1,0 +1,79 @@
+{
+  "$defs": {
+    "AnchorStatus": {
+      "description": "The authoring state of an anchor — so 'not yet written' is a first-class, explicit state,\nnever a silent gap or a fabricated-looking placeholder.",
+      "enum": [
+        "authored",
+        "draft",
+        "todo"
+      ],
+      "title": "AnchorStatus",
+      "type": "string"
+    },
+    "MaturityLevel": {
+      "description": "The four maturity levels (Methodology §3.1).\n\nThe numeric ``index`` is for computation only; clients see the label. These four indices\nare the ONLY legal subcomponent indices — any other value is a contract violation, not a\ndatum to clamp or round (ADR-0001 §1).",
+      "enum": [
+        "Basic",
+        "Developing",
+        "Advanced",
+        "Frontier"
+      ],
+      "title": "MaturityLevel",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One subcomponent × level anchor (§4 template).",
+  "properties": {
+    "differentiator_questions": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Differentiator Questions",
+      "type": "array"
+    },
+    "level": {
+      "$ref": "#/$defs/MaturityLevel"
+    },
+    "misgrading_notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Misgrading Notes"
+    },
+    "required_evidence": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Required Evidence",
+      "type": "array"
+    },
+    "statement": {
+      "default": "",
+      "title": "Statement",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/AnchorStatus"
+    },
+    "subcomponent_key": {
+      "title": "Subcomponent Key",
+      "type": "string"
+    }
+  },
+  "required": [
+    "subcomponent_key",
+    "level",
+    "status"
+  ],
+  "title": "RubricAnchor",
+  "type": "object"
+}

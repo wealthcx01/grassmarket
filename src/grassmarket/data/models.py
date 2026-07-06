@@ -109,6 +109,8 @@ class ScoringRunORM(Base):
     engine_version: Mapped[str] = mapped_column(String(64), nullable=False)
     methodology_version: Mapped[str] = mapped_column(String(64), nullable=False)
     coefficient_version: Mapped[str] = mapped_column(String(128), nullable=False)
+    # Which uncertainty model produced the band (§7, ADR-0008); null for a point-only run.
+    uncertainty_version: Mapped[str | None] = mapped_column(String(128), nullable=True)
 
     # The immutability seal: SHA-256 over the canonical inputs + the three versions. Indexed (not
     # unique — a legitimate re-run of identical inputs is a new append-only row with the same hash).
@@ -126,3 +128,33 @@ class ScoringRunORM(Base):
 
     finalised: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
+class AssessmentORM(Base):
+    """A scoped, lifecycle-managed assessment (GRS-0009). The intermediate document is stored as
+    JSON so a partial, half-filled assessment saves without scoring (autosave). Editing is refused
+    once ``state`` is finalised; the immutable scoring run is linked via ``scoring_run_id``."""
+
+    __tablename__ = "assessments"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    # THE scoping column — every read/list/update is filtered by this in the repository layer.
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    subject: Mapped[str] = mapped_column(String(200), default="", nullable=False)
+    state: Mapped[str] = mapped_column(String(16), default="draft", nullable=False)
+    document_json: Mapped[str] = mapped_column(Text, nullable=False)
+
+    finalised_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    scoring_run_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    # Version stamps recorded at finalisation (null while editable).
+    engine_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    methodology_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    coefficient_version: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    uncertainty_version: Mapped[str | None] = mapped_column(String(128), nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )

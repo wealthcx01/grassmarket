@@ -1,0 +1,178 @@
+{
+  "$defs": {
+    "IndexBand": {
+      "additionalProperties": false,
+      "description": "A P10/P50/P90 band for one index with the ADR-0008 honesty flag. `modelled = False` ⟹ a\npoint estimate (P10=P50=P90) — the client shows a point labelled 'uncertainty not modelled',\nnever a tight band.",
+      "properties": {
+        "modelled": {
+          "title": "Modelled",
+          "type": "boolean"
+        },
+        "p10": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "P10",
+          "type": "number"
+        },
+        "p50": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "P50",
+          "type": "number"
+        },
+        "p90": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "P90",
+          "type": "number"
+        }
+      },
+      "required": [
+        "p10",
+        "p50",
+        "p90",
+        "modelled"
+      ],
+      "title": "IndexBand",
+      "type": "object"
+    },
+    "UncertaintyRating": {
+      "description": "Assessment Uncertainty Rating (Methodology §7), Morningstar pattern.",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Very High"
+      ],
+      "title": "UncertaintyRating",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The live-score panel output for a (possibly partial) document. When `scoreable`, the bands\nare present; else `blocking` says what is still needed. Not Assessed inputs flow through as\nfirst-class (excluded, never zero) and are reflected in `coverage`.",
+  "properties": {
+    "b": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/IndexBand"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "blocking": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Blocking",
+      "type": "array"
+    },
+    "coefficient_version": {
+      "title": "Coefficient Version",
+      "type": "string"
+    },
+    "coverage": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Coverage"
+    },
+    "engine_version": {
+      "title": "Engine Version",
+      "type": "string"
+    },
+    "l_index": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/IndexBand"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "methodology_version": {
+      "title": "Methodology Version",
+      "type": "string"
+    },
+    "module_qm": {
+      "additionalProperties": {
+        "$ref": "#/$defs/IndexBand"
+      },
+      "title": "Module Qm",
+      "type": "object"
+    },
+    "overall_uncertainty": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/UncertaintyRating"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "p": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/IndexBand"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "scoreable": {
+      "title": "Scoreable",
+      "type": "boolean"
+    },
+    "subcomponents_assessed": {
+      "default": 0,
+      "title": "Subcomponents Assessed",
+      "type": "integer"
+    },
+    "subcomponents_total": {
+      "default": 0,
+      "title": "Subcomponents Total",
+      "type": "integer"
+    },
+    "uncertainty_version": {
+      "title": "Uncertainty Version",
+      "type": "string"
+    },
+    "v": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/IndexBand"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "scoreable",
+    "engine_version",
+    "methodology_version",
+    "coefficient_version",
+    "uncertainty_version"
+  ],
+  "title": "LiveScore",
+  "type": "object"
+}
