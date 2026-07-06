@@ -212,3 +212,80 @@ def test_guidance_returns_todo_anchors_labelled_not_blank(client, alice: SeededC
 
 def test_guidance_unknown_subcomponent_is_404(client, alice: SeededConsultant) -> None:
     assert client.get("/guidance/subcomponents/NOPE", headers=auth_header(alice)).status_code == 404
+
+
+# --- Scenario evaluation (ΔV → Upgrade Priority Index) -----------------------------------
+
+
+def _doc_with_extra_sub(module: str, key: str, level: MaturityLevel) -> AssessmentDocument:
+    base = _scoreable_partial_doc()
+    extra = SubcomponentRating(
+        module_key=module, subcomponent_key=key, level=level, evidence_grade=_E3
+    )
+    return base.model_copy(update={"subcomponents": (*base.subcomponents, extra)})
+
+
+def test_scenarios_rank_by_delta_v(client, alice: SeededConsultant) -> None:
+    aid = client.post("/assessments", json={}, headers=auth_header(alice)).json()["id"]
+    client.put(
+        f"/assessments/{aid}", json=_body(_scoreable_partial_doc()), headers=auth_header(alice)
+    )
+    # A bottleneck fix in a core module (OEMS) vs a top-up elsewhere (FRONTEND, non-core).
+    big = _doc_with_extra_sub("OEMS", "OEMS_EXEC_ALGOS", MaturityLevel.ADVANCED)
+    small = _doc_with_extra_sub("FRONTEND", "FRONTEND_PERFORMANCE", MaturityLevel.DEVELOPING)
+    resp = client.post(
+        f"/assessments/{aid}/scenarios",
+        json={
+            "scenarios": [
+                {"name": "Top-up frontend", "document": _body(small)},
+                {"name": "Fix OEMS bottleneck", "document": _body(big)},
+            ]
+        },
+        headers=auth_header(alice),
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["scoreable"] is True
+    assert body["baseline_v"] is not None
+    ranked = body["priority_index"]
+    assert [r["rank"] for r in ranked] == [1, 2]
+    assert (
+        ranked[0]["delta_v"] >= ranked[1]["delta_v"]
+    )  # bigger ΔV first, regardless of input order
+
+
+def test_scenarios_on_unscoreable_baseline_reports_blocking(
+    client, alice: SeededConsultant
+) -> None:
+    aid = client.post("/assessments", json={}, headers=auth_header(alice)).json()["id"]  # empty
+    resp = client.post(
+        f"/assessments/{aid}/scenarios", json={"scenarios": []}, headers=auth_header(alice)
+    )
+    assert resp.status_code == 200
+    assert resp.json()["scoreable"] is False
+    assert resp.json()["blocking"]
+
+
+def test_scenarios_scoped_to_owner(client, alice: SeededConsultant, bob: SeededConsultant) -> None:
+    aid = client.post("/assessments", json={}, headers=auth_header(alice)).json()["id"]
+    resp = client.post(
+        f"/assessments/{aid}/scenarios", json={"scenarios": []}, headers=auth_header(bob)
+    )
+    assert resp.status_code == 404
+
+
+# --- Registry endpoint (wizard form structure) ------------------------------------------
+
+
+def test_registry_endpoint_returns_structure(client, alice: SeededConsultant) -> None:
+    resp = client.get("/registry", headers=auth_header(alice))
+    assert resp.status_code == 200
+    body = resp.json()
+    assert len(body["modules"]) == 9
+    assert sum(len(m["subcomponents"]) for m in body["modules"]) == 51
+    assert len(body["metrics"]) == 10
+    assert len(body["powers"]) == 7
+
+
+def test_registry_requires_authentication(client) -> None:
+    assert client.get("/registry").status_code == 401

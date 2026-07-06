@@ -9,8 +9,34 @@
  * present the failure.
  */
 
+import type {
+  Assessment,
+  AssessmentDocument,
+  LiveScore,
+  Registry,
+  RubricAnchor,
+  ScenarioComparison,
+} from "@/lib/types";
+
 export const API_BASE_URL: string =
   process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, "") ?? "http://localhost:8000";
+
+/** Where the (skeleton) access token lives — mirrors the login page (Loop 6 replaces this). */
+export const TOKEN_KEY = "bas.access_token";
+
+export function getToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem(TOKEN_KEY);
+}
+
+export function clearToken(): void {
+  if (typeof window !== "undefined") window.localStorage.removeItem(TOKEN_KEY);
+}
+
+function authHeaders(): Record<string, string> {
+  const token = getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 /** Backend GET /health — coded defensively; fields beyond `status` are optional. */
 export interface HealthResponse {
@@ -100,6 +126,82 @@ export const api = {
     return request<LoginResponse>("/auth/login", {
       method: "POST",
       body: JSON.stringify(payload),
+      signal,
+    });
+  },
+
+  // --- Assessments (all JWT-scoped server-side; the client carries the token) ---
+  registry(signal?: AbortSignal): Promise<Registry> {
+    return request<Registry>("/registry", { method: "GET", headers: authHeaders(), signal });
+  },
+
+  createAssessment(subject: string, signal?: AbortSignal): Promise<Assessment> {
+    return request<Assessment>("/assessments", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ subject }),
+      signal,
+    });
+  },
+
+  listAssessments(signal?: AbortSignal): Promise<Assessment[]> {
+    return request<Assessment[]>("/assessments", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  getAssessment(id: string, signal?: AbortSignal): Promise<Assessment> {
+    return request<Assessment>(`/assessments/${id}`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  saveAssessment(id: string, doc: AssessmentDocument, signal?: AbortSignal): Promise<Assessment> {
+    return request<Assessment>(`/assessments/${id}`, {
+      method: "PUT",
+      headers: authHeaders(),
+      body: JSON.stringify(doc),
+      signal,
+    });
+  },
+
+  liveScore(id: string, signal?: AbortSignal): Promise<LiveScore> {
+    return request<LiveScore>(`/assessments/${id}/live-score`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  finaliseAssessment(id: string, signal?: AbortSignal): Promise<Assessment> {
+    return request<Assessment>(`/assessments/${id}/finalise`, {
+      method: "POST",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  evaluateScenarios(
+    id: string,
+    scenarios: { name: string; document: AssessmentDocument }[],
+    signal?: AbortSignal,
+  ): Promise<ScenarioComparison> {
+    return request<ScenarioComparison>(`/assessments/${id}/scenarios`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ scenarios }),
+      signal,
+    });
+  },
+
+  guidance(subcomponentKey: string, signal?: AbortSignal): Promise<RubricAnchor[]> {
+    return request<RubricAnchor[]>(`/guidance/subcomponents/${subcomponentKey}`, {
+      method: "GET",
+      headers: authHeaders(),
       signal,
     });
   },

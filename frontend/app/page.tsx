@@ -11,7 +11,7 @@ const SECTIONS: ReadonlyArray<{ title: string; href: string; blurb: string; loop
   },
   {
     title: "Assessments",
-    href: "#",
+    href: "/assessments",
     blurb: "ATLAS engine, the 7-step wizard, and live scores with uncertainty bands.",
     loop: "Loop 1–2",
   },

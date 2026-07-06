@@ -1,0 +1,275 @@
+{
+  "$defs": {
+    "AnchorPoint": {
+      "additionalProperties": false,
+      "description": "One point in a metric's normalisation curve: a raw value maps to a normalised score in\n[0,1] (Methodology §5.3). Anchor points are documented in the register, never inferred.",
+      "properties": {
+        "normalised": {
+          "description": "Its normalised score in [0,1].",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Normalised",
+          "type": "number"
+        },
+        "raw": {
+          "description": "A raw metric value in the metric's declared unit.",
+          "title": "Raw",
+          "type": "number"
+        }
+      },
+      "required": [
+        "raw",
+        "normalised"
+      ],
+      "title": "AnchorPoint",
+      "type": "object"
+    },
+    "MetricDef": {
+      "additionalProperties": false,
+      "properties": {
+        "direction": {
+          "enum": [
+            "higher_is_better",
+            "lower_is_better"
+          ],
+          "title": "Direction",
+          "type": "string"
+        },
+        "group": {
+          "anyOf": [
+            {
+              "enum": [
+                "scale",
+                "unit_economics",
+                "momentum"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Group"
+        },
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "normalisation": {
+          "$ref": "#/$defs/NormalisationSpec"
+        },
+        "status": {
+          "default": "settled",
+          "title": "Status",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "unit",
+        "direction",
+        "normalisation"
+      ],
+      "title": "MetricDef",
+      "type": "object"
+    },
+    "ModuleDef": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "subcomponents": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SubcomponentDef"
+          },
+          "title": "Subcomponents",
+          "type": "array"
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "description"
+      ],
+      "title": "ModuleDef",
+      "type": "object"
+    },
+    "NormalisationSpec": {
+      "additionalProperties": false,
+      "description": "The normalisation n_k for a business metric (Methodology §5.3).\n\nStage 1 uses documented piecewise-linear anchor points; from Stage 2 (≥10 engagements) this\nbecomes percentile-vs-benchmark-population. The prototype's unit-sensitive log heuristic\n(defect D5) is retired — the unit is declared, never inferred.",
+      "properties": {
+        "anchors": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AnchorPoint"
+          },
+          "title": "Anchors",
+          "type": "array"
+        },
+        "method": {
+          "default": "piecewise_linear",
+          "enum": [
+            "piecewise_linear",
+            "percentile"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        }
+      },
+      "title": "NormalisationSpec",
+      "type": "object"
+    },
+    "PowerDef": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "lifecycle_stage": {
+          "$ref": "#/$defs/PowerLifecycleStage"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "lifecycle_stage",
+        "description"
+      ],
+      "title": "PowerDef",
+      "type": "object"
+    },
+    "PowerLifecycleStage": {
+      "description": "Helmer Power Progression window a power is acquirable in (Methodology §8).",
+      "enum": [
+        "origination",
+        "takeoff",
+        "stability"
+      ],
+      "title": "PowerLifecycleStage",
+      "type": "string"
+    },
+    "SubcomponentDef": {
+      "additionalProperties": false,
+      "properties": {
+        "critical": {
+          "default": false,
+          "title": "Critical",
+          "type": "boolean"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "module_key": {
+          "title": "Module Key",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "module_key"
+      ],
+      "title": "SubcomponentDef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The whole legal key-space in one immutable object.\n\nConstructable directly (tests build small in-memory registries) or via\n:func:`load_registry` (reads the canonical YAML). The strict accessors below never default.",
+  "properties": {
+    "metric_status": {
+      "default": "settled",
+      "title": "Metric Status",
+      "type": "string"
+    },
+    "metrics": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/MetricDef"
+      },
+      "title": "Metrics",
+      "type": "array"
+    },
+    "modules": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ModuleDef"
+      },
+      "title": "Modules",
+      "type": "array"
+    },
+    "powers": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/PowerDef"
+      },
+      "title": "Powers",
+      "type": "array"
+    },
+    "subcomponent_status": {
+      "default": "settled",
+      "title": "Subcomponent Status",
+      "type": "string"
+    }
+  },
+  "title": "Registry",
+  "type": "object"
+}

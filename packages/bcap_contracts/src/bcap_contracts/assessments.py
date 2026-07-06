@@ -408,6 +408,10 @@ class LiveScore(BaseModel):
     p: IndexBand | None = None
     l_index: IndexBand | None = None
     module_qm: dict[str, IndexBand] = Field(default_factory=dict)
+    # Derived Platform Power triad — ordinal out (ADR-0002), never a decimal to the client.
+    triad_economic: StrengthRating | None = None
+    triad_perceived: StrengthRating | None = None
+    triad_defence: StrengthRating | None = None
     overall_uncertainty: UncertaintyRating | None = None
     subcomponents_assessed: int = 0
     subcomponents_total: int = 0

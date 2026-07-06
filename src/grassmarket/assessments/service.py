@@ -21,9 +21,10 @@ from bcap_contracts.assessments import (
     MetricEntry,
     PowerEntry,
 )
-from bcap_contracts.common import NonScoreState
+from bcap_contracts.common import NonScoreState, StrengthRating
 from bcap_contracts.registry import Registry
 from bcap_contracts.uncertainty import UncertaintyModel
+from bcap_contracts.value import ScenarioComparison
 
 from grassmarket.atlas import (
     ENGINE_VERSION,
@@ -35,6 +36,7 @@ from grassmarket.atlas import (
     score,
 )
 from grassmarket.atlas.montecarlo import Band, SupportsRandom, UncertaintyResult
+from grassmarket.value import evaluate_scenario, prioritise_upgrades
 
 LIVE_DRAWS = 400  # modest draw count for a responsive on-demand live panel
 
@@ -200,6 +202,7 @@ def live_score(
 
     art = compute_score(document, coefficients, registry, model, rng, draws=draws)
     unc = art.uncertainty
+    triad = art.result.triad
     return LiveScore(
         scoreable=True,
         v=_band(unc.v_band),
@@ -207,6 +210,9 @@ def live_score(
         p=_band(unc.p_band),
         l_index=_band(unc.l_band),
         module_qm={k: _band(v) for k, v in unc.module_qm.items()},
+        triad_economic=StrengthRating(triad.economic_value.rating),
+        triad_perceived=StrengthRating(triad.perceived_value.rating),
+        triad_defence=StrengthRating(triad.defence_value.rating),
         overall_uncertainty=unc.overall_uncertainty,
         subcomponents_assessed=assessed,
         subcomponents_total=total,
@@ -215,4 +221,30 @@ def live_score(
         methodology_version=methodology_version,
         coefficient_version=coefficient_version,
         uncertainty_version=uncertainty_version,
+    )
+
+
+def evaluate_scenarios(
+    baseline: AssessmentDocument,
+    named_scenarios: list[tuple[str, AssessmentDocument]],
+    coefficients: CoefficientSet,
+    registry: Registry,
+) -> ScenarioComparison:
+    """Compare candidate upgrade scenarios against the baseline by full re-scoring — ΔV → the
+    Upgrade Priority Index (score domain only, ADR-0002). The baseline must be scoreable; each
+    scenario is completed to engine inputs the same way (unrated → Not Assessed) and evaluated."""
+    blockers = scoreability_blockers(baseline, registry)
+    if blockers:
+        return ScenarioComparison(scoreable=False, blocking=tuple(blockers))
+
+    baseline_inputs = _complete_inputs(baseline, registry)
+    scenario_inputs = [(name, _complete_inputs(doc, registry)) for name, doc in named_scenarios]
+    results = tuple(
+        evaluate_scenario(name, baseline_inputs, inputs, coefficients, registry)
+        for name, inputs in scenario_inputs
+    )
+    priority = tuple(prioritise_upgrades(baseline_inputs, scenario_inputs, coefficients, registry))
+    baseline_v = score(baseline_inputs, coefficients, registry).composite.v_index
+    return ScenarioComparison(
+        scoreable=True, baseline_v=baseline_v, results=results, priority_index=priority
     )

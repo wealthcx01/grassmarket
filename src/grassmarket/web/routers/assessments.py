@@ -14,10 +14,16 @@ from uuid import UUID
 
 from bcap_contracts.assessments import Assessment, AssessmentDocument, LiveScore
 from bcap_contracts.registry import load_registry
+from bcap_contracts.value import ScenarioComparison
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
-from grassmarket.assessments import compute_score, live_score, scoreability_blockers
+from grassmarket.assessments import (
+    compute_score,
+    evaluate_scenarios,
+    live_score,
+    scoreability_blockers,
+)
 from grassmarket.atlas.draft_coefficients import draft_v1_coefficient_set
 from grassmarket.atlas.montecarlo import draft_v1_uncertainty_model
 from grassmarket.data.repository import (
@@ -38,6 +44,15 @@ _LIVE_SEED = 20260706
 
 class CreateAssessmentRequest(BaseModel):
     subject: str = ""
+
+
+class NamedScenario(BaseModel):
+    name: str
+    document: AssessmentDocument
+
+
+class ScenariosRequest(BaseModel):
+    scenarios: list[NamedScenario]
 
 
 def _not_found(exc: Exception) -> HTTPException:
@@ -106,6 +121,26 @@ def get_live_score(
         registry,
         draft_v1_uncertainty_model(),
         random.Random(_LIVE_SEED),
+    )
+
+
+@router.post("/{assessment_id}/scenarios", response_model=ScenarioComparison)
+def evaluate_assessment_scenarios(
+    assessment_id: UUID,
+    payload: ScenariosRequest,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> ScenarioComparison:
+    """Rank candidate upgrade scenarios against the assessment's baseline document by ΔV — the
+    Upgrade Priority Index (score domain only, ADR-0002; no currency here)."""
+    try:
+        assessment = repo.get_assessment(principal, assessment_id)
+    except (NotFoundError, ScopeViolationError) as exc:
+        raise _not_found(exc) from exc
+    registry = load_registry()
+    named = [(s.name, s.document) for s in payload.scenarios]
+    return evaluate_scenarios(
+        assessment.document, named, draft_v1_coefficient_set(registry), registry
     )
 
 
