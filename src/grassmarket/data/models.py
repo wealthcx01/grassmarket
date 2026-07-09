@@ -8,12 +8,13 @@ consultants, invitations, and one owned pipeline resource (prospects).
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from uuid import UUID, uuid4
 
 from bcap_contracts.common import AssessorLevel, ConsultantTier, Role
+from bcap_contracts.engagements import WorkshopState
 from bcap_contracts.entities import PipelineStage
-from sqlalchemy import Boolean, DateTime, Float, ForeignKey, String, Text, Uuid
+from sqlalchemy import Boolean, Date, DateTime, Float, ForeignKey, Integer, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
 
 from grassmarket.data.database import Base
@@ -89,6 +90,61 @@ class ProspectORM(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_now, onupdate=_now
     )
+
+
+class WorkshopORM(Base):
+    """A workshop owned by a consultant and linked to a prospect (GRS-0012, PRD §4). Scheduled,
+    then delivered; the delivered date is the anchor for recovery-fee attribution."""
+
+    __tablename__ = "workshops"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    # THE scoping column — every read/list/write is filtered by this in the repository layer.
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    prospect_id: Mapped[UUID] = mapped_column(
+        ForeignKey("prospects.id"), index=True, nullable=False
+    )
+    state: Mapped[WorkshopState] = mapped_column(
+        String(16), default=WorkshopState.SCHEDULED, nullable=False
+    )
+    scheduled_for: Mapped[date | None] = mapped_column(Date, nullable=True)
+    delivered_on: Mapped[date | None] = mapped_column(Date, nullable=True)
+    pre_workshop_brief: Mapped[str | None] = mapped_column(Text, nullable=True)
+    workshop_output: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
+class RecoveryFeeAttributionORM(Base):
+    """An immutable, content-hashed recovery-fee attribution (GRS-0012). Append-only: rows are
+    inserted, never updated. The £ fee is stored as integer minor units + currency (never a float)
+    plus the assumption-register ref that justifies it; the content hash seals the record."""
+
+    __tablename__ = "recovery_fee_attributions"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    # THE scoping column — every read/list is filtered by this in the repository layer.
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    # Unique: one recovery-fee attribution per delivered workshop (no double-attribution).
+    workshop_id: Mapped[UUID] = mapped_column(
+        ForeignKey("workshops.id"), unique=True, index=True, nullable=False
+    )
+    prospect_id: Mapped[UUID] = mapped_column(Uuid, index=True, nullable=False)
+    delivered_on: Mapped[date] = mapped_column(Date, nullable=False)
+    contracted_on: Mapped[date] = mapped_column(Date, nullable=False)
+    window_days: Mapped[int] = mapped_column(Integer, nullable=False)
+    rate_ref: Mapped[str] = mapped_column(String(128), nullable=False)
+    fee_amount_minor: Mapped[int] = mapped_column(Integer, nullable=False)
+    fee_currency: Mapped[str] = mapped_column(String(3), nullable=False)
+    fee_assumption_ref: Mapped[str] = mapped_column(String(128), nullable=False)
+    content_hash: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
 
 class ScoringRunORM(Base):

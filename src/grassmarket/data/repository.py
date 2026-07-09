@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from uuid import UUID
 
 from bcap_contracts.assessments import (
@@ -28,7 +28,14 @@ from bcap_contracts.assessments import (
 )
 from bcap_contracts.auth import Consultant
 from bcap_contracts.common import AssessorLevel, ConsultantTier, Role, UncertaintyRating
+from bcap_contracts.engagements import Workshop, WorkshopState
 from bcap_contracts.entities import PipelineStage, Prospect
+from bcap_contracts.fees import (
+    RecoveryFeeAttribution,
+    RecoveryFeeConfig,
+    load_recovery_fee_config,
+)
+from bcap_contracts.money import Currency, Money
 from bcap_contracts.pipeline import assert_legal_transition
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -39,8 +46,11 @@ from grassmarket.data.models import (
     ConsultantORM,
     InvitationORM,
     ProspectORM,
+    RecoveryFeeAttributionORM,
     ScoringRunORM,
+    WorkshopORM,
 )
+from grassmarket.pipeline.fees import attribution_content_hash, is_within_attribution_window
 
 
 def content_hash_for(
@@ -72,6 +82,16 @@ class ScopeViolationError(RepositoryError):
 
 class ConflictError(RepositoryError):
     """A uniqueness/state conflict (e.g. duplicate email, already-accepted invitation)."""
+
+
+class WorkshopStateError(RepositoryError):
+    """An operation invalid for the workshop's state (e.g. attributing a fee to a not-yet-delivered
+    workshop). Fail loud rather than fabricate a delivered date."""
+
+
+class AttributionWindowExpired(RepositoryError):
+    """The prospect contracted outside the recovery-fee attribution window — not eligible. Refusal,
+    never a silently-recorded (and unearned) fee."""
 
 
 @dataclass(frozen=True)
@@ -289,6 +309,161 @@ class Repository:
         self._session.add(row)
         self._session.flush()
         return self._to_prospect(row)
+
+    # ------------------------------------------------------------------ workshops (SCOPED)
+    def create_workshop(
+        self,
+        principal: Principal,
+        *,
+        prospect_id: UUID,
+        scheduled_for: date | None = None,
+        pre_workshop_brief: str | None = None,
+    ) -> Workshop:
+        """Schedule a workshop for one of the principal's OWN prospects. The prospect is checked for
+        access (a workshop can't be attached to someone else's prospect); the owner is the
+        principal, never caller-supplied."""
+        # Access check — raises NotFound/ScopeViolation if the prospect isn't the principal's.
+        self.get_prospect(principal, prospect_id)
+        row = WorkshopORM(
+            owner_consultant_id=principal.consultant_id,
+            prospect_id=prospect_id,
+            state=WorkshopState.SCHEDULED,
+            scheduled_for=scheduled_for,
+            pre_workshop_brief=pre_workshop_brief,
+        )
+        self._session.add(row)
+        self._session.flush()
+        return self._to_workshop(row)
+
+    def get_workshop(self, principal: Principal, workshop_id: UUID) -> Workshop:
+        return self._to_workshop(self._require_workshop(principal, workshop_id))
+
+    def list_workshops(self, principal: Principal) -> list[Workshop]:
+        stmt = select(WorkshopORM)
+        if not principal.is_admin:
+            stmt = stmt.where(WorkshopORM.owner_consultant_id == principal.consultant_id)
+        rows = self._session.execute(stmt.order_by(WorkshopORM.created_at)).scalars().all()
+        result: list[Workshop] = []
+        for row in rows:
+            self._assert_can_access(principal, row.owner_consultant_id)  # belt and braces
+            result.append(self._to_workshop(row))
+        return result
+
+    def deliver_workshop(
+        self,
+        principal: Principal,
+        workshop_id: UUID,
+        *,
+        delivered_on: date,
+        workshop_output: str | None = None,
+    ) -> Workshop:
+        """Mark a scheduled workshop delivered. Re-delivering is refused (state is not re-set)."""
+        row = self._require_workshop(principal, workshop_id)
+        if row.state == WorkshopState.DELIVERED:
+            raise WorkshopStateError(f"Workshop {workshop_id} is already delivered.")
+        row.state = WorkshopState.DELIVERED
+        row.delivered_on = delivered_on
+        if workshop_output is not None:
+            row.workshop_output = workshop_output
+        self._session.add(row)
+        self._session.flush()
+        return self._to_workshop(row)
+
+    # ----------------------------------------- recovery-fee attributions (SCOPED, append-only)
+    def record_recovery_fee_attribution(
+        self,
+        principal: Principal,
+        workshop_id: UUID,
+        *,
+        contracted_on: date,
+        config: RecoveryFeeConfig | None = None,
+    ) -> RecoveryFeeAttribution:
+        """Attribute a recovery fee to a DELIVERED workshop whose prospect contracted within the
+        config window. Append-only and immutable: the fee is computed from config (by the owner's
+        tier), sealed with a content hash, and written once. Outside the window → refusal; a second
+        attribution for the same workshop → conflict. The fee £ is `Money` (never a Score)."""
+        config = config or load_recovery_fee_config()
+        row = self._require_workshop(principal, workshop_id)
+        if row.state != WorkshopState.DELIVERED or row.delivered_on is None:
+            raise WorkshopStateError(
+                f"Workshop {workshop_id} is not delivered; no recovery fee can be attributed."
+            )
+        if not is_within_attribution_window(
+            row.delivered_on, contracted_on, config.attribution_window_days
+        ):
+            raise AttributionWindowExpired(
+                f"Prospect contracted on {contracted_on} — outside the "
+                f"{config.attribution_window_days}-day window from delivery on {row.delivered_on}."
+            )
+        existing = self._session.execute(
+            select(RecoveryFeeAttributionORM).where(
+                RecoveryFeeAttributionORM.workshop_id == workshop_id
+            )
+        ).scalar_one_or_none()
+        if existing is not None:
+            raise ConflictError(
+                f"Workshop {workshop_id} already has a recovery-fee attribution; records are "
+                f"append-only and immutable."
+            )
+
+        # The column is a plain String, so SQLite hands back a str — coerce to the enum.
+        tier = ConsultantTier(self._require_consultant(principal.consultant_id).tier)
+        fee = config.fee_for(tier)
+        digest = attribution_content_hash(
+            workshop_id=workshop_id,
+            prospect_id=row.prospect_id,
+            delivered_on=row.delivered_on,
+            contracted_on=contracted_on,
+            window_days=config.attribution_window_days,
+            rate_ref=config.rate_ref(tier),
+            fee=fee,
+        )
+        attribution = RecoveryFeeAttributionORM(
+            owner_consultant_id=principal.consultant_id,
+            workshop_id=workshop_id,
+            prospect_id=row.prospect_id,
+            delivered_on=row.delivered_on,
+            contracted_on=contracted_on,
+            window_days=config.attribution_window_days,
+            rate_ref=config.rate_ref(tier),
+            fee_amount_minor=fee.amount_minor,
+            fee_currency=fee.currency.value,
+            fee_assumption_ref=fee.assumption_register_ref,
+            content_hash=digest,
+        )
+        self._session.add(attribution)
+        self._session.flush()
+        return self._to_attribution(attribution)
+
+    def list_recovery_fee_attributions(self, principal: Principal) -> list[RecoveryFeeAttribution]:
+        stmt = select(RecoveryFeeAttributionORM)
+        if not principal.is_admin:
+            stmt = stmt.where(
+                RecoveryFeeAttributionORM.owner_consultant_id == principal.consultant_id
+            )
+        rows = (
+            self._session.execute(stmt.order_by(RecoveryFeeAttributionORM.created_at))
+            .scalars()
+            .all()
+        )
+        result: list[RecoveryFeeAttribution] = []
+        for row in rows:
+            self._assert_can_access(principal, row.owner_consultant_id)  # belt and braces
+            result.append(self._to_attribution(row))
+        return result
+
+    def _require_workshop(self, principal: Principal, workshop_id: UUID) -> WorkshopORM:
+        row = self._session.get(WorkshopORM, workshop_id)
+        if row is None:
+            raise NotFoundError(f"Workshop {workshop_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        return row
+
+    def _require_consultant(self, consultant_id: UUID) -> ConsultantORM:
+        row = self._session.get(ConsultantORM, consultant_id)
+        if row is None:
+            raise NotFoundError(f"Consultant {consultant_id} not found.")
+        return row
 
     # ------------------------------------------------------------------ scoring runs (SCOPED)
     def create_scoring_run(
@@ -532,4 +707,41 @@ class Repository:
             notes=row.notes,
             created_at=row.created_at,
             updated_at=row.updated_at,
+        )
+
+    @staticmethod
+    def _to_workshop(row: WorkshopORM) -> Workshop:
+        return Workshop(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            prospect_id=row.prospect_id,
+            state=WorkshopState(row.state),
+            scheduled_for=row.scheduled_for,
+            delivered_on=row.delivered_on,
+            pre_workshop_brief=row.pre_workshop_brief,
+            workshop_output=row.workshop_output,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    @staticmethod
+    def _to_attribution(row: RecoveryFeeAttributionORM) -> RecoveryFeeAttribution:
+        return RecoveryFeeAttribution(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            workshop_id=row.workshop_id,
+            prospect_id=row.prospect_id,
+            delivered_on=row.delivered_on,
+            contracted_on=row.contracted_on,
+            window_days=row.window_days,
+            rate_ref=row.rate_ref,
+            fee=Money(
+                amount_minor=row.fee_amount_minor,
+                currency=Currency(row.fee_currency),
+                assumption_register_ref=row.fee_assumption_ref,
+            ),
+            content_hash=row.content_hash,
+            created_at=row.created_at,
+            # Append-only: the row is never updated, so updated mirrors created.
+            updated_at=row.created_at,
         )

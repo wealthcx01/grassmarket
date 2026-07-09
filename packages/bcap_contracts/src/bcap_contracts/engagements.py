@@ -28,14 +28,23 @@ class Engagement(OwnedResource):
     started_on: date | None = None
 
 
+class WorkshopState(StrEnum):
+    """A workshop is scheduled, then delivered (PRD §4). Recovery-fee attribution keys off the
+    delivered date + the config window; the window itself is NOT a per-workshop field (it is
+    configuration — GRS-0012)."""
+
+    SCHEDULED = "scheduled"
+    DELIVERED = "delivered"
+
+
 class Workshop(OwnedResource):
-    """A workshop with its recovery-fee attribution window (PRD §4)."""
+    """A workshop in a consultant's pipeline, linked to a prospect (PRD §4)."""
 
     model_config = ConfigDict(extra="forbid")
 
     prospect_id: UUID
+    state: WorkshopState = WorkshopState.SCHEDULED
     scheduled_for: date | None = None
     delivered_on: date | None = None
     pre_workshop_brief: str | None = None
     workshop_output: str | None = None
-    recovery_fee_window_days: int = 365  # 12-month attribution window

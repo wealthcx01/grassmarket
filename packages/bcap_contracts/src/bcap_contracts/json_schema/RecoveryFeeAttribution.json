@@ -1,0 +1,123 @@
+{
+  "$defs": {
+    "Currency": {
+      "enum": [
+        "GBP",
+        "USD",
+        "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "description": "A currency amount that cannot exist without an explicit currency and a reference to the\nassumption register that justifies it (Methodology §10, ADR-0002 compliance test).\n\nA lever NPV or remediation cost is only meaningful under stated assumptions; a `Money`\nwithout an ``assumption_register_ref`` is not constructible.",
+      "properties": {
+        "amount_minor": {
+          "description": "Amount in integer minor units (e.g. pence).",
+          "title": "Amount Minor",
+          "type": "integer"
+        },
+        "assumption_register_ref": {
+          "description": "Reference to the assumption-register entry that justifies this figure. Mandatory: currency claims are never made without stated assumptions (Methodology §10).",
+          "minLength": 1,
+          "title": "Assumption Register Ref",
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        }
+      },
+      "required": [
+        "amount_minor",
+        "currency",
+        "assumption_register_ref"
+      ],
+      "title": "Money",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "An immutable, content-hashed record that a delivered workshop was attributed a recovery fee\nbecause its prospect contracted within the window. Append-only — never updated once written.",
+  "properties": {
+    "content_hash": {
+      "description": "SHA-256 immutability seal over the record.",
+      "minLength": 1,
+      "title": "Content Hash",
+      "type": "string"
+    },
+    "contracted_on": {
+      "format": "date",
+      "title": "Contracted On",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "delivered_on": {
+      "format": "date",
+      "title": "Delivered On",
+      "type": "string"
+    },
+    "fee": {
+      "$ref": "#/$defs/Money",
+      "description": "The computed recovery fee (currency; assumptions attached)."
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "prospect_id": {
+      "format": "uuid",
+      "title": "Prospect Id",
+      "type": "string"
+    },
+    "rate_ref": {
+      "description": "The config rate reference the fee derives from.",
+      "minLength": 1,
+      "title": "Rate Ref",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    },
+    "window_days": {
+      "description": "The attribution window this record used (config).",
+      "minimum": 1,
+      "title": "Window Days",
+      "type": "integer"
+    },
+    "workshop_id": {
+      "format": "uuid",
+      "title": "Workshop Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "workshop_id",
+    "prospect_id",
+    "delivered_on",
+    "contracted_on",
+    "window_days",
+    "rate_ref",
+    "fee",
+    "content_hash"
+  ],
+  "title": "RecoveryFeeAttribution",
+  "type": "object"
+}
