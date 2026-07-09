@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from enum import StrEnum
 
 from pydantic import ConfigDict, Field
@@ -35,6 +36,10 @@ class Prospect(OwnedResource):
 
     company_name: str = Field(min_length=1)
     stage: PipelineStage = PipelineStage.PROSPECT
+    stage_entered_at: datetime = Field(
+        description="When the prospect entered its current stage — the basis for time-in-stage "
+        "flags. Set on creation and updated on every (validated) stage transition."
+    )
     sector: str | None = None
     primary_contact_name: str | None = None
     primary_contact_email: str | None = None

@@ -94,6 +94,12 @@
       "$ref": "#/$defs/PipelineStage",
       "default": "prospect"
     },
+    "stage_entered_at": {
+      "description": "When the prospect entered its current stage — the basis for time-in-stage flags. Set on creation and updated on every (validated) stage transition.",
+      "format": "date-time",
+      "title": "Stage Entered At",
+      "type": "string"
+    },
     "updated_at": {
       "format": "date-time",
       "title": "Updated At",
@@ -105,7 +111,8 @@
     "created_at",
     "updated_at",
     "owner_consultant_id",
-    "company_name"
+    "company_name",
+    "stage_entered_at"
   ],
   "title": "Prospect",
   "type": "object"

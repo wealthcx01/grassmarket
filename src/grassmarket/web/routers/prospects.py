@@ -11,6 +11,7 @@ from __future__ import annotations
 from uuid import UUID
 
 from bcap_contracts.entities import PipelineStage, Prospect
+from bcap_contracts.pipeline import IllegalStageTransition
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
@@ -88,3 +89,6 @@ def update_stage(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Prospect not found."
         ) from exc
+    except IllegalStageTransition as exc:
+        # A legitimate, owned prospect but an illegal move — 409, with the reason.
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc

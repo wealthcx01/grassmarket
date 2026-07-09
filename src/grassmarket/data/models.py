@@ -76,6 +76,11 @@ class ProspectORM(Base):
     stage: Mapped[PipelineStage] = mapped_column(
         String(32), default=PipelineStage.PROSPECT, nullable=False
     )
+    # When the prospect entered its current stage — the basis for time-in-stage flags. Set on
+    # creation and rewritten on every validated stage transition.
+    stage_entered_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, nullable=False
+    )
     sector: Mapped[str | None] = mapped_column(String(120), nullable=True)
     primary_contact_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
     primary_contact_email: Mapped[str | None] = mapped_column(String(320), nullable=True)

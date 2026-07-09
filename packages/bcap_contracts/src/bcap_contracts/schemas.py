@@ -35,6 +35,7 @@ from bcap_contracts.engagements import Engagement, Workshop
 from bcap_contracts.entities import Prospect
 from bcap_contracts.learning import CertificationProgress, DrillResult
 from bcap_contracts.money import Money
+from bcap_contracts.pipeline import PipelineBoard, PipelineForecast
 from bcap_contracts.provenance import WeightProvenanceRecord
 from bcap_contracts.registry import Registry
 from bcap_contracts.rubric import RubricAnchor
@@ -57,6 +58,8 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "RubricAnchor": RubricAnchor,
     "Registry": Registry,
     "Prospect": Prospect,
+    "PipelineForecast": PipelineForecast,
+    "PipelineBoard": PipelineBoard,
     "Engagement": Engagement,
     "Workshop": Workshop,
     "Deliverable": Deliverable,
