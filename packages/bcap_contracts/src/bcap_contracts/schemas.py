@@ -36,7 +36,9 @@ from bcap_contracts.entities import Prospect
 from bcap_contracts.learning import CertificationProgress, DrillResult
 from bcap_contracts.money import Money
 from bcap_contracts.provenance import WeightProvenanceRecord
+from bcap_contracts.registry import Registry
 from bcap_contracts.rubric import RubricAnchor
+from bcap_contracts.value import ScenarioComparison
 
 # The exported surface. Adding a resource means adding it here and regenerating — deliberate
 # friction so the contract surface is always explicit and mirrored.
@@ -51,7 +53,9 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "AssessmentDocument": AssessmentDocument,
     "Assessment": Assessment,
     "LiveScore": LiveScore,
+    "ScenarioComparison": ScenarioComparison,
     "RubricAnchor": RubricAnchor,
+    "Registry": Registry,
     "Prospect": Prospect,
     "Engagement": Engagement,
     "Workshop": Workshop,

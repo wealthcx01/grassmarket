@@ -1,0 +1,130 @@
+{
+  "$defs": {
+    "ScenarioResult": {
+      "additionalProperties": false,
+      "description": "One scenario evaluated by full re-scoring (Methodology §10). Prioritisation is score-domain:\nΔV is the difference of two `score()` runs, never anything touching currency.",
+      "properties": {
+        "baseline_v": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Baseline V",
+          "type": "number"
+        },
+        "delta_b": {
+          "title": "Delta B",
+          "type": "number"
+        },
+        "delta_l": {
+          "title": "Delta L",
+          "type": "number"
+        },
+        "delta_p": {
+          "title": "Delta P",
+          "type": "number"
+        },
+        "delta_v": {
+          "title": "Delta V",
+          "type": "number"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "scenario_v": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Scenario V",
+          "type": "number"
+        }
+      },
+      "required": [
+        "name",
+        "baseline_v",
+        "scenario_v",
+        "delta_v",
+        "delta_l",
+        "delta_b",
+        "delta_p"
+      ],
+      "title": "ScenarioResult",
+      "type": "object"
+    },
+    "UpgradePriority": {
+      "additionalProperties": false,
+      "description": "A ranked entry in the Upgrade Priority Index — scenarios ordered by ΔV (descending). The\nindex RANKS in the score domain; the bridge PRICES in currency; the two are never divided.",
+      "properties": {
+        "delta_v": {
+          "title": "Delta V",
+          "type": "number"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "rank": {
+          "minimum": 1,
+          "title": "Rank",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "delta_v",
+        "rank"
+      ],
+      "title": "UpgradePriority",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The API result of comparing candidate upgrade scenarios against a baseline (score domain).\nWhen `scoreable`, `priority_index` ranks the scenarios by ΔV; otherwise `blocking` says what the\nbaseline still needs. No currency here — the value bridge is a separate, later step (§10).",
+  "properties": {
+    "baseline_v": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Baseline V"
+    },
+    "blocking": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Blocking",
+      "type": "array"
+    },
+    "priority_index": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/UpgradePriority"
+      },
+      "title": "Priority Index",
+      "type": "array"
+    },
+    "results": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ScenarioResult"
+      },
+      "title": "Results",
+      "type": "array"
+    },
+    "scoreable": {
+      "title": "Scoreable",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "scoreable"
+  ],
+  "title": "ScenarioComparison",
+  "type": "object"
+}

@@ -52,6 +52,20 @@ class UpgradePriority(BaseModel):
     rank: int = Field(ge=1)
 
 
+class ScenarioComparison(BaseModel):
+    """The API result of comparing candidate upgrade scenarios against a baseline (score domain).
+    When `scoreable`, `priority_index` ranks the scenarios by ΔV; otherwise `blocking` says what the
+    baseline still needs. No currency here — the value bridge is a separate, later step (§10)."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    scoreable: bool
+    blocking: tuple[str, ...] = ()
+    baseline_v: Score | None = None
+    results: tuple[ScenarioResult, ...] = ()
+    priority_index: tuple[UpgradePriority, ...] = ()
+
+
 # --- The value bridge (CURRENCY / ORDINAL domains) --------------------------------------
 
 

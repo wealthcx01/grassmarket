@@ -25,6 +25,8 @@ _SCAN_DIRS = [
     _REPO_ROOT / "src" / "grassmarket" / "atlas",
     # The value layer is exactly where prototype D2 mixed pounds and score-points — scan it hardest.
     _REPO_ROOT / "src" / "grassmarket" / "value",
+    # The assessment services orchestrate scoring + scenario ΔV; keep them Money-free too.
+    _REPO_ROOT / "src" / "grassmarket" / "assessments",
 ]
 _SCORE = re.compile(r"\bScore\b")
 _MONEY = re.compile(r"\bMoney\b")

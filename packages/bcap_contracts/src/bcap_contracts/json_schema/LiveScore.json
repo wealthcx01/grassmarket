@@ -36,6 +36,17 @@
       "title": "IndexBand",
       "type": "object"
     },
+    "StrengthRating": {
+      "description": "Power strength and triad rating — ordinal with falsifiable duration semantics (§8).\n\nReported as a rating, NEVER as a decimal. Establishing this as an enum (not a float) is the\nADR-0002 guarantee that no decimal leaks into a triad figure.",
+      "enum": [
+        "None",
+        "Emerging",
+        "Established",
+        "Wide"
+      ],
+      "title": "StrengthRating",
+      "type": "string"
+    },
     "UncertaintyRating": {
       "description": "Assessment Uncertainty Rating (Methodology §7), Morningstar pattern.",
       "enum": [
@@ -149,6 +160,39 @@
       "default": 0,
       "title": "Subcomponents Total",
       "type": "integer"
+    },
+    "triad_defence": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/StrengthRating"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "triad_economic": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/StrengthRating"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "triad_perceived": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/StrengthRating"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "uncertainty_version": {
       "title": "Uncertainty Version",
