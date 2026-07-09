@@ -1,0 +1,50 @@
+{
+  "$defs": {
+    "CommsChannel": {
+      "enum": [
+        "note",
+        "email",
+        "call",
+        "meeting"
+      ],
+      "title": "CommsChannel",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One timestamped communication-log entry. Append-only in practice (the repository never\nupdates one); ordering is by ``at``.",
+  "properties": {
+    "at": {
+      "format": "date-time",
+      "title": "At",
+      "type": "string"
+    },
+    "author_consultant_id": {
+      "format": "uuid",
+      "title": "Author Consultant Id",
+      "type": "string"
+    },
+    "body": {
+      "minLength": 1,
+      "title": "Body",
+      "type": "string"
+    },
+    "channel": {
+      "$ref": "#/$defs/CommsChannel"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "at",
+    "channel",
+    "author_consultant_id",
+    "body"
+  ],
+  "title": "CommsLogEntry",
+  "type": "object"
+}

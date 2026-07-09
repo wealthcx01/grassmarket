@@ -16,6 +16,7 @@ Fail-loud throughout: a missing row raises `NotFoundError`; a cross-owner access
 from __future__ import annotations
 
 import hashlib
+import json
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from uuid import UUID
@@ -28,7 +29,15 @@ from bcap_contracts.assessments import (
 )
 from bcap_contracts.auth import Consultant
 from bcap_contracts.common import AssessorLevel, ConsultantTier, Role, UncertaintyRating
-from bcap_contracts.engagements import Workshop, WorkshopState
+from bcap_contracts.engagements import (
+    CommsChannel,
+    CommsLogEntry,
+    DeliverableSlot,
+    Engagement,
+    EngagementStatus,
+    Workshop,
+    WorkshopState,
+)
 from bcap_contracts.entities import PipelineStage, Prospect
 from bcap_contracts.fees import (
     RecoveryFeeAttribution,
@@ -43,7 +52,9 @@ from sqlalchemy.orm import Session
 from grassmarket.atlas import AssessmentInputs, AtlasResult
 from grassmarket.data.models import (
     AssessmentORM,
+    CommsLogEntryORM,
     ConsultantORM,
+    EngagementORM,
     InvitationORM,
     ProspectORM,
     RecoveryFeeAttributionORM,
@@ -51,6 +62,11 @@ from grassmarket.data.models import (
     WorkshopORM,
 )
 from grassmarket.pipeline.fees import attribution_content_hash, is_within_attribution_window
+
+# Stages at which a prospect is "contracted or beyond" — the only prospects an engagement may link.
+_ENGAGEABLE_STAGES = frozenset(
+    {PipelineStage.CONTRACTED, PipelineStage.ACTIVE, PipelineStage.DELIVERED}
+)
 
 
 def content_hash_for(
@@ -92,6 +108,11 @@ class WorkshopStateError(RepositoryError):
 class AttributionWindowExpired(RepositoryError):
     """The prospect contracted outside the recovery-fee attribution window — not eligible. Refusal,
     never a silently-recorded (and unearned) fee."""
+
+
+class EngagementLinkError(RepositoryError):
+    """An engagement was asked to link something it may not — a prospect that isn't contracted, or
+    an assessment that isn't the owner's or isn't finalised. Fail loud rather than link loosely."""
 
 
 @dataclass(frozen=True)
@@ -465,6 +486,102 @@ class Repository:
             raise NotFoundError(f"Consultant {consultant_id} not found.")
         return row
 
+    # ------------------------------------------------------------------ engagements (SCOPED)
+    def create_engagement(
+        self,
+        principal: Principal,
+        *,
+        prospect_id: UUID,
+        title: str,
+        started_on: date | None = None,
+        assessment_ids: tuple[UUID, ...] = (),
+        deliverables: tuple[DeliverableSlot, ...] = (),
+    ) -> Engagement:
+        """Open an engagement against one of the principal's OWN contracted prospects, optionally
+        linking finalised assessments. A cross-owner prospect/assessment is refused as not-found
+        (no existence leak); an own-but-not-contracted prospect or an unfinalised assessment is an
+        `EngagementLinkError`. The owner is the principal, never caller-supplied."""
+        prospect = self.get_prospect(principal, prospect_id)  # raises NotFound/Scope on cross-owner
+        if prospect.stage not in _ENGAGEABLE_STAGES:
+            raise EngagementLinkError(
+                f"Prospect {prospect_id} is at stage {prospect.stage.value}; an engagement links a "
+                f"contracted (or beyond) prospect only."
+            )
+        for assessment_id in assessment_ids:
+            assessment = self.get_assessment(
+                principal, assessment_id
+            )  # scoped: cross-owner refused
+            if assessment.state != AssessmentState.FINALISED:
+                raise EngagementLinkError(
+                    f"Assessment {assessment_id} is not finalised; only finalised assessments link."
+                )
+
+        row = EngagementORM(
+            owner_consultant_id=principal.consultant_id,
+            prospect_id=prospect_id,
+            title=title,
+            status=EngagementStatus.CONTRACTED,
+            started_on=started_on,
+            assessment_ids_json=json.dumps([str(a) for a in assessment_ids]),
+            deliverables_json=json.dumps([d.model_dump(mode="json") for d in deliverables]),
+        )
+        self._session.add(row)
+        self._session.flush()
+        return self._to_engagement(row)
+
+    def get_engagement(self, principal: Principal, engagement_id: UUID) -> Engagement:
+        return self._to_engagement(self._require_engagement(principal, engagement_id))
+
+    def list_engagements(self, principal: Principal) -> list[Engagement]:
+        stmt = select(EngagementORM)
+        if not principal.is_admin:
+            stmt = stmt.where(EngagementORM.owner_consultant_id == principal.consultant_id)
+        rows = self._session.execute(stmt.order_by(EngagementORM.created_at)).scalars().all()
+        result: list[Engagement] = []
+        for row in rows:
+            self._assert_can_access(principal, row.owner_consultant_id)  # belt and braces
+            result.append(self._to_engagement(row))
+        return result
+
+    def append_comms_entry(
+        self,
+        principal: Principal,
+        engagement_id: UUID,
+        *,
+        channel: CommsChannel,
+        body: str,
+        at: datetime | None = None,
+    ) -> CommsLogEntry:
+        """Append a communication-log entry to a scoped engagement. Append-only — the entry is
+        inserted, never updated; the author is the principal."""
+        self._require_engagement(principal, engagement_id)  # scope check
+        row = CommsLogEntryORM(
+            owner_consultant_id=principal.consultant_id,
+            engagement_id=engagement_id,
+            at=at or datetime.now(UTC),
+            channel=channel.value,
+            author_consultant_id=principal.consultant_id,
+            body=body,
+        )
+        self._session.add(row)
+        self._session.flush()
+        return self._to_comms_entry(row)
+
+    def _require_engagement(self, principal: Principal, engagement_id: UUID) -> EngagementORM:
+        row = self._session.get(EngagementORM, engagement_id)
+        if row is None:
+            raise NotFoundError(f"Engagement {engagement_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        return row
+
+    def _comms_for(self, engagement_id: UUID) -> list[CommsLogEntryORM]:
+        stmt = (
+            select(CommsLogEntryORM)
+            .where(CommsLogEntryORM.engagement_id == engagement_id)
+            .order_by(CommsLogEntryORM.at, CommsLogEntryORM.created_at)
+        )
+        return list(self._session.execute(stmt).scalars().all())
+
     # ------------------------------------------------------------------ scoring runs (SCOPED)
     def create_scoring_run(
         self,
@@ -744,4 +861,34 @@ class Repository:
             created_at=row.created_at,
             # Append-only: the row is never updated, so updated mirrors created.
             updated_at=row.created_at,
+        )
+
+    def _to_engagement(self, row: EngagementORM) -> Engagement:
+        assessment_ids = tuple(UUID(a) for a in json.loads(row.assessment_ids_json))
+        deliverables = tuple(
+            DeliverableSlot.model_validate(d) for d in json.loads(row.deliverables_json)
+        )
+        comms = tuple(self._to_comms_entry(c) for c in self._comms_for(row.id))
+        return Engagement(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            prospect_id=row.prospect_id,
+            title=row.title,
+            status=EngagementStatus(row.status),
+            started_on=row.started_on,
+            assessment_ids=assessment_ids,
+            deliverables=deliverables,
+            comms_log=comms,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    @staticmethod
+    def _to_comms_entry(row: CommsLogEntryORM) -> CommsLogEntry:
+        return CommsLogEntry(
+            id=row.id,
+            at=row.at,
+            channel=CommsChannel(row.channel),
+            author_consultant_id=row.author_consultant_id,
+            body=row.body,
         )

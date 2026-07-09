@@ -12,7 +12,7 @@ from datetime import UTC, date, datetime
 from uuid import UUID, uuid4
 
 from bcap_contracts.common import AssessorLevel, ConsultantTier, Role
-from bcap_contracts.engagements import WorkshopState
+from bcap_contracts.engagements import EngagementStatus, WorkshopState
 from bcap_contracts.entities import PipelineStage
 from sqlalchemy import Boolean, Date, DateTime, Float, ForeignKey, Integer, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
@@ -144,6 +144,56 @@ class RecoveryFeeAttributionORM(Base):
     fee_currency: Mapped[str] = mapped_column(String(3), nullable=False)
     fee_assumption_ref: Mapped[str] = mapped_column(String(128), nullable=False)
     content_hash: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
+class EngagementORM(Base):
+    """A contracted prospect's delivery record (GRS-0013, PRD §4). The linked finalised assessments
+    and the deliverables progress shell are stored as JSON (a partial/growing structure saves
+    without a schema migration); the communication log is a separate append-only table."""
+
+    __tablename__ = "engagements"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    # THE scoping column — every read/list/write is filtered by this in the repository layer.
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    prospect_id: Mapped[UUID] = mapped_column(
+        ForeignKey("prospects.id"), index=True, nullable=False
+    )
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    status: Mapped[EngagementStatus] = mapped_column(
+        String(16), default=EngagementStatus.CONTRACTED, nullable=False
+    )
+    started_on: Mapped[date | None] = mapped_column(Date, nullable=True)
+    # JSON: a list of finalised assessment ids, and the deliverables progress shell (Loop 4 fills).
+    assessment_ids_json: Mapped[str] = mapped_column(Text, default="[]", nullable=False)
+    deliverables_json: Mapped[str] = mapped_column(Text, default="[]", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
+class CommsLogEntryORM(Base):
+    """One append-only communication-log entry against an engagement (GRS-0013). Rows are inserted,
+    never updated; ordering is by ``at`` then ``created_at``."""
+
+    __tablename__ = "comms_log_entries"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    # THE scoping column — every read/list is filtered by this in the repository layer.
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    engagement_id: Mapped[UUID] = mapped_column(
+        ForeignKey("engagements.id"), index=True, nullable=False
+    )
+    at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    channel: Mapped[str] = mapped_column(String(16), nullable=False)
+    author_consultant_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
 
