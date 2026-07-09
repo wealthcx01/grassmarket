@@ -5,7 +5,7 @@ import { HealthWidget } from "./health-widget";
 const SECTIONS: ReadonlyArray<{ title: string; href: string; blurb: string; loop: string }> = [
   {
     title: "Pipeline",
-    href: "#",
+    href: "/pipeline",
     blurb: "Prospects, workshops, and kanban stages with time-in-stage flags.",
     loop: "Loop 3",
   },
