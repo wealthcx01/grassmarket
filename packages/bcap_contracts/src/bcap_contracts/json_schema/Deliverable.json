@@ -10,6 +10,15 @@
       "title": "ApprovalStatus",
       "type": "string"
     },
+    "DeliverableMode": {
+      "description": "CLIENT — a clean, client-ready pack (only on a client-usable coefficient set). DRAFT_INTERNAL\n— a watermarked \"DRAFT — not client-usable\" internal document. The client-usable gate (GRS-0015)\ndecides which; a CLIENT document can never be produced from a draft coefficient set.",
+      "enum": [
+        "client",
+        "draft_internal"
+      ],
+      "title": "DeliverableMode",
+      "type": "string"
+    },
     "DeliverableType": {
       "enum": [
         "executive_summary",
@@ -48,6 +57,30 @@
       "default": null,
       "title": "Approved By Consultant Id"
     },
+    "coefficient_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Coefficient Version"
+    },
+    "content_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Content Hash"
+    },
     "created_at": {
       "format": "date-time",
       "title": "Created At",
@@ -58,16 +91,46 @@
       "title": "Engagement Id",
       "type": "string"
     },
+    "generated_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Generated At"
+    },
     "id": {
       "format": "uuid",
       "title": "Id",
       "type": "string"
+    },
+    "mode": {
+      "$ref": "#/$defs/DeliverableMode",
+      "default": "draft_internal"
     },
     "owner_consultant_id": {
       "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
       "format": "uuid",
       "title": "Owner Consultant Id",
       "type": "string"
+    },
+    "scoring_run_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Scoring Run Id"
     },
     "title": {
       "minLength": 1,

@@ -8,6 +8,7 @@ the approver field explicit now so nothing AI-generated can silently reach a cli
 
 from __future__ import annotations
 
+from datetime import datetime
 from enum import StrEnum
 from uuid import UUID
 
@@ -33,6 +34,15 @@ class ApprovalStatus(StrEnum):
     REJECTED = "rejected"
 
 
+class DeliverableMode(StrEnum):
+    """CLIENT — a clean, client-ready pack (only on a client-usable coefficient set). DRAFT_INTERNAL
+    — a watermarked "DRAFT — not client-usable" internal document. The client-usable gate (GRS-0015)
+    decides which; a CLIENT document can never be produced from a draft coefficient set."""
+
+    CLIENT = "client"
+    DRAFT_INTERNAL = "draft_internal"
+
+
 class Deliverable(OwnedResource):
     model_config = ConfigDict(extra="forbid")
 
@@ -42,6 +52,15 @@ class Deliverable(OwnedResource):
     ai_generated: bool = False
     approval_status: ApprovalStatus = ApprovalStatus.DRAFT
     approved_by_consultant_id: UUID | None = None
+
+    # Generation metadata (GRS-0015). Ties the deliverable to the finalised scoring run + the
+    # coefficient set it was rendered from; `mode` records the gate's decision; the content hash
+    # seals the defining tuple so the document is reproducible/auditable.
+    mode: DeliverableMode = DeliverableMode.DRAFT_INTERNAL
+    scoring_run_id: UUID | None = None
+    coefficient_version: str | None = None
+    content_hash: str | None = None
+    generated_at: datetime | None = None
 
     @model_validator(mode="after")
     def _approved_requires_human(self) -> Deliverable:
