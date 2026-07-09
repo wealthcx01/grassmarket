@@ -1,0 +1,23 @@
+# Pipeline configuration (GRS-0011, PRD §4) — rates/percentages are CONFIGURATION, never code.
+#
+# Every one of the ten kanban stages MUST appear (ADR-0001 completeness; a missing stage is a
+# load-time refusal, never a default). Two knobs per stage:
+#   close_probability — forecast weight: P(a prospect at this stage becomes a won deal). Terminal
+#                       Closed = 0.0; a completed win (Active/Delivered) = 1.0.
+#   stale_after_days  — time-in-stage flag threshold: days before the prospect is flagged stale.
+#
+# These are the draft v1 values, pending advisor calibration. Currency never appears here — the £
+# value forecast and recovery-fee rates arrive with Money in GRS-0012.
+version: pipeline-config-v1
+
+stages:
+  prospect:            { close_probability: 0.10, stale_after_days: 21 }
+  workshop_scheduled:  { close_probability: 0.25, stale_after_days: 30 }
+  workshop_delivered:  { close_probability: 0.40, stale_after_days: 14 }
+  qualified:           { close_probability: 0.55, stale_after_days: 21 }
+  scoped:              { close_probability: 0.70, stale_after_days: 30 }
+  contracted:          { close_probability: 0.90, stale_after_days: 30 }
+  active:              { close_probability: 1.00, stale_after_days: 90 }
+  delivered:           { close_probability: 1.00, stale_after_days: 30 }
+  closed:              { close_probability: 0.00, stale_after_days: 3650 }
+  nurture:             { close_probability: 0.05, stale_after_days: 180 }

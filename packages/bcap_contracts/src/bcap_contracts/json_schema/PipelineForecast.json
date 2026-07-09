@@ -1,0 +1,97 @@
+{
+  "$defs": {
+    "PipelineStage": {
+      "description": "Kanban stages (PRD §4). Ordered; time-in-stage flags key off the transitions.",
+      "enum": [
+        "prospect",
+        "workshop_scheduled",
+        "workshop_delivered",
+        "qualified",
+        "scoped",
+        "contracted",
+        "active",
+        "delivered",
+        "closed",
+        "nurture"
+      ],
+      "title": "PipelineStage",
+      "type": "string"
+    },
+    "StageForecast": {
+      "additionalProperties": false,
+      "description": "One stage's slice of the forecast — count and probability-weighted expected deals.",
+      "properties": {
+        "close_probability": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Close Probability",
+          "type": "number"
+        },
+        "count": {
+          "minimum": 0,
+          "title": "Count",
+          "type": "integer"
+        },
+        "stage": {
+          "$ref": "#/$defs/PipelineStage"
+        },
+        "weighted_deals": {
+          "description": "count × close_probability.",
+          "minimum": 0.0,
+          "title": "Weighted Deals",
+          "type": "number"
+        }
+      },
+      "required": [
+        "stage",
+        "count",
+        "close_probability",
+        "weighted_deals"
+      ],
+      "title": "StageForecast",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A currency-free pipeline forecast: deal *volume*, probability-weighted by stage.\n\nThe £ value forecast is a GRS-0012 concern (Money enters there); this stays in deal-count units\nso score/volume and currency never mix (ADR-0002).",
+  "properties": {
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "open_prospects": {
+      "description": "Prospects not in a terminal stage.",
+      "minimum": 0,
+      "title": "Open Prospects",
+      "type": "integer"
+    },
+    "stages": {
+      "items": {
+        "$ref": "#/$defs/StageForecast"
+      },
+      "title": "Stages",
+      "type": "array"
+    },
+    "total_prospects": {
+      "minimum": 0,
+      "title": "Total Prospects",
+      "type": "integer"
+    },
+    "weighted_expected_deals": {
+      "description": "Σ close_probability over all prospects — expected won deals in the book.",
+      "minimum": 0.0,
+      "title": "Weighted Expected Deals",
+      "type": "number"
+    }
+  },
+  "required": [
+    "generated_at",
+    "total_prospects",
+    "open_prospects",
+    "stages",
+    "weighted_expected_deals"
+  ],
+  "title": "PipelineForecast",
+  "type": "object"
+}

@@ -1,0 +1,174 @@
+{
+  "$defs": {
+    "PipelineBoardEntry": {
+      "additionalProperties": false,
+      "description": "A prospect annotated with its time-in-stage and staleness flag.",
+      "properties": {
+        "days_in_stage": {
+          "minimum": 0,
+          "title": "Days In Stage",
+          "type": "integer"
+        },
+        "prospect": {
+          "$ref": "#/$defs/Prospect"
+        },
+        "stale": {
+          "title": "Stale",
+          "type": "boolean"
+        },
+        "stale_after_days": {
+          "minimum": 0,
+          "title": "Stale After Days",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "prospect",
+        "days_in_stage",
+        "stale_after_days",
+        "stale"
+      ],
+      "title": "PipelineBoardEntry",
+      "type": "object"
+    },
+    "PipelineStage": {
+      "description": "Kanban stages (PRD §4). Ordered; time-in-stage flags key off the transitions.",
+      "enum": [
+        "prospect",
+        "workshop_scheduled",
+        "workshop_delivered",
+        "qualified",
+        "scoped",
+        "contracted",
+        "active",
+        "delivered",
+        "closed",
+        "nurture"
+      ],
+      "title": "PipelineStage",
+      "type": "string"
+    },
+    "Prospect": {
+      "additionalProperties": false,
+      "description": "A prospect/client in a consultant's pipeline. Scoped to its owner (repository-enforced).\n\n'Entity-shaped' means the identifying fields mirror the future Holy Corner entity resource,\nso a later sync maps cleanly rather than reshaping the record.",
+      "properties": {
+        "company_name": {
+          "minLength": 1,
+          "title": "Company Name",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "owner_consultant_id": {
+          "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+          "format": "uuid",
+          "title": "Owner Consultant Id",
+          "type": "string"
+        },
+        "primary_contact_email": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Primary Contact Email"
+        },
+        "primary_contact_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Primary Contact Name"
+        },
+        "sector": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sector"
+        },
+        "stage": {
+          "$ref": "#/$defs/PipelineStage",
+          "default": "prospect"
+        },
+        "stage_entered_at": {
+          "description": "When the prospect entered its current stage — the basis for time-in-stage flags. Set on creation and updated on every (validated) stage transition.",
+          "format": "date-time",
+          "title": "Stage Entered At",
+          "type": "string"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "created_at",
+        "updated_at",
+        "owner_consultant_id",
+        "company_name",
+        "stage_entered_at"
+      ],
+      "title": "Prospect",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The kanban board: every scoped prospect with its time-in-stage flag.",
+  "properties": {
+    "entries": {
+      "items": {
+        "$ref": "#/$defs/PipelineBoardEntry"
+      },
+      "title": "Entries",
+      "type": "array"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "generated_at",
+    "entries"
+  ],
+  "title": "PipelineBoard",
+  "type": "object"
+}

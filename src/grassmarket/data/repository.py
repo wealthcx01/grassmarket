@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import UUID
 
 from bcap_contracts.assessments import (
@@ -29,6 +29,7 @@ from bcap_contracts.assessments import (
 from bcap_contracts.auth import Consultant
 from bcap_contracts.common import AssessorLevel, ConsultantTier, Role, UncertaintyRating
 from bcap_contracts.entities import PipelineStage, Prospect
+from bcap_contracts.pipeline import assert_legal_transition
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -275,11 +276,16 @@ class Repository:
     def update_prospect_stage(
         self, principal: Principal, prospect_id: UUID, stage: PipelineStage
     ) -> Prospect:
+        """Move a prospect to a new stage. The move must be legal per the lifecycle graph — an
+        illegal jump (or a no-op to the same stage) raises `IllegalStageTransition`, never a silent
+        allow. On a valid move `stage_entered_at` is reset so time-in-stage restarts."""
         row = self._session.get(ProspectORM, prospect_id)
         if row is None:
             raise NotFoundError(f"Prospect {prospect_id} not found.")
         self._assert_can_access(principal, row.owner_consultant_id)
+        assert_legal_transition(PipelineStage(row.stage), stage)
         row.stage = stage
+        row.stage_entered_at = datetime.now(UTC)
         self._session.add(row)
         self._session.flush()
         return self._to_prospect(row)
@@ -519,6 +525,7 @@ class Repository:
             owner_consultant_id=row.owner_consultant_id,
             company_name=row.company_name,
             stage=PipelineStage(row.stage),
+            stage_entered_at=row.stage_entered_at,
             sector=row.sector,
             primary_contact_name=row.primary_contact_name,
             primary_contact_email=row.primary_contact_email,
