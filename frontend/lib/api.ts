@@ -12,10 +12,20 @@
 import type {
   Assessment,
   AssessmentDocument,
+  CommsChannel,
+  CommsLogEntry,
+  DeliverableSlot,
+  Engagement,
   LiveScore,
+  PipelineBoard,
+  PipelineForecast,
+  PipelineStage,
+  Prospect,
+  RecoveryFeeAttribution,
   Registry,
   RubricAnchor,
   ScenarioComparison,
+  Workshop,
 } from "@/lib/types";
 
 export const API_BASE_URL: string =
@@ -202,6 +212,150 @@ export const api = {
     return request<RubricAnchor[]>(`/guidance/subcomponents/${subcomponentKey}`, {
       method: "GET",
       headers: authHeaders(),
+      signal,
+    });
+  },
+
+  // --- Pipeline / prospects (GRS-0011/0014) ---
+  pipelineBoard(signal?: AbortSignal): Promise<PipelineBoard> {
+    return request<PipelineBoard>("/pipeline/board", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  pipelineForecast(signal?: AbortSignal): Promise<PipelineForecast> {
+    return request<PipelineForecast>("/pipeline/forecast", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  createProspect(company_name: string, signal?: AbortSignal): Promise<Prospect> {
+    return request<Prospect>("/prospects", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ company_name }),
+      signal,
+    });
+  },
+
+  getProspect(id: string, signal?: AbortSignal): Promise<Prospect> {
+    return request<Prospect>(`/prospects/${id}`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  /** Move a prospect to a new stage. The BACKEND owns legality — an illegal move throws
+   * ApiError(409) and the caller reverts the card + surfaces the reason. */
+  updateProspectStage(id: string, stage: PipelineStage, signal?: AbortSignal): Promise<Prospect> {
+    return request<Prospect>(`/prospects/${id}/stage`, {
+      method: "PATCH",
+      headers: authHeaders(),
+      body: JSON.stringify({ stage }),
+      signal,
+    });
+  },
+
+  // --- Workshops + recovery fees (GRS-0012/0014) ---
+  createWorkshop(
+    body: { prospect_id: string; scheduled_for?: string | null; pre_workshop_brief?: string | null },
+    signal?: AbortSignal,
+  ): Promise<Workshop> {
+    return request<Workshop>("/workshops", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(body),
+      signal,
+    });
+  },
+
+  listWorkshops(signal?: AbortSignal): Promise<Workshop[]> {
+    return request<Workshop[]>("/workshops", { method: "GET", headers: authHeaders(), signal });
+  },
+
+  getWorkshop(id: string, signal?: AbortSignal): Promise<Workshop> {
+    return request<Workshop>(`/workshops/${id}`, { method: "GET", headers: authHeaders(), signal });
+  },
+
+  deliverWorkshop(
+    id: string,
+    body: { delivered_on: string; workshop_output?: string | null },
+    signal?: AbortSignal,
+  ): Promise<Workshop> {
+    return request<Workshop>(`/workshops/${id}/deliver`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(body),
+      signal,
+    });
+  },
+
+  attributeRecoveryFee(
+    id: string,
+    contracted_on: string,
+    signal?: AbortSignal,
+  ): Promise<RecoveryFeeAttribution> {
+    return request<RecoveryFeeAttribution>(`/workshops/${id}/recovery-fee`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ contracted_on }),
+      signal,
+    });
+  },
+
+  listRecoveryFees(signal?: AbortSignal): Promise<RecoveryFeeAttribution[]> {
+    return request<RecoveryFeeAttribution[]>("/recovery-fees", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  // --- Engagements (GRS-0013/0014) ---
+  createEngagement(
+    body: {
+      prospect_id: string;
+      title: string;
+      started_on?: string | null;
+      assessment_ids?: string[];
+      deliverables?: DeliverableSlot[];
+    },
+    signal?: AbortSignal,
+  ): Promise<Engagement> {
+    return request<Engagement>("/engagements", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(body),
+      signal,
+    });
+  },
+
+  listEngagements(signal?: AbortSignal): Promise<Engagement[]> {
+    return request<Engagement[]>("/engagements", { method: "GET", headers: authHeaders(), signal });
+  },
+
+  getEngagement(id: string, signal?: AbortSignal): Promise<Engagement> {
+    return request<Engagement>(`/engagements/${id}`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  appendComms(
+    id: string,
+    body: { channel: CommsChannel; body: string },
+    signal?: AbortSignal,
+  ): Promise<CommsLogEntry> {
+    return request<CommsLogEntry>(`/engagements/${id}/comms`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(body),
       signal,
     });
   },

@@ -187,3 +187,149 @@ export interface ScenarioComparison {
   results: ScenarioResult[];
   priority_index: UpgradePriority[];
 }
+
+// --- Pipeline / CRM (GRS-0011..0014) ----------------------------------------------------
+
+export type PipelineStage =
+  | "prospect"
+  | "workshop_scheduled"
+  | "workshop_delivered"
+  | "qualified"
+  | "scoped"
+  | "contracted"
+  | "active"
+  | "delivered"
+  | "closed"
+  | "nurture";
+
+/** The ten stages in canonical order, with display labels — the kanban columns. */
+export const PIPELINE_STAGES: { stage: PipelineStage; label: string }[] = [
+  { stage: "prospect", label: "Prospect" },
+  { stage: "workshop_scheduled", label: "Workshop Scheduled" },
+  { stage: "workshop_delivered", label: "Workshop Delivered" },
+  { stage: "qualified", label: "Qualified" },
+  { stage: "scoped", label: "Scoped" },
+  { stage: "contracted", label: "Contracted" },
+  { stage: "active", label: "Active" },
+  { stage: "delivered", label: "Delivered" },
+  { stage: "closed", label: "Closed" },
+  { stage: "nurture", label: "Nurture" },
+];
+
+export const STAGE_LABEL: Record<PipelineStage, string> = Object.fromEntries(
+  PIPELINE_STAGES.map((s) => [s.stage, s.label]),
+) as Record<PipelineStage, string>;
+
+export interface Prospect {
+  id: string;
+  owner_consultant_id: string;
+  company_name: string;
+  stage: PipelineStage;
+  stage_entered_at: string;
+  sector?: string | null;
+  primary_contact_name?: string | null;
+  primary_contact_email?: string | null;
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PipelineBoardEntry {
+  prospect: Prospect;
+  days_in_stage: number;
+  stale_after_days: number;
+  stale: boolean;
+}
+
+export interface PipelineBoard {
+  generated_at: string;
+  entries: PipelineBoardEntry[];
+}
+
+export interface StageForecast {
+  stage: PipelineStage;
+  count: number;
+  close_probability: number;
+  weighted_deals: number;
+}
+
+export interface PipelineForecast {
+  generated_at: string;
+  total_prospects: number;
+  open_prospects: number;
+  stages: StageForecast[];
+  weighted_expected_deals: number;
+}
+
+/** Currency amount straight from the API. `amount_minor` is integer minor units (never a float);
+ * the UI FORMATS it for display but never does arithmetic on it (ADR-0002 at the view layer). */
+export type Currency = "GBP" | "USD" | "EUR";
+export interface Money {
+  amount_minor: number;
+  currency: Currency;
+  assumption_register_ref: string;
+}
+
+export type WorkshopState = "scheduled" | "delivered";
+
+export interface Workshop {
+  id: string;
+  owner_consultant_id: string;
+  prospect_id: string;
+  state: WorkshopState;
+  scheduled_for?: string | null;
+  delivered_on?: string | null;
+  pre_workshop_brief?: string | null;
+  workshop_output?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RecoveryFeeAttribution {
+  id: string;
+  owner_consultant_id: string;
+  workshop_id: string;
+  prospect_id: string;
+  delivered_on: string;
+  contracted_on: string;
+  window_days: number;
+  rate_ref: string;
+  fee: Money;
+  content_hash: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type EngagementStatus = "scoped" | "contracted" | "active" | "delivered" | "closed";
+export type DeliverableStatus = "not_started" | "in_progress" | "drafted" | "delivered";
+export type CommsChannel = "note" | "email" | "call" | "meeting";
+
+export const COMMS_CHANNELS: CommsChannel[] = ["note", "email", "call", "meeting"];
+
+export interface DeliverableSlot {
+  key: string;
+  label?: string | null;
+  status: DeliverableStatus;
+}
+
+export interface CommsLogEntry {
+  id: string;
+  at: string;
+  channel: CommsChannel;
+  author_consultant_id: string;
+  body: string;
+}
+
+export interface Engagement {
+  id: string;
+  owner_consultant_id: string;
+  prospect_id: string;
+  title: string;
+  status: EngagementStatus;
+  started_on?: string | null;
+  assessment_ids: string[];
+  deliverables: DeliverableSlot[];
+  comms_log: CommsLogEntry[];
+  created_at: string;
+  updated_at: string;
+}
