@@ -27,6 +27,9 @@ _SCAN_DIRS = [
     _REPO_ROOT / "src" / "grassmarket" / "value",
     # The assessment services orchestrate scoring + scenario ΔV; keep them Money-free too.
     _REPO_ROOT / "src" / "grassmarket" / "assessments",
+    # The pipeline tree is where Money entered (GRS-0012 recovery fees) alongside the score-free
+    # forecast — the boundary must hold across both, so scan the whole subtree.
+    _REPO_ROOT / "src" / "grassmarket" / "pipeline",
 ]
 _SCORE = re.compile(r"\bScore\b")
 _MONEY = re.compile(r"\bMoney\b")

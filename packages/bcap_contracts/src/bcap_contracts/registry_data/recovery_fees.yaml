@@ -1,0 +1,16 @@
+# Recovery-fee configuration (GRS-0012, PRD §4) — rates/percentages are CONFIGURATION, never code.
+#
+# The Workshop Recovery Fee: when a workshop is delivered and the prospect contracts within the
+# attribution window, the consultant earns a tier-dependent fee. Every consultant tier MUST have a
+# fee (ADR-0001 completeness; a missing tier is a load-time refusal, never a default). Amounts are
+# integer minor units (pence) so the £ figure is exact. The window is config too — one place to tune.
+#
+# Draft v1 values, pending advisory-network calibration.
+version: recovery-fees-v1
+currency: GBP
+attribution_window_days: 365 # the 12-month window
+
+tier_fees_minor:
+  venture_associate: 500000 # £5,000
+  advisor: 750000 # £7,500
+  consultant: 1000000 # £10,000

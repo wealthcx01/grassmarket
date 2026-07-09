@@ -33,6 +33,7 @@ from bcap_contracts.commissions import CommissionLine
 from bcap_contracts.deliverables import Deliverable
 from bcap_contracts.engagements import Engagement, Workshop
 from bcap_contracts.entities import Prospect
+from bcap_contracts.fees import RecoveryFeeAttribution
 from bcap_contracts.learning import CertificationProgress, DrillResult
 from bcap_contracts.money import Money
 from bcap_contracts.pipeline import PipelineBoard, PipelineForecast
@@ -62,6 +63,7 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "PipelineBoard": PipelineBoard,
     "Engagement": Engagement,
     "Workshop": Workshop,
+    "RecoveryFeeAttribution": RecoveryFeeAttribution,
     "Deliverable": Deliverable,
     "CommissionLine": CommissionLine,
     "CertificationProgress": CertificationProgress,

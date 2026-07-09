@@ -1,6 +1,17 @@
 {
+  "$defs": {
+    "WorkshopState": {
+      "description": "A workshop is scheduled, then delivered (PRD §4). Recovery-fee attribution keys off the\ndelivered date + the config window; the window itself is NOT a per-workshop field (it is\nconfiguration — GRS-0012).",
+      "enum": [
+        "scheduled",
+        "delivered"
+      ],
+      "title": "WorkshopState",
+      "type": "string"
+    }
+  },
   "additionalProperties": false,
-  "description": "A workshop with its recovery-fee attribution window (PRD §4).",
+  "description": "A workshop in a consultant's pipeline, linked to a prospect (PRD §4).",
   "properties": {
     "created_at": {
       "format": "date-time",
@@ -48,11 +59,6 @@
       "title": "Prospect Id",
       "type": "string"
     },
-    "recovery_fee_window_days": {
-      "default": 365,
-      "title": "Recovery Fee Window Days",
-      "type": "integer"
-    },
     "scheduled_for": {
       "anyOf": [
         {
@@ -65,6 +71,10 @@
       ],
       "default": null,
       "title": "Scheduled For"
+    },
+    "state": {
+      "$ref": "#/$defs/WorkshopState",
+      "default": "scheduled"
     },
     "updated_at": {
       "format": "date-time",
