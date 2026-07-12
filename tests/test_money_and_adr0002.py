@@ -30,6 +30,9 @@ _SCAN_DIRS = [
     # The pipeline tree is where Money entered (GRS-0012 recovery fees) alongside the score-free
     # forecast — the boundary must hold across both, so scan the whole subtree.
     _REPO_ROOT / "src" / "grassmarket" / "pipeline",
+    # The deliverable builder renders scores now and Money (the value bridge) from GRS-0016 — the
+    # doc may print both side by side but no function may mix them in one signature.
+    _REPO_ROOT / "src" / "grassmarket" / "deliverables",
 ]
 _SCORE = re.compile(r"\bScore\b")
 _MONEY = re.compile(r"\bMoney\b")

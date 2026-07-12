@@ -197,6 +197,37 @@ class CommsLogEntryORM(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
 
+class DeliverableORM(Base):
+    """A generated deliverable document tied to an engagement (GRS-0015). Metadata only — the .docx
+    is regenerated deterministically from the finalised scoring run on download (no bytes stored).
+    ``mode`` records the client-usable gate's decision; approval fields carry non-negotiable #8."""
+
+    __tablename__ = "deliverables"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    # THE scoping column — every read/list/write is filtered by this in the repository layer.
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    engagement_id: Mapped[UUID] = mapped_column(
+        ForeignKey("engagements.id"), index=True, nullable=False
+    )
+    type: Mapped[str] = mapped_column(String(40), nullable=False)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    ai_generated: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    approval_status: Mapped[str] = mapped_column(String(20), default="draft", nullable=False)
+    approved_by_consultant_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    mode: Mapped[str] = mapped_column(String(16), nullable=False)
+    scoring_run_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    coefficient_version: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    content_hash: Mapped[str | None] = mapped_column(String(64), index=True, nullable=True)
+    generated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
 class ScoringRunORM(Base):
     """An immutable, versioned, content-hashed scoring run (CLAUDE.md non-negotiable #6).
 

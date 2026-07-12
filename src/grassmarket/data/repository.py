@@ -29,6 +29,12 @@ from bcap_contracts.assessments import (
 )
 from bcap_contracts.auth import Consultant
 from bcap_contracts.common import AssessorLevel, ConsultantTier, Role, UncertaintyRating
+from bcap_contracts.deliverables import (
+    ApprovalStatus,
+    Deliverable,
+    DeliverableMode,
+    DeliverableType,
+)
 from bcap_contracts.engagements import (
     CommsChannel,
     CommsLogEntry,
@@ -54,6 +60,7 @@ from grassmarket.data.models import (
     AssessmentORM,
     CommsLogEntryORM,
     ConsultantORM,
+    DeliverableORM,
     EngagementORM,
     InvitationORM,
     ProspectORM,
@@ -581,6 +588,86 @@ class Repository:
             .order_by(CommsLogEntryORM.at, CommsLogEntryORM.created_at)
         )
         return list(self._session.execute(stmt).scalars().all())
+
+    # ------------------------------------------------------------------ deliverables (SCOPED)
+    def create_deliverable(
+        self,
+        principal: Principal,
+        *,
+        engagement_id: UUID,
+        deliverable_type: DeliverableType,
+        title: str,
+        mode: DeliverableMode,
+        scoring_run_id: UUID | None,
+        coefficient_version: str | None,
+        content_hash: str | None,
+        generated_at: datetime | None,
+        ai_generated: bool = False,
+    ) -> Deliverable:
+        """Persist a deliverable's metadata against one of the principal's OWN engagements. The
+        engagement is access-checked; the owner is the principal, never caller-supplied. The .docx
+        is regenerated on download (no bytes stored)."""
+        self.get_engagement(principal, engagement_id)  # scope check (cross-owner refused)
+        row = DeliverableORM(
+            owner_consultant_id=principal.consultant_id,
+            engagement_id=engagement_id,
+            type=deliverable_type.value,
+            title=title,
+            ai_generated=ai_generated,
+            approval_status=ApprovalStatus.DRAFT.value,
+            mode=mode.value,
+            scoring_run_id=scoring_run_id,
+            coefficient_version=coefficient_version,
+            content_hash=content_hash,
+            generated_at=generated_at,
+        )
+        self._session.add(row)
+        self._session.flush()
+        return self._to_deliverable(row)
+
+    def get_deliverable(self, principal: Principal, deliverable_id: UUID) -> Deliverable:
+        return self._to_deliverable(self._require_deliverable(principal, deliverable_id))
+
+    def list_deliverables(self, principal: Principal, engagement_id: UUID) -> list[Deliverable]:
+        self.get_engagement(principal, engagement_id)  # scope check on the parent
+        stmt = (
+            select(DeliverableORM)
+            .where(DeliverableORM.engagement_id == engagement_id)
+            .order_by(DeliverableORM.created_at)
+        )
+        rows = self._session.execute(stmt).scalars().all()
+        result: list[Deliverable] = []
+        for row in rows:
+            self._assert_can_access(principal, row.owner_consultant_id)  # belt and braces
+            result.append(self._to_deliverable(row))
+        return result
+
+    def _require_deliverable(self, principal: Principal, deliverable_id: UUID) -> DeliverableORM:
+        row = self._session.get(DeliverableORM, deliverable_id)
+        if row is None:
+            raise NotFoundError(f"Deliverable {deliverable_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        return row
+
+    @staticmethod
+    def _to_deliverable(row: DeliverableORM) -> Deliverable:
+        return Deliverable(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            engagement_id=row.engagement_id,
+            type=DeliverableType(row.type),
+            title=row.title,
+            ai_generated=row.ai_generated,
+            approval_status=ApprovalStatus(row.approval_status),
+            approved_by_consultant_id=row.approved_by_consultant_id,
+            mode=DeliverableMode(row.mode),
+            scoring_run_id=row.scoring_run_id,
+            coefficient_version=row.coefficient_version,
+            content_hash=row.content_hash,
+            generated_at=row.generated_at,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
 
     # ------------------------------------------------------------------ scoring runs (SCOPED)
     def create_scoring_run(
