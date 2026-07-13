@@ -10,6 +10,7 @@
  */
 
 import type {
+  AINarrative,
   Assessment,
   AssessmentDocument,
   CommsChannel,
@@ -18,6 +19,7 @@ import type {
   DeliverableSlot,
   DeliverableType,
   Engagement,
+  NarrativeSection,
   LiveScore,
   PipelineBoard,
   PipelineForecast,
@@ -410,5 +412,40 @@ export const api = {
     const disposition = res.headers.get("content-disposition") ?? "";
     const match = /filename="?([^"]+)"?/.exec(disposition);
     return { blob, filename: match?.[1] ?? `${id}.docx` };
+  },
+
+  // --- AI narratives (GRS-0017; propose is AI, approve is human — the runtime gate) ---
+  listNarratives(deliverableId: string, signal?: AbortSignal): Promise<AINarrative[]> {
+    return request<AINarrative[]>(`/deliverables/${deliverableId}/narratives`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  proposeNarratives(
+    deliverableId: string,
+    sections?: NarrativeSection[],
+    signal?: AbortSignal,
+  ): Promise<AINarrative[]> {
+    return request<AINarrative[]>(`/deliverables/${deliverableId}/narratives`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(sections ? { sections } : {}),
+      signal,
+    });
+  },
+
+  approveNarrative(
+    narrativeId: string,
+    body: { final_text?: string },
+    signal?: AbortSignal,
+  ): Promise<AINarrative> {
+    return request<AINarrative>(`/narratives/${narrativeId}/approve`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(body),
+      signal,
+    });
   },
 };

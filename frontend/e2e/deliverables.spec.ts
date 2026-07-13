@@ -60,3 +60,28 @@ test.describe("GRS-0019 slice 1 — deliverable library", () => {
     await expect(alert).toContainText(/client-usable|client_usable=False/i);
   });
 });
+
+test.describe("GRS-0019 slice 2 — AI narrative review", () => {
+  test("draft → edit → approve an AI narrative section", async ({ page }) => {
+    await login(page);
+    await openSeededEngagement(page);
+
+    // Ensure a deliverable exists to attach narratives to.
+    await page.getByLabel("Deliverable type").selectOption("platform_power_report");
+    await page.getByRole("button", { name: "Generate" }).click();
+    await expect(page.getByText(/Generated Platform Power Report/i)).toBeVisible();
+
+    // Open the AI-narrative review on the first deliverable.
+    await page.getByRole("button", { name: "Review AI" }).first().click();
+    const draft = page.getByRole("button", { name: "Draft AI narratives" });
+    if (await draft.isVisible().catch(() => false)) await draft.click();
+
+    // Edit the AI draft and approve (the seeded advisor is Consultant-tier → may self-approve).
+    const box = page.getByRole("textbox", { name: /Edit Interpretation/ }).first();
+    await expect(box).toBeVisible();
+    await box.fill("Reviewed interpretation for Meridian Securities.");
+    await page.getByRole("button", { name: /Approve/ }).first().click();
+
+    await expect(page.getByText(/Interpretation approved/i)).toBeVisible();
+  });
+});

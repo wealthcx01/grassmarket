@@ -9,10 +9,11 @@
  * engagement is not the advisor's and the caller has already been redirected.
  */
 
-import { useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 
 import { ApiError, api } from "@/lib/api";
 import type { Deliverable, DeliverableMode, DeliverableType } from "@/lib/types";
+import { NarrativeReview } from "@/components/NarrativeReview";
 
 const TYPE_LABEL: Record<DeliverableType, string> = {
   executive_summary: "Executive Summary",
@@ -65,6 +66,7 @@ export function DeliverablesPanel({ engagementId }: { engagementId: string }) {
   const [clientFacing, setClientFacing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<{ kind: "error" | "ok"; text: string } | null>(null);
+  const [reviewing, setReviewing] = useState<string | null>(null);
 
   const reload = useCallback(
     (signal?: AbortSignal) =>
@@ -219,23 +221,41 @@ export function DeliverablesPanel({ engagementId }: { engagementId: string }) {
           </thead>
           <tbody>
             {items.map((d) => (
-              <tr key={d.id} style={{ borderTop: "1px solid var(--color-border)" }}>
-                <td style={tdStyle}>{d.title}</td>
-                <td style={tdStyle}>
-                  <ModeBadge mode={d.mode} />
-                </td>
-                <td style={tdStyle}>
-                  {d.ai_generated ? APPROVAL_LABEL[d.approval_status] ?? d.approval_status : "—"}
-                </td>
-                <td className="mono" style={{ ...tdStyle, textAlign: "right", fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
-                  {formatWhen(d.generated_at)}
-                </td>
-                <td style={{ ...tdStyle, textAlign: "right" }}>
-                  <button type="button" onClick={() => void download(d)} style={linkButtonStyle}>
-                    Download
-                  </button>
-                </td>
-              </tr>
+              <Fragment key={d.id}>
+                <tr style={{ borderTop: "1px solid var(--color-border)" }}>
+                  <td style={tdStyle}>{d.title}</td>
+                  <td style={tdStyle}>
+                    <ModeBadge mode={d.mode} />
+                  </td>
+                  <td style={tdStyle}>
+                    {d.ai_generated ? APPROVAL_LABEL[d.approval_status] ?? d.approval_status : "—"}
+                  </td>
+                  <td className="mono" style={{ ...tdStyle, textAlign: "right", fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
+                    {formatWhen(d.generated_at)}
+                  </td>
+                  <td style={{ ...tdStyle, textAlign: "right", whiteSpace: "nowrap" }}>
+                    <button
+                      type="button"
+                      onClick={() => setReviewing((cur) => (cur === d.id ? null : d.id))}
+                      style={linkButtonStyle}
+                      aria-expanded={reviewing === d.id}
+                    >
+                      {reviewing === d.id ? "Hide AI" : "Review AI"}
+                    </button>
+                    <span style={{ color: "var(--color-border)", margin: "0 0.5rem" }}>|</span>
+                    <button type="button" onClick={() => void download(d)} style={linkButtonStyle}>
+                      Download
+                    </button>
+                  </td>
+                </tr>
+                {reviewing === d.id && (
+                  <tr>
+                    <td colSpan={5} style={{ padding: "0 0.4rem 0.6rem" }}>
+                      <NarrativeReview deliverableId={d.id} />
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
             ))}
           </tbody>
         </table>
