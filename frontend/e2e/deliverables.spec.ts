@@ -55,7 +55,8 @@ test.describe("GRS-0019 slice 1 — deliverable library", () => {
     await page.getByRole("button", { name: "Generate" }).click();
 
     // The client-usable gate refuses (draft coefficient set) — the human sees WHY, not a 409.
-    const alert = page.getByRole("alert");
+    // Filter past Next.js's always-present empty #__next-route-announcer__ (also role="alert").
+    const alert = page.getByRole("alert").filter({ hasText: /client-usable|client_usable=False|Refusing/i });
     await expect(alert).toBeVisible();
     await expect(alert).toContainText(/client-usable|client_usable=False/i);
   });
