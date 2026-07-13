@@ -33,6 +33,11 @@ from bcap_contracts.calibration import (
     RatingEntry,
     VignetteAnchor,
 )
+from bcap_contracts.certification import (
+    CertificationEvent,
+    CertificationEventKind,
+    CertificationRecord,
+)
 from bcap_contracts.commissions import CommissionKind, CommissionLine, PaymentStatus
 from bcap_contracts.committee import (
     CommitteeDecision,
@@ -144,6 +149,9 @@ __all__ = [
     "VignetteAnchor",
     "RatingEntry",
     "AnchorAgreement",
+    "CertificationRecord",
+    "CertificationEvent",
+    "CertificationEventKind",
     "CertificationProgress",
     "DrillResult",
     # auth

@@ -272,6 +272,51 @@ class AINarrativeORM(Base):
     )
 
 
+class CertificationRecordORM(Base):
+    """The accumulated certification-ladder evidence for one advisor (GRS-0023, §9). One row per
+    consultant (``owner_consultant_id`` unique). The advisor's LEVEL lives on ConsultantORM (and the
+    JWT); this holds the evidence that promotions are gated on."""
+
+    __tablename__ = "certification_records"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), unique=True, index=True, nullable=False
+    )
+    coursework_complete: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    exam_score: Mapped[float | None] = mapped_column(Float, nullable=True)
+    shadow_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    observed_lead_logged: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    observed_lead_signoff_by: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
+class CertificationEventORM(Base):
+    """One append-only certification audit record for an advisor (GRS-0023, §9). Every credit,
+    promotion, and admin override is written here and never mutated — the evidence trail."""
+
+    __tablename__ = "certification_events"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    kind: Mapped[str] = mapped_column(String(32), nullable=False)
+    detail: Mapped[str] = mapped_column(Text, default="", nullable=False)
+    from_level: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    to_level: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    recorded_by_consultant_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
 class CalibrationSessionORM(Base):
     """A calibration round (GRS-0022, Methodology §9). Owner = the facilitator. The vignettes are
     stored as JSON; the computed result is stamped into ``results_json`` on close (immutable

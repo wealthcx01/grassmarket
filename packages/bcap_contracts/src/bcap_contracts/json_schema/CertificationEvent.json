@@ -1,0 +1,118 @@
+{
+  "$defs": {
+    "AssessorLevel": {
+      "description": "Certification ladder (Methodology §9). High-stakes ratings require CERTIFIED_LEAD.",
+      "enum": [
+        "trained",
+        "shadow",
+        "observed_lead",
+        "certified_lead"
+      ],
+      "title": "AssessorLevel",
+      "type": "string"
+    },
+    "CertificationEventKind": {
+      "description": "Every entry in the append-only certification audit (Methodology §9).",
+      "enum": [
+        "coursework_completed",
+        "exam_recorded",
+        "shadow_logged",
+        "observed_lead_logged",
+        "signoff_recorded",
+        "promoted",
+        "override"
+      ],
+      "title": "CertificationEventKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One append-only certification audit record for an advisor (`owner_consultant_id`). Promotions\ncarry from/to levels; an override carries the mandatory reason. Recorded by an admin/signer.",
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "detail": {
+      "default": "",
+      "title": "Detail",
+      "type": "string"
+    },
+    "from_level": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AssessorLevel"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "kind": {
+      "$ref": "#/$defs/CertificationEventKind"
+    },
+    "occurred_at": {
+      "format": "date-time",
+      "title": "Occurred At",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Mandatory for an OVERRIDE (§9).",
+      "title": "Reason"
+    },
+    "recorded_by_consultant_id": {
+      "format": "uuid",
+      "title": "Recorded By Consultant Id",
+      "type": "string"
+    },
+    "to_level": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AssessorLevel"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "kind",
+    "recorded_by_consultant_id",
+    "occurred_at"
+  ],
+  "title": "CertificationEvent",
+  "type": "object"
+}

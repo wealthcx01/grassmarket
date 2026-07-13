@@ -1,0 +1,96 @@
+{
+  "$defs": {
+    "AssessorLevel": {
+      "description": "Certification ladder (Methodology §9). High-stakes ratings require CERTIFIED_LEAD.",
+      "enum": [
+        "trained",
+        "shadow",
+        "observed_lead",
+        "certified_lead"
+      ],
+      "title": "AssessorLevel",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The accumulated ladder evidence for one advisor (`owner_consultant_id`). The advisor's LEVEL\nis on their consultant record (and JWT); this holds the evidence promotions are gated on.",
+  "properties": {
+    "coursework_complete": {
+      "default": false,
+      "title": "Coursework Complete",
+      "type": "boolean"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "exam_score": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Exam Score"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "level": {
+      "$ref": "#/$defs/AssessorLevel",
+      "default": "trained"
+    },
+    "observed_lead_logged": {
+      "default": false,
+      "title": "Observed Lead Logged",
+      "type": "boolean"
+    },
+    "observed_lead_signoff_by": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The Certified Lead who signed off the observed lead.",
+      "title": "Observed Lead Signoff By"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "shadow_count": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Shadow Count",
+      "type": "integer"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id"
+  ],
+  "title": "CertificationRecord",
+  "type": "object"
+}
