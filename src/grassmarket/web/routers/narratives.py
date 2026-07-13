@@ -13,7 +13,7 @@ from uuid import UUID
 
 from bcap_contracts.narratives import AINarrative, NarrativeSection
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from grassmarket.atlas.results import AtlasResult
 from grassmarket.data.repository import (
@@ -42,8 +42,9 @@ class ProposeNarrativesRequest(BaseModel):
 
 
 class ApproveNarrativeRequest(BaseModel):
-    # The final text a human signs off on. Omitted → approve the proposal verbatim.
-    final_text: str | None = None
+    # The final text a human signs off on. Omitted → approve the proposal verbatim. Bounded so an
+    # oversized body cannot be stored + rendered into a deliverable (resource safety).
+    final_text: str | None = Field(default=None, max_length=20_000)
 
 
 def _not_found(detail: str = "Not found.") -> HTTPException:
@@ -79,6 +80,8 @@ def propose_narratives(
             detail="Deliverable has no finalised scoring run to draft narratives from.",
         )
 
+    # The run is finalised by construction: a deliverable is only creatable from a finalised
+    # assessment (deliverables router `_resolve_run`), so its scoring_run_id is that finalised run.
     record = repo.get_scoring_run_record(principal, deliverable.scoring_run_id)
     subject = repo.get_prospect(principal, engagement.prospect_id).company_name
     result = AtlasResult.model_validate_json(record.result_json)

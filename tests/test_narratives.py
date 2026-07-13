@@ -8,7 +8,7 @@ sign-off (the quality gate), and a client-facing pack with any unapproved AI sec
 from __future__ import annotations
 
 import random
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from io import BytesIO
 from uuid import uuid4
 
@@ -16,6 +16,7 @@ import pytest
 from bcap_contracts.common import AssessorLevel, ConsultantTier, Role
 from bcap_contracts.deliverables import DeliverableMode
 from bcap_contracts.narratives import AINarrative, NarrativeSection, NarrativeStatus
+from bcap_contracts.registry import load_registry
 from docx import Document
 from pydantic import ValidationError
 
@@ -26,6 +27,7 @@ from grassmarket.auth.security import create_access_token, hash_password
 from grassmarket.data.repository import Repository
 from grassmarket.deliverables.builder import AI_DRAFTED_LABEL, append_narrative_appendix
 from grassmarket.deliverables.gate import (
+    DRAFT_WATERMARK,
     SeniorApprovalError,
     UnapprovedNarrativeError,
     assert_narratives_approved,
@@ -38,9 +40,11 @@ from grassmarket.deliverables.narrative import (
     context_from_result,
     edit_summary,
 )
+from grassmarket.deliverables.service import render_platform_power_report
 from tests.conftest import SeededConsultant, auth_header
-from tests.test_deliverables import _doc
+from tests.test_deliverables import _client_usable_set, _doc
 
+_REGISTRY = load_registry()
 _REGISTRY_MODEL = draft_v1_uncertainty_model()
 
 
@@ -172,9 +176,18 @@ def test_senior_approval_gate() -> None:
         assert_senior_approval(
             author_tier=ConsultantTier.ADVISOR, approver_tier=ConsultantTier.ADVISOR
         )
-    # Senior sign-off is fine, and a Consultant author may self-approve.
+    # "Senior" means Consultant, not merely more senior: an Advisor is NOT senior enough to sign off
+    # a Venture Associate's draft.
+    with pytest.raises(SeniorApprovalError):
+        assert_senior_approval(
+            author_tier=ConsultantTier.VENTURE_ASSOCIATE, approver_tier=ConsultantTier.ADVISOR
+        )
+    # Senior (Consultant) sign-off clears any junior author; a Consultant author may self-approve.
     assert_senior_approval(
         author_tier=ConsultantTier.VENTURE_ASSOCIATE, approver_tier=ConsultantTier.CONSULTANT
+    )
+    assert_senior_approval(
+        author_tier=ConsultantTier.ADVISOR, approver_tier=ConsultantTier.CONSULTANT
     )
     assert_senior_approval(
         author_tier=ConsultantTier.CONSULTANT, approver_tier=ConsultantTier.CONSULTANT
@@ -427,3 +440,48 @@ def test_http_narratives_scoped(client, senior: SeededConsultant, bob: SeededCon
     assert (
         len(client.get(f"/deliverables/{did}/narratives", headers=auth_header(senior)).json()) == 1
     )
+
+
+def test_http_senior_tier_alone_does_not_cross_ownership(
+    client, alice: SeededConsultant, senior: SeededConsultant
+) -> None:
+    # `senior` is Consultant-tier but NOT a governance role. The ADR-0009 guarantee: senior tier
+    # ALONE never widens scope — only the governance (ADMIN/committee) role does. So `senior` cannot
+    # even reach alice's narrative to approve it (404), unlike the ADMIN in the governance test.
+    did = _deliverable_id(client, alice)
+    nid = client.post(
+        f"/deliverables/{did}/narratives",
+        json={"sections": ["interpretation"]},
+        headers=auth_header(alice),
+    ).json()[0]["id"]
+    resp = client.post(f"/narratives/{nid}/approve", json={}, headers=auth_header(senior))
+    assert resp.status_code == 404  # scoping blocks a non-owning, non-governance senior
+
+
+def test_approved_narrative_renders_into_client_pack() -> None:
+    # The positive counterpart to the 409 refusal: with a client-usable set and the AI section
+    # APPROVED, the pack renders in CLIENT mode (no watermark) and carries the approved words, the
+    # approver id, and the approval timestamp — the actual product promise, end-to-end through the
+    # gate + builder wiring (HTTP can't reach CLIENT mode: the router hardcodes the draft set).
+    coeffs = _client_usable_set()
+    art = compute_score(_doc(graded=True), coeffs, _REGISTRY, _REGISTRY_MODEL, random.Random(1))
+    approved = _narrative(NarrativeSection.INTERPRETATION, approved=True)
+    rendered = render_platform_power_report(
+        inputs=art.inputs,
+        stored_result=art.result,
+        coefficients=coeffs,
+        registry=_REGISTRY,
+        model=_REGISTRY_MODEL,
+        subject="Meridian",
+        generated_on=date(2026, 7, 13),
+        client_facing=True,
+        narratives=[approved],
+    )
+    assert rendered.mode is DeliverableMode.CLIENT
+    doc = Document(BytesIO(rendered.docx_bytes))
+    text = "\n".join(p.text for p in doc.paragraphs)
+    header = "\n".join(p.text for s in doc.sections for p in s.header.paragraphs)
+    assert DRAFT_WATERMARK not in header  # a clean client pack
+    assert approved.final_text is not None and approved.final_text in text  # the approved words
+    assert str(approved.approved_by_consultant_id) in text  # who approved
+    assert approved.approved_at is not None and approved.approved_at.isoformat() in text  # when
