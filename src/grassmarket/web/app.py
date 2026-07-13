@@ -22,6 +22,7 @@ from grassmarket.web.routers import (
     engagements,
     guidance,
     health,
+    narratives,
     pipeline,
     prospects,
     registry,
@@ -62,6 +63,7 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
     app.include_router(workshops.fees_router)
     app.include_router(engagements.router)
     app.include_router(deliverables.router)
+    app.include_router(narratives.router)
     app.include_router(assessments.router)
     app.include_router(guidance.router)
     app.include_router(registry.router)

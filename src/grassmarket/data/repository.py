@@ -51,12 +51,14 @@ from bcap_contracts.fees import (
     load_recovery_fee_config,
 )
 from bcap_contracts.money import Currency, Money
+from bcap_contracts.narratives import AINarrative, NarrativeSection, NarrativeStatus
 from bcap_contracts.pipeline import assert_legal_transition
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from grassmarket.atlas import AssessmentInputs, AtlasResult
 from grassmarket.data.models import (
+    AINarrativeORM,
     AssessmentORM,
     CommsLogEntryORM,
     ConsultantORM,
@@ -665,6 +667,108 @@ class Repository:
             coefficient_version=row.coefficient_version,
             content_hash=row.content_hash,
             generated_at=row.generated_at,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    # ------------------------------------------------------------------ AI narratives (SCOPED)
+    def create_narrative(
+        self,
+        principal: Principal,
+        *,
+        deliverable_id: UUID,
+        scoring_run_id: UUID,
+        section: NarrativeSection,
+        proposed_text: str,
+        drafter_version: str,
+        prompt_template_version: str,
+        author_tier: ConsultantTier,
+    ) -> AINarrative:
+        """Persist an AI narrative PROPOSAL against one of the principal's OWN deliverables. The
+        deliverable AND the scoring run are access-checked (the repository is the single scoping
+        layer, #9); the owner is the principal. A proposal never carries an approval trail — that is
+        a separate, human step (non-negotiable #8)."""
+        self._require_deliverable(principal, deliverable_id)  # scope check (cross-owner refused)
+        self.get_scoring_run_record(principal, scoring_run_id)  # scope the run too — never trusted
+        row = AINarrativeORM(
+            owner_consultant_id=principal.consultant_id,
+            deliverable_id=deliverable_id,
+            scoring_run_id=scoring_run_id,
+            section=section.value,
+            status=NarrativeStatus.PROPOSED.value,
+            proposed_text=proposed_text,
+            drafter_version=drafter_version,
+            prompt_template_version=prompt_template_version,
+            author_tier=author_tier,
+        )
+        self._session.add(row)
+        self._session.flush()
+        return self._to_ai_narrative(row)
+
+    def approve_narrative(
+        self,
+        principal: Principal,
+        *,
+        narrative_id: UUID,
+        final_text: str,
+        edit_summary: str,
+        approved_at: datetime,
+    ) -> AINarrative:
+        """Record human sign-off on one of the principal's OWN narratives: approver, timestamp, the
+        final (possibly edited) text, and the edit diff. The seniority gate (PRD §5) is enforced by
+        the caller before this point. Approving an already-approved narrative is refused."""
+        row = self._require_ai_narrative(principal, narrative_id)
+        if row.status == NarrativeStatus.APPROVED.value:
+            raise RepositoryError(f"Narrative {narrative_id} is already approved.")
+        row.status = NarrativeStatus.APPROVED.value
+        row.final_text = final_text
+        row.edit_summary = edit_summary
+        row.approved_by_consultant_id = principal.consultant_id
+        row.approved_at = approved_at
+        self._session.flush()
+        return self._to_ai_narrative(row)
+
+    def get_narrative(self, principal: Principal, narrative_id: UUID) -> AINarrative:
+        return self._to_ai_narrative(self._require_ai_narrative(principal, narrative_id))
+
+    def list_narratives(self, principal: Principal, deliverable_id: UUID) -> list[AINarrative]:
+        self._require_deliverable(principal, deliverable_id)  # scope check on the parent
+        stmt = (
+            select(AINarrativeORM)
+            .where(AINarrativeORM.deliverable_id == deliverable_id)
+            .order_by(AINarrativeORM.created_at)
+        )
+        rows = self._session.execute(stmt).scalars().all()
+        result: list[AINarrative] = []
+        for row in rows:
+            self._assert_can_access(principal, row.owner_consultant_id)  # belt and braces
+            result.append(self._to_ai_narrative(row))
+        return result
+
+    def _require_ai_narrative(self, principal: Principal, narrative_id: UUID) -> AINarrativeORM:
+        row = self._session.get(AINarrativeORM, narrative_id)
+        if row is None:
+            raise NotFoundError(f"AI narrative {narrative_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        return row
+
+    @staticmethod
+    def _to_ai_narrative(row: AINarrativeORM) -> AINarrative:
+        return AINarrative(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            deliverable_id=row.deliverable_id,
+            scoring_run_id=row.scoring_run_id,
+            section=NarrativeSection(row.section),
+            status=NarrativeStatus(row.status),
+            proposed_text=row.proposed_text,
+            drafter_version=row.drafter_version,
+            prompt_template_version=row.prompt_template_version,
+            author_tier=ConsultantTier(row.author_tier),
+            final_text=row.final_text,
+            approved_by_consultant_id=row.approved_by_consultant_id,
+            approved_at=row.approved_at,
+            edit_summary=row.edit_summary,
             created_at=row.created_at,
             updated_at=row.updated_at,
         )
