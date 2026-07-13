@@ -72,8 +72,13 @@ test.describe("GRS-0019 slice 2 — AI narrative review", () => {
     await page.getByRole("button", { name: "Generate" }).click();
     await expect(page.getByText(/Generated Platform Power Report/i)).toBeVisible();
 
-    // Open the AI-narrative review on the first deliverable.
-    await page.getByRole("button", { name: "Review AI" }).first().click();
+    // Open the AI-narrative review on the deliverable we just generated. The library accumulates
+    // rows across tests/retries and is ordered oldest-first, so `.first()` would target an
+    // arbitrary earlier deliverable (possibly a different type with no Interpretation section) —
+    // the source of the historical flake. `.last()` of this type's rows is *this* run's fresh,
+    // un-drafted deliverable, deterministic across runs and retries.
+    const row = page.getByRole("row").filter({ hasText: "Platform Power Report" }).last();
+    await row.getByRole("button", { name: "Review AI" }).click();
     const draft = page.getByRole("button", { name: "Draft AI narratives" });
     if (await draft.isVisible().catch(() => false)) await draft.click();
 
@@ -96,11 +101,14 @@ test.describe("GRS-0019 slice 3 — review gate + approval queue", () => {
     await page.getByRole("button", { name: "Generate" }).click();
     await expect(page.getByText(/Generated Executive Summary/i)).toBeVisible();
 
-    await page.getByRole("button", { name: "Review AI" }).first().click();
+    // Review the deliverable we just generated (see slice 2 for why `.last()`, not `.first()`).
+    const row = page.getByRole("row").filter({ hasText: "Executive Summary" }).last();
+    await row.getByRole("button", { name: "Review AI" }).click();
     const draft = page.getByRole("button", { name: "Draft AI narratives" });
     if (await draft.isVisible().catch(() => false)) await draft.click();
 
-    // The review gate is visible: the queue banner warns the pack cannot go to a client yet.
+    // The review gate is visible: the queue banner warns the pack cannot go to a client yet
+    // (the banner counts pending sections engagement-wide, so the fresh draft must land first).
     await expect(page.getByText(/awaiting approval/i)).toBeVisible();
   });
 });

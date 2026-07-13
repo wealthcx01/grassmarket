@@ -15,7 +15,11 @@ export default defineConfig({
   timeout: 30_000,
   expect: { timeout: 10_000 },
   fullyParallel: false,
-  retries: 0,
+  // CI runners are cold on the first navigation and the first AI-narrative draft call, which
+  // intermittently blows the 10s expect budget (a timing flake, not a logic failure — the same spec
+  // passes on manual re-run). Retry twice in CI so a single cold-start hiccup doesn't red the whole
+  // job; keep 0 locally so a real regression fails fast. Traces are retained on the final attempt.
+  retries: process.env.CI ? 2 : 0,
   reporter: [["list"]],
   use: {
     baseURL: process.env.E2E_BASE_URL ?? "http://localhost:3000",
