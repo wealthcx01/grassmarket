@@ -12,13 +12,7 @@ import Link from "next/link";
 
 import { ApiError, api, getToken } from "@/lib/api";
 import { COMMS_CHANNELS, type CommsChannel, type Engagement } from "@/lib/types";
-
-const DELIVERABLE_LABEL: Record<string, string> = {
-  not_started: "Not started",
-  in_progress: "In progress",
-  drafted: "Drafted",
-  delivered: "Delivered",
-};
+import { DeliverablesPanel } from "@/components/DeliverablesPanel";
 
 export default function EngagementDetailPage() {
   const router = useRouter();
@@ -81,25 +75,7 @@ export default function EngagementDetailPage() {
         )}
       </section>
 
-      <section>
-        <h2 style={{ fontSize: "1.05rem", marginBottom: "0.4rem" }}>Deliverables</h2>
-        {engagement.deliverables.length === 0 ? (
-          <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem" }}>
-            No deliverables yet — the Loop 4 builder fills these.
-          </p>
-        ) : (
-          <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.3rem" }}>
-            {engagement.deliverables.map((d) => (
-              <li key={d.key} style={{ display: "flex", justifyContent: "space-between", border: "1px solid var(--color-border)", borderRadius: "var(--radius)", padding: "0.4rem 0.6rem", fontSize: "0.85rem" }}>
-                <span>{d.label ?? d.key}</span>
-                <span className="mono" style={{ fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
-                  {DELIVERABLE_LABEL[d.status] ?? d.status}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      <DeliverablesPanel engagementId={id} />
 
       <CommsLog engagement={engagement} onAdded={reload} />
     </div>

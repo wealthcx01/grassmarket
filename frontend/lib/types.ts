@@ -312,6 +312,62 @@ export interface DeliverableSlot {
   status: DeliverableStatus;
 }
 
+// --- Generated deliverables (GRS-0015/0018 backend `Deliverable` contract) ---
+export type DeliverableType =
+  | "executive_summary"
+  | "platform_power_report"
+  | "infrastructure_heatmap"
+  | "modernisation_roadmap"
+  | "technical_appendix"
+  | "workshop_output"
+  | "score_evolution";
+
+export type DeliverableMode = "client" | "draft_internal";
+
+export type ApprovalStatus = "draft" | "pending_approval" | "approved" | "rejected";
+
+export interface Deliverable {
+  id: string;
+  owner_consultant_id: string;
+  engagement_id: string;
+  type: DeliverableType;
+  title: string;
+  ai_generated: boolean;
+  approval_status: ApprovalStatus;
+  approved_by_consultant_id: string | null;
+  mode: DeliverableMode;
+  scoring_run_id: string | null;
+  coefficient_version: string | null;
+  content_hash: string | null;
+  generated_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// --- AI first-draft narratives (GRS-0017 backend `AINarrative` contract) ---
+export type NarrativeSection = "interpretation" | "commentary" | "recommendation";
+export type NarrativeStatus = "proposed" | "approved" | "rejected";
+export type ConsultantTier = "venture_associate" | "advisor" | "consultant";
+
+export interface AINarrative {
+  id: string;
+  owner_consultant_id: string;
+  deliverable_id: string;
+  scoring_run_id: string;
+  section: NarrativeSection;
+  status: NarrativeStatus;
+  proposed_text: string;
+  drafter_version: string;
+  prompt_template_version: string;
+  author_tier: ConsultantTier;
+  final_text: string | null;
+  approved_by_consultant_id: string | null;
+  approved_at: string | null;
+  edit_summary: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface CommsLogEntry {
   id: string;
   at: string;
