@@ -2,7 +2,7 @@
 
 - **Loop:** 5
 - **Branch:** `grs-0025-practice-arena`
-- **Status:** Planned
+- **Status:** In review
 - **Normative source:** PRD §6 (Practice Arena; vignettes double as calibration content); CLAUDE.md #8.
 - **Depends on:** GRS-0022 (vignettes), GRS-0017 (gated-AI plumbing pattern).
 
@@ -20,6 +20,15 @@ AI-simulated client sessions: advisors practise discovery against a role-played 
 
 ## Exit criteria
 
-- A full arena session runs end-to-end with rubric-based scoring against a fixture transcript (deterministic scoring test; the role-play itself exercised manually).
-- Feedback labelled AI-drafted; scores persist and appear in advisor history.
-- Full gate green; CI green.
+- A full arena session runs end-to-end with rubric-based scoring against a fixture transcript (deterministic scoring test; the role-play itself exercised manually). ✅
+- Feedback labelled AI-drafted; scores persist and appear in advisor history. ✅
+- Full gate green; CI green. ✅
+
+## Implementation notes
+
+- Deterministic scorer `workbench/arena.py::score_transcript` (golden-mastered at completeness
+  0.625); AI feedback behind an injectable `ArenaFeedbackDrafter` port (offline Template impl for CI),
+  `AI-DRAFTED`-labelled with `feedback_is_ai_drafted`/`drafter_version` — the *number* is
+  deterministic, not model-authored (#8). Design recorded in ADR-0015.
+- Scenario authoring admin-only; sessions owner-scoped (foreign session → 404) and single-shot
+  (re-submit → 409). No client data — anonymised vignettes only (#9).

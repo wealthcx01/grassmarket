@@ -1,0 +1,139 @@
+{
+  "$defs": {
+    "ArenaModuleTarget": {
+      "additionalProperties": false,
+      "description": "An infrastructure module the advisor should evidence, with its cue phrases.",
+      "properties": {
+        "cues": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Cues",
+          "type": "array"
+        },
+        "module_key": {
+          "minLength": 1,
+          "title": "Module Key",
+          "type": "string"
+        }
+      },
+      "required": [
+        "module_key",
+        "cues"
+      ],
+      "title": "ArenaModuleTarget",
+      "type": "object"
+    },
+    "ArenaPowerTarget": {
+      "additionalProperties": false,
+      "description": "A power the advisor should probe, with the cue phrases that count as probing each side. A\npower is fully probed only when BOTH benefit and barrier are raised (Helmer, §8).",
+      "properties": {
+        "barrier_cues": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Barrier Cues",
+          "type": "array"
+        },
+        "benefit_cues": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Benefit Cues",
+          "type": "array"
+        },
+        "power_key": {
+          "minLength": 1,
+          "title": "Power Key",
+          "type": "string"
+        }
+      },
+      "required": [
+        "power_key",
+        "benefit_cues",
+        "barrier_cues"
+      ],
+      "title": "ArenaPowerTarget",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A shared practice scenario (sourced from a calibration vignette — the single content\npipeline, GRS-0022). Holds the case brief, the client persona, and the scoring targets.",
+  "properties": {
+    "brief": {
+      "minLength": 1,
+      "title": "Brief",
+      "type": "string"
+    },
+    "client_persona": {
+      "minLength": 1,
+      "title": "Client Persona",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "evidence_cues": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Cues",
+      "type": "array"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "target_modules": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ArenaModuleTarget"
+      },
+      "title": "Target Modules",
+      "type": "array"
+    },
+    "target_powers": {
+      "items": {
+        "$ref": "#/$defs/ArenaPowerTarget"
+      },
+      "minItems": 1,
+      "title": "Target Powers",
+      "type": "array"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "title",
+    "brief",
+    "client_persona",
+    "target_powers"
+  ],
+  "title": "ArenaScenario",
+  "type": "object"
+}

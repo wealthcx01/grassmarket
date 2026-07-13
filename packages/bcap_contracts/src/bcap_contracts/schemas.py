@@ -11,6 +11,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
+from bcap_contracts.arena import ArenaScenario, ArenaSession
 from bcap_contracts.assessments import (
     Assessment,
     AssessmentDocument,
@@ -99,6 +100,8 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "LearningModule": LearningModule,
     "ContentCompletion": ContentCompletion,
     "GeneratedQuiz": GeneratedQuiz,
+    "ArenaScenario": ArenaScenario,
+    "ArenaSession": ArenaSession,
     "JWTClaims": JWTClaims,
     "Consultant": Consultant,
     "Invitation": Invitation,

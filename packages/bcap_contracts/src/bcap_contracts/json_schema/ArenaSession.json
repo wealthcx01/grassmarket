@@ -1,0 +1,209 @@
+{
+  "$defs": {
+    "ArenaScore": {
+      "additionalProperties": false,
+      "description": "The deterministic extraction-completeness score of a discovery transcript.",
+      "properties": {
+        "completeness": {
+          "description": "Fraction of the target extracted (0–1).",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Completeness",
+          "type": "number"
+        },
+        "evidence_questions": {
+          "minimum": 0,
+          "title": "Evidence Questions",
+          "type": "integer"
+        },
+        "modules_evidenced": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Modules Evidenced",
+          "type": "array"
+        },
+        "powers": {
+          "items": {
+            "$ref": "#/$defs/PowerProbeResult"
+          },
+          "title": "Powers",
+          "type": "array"
+        }
+      },
+      "required": [
+        "powers",
+        "modules_evidenced",
+        "evidence_questions",
+        "completeness"
+      ],
+      "title": "ArenaScore",
+      "type": "object"
+    },
+    "ArenaSpeaker": {
+      "enum": [
+        "advisor",
+        "client"
+      ],
+      "title": "ArenaSpeaker",
+      "type": "string"
+    },
+    "ArenaStatus": {
+      "enum": [
+        "in_progress",
+        "scored"
+      ],
+      "title": "ArenaStatus",
+      "type": "string"
+    },
+    "ArenaTurn": {
+      "additionalProperties": false,
+      "description": "One turn of the discovery conversation.",
+      "properties": {
+        "speaker": {
+          "$ref": "#/$defs/ArenaSpeaker"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "speaker",
+        "text"
+      ],
+      "title": "ArenaTurn",
+      "type": "object"
+    },
+    "PowerProbeResult": {
+      "additionalProperties": false,
+      "description": "Whether the advisor probed a power's benefit and barrier sides.",
+      "properties": {
+        "barrier_probed": {
+          "title": "Barrier Probed",
+          "type": "boolean"
+        },
+        "benefit_probed": {
+          "title": "Benefit Probed",
+          "type": "boolean"
+        },
+        "power_key": {
+          "title": "Power Key",
+          "type": "string"
+        }
+      },
+      "required": [
+        "power_key",
+        "benefit_probed",
+        "barrier_probed"
+      ],
+      "title": "PowerProbeResult",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One advisor's practice session. `owner_consultant_id` is the advisor. The transcript is\nsubmitted, then scored deterministically and given AI-drafted feedback (a labelled proposal,\n#8). Scores persist to the advisor's history (certification / bench-queue input).",
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "drafter_version": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Drafter Version"
+    },
+    "feedback": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Feedback"
+    },
+    "feedback_is_ai_drafted": {
+      "default": false,
+      "title": "Feedback Is Ai Drafted",
+      "type": "boolean"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "scenario_id": {
+      "format": "uuid",
+      "title": "Scenario Id",
+      "type": "string"
+    },
+    "score": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ArenaScore"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "scored_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Scored At"
+    },
+    "status": {
+      "$ref": "#/$defs/ArenaStatus",
+      "default": "in_progress"
+    },
+    "transcript": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ArenaTurn"
+      },
+      "title": "Transcript",
+      "type": "array"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "scenario_id"
+  ],
+  "title": "ArenaSession",
+  "type": "object"
+}

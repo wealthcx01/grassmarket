@@ -7,6 +7,15 @@ and ADR-0002 (score and currency never mix).
 
 from __future__ import annotations
 
+from bcap_contracts.arena import (
+    ArenaScenario,
+    ArenaScore,
+    ArenaSession,
+    ArenaSpeaker,
+    ArenaStatus,
+    ArenaTurn,
+    PowerProbeResult,
+)
 from bcap_contracts.assessments import (
     CoefficientSet,
     ModuleRatingDraft,
@@ -173,6 +182,13 @@ __all__ = [
     "GeneratedQuiz",
     "QuizStatus",
     "QuizQuestion",
+    "ArenaScenario",
+    "ArenaSession",
+    "ArenaScore",
+    "ArenaTurn",
+    "ArenaSpeaker",
+    "ArenaStatus",
+    "PowerProbeResult",
     # auth
     "JWTClaims",
     "Consultant",
