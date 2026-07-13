@@ -19,6 +19,7 @@ from grassmarket.web.routers import (
     assessments,
     auth,
     calibration,
+    certification,
     committee,
     deliverables,
     engagements,
@@ -69,6 +70,7 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
     app.include_router(assessments.router)
     app.include_router(committee.router)
     app.include_router(calibration.router)
+    app.include_router(certification.router)
     app.include_router(guidance.router)
     app.include_router(registry.router)
     return app

@@ -39,6 +39,11 @@ from bcap_contracts.calibration import (
     CalibrationVignette,
     RatingEntry,
 )
+from bcap_contracts.certification import (
+    CertificationEvent,
+    CertificationEventKind,
+    CertificationRecord,
+)
 from bcap_contracts.committee import (
     CommitteeDecision,
     CommitteeDecisionStatus,
@@ -79,6 +84,8 @@ from grassmarket.data.models import (
     AssessmentORM,
     CalibrationRatingORM,
     CalibrationSessionORM,
+    CertificationEventORM,
+    CertificationRecordORM,
     CommitteeDecisionORM,
     CommsLogEntryORM,
     ConsultantORM,
@@ -93,6 +100,7 @@ from grassmarket.data.models import (
 )
 from grassmarket.pipeline.fees import attribution_content_hash, is_within_attribution_window
 from grassmarket.workbench.calibration import compute_calibration_result
+from grassmarket.workbench.certification import next_level, promotion_blockers
 
 # Stages at which a prospect is "contracted or beyond" — the only prospects an engagement may link.
 _ENGAGEABLE_STAGES = frozenset(
@@ -1592,6 +1600,262 @@ class Repository:
             entries=tuple(RatingEntry.model_validate(e) for e in json.loads(row.entries_json)),
             submitted=row.submitted,
             submitted_at=row.submitted_at,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    # ------------------------------------------------ certification ladder (SCOPED, Methodology §9)
+    # The ladder is advanced on RECORDED EVIDENCE, never a badge. Evidence is recorded by an admin
+    # (trainer/facilitator); promotion checks the state machine and refuses if the evidence is not
+    # in; every credit, promotion and admin override is an append-only event. The advisor's LEVEL is
+    # kept on their consultant record (the JWT claim); this layer keeps the evidence + audit trail.
+
+    def _require_cert_admin(self, principal: Principal) -> None:
+        if not principal.is_admin:
+            raise ScopeViolationError(
+                "Only an admin may record certification evidence or promote an advisor (§9)."
+            )
+
+    def _consultant_level(self, consultant_id: UUID) -> AssessorLevel:
+        row = self._session.get(ConsultantORM, consultant_id)
+        if row is None:
+            raise NotFoundError(f"Consultant {consultant_id} not found.")
+        return AssessorLevel(row.assessor_level)
+
+    def _get_or_create_cert_record(self, consultant_id: UUID) -> CertificationRecordORM:
+        stmt = select(CertificationRecordORM).where(
+            CertificationRecordORM.owner_consultant_id == consultant_id
+        )
+        row = self._session.execute(stmt).scalar_one_or_none()
+        if row is None:
+            if self._session.get(ConsultantORM, consultant_id) is None:
+                raise NotFoundError(f"Consultant {consultant_id} not found.")
+            row = CertificationRecordORM(owner_consultant_id=consultant_id)
+            self._session.add(row)
+            try:
+                self._session.flush()
+            except IntegrityError:  # a concurrent first-access created it — re-read the winner
+                self._session.rollback()
+                row = self._session.execute(stmt).scalar_one()
+        return row
+
+    def _append_cert_event(
+        self,
+        consultant_id: UUID,
+        kind: CertificationEventKind,
+        recorded_by: UUID,
+        occurred_at: datetime,
+        *,
+        detail: str = "",
+        from_level: AssessorLevel | None = None,
+        to_level: AssessorLevel | None = None,
+        reason: str | None = None,
+    ) -> None:
+        self._session.add(
+            CertificationEventORM(
+                owner_consultant_id=consultant_id,
+                kind=kind.value,
+                detail=detail,
+                from_level=from_level.value if from_level else None,
+                to_level=to_level.value if to_level else None,
+                reason=reason,
+                recorded_by_consultant_id=recorded_by,
+                occurred_at=occurred_at,
+            )
+        )
+
+    def record_coursework(
+        self, principal: Principal, advisor_id: UUID, *, occurred_at: datetime
+    ) -> CertificationRecord:
+        self._require_cert_admin(principal)
+        record = self._get_or_create_cert_record(advisor_id)
+        record.coursework_complete = True
+        self._append_cert_event(
+            advisor_id,
+            CertificationEventKind.COURSEWORK_COMPLETED,
+            principal.consultant_id,
+            occurred_at,
+        )
+        self._session.flush()
+        return self._to_certification_record(record)
+
+    def record_exam(
+        self, principal: Principal, advisor_id: UUID, *, score: float, occurred_at: datetime
+    ) -> CertificationRecord:
+        self._require_cert_admin(principal)
+        record = self._get_or_create_cert_record(advisor_id)
+        record.exam_score = score
+        self._append_cert_event(
+            advisor_id,
+            CertificationEventKind.EXAM_RECORDED,
+            principal.consultant_id,
+            occurred_at,
+            detail=f"score={score}",
+        )
+        self._session.flush()
+        return self._to_certification_record(record)
+
+    def log_shadow_assessment(
+        self, principal: Principal, advisor_id: UUID, *, occurred_at: datetime
+    ) -> CertificationRecord:
+        # A shadow is an admin-recorded credit (a trusted trainer logs each real participation); the
+        # count is not tied to a distinct assessment id — that finer accounting is out of scope.
+        self._require_cert_admin(principal)
+        record = self._get_or_create_cert_record(advisor_id)
+        record.shadow_count += 1
+        self._append_cert_event(
+            advisor_id,
+            CertificationEventKind.SHADOW_LOGGED,
+            principal.consultant_id,
+            occurred_at,
+            detail=f"count={record.shadow_count}",
+        )
+        self._session.flush()
+        return self._to_certification_record(record)
+
+    def log_observed_lead(
+        self, principal: Principal, advisor_id: UUID, *, occurred_at: datetime
+    ) -> CertificationRecord:
+        self._require_cert_admin(principal)
+        record = self._get_or_create_cert_record(advisor_id)
+        record.observed_lead_logged = True
+        self._append_cert_event(
+            advisor_id,
+            CertificationEventKind.OBSERVED_LEAD_LOGGED,
+            principal.consultant_id,
+            occurred_at,
+        )
+        self._session.flush()
+        return self._to_certification_record(record)
+
+    def record_signoff(
+        self, principal: Principal, advisor_id: UUID, *, signer_id: UUID, occurred_at: datetime
+    ) -> CertificationRecord:
+        """Record a Certified Lead's sign-off of an advisor's observed lead. Admin-recorded; the
+        signer must actually be a Certified Lead, and cannot be the advisor (peer sign-off, §9)."""
+        self._require_cert_admin(principal)
+        if signer_id == advisor_id:
+            raise ConflictError("A sign-off must come from another consultant, not the advisor.")
+        if self._consultant_level(signer_id) is not AssessorLevel.CERTIFIED_LEAD:
+            raise ConflictError("A sign-off must be recorded by a Certified Lead.")
+        record = self._get_or_create_cert_record(advisor_id)
+        record.observed_lead_signoff_by = signer_id
+        self._append_cert_event(
+            advisor_id,
+            CertificationEventKind.SIGNOFF_RECORDED,
+            principal.consultant_id,
+            occurred_at,
+            detail=f"signer={signer_id}",
+        )
+        self._session.flush()
+        return self._to_certification_record(record)
+
+    def promote_advisor(
+        self, principal: Principal, advisor_id: UUID, *, occurred_at: datetime
+    ) -> CertificationRecord:
+        """Advance an advisor one rung — refused unless the next level's evidence is in (§9)."""
+        self._require_cert_admin(principal)
+        consultant = self._session.get(ConsultantORM, advisor_id)
+        if consultant is None:
+            raise NotFoundError(f"Consultant {advisor_id} not found.")
+        record = self._get_or_create_cert_record(advisor_id)
+        current = AssessorLevel(consultant.assessor_level)
+        target = next_level(current)
+        if target is None:
+            raise ConflictError(f"{current.value} is already the top of the ladder.")
+        blockers = promotion_blockers(self._to_certification_record(record), target)
+        if blockers:
+            raise ConflictError(
+                f"Cannot promote to {target.value} — evidence incomplete: " + " ".join(blockers)
+            )
+        consultant.assessor_level = target
+        self._append_cert_event(
+            advisor_id,
+            CertificationEventKind.PROMOTED,
+            principal.consultant_id,
+            occurred_at,
+            from_level=current,
+            to_level=target,
+        )
+        self._session.add(consultant)
+        self._session.flush()
+        return self._to_certification_record(record)
+
+    def record_certification_override(
+        self,
+        principal: Principal,
+        advisor_id: UUID,
+        *,
+        reason: str,
+        detail: str,
+        occurred_at: datetime,
+    ) -> None:
+        """Append an admin OVERRIDE audit record (e.g. a certification-gate bypass at finalisation).
+        Admin-only and the reason is mandatory — no silent bypass (§9). Self-guarded here (not only
+        at the router) because this is the one privileged path that skips a governance gate."""
+        self._require_cert_admin(principal)
+        if not reason.strip():
+            raise ConflictError("An override reason is mandatory — no silent bypass (§9).")
+        self._append_cert_event(
+            advisor_id,
+            CertificationEventKind.OVERRIDE,
+            principal.consultant_id,
+            occurred_at,
+            detail=detail,
+            reason=reason,
+        )
+        self._session.flush()
+
+    def get_certification_record(
+        self, principal: Principal, advisor_id: UUID
+    ) -> CertificationRecord:
+        """An advisor's own record, or any advisor's for an admin."""
+        if not (principal.is_admin or advisor_id == principal.consultant_id):
+            raise ScopeViolationError("You may view only your own certification record.")
+        return self._to_certification_record(self._get_or_create_cert_record(advisor_id))
+
+    def list_certification_events(
+        self, principal: Principal, advisor_id: UUID
+    ) -> list[CertificationEvent]:
+        if not (principal.is_admin or advisor_id == principal.consultant_id):
+            raise ScopeViolationError("You may view only your own certification history.")
+        rows = (
+            self._session.execute(
+                select(CertificationEventORM)
+                .where(CertificationEventORM.owner_consultant_id == advisor_id)
+                .order_by(CertificationEventORM.occurred_at, CertificationEventORM.created_at)
+            )
+            .scalars()
+            .all()
+        )
+        return [self._to_certification_event(r) for r in rows]
+
+    def _to_certification_record(self, row: CertificationRecordORM) -> CertificationRecord:
+        return CertificationRecord(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            level=self._consultant_level(row.owner_consultant_id),
+            coursework_complete=row.coursework_complete,
+            exam_score=row.exam_score,
+            shadow_count=row.shadow_count,
+            observed_lead_logged=row.observed_lead_logged,
+            observed_lead_signoff_by=row.observed_lead_signoff_by,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    @staticmethod
+    def _to_certification_event(row: CertificationEventORM) -> CertificationEvent:
+        return CertificationEvent(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            kind=CertificationEventKind(row.kind),
+            detail=row.detail,
+            from_level=AssessorLevel(row.from_level) if row.from_level else None,
+            to_level=AssessorLevel(row.to_level) if row.to_level else None,
+            reason=row.reason,
+            recorded_by_consultant_id=row.recorded_by_consultant_id,
+            occurred_at=row.occurred_at,
             created_at=row.created_at,
             updated_at=row.updated_at,
         )

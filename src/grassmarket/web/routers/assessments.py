@@ -19,6 +19,7 @@ from bcap_contracts.assessments import (
     ModuleRatingDraft,
     SubcomponentRating,
 )
+from bcap_contracts.common import AssessorLevel
 from bcap_contracts.registry import load_registry
 from bcap_contracts.value import ScenarioComparison
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -43,6 +44,7 @@ from grassmarket.data.repository import (
     ScopeViolationError,
 )
 from grassmarket.web.dependencies import get_current_principal, get_repository
+from grassmarket.workbench.certification import requires_certified_lead
 
 router = APIRouter(prefix="/assessments", tags=["assessments"])
 
@@ -173,11 +175,13 @@ def evaluate_assessment_scenarios(
 @router.post("/{assessment_id}/finalise", response_model=Assessment)
 def finalise_assessment(
     assessment_id: UUID,
+    override_reason: str | None = None,
     principal: Principal = Depends(get_current_principal),
     repo: Repository = Depends(get_repository),
 ) -> Assessment:
     """Lock inputs and create the immutable scoring run. Refuses if already finalised or not yet
-    scoreable — both 409 (the run and the lock happen in one transaction)."""
+    scoreable — both 409. A Frontier module or Wide power requires a Certified Lead to lead the
+    assessment (§9); an admin may override that with `override_reason`, which is audited."""
     try:
         assessment = repo.get_assessment(principal, assessment_id)
     except (NotFoundError, ScopeViolationError) as exc:
@@ -216,6 +220,30 @@ def finalise_assessment(
             status_code=status.HTTP_409_CONFLICT,
             detail="Cannot finalise — Rating Committee sign-off incomplete: " + " ".join(committee),
         )
+    # Certification (Methodology §9): a Frontier module or Wide power requires a Certified Lead to
+    # lead the assessment. An admin may override with a recorded reason (fail-loud, audited).
+    cert_reasons = requires_certified_lead(art.result)
+    if cert_reasons:
+        owner = repo.get_consultant_by_id(assessment.owner_consultant_id)
+        certified = owner is not None and owner.assessor_level is AssessorLevel.CERTIFIED_LEAD
+        if not certified:
+            if principal.is_admin and override_reason and override_reason.strip():
+                repo.record_certification_override(
+                    principal,
+                    assessment.owner_consultant_id,
+                    reason=override_reason,
+                    detail="Finalise override: " + "; ".join(cert_reasons),
+                    occurred_at=datetime.now(UTC),
+                )
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail=(
+                        "Cannot finalise — a Certified Lead must lead this assessment ("
+                        + "; ".join(cert_reasons)
+                        + "). An admin may override with a recorded reason."
+                    ),
+                )
     run = repo.create_scoring_run(
         principal,
         assessment_id=assessment_id,
