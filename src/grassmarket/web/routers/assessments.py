@@ -32,6 +32,7 @@ from grassmarket.assessments import (
     module_rating_errors,
     scoreability_blockers,
 )
+from grassmarket.atlas.committee import committee_blockers, required_committee_items
 from grassmarket.atlas.draft_coefficients import draft_v1_coefficient_set
 from grassmarket.atlas.montecarlo import draft_v1_uncertainty_model
 from grassmarket.data.repository import (
@@ -204,6 +205,17 @@ def finalise_assessment(
     art = compute_score(
         assessment.document, coefficients, registry, model, random.Random(_LIVE_SEED)
     )
+    # Rating Committee sign-off on high-stakes ratings (Methodology §8): power Established+, triad
+    # above None, module Frontier. Any awaiting sign-off blocks finalisation.
+    committee = committee_blockers(
+        required_committee_items(art.result),
+        repo.list_committee_decisions(principal, assessment_id),
+    )
+    if committee:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cannot finalise — Rating Committee sign-off incomplete: " + " ".join(committee),
+        )
     run = repo.create_scoring_run(
         principal,
         assessment_id=assessment_id,

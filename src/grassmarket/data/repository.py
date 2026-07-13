@@ -30,6 +30,11 @@ from bcap_contracts.assessments import (
     SubcomponentRating,
 )
 from bcap_contracts.auth import Consultant
+from bcap_contracts.committee import (
+    CommitteeDecision,
+    CommitteeDecisionStatus,
+    CommitteeItemType,
+)
 from bcap_contracts.common import AssessorLevel, ConsultantTier, Role, UncertaintyRating
 from bcap_contracts.deliverables import (
     ApprovalStatus,
@@ -63,6 +68,7 @@ from grassmarket.atlas import AssessmentInputs, AtlasResult
 from grassmarket.data.models import (
     AINarrativeORM,
     AssessmentORM,
+    CommitteeDecisionORM,
     CommsLogEntryORM,
     ConsultantORM,
     DeliverableORM,
@@ -153,6 +159,12 @@ class Principal:
     @property
     def is_admin(self) -> bool:
         return self.role is Role.ADMIN
+
+    @property
+    def is_committee(self) -> bool:
+        """A Rating Committee member (Methodology §8). Widens visibility of the committee queue and
+        permits sign-off — but never on the member's own assessment (peer challenge)."""
+        return self.role is Role.COMMITTEE_MEMBER
 
 
 @dataclass(frozen=True)
@@ -1264,6 +1276,127 @@ class Repository:
             ratings=Repository._load_ratings(row.ratings_json),
             submitted=row.submitted,
             submitted_at=row.submitted_at,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    # ------------------------------------------------- Rating Committee (SCOPED, Methodology §8)
+    # High-stakes ratings need peer sign-off. The committee QUEUE is visible to the assessment
+    # owner (to watch status), a committee member, or an admin; a DECISION may be recorded only by a
+    # committee member or admin, and never on their own assessment (peer challenge, ADR-0011). The
+    # required-items computation lives in `grassmarket.atlas.committee`; this layer stores calls.
+
+    def _require_committee_view(self, principal: Principal, assessment_id: UUID) -> AssessmentORM:
+        row = self._session.get(AssessmentORM, assessment_id)
+        if row is None:
+            raise NotFoundError(f"Assessment {assessment_id} not found.")
+        if (
+            principal.is_admin
+            or principal.is_committee
+            or row.owner_consultant_id == principal.consultant_id
+        ):
+            return row
+        raise ScopeViolationError(
+            "Only the assessment owner, a committee member, or an admin may view the committee "
+            "queue (data scoping is absolute, CLAUDE.md #9; committee visibility per ADR-0011)."
+        )
+
+    def get_assessment_for_committee(self, principal: Principal, assessment_id: UUID) -> Assessment:
+        """The assessment as seen by a committee viewer (owner / committee / admin) — so the queue
+        endpoint can score its document to derive the high-stakes items."""
+        return self._to_assessment(self._require_committee_view(principal, assessment_id))
+
+    def list_committee_decisions(
+        self, principal: Principal, assessment_id: UUID
+    ) -> list[CommitteeDecision]:
+        """Every recorded committee call on an assessment (scoped to owner / committee / admin)."""
+        self._require_committee_view(principal, assessment_id)
+        stmt = (
+            select(CommitteeDecisionORM)
+            .where(CommitteeDecisionORM.assessment_id == assessment_id)
+            .order_by(CommitteeDecisionORM.created_at)
+        )
+        rows = self._session.execute(stmt).scalars().all()
+        return [self._to_committee_decision(r) for r in rows]
+
+    def decide_committee_item(
+        self,
+        principal: Principal,
+        assessment_id: UUID,
+        *,
+        item_type: CommitteeItemType,
+        item_key: str,
+        rating: str,
+        status: CommitteeDecisionStatus,
+        rationale: str,
+        dissent_note: str | None = None,
+    ) -> CommitteeDecision:
+        """Record (or update) the committee's call on one high-stakes item, at the rating reviewed.
+        Committee/admin only, and never on the decider's own assessment (peer challenge, §8);
+        refused once the assessment is finalised. Upserts on (assessment, item_type, item_key)."""
+        assessment = self._session.get(AssessmentORM, assessment_id)
+        if assessment is None:
+            raise NotFoundError(f"Assessment {assessment_id} not found.")
+        if not (principal.is_committee or principal.is_admin):
+            # A non-committee principal has no business at the decision surface — do not reveal it.
+            raise ScopeViolationError(
+                "Only a Rating Committee member or an admin may record a committee decision (§8)."
+            )
+        if assessment.owner_consultant_id == principal.consultant_id:
+            raise ConflictError(
+                "A consultant cannot sign off the high-stakes ratings on their own assessment — "
+                "committee review is peer challenge, not self-approval (Methodology §8)."
+            )
+        if assessment.state == AssessmentState.FINALISED.value:
+            raise ConflictError(
+                f"Assessment {assessment_id} is finalised; committee decisions are locked (#6)."
+            )
+
+        stmt = select(CommitteeDecisionORM).where(
+            CommitteeDecisionORM.assessment_id == assessment_id,
+            CommitteeDecisionORM.item_type == item_type.value,
+            CommitteeDecisionORM.item_key == item_key,
+        )
+        row = self._session.execute(stmt).scalar_one_or_none()
+        now = datetime.now(UTC)
+        if row is None:
+            row = CommitteeDecisionORM(
+                owner_consultant_id=assessment.owner_consultant_id,
+                assessment_id=assessment_id,
+                item_type=item_type.value,
+                item_key=item_key,
+            )
+        row.rating = rating
+        row.status = status.value
+        row.rationale = rationale
+        row.dissent_note = dissent_note
+        row.decided_by_consultant_id = principal.consultant_id
+        row.decided_at = now
+        self._session.add(row)
+        try:
+            self._session.flush()
+        except IntegrityError as exc:  # two members raced the first decision on the same item
+            self._session.rollback()
+            raise ConflictError(
+                f"A committee decision on {item_type.value} {item_key!r} was recorded "
+                f"concurrently; re-read the queue and try again."
+            ) from exc
+        return self._to_committee_decision(row)
+
+    @staticmethod
+    def _to_committee_decision(row: CommitteeDecisionORM) -> CommitteeDecision:
+        return CommitteeDecision(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            assessment_id=row.assessment_id,
+            item_type=CommitteeItemType(row.item_type),
+            item_key=row.item_key,
+            rating=row.rating,
+            status=CommitteeDecisionStatus(row.status),
+            rationale=row.rationale,
+            dissent_note=row.dissent_note,
+            decided_by_consultant_id=row.decided_by_consultant_id,
+            decided_at=row.decided_at,
             created_at=row.created_at,
             updated_at=row.updated_at,
         )

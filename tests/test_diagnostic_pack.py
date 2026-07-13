@@ -264,6 +264,8 @@ def test_charts_are_byte_deterministic() -> None:
 
 # ----------------------------------------------------------- service dispatcher + gate
 def _render(dtype: DeliverableType, *, client_facing: bool, coeffs=None):
+    from tests.committee_helpers import approved_decisions_for
+
     coeffs = coeffs or draft_v1_coefficient_set(_REGISTRY)
     art = compute_score(_doc(graded=True), coeffs, _REGISTRY, _MODEL, random.Random(1))
     return render_diagnostic_document(
@@ -276,6 +278,7 @@ def _render(dtype: DeliverableType, *, client_facing: bool, coeffs=None):
         subject="Meridian",
         generated_on=date(2026, 7, 13),
         client_facing=client_facing,
+        committee_decisions=approved_decisions_for(art.result),
     )
 
 

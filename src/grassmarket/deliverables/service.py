@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from bcap_contracts.assessments import CoefficientSet
+from bcap_contracts.committee import CommitteeDecision
 from bcap_contracts.deliverables import DeliverableMode, DeliverableType
 from bcap_contracts.narratives import AINarrative
 from bcap_contracts.registry import Registry
@@ -23,7 +24,7 @@ from bcap_contracts.value import ScenarioResult, ValueBridge
 from grassmarket.atlas import AssessmentInputs, run_monte_carlo
 from grassmarket.atlas.results import AtlasResult
 from grassmarket.deliverables.builder import DeliverableContext, build_platform_power_report
-from grassmarket.deliverables.gate import resolve_mode
+from grassmarket.deliverables.gate import assert_committee_approved, resolve_mode
 from grassmarket.deliverables.heatmap import build_infrastructure_heatmap
 from grassmarket.deliverables.reports import (
     build_executive_summary,
@@ -102,12 +103,13 @@ def render_diagnostic_document(
     generated_on: date,
     client_facing: bool,
     narratives: Sequence[AINarrative] = (),
+    committee_decisions: Sequence[CommitteeDecision] = (),
 ) -> RenderedDeliverable:
-    """Render one single-run Diagnostic-pack document. Enforces the client-usable gate first (may
-    raise `ClientUsabilityError`), then re-derives the uncertainty bands from the stored inputs
-    (fixed seed → reproducible) and dispatches to the builder for the requested type. Any approved
-    AI narratives are rendered into the Platform Power Report's methods appendix (GRS-0017); other
-    types accept and ignore them.
+    """Render one single-run Diagnostic-pack document. Enforces the client-usable AND committee
+    gates first (may raise `ClientUsabilityError` / `CommitteePendingError`), then re-derives the
+    uncertainty bands from the stored inputs (fixed seed → reproducible) and dispatches to the
+    builder. Approved AI narratives and committee rationale/dissent render into the Platform Power
+    Report's methods appendix (GRS-0017/0021); other types accept and ignore the narratives.
 
     A type that is not a single-run document (the roadmap, which needs the value bridge; score
     evolution, which needs multiple runs) is refused loud — those have their own render paths."""
@@ -117,6 +119,8 @@ def render_diagnostic_document(
             f"render path (roadmap needs the value bridge; score evolution needs multiple runs)."
         )
     mode = resolve_mode(coefficients, client_facing=client_facing)  # the gate — refuses first
+    # High-stakes ratings need committee sign-off before a client pack (Methodology §8).
+    assert_committee_approved(stored_result, committee_decisions, client_facing=client_facing)
     uncertainty = run_monte_carlo(
         inputs, coefficients, registry, model, random.Random(DELIVERABLE_SEED)
     )
@@ -127,6 +131,7 @@ def render_diagnostic_document(
         coefficients=coefficients,
         uncertainty_version=model.version,
         generated_on=generated_on,
+        committee_decisions=tuple(committee_decisions),
     )
     build = _SINGLE_RUN_BUILDERS[deliverable_type].build
     return RenderedDeliverable(mode=mode, docx_bytes=build(context, mode, narratives))
@@ -143,9 +148,10 @@ def render_platform_power_report(
     generated_on: date,
     client_facing: bool,
     narratives: Sequence[AINarrative] = (),
+    committee_decisions: Sequence[CommitteeDecision] = (),
 ) -> RenderedDeliverable:
-    """Render the Platform Power Report (a thin wrapper over `render_diagnostic_document`). Any
-    approved AI narratives render into its methods appendix with their approval trail (GRS-0017)."""
+    """Render the Platform Power Report (a thin wrapper over `render_diagnostic_document`). Approved
+    AI narratives and the committee-approved triad rationale render into its methods appendix."""
     return render_diagnostic_document(
         deliverable_type=DeliverableType.PLATFORM_POWER_REPORT,
         inputs=inputs,
@@ -157,6 +163,7 @@ def render_platform_power_report(
         generated_on=generated_on,
         client_facing=client_facing,
         narratives=narratives,
+        committee_decisions=committee_decisions,
     )
 
 
@@ -171,12 +178,15 @@ def render_modernisation_roadmap(
     subject: str,
     generated_on: date,
     client_facing: bool,
+    committee_decisions: Sequence[CommitteeDecision] = (),
 ) -> RenderedDeliverable:
-    """Render the Modernisation Roadmap. Enforces the client-usable gate first (may raise
-    `ClientUsabilityError`) — a draft coefficient set yields only a watermarked internal document,
-    never a client pack — then builds the .docx from the upstream value-bridge + priority objects.
-    Versions come from the run's immutable stored result, so the document is reproducible."""
+    """Render the Modernisation Roadmap. Enforces the client-usable AND committee gates first (may
+    raise `ClientUsabilityError` / `CommitteePendingError`) — a draft coefficient set or an
+    unsigned-off high-stakes rating yields only a watermarked internal document, never a client pack
+    — then builds the .docx from the upstream value-bridge + priority objects. Versions come from
+    run's immutable stored result, so the document is reproducible."""
     mode = resolve_mode(coefficients, client_facing=client_facing)  # the gate — refuses first
+    assert_committee_approved(stored_result, committee_decisions, client_facing=client_facing)
     context = RoadmapContext(
         subject=subject,
         bridge=bridge,

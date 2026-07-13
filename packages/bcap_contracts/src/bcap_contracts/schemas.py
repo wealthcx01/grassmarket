@@ -31,6 +31,7 @@ from bcap_contracts.auth import (
     TokenResponse,
 )
 from bcap_contracts.commissions import CommissionLine
+from bcap_contracts.committee import CommitteeDecision, CommitteeItem, CommitteeQueueEntry
 from bcap_contracts.deliverables import Deliverable
 from bcap_contracts.engagements import CommsLogEntry, Engagement, Workshop
 from bcap_contracts.entities import Prospect
@@ -71,6 +72,9 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "Deliverable": Deliverable,
     "AINarrative": AINarrative,
     "CommissionLine": CommissionLine,
+    "CommitteeItem": CommitteeItem,
+    "CommitteeDecision": CommitteeDecision,
+    "CommitteeQueueEntry": CommitteeQueueEntry,
     "CertificationProgress": CertificationProgress,
     "DrillResult": DrillResult,
     "JWTClaims": JWTClaims,

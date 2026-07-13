@@ -13,6 +13,7 @@ from uuid import UUID, uuid4
 from bcap_contracts.common import EvidenceGrade, MaturityLevel
 
 from grassmarket.atlas import AssessmentInputs
+from tests.committee_helpers import approve_committee_queue
 from tests.conftest import SeededConsultant, auth_header
 from tests.dual_rating_helpers import (
     assign_rater,
@@ -87,6 +88,7 @@ def test_consensus_needs_at_least_two_raters(client, alice: SeededConsultant) ->
 def test_agreed_consensus_lets_the_assessment_finalise(client, alice: SeededConsultant) -> None:
     aid = _new_assessment(client, alice)
     reach_consensus(client, aid, alice, _MODULE, [(_SUB, MaturityLevel.ADVANCED)])
+    approve_committee_queue(client, aid, alice)  # the high-stakes triad also needs sign-off (§8)
     final = client.post(f"/assessments/{aid}/finalise", headers=auth_header(alice))
     assert final.status_code == 200
     assert final.json()["state"] == "finalised"
@@ -208,6 +210,7 @@ def test_dissent_is_sealed_into_the_scoring_run_and_retrievable(
         json={"resolved": [_rating(MaturityLevel.ADVANCED, dissent_note=note)]},
         headers=auth_header(alice),
     )
+    approve_committee_queue(client, aid, alice)
     final = client.post(f"/assessments/{aid}/finalise", headers=auth_header(alice))
     assert final.status_code == 200
     run_id = final.json()["scoring_run_id"]
@@ -434,6 +437,7 @@ def test_finalisation_locks_the_whole_rating_workflow(
     an assigned rater, no re-resolution."""
     aid = _new_assessment(client, alice)
     co = reach_consensus(client, aid, alice, _MODULE, [(_SUB, MaturityLevel.ADVANCED)])
+    approve_committee_queue(client, aid, alice)
     assert (
         client.post(f"/assessments/{aid}/finalise", headers=auth_header(alice)).status_code == 200
     )

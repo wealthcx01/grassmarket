@@ -14,6 +14,7 @@ from io import BytesIO
 from uuid import UUID
 
 from bcap_contracts.assessments import AssessmentState
+from bcap_contracts.committee import CommitteeDecision
 from bcap_contracts.deliverables import Deliverable, DeliverableMode, DeliverableType
 from bcap_contracts.narratives import AINarrative
 from bcap_contracts.registry import load_registry
@@ -34,6 +35,7 @@ from grassmarket.data.repository import (
 )
 from grassmarket.deliverables.gate import (
     ClientUsabilityError,
+    CommitteePendingError,
     UnapprovedNarrativeError,
     assert_narratives_approved,
 )
@@ -91,6 +93,7 @@ def _render(
     client_facing: bool,
     generated_on: date,
     narratives: Sequence[AINarrative] = (),
+    committee_decisions: Sequence[CommitteeDecision] = (),
 ) -> RenderedDeliverable:
     registry = load_registry()
     inputs = AssessmentInputs.model_validate_json(record.inputs_json)
@@ -106,6 +109,7 @@ def _render(
         generated_on=generated_on,
         client_facing=client_facing,
         narratives=narratives,
+        committee_decisions=committee_decisions,
     )
 
 
@@ -129,15 +133,18 @@ def generate_deliverable(
     dtype = payload.deliverable_type
     now = datetime.now(UTC)
     try:
+        committee_decisions = repo.list_committee_decisions(principal, record.assessment_id)
         rendered = _render(
             record,
             subject,
             deliverable_type=dtype,
             client_facing=payload.client_facing,
             generated_on=now.date(),
+            committee_decisions=committee_decisions,
         )
-    except ClientUsabilityError as exc:
-        # The controlling gate: a client-facing pack on a non-client-usable set is refused.
+    except (ClientUsabilityError, CommitteePendingError) as exc:
+        # The controlling gates: a client-facing pack on a non-client-usable set, or one whose
+        # high-stakes ratings still lack committee sign-off (§8), is refused.
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
     except UnsupportedDeliverableTypeError as exc:
         # A type with its own render path (roadmap / score evolution) is not generable here.
@@ -208,6 +215,7 @@ def download_deliverable(
     subject = repo.get_prospect(principal, engagement.prospect_id).company_name
     generated_on = (deliverable.generated_at or datetime.now(UTC)).date()
     try:
+        committee_decisions = repo.list_committee_decisions(principal, record.assessment_id)
         rendered = _render(
             record,
             subject,
@@ -215,9 +223,11 @@ def download_deliverable(
             client_facing=client_facing,
             generated_on=generated_on,
             narratives=narratives,
+            committee_decisions=committee_decisions,
         )
-    except ClientUsabilityError as exc:
-        # Defense in depth — if the set is no longer client-usable, refuse on download too.
+    except (ClientUsabilityError, CommitteePendingError) as exc:
+        # Defense in depth — refuse on download if the set is no longer client-usable OR a
+        # high-stakes rating still lacks committee sign-off (§8).
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
     except UnsupportedDeliverableTypeError as exc:
         # A stored deliverable whose type has its own render path (roadmap / evolution) — consistent

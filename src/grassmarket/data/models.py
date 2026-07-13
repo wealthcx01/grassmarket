@@ -272,6 +272,45 @@ class AINarrativeORM(Base):
     )
 
 
+class CommitteeDecisionORM(Base):
+    """A Rating Committee's recorded call on one high-stakes item of an assessment (GRS-0021,
+    Methodology §8). One row per (assessment, item_type, item_key) — a re-decision updates it in
+    place. ``owner_consultant_id`` is the assessment's owner (scoping); ``decided_by_consultant_id``
+    is the committee member who made the call (never the owner — peer challenge)."""
+
+    __tablename__ = "committee_decisions"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    # THE scoping column — the assessment owner; committee visibility is widened in the repo.
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    assessment_id: Mapped[UUID] = mapped_column(
+        ForeignKey("assessments.id"), index=True, nullable=False
+    )
+    item_type: Mapped[str] = mapped_column(String(16), nullable=False)
+    item_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    rating: Mapped[str] = mapped_column(String(32), nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False)
+    rationale: Mapped[str] = mapped_column(Text, nullable=False)
+    dissent_note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    decided_by_consultant_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    decided_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "assessment_id",
+            "item_type",
+            "item_key",
+            name="uq_committee_decision_assessment_item",
+        ),
+    )
+
+
 class ModuleRatingDraftORM(Base):
     """One rater's independent, blind rating of one module's subcomponents (GRS-0020, Methodology
     §9 dual rating). ``owner_consultant_id`` is the rater. The (assessment, module, rater) triple is

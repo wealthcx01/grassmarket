@@ -19,6 +19,7 @@ from datetime import date
 from io import BytesIO
 
 from bcap_contracts.assessments import CoefficientSet
+from bcap_contracts.committee import CommitteeDecision, CommitteeDecisionStatus, CommitteeItemType
 from bcap_contracts.deliverables import DeliverableMode
 from bcap_contracts.narratives import AINarrative, NarrativeStatus
 from docx import Document
@@ -42,6 +43,9 @@ class DeliverableContext:
     coefficients: CoefficientSet
     uncertainty_version: str
     generated_on: date
+    # Rating Committee calls on this run's high-stakes items (GRS-0021, §8). The approved triad
+    # rationale is the text a client sees; every decision + dissent renders into the appendix.
+    committee_decisions: tuple[CommitteeDecision, ...] = ()
 
 
 _TRIAD_ORDER = (
@@ -119,14 +123,25 @@ def _platform_power_section(doc: DocxDocument, context: DeliverableContext) -> N
         "score is shown for traceability; ordinal and currency are never mixed (ADR-0002)."
     )
     triad = context.result.triad
+    approved_triad = {
+        d.item_key: d
+        for d in context.committee_decisions
+        if d.item_type is CommitteeItemType.TRIAD and d.status is CommitteeDecisionStatus.APPROVED
+    }
     for label, attr in _TRIAD_ORDER:
         dim = getattr(triad, attr)
         p = doc.add_paragraph(style="List Bullet")
         p.add_run(f"{label}: {dim.rating}. ").bold = True
-        p.add_run(
-            f"Ordinal rating derived from the continuous inputs against the ADR-0007 triad "
-            f"thresholds (audit-only score {dim.score:.3f})."
-        )
+        decision = approved_triad.get(attr)
+        if decision is not None and decision.rating == dim.rating:
+            # The committee-approved rationale is the text a client sees for a high-stakes rating
+            # (Methodology §8, scope item 5); the derivation note stays for traceability.
+            p.add_run(decision.rationale)
+        else:
+            p.add_run(
+                f"Ordinal rating derived from the continuous inputs against the ADR-0007 triad "
+                f"thresholds (audit-only score {dim.score:.3f})."
+            )
 
 
 def _methods_appendix(doc: DocxDocument, context: DeliverableContext) -> None:
@@ -174,6 +189,37 @@ def _methods_appendix(doc: DocxDocument, context: DeliverableContext) -> None:
         f"Headline platform value V = {to_display(result.composite.v_index):.1f} "
         f"(display scale 0–100)."
     )
+
+    _committee_appendix(doc, context)
+
+
+def _committee_appendix(doc: DocxDocument, context: DeliverableContext) -> None:
+    """Render the Rating Committee's calls on this run's high-stakes ratings — recorded rationale
+    and any dissent (Methodology §8 audit evidence). Absent for an assessment with no high-stakes
+    ratings (nothing needed sign-off)."""
+    if not context.committee_decisions:
+        return
+    doc.add_heading("Rating Committee decisions", level=2)
+    doc.add_paragraph(
+        "High-stakes ratings (a power Established or above, a triad rating above None, a module "
+        "rated Frontier) carry recorded committee sign-off with rationale and dissent — judgment "
+        "disciplined by peer challenge, not formula (Methodology §8)."
+    )
+    for decision in context.committee_decisions:
+        p = doc.add_paragraph(style="List Bullet")
+        p.add_run(
+            f"{decision.item_type.value.title()} '{decision.item_key}' ({decision.rating}) — "
+            f"{decision.status.value}: "
+        ).bold = True
+        p.add_run(decision.rationale)
+        trail = doc.add_paragraph()
+        trail.add_run(
+            f"    Decided by committee member {decision.decided_by_consultant_id} at "
+            f"{decision.decided_at.isoformat()}."
+        )
+        if decision.dissent_note is not None:
+            dissent = doc.add_paragraph()
+            dissent.add_run(f"    Dissent: {decision.dissent_note}").italic = True
 
 
 AI_DRAFTED_LABEL = "AI-DRAFTED"
