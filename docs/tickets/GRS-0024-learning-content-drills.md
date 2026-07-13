@@ -2,7 +2,7 @@
 
 - **Loop:** 5
 - **Branch:** `grs-0024-learning-content-drills`
-- **Status:** Planned
+- **Status:** In review — PR #26
 - **Normative source:** PRD §6 (Workbench); CLAUDE.md #8.
 - **Depends on:** GRS-0023 (progress-tracking hooks).
 
