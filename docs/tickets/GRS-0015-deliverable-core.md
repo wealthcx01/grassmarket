@@ -2,7 +2,7 @@
 
 - **Loop:** 4 (see PRD §9) — first Loop 4 ticket.
 - **Branch:** `grs-0015-deliverable-core`
-- **Status:** In review
+- **Status:** Merged — PR #15
 - **Normative source:** PRD §5 (Deliverable Builder); `docs/ATLAS-Methodology-v1.2.md` §6–§7;
   ADR-0001 (fail loud), ADR-0002 (score/currency separation), ADR-0008 (honest uncertainty),
   CLAUDE.md #8 (AI proposes / humans approve — the approver field is present now).

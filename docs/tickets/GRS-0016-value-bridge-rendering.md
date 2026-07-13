@@ -2,7 +2,7 @@
 
 - **Loop:** 4
 - **Branch:** `grs-0016-value-bridge-rendering`
-- **Status:** In review — PR #16
+- **Status:** Merged — PR #16
 - **Normative source:** Methodology v1.2 §10 (value bridge); PRD §5; ADR-0002 (score/currency separation).
 - **Depends on:** GRS-0006 (value layer), GRS-0015 (builder + client-usable gate).
 

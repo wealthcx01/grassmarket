@@ -2,7 +2,7 @@
 
 - **Loop:** 4 (closes Loop 4)
 - **Branch:** `grs-0019-deliverables-frontend`
-- **Status:** In review — PR #20
+- **Status:** Merged — PR #20
 - **Normative source:** PRD §5; CLAUDE.md #8, #9.
 - **Depends on:** GRS-0015–0018 APIs.
 

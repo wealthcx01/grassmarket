@@ -2,7 +2,7 @@
 
 - **Loop:** 4
 - **Branch:** `grs-0017-ai-draft-narratives`
-- **Status:** In review — PR #17
+- **Status:** Merged — PR #17
 - **Normative source:** PRD §5; CLAUDE.md non-negotiable #8 (AI proposes, humans approve — runtime guarantee).
 - **Depends on:** GRS-0015 (builder, approver fields). ActiveGraph if available; otherwise a minimal proposal/approval model now with an ActiveGraph adapter later (record the choice as an ADR).
 
