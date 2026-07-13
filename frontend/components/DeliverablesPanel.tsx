@@ -12,8 +12,20 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 
 import { ApiError, api } from "@/lib/api";
-import type { Deliverable, DeliverableMode, DeliverableType } from "@/lib/types";
+import type { AINarrative, Deliverable, DeliverableMode, DeliverableType } from "@/lib/types";
 import { NarrativeReview } from "@/components/NarrativeReview";
+
+interface NarrativeSummary {
+  total: number;
+  approved: number;
+  pending: number;
+}
+
+function summariseNarratives(narratives: AINarrative[]): NarrativeSummary {
+  const approved = narratives.filter((n) => n.status === "approved").length;
+  const pending = narratives.filter((n) => n.status !== "approved").length;
+  return { total: narratives.length, approved, pending };
+}
 
 const TYPE_LABEL: Record<DeliverableType, string> = {
   executive_summary: "Executive Summary",
@@ -34,13 +46,6 @@ const GENERATABLE: DeliverableType[] = [
   "technical_appendix",
   "workshop_output",
 ];
-
-const APPROVAL_LABEL: Record<string, string> = {
-  draft: "Draft",
-  pending_approval: "Pending approval",
-  approved: "Approved",
-  rejected: "Rejected",
-};
 
 function triggerBlobDownload(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
@@ -67,16 +72,30 @@ export function DeliverablesPanel({ engagementId }: { engagementId: string }) {
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<{ kind: "error" | "ok"; text: string } | null>(null);
   const [reviewing, setReviewing] = useState<string | null>(null);
+  // Per-deliverable AI-narrative approval status — drives the "not client-ready" gate + the queue.
+  const [narr, setNarr] = useState<Record<string, NarrativeSummary>>({});
 
   const reload = useCallback(
-    (signal?: AbortSignal) =>
-      api
-        .listDeliverables(engagementId, signal)
-        .then(setItems)
-        .catch((err: unknown) => {
-          if (err instanceof ApiError && err.status === 0) return; // backend unreachable; retried elsewhere
-          setLoadError(err instanceof ApiError ? err.message : "Could not load deliverables.");
-        }),
+    async (signal?: AbortSignal) => {
+      try {
+        const list = await api.listDeliverables(engagementId, signal);
+        setItems(list);
+        // Fetch each deliverable's narrative status so the review gate + approval queue are visible.
+        const summaries = await Promise.all(
+          list.map(async (d): Promise<[string, NarrativeSummary]> => {
+            try {
+              return [d.id, summariseNarratives(await api.listNarratives(d.id, signal))];
+            } catch {
+              return [d.id, { total: 0, approved: 0, pending: 0 }];
+            }
+          }),
+        );
+        setNarr(Object.fromEntries(summaries));
+      } catch (err) {
+        if (err instanceof ApiError && err.status === 0) return; // backend unreachable
+        setLoadError(err instanceof ApiError ? err.message : "Could not load deliverables.");
+      }
+    },
     [engagementId],
   );
 
@@ -199,6 +218,29 @@ export function DeliverablesPanel({ engagementId }: { engagementId: string }) {
         </p>
       )}
 
+      {/* Approval queue — the review gate made visible: packs are not client-ready while any AI
+          section is still awaiting sign-off. For junior-tier authors, senior review clears these. */}
+      {(() => {
+        const totalPending = Object.values(narr).reduce((s, x) => s + x.pending, 0);
+        if (totalPending === 0) return null;
+        return (
+          <p
+            style={{
+              fontSize: "0.8rem",
+              margin: "0 0 0.7rem",
+              padding: "0.4rem 0.6rem",
+              borderRadius: "var(--radius)",
+              color: "var(--color-warn)",
+              background: "rgba(138, 90, 0, 0.07)",
+              border: "1px solid rgba(138, 90, 0, 0.25)",
+            }}
+          >
+            {totalPending} AI section{totalPending === 1 ? "" : "s"} awaiting approval — the pack
+            cannot be sent to a client until every section is approved.
+          </p>
+        );
+      })()}
+
       {/* Library */}
       {loadError ? (
         <p role="alert" style={{ color: "var(--color-error)", fontSize: "0.85rem" }}>{loadError}</p>
@@ -228,7 +270,7 @@ export function DeliverablesPanel({ engagementId }: { engagementId: string }) {
                     <ModeBadge mode={d.mode} />
                   </td>
                   <td style={tdStyle}>
-                    {d.ai_generated ? APPROVAL_LABEL[d.approval_status] ?? d.approval_status : "—"}
+                    <NarrativeStatusCell summary={narr[d.id]} />
                   </td>
                   <td className="mono" style={{ ...tdStyle, textAlign: "right", fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
                     {formatWhen(d.generated_at)}
@@ -251,7 +293,7 @@ export function DeliverablesPanel({ engagementId }: { engagementId: string }) {
                 {reviewing === d.id && (
                   <tr>
                     <td colSpan={5} style={{ padding: "0 0.4rem 0.6rem" }}>
-                      <NarrativeReview deliverableId={d.id} />
+                      <NarrativeReview deliverableId={d.id} onNarrativesChanged={() => void reload()} />
                     </td>
                   </tr>
                 )}
@@ -261,6 +303,20 @@ export function DeliverablesPanel({ engagementId }: { engagementId: string }) {
         </table>
       )}
     </section>
+  );
+}
+
+function NarrativeStatusCell({ summary }: { summary?: NarrativeSummary }) {
+  if (!summary || summary.total === 0) {
+    return <span style={{ color: "var(--color-ink-muted)" }}>—</span>;
+  }
+  if (summary.pending === 0) {
+    return <span style={{ color: "var(--color-accent)" }}>Client-ready</span>;
+  }
+  return (
+    <span style={{ color: "var(--color-warn)" }}>
+      {summary.pending} pending · {summary.approved}/{summary.total} approved
+    </span>
   );
 }
 

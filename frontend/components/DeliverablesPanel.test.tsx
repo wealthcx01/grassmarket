@@ -14,6 +14,7 @@ vi.mock("@/lib/api", async (importActual) => {
       listDeliverables: vi.fn(),
       generateDeliverable: vi.fn(),
       downloadDeliverable: vi.fn(),
+      listNarratives: vi.fn(),
     },
   };
 });
@@ -22,6 +23,7 @@ const mocked = api as unknown as {
   listDeliverables: ReturnType<typeof vi.fn>;
   generateDeliverable: ReturnType<typeof vi.fn>;
   downloadDeliverable: ReturnType<typeof vi.fn>;
+  listNarratives: ReturnType<typeof vi.fn>;
 };
 
 function deliverable(over: Partial<Deliverable> = {}): Deliverable {
@@ -48,6 +50,7 @@ function deliverable(over: Partial<Deliverable> = {}): Deliverable {
 describe("DeliverablesPanel (GRS-0019)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocked.listNarratives.mockResolvedValue([]); // no AI narratives unless a test says otherwise
   });
 
   it("lists an engagement's deliverables with a distinct Draft badge", async () => {
@@ -81,6 +84,19 @@ describe("DeliverablesPanel (GRS-0019)", () => {
     );
     // The list reloads and now shows the generated document.
     expect(await screen.findByText("Platform Power Report — Meridian")).toBeTruthy();
+  });
+
+  it("surfaces pending AI sections as a review-gate banner and a not-client-ready row", async () => {
+    mocked.listDeliverables.mockResolvedValue([deliverable({ ai_generated: true })]);
+    mocked.listNarratives.mockResolvedValue([
+      { status: "proposed" } as never,
+      { status: "approved" } as never,
+    ]);
+    render(<DeliverablesPanel engagementId="e1" />);
+    // The queue banner warns the pack is not client-ready while a section is unapproved.
+    expect(await screen.findByText(/awaiting approval/i)).toBeTruthy();
+    // ...and the row shows the count, not "client-ready".
+    expect(await screen.findByText(/1 pending/)).toBeTruthy();
   });
 
   it("surfaces the gate refusal message verbatim, not a status code", async () => {

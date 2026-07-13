@@ -85,3 +85,21 @@ test.describe("GRS-0019 slice 2 — AI narrative review", () => {
     await expect(page.getByText(/Interpretation approved/i)).toBeVisible();
   });
 });
+
+test.describe("GRS-0019 slice 3 — review gate + approval queue", () => {
+  test("unapproved AI sections show the pack as not client-ready", async ({ page }) => {
+    await login(page);
+    await openSeededEngagement(page);
+
+    await page.getByLabel("Deliverable type").selectOption("executive_summary");
+    await page.getByRole("button", { name: "Generate" }).click();
+    await expect(page.getByText(/Generated Executive Summary/i)).toBeVisible();
+
+    await page.getByRole("button", { name: "Review AI" }).first().click();
+    const draft = page.getByRole("button", { name: "Draft AI narratives" });
+    if (await draft.isVisible().catch(() => false)) await draft.click();
+
+    // The review gate is visible: the queue banner warns the pack cannot go to a client yet.
+    await expect(page.getByText(/awaiting approval/i)).toBeVisible();
+  });
+});

@@ -29,7 +29,13 @@ function formatWhen(iso: string | null): string {
   return Number.isNaN(d.getTime()) ? "—" : d.toISOString().slice(0, 16).replace("T", " ");
 }
 
-export function NarrativeReview({ deliverableId }: { deliverableId: string }) {
+export function NarrativeReview({
+  deliverableId,
+  onNarrativesChanged,
+}: {
+  deliverableId: string;
+  onNarrativesChanged?: () => void;
+}) {
   const [items, setItems] = useState<AINarrative[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -60,6 +66,7 @@ export function NarrativeReview({ deliverableId }: { deliverableId: string }) {
       await api.proposeNarratives(deliverableId);
       setNotice({ kind: "ok", text: "AI drafted the interpretation, commentary and recommendation." });
       await reload();
+      onNarrativesChanged?.(); // keep the parent's approval-queue count fresh
     } catch (err) {
       setNotice({
         kind: "error",
@@ -74,8 +81,9 @@ export function NarrativeReview({ deliverableId }: { deliverableId: string }) {
     (text: string) => {
       setNotice({ kind: "ok", text });
       void reload();
+      onNarrativesChanged?.(); // an approval clears a section from the parent's queue
     },
-    [reload],
+    [reload, onNarrativesChanged],
   );
 
   return (
