@@ -1,0 +1,126 @@
+{
+  "$defs": {
+    "QuizQuestion": {
+      "additionalProperties": false,
+      "description": "One quiz question. The answer links back to the section it teaches (question-bank rule).",
+      "properties": {
+        "answer": {
+          "minLength": 1,
+          "title": "Answer",
+          "type": "string"
+        },
+        "methodology_ref": {
+          "minLength": 1,
+          "title": "Methodology Ref",
+          "type": "string"
+        },
+        "prompt": {
+          "minLength": 1,
+          "title": "Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "prompt",
+        "answer",
+        "methodology_ref"
+      ],
+      "title": "QuizQuestion",
+      "type": "object"
+    },
+    "QuizStatus": {
+      "description": "AI-generated content is PROPOSED and reaches an advisor only once APPROVED (#8).",
+      "enum": [
+        "proposed",
+        "approved",
+        "rejected"
+      ],
+      "title": "QuizStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A weekly quiz drafted by AI from Briefing content and gated: never advisor-visible until a\nhuman approves it (non-negotiable #8). Versioned by the drafter that produced it.",
+  "properties": {
+    "approved_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Approved At"
+    },
+    "approved_by_consultant_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Approved By Consultant Id"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "drafter_version": {
+      "minLength": 1,
+      "title": "Drafter Version",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "questions": {
+      "items": {
+        "$ref": "#/$defs/QuizQuestion"
+      },
+      "minItems": 1,
+      "title": "Questions",
+      "type": "array"
+    },
+    "status": {
+      "$ref": "#/$defs/QuizStatus",
+      "default": "proposed"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "title",
+    "questions",
+    "drafter_version"
+  ],
+  "title": "GeneratedQuiz",
+  "type": "object"
+}

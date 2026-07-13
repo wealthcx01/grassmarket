@@ -65,7 +65,18 @@ from bcap_contracts.common import (
 from bcap_contracts.deliverables import ApprovalStatus, Deliverable, DeliverableType
 from bcap_contracts.engagements import Engagement, EngagementStatus, Workshop
 from bcap_contracts.entities import PipelineStage, Prospect
-from bcap_contracts.learning import CertificationProgress, DrillResult
+from bcap_contracts.learning import (
+    CertificationCredit,
+    CertificationProgress,
+    ContentCompletion,
+    DrillCard,
+    DrillResult,
+    GeneratedQuiz,
+    LearningKind,
+    LearningModule,
+    QuizQuestion,
+    QuizStatus,
+)
 from bcap_contracts.money import Currency, Money
 from bcap_contracts.provenance import WeightProvenanceRecord
 from bcap_contracts.registry import (
@@ -154,6 +165,14 @@ __all__ = [
     "CertificationEventKind",
     "CertificationProgress",
     "DrillResult",
+    "DrillCard",
+    "LearningModule",
+    "LearningKind",
+    "CertificationCredit",
+    "ContentCompletion",
+    "GeneratedQuiz",
+    "QuizStatus",
+    "QuizQuestion",
     # auth
     "JWTClaims",
     "Consultant",

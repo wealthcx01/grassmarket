@@ -272,6 +272,103 @@ class AINarrativeORM(Base):
     )
 
 
+class DrillCardORM(Base):
+    """One advisor's SM-2 spaced-repetition state for a drill topic (GRS-0024). Unique per
+    (advisor, topic). Scoped by ``owner_consultant_id`` (the advisor)."""
+
+    __tablename__ = "drill_cards"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    topic: Mapped[str] = mapped_column(String(128), nullable=False)
+    repetitions: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    easiness: Mapped[float] = mapped_column(Float, default=2.5, nullable=False)
+    interval_days: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    due_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    streak: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    last_reviewed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+    __table_args__ = (
+        UniqueConstraint("owner_consultant_id", "topic", name="uq_drill_card_owner_topic"),
+    )
+
+
+class LearningModuleORM(Base):
+    """A shared learning-content item (GRS-0024). Owned by its author; readable org-wide."""
+
+    __tablename__ = "learning_modules"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    kind: Mapped[str] = mapped_column(String(32), nullable=False)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    methodology_ref: Mapped[str] = mapped_column(String(200), nullable=False)
+    certification_credit: Mapped[str] = mapped_column(String(16), default="none", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
+class ContentCompletionORM(Base):
+    """One advisor's completion of a learning module (GRS-0024) — feeds certification evidence.
+    Unique per (advisor, module). Scoped by ``owner_consultant_id`` (the advisor)."""
+
+    __tablename__ = "content_completions"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    module_id: Mapped[UUID] = mapped_column(
+        ForeignKey("learning_modules.id"), index=True, nullable=False
+    )
+    score: Mapped[float | None] = mapped_column(Float, nullable=True)
+    completed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "owner_consultant_id", "module_id", name="uq_content_completion_owner_module"
+        ),
+    )
+
+
+class GeneratedQuizORM(Base):
+    """A weekly AI-drafted quiz (GRS-0024), gated: advisors see it only once APPROVED (#8). Owned by
+    the proposer; the questions are stored as JSON."""
+
+    __tablename__ = "generated_quizzes"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    status: Mapped[str] = mapped_column(String(16), default="proposed", nullable=False)
+    questions_json: Mapped[str] = mapped_column(Text, nullable=False)
+    drafter_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    approved_by_consultant_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
 class CertificationRecordORM(Base):
     """The accumulated certification-ladder evidence for one advisor (GRS-0023, §9). One row per
     consultant (``owner_consultant_id`` unique). The advisor's LEVEL lives on ConsultantORM (and the
