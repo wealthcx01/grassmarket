@@ -30,6 +30,11 @@ from bcap_contracts.auth import (
     LoginRequest,
     TokenResponse,
 )
+from bcap_contracts.calibration import (
+    CalibrationRating,
+    CalibrationResult,
+    CalibrationSession,
+)
 from bcap_contracts.commissions import CommissionLine
 from bcap_contracts.committee import CommitteeDecision, CommitteeItem, CommitteeQueueEntry
 from bcap_contracts.deliverables import Deliverable
@@ -75,6 +80,9 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "CommitteeItem": CommitteeItem,
     "CommitteeDecision": CommitteeDecision,
     "CommitteeQueueEntry": CommitteeQueueEntry,
+    "CalibrationSession": CalibrationSession,
+    "CalibrationRating": CalibrationRating,
+    "CalibrationResult": CalibrationResult,
     "CertificationProgress": CertificationProgress,
     "DrillResult": DrillResult,
     "JWTClaims": JWTClaims,

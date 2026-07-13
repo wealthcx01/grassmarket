@@ -1,0 +1,85 @@
+{
+  "$defs": {
+    "AnchorAgreement": {
+      "additionalProperties": false,
+      "description": "The per-anchor inter-rater result. `kappa_w` is the target (≥0.75); `flagged` is True when it\nis below the 0.6 rewrite threshold (§9). `ac1` is reported alongside (skew-robust).",
+      "properties": {
+        "ac1": {
+          "maximum": 1.0,
+          "minimum": -1.0,
+          "title": "Ac1",
+          "type": "number"
+        },
+        "flagged": {
+          "description": "kappa_w below the 0.6 rewrite threshold (§9).",
+          "title": "Flagged",
+          "type": "boolean"
+        },
+        "kappa_w": {
+          "maximum": 1.0,
+          "minimum": -1.0,
+          "title": "Kappa W",
+          "type": "number"
+        },
+        "n_raters": {
+          "minimum": 2,
+          "title": "N Raters",
+          "type": "integer"
+        },
+        "n_vignettes": {
+          "minimum": 1,
+          "title": "N Vignettes",
+          "type": "integer"
+        },
+        "subcomponent_key": {
+          "title": "Subcomponent Key",
+          "type": "string"
+        }
+      },
+      "required": [
+        "subcomponent_key",
+        "n_raters",
+        "n_vignettes",
+        "kappa_w",
+        "ac1",
+        "flagged"
+      ],
+      "title": "AnchorAgreement",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A closed session's computed agreement, per anchor, plus the flagged-anchor report.",
+  "properties": {
+    "anchors": {
+      "items": {
+        "$ref": "#/$defs/AnchorAgreement"
+      },
+      "title": "Anchors",
+      "type": "array"
+    },
+    "computed_at": {
+      "format": "date-time",
+      "title": "Computed At",
+      "type": "string"
+    },
+    "n_raters": {
+      "minimum": 2,
+      "title": "N Raters",
+      "type": "integer"
+    },
+    "session_id": {
+      "format": "uuid",
+      "title": "Session Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "session_id",
+    "computed_at",
+    "n_raters",
+    "anchors"
+  ],
+  "title": "CalibrationResult",
+  "type": "object"
+}
