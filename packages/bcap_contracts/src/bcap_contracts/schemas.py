@@ -36,6 +36,7 @@ from bcap_contracts.entities import Prospect
 from bcap_contracts.fees import RecoveryFeeAttribution
 from bcap_contracts.learning import CertificationProgress, DrillResult
 from bcap_contracts.money import Money
+from bcap_contracts.narratives import AINarrative
 from bcap_contracts.pipeline import PipelineBoard, PipelineForecast
 from bcap_contracts.provenance import WeightProvenanceRecord
 from bcap_contracts.registry import Registry
@@ -66,6 +67,7 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "Workshop": Workshop,
     "RecoveryFeeAttribution": RecoveryFeeAttribution,
     "Deliverable": Deliverable,
+    "AINarrative": AINarrative,
     "CommissionLine": CommissionLine,
     "CertificationProgress": CertificationProgress,
     "DrillResult": DrillResult,

@@ -9,12 +9,13 @@ document is reproducible. The client-usable gate is enforced BEFORE anything is 
 from __future__ import annotations
 
 import random
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import date
 
 from bcap_contracts.assessments import CoefficientSet
 from bcap_contracts.deliverables import DeliverableMode, DeliverableType
+from bcap_contracts.narratives import AINarrative
 from bcap_contracts.registry import Registry
 from bcap_contracts.uncertainty import UncertaintyModel
 from bcap_contracts.value import ScenarioResult, ValueBridge
@@ -44,7 +45,10 @@ class UnsupportedDeliverableTypeError(ValueError):
 
 @dataclass(frozen=True)
 class _SingleRunSpec:
-    build: Callable[[DeliverableContext, DeliverableMode], bytes]
+    # Every single-run builder takes the same shape; only the Platform Power Report renders the AI
+    # narratives (GRS-0017) into its methods appendix — the others accept and ignore them, so the
+    # dispatcher can pass narratives uniformly.
+    build: Callable[[DeliverableContext, DeliverableMode, Sequence[AINarrative]], bytes]
     title: str
 
 
@@ -97,10 +101,13 @@ def render_diagnostic_document(
     subject: str,
     generated_on: date,
     client_facing: bool,
+    narratives: Sequence[AINarrative] = (),
 ) -> RenderedDeliverable:
     """Render one single-run Diagnostic-pack document. Enforces the client-usable gate first (may
     raise `ClientUsabilityError`), then re-derives the uncertainty bands from the stored inputs
-    (fixed seed → reproducible) and dispatches to the builder for the requested type.
+    (fixed seed → reproducible) and dispatches to the builder for the requested type. Any approved
+    AI narratives are rendered into the Platform Power Report's methods appendix (GRS-0017); other
+    types accept and ignore them.
 
     A type that is not a single-run document (the roadmap, which needs the value bridge; score
     evolution, which needs multiple runs) is refused loud — those have their own render paths."""
@@ -122,7 +129,7 @@ def render_diagnostic_document(
         generated_on=generated_on,
     )
     build = _SINGLE_RUN_BUILDERS[deliverable_type].build
-    return RenderedDeliverable(mode=mode, docx_bytes=build(context, mode))
+    return RenderedDeliverable(mode=mode, docx_bytes=build(context, mode, narratives))
 
 
 def render_platform_power_report(
@@ -135,8 +142,10 @@ def render_platform_power_report(
     subject: str,
     generated_on: date,
     client_facing: bool,
+    narratives: Sequence[AINarrative] = (),
 ) -> RenderedDeliverable:
-    """Render the Platform Power Report (a thin wrapper over `render_diagnostic_document`)."""
+    """Render the Platform Power Report (a thin wrapper over `render_diagnostic_document`). Any
+    approved AI narratives render into its methods appendix with their approval trail (GRS-0017)."""
     return render_diagnostic_document(
         deliverable_type=DeliverableType.PLATFORM_POWER_REPORT,
         inputs=inputs,
@@ -147,6 +156,7 @@ def render_platform_power_report(
         subject=subject,
         generated_on=generated_on,
         client_facing=client_facing,
+        narratives=narratives,
     )
 
 

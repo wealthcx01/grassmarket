@@ -6,10 +6,12 @@ Not Assessed coverage (§3.2). All render deterministically from the immutable s
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from io import BytesIO
 
 from bcap_contracts.common import MaturityLevel, NonScoreState
 from bcap_contracts.deliverables import DeliverableMode
+from bcap_contracts.narratives import AINarrative
 from docx.document import Document as DocxDocument
 from docx.shared import Inches
 
@@ -46,8 +48,13 @@ def _tornado_png(context: DeliverableContext) -> bytes:
 
 
 # --------------------------------------------------------------------- Executive Summary
-def build_executive_summary(context: DeliverableContext, mode: DeliverableMode) -> bytes:
-    """A short, board-ready summary: the headline, the triad, strengths, risks, uncertainty."""
+def build_executive_summary(
+    context: DeliverableContext, mode: DeliverableMode, narratives: Sequence[AINarrative] = ()
+) -> bytes:
+    """A short, board-ready summary: the headline, the triad, strengths, risks, uncertainty. AI
+    narratives are not rendered here (they belong to the Platform Power Report); the parameter
+    keeps the single-run builder signature uniform for the dispatcher."""
+    del narratives
     doc = _start(context, mode, "Executive Summary")
     result = context.result
     unc = context.uncertainty
@@ -100,9 +107,13 @@ def build_executive_summary(context: DeliverableContext, mode: DeliverableMode) 
 
 
 # --------------------------------------------------------------------- Technical Appendix
-def build_technical_appendix(context: DeliverableContext, mode: DeliverableMode) -> bytes:
+def build_technical_appendix(
+    context: DeliverableContext, mode: DeliverableMode, narratives: Sequence[AINarrative] = ()
+) -> bytes:
     """The full auditable detail: versions, weight provenance, per-module gate reasoning, and the
-    L / B / P composition. Extends the GRS-0015 methods appendix (PRD §5)."""
+    L / B / P composition. Extends the GRS-0015 methods appendix (PRD §5). (``narratives`` keeps the
+    single-run builder signature uniform for the dispatcher; not rendered here.)"""
+    del narratives
     doc = _start(context, mode, "Technical Appendix")
     result = context.result
 
@@ -154,10 +165,14 @@ def build_technical_appendix(context: DeliverableContext, mode: DeliverableMode)
 
 
 # --------------------------------------------------------------------- Workshop Output
-def build_workshop_output(context: DeliverableContext, mode: DeliverableMode) -> bytes:
+def build_workshop_output(
+    context: DeliverableContext, mode: DeliverableMode, narratives: Sequence[AINarrative] = ()
+) -> bytes:
     """A pre-engagement workshop template. Tolerates partial data: it reports what is assessed and
     what is still Not Assessed, shows the (wide) uncertainty, and leaves discussion prompts. It
-    never pretends coverage it does not have (§3.2)."""
+    never pretends coverage it does not have (§3.2). (``narratives`` keeps the builder signature
+    uniform for the dispatcher; not rendered here.)"""
+    del narratives
     doc = _start(context, mode, "Workshop Output")
     result = context.result
 

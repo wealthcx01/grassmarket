@@ -25,7 +25,8 @@ from docx.shared import Inches
 
 from grassmarket.deliverables.builder import _apply_draft_watermark
 from grassmarket.deliverables.charts import priority_cost_scatter
-from grassmarket.deliverables.money_text import _SYMBOL, format_money
+from grassmarket.deliverables.money_text import currency_symbol, format_money, major_units
+from grassmarket.deliverables.uncertainty_text import to_display
 
 _LEVER_LABEL = {
     LeverKind.COST_TO_SERVE: "Cost to serve",
@@ -84,7 +85,7 @@ class RoadmapContext:
 
 def _delta_points(delta_v: float) -> str:
     """ΔV on the 0–100 display scale, always signed."""
-    return f"{delta_v * 100:+.1f}"
+    return f"{to_display(delta_v):+.1f}"
 
 
 def build_modernisation_roadmap(context: RoadmapContext, mode: DeliverableMode) -> bytes:
@@ -191,9 +192,9 @@ def _scatter_section(doc: DocxDocument, context: RoadmapContext) -> None:
     ordered = sorted(context.entries, key=lambda e: e.rank)
     png = priority_cost_scatter(
         labels=[e.name for e in ordered],
-        costs_major=[e.cost.amount_minor / 100 for e in ordered],
-        priority_points=[e.delta_v * 100 for e in ordered],
-        currency_symbol=_SYMBOL[context.bridge.cost.total.currency],
+        costs_major=[major_units(e.cost) for e in ordered],
+        priority_points=[to_display(e.delta_v) for e in ordered],
+        currency_symbol=currency_symbol(context.bridge.cost.total.currency),
     )
     doc.add_picture(BytesIO(png), width=Inches(6.0))
 

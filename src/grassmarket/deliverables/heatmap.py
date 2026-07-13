@@ -8,10 +8,12 @@ lighter fill. The fills are exposed as constants so the rendering test can asser
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from io import BytesIO
 
 from bcap_contracts.common import MaturityLevel, NonScoreState
 from bcap_contracts.deliverables import DeliverableMode
+from bcap_contracts.narratives import AINarrative
 from docx.document import Document as DocxDocument
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -69,8 +71,12 @@ def cell_fill(cell: _Cell) -> str | None:
     return None if shd is None else shd.get(qn("w:fill"))
 
 
-def build_infrastructure_heatmap(context: DeliverableContext, mode: DeliverableMode) -> bytes:
-    """Render the Infrastructure Heatmap to .docx bytes."""
+def build_infrastructure_heatmap(
+    context: DeliverableContext, mode: DeliverableMode, narratives: Sequence[AINarrative] = ()
+) -> bytes:
+    """Render the Infrastructure Heatmap to .docx bytes. (``narratives`` keeps the single-run
+    builder signature uniform for the dispatcher; not rendered here.)"""
+    del narratives
     doc = start_document(
         title="Infrastructure Heatmap",
         subject=context.subject,

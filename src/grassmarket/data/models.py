@@ -228,6 +228,39 @@ class DeliverableORM(Base):
     )
 
 
+class AINarrativeORM(Base):
+    """One AI-drafted, human-gated deliverable section (GRS-0017, non-negotiable #8). Bound to a
+    deliverable + finalised scoring run; carries the proposal, its versioned attribution, and — once
+    signed off — the approval trail (approver, timestamp, final text, edit diff). Scoped by
+    ``owner_consultant_id`` like every owned resource."""
+
+    __tablename__ = "ai_narratives"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    # THE scoping column — every read/list/write is filtered by this in the repository layer.
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    deliverable_id: Mapped[UUID] = mapped_column(
+        ForeignKey("deliverables.id"), index=True, nullable=False
+    )
+    scoring_run_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    section: Mapped[str] = mapped_column(String(20), nullable=False)
+    status: Mapped[str] = mapped_column(String(20), default="proposed", nullable=False)
+    proposed_text: Mapped[str] = mapped_column(Text, nullable=False)
+    drafter_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    prompt_template_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    author_tier: Mapped[ConsultantTier] = mapped_column(String(32), nullable=False)
+    final_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    approved_by_consultant_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    edit_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
 class ScoringRunORM(Base):
     """An immutable, versioned, content-hashed scoring run (CLAUDE.md non-negotiable #6).
 

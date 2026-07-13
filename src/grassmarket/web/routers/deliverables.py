@@ -8,12 +8,14 @@ set is refused (409). Every handler is scoped through the repository (cross-owne
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Sequence
 from datetime import UTC, date, datetime
 from io import BytesIO
 from uuid import UUID
 
 from bcap_contracts.assessments import AssessmentState
 from bcap_contracts.deliverables import Deliverable, DeliverableMode, DeliverableType
+from bcap_contracts.narratives import AINarrative
 from bcap_contracts.registry import load_registry
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
@@ -30,7 +32,11 @@ from grassmarket.data.repository import (
     ScopeViolationError,
     StoredScoringRun,
 )
-from grassmarket.deliverables.gate import ClientUsabilityError
+from grassmarket.deliverables.gate import (
+    ClientUsabilityError,
+    UnapprovedNarrativeError,
+    assert_narratives_approved,
+)
 from grassmarket.deliverables.service import (
     RenderedDeliverable,
     UnsupportedDeliverableTypeError,
@@ -84,6 +90,7 @@ def _render(
     deliverable_type: DeliverableType,
     client_facing: bool,
     generated_on: date,
+    narratives: Sequence[AINarrative] = (),
 ) -> RenderedDeliverable:
     registry = load_registry()
     inputs = AssessmentInputs.model_validate_json(record.inputs_json)
@@ -98,6 +105,7 @@ def _render(
         subject=subject,
         generated_on=generated_on,
         client_facing=client_facing,
+        narratives=narratives,
     )
 
 
@@ -174,6 +182,7 @@ def list_deliverables(
 @router.get("/deliverables/{deliverable_id}/download")
 def download_deliverable(
     deliverable_id: UUID,
+    client_facing: bool = False,
     principal: Principal = Depends(get_current_principal),
     repo: Repository = Depends(get_repository),
 ) -> StreamingResponse:
@@ -185,10 +194,19 @@ def download_deliverable(
     if deliverable.scoring_run_id is None:
         raise _not_found("Deliverable has no scoring run to render from.")
 
+    # The client pack is client-facing if the deliverable was rendered in CLIENT mode OR the caller
+    # explicitly asks for a client-facing download. Either way, the GRS-0017 gate runs FIRST: an
+    # unapproved AI narrative refuses the client pack (409) before anything is rendered (#8).
+    client_facing = client_facing or deliverable.mode is DeliverableMode.CLIENT
+    narratives = repo.list_narratives(principal, deliverable_id)
+    try:
+        assert_narratives_approved(narratives, client_facing=client_facing)
+    except UnapprovedNarrativeError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+
     record = repo.get_scoring_run_record(principal, deliverable.scoring_run_id)
     subject = repo.get_prospect(principal, engagement.prospect_id).company_name
     generated_on = (deliverable.generated_at or datetime.now(UTC)).date()
-    client_facing = deliverable.mode is DeliverableMode.CLIENT
     try:
         rendered = _render(
             record,
@@ -196,6 +214,7 @@ def download_deliverable(
             deliverable_type=deliverable.type,
             client_facing=client_facing,
             generated_on=generated_on,
+            narratives=narratives,
         )
     except ClientUsabilityError as exc:
         # Defense in depth — if the set is no longer client-usable, refuse on download too.

@@ -8,8 +8,12 @@ internal documents. Never silently produce a client pack on draft coefficients.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 from bcap_contracts.assessments import CoefficientSet
+from bcap_contracts.common import ConsultantTier
 from bcap_contracts.deliverables import DeliverableMode
+from bcap_contracts.narratives import AINarrative, NarrativeStatus
 
 
 class ClientUsabilityError(Exception):
@@ -17,7 +21,50 @@ class ClientUsabilityError(Exception):
     A runtime refusal — the fail-safe that keeps a draft-weighted pack away from a client."""
 
 
+class UnapprovedNarrativeError(Exception):
+    """A client-facing pack was requested while it still contains an AI narrative that is not
+    APPROVED. The GRS-0017 gate extension: AI content never reaches a client unsigned (#8)."""
+
+
+class SeniorApprovalError(Exception):
+    """A narrative authored under a junior tier (Venture Associate / Advisor) was approved without
+    senior (Consultant-tier) sign-off — the PRD §5 quality-review gate refuses it."""
+
+
 DRAFT_WATERMARK = "DRAFT — not client-usable"
+
+# Seniority ordering (ADR-0009). VA and Advisor authors need a Consultant-tier approver; a
+# Consultant may self-approve. Revisit here if the PRD later splits "early-tier" Advisors out.
+_TIER_RANK = {
+    ConsultantTier.VENTURE_ASSOCIATE: 0,
+    ConsultantTier.ADVISOR: 1,
+    ConsultantTier.CONSULTANT: 2,
+}
+_SENIOR_RANK = _TIER_RANK[ConsultantTier.CONSULTANT]
+
+
+def assert_narratives_approved(narratives: Iterable[AINarrative], *, client_facing: bool) -> None:
+    """Refuse a client-facing pack that still carries any not-APPROVED AI narrative. Watermarked
+    internal documents are allowed (each draft is labelled AI-DRAFTED at render time)."""
+    if not client_facing:
+        return
+    unapproved = [n for n in narratives if n.status is not NarrativeStatus.APPROVED]
+    if unapproved:
+        sections = ", ".join(sorted(n.section.value for n in unapproved))
+        raise UnapprovedNarrativeError(
+            f"Refusing a client-facing pack: {len(unapproved)} AI narrative section(s) not "
+            f"approved ({sections}). Every AI-drafted section needs consultant sign-off first (#8)."
+        )
+
+
+def assert_senior_approval(*, author_tier: ConsultantTier, approver_tier: ConsultantTier) -> None:
+    """The quality-review gate (PRD §5): a narrative authored under a junior tier requires a
+    senior (Consultant-tier) approver. A Consultant-tier author may self-approve."""
+    if _TIER_RANK[author_tier] < _SENIOR_RANK and _TIER_RANK[approver_tier] < _SENIOR_RANK:
+        raise SeniorApprovalError(
+            f"A narrative authored under tier '{author_tier.value}' requires senior "
+            f"(Consultant-tier) approval; approver tier '{approver_tier.value}' is not senior."
+        )
 
 
 def resolve_mode(coefficients: CoefficientSet, *, client_facing: bool) -> DeliverableMode:
