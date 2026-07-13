@@ -71,6 +71,16 @@ from bcap_contracts.fees import (
     RecoveryFeeConfig,
     load_recovery_fee_config,
 )
+from bcap_contracts.learning import (
+    CertificationCredit,
+    ContentCompletion,
+    DrillCard,
+    GeneratedQuiz,
+    LearningKind,
+    LearningModule,
+    QuizQuestion,
+    QuizStatus,
+)
 from bcap_contracts.money import Currency, Money
 from bcap_contracts.narratives import AINarrative, NarrativeSection, NarrativeStatus
 from bcap_contracts.pipeline import assert_legal_transition
@@ -89,9 +99,13 @@ from grassmarket.data.models import (
     CommitteeDecisionORM,
     CommsLogEntryORM,
     ConsultantORM,
+    ContentCompletionORM,
     DeliverableORM,
+    DrillCardORM,
     EngagementORM,
+    GeneratedQuizORM,
     InvitationORM,
+    LearningModuleORM,
     ModuleRatingDraftORM,
     ProspectORM,
     RecoveryFeeAttributionORM,
@@ -101,6 +115,7 @@ from grassmarket.data.models import (
 from grassmarket.pipeline.fees import attribution_content_hash, is_within_attribution_window
 from grassmarket.workbench.calibration import compute_calibration_result
 from grassmarket.workbench.certification import next_level, promotion_blockers
+from grassmarket.workbench.drills import PASSING_GRADE, DrillState, next_due, review
 
 # Stages at which a prospect is "contracted or beyond" — the only prospects an engagement may link.
 _ENGAGEABLE_STAGES = frozenset(
@@ -1856,6 +1871,277 @@ class Repository:
             reason=row.reason,
             recorded_by_consultant_id=row.recorded_by_consultant_id,
             occurred_at=row.occurred_at,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    # ------------------------------------------------- Power Drills (SCOPED, SM-2, GRS-0024)
+    # Each advisor owns their own spaced-repetition cards; answering one reschedules it by SM-2. The
+    # clock is injected (never `datetime.now()` inside), so the schedule is deterministic in tests.
+
+    def create_drill_card(self, principal: Principal, *, topic: str, now: datetime) -> DrillCard:
+        """Add a drill card for the caller over a topic — due immediately. One card per topic."""
+        row = DrillCardORM(
+            owner_consultant_id=principal.consultant_id,
+            topic=topic,
+            due_at=now,
+        )
+        self._session.add(row)
+        try:
+            self._session.flush()
+        except IntegrityError as exc:
+            self._session.rollback()
+            raise ConflictError(f"You already have a drill card for {topic!r}.") from exc
+        return self._to_drill_card(row)
+
+    def list_drill_cards(self, principal: Principal) -> list[DrillCard]:
+        rows = (
+            self._session.execute(
+                select(DrillCardORM)
+                .where(DrillCardORM.owner_consultant_id == principal.consultant_id)
+                .order_by(DrillCardORM.due_at)
+            )
+            .scalars()
+            .all()
+        )
+        return [self._to_drill_card(r) for r in rows]
+
+    def list_due_drill_cards(self, principal: Principal, *, now: datetime) -> list[DrillCard]:
+        """The caller's cards that are due for review (due_at ≤ now)."""
+        rows = (
+            self._session.execute(
+                select(DrillCardORM)
+                .where(
+                    DrillCardORM.owner_consultant_id == principal.consultant_id,
+                    DrillCardORM.due_at <= now,
+                )
+                .order_by(DrillCardORM.due_at)
+            )
+            .scalars()
+            .all()
+        )
+        return [self._to_drill_card(r) for r in rows]
+
+    def answer_drill_card(
+        self, principal: Principal, card_id: UUID, *, grade: int, now: datetime
+    ) -> DrillCard:
+        """Review the caller's own card at recall-quality `grade` — reschedule by SM-2, update the
+        streak (a pass extends it, a lapse resets it), and stamp the review time."""
+        row = self._session.get(DrillCardORM, card_id)
+        if row is None:
+            raise NotFoundError(f"Drill card {card_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+
+        new_state = review(
+            DrillState(
+                repetitions=row.repetitions,
+                easiness=row.easiness,
+                interval_days=row.interval_days,
+            ),
+            grade,
+        )
+        row.repetitions = new_state.repetitions
+        row.easiness = new_state.easiness
+        row.interval_days = new_state.interval_days
+        row.due_at = next_due(now, new_state)
+        row.streak = row.streak + 1 if grade >= PASSING_GRADE else 0
+        row.last_reviewed_at = now
+        self._session.add(row)
+        self._session.flush()
+        return self._to_drill_card(row)
+
+    # ------------------------------------------------- learning content (feeds certification)
+    def create_learning_module(
+        self,
+        principal: Principal,
+        *,
+        kind: LearningKind,
+        title: str,
+        methodology_ref: str,
+        certification_credit: CertificationCredit = CertificationCredit.NONE,
+    ) -> LearningModule:
+        """Author a shared learning module (admin)."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may author learning content (PRD §6).")
+        row = LearningModuleORM(
+            owner_consultant_id=principal.consultant_id,
+            kind=kind.value,
+            title=title,
+            methodology_ref=methodology_ref,
+            certification_credit=certification_credit.value,
+        )
+        self._session.add(row)
+        self._session.flush()
+        return self._to_learning_module(row)
+
+    def list_learning_modules(self, principal: Principal) -> list[LearningModule]:
+        """All learning modules — shared content, visible org-wide."""
+        rows = (
+            self._session.execute(select(LearningModuleORM).order_by(LearningModuleORM.created_at))
+            .scalars()
+            .all()
+        )
+        return [self._to_learning_module(r) for r in rows]
+
+    def complete_learning_module(
+        self, principal: Principal, module_id: UUID, *, score: float | None, now: datetime
+    ) -> ContentCompletion:
+        """The caller completes a learning module. If the module grants a certification credit, the
+        evidence is applied to the caller's certification record and audited — self-service, but
+        only for COURSEWORK (binary and platform-verifiable). An exam score is objective and never
+        self-attested: the certification exam is proctored/admin-recorded (GRS-0023, ADR-0014). A
+        practice-exam `score` is stored on the completion for the advisor's own tracking only. One
+        completion per (advisor, module)."""
+        module = self._session.get(LearningModuleORM, module_id)
+        if module is None:
+            raise NotFoundError(f"Learning module {module_id} not found.")
+        credit = CertificationCredit(module.certification_credit)
+
+        completion = ContentCompletionORM(
+            owner_consultant_id=principal.consultant_id,
+            module_id=module_id,
+            score=score,
+            completed_at=now,
+        )
+        self._session.add(completion)
+        try:
+            self._session.flush()
+        except IntegrityError as exc:
+            self._session.rollback()
+            raise ConflictError("You have already completed this module.") from exc
+
+        if credit is CertificationCredit.COURSEWORK:
+            self._apply_coursework_credit(principal.consultant_id, now)
+        return self._to_content_completion(completion)
+
+    def _apply_coursework_credit(self, advisor_id: UUID, now: datetime) -> None:
+        """Grant the self-service coursework credit to the advisor's certification record, audited.
+        (Never the exam credit — that is proctored/admin-only, GRS-0023.)"""
+        record = self._get_or_create_cert_record(advisor_id)
+        record.coursework_complete = True
+        self._append_cert_event(
+            advisor_id,
+            CertificationEventKind.COURSEWORK_COMPLETED,
+            advisor_id,
+            now,
+            detail="via learning module",
+        )
+        self._session.flush()
+
+    # ------------------------------------------------- the weekly quiz (AI-drafted, gated, #8)
+    def propose_quiz(
+        self,
+        principal: Principal,
+        *,
+        title: str,
+        questions: Sequence[QuizQuestion],
+        drafter_version: str,
+    ) -> GeneratedQuiz:
+        """Store an AI-drafted quiz as a PROPOSAL (admin). Never advisor-visible until approved."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may propose a weekly quiz.")
+        row = GeneratedQuizORM(
+            owner_consultant_id=principal.consultant_id,
+            title=title,
+            status=QuizStatus.PROPOSED.value,
+            questions_json=json.dumps([q.model_dump(mode="json") for q in questions]),
+            drafter_version=drafter_version,
+        )
+        self._session.add(row)
+        self._session.flush()
+        return self._to_generated_quiz(row)
+
+    def decide_quiz(
+        self, principal: Principal, quiz_id: UUID, *, approve: bool, now: datetime
+    ) -> GeneratedQuiz:
+        """Approve or reject a proposed quiz (admin). Approval makes it advisor-visible (#8)."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may approve or reject a quiz.")
+        row = self._session.get(GeneratedQuizORM, quiz_id)
+        if row is None:
+            raise NotFoundError(f"Quiz {quiz_id} not found.")
+        if row.status != QuizStatus.PROPOSED.value:
+            raise ConflictError(f"Quiz {quiz_id} is already {row.status}.")
+        if approve:
+            row.status = QuizStatus.APPROVED.value
+            row.approved_by_consultant_id = principal.consultant_id
+            row.approved_at = now
+        else:
+            row.status = QuizStatus.REJECTED.value
+        self._session.add(row)
+        self._session.flush()
+        return self._to_generated_quiz(row)
+
+    def list_quizzes(self, principal: Principal) -> list[GeneratedQuiz]:
+        """An admin sees every quiz; an advisor sees ONLY approved ones — unapproved AI content
+        never reaches an advisor (#8)."""
+        stmt = select(GeneratedQuizORM)
+        if not principal.is_admin:
+            stmt = stmt.where(GeneratedQuizORM.status == QuizStatus.APPROVED.value)
+        rows = self._session.execute(stmt.order_by(GeneratedQuizORM.created_at)).scalars().all()
+        return [self._to_generated_quiz(r) for r in rows]
+
+    def get_quiz(self, principal: Principal, quiz_id: UUID) -> GeneratedQuiz:
+        row = self._session.get(GeneratedQuizORM, quiz_id)
+        if row is None:
+            raise NotFoundError(f"Quiz {quiz_id} not found.")
+        # A non-admin may only reach an APPROVED quiz — an unapproved one is hidden (#8).
+        if not principal.is_admin and row.status != QuizStatus.APPROVED.value:
+            raise NotFoundError(f"Quiz {quiz_id} not found.")
+        return self._to_generated_quiz(row)
+
+    @staticmethod
+    def _to_drill_card(row: DrillCardORM) -> DrillCard:
+        return DrillCard(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            topic=row.topic,
+            repetitions=row.repetitions,
+            easiness=row.easiness,
+            interval_days=row.interval_days,
+            due_at=row.due_at,
+            streak=row.streak,
+            last_reviewed_at=row.last_reviewed_at,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    @staticmethod
+    def _to_learning_module(row: LearningModuleORM) -> LearningModule:
+        return LearningModule(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            kind=LearningKind(row.kind),
+            title=row.title,
+            methodology_ref=row.methodology_ref,
+            certification_credit=CertificationCredit(row.certification_credit),
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    @staticmethod
+    def _to_content_completion(row: ContentCompletionORM) -> ContentCompletion:
+        return ContentCompletion(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            module_id=row.module_id,
+            score=row.score,
+            completed_at=row.completed_at,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    @staticmethod
+    def _to_generated_quiz(row: GeneratedQuizORM) -> GeneratedQuiz:
+        return GeneratedQuiz(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            title=row.title,
+            status=QuizStatus(row.status),
+            questions=tuple(QuizQuestion.model_validate(q) for q in json.loads(row.questions_json)),
+            drafter_version=row.drafter_version,
+            approved_by_consultant_id=row.approved_by_consultant_id,
+            approved_at=row.approved_at,
             created_at=row.created_at,
             updated_at=row.updated_at,
         )

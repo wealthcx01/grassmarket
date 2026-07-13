@@ -1,0 +1,61 @@
+{
+  "additionalProperties": false,
+  "description": "One advisor's completion of a learning module. `owner_consultant_id` is the advisor; a\nself-assessment `score` may be recorded for a practice exam quiz (their own tracking — it does\nNOT feed certification, which uses proctored scores). Completion is what feeds coursework\nevidence.",
+  "properties": {
+    "completed_at": {
+      "format": "date-time",
+      "title": "Completed At",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "module_id": {
+      "format": "uuid",
+      "title": "Module Id",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "score": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Score"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "module_id",
+    "completed_at"
+  ],
+  "title": "ContentCompletion",
+  "type": "object"
+}

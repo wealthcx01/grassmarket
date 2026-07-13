@@ -42,7 +42,14 @@ from bcap_contracts.deliverables import Deliverable
 from bcap_contracts.engagements import CommsLogEntry, Engagement, Workshop
 from bcap_contracts.entities import Prospect
 from bcap_contracts.fees import RecoveryFeeAttribution
-from bcap_contracts.learning import CertificationProgress, DrillResult
+from bcap_contracts.learning import (
+    CertificationProgress,
+    ContentCompletion,
+    DrillCard,
+    DrillResult,
+    GeneratedQuiz,
+    LearningModule,
+)
 from bcap_contracts.money import Money
 from bcap_contracts.narratives import AINarrative
 from bcap_contracts.pipeline import PipelineBoard, PipelineForecast
@@ -88,6 +95,10 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "CertificationEvent": CertificationEvent,
     "CertificationProgress": CertificationProgress,
     "DrillResult": DrillResult,
+    "DrillCard": DrillCard,
+    "LearningModule": LearningModule,
+    "ContentCompletion": ContentCompletion,
+    "GeneratedQuiz": GeneratedQuiz,
     "JWTClaims": JWTClaims,
     "Consultant": Consultant,
     "Invitation": Invitation,
