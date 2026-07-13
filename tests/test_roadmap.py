@@ -28,7 +28,7 @@ from docx import Document
 from grassmarket.assessments.service import compute_score
 from grassmarket.atlas.draft_coefficients import draft_v1_coefficient_set
 from grassmarket.atlas.montecarlo import draft_v1_uncertainty_model
-from grassmarket.deliverables.gate import ClientUsabilityError
+from grassmarket.deliverables.gate import DRAFT_WATERMARK, ClientUsabilityError
 from grassmarket.deliverables.money_text import format_money
 from grassmarket.deliverables.roadmap import (
     RoadmapContext,
@@ -266,6 +266,11 @@ def test_every_lever_npv_traces_to_a_printed_assumption() -> None:
     # Every register entry (ref + its source) renders.
     for a in ctx.bridge.assumption_register.entries:
         assert a.ref in text and a.source in text
+    # ...and the actual money figures land on the page (a blank/garbled column would else pass).
+    for lever in ctx.bridge.levers:
+        assert format_money(lever.npv) in text
+    for entry in ctx.entries:
+        assert format_money(entry.cost) in text
 
 
 def test_scatter_chart_is_embedded() -> None:
@@ -324,12 +329,38 @@ def test_intervention_cost_citing_missing_assumption_refuses() -> None:
         )
 
 
-def test_roadmap_is_byte_reproducible() -> None:
-    # Same finalised inputs → byte-identical document (the reproducibility the docstrings claim).
+def test_roadmap_content_is_reproducible() -> None:
+    # Two INDEPENDENT context builds (full compute chain — scoring, scenarios, prioritisation,
+    # chart) → identical CONTENT. Building from one shared ctx would only prove build() is pure;
+    # running the chain twice proves the chain itself is deterministic.
+    #
+    # Note: the guarantee is on the rendered CONTENT, not the raw .docx bytes — python-docx stamps
+    # each zip entry with the wall clock, so two saves >2s apart differ in bytes while being
+    # identical documents. The reproducibility contract is the run's data + this content, and the
+    # embedded chart PNG is separately byte-deterministic (see charts tests).
+    first = build_modernisation_roadmap(_context(), DeliverableMode.DRAFT_INTERNAL)
+    second = build_modernisation_roadmap(_context(), DeliverableMode.DRAFT_INTERNAL)
+    assert _all_text(first) == _all_text(second)
+
+
+def test_roadmap_handles_a_lever_less_bridge() -> None:
+    # The contract permits a bridge with no levers; the builder must guard total_lever_npv() (which
+    # refuses an empty tuple) rather than crash mid-render. This exercises that fail-safe branch.
     ctx = _context()
-    first = build_modernisation_roadmap(ctx, DeliverableMode.DRAFT_INTERNAL)
-    second = build_modernisation_roadmap(ctx, DeliverableMode.DRAFT_INTERNAL)
-    assert first == second
+    bare = ctx.bridge.model_copy(update={"levers": ()})
+    ctx2 = RoadmapContext(
+        subject=ctx.subject,
+        bridge=bare,
+        entries=ctx.entries,
+        scenarios=ctx.scenarios,
+        engine_version=ctx.engine_version,
+        methodology_version=ctx.methodology_version,
+        coefficient_version=ctx.coefficient_version,
+        uncertainty_version=ctx.uncertainty_version,
+        generated_on=ctx.generated_on,
+    )
+    text = _all_text(build_modernisation_roadmap(ctx2, DeliverableMode.DRAFT_INTERNAL))
+    assert "No evidenced levers recorded" in text
 
 
 # ---------------------------------------------------------------- gate + watermark (from GRS-0015)
@@ -337,7 +368,7 @@ def test_roadmap_draft_is_watermarked() -> None:
     data = build_modernisation_roadmap(_context(), DeliverableMode.DRAFT_INTERNAL)
     doc = Document(BytesIO(data))
     header = "\n".join(p.text for s in doc.sections for p in s.header.paragraphs)
-    assert "DRAFT — not client-usable" in header
+    assert DRAFT_WATERMARK in header
 
 
 def test_service_gate_refuses_client_pack_on_draft_set() -> None:
@@ -375,6 +406,10 @@ def test_service_allows_client_pack_on_client_usable_set() -> None:
     )
     assert rendered.mode is DeliverableMode.CLIENT
     assert rendered.docx_bytes[:2] == b"PK"
+    # A client pack is clean — the DRAFT watermark must NOT appear (the whole point of the gate).
+    doc = Document(BytesIO(rendered.docx_bytes))
+    header = "\n".join(p.text for s in doc.sections for p in s.header.paragraphs)
+    assert DRAFT_WATERMARK not in header
 
 
 # ---------------------------------------------------------------- money formatting

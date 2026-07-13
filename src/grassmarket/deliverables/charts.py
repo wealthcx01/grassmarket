@@ -56,7 +56,9 @@ def priority_cost_scatter(
         fig.tight_layout()
         buffer = BytesIO()
         # metadata={"Software": None} strips matplotlib's version stamp so the same inputs render
-        # byte-identical PNGs (reproducibility — a deliverable regenerates the same on any host).
+        # byte-identical PNGs within a pinned matplotlib/freetype (glyph rasterisation can differ
+        # across those versions, so this is not a cross-host guarantee — the run's DATA is the
+        # reproducibility contract; the chart image is a rendering of it).
         fig.savefig(buffer, format="png", dpi=150, metadata={"Software": None})
         return buffer.getvalue()
     finally:
