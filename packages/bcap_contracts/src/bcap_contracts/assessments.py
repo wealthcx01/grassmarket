@@ -250,6 +250,18 @@ class SubcomponentRating(BaseModel):
             raise ValueError("An assessed subcomponent (level set) requires an evidence_grade.")
         return self
 
+    @model_validator(mode="after")
+    def _consensus_and_dissent_are_consistent(self) -> SubcomponentRating:
+        """Consensus (raters agreed) and a dissent note are mutually exclusive: a note is recorded
+        precisely when raters DIFFERED and one yielded (Methodology §9). The ≥2-rater requirement
+        for a deliverable is enforced at finalisation (a draft/partial rating carries no raters)."""
+        if self.consensus and self.dissent_note is not None:
+            raise ValueError(
+                "A consensus rating (raters agreed) carries no dissent note; a dissent note means "
+                "consensus=False — the raters differed and one yielded (Methodology §9)."
+            )
+        return self
+
 
 class PowerAssessment(BaseModel):
     """Per-power evidence (Methodology §8): dual Benefit + Barrier, strength, trend, lifecycle."""
@@ -376,6 +388,42 @@ class Assessment(OwnedResource):
     methodology_version: str | None = None
     coefficient_version: str | None = None
     uncertainty_version: str | None = None
+
+
+# --- Dual-rating governance (Methodology §9) --------------------------------------------
+
+
+class ModuleRatingDraft(OwnedResource):
+    """One rater's INDEPENDENT rating of one module's subcomponents (Methodology §9 dual rating).
+
+    `owner_consultant_id` is the rater. A module needs ≥2 of these before its subcomponents can
+    reach consensus and be finalised — "solo ratings are drafts, never deliverables". Blind by
+    construction: the repository refuses to show a rater a co-rater's draft until every assigned
+    rater on the module has submitted, so the second opinion is genuinely independent. `submitted`
+    locks the draft; the lead then resolves consensus per subcomponent."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    assessment_id: UUID
+    module_key: str
+    ratings: tuple[SubcomponentRating, ...] = ()
+    submitted: bool = False
+    submitted_at: datetime | None = None
+
+    @model_validator(mode="after")
+    def _ratings_belong_to_this_module_and_submit_is_stamped(self) -> ModuleRatingDraft:
+        stray = sorted({r.module_key for r in self.ratings if r.module_key != self.module_key})
+        if stray:
+            raise ValueError(
+                f"Every rating in a module draft must carry this draft's module_key "
+                f"({self.module_key!r}); found stray module_key(s) {stray}."
+            )
+        if self.submitted != (self.submitted_at is not None):
+            raise ValueError(
+                "A submitted draft carries a submitted_at timestamp, and an unsubmitted one "
+                "carries none — the two move together."
+            )
+        return self
 
 
 # --- Live-score response (the wizard's live panel) --------------------------------------

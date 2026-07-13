@@ -20,6 +20,7 @@ from bcap_contracts.assessments import (
     LiveScore,
     MetricEntry,
     PowerEntry,
+    SubcomponentRating,
 )
 from bcap_contracts.common import NonScoreState, StrengthRating
 from bcap_contracts.registry import Registry
@@ -82,12 +83,52 @@ def scoreability_blockers(document: AssessmentDocument, registry: Registry) -> l
     return blockers
 
 
+def consensus_blockers(document: AssessmentDocument) -> list[str]:
+    """What dual-rating governance still blocks finalisation (Methodology §9). Every ASSESSED
+    subcomponent (level set) must carry a resolved consensus: two raters and either agreement
+    (`consensus=True`) or a documented dissent. A solo-rated subcomponent is a draft, never a
+    deliverable — so a document with one blocks the whole finalisation, loudly. Not Assessed / Not
+    Applicable subcomponents carry no rating and are exempt."""
+    blockers: list[str] = []
+    for r in document.subcomponents:
+        if r.level is None:
+            continue
+        if len(set(r.rater_ids)) < 2:
+            blockers.append(
+                f"{r.module_key}/{r.subcomponent_key} is solo-rated — Methodology §9 requires two "
+                f"independent raters and a resolved consensus."
+            )
+        elif not r.consensus and r.dissent_note is None:
+            blockers.append(
+                f"{r.module_key}/{r.subcomponent_key} has neither a recorded consensus nor a "
+                f"documented dissent."
+            )
+    return blockers
+
+
+def module_rating_errors(
+    module_key: str, ratings: tuple[SubcomponentRating, ...], registry: Registry
+) -> list[str]:
+    """Validate a rater's (or a consensus) rating set against the registry: the module must exist
+    and every subcomponent must belong to it. Fail loud — an unknown key is never scored around."""
+    from bcap_contracts.registry import RegistryError
+
+    try:
+        module = registry.require_module(module_key)
+    except RegistryError as exc:
+        return [str(exc)]
+    valid = {s.key for s in module.subcomponents}
+    return [
+        f"Subcomponent {r.subcomponent_key!r} is not part of module {module_key!r}."
+        for r in ratings
+        if r.subcomponent_key not in valid
+    ]
+
+
 def _complete_inputs(document: AssessmentDocument, registry: Registry) -> AssessmentInputs:
     """Build full engine inputs from a partial document: unrated subcomponents and unobserved
     metrics become Not Assessed (first-class); powers are taken as given (scoreability ensures 7).
     """
-    from bcap_contracts.assessments import SubcomponentRating
-
     doc_subs = {r.subcomponent_key: r for r in document.subcomponents}
     subs: list[SubcomponentRating] = []
     for module in registry.modules:

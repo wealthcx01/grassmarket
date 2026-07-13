@@ -25,7 +25,9 @@ from bcap_contracts.assessments import (
     Assessment,
     AssessmentDocument,
     AssessmentState,
+    ModuleRatingDraft,
     ScoringRun,
+    SubcomponentRating,
 )
 from bcap_contracts.auth import Consultant
 from bcap_contracts.common import AssessorLevel, ConsultantTier, Role, UncertaintyRating
@@ -54,6 +56,7 @@ from bcap_contracts.money import Currency, Money
 from bcap_contracts.narratives import AINarrative, NarrativeSection, NarrativeStatus
 from bcap_contracts.pipeline import assert_legal_transition
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from grassmarket.atlas import AssessmentInputs, AtlasResult
@@ -65,6 +68,7 @@ from grassmarket.data.models import (
     DeliverableORM,
     EngagementORM,
     InvitationORM,
+    ModuleRatingDraftORM,
     ProspectORM,
     RecoveryFeeAttributionORM,
     ScoringRunORM,
@@ -91,6 +95,20 @@ def content_hash_for(
         [engine_version, methodology_version, coefficient_version, inputs.model_dump_json()]
     )
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _strip_governance_fields(document: AssessmentDocument) -> AssessmentDocument:
+    """Return a copy of the document with every subcomponent's dual-rating governance fields reset
+    to their unrated defaults. Only `resolve_module_consensus` (which computes them from real
+    drafts) may set them — an autosave never carries forgeable governance (ADR-0010, §9)."""
+    return document.model_copy(
+        update={
+            "subcomponents": tuple(
+                s.model_copy(update={"rater_ids": (), "consensus": False, "dissent_note": None})
+                for s in document.subcomponents
+            )
+        }
+    )
 
 
 class RepositoryError(Exception):
@@ -896,13 +914,21 @@ class Repository:
         self, principal: Principal, assessment_id: UUID, *, document: AssessmentDocument
     ) -> Assessment:
         """Autosave: replace the intermediate document. A partial document is valid and saved
-        without scoring. A FINALISED assessment refuses edits (its inputs are locked)."""
+        without scoring. A FINALISED assessment refuses edits (its inputs are locked).
+
+        The dual-rating governance fields (`rater_ids`/`consensus`/`dissent_note`) are STRIPPED from
+        an autosaved document: they are set only by `resolve_module_consensus`, which is computed
+        from real submitted drafts. Were an autosave allowed to carry them, a lead could PUT a
+        document with fabricated `consensus=True, rater_ids=[…]` and finalise with no second rater —
+        the finalise gate reads these fields, so §9 would be advisory (ADR-0010). Editing a
+        subcomponent legitimately invalidates any prior consensus on it, so clearing is right too.
+        """
         row = self._require_assessment(principal, assessment_id)
         if row.state == AssessmentState.FINALISED.value:
             raise ConflictError(
                 f"Assessment {assessment_id} is finalised; its inputs are locked (#6)."
             )
-        row.document_json = document.model_dump_json()
+        row.document_json = _strip_governance_fields(document).model_dump_json()
         row.subject = document.subject
         row.state = AssessmentState.IN_PROGRESS.value
         self._session.add(row)
@@ -959,6 +985,285 @@ class Repository:
             methodology_version=row.methodology_version,
             coefficient_version=row.coefficient_version,
             uncertainty_version=row.uncertainty_version,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    # ------------------------------------------------------- dual rating (SCOPED, Methodology §9)
+    # "Solo ratings are drafts, never deliverables." A module is rated by ≥2 consultants who work
+    # BLIND of each other until both submit; the lead then resolves consensus per subcomponent, with
+    # a mandatory dissent note where they differed. Scoping widens here — an assigned rater who is
+    # not the assessment owner may reach the rating surface (ADR-0010) — but never the owner's
+    # document editing or finalisation, which stay lead-only.
+
+    def _is_rater_on(self, assessment_id: UUID, consultant_id: UUID) -> bool:
+        stmt = select(ModuleRatingDraftORM.id).where(
+            ModuleRatingDraftORM.assessment_id == assessment_id,
+            ModuleRatingDraftORM.owner_consultant_id == consultant_id,
+        )
+        return self._session.execute(stmt).first() is not None
+
+    def _require_rating_access(self, principal: Principal, assessment_id: UUID) -> AssessmentORM:
+        """The lead (owner), an assigned rater, or an admin may reach the rating workflow. Anyone
+        else is refused loudly (a 404 at the boundary — the API never reveals the assessment)."""
+        row = self._session.get(AssessmentORM, assessment_id)
+        if row is None:
+            raise NotFoundError(f"Assessment {assessment_id} not found.")
+        if (
+            principal.is_admin
+            or row.owner_consultant_id == principal.consultant_id
+            or self._is_rater_on(assessment_id, principal.consultant_id)
+        ):
+            return row
+        raise ScopeViolationError(
+            "Principal is neither the lead, an assigned rater, nor an admin for this assessment "
+            "(data scoping is absolute, CLAUDE.md #9; rating access widened per ADR-0010)."
+        )
+
+    def _refuse_if_finalised(self, assessment_id: UUID) -> None:
+        """A finalised assessment's inputs are locked (#6) — no draft mutation touches them."""
+        row = self._session.get(AssessmentORM, assessment_id)
+        if row is not None and row.state == AssessmentState.FINALISED.value:
+            raise ConflictError(
+                f"Assessment {assessment_id} is finalised; its inputs are locked (#6)."
+            )
+
+    def _module_drafts(self, assessment_id: UUID, module_key: str) -> list[ModuleRatingDraftORM]:
+        stmt = (
+            select(ModuleRatingDraftORM)
+            .where(
+                ModuleRatingDraftORM.assessment_id == assessment_id,
+                ModuleRatingDraftORM.module_key == module_key,
+            )
+            .order_by(ModuleRatingDraftORM.created_at)
+        )
+        return list(self._session.execute(stmt).scalars().all())
+
+    def _require_own_draft(
+        self, principal: Principal, assessment_id: UUID, module_key: str
+    ) -> ModuleRatingDraftORM:
+        stmt = select(ModuleRatingDraftORM).where(
+            ModuleRatingDraftORM.assessment_id == assessment_id,
+            ModuleRatingDraftORM.module_key == module_key,
+            ModuleRatingDraftORM.owner_consultant_id == principal.consultant_id,
+        )
+        row = self._session.execute(stmt).scalar_one_or_none()
+        if row is None:
+            raise NotFoundError(
+                f"You are not assigned to rate module {module_key} on this assessment."
+            )
+        return row
+
+    def assign_rater(
+        self,
+        principal: Principal,
+        assessment_id: UUID,
+        *,
+        module_key: str,
+        rater_consultant_id: UUID,
+    ) -> ModuleRatingDraft:
+        """The lead assigns a rater to a module (creates their empty, unsubmitted draft). Lead/admin
+        only; refused on a finalised assessment, an unknown consultant, or a duplicate."""
+        row = self._require_assessment(principal, assessment_id)  # owner/admin only
+        if row.state == AssessmentState.FINALISED.value:
+            raise ConflictError(
+                f"Assessment {assessment_id} is finalised; rater assignment is locked (#6)."
+            )
+        if self._session.get(ConsultantORM, rater_consultant_id) is None:
+            raise NotFoundError(f"Consultant {rater_consultant_id} not found.")
+        existing = self._session.execute(
+            select(ModuleRatingDraftORM.id).where(
+                ModuleRatingDraftORM.assessment_id == assessment_id,
+                ModuleRatingDraftORM.module_key == module_key,
+                ModuleRatingDraftORM.owner_consultant_id == rater_consultant_id,
+            )
+        ).first()
+        if existing is not None:
+            raise ConflictError(
+                f"Consultant {rater_consultant_id} is already assigned to module {module_key}."
+            )
+        draft = ModuleRatingDraftORM(
+            owner_consultant_id=rater_consultant_id,
+            assessment_id=assessment_id,
+            module_key=module_key,
+            ratings_json="[]",
+            submitted=False,
+        )
+        self._session.add(draft)
+        try:
+            self._session.flush()
+        except IntegrityError as exc:  # a concurrent assign won the unique-constraint race
+            self._session.rollback()
+            raise ConflictError(
+                f"Consultant {rater_consultant_id} is already assigned to module {module_key}."
+            ) from exc
+        return self._to_module_rating_draft(draft)
+
+    def get_own_module_draft(
+        self, principal: Principal, assessment_id: UUID, module_key: str
+    ) -> ModuleRatingDraft:
+        return self._to_module_rating_draft(
+            self._require_own_draft(principal, assessment_id, module_key)
+        )
+
+    def update_own_module_draft(
+        self,
+        principal: Principal,
+        assessment_id: UUID,
+        module_key: str,
+        *,
+        ratings: tuple[SubcomponentRating, ...],
+    ) -> ModuleRatingDraft:
+        """A rater fills in their OWN draft. Refused once submitted (locked) or the assessment is
+        finalised. Ratings must all belong to this module (fail loud on a stray module_key)."""
+        draft = self._require_own_draft(principal, assessment_id, module_key)
+        self._refuse_if_finalised(assessment_id)
+        if draft.submitted:
+            raise ConflictError(
+                "Your rating is submitted and locked; a submitted rating cannot be edited."
+            )
+        stray = sorted({r.module_key for r in ratings if r.module_key != module_key})
+        if stray:
+            raise ConflictError(
+                f"Every rating must be for module {module_key}; found stray module_key(s) {stray}."
+            )
+        draft.ratings_json = json.dumps([r.model_dump(mode="json") for r in ratings])
+        self._session.add(draft)
+        self._session.flush()
+        return self._to_module_rating_draft(draft)
+
+    def submit_own_module_draft(
+        self, principal: Principal, assessment_id: UUID, module_key: str
+    ) -> ModuleRatingDraft:
+        """Lock the rater's own draft (blind opens once every assigned rater has submitted). An
+        empty draft cannot be submitted — a rater must actually rate at least one subcomponent.
+        Refused once the assessment is finalised (its inputs are locked, #6)."""
+        draft = self._require_own_draft(principal, assessment_id, module_key)
+        self._refuse_if_finalised(assessment_id)
+        if draft.submitted:
+            raise ConflictError("Your rating is already submitted.")
+        if not self._load_ratings(draft.ratings_json):
+            raise ConflictError("Cannot submit an empty rating — rate at least one subcomponent.")
+        draft.submitted = True
+        draft.submitted_at = datetime.now(UTC)
+        self._session.add(draft)
+        self._session.flush()
+        return self._to_module_rating_draft(draft)
+
+    def list_module_drafts(
+        self, principal: Principal, assessment_id: UUID, module_key: str
+    ) -> list[ModuleRatingDraft]:
+        """Blind read: the caller always sees their OWN draft; a co-rater's draft is visible only
+        once EVERY assigned rater on the module has submitted. This is the structural guarantee that
+        the second opinion is formed independently (Methodology §9) — it holds for the lead and even
+        for an admin, because peeking would defeat the method, not merely leak data."""
+        self._require_rating_access(principal, assessment_id)
+        rows = self._module_drafts(assessment_id, module_key)
+        all_submitted = bool(rows) and all(r.submitted for r in rows)
+        visible = [
+            r for r in rows if r.owner_consultant_id == principal.consultant_id or all_submitted
+        ]
+        return [self._to_module_rating_draft(r) for r in visible]
+
+    def resolve_module_consensus(
+        self,
+        principal: Principal,
+        assessment_id: UUID,
+        module_key: str,
+        *,
+        resolved: tuple[SubcomponentRating, ...],
+    ) -> Assessment:
+        """The lead records the agreed rating for each assessed subcomponent of a module, drawing on
+        the now-visible rater drafts, and it is written into the assessment document. Enforced:
+        ≥2 raters assigned and ALL submitted; each resolved subcomponent was assessed by ≥2 raters;
+        a subcomponent the raters DISAGREED on carries a dissent note. `rater_ids` and `consensus`
+        are computed from the drafts here — never caller-supplied — so the governance record is
+        trustworthy. The resolved set REPLACES this module's entries in the document."""
+        row = self._require_assessment(principal, assessment_id)  # lead/admin only
+        if row.state == AssessmentState.FINALISED.value:
+            raise ConflictError(
+                f"Assessment {assessment_id} is finalised; consensus is locked (#6)."
+            )
+
+        drafts = self._module_drafts(assessment_id, module_key)
+        if len(drafts) < 2:
+            raise ConflictError(
+                f"Module {module_key} has {len(drafts)} rater(s); dual rating requires ≥2 "
+                f"(Methodology §9)."
+            )
+        if not all(d.submitted for d in drafts):
+            raise ConflictError(
+                "Every assigned rater must submit before consensus can be resolved — the blind "
+                "opens only when all ratings are in (Methodology §9)."
+            )
+
+        # Per subcomponent: which raters ASSESSED it (gave a level) and the distinct levels given.
+        raters_by_sub: dict[str, set[UUID]] = {}
+        levels_by_sub: dict[str, set[str]] = {}
+        for d in drafts:
+            for r in self._load_ratings(d.ratings_json):
+                if r.level is None:
+                    continue  # a rater's "Not Assessed" is not a second opinion on an assessed sub
+                raters_by_sub.setdefault(r.subcomponent_key, set()).add(d.owner_consultant_id)
+                levels_by_sub.setdefault(r.subcomponent_key, set()).add(r.level.value)
+
+        out: list[SubcomponentRating] = []
+        for r in resolved:
+            if r.module_key != module_key:
+                raise ConflictError(
+                    f"Resolved rating {r.subcomponent_key} is not in module {module_key}."
+                )
+            if r.level is None:
+                raise ConflictError(
+                    f"Consensus records ASSESSED subcomponents; {r.subcomponent_key} has no level. "
+                    "Leave unassessed subcomponents out — they default to Not Assessed."
+                )
+            raters = raters_by_sub.get(r.subcomponent_key, set())
+            if len(raters) < 2:
+                raise ConflictError(
+                    f"{module_key}/{r.subcomponent_key} was assessed by {len(raters)} rater(s); a "
+                    f"deliverable rating needs two independent assessments (Methodology §9)."
+                )
+            differed = len(levels_by_sub.get(r.subcomponent_key, set())) > 1
+            if differed and r.dissent_note is None:
+                raise ConflictError(
+                    f"{module_key}/{r.subcomponent_key}: the raters differed — a dissent note is "
+                    f"required when one position yields to another (Methodology §9)."
+                )
+            out.append(
+                r.model_copy(
+                    update={
+                        "rater_ids": tuple(sorted(raters, key=str)),
+                        "consensus": not differed,
+                        "dissent_note": r.dissent_note if differed else None,
+                    }
+                )
+            )
+
+        doc = AssessmentDocument.model_validate_json(row.document_json)
+        kept = tuple(s for s in doc.subcomponents if s.module_key != module_key)
+        new_doc = doc.model_copy(update={"subcomponents": (*kept, *out)})
+        row.document_json = new_doc.model_dump_json()
+        if row.state == AssessmentState.DRAFT.value:
+            row.state = AssessmentState.IN_PROGRESS.value
+        self._session.add(row)
+        self._session.flush()
+        return self._to_assessment(row)
+
+    @staticmethod
+    def _load_ratings(ratings_json: str) -> tuple[SubcomponentRating, ...]:
+        return tuple(SubcomponentRating.model_validate(d) for d in json.loads(ratings_json))
+
+    @staticmethod
+    def _to_module_rating_draft(row: ModuleRatingDraftORM) -> ModuleRatingDraft:
+        return ModuleRatingDraft(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            assessment_id=row.assessment_id,
+            module_key=row.module_key,
+            ratings=Repository._load_ratings(row.ratings_json),
+            submitted=row.submitted,
+            submitted_at=row.submitted_at,
             created_at=row.created_at,
             updated_at=row.updated_at,
         )

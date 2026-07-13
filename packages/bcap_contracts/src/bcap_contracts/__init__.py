@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from bcap_contracts.assessments import (
     CoefficientSet,
+    ModuleRatingDraft,
     PowerAssessment,
     ScoringRun,
     SubcomponentRating,
@@ -100,6 +101,7 @@ __all__ = [
     "PowerAssessment",
     "TriadResult",
     "ScoringRun",
+    "ModuleRatingDraft",
     # resources
     "Prospect",
     "PipelineStage",

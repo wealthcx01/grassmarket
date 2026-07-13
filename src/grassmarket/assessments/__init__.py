@@ -9,8 +9,10 @@ from grassmarket.assessments.service import (
     LIVE_DRAWS,
     ScoreArtifacts,
     compute_score,
+    consensus_blockers,
     evaluate_scenarios,
     live_score,
+    module_rating_errors,
     scoreability_blockers,
 )
 
@@ -18,7 +20,9 @@ __all__ = [
     "LIVE_DRAWS",
     "ScoreArtifacts",
     "compute_score",
+    "consensus_blockers",
     "evaluate_scenarios",
     "live_score",
+    "module_rating_errors",
     "scoreability_blockers",
 ]
