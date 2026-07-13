@@ -27,9 +27,7 @@ def upgrade() -> None:
         sa.Column(
             "owner_consultant_id", sa.Uuid(), sa.ForeignKey("consultants.id"), nullable=False
         ),
-        sa.Column(
-            "deliverable_id", sa.Uuid(), sa.ForeignKey("deliverables.id"), nullable=False
-        ),
+        sa.Column("deliverable_id", sa.Uuid(), sa.ForeignKey("deliverables.id"), nullable=False),
         sa.Column("scoring_run_id", sa.Uuid(), nullable=False),
         sa.Column("section", sa.String(length=20), nullable=False),
         sa.Column("status", sa.String(length=20), nullable=False),
