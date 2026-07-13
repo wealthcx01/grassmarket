@@ -22,6 +22,15 @@ from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from uuid import UUID
 
+from bcap_contracts.arena import (
+    ArenaModuleTarget,
+    ArenaPowerTarget,
+    ArenaScenario,
+    ArenaScore,
+    ArenaSession,
+    ArenaStatus,
+    ArenaTurn,
+)
 from bcap_contracts.assessments import (
     Assessment,
     AssessmentDocument,
@@ -91,6 +100,8 @@ from sqlalchemy.orm import Session
 from grassmarket.atlas import AssessmentInputs, AtlasResult
 from grassmarket.data.models import (
     AINarrativeORM,
+    ArenaScenarioORM,
+    ArenaSessionORM,
     AssessmentORM,
     CalibrationRatingORM,
     CalibrationSessionORM,
@@ -113,6 +124,7 @@ from grassmarket.data.models import (
     WorkshopORM,
 )
 from grassmarket.pipeline.fees import attribution_content_hash, is_within_attribution_window
+from grassmarket.workbench.arena import ArenaFeedbackDrafter, score_transcript
 from grassmarket.workbench.calibration import compute_calibration_result
 from grassmarket.workbench.certification import next_level, promotion_blockers
 from grassmarket.workbench.drills import PASSING_GRADE, DrillState, next_due, review
@@ -2142,6 +2154,163 @@ class Repository:
             drafter_version=row.drafter_version,
             approved_by_consultant_id=row.approved_by_consultant_id,
             approved_at=row.approved_at,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    # ------------------------------------------------- Practice Arena (SCOPED, GRS-0025, PRD §6)
+    # Scenarios are shared, admin-authored content; a session is an advisor's own run — scored
+    # deterministically on submit, with AI-drafted (labelled) feedback. No client data — vignettes
+    # only. Scores persist to the advisor's own history.
+
+    def create_arena_scenario(
+        self,
+        principal: Principal,
+        *,
+        title: str,
+        brief: str,
+        client_persona: str,
+        target_powers: Sequence[ArenaPowerTarget],
+        target_modules: Sequence[ArenaModuleTarget] = (),
+        evidence_cues: Sequence[str] = (),
+    ) -> ArenaScenario:
+        """Author a shared Practice Arena scenario (admin)."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may author Practice Arena scenarios (PRD §6).")
+        row = ArenaScenarioORM(
+            owner_consultant_id=principal.consultant_id,
+            title=title,
+            brief=brief,
+            client_persona=client_persona,
+            targets_json=json.dumps(
+                {
+                    "target_powers": [p.model_dump(mode="json") for p in target_powers],
+                    "target_modules": [m.model_dump(mode="json") for m in target_modules],
+                    "evidence_cues": list(evidence_cues),
+                }
+            ),
+        )
+        self._session.add(row)
+        self._session.flush()
+        return self._to_arena_scenario(row)
+
+    def list_arena_scenarios(self, principal: Principal) -> list[ArenaScenario]:
+        rows = (
+            self._session.execute(select(ArenaScenarioORM).order_by(ArenaScenarioORM.created_at))
+            .scalars()
+            .all()
+        )
+        return [self._to_arena_scenario(r) for r in rows]
+
+    def get_arena_scenario(self, principal: Principal, scenario_id: UUID) -> ArenaScenario:
+        row = self._session.get(ArenaScenarioORM, scenario_id)
+        if row is None:
+            raise NotFoundError(f"Arena scenario {scenario_id} not found.")
+        return self._to_arena_scenario(row)
+
+    def start_arena_session(self, principal: Principal, scenario_id: UUID) -> ArenaSession:
+        """Begin a practice session for the caller against a scenario (empty, in progress)."""
+        if self._session.get(ArenaScenarioORM, scenario_id) is None:
+            raise NotFoundError(f"Arena scenario {scenario_id} not found.")
+        row = ArenaSessionORM(
+            owner_consultant_id=principal.consultant_id,
+            scenario_id=scenario_id,
+            status=ArenaStatus.IN_PROGRESS.value,
+        )
+        self._session.add(row)
+        self._session.flush()
+        return self._to_arena_session(row)
+
+    def submit_arena_session(
+        self,
+        principal: Principal,
+        session_id: UUID,
+        *,
+        transcript: Sequence[ArenaTurn],
+        drafter: ArenaFeedbackDrafter,
+        now: datetime,
+    ) -> ArenaSession:
+        """Submit the caller's transcript — scored deterministically against the scenario's targets,
+        with AI-drafted (labelled) coaching feedback. The score persists to the advisor's history.
+        The caller's own session only; refused once already scored."""
+        row = self._session.get(ArenaSessionORM, session_id)
+        if row is None:
+            raise NotFoundError(f"Arena session {session_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        if row.status != ArenaStatus.IN_PROGRESS.value:
+            raise ConflictError("This session has already been scored.")
+
+        scenario_row = self._session.get(ArenaScenarioORM, row.scenario_id)
+        if scenario_row is None:  # the scenario was deleted out from under the session — fail loud
+            raise NotFoundError(f"Arena scenario {row.scenario_id} not found.")
+        scenario = self._to_arena_scenario(scenario_row)
+        score = score_transcript(scenario, transcript)
+        feedback = drafter.draft(scenario, score)
+
+        row.transcript_json = json.dumps([t.model_dump(mode="json") for t in transcript])
+        row.score_json = score.model_dump_json()
+        row.feedback = feedback
+        row.feedback_is_ai_drafted = True
+        row.drafter_version = drafter.version
+        row.status = ArenaStatus.SCORED.value
+        row.scored_at = now
+        self._session.add(row)
+        self._session.flush()
+        return self._to_arena_session(row)
+
+    def list_arena_sessions(self, principal: Principal) -> list[ArenaSession]:
+        """The caller's own Practice Arena history (their scores over time)."""
+        rows = (
+            self._session.execute(
+                select(ArenaSessionORM)
+                .where(ArenaSessionORM.owner_consultant_id == principal.consultant_id)
+                .order_by(ArenaSessionORM.created_at)
+            )
+            .scalars()
+            .all()
+        )
+        return [self._to_arena_session(r) for r in rows]
+
+    def get_arena_session(self, principal: Principal, session_id: UUID) -> ArenaSession:
+        row = self._session.get(ArenaSessionORM, session_id)
+        if row is None:
+            raise NotFoundError(f"Arena session {session_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        return self._to_arena_session(row)
+
+    @staticmethod
+    def _to_arena_scenario(row: ArenaScenarioORM) -> ArenaScenario:
+        targets = json.loads(row.targets_json)
+        return ArenaScenario(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            title=row.title,
+            brief=row.brief,
+            client_persona=row.client_persona,
+            target_powers=tuple(
+                ArenaPowerTarget.model_validate(p) for p in targets["target_powers"]
+            ),
+            target_modules=tuple(
+                ArenaModuleTarget.model_validate(m) for m in targets["target_modules"]
+            ),
+            evidence_cues=tuple(targets["evidence_cues"]),
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    @staticmethod
+    def _to_arena_session(row: ArenaSessionORM) -> ArenaSession:
+        return ArenaSession(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            scenario_id=row.scenario_id,
+            status=ArenaStatus(row.status),
+            transcript=tuple(ArenaTurn.model_validate(t) for t in json.loads(row.transcript_json)),
+            score=ArenaScore.model_validate_json(row.score_json) if row.score_json else None,
+            feedback=row.feedback,
+            feedback_is_ai_drafted=row.feedback_is_ai_drafted,
+            drafter_version=row.drafter_version,
+            scored_at=row.scored_at,
             created_at=row.created_at,
             updated_at=row.updated_at,
         )

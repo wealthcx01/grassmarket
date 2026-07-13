@@ -16,6 +16,7 @@ from grassmarket import __version__
 from grassmarket.config import Settings, get_settings
 from grassmarket.data.database import make_engine, make_session_factory, run_migrations
 from grassmarket.web.routers import (
+    arena,
     assessments,
     auth,
     calibration,
@@ -73,6 +74,7 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
     app.include_router(calibration.router)
     app.include_router(certification.router)
     app.include_router(workbench.router)
+    app.include_router(arena.router)
     app.include_router(guidance.router)
     app.include_router(registry.router)
     return app

@@ -272,6 +272,53 @@ class AINarrativeORM(Base):
     )
 
 
+class ArenaScenarioORM(Base):
+    """A shared Practice Arena scenario (GRS-0025). Owned by its author; readable org-wide. The
+    scoring targets (powers / modules / evidence cues) are stored as JSON."""
+
+    __tablename__ = "arena_scenarios"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    brief: Mapped[str] = mapped_column(Text, nullable=False)
+    client_persona: Mapped[str] = mapped_column(Text, nullable=False)
+    targets_json: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
+class ArenaSessionORM(Base):
+    """One advisor's Practice Arena session (GRS-0025). ``owner_consultant_id`` is the advisor. The
+    transcript is submitted, then scored deterministically with AI-drafted feedback (labelled, #8);
+    the score persists to the advisor's history."""
+
+    __tablename__ = "arena_sessions"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    scenario_id: Mapped[UUID] = mapped_column(
+        ForeignKey("arena_scenarios.id"), index=True, nullable=False
+    )
+    status: Mapped[str] = mapped_column(String(16), default="in_progress", nullable=False)
+    transcript_json: Mapped[str] = mapped_column(Text, default="[]", nullable=False)
+    score_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    feedback: Mapped[str | None] = mapped_column(Text, nullable=True)
+    feedback_is_ai_drafted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    drafter_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    scored_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
 class DrillCardORM(Base):
     """One advisor's SM-2 spaced-repetition state for a drill topic (GRS-0024). Unique per
     (advisor, topic). Scoped by ``owner_consultant_id`` (the advisor)."""
