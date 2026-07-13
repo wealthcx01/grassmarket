@@ -37,7 +37,12 @@ from grassmarket.deliverables.gate import (
     UnapprovedNarrativeError,
     assert_narratives_approved,
 )
-from grassmarket.deliverables.service import RenderedDeliverable, render_platform_power_report
+from grassmarket.deliverables.service import (
+    RenderedDeliverable,
+    UnsupportedDeliverableTypeError,
+    render_diagnostic_document,
+    title_for,
+)
 from grassmarket.web.dependencies import get_current_principal, get_repository
 
 router = APIRouter(tags=["deliverables"])
@@ -49,6 +54,9 @@ class GenerateDeliverableRequest(BaseModel):
     # A draft coefficient set refuses client_facing=True (the gate). Default False → watermarked
     # internal document, which is always permitted.
     client_facing: bool = False
+    # Which single-run Diagnostic-pack document to generate (GRS-0018). The roadmap + score
+    # evolution have their own generation paths and are refused here (422).
+    deliverable_type: DeliverableType = DeliverableType.PLATFORM_POWER_REPORT
 
 
 def _not_found(detail: str = "Not found.") -> HTTPException:
@@ -79,6 +87,7 @@ def _render(
     record: StoredScoringRun,
     subject: str,
     *,
+    deliverable_type: DeliverableType,
     client_facing: bool,
     generated_on: date,
     narratives: Sequence[AINarrative] = (),
@@ -86,7 +95,8 @@ def _render(
     registry = load_registry()
     inputs = AssessmentInputs.model_validate_json(record.inputs_json)
     result = AtlasResult.model_validate_json(record.result_json)
-    return render_platform_power_report(
+    return render_diagnostic_document(
+        deliverable_type=deliverable_type,
         inputs=inputs,
         stored_result=result,
         coefficients=draft_v1_coefficient_set(registry),
@@ -116,20 +126,28 @@ def generate_deliverable(
         raise _not_found("Engagement not found.") from exc
 
     record, subject = _resolve_run(repo, principal, engagement)
+    dtype = payload.deliverable_type
     now = datetime.now(UTC)
     try:
         rendered = _render(
-            record, subject, client_facing=payload.client_facing, generated_on=now.date()
+            record,
+            subject,
+            deliverable_type=dtype,
+            client_facing=payload.client_facing,
+            generated_on=now.date(),
         )
     except ClientUsabilityError as exc:
         # The controlling gate: a client-facing pack on a non-client-usable set is refused.
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+    except UnsupportedDeliverableTypeError as exc:
+        # A type with its own render path (roadmap / score evolution) is not generable here.
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     digest = hashlib.sha256(
         "|".join(
             [
                 str(engagement_id),
-                DeliverableType.PLATFORM_POWER_REPORT.value,
+                dtype.value,
                 str(record.id),
                 record.coefficient_version,
                 rendered.mode.value,
@@ -139,8 +157,8 @@ def generate_deliverable(
     return repo.create_deliverable(
         principal,
         engagement_id=engagement_id,
-        deliverable_type=DeliverableType.PLATFORM_POWER_REPORT,
-        title=f"Platform Power Report — {subject}",
+        deliverable_type=dtype,
+        title=f"{title_for(dtype)} — {subject}",
         mode=rendered.mode,
         scoring_run_id=record.id,
         coefficient_version=record.coefficient_version,
@@ -193,6 +211,7 @@ def download_deliverable(
         rendered = _render(
             record,
             subject,
+            deliverable_type=deliverable.type,
             client_facing=client_facing,
             generated_on=generated_on,
             narratives=narratives,
@@ -200,6 +219,10 @@ def download_deliverable(
     except ClientUsabilityError as exc:
         # Defense in depth — if the set is no longer client-usable, refuse on download too.
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+    except UnsupportedDeliverableTypeError as exc:
+        # A stored deliverable whose type has its own render path (roadmap / evolution) — consistent
+        # with generate's 422, never a 500. Unreachable today (generate refuses those types).
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     filename = f"{deliverable.type.value}-{deliverable.id}.docx"
     return StreamingResponse(

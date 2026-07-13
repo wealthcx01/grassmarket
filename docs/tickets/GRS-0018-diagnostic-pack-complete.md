@@ -2,7 +2,7 @@
 
 - **Loop:** 4
 - **Branch:** `grs-0018-diagnostic-pack-complete`
-- **Status:** Planned
+- **Status:** In review — PR #18 (stacked on GRS-0016 / PR #16)
 - **Normative source:** PRD §5 (the seven standard deliverables); Methodology v1.2 §3.2 (Not Assessed semantics), §7 (uncertainty rendering).
 - **Depends on:** GRS-0015, GRS-0016.
 

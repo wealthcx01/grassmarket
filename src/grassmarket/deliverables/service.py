@@ -9,12 +9,12 @@ document is reproducible. The client-usable gate is enforced BEFORE anything is 
 from __future__ import annotations
 
 import random
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import date
 
 from bcap_contracts.assessments import CoefficientSet
-from bcap_contracts.deliverables import DeliverableMode
+from bcap_contracts.deliverables import DeliverableMode, DeliverableType
 from bcap_contracts.narratives import AINarrative
 from bcap_contracts.registry import Registry
 from bcap_contracts.uncertainty import UncertaintyModel
@@ -24,20 +24,112 @@ from grassmarket.atlas import AssessmentInputs, run_monte_carlo
 from grassmarket.atlas.results import AtlasResult
 from grassmarket.deliverables.builder import DeliverableContext, build_platform_power_report
 from grassmarket.deliverables.gate import resolve_mode
+from grassmarket.deliverables.heatmap import build_infrastructure_heatmap
+from grassmarket.deliverables.reports import (
+    build_executive_summary,
+    build_technical_appendix,
+    build_workshop_output,
+)
 from grassmarket.deliverables.roadmap import (
     RoadmapContext,
     RoadmapEntry,
     build_modernisation_roadmap,
 )
 
+
+class UnsupportedDeliverableTypeError(ValueError):
+    """The requested deliverable type is not a single-run document — it has its own render path
+    (the roadmap needs the value bridge; score evolution needs multiple runs). A `ValueError`
+    subclass so callers may catch it specifically without a broad `except ValueError`."""
+
+
+@dataclass(frozen=True)
+class _SingleRunSpec:
+    # Every single-run builder takes the same shape; only the Platform Power Report renders the AI
+    # narratives (GRS-0017) into its methods appendix — the others accept and ignore them, so the
+    # dispatcher can pass narratives uniformly.
+    build: Callable[[DeliverableContext, DeliverableMode, Sequence[AINarrative]], bytes]
+    title: str
+
+
+# THE single source of truth for the single-run Diagnostic-pack documents: builder AND display
+# title in one place, so a new type can never render fine then 500 on a missing title lookup.
+# MODERNISATION_ROADMAP (needs the value bridge) and SCORE_EVOLUTION (needs multiple runs) have
+# their own render paths and are deliberately absent here.
+_SINGLE_RUN_BUILDERS: dict[DeliverableType, _SingleRunSpec] = {
+    DeliverableType.EXECUTIVE_SUMMARY: _SingleRunSpec(build_executive_summary, "Executive Summary"),
+    DeliverableType.PLATFORM_POWER_REPORT: _SingleRunSpec(
+        build_platform_power_report, "Platform Power Report"
+    ),
+    DeliverableType.INFRASTRUCTURE_HEATMAP: _SingleRunSpec(
+        build_infrastructure_heatmap, "Infrastructure Heatmap"
+    ),
+    DeliverableType.TECHNICAL_APPENDIX: _SingleRunSpec(
+        build_technical_appendix, "Technical Appendix"
+    ),
+    DeliverableType.WORKSHOP_OUTPUT: _SingleRunSpec(build_workshop_output, "Workshop Output"),
+}
+
 # The same fixed seed the finalise path uses, so re-derived bands reproduce the finalised run.
 DELIVERABLE_SEED = 20260706
+
+
+def title_for(deliverable_type: DeliverableType) -> str:
+    """The display title for a single-run type. Refuses a non-single-run type loud (same registry
+    the builder is looked up from — no drift, no request-time 500)."""
+    if deliverable_type not in _SINGLE_RUN_BUILDERS:
+        raise UnsupportedDeliverableTypeError(
+            f"{deliverable_type.value} is not a single-run diagnostic document."
+        )
+    return _SINGLE_RUN_BUILDERS[deliverable_type].title
 
 
 @dataclass(frozen=True)
 class RenderedDeliverable:
     mode: DeliverableMode
     docx_bytes: bytes
+
+
+def render_diagnostic_document(
+    *,
+    deliverable_type: DeliverableType,
+    inputs: AssessmentInputs,
+    stored_result: AtlasResult,
+    coefficients: CoefficientSet,
+    registry: Registry,
+    model: UncertaintyModel,
+    subject: str,
+    generated_on: date,
+    client_facing: bool,
+    narratives: Sequence[AINarrative] = (),
+) -> RenderedDeliverable:
+    """Render one single-run Diagnostic-pack document. Enforces the client-usable gate first (may
+    raise `ClientUsabilityError`), then re-derives the uncertainty bands from the stored inputs
+    (fixed seed → reproducible) and dispatches to the builder for the requested type. Any approved
+    AI narratives are rendered into the Platform Power Report's methods appendix (GRS-0017); other
+    types accept and ignore them.
+
+    A type that is not a single-run document (the roadmap, which needs the value bridge; score
+    evolution, which needs multiple runs) is refused loud — those have their own render paths."""
+    if deliverable_type not in _SINGLE_RUN_BUILDERS:
+        raise UnsupportedDeliverableTypeError(
+            f"{deliverable_type.value} is not a single-run diagnostic document; it has its own "
+            f"render path (roadmap needs the value bridge; score evolution needs multiple runs)."
+        )
+    mode = resolve_mode(coefficients, client_facing=client_facing)  # the gate — refuses first
+    uncertainty = run_monte_carlo(
+        inputs, coefficients, registry, model, random.Random(DELIVERABLE_SEED)
+    )
+    context = DeliverableContext(
+        subject=subject,
+        result=stored_result,
+        uncertainty=uncertainty,
+        coefficients=coefficients,
+        uncertainty_version=model.version,
+        generated_on=generated_on,
+    )
+    build = _SINGLE_RUN_BUILDERS[deliverable_type].build
+    return RenderedDeliverable(mode=mode, docx_bytes=build(context, mode, narratives))
 
 
 def render_platform_power_report(
@@ -52,23 +144,19 @@ def render_platform_power_report(
     client_facing: bool,
     narratives: Sequence[AINarrative] = (),
 ) -> RenderedDeliverable:
-    """Render the Platform Power Report. Enforces the client-usable gate first (may raise
-    `ClientUsabilityError`), then re-derives bands and builds the .docx. Any AI narratives are
-    rendered into the methods appendix with their approval trail (GRS-0017)."""
-    mode = resolve_mode(coefficients, client_facing=client_facing)  # the gate — refuses first
-    uncertainty = run_monte_carlo(
-        inputs, coefficients, registry, model, random.Random(DELIVERABLE_SEED)
-    )
-    context = DeliverableContext(
-        subject=subject,
-        result=stored_result,
-        uncertainty=uncertainty,
+    """Render the Platform Power Report (a thin wrapper over `render_diagnostic_document`). Any
+    approved AI narratives render into its methods appendix with their approval trail (GRS-0017)."""
+    return render_diagnostic_document(
+        deliverable_type=DeliverableType.PLATFORM_POWER_REPORT,
+        inputs=inputs,
+        stored_result=stored_result,
         coefficients=coefficients,
-        uncertainty_version=model.version,
+        registry=registry,
+        model=model,
+        subject=subject,
         generated_on=generated_on,
-    )
-    return RenderedDeliverable(
-        mode=mode, docx_bytes=build_platform_power_report(context, mode, narratives)
+        client_facing=client_facing,
+        narratives=narratives,
     )
 
 
