@@ -9,11 +9,13 @@ document is reproducible. The client-usable gate is enforced BEFORE anything is 
 from __future__ import annotations
 
 import random
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date
 
 from bcap_contracts.assessments import CoefficientSet
 from bcap_contracts.deliverables import DeliverableMode
+from bcap_contracts.narratives import AINarrative
 from bcap_contracts.registry import Registry
 from bcap_contracts.uncertainty import UncertaintyModel
 from bcap_contracts.value import ScenarioResult, ValueBridge
@@ -48,9 +50,11 @@ def render_platform_power_report(
     subject: str,
     generated_on: date,
     client_facing: bool,
+    narratives: Sequence[AINarrative] = (),
 ) -> RenderedDeliverable:
     """Render the Platform Power Report. Enforces the client-usable gate first (may raise
-    `ClientUsabilityError`), then re-derives bands and builds the .docx."""
+    `ClientUsabilityError`), then re-derives bands and builds the .docx. Any AI narratives are
+    rendered into the methods appendix with their approval trail (GRS-0017)."""
     mode = resolve_mode(coefficients, client_facing=client_facing)  # the gate — refuses first
     uncertainty = run_monte_carlo(
         inputs, coefficients, registry, model, random.Random(DELIVERABLE_SEED)
@@ -63,7 +67,9 @@ def render_platform_power_report(
         uncertainty_version=model.version,
         generated_on=generated_on,
     )
-    return RenderedDeliverable(mode=mode, docx_bytes=build_platform_power_report(context, mode))
+    return RenderedDeliverable(
+        mode=mode, docx_bytes=build_platform_power_report(context, mode, narratives)
+    )
 
 
 def render_modernisation_roadmap(

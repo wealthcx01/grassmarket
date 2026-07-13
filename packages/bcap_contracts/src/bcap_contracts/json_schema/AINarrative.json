@@ -1,0 +1,165 @@
+{
+  "$defs": {
+    "ConsultantTier": {
+      "description": "Advisory Network tier (PRD §2).",
+      "enum": [
+        "venture_associate",
+        "advisor",
+        "consultant"
+      ],
+      "title": "ConsultantTier",
+      "type": "string"
+    },
+    "NarrativeSection": {
+      "description": "The AI-drafted prose sections of a deliverable (PRD §5).",
+      "enum": [
+        "interpretation",
+        "commentary",
+        "recommendation"
+      ],
+      "title": "NarrativeSection",
+      "type": "string"
+    },
+    "NarrativeStatus": {
+      "description": "Proposal lifecycle. AI output starts PROPOSED and reaches a client only once APPROVED.",
+      "enum": [
+        "proposed",
+        "approved",
+        "rejected"
+      ],
+      "title": "NarrativeStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One AI-drafted, human-gated deliverable section. Bound to a deliverable + scoring run so the\nproposal is always attributable to the run it interprets and the drafter that wrote it.",
+  "properties": {
+    "approved_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Approved At"
+    },
+    "approved_by_consultant_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Approved By Consultant Id"
+    },
+    "author_tier": {
+      "$ref": "#/$defs/ConsultantTier",
+      "description": "Tier of the consultant who commissioned the draft — drives the seniority gate."
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "deliverable_id": {
+      "format": "uuid",
+      "title": "Deliverable Id",
+      "type": "string"
+    },
+    "drafter_version": {
+      "description": "Which drafter produced the proposal.",
+      "minLength": 1,
+      "title": "Drafter Version",
+      "type": "string"
+    },
+    "edit_summary": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Human-readable diff of consultant edits from proposal to final.",
+      "title": "Edit Summary"
+    },
+    "final_text": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The approved text (may differ from the proposal after edits).",
+      "title": "Final Text"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "prompt_template_version": {
+      "description": "Which template version was used.",
+      "minLength": 1,
+      "title": "Prompt Template Version",
+      "type": "string"
+    },
+    "proposed_text": {
+      "description": "The AI's first draft — never client-bound.",
+      "minLength": 1,
+      "title": "Proposed Text",
+      "type": "string"
+    },
+    "scoring_run_id": {
+      "format": "uuid",
+      "title": "Scoring Run Id",
+      "type": "string"
+    },
+    "section": {
+      "$ref": "#/$defs/NarrativeSection"
+    },
+    "status": {
+      "$ref": "#/$defs/NarrativeStatus",
+      "default": "proposed"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "deliverable_id",
+    "scoring_run_id",
+    "section",
+    "proposed_text",
+    "drafter_version",
+    "prompt_template_version",
+    "author_tier"
+  ],
+  "title": "AINarrative",
+  "type": "object"
+}

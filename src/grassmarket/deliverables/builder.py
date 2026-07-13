@@ -13,12 +13,14 @@ DRAFT_INTERNAL document is watermarked "DRAFT — not client-usable" on every pa
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date
 from io import BytesIO
 
 from bcap_contracts.assessments import CoefficientSet
 from bcap_contracts.deliverables import DeliverableMode
+from bcap_contracts.narratives import AINarrative, NarrativeStatus
 from docx import Document
 from docx.document import Document as DocxDocument
 from docx.shared import Pt, RGBColor
@@ -49,8 +51,15 @@ _TRIAD_ORDER = (
 )
 
 
-def build_platform_power_report(context: DeliverableContext, mode: DeliverableMode) -> bytes:
-    """Render the Platform Power Report + Methods Appendix to .docx bytes."""
+def build_platform_power_report(
+    context: DeliverableContext,
+    mode: DeliverableMode,
+    narratives: Sequence[AINarrative] = (),
+) -> bytes:
+    """Render the Platform Power Report + Methods Appendix to .docx bytes. Any approved (or, for an
+    internal draft, proposed) AI narratives are rendered into the methods appendix with their
+    approval trail (GRS-0017); the client-usable gate upstream guarantees a CLIENT pack only ever
+    carries fully-approved narratives."""
     doc = Document()
     if mode is DeliverableMode.DRAFT_INTERNAL:
         _apply_draft_watermark(doc)
@@ -60,6 +69,7 @@ def build_platform_power_report(context: DeliverableContext, mode: DeliverableMo
 
     _platform_power_section(doc, context)
     _methods_appendix(doc, context)
+    append_narrative_appendix(doc, narratives, mode)
 
     buffer = BytesIO()
     doc.save(buffer)
@@ -164,3 +174,41 @@ def _methods_appendix(doc: DocxDocument, context: DeliverableContext) -> None:
         f"Headline platform value V = {to_display(result.composite.v_index):.1f} "
         f"(display scale 0–100)."
     )
+
+
+AI_DRAFTED_LABEL = "AI-DRAFTED"
+
+
+def append_narrative_appendix(
+    doc: DocxDocument, narratives: Sequence[AINarrative], mode: DeliverableMode
+) -> None:
+    """Render the AI-drafted narrative sections and their approval trail into the methods appendix
+    (GRS-0017, §5). Every AI section is labelled ``AI-DRAFTED``; an approved section prints who
+    approved it, when, and the edit summary; an unapproved section is flagged as not client-usable.
+
+    A CLIENT-mode document only ever reaches here with fully-approved narratives (the gate refuses
+    otherwise), so the approval line is always present for a client pack."""
+    if not narratives:
+        return
+    doc.add_heading("AI-drafted narratives", level=2)
+    doc.add_paragraph(
+        "The interpretive sections below were AI-drafted and are gated: nothing reaches a client "
+        "without a recorded human approval (non-negotiable #8)."
+    )
+    for narrative in narratives:
+        heading = doc.add_paragraph(style="List Bullet")
+        heading.add_run(f"[{AI_DRAFTED_LABEL}] {narrative.section.value.title()}: ").bold = True
+        if narrative.status is NarrativeStatus.APPROVED:
+            # The contract guarantees an APPROVED narrative carries its full trail — assert it,
+            # never silently default a blank/"unknown" (non-negotiable #3: fail loud).
+            assert narrative.final_text is not None and narrative.approved_at is not None
+            heading.add_run(narrative.final_text)
+            doc.add_paragraph(
+                f"    Approved by consultant {narrative.approved_by_consultant_id} at "
+                f"{narrative.approved_at.isoformat()}. Edits: {narrative.edit_summary}."
+            )
+        else:
+            heading.add_run(narrative.proposed_text)
+            doc.add_paragraph(
+                f"    Status: {narrative.status.value} — not client-usable until approved."
+            )
