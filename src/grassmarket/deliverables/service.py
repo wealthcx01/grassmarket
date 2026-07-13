@@ -18,11 +18,17 @@ from bcap_contracts.deliverables import DeliverableMode
 from bcap_contracts.narratives import AINarrative
 from bcap_contracts.registry import Registry
 from bcap_contracts.uncertainty import UncertaintyModel
+from bcap_contracts.value import ScenarioResult, ValueBridge
 
 from grassmarket.atlas import AssessmentInputs, run_monte_carlo
 from grassmarket.atlas.results import AtlasResult
 from grassmarket.deliverables.builder import DeliverableContext, build_platform_power_report
 from grassmarket.deliverables.gate import resolve_mode
+from grassmarket.deliverables.roadmap import (
+    RoadmapContext,
+    RoadmapEntry,
+    build_modernisation_roadmap,
+)
 
 # The same fixed seed the finalise path uses, so re-derived bands reproduce the finalised run.
 DELIVERABLE_SEED = 20260706
@@ -64,3 +70,34 @@ def render_platform_power_report(
     return RenderedDeliverable(
         mode=mode, docx_bytes=build_platform_power_report(context, mode, narratives)
     )
+
+
+def render_modernisation_roadmap(
+    *,
+    stored_result: AtlasResult,
+    coefficients: CoefficientSet,
+    bridge: ValueBridge,
+    entries: tuple[RoadmapEntry, ...],
+    scenarios: tuple[ScenarioResult, ...],
+    uncertainty_version: str,
+    subject: str,
+    generated_on: date,
+    client_facing: bool,
+) -> RenderedDeliverable:
+    """Render the Modernisation Roadmap. Enforces the client-usable gate first (may raise
+    `ClientUsabilityError`) — a draft coefficient set yields only a watermarked internal document,
+    never a client pack — then builds the .docx from the upstream value-bridge + priority objects.
+    Versions come from the run's immutable stored result, so the document is reproducible."""
+    mode = resolve_mode(coefficients, client_facing=client_facing)  # the gate — refuses first
+    context = RoadmapContext(
+        subject=subject,
+        bridge=bridge,
+        entries=entries,
+        scenarios=scenarios,
+        engine_version=stored_result.engine_version,
+        methodology_version=stored_result.methodology_version,
+        coefficient_version=stored_result.coefficient_version,
+        uncertainty_version=uncertainty_version,
+        generated_on=generated_on,
+    )
+    return RenderedDeliverable(mode=mode, docx_bytes=build_modernisation_roadmap(context, mode))
