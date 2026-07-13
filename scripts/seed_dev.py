@@ -51,6 +51,8 @@ DEMO_PASSWORD = "grassmarket-demo"  # pragma: allowlist secret  (local dev seed 
 # A second rater — dual rating is mandatory before an assessment can finalise (Methodology §9,
 # GRS-0020). The demo advisor leads; this consultant supplies the independent second opinion.
 REVIEWER_EMAIL = "reviewer@bruntsfieldcapital.com"
+# A committee member (peer sign-off on high-stakes ratings, §8) — never the lead.
+COMMITTEE_EMAIL = "committee@bruntsfieldcapital.com"
 _DUAL_MODULE = "APP_SERVER"
 _DUAL_SUB = "APP_SERVER_SECURITY_COMPLIANCE"
 _TO_CONTRACTED = (
@@ -94,7 +96,12 @@ def _scoreable_partial_doc() -> AssessmentDocument:
 
 
 def _ensure_consultant(
-    session_factory, *, email: str, full_name: str, password: str | None
+    session_factory,
+    *,
+    email: str,
+    full_name: str,
+    password: str | None,
+    role: Role = Role.CONSULTANT,
 ) -> StoredConsultant:
     """Bootstrap a consultant directly (no self-register endpoint exists); idempotent on email.
     Returns the stored record (with id/role/tier/assessor_level for token minting)."""
@@ -107,7 +114,7 @@ def _ensure_consultant(
                 email=email,
                 full_name=full_name,
                 hashed_password=hash_password(password or "grassmarket-reviewer"),
-                role=Role.CONSULTANT,
+                role=role,
                 tier=ConsultantTier.CONSULTANT,
                 assessor_level=AssessorLevel.CERTIFIED_LEAD,
             )
@@ -191,6 +198,30 @@ def main() -> None:
         json={"resolved": [_rating_body(MaturityLevel.ADVANCED)]},
         headers=headers,
     )
+
+    # Rating Committee sign-off on the high-stakes triad ratings before finalising (§8, GRS-0021).
+    # A committee member (never the lead — peer challenge) approves every item on the queue.
+    committee = _ensure_consultant(
+        session_factory,
+        email=COMMITTEE_EMAIL,
+        full_name="Demo Committee",
+        password=None,
+        role=Role.COMMITTEE_MEMBER,
+    )
+    committee_headers = _headers(settings, committee)
+    for entry in client.get(f"/assessments/{aid}/committee", headers=headers).json():
+        item = entry["item"]
+        client.post(
+            f"/assessments/{aid}/committee/decide",
+            json={
+                "item_type": item["item_type"],
+                "item_key": item["item_key"],
+                "rating": item["rating"],
+                "status": "approved",
+                "rationale": "Reviewed against the moat-duration rubric; the rating holds (demo).",
+            },
+            headers=committee_headers,
+        )
 
     finalised = client.post(f"/assessments/{aid}/finalise", headers=headers)
     if finalised.status_code != 200:

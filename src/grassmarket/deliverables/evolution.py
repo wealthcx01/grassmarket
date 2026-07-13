@@ -53,7 +53,12 @@ def build_score_evolution(
     generated_on: date,
 ) -> bytes:
     """Render the Score Evolution Report. Requires at least two runs (a trajectory needs two
-    points); fails loud on a single run rather than draw a line from nothing."""
+    points); fails loud on a single run rather than draw a line from nothing.
+
+    NOTE (GRS-0021): this multi-run type has no render/service path or endpoint yet. When one is
+    wired for a CLIENT-mode Score Evolution pack, it MUST run the §8 committee gate
+    (`assert_committee_approved`) first, as the single-run and roadmap render paths do — else a
+    client pack could carry an unsigned-off high-stakes rating."""
     if len(runs) < 2:
         raise ValueError("Score Evolution needs at least two finalised runs to compare.")
 

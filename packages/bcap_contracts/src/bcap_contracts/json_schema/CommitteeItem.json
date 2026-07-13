@@ -1,0 +1,52 @@
+{
+  "$defs": {
+    "CommitteeItemType": {
+      "description": "The three kinds of high-stakes rating that require committee sign-off (Methodology §8).",
+      "enum": [
+        "power",
+        "triad",
+        "module"
+      ],
+      "title": "CommitteeItemType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A computed sign-off requirement: which item, at which rating, and why it is high-stakes.\n\nNot persisted — derived from the scored `AtlasResult`. `item_key` is stable (a power/module\nregistry key, or a `TriadDimension` value); `rating` is the current headline rating that\ntriggered the requirement, so a decision is only valid while it still matches.",
+  "properties": {
+    "item_key": {
+      "title": "Item Key",
+      "type": "string"
+    },
+    "item_type": {
+      "$ref": "#/$defs/CommitteeItemType"
+    },
+    "label": {
+      "description": "Human-readable name of the item.",
+      "minLength": 1,
+      "title": "Label",
+      "type": "string"
+    },
+    "rating": {
+      "description": "The high-stakes rating requiring sign-off.",
+      "minLength": 1,
+      "title": "Rating",
+      "type": "string"
+    },
+    "reason": {
+      "description": "Why this item needs committee approval.",
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    }
+  },
+  "required": [
+    "item_type",
+    "item_key",
+    "rating",
+    "label",
+    "reason"
+  ],
+  "title": "CommitteeItem",
+  "type": "object"
+}

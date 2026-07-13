@@ -1,0 +1,179 @@
+{
+  "$defs": {
+    "CommitteeDecision": {
+      "additionalProperties": false,
+      "description": "The committee's recorded call on one high-stakes item, at the rating it reviewed.\n\n`owner_consultant_id` is the assessment's owner (the record is scoped to the assessment);\n`decided_by_consultant_id` is the committee member who made the call — never the owner, so a\nconsultant cannot sign off their own high-stakes ratings (peer challenge, Methodology §8).",
+      "properties": {
+        "assessment_id": {
+          "format": "uuid",
+          "title": "Assessment Id",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "decided_at": {
+          "format": "date-time",
+          "title": "Decided At",
+          "type": "string"
+        },
+        "decided_by_consultant_id": {
+          "format": "uuid",
+          "title": "Decided By Consultant Id",
+          "type": "string"
+        },
+        "dissent_note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Recorded dissent on a split decision (§8).",
+          "title": "Dissent Note"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "item_key": {
+          "title": "Item Key",
+          "type": "string"
+        },
+        "item_type": {
+          "$ref": "#/$defs/CommitteeItemType"
+        },
+        "owner_consultant_id": {
+          "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+          "format": "uuid",
+          "title": "Owner Consultant Id",
+          "type": "string"
+        },
+        "rating": {
+          "description": "The rating the committee reviewed.",
+          "minLength": 1,
+          "title": "Rating",
+          "type": "string"
+        },
+        "rationale": {
+          "description": "Recorded rationale for the call (§8).",
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/CommitteeDecisionStatus"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "created_at",
+        "updated_at",
+        "owner_consultant_id",
+        "assessment_id",
+        "item_type",
+        "item_key",
+        "rating",
+        "status",
+        "rationale",
+        "decided_by_consultant_id",
+        "decided_at"
+      ],
+      "title": "CommitteeDecision",
+      "type": "object"
+    },
+    "CommitteeDecisionStatus": {
+      "description": "A committee call. The absence of a decision is 'pending' — never stored, always computed.",
+      "enum": [
+        "approved",
+        "rejected"
+      ],
+      "title": "CommitteeDecisionStatus",
+      "type": "string"
+    },
+    "CommitteeItem": {
+      "additionalProperties": false,
+      "description": "A computed sign-off requirement: which item, at which rating, and why it is high-stakes.\n\nNot persisted — derived from the scored `AtlasResult`. `item_key` is stable (a power/module\nregistry key, or a `TriadDimension` value); `rating` is the current headline rating that\ntriggered the requirement, so a decision is only valid while it still matches.",
+      "properties": {
+        "item_key": {
+          "title": "Item Key",
+          "type": "string"
+        },
+        "item_type": {
+          "$ref": "#/$defs/CommitteeItemType"
+        },
+        "label": {
+          "description": "Human-readable name of the item.",
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "rating": {
+          "description": "The high-stakes rating requiring sign-off.",
+          "minLength": 1,
+          "title": "Rating",
+          "type": "string"
+        },
+        "reason": {
+          "description": "Why this item needs committee approval.",
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "item_type",
+        "item_key",
+        "rating",
+        "label",
+        "reason"
+      ],
+      "title": "CommitteeItem",
+      "type": "object"
+    },
+    "CommitteeItemType": {
+      "description": "The three kinds of high-stakes rating that require committee sign-off (Methodology §8).",
+      "enum": [
+        "power",
+        "triad",
+        "module"
+      ],
+      "title": "CommitteeItemType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One row of the committee queue for an assessment: a required item and the current decision on\nit (if any). `decision is None` ⟹ pending; a decision whose `rating` differs from `item.rating`\nis stale (the item was re-rated after the call) and does not clear the gate.",
+  "properties": {
+    "decision": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CommitteeDecision"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "item": {
+      "$ref": "#/$defs/CommitteeItem"
+    }
+  },
+  "required": [
+    "item"
+  ],
+  "title": "CommitteeQueueEntry",
+  "type": "object"
+}

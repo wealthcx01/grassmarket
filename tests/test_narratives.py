@@ -463,6 +463,8 @@ def test_approved_narrative_renders_into_client_pack() -> None:
     # APPROVED, the pack renders in CLIENT mode (no watermark) and carries the approved words, the
     # approver id, and the approval timestamp — the actual product promise, end-to-end through the
     # gate + builder wiring (HTTP can't reach CLIENT mode: the router hardcodes the draft set).
+    from tests.committee_helpers import approved_decisions_for
+
     coeffs = _client_usable_set()
     art = compute_score(_doc(graded=True), coeffs, _REGISTRY, _REGISTRY_MODEL, random.Random(1))
     approved = _narrative(NarrativeSection.INTERPRETATION, approved=True)
@@ -476,6 +478,7 @@ def test_approved_narrative_renders_into_client_pack() -> None:
         generated_on=date(2026, 7, 13),
         client_facing=True,
         narratives=[approved],
+        committee_decisions=approved_decisions_for(art.result),
     )
     assert rendered.mode is DeliverableMode.CLIENT
     doc = Document(BytesIO(rendered.docx_bytes))

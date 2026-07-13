@@ -18,6 +18,7 @@ from bcap_contracts.entities import PipelineStage
 from pydantic import ValidationError
 
 from grassmarket.data.repository import EngagementLinkError, Repository
+from tests.committee_helpers import approve_committee_queue
 from tests.conftest import SeededConsultant, auth_header
 from tests.dual_rating_helpers import reach_consensus
 from tests.test_assessment_lifecycle import _body, _scoreable_partial_doc
@@ -67,6 +68,8 @@ def _finalised_assessment_http(client, owner: SeededConsultant) -> str:
         "APP_SERVER",
         [("APP_SERVER_SECURITY_COMPLIANCE", MaturityLevel.ADVANCED)],
     )
+    # High-stakes ratings (the triad rates above None) need committee sign-off first (§8, GRS-0021).
+    approve_committee_queue(client, aid, owner)
     resp = client.post(f"/assessments/{aid}/finalise", headers=auth_header(owner))
     assert resp.status_code == 200, resp.text
     return aid

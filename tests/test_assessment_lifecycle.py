@@ -17,6 +17,7 @@ from bcap_contracts.assessments import (
 from bcap_contracts.common import EvidenceGrade, MaturityLevel, MetricConfidence, StrengthRating
 from bcap_contracts.registry import load_registry
 
+from tests.committee_helpers import approve_committee_queue
 from tests.conftest import SeededConsultant, auth_header
 from tests.dual_rating_helpers import reach_consensus
 
@@ -130,7 +131,8 @@ def test_finalisation_locks_and_creates_scoring_run(client, alice: SeededConsult
     client.put(
         f"/assessments/{aid}", json=_body(_scoreable_partial_doc()), headers=auth_header(alice)
     )
-    # The one assessed subcomponent must clear dual rating → consensus first (Methodology §9).
+    # Dual-rating consensus (§9) AND committee sign-off of the high-stakes triad (§8) must clear
+    # before finalisation is allowed.
     reach_consensus(
         client,
         aid,
@@ -138,6 +140,7 @@ def test_finalisation_locks_and_creates_scoring_run(client, alice: SeededConsult
         "APP_SERVER",
         [("APP_SERVER_SECURITY_COMPLIANCE", MaturityLevel.ADVANCED)],
     )
+    approve_committee_queue(client, aid, alice)
 
     final = client.post(f"/assessments/{aid}/finalise", headers=auth_header(alice))
     assert final.status_code == 200

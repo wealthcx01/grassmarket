@@ -2,7 +2,7 @@
 
 - **Loop:** 5
 - **Branch:** `grs-0021-rating-committee`
-- **Status:** Planned
+- **Status:** In review — PR #23
 - **Normative source:** Methodology v1.2 §8 (committee sign-off); ADR-0007; Morningstar moat-committee pattern.
 - **Depends on:** GRS-0020.
 

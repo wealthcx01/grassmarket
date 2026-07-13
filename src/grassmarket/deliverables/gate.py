@@ -11,14 +11,24 @@ from __future__ import annotations
 from collections.abc import Iterable
 
 from bcap_contracts.assessments import CoefficientSet
+from bcap_contracts.committee import CommitteeDecision
 from bcap_contracts.common import ConsultantTier
 from bcap_contracts.deliverables import DeliverableMode
 from bcap_contracts.narratives import AINarrative, NarrativeStatus
+
+from grassmarket.atlas.committee import committee_blockers, required_committee_items
+from grassmarket.atlas.results import AtlasResult
 
 
 class ClientUsabilityError(Exception):
     """A client-facing document was requested against a coefficient set that is not client-usable.
     A runtime refusal — the fail-safe that keeps a draft-weighted pack away from a client."""
+
+
+class CommitteePendingError(Exception):
+    """A client-facing pack was requested while a high-stakes rating (power Established+, triad
+    above None, module Frontier) still lacks Rating Committee sign-off (§8). Defence-in-depth:
+    finalisation already gates on this, but the client-pack layer refuses independently too."""
 
 
 class UnapprovedNarrativeError(Exception):
@@ -55,6 +65,19 @@ def assert_narratives_approved(narratives: Iterable[AINarrative], *, client_faci
             f"Refusing a client-facing pack: {len(unapproved)} AI narrative section(s) not "
             f"approved ({sections}). Every AI-drafted section needs consultant sign-off first (#8)."
         )
+
+
+def assert_committee_approved(
+    result: AtlasResult, decisions: Iterable[CommitteeDecision], *, client_facing: bool
+) -> None:
+    """Refuse a client-facing pack while any high-stakes rating in `result` lacks a matching
+    APPROVED committee decision (§8). Watermarked internal drafts are allowed (they carry the
+    pending status in the appendix)."""
+    if not client_facing:
+        return
+    blockers = committee_blockers(required_committee_items(result), list(decisions))
+    if blockers:
+        raise CommitteePendingError("Refusing a client-facing pack: " + " ".join(blockers))
 
 
 def assert_senior_approval(*, author_tier: ConsultantTier, approver_tier: ConsultantTier) -> None:

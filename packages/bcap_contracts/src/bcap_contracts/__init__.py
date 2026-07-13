@@ -24,6 +24,13 @@ from bcap_contracts.auth import (
     TokenResponse,
 )
 from bcap_contracts.commissions import CommissionKind, CommissionLine, PaymentStatus
+from bcap_contracts.committee import (
+    CommitteeDecision,
+    CommitteeDecisionStatus,
+    CommitteeItem,
+    CommitteeItemType,
+    CommitteeQueueEntry,
+)
 from bcap_contracts.common import (
     AssessorLevel,
     ConsultantTier,
@@ -114,6 +121,11 @@ __all__ = [
     "CommissionLine",
     "CommissionKind",
     "PaymentStatus",
+    "CommitteeItem",
+    "CommitteeItemType",
+    "CommitteeDecision",
+    "CommitteeDecisionStatus",
+    "CommitteeQueueEntry",
     "CertificationProgress",
     "DrillResult",
     # auth
