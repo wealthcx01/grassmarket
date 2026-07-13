@@ -18,6 +18,7 @@ from bcap_contracts.common import EvidenceGrade, MaturityLevel, MetricConfidence
 from bcap_contracts.registry import load_registry
 
 from tests.conftest import SeededConsultant, auth_header
+from tests.dual_rating_helpers import reach_consensus
 
 _E3 = EvidenceGrade.E3_ARTIFACT
 
@@ -128,6 +129,14 @@ def test_finalisation_locks_and_creates_scoring_run(client, alice: SeededConsult
     aid = client.post("/assessments", json={}, headers=auth_header(alice)).json()["id"]
     client.put(
         f"/assessments/{aid}", json=_body(_scoreable_partial_doc()), headers=auth_header(alice)
+    )
+    # The one assessed subcomponent must clear dual rating → consensus first (Methodology §9).
+    reach_consensus(
+        client,
+        aid,
+        alice,
+        "APP_SERVER",
+        [("APP_SERVER_SECURITY_COMPLIANCE", MaturityLevel.ADVANCED)],
     )
 
     final = client.post(f"/assessments/{aid}/finalise", headers=auth_header(alice))

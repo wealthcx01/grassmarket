@@ -12,12 +12,14 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 
 import pytest
+from bcap_contracts.common import MaturityLevel
 from bcap_contracts.engagements import CommsChannel, DeliverableSlot, DeliverableStatus
 from bcap_contracts.entities import PipelineStage
 from pydantic import ValidationError
 
 from grassmarket.data.repository import EngagementLinkError, Repository
 from tests.conftest import SeededConsultant, auth_header
+from tests.dual_rating_helpers import reach_consensus
 from tests.test_assessment_lifecycle import _body, _scoreable_partial_doc
 
 # The legal stage path from Prospect to Contracted (GRS-0011 transition graph).
@@ -49,13 +51,24 @@ def _contracted_prospect_http(client, owner: SeededConsultant) -> str:
 
 
 def _finalised_assessment_http(client, owner: SeededConsultant) -> str:
+    """A finalised assessment via the API. The partial doc's one assessed subcomponent
+    (APP_SERVER_SECURITY_COMPLIANCE) must pass dual rating → consensus before finalisation is
+    allowed (Methodology §9, GRS-0020) — a self-seeded second rater supplies the second opinion."""
     aid = client.post("/assessments", json={"subject": "S"}, headers=auth_header(owner)).json()[
         "id"
     ]
     client.put(
         f"/assessments/{aid}", json=_body(_scoreable_partial_doc()), headers=auth_header(owner)
     )
-    client.post(f"/assessments/{aid}/finalise", headers=auth_header(owner))
+    reach_consensus(
+        client,
+        aid,
+        owner,
+        "APP_SERVER",
+        [("APP_SERVER_SECURITY_COMPLIANCE", MaturityLevel.ADVANCED)],
+    )
+    resp = client.post(f"/assessments/{aid}/finalise", headers=auth_header(owner))
+    assert resp.status_code == 200, resp.text
     return aid
 
 

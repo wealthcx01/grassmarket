@@ -43,11 +43,16 @@ from grassmarket.data.database import (  # noqa: E402
     make_session_factory,
     run_migrations,
 )
-from grassmarket.data.repository import Repository  # noqa: E402
+from grassmarket.data.repository import Repository, StoredConsultant  # noqa: E402
 from grassmarket.web.app import create_app  # noqa: E402
 
 DEMO_EMAIL = "advisor@bruntsfieldcapital.com"
 DEMO_PASSWORD = "grassmarket-demo"  # pragma: allowlist secret  (local dev seed only)
+# A second rater — dual rating is mandatory before an assessment can finalise (Methodology §9,
+# GRS-0020). The demo advisor leads; this consultant supplies the independent second opinion.
+REVIEWER_EMAIL = "reviewer@bruntsfieldcapital.com"
+_DUAL_MODULE = "APP_SERVER"
+_DUAL_SUB = "APP_SERVER_SECURITY_COMPLIANCE"
 _TO_CONTRACTED = (
     PipelineStage.WORKSHOP_SCHEDULED,
     PipelineStage.WORKSHOP_DELIVERED,
@@ -88,28 +93,31 @@ def _scoreable_partial_doc() -> AssessmentDocument:
     )
 
 
-def main() -> None:
-    settings = get_settings()
-    engine = make_engine(settings.database_url)
-    run_migrations(engine)
-    session_factory = make_session_factory(engine)
-
-    # Bootstrap the demo consultant directly (no self-register endpoint exists).
+def _ensure_consultant(
+    session_factory, *, email: str, full_name: str, password: str | None
+) -> StoredConsultant:
+    """Bootstrap a consultant directly (no self-register endpoint exists); idempotent on email.
+    Returns the stored record (with id/role/tier/assessor_level for token minting)."""
     session = session_factory()
-    repo = Repository(session)
-    stored = repo.get_consultant_by_email(DEMO_EMAIL)
-    if stored is None:
-        stored = repo.create_consultant(
-            email=DEMO_EMAIL,
-            full_name="Demo Advisor",
-            hashed_password=hash_password(DEMO_PASSWORD),
-            role=Role.CONSULTANT,
-            tier=ConsultantTier.CONSULTANT,
-            assessor_level=AssessorLevel.TRAINED,
-        )
-        session.commit()
-    session.close()
+    try:
+        repo = Repository(session)
+        stored = repo.get_consultant_by_email(email)
+        if stored is None:
+            stored = repo.create_consultant(
+                email=email,
+                full_name=full_name,
+                hashed_password=hash_password(password or "grassmarket-reviewer"),
+                role=Role.CONSULTANT,
+                tier=ConsultantTier.CONSULTANT,
+                assessor_level=AssessorLevel.CERTIFIED_LEAD,
+            )
+            session.commit()
+        return stored
+    finally:
+        session.close()
 
+
+def _headers(settings, stored) -> dict:
     token = create_access_token(
         settings,
         consultant_id=stored.id,
@@ -118,7 +126,32 @@ def main() -> None:
         tier=stored.tier,
         assessor_level=stored.assessor_level,
     )
-    headers = {"Authorization": f"Bearer {token}"}
+    return {"Authorization": f"Bearer {token}"}
+
+
+def _rating_body(level: MaturityLevel) -> dict:
+    return {
+        "module_key": _DUAL_MODULE,
+        "subcomponent_key": _DUAL_SUB,
+        "level": level.value,
+        "evidence_grade": EvidenceGrade.E3_ARTIFACT.value,
+    }
+
+
+def main() -> None:
+    settings = get_settings()
+    engine = make_engine(settings.database_url)
+    run_migrations(engine)
+    session_factory = make_session_factory(engine)
+
+    stored = _ensure_consultant(
+        session_factory, email=DEMO_EMAIL, full_name="Demo Advisor", password=DEMO_PASSWORD
+    )
+    reviewer = _ensure_consultant(
+        session_factory, email=REVIEWER_EMAIL, full_name="Demo Reviewer", password=None
+    )
+    headers = _headers(settings, stored)
+    reviewer_headers = _headers(settings, reviewer)
 
     client = TestClient(create_app(settings=settings, engine=engine))
 
@@ -136,7 +169,34 @@ def main() -> None:
         json=_scoreable_partial_doc().model_dump(mode="json"),
         headers=headers,
     )
-    client.post(f"/assessments/{aid}/finalise", headers=headers)
+
+    # Dual rating → consensus for the one assessed subcomponent, before finalising (Methodology §9).
+    for rater_id in (stored.id, reviewer.id):
+        client.post(
+            f"/assessments/{aid}/modules/{_DUAL_MODULE}/raters",
+            json={"rater_consultant_id": str(rater_id)},
+            headers=headers,  # the lead assigns
+        )
+    for rater_headers in (headers, reviewer_headers):
+        client.put(
+            f"/assessments/{aid}/modules/{_DUAL_MODULE}/my-rating",
+            json={"ratings": [_rating_body(MaturityLevel.ADVANCED)]},
+            headers=rater_headers,
+        )
+        client.post(
+            f"/assessments/{aid}/modules/{_DUAL_MODULE}/my-rating/submit", headers=rater_headers
+        )
+    client.post(
+        f"/assessments/{aid}/modules/{_DUAL_MODULE}/consensus",
+        json={"resolved": [_rating_body(MaturityLevel.ADVANCED)]},
+        headers=headers,
+    )
+
+    finalised = client.post(f"/assessments/{aid}/finalise", headers=headers)
+    if finalised.status_code != 200:
+        raise SystemExit(
+            f"Seed failed to finalise the assessment: {finalised.status_code} {finalised.text}"
+        )
 
     eid = client.post(
         "/engagements",

@@ -14,7 +14,18 @@ from uuid import UUID, uuid4
 from bcap_contracts.common import AssessorLevel, ConsultantTier, Role
 from bcap_contracts.engagements import EngagementStatus, WorkshopState
 from bcap_contracts.entities import PipelineStage
-from sqlalchemy import Boolean, Date, DateTime, Float, ForeignKey, Integer, String, Text, Uuid
+from sqlalchemy import (
+    Boolean,
+    Date,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    Uuid,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from grassmarket.data.database import Base
@@ -258,6 +269,42 @@ class AINarrativeORM(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
+class ModuleRatingDraftORM(Base):
+    """One rater's independent, blind rating of one module's subcomponents (GRS-0020, Methodology
+    §9 dual rating). ``owner_consultant_id`` is the rater. The (assessment, module, rater) triple is
+    unique — a rater is assigned to a module once. ``ratings_json`` holds the rater's
+    ``SubcomponentRating`` tuple; ``submitted`` locks it (the blind opens only when every assigned
+    rater on the module has submitted). Consensus is then resolved into the assessment document."""
+
+    __tablename__ = "module_rating_drafts"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    # THE scoping column — the rater who owns this draft.
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    assessment_id: Mapped[UUID] = mapped_column(
+        ForeignKey("assessments.id"), index=True, nullable=False
+    )
+    module_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    ratings_json: Mapped[str] = mapped_column(Text, default="[]", nullable=False)
+    submitted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "assessment_id",
+            "module_key",
+            "owner_consultant_id",
+            name="uq_module_rating_draft_assessment_module_rater",
+        ),
     )
 
 

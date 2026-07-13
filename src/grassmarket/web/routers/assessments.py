@@ -12,7 +12,13 @@ import random
 from datetime import UTC, datetime
 from uuid import UUID
 
-from bcap_contracts.assessments import Assessment, AssessmentDocument, LiveScore
+from bcap_contracts.assessments import (
+    Assessment,
+    AssessmentDocument,
+    LiveScore,
+    ModuleRatingDraft,
+    SubcomponentRating,
+)
 from bcap_contracts.registry import load_registry
 from bcap_contracts.value import ScenarioComparison
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -20,8 +26,10 @@ from pydantic import BaseModel
 
 from grassmarket.assessments import (
     compute_score,
+    consensus_blockers,
     evaluate_scenarios,
     live_score,
+    module_rating_errors,
     scoreability_blockers,
 )
 from grassmarket.atlas.draft_coefficients import draft_v1_coefficient_set
@@ -53,6 +61,23 @@ class NamedScenario(BaseModel):
 
 class ScenariosRequest(BaseModel):
     scenarios: list[NamedScenario]
+
+
+class AssignRaterRequest(BaseModel):
+    rater_consultant_id: UUID
+
+
+class ModuleRatingRequest(BaseModel):
+    """A rater's ratings for one module's subcomponents (governance workflow, Methodology §9)."""
+
+    ratings: list[SubcomponentRating] = []
+
+
+class ConsensusRequest(BaseModel):
+    """The lead's resolved (agreed) ratings for a module's assessed subcomponents. `rater_ids` and
+    `consensus` are computed server-side from the submitted drafts — anything sent is ignored."""
+
+    resolved: list[SubcomponentRating] = []
 
 
 def _not_found(exc: Exception) -> HTTPException:
@@ -168,6 +193,13 @@ def finalise_assessment(
             status_code=status.HTTP_409_CONFLICT,
             detail="Cannot finalise — not yet scoreable: " + " ".join(blockers),
         )
+    # Dual-rating governance (Methodology §9): solo ratings are drafts, never deliverables.
+    governance = consensus_blockers(assessment.document)
+    if governance:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cannot finalise — dual-rating consensus incomplete: " + " ".join(governance),
+        )
 
     art = compute_score(
         assessment.document, coefficients, registry, model, random.Random(_LIVE_SEED)
@@ -195,3 +227,145 @@ def finalise_assessment(
         )
     except ConflictError as exc:  # a concurrent finalise won the race — roll back this run
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+
+
+# --- Dual-rating governance (Methodology §9) --------------------------------------------
+# Two raters per module, working blind of each other until both submit; the lead resolves consensus
+# per subcomponent with a mandatory dissent note where they differed. Assignment and consensus are
+# the lead's authority (assessment owner); a rater fills only their own blind draft. Scope-refusals
+# are 404 (never reveal the assessment); state/consensus refusals are 409; a bad key is 422.
+
+
+def _conflict(exc: Exception) -> HTTPException:
+    return HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
+
+
+def _require_known_module(module_key: str) -> None:
+    if module_key not in load_registry().module_keys():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Unknown module {module_key!r}."
+        )
+
+
+def _reject_stray_subcomponents(module_key: str, ratings: list[SubcomponentRating]) -> None:
+    errors = module_rating_errors(module_key, tuple(ratings), load_registry())
+    if errors:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=" ".join(errors)
+        )
+
+
+@router.post(
+    "/{assessment_id}/modules/{module_key}/raters",
+    response_model=ModuleRatingDraft,
+    status_code=status.HTTP_201_CREATED,
+)
+def assign_rater(
+    assessment_id: UUID,
+    module_key: str,
+    payload: AssignRaterRequest,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> ModuleRatingDraft:
+    """The lead assigns a rater to a module (creates their empty blind draft). Assign at least two
+    per module — a solo-rated module can never finalise."""
+    _require_known_module(module_key)
+    try:
+        return repo.assign_rater(
+            principal,
+            assessment_id,
+            module_key=module_key,
+            rater_consultant_id=payload.rater_consultant_id,
+        )
+    except (NotFoundError, ScopeViolationError) as exc:
+        raise _not_found(exc) from exc
+    except ConflictError as exc:
+        raise _conflict(exc) from exc
+
+
+@router.get("/{assessment_id}/modules/{module_key}/my-rating", response_model=ModuleRatingDraft)
+def get_my_module_rating(
+    assessment_id: UUID,
+    module_key: str,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> ModuleRatingDraft:
+    """The caller's own blind draft for a module (hidden from co-raters until all submit)."""
+    try:
+        return repo.get_own_module_draft(principal, assessment_id, module_key)
+    except (NotFoundError, ScopeViolationError) as exc:
+        raise _not_found(exc) from exc
+
+
+@router.put("/{assessment_id}/modules/{module_key}/my-rating", response_model=ModuleRatingDraft)
+def update_my_module_rating(
+    assessment_id: UUID,
+    module_key: str,
+    payload: ModuleRatingRequest,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> ModuleRatingDraft:
+    """A rater fills in their own draft. Refused once submitted (409) or on stray subcomponents."""
+    _reject_stray_subcomponents(module_key, payload.ratings)
+    try:
+        return repo.update_own_module_draft(
+            principal, assessment_id, module_key, ratings=tuple(payload.ratings)
+        )
+    except (NotFoundError, ScopeViolationError) as exc:
+        raise _not_found(exc) from exc
+    except ConflictError as exc:
+        raise _conflict(exc) from exc
+
+
+@router.post(
+    "/{assessment_id}/modules/{module_key}/my-rating/submit", response_model=ModuleRatingDraft
+)
+def submit_my_module_rating(
+    assessment_id: UUID,
+    module_key: str,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> ModuleRatingDraft:
+    """Lock the caller's own draft. The blind opens (co-raters become visible) once all have."""
+    try:
+        return repo.submit_own_module_draft(principal, assessment_id, module_key)
+    except (NotFoundError, ScopeViolationError) as exc:
+        raise _not_found(exc) from exc
+    except ConflictError as exc:
+        raise _conflict(exc) from exc
+
+
+@router.get("/{assessment_id}/modules/{module_key}/ratings", response_model=list[ModuleRatingDraft])
+def list_module_ratings(
+    assessment_id: UUID,
+    module_key: str,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> list[ModuleRatingDraft]:
+    """The consensus screen: every rater's draft for a module — but a co-rater's is withheld until
+    all have submitted, so the blind holds. Reachable by the lead, an assigned rater, or admin."""
+    try:
+        return repo.list_module_drafts(principal, assessment_id, module_key)
+    except (NotFoundError, ScopeViolationError) as exc:
+        raise _not_found(exc) from exc
+
+
+@router.post("/{assessment_id}/modules/{module_key}/consensus", response_model=Assessment)
+def resolve_module_consensus(
+    assessment_id: UUID,
+    module_key: str,
+    payload: ConsensusRequest,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> Assessment:
+    """The lead records the agreed rating per assessed subcomponent (with a dissent note where the
+    raters differed), writing it into the assessment document. Needs ≥2 raters, all submitted."""
+    _reject_stray_subcomponents(module_key, payload.resolved)
+    try:
+        return repo.resolve_module_consensus(
+            principal, assessment_id, module_key, resolved=tuple(payload.resolved)
+        )
+    except (NotFoundError, ScopeViolationError) as exc:
+        raise _not_found(exc) from exc
+    except ConflictError as exc:
+        raise _conflict(exc) from exc
