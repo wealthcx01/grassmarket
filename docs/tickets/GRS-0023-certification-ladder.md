@@ -2,7 +2,7 @@
 
 - **Loop:** 5
 - **Branch:** `grs-0023-certification-ladder`
-- **Status:** Planned
+- **Status:** In review — PR #25
 - **Normative source:** Methodology v1.2 §9 (CMMI appraiser pattern); PRD §2, §6.
 - **Depends on:** GRS-0020. Content dependency: coursework + exam content (founder track; Advisor Guide is the textbook seed).
 
