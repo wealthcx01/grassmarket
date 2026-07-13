@@ -2,7 +2,7 @@
 
 - **Loop:** 5
 - **Branch:** `grs-0020-dual-rating-consensus`
-- **Status:** Planned
+- **Status:** In review — PR #22
 - **Normative source:** Methodology v1.2 §9 ("solo ratings are drafts, never deliverables"); PRD §3.4.
 - **Depends on:** GRS-0009 (assessment lifecycle). No Loop-4 dependency — may interleave with GRS-0016–0019.
 
