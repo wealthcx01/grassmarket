@@ -1,0 +1,311 @@
+/**
+ * DeliverablesPanel (GRS-0019) — the per-engagement deliverable library: generate a document
+ * (internal draft or client-facing), list what exists (type / mode / status / generated-at), and
+ * download the regenerated .docx.
+ *
+ * Gate refusals are shown as the backend's plain-English message, not a technical error: a
+ * client-facing generation on a draft coefficient set is refused (409), and a type with its own
+ * render path (roadmap / score evolution) is refused (422). Scoping is server-side; a 404 means the
+ * engagement is not the advisor's and the caller has already been redirected.
+ */
+
+import { useCallback, useEffect, useState } from "react";
+
+import { ApiError, api } from "@/lib/api";
+import type { Deliverable, DeliverableMode, DeliverableType } from "@/lib/types";
+
+const TYPE_LABEL: Record<DeliverableType, string> = {
+  executive_summary: "Executive Summary",
+  platform_power_report: "Platform Power Report",
+  infrastructure_heatmap: "Infrastructure Heatmap",
+  modernisation_roadmap: "Modernisation Roadmap",
+  technical_appendix: "Technical Appendix",
+  workshop_output: "Workshop Output",
+  score_evolution: "Score Evolution",
+};
+
+// The single-run types the generate endpoint accepts; the roadmap (needs the value bridge) and
+// score evolution (needs multiple runs) have their own paths and are not offered here.
+const GENERATABLE: DeliverableType[] = [
+  "executive_summary",
+  "platform_power_report",
+  "infrastructure_heatmap",
+  "technical_appendix",
+  "workshop_output",
+];
+
+const APPROVAL_LABEL: Record<string, string> = {
+  draft: "Draft",
+  pending_approval: "Pending approval",
+  approved: "Approved",
+  rejected: "Rejected",
+};
+
+function triggerBlobDownload(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function formatWhen(iso: string | null): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "—" : d.toISOString().slice(0, 16).replace("T", " ");
+}
+
+export function DeliverablesPanel({ engagementId }: { engagementId: string }) {
+  const [items, setItems] = useState<Deliverable[] | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [type, setType] = useState<DeliverableType>("platform_power_report");
+  const [clientFacing, setClientFacing] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState<{ kind: "error" | "ok"; text: string } | null>(null);
+
+  const reload = useCallback(
+    (signal?: AbortSignal) =>
+      api
+        .listDeliverables(engagementId, signal)
+        .then(setItems)
+        .catch((err: unknown) => {
+          if (err instanceof ApiError && err.status === 0) return; // backend unreachable; retried elsewhere
+          setLoadError(err instanceof ApiError ? err.message : "Could not load deliverables.");
+        }),
+    [engagementId],
+  );
+
+  useEffect(() => {
+    const ctrl = new AbortController();
+    void reload(ctrl.signal);
+    return () => ctrl.abort();
+  }, [reload]);
+
+  async function generate() {
+    setBusy(true);
+    setNotice(null);
+    try {
+      const created = await api.generateDeliverable(engagementId, {
+        deliverable_type: type,
+        client_facing: clientFacing,
+      });
+      setNotice({ kind: "ok", text: `Generated ${TYPE_LABEL[created.type]} (${created.mode === "client" ? "client" : "internal draft"}).` });
+      await reload();
+    } catch (err) {
+      // The gate refusals (409 draft-coefficients, 422 unsupported type) carry a plain-English
+      // detail from the backend — show it verbatim rather than a status code.
+      setNotice({
+        kind: "error",
+        text: err instanceof ApiError ? err.message : "Could not generate the deliverable.",
+      });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function download(d: Deliverable) {
+    setNotice(null);
+    try {
+      const { blob, filename } = await api.downloadDeliverable(d.id, {
+        clientFacing: d.mode === "client",
+      });
+      triggerBlobDownload(blob, filename);
+    } catch (err) {
+      setNotice({
+        kind: "error",
+        text: err instanceof ApiError ? err.message : "Could not download the document.",
+      });
+    }
+  }
+
+  return (
+    <section
+      style={{
+        border: "1px solid var(--color-border)",
+        borderRadius: "var(--radius)",
+        padding: "0.9rem 1rem",
+        background: "var(--color-paper-raised)",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+        <h2 style={{ fontSize: "1.05rem", margin: 0 }}>Deliverables</h2>
+        <span className="mono" style={{ fontSize: "0.68rem", color: "var(--color-ink-muted)" }}>
+          generated from the finalised assessment
+        </span>
+      </div>
+
+      {/* Generate control */}
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "0.75rem",
+          alignItems: "flex-end",
+          margin: "0.8rem 0",
+          paddingBottom: "0.8rem",
+          borderBottom: "1px solid var(--color-border)",
+        }}
+      >
+        <label style={{ display: "flex", flexDirection: "column", gap: "0.2rem", fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
+          Document
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value as DeliverableType)}
+            aria-label="Deliverable type"
+            style={selectStyle}
+          >
+            {GENERATABLE.map((t) => (
+              <option key={t} value={t}>
+                {TYPE_LABEL[t]}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <fieldset style={{ border: 0, padding: 0, margin: 0, display: "flex", gap: "0.75rem" }}>
+          <legend style={{ fontSize: "0.72rem", color: "var(--color-ink-muted)", padding: 0, marginBottom: "0.2rem" }}>
+            Audience
+          </legend>
+          <label style={radioStyle}>
+            <input type="radio" name="audience" checked={!clientFacing} onChange={() => setClientFacing(false)} />
+            Internal draft
+          </label>
+          <label style={radioStyle}>
+            <input type="radio" name="audience" checked={clientFacing} onChange={() => setClientFacing(true)} />
+            Client-facing
+          </label>
+        </fieldset>
+
+        <button type="button" onClick={() => void generate()} disabled={busy} style={buttonStyle(busy)}>
+          {busy ? "Generating…" : "Generate"}
+        </button>
+      </div>
+
+      {notice && (
+        <p
+          role={notice.kind === "error" ? "alert" : undefined}
+          style={{
+            fontSize: "0.8rem",
+            margin: "0 0 0.7rem",
+            color: notice.kind === "error" ? "var(--color-error)" : "var(--color-accent)",
+          }}
+        >
+          {notice.text}
+        </p>
+      )}
+
+      {/* Library */}
+      {loadError ? (
+        <p role="alert" style={{ color: "var(--color-error)", fontSize: "0.85rem" }}>{loadError}</p>
+      ) : items === null ? (
+        <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem" }}>Loading…</p>
+      ) : items.length === 0 ? (
+        <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem" }}>
+          No deliverables generated yet.
+        </p>
+      ) : (
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem" }}>
+          <thead>
+            <tr style={{ textAlign: "left", color: "var(--color-ink-muted)" }}>
+              <th style={thStyle}>Document</th>
+              <th style={thStyle}>Audience</th>
+              <th style={thStyle}>Status</th>
+              <th style={{ ...thStyle, textAlign: "right" }}>Generated</th>
+              <th style={{ ...thStyle, textAlign: "right" }}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((d) => (
+              <tr key={d.id} style={{ borderTop: "1px solid var(--color-border)" }}>
+                <td style={tdStyle}>{d.title}</td>
+                <td style={tdStyle}>
+                  <ModeBadge mode={d.mode} />
+                </td>
+                <td style={tdStyle}>
+                  {d.ai_generated ? APPROVAL_LABEL[d.approval_status] ?? d.approval_status : "—"}
+                </td>
+                <td className="mono" style={{ ...tdStyle, textAlign: "right", fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
+                  {formatWhen(d.generated_at)}
+                </td>
+                <td style={{ ...tdStyle, textAlign: "right" }}>
+                  <button type="button" onClick={() => void download(d)} style={linkButtonStyle}>
+                    Download
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </section>
+  );
+}
+
+function ModeBadge({ mode }: { mode: DeliverableMode }) {
+  const isClient = mode === "client";
+  return (
+    <span
+      className="mono"
+      style={{
+        fontSize: "0.64rem",
+        letterSpacing: "0.03em",
+        textTransform: "uppercase",
+        padding: "0.1rem 0.4rem",
+        borderRadius: "2px",
+        border: `1px solid ${isClient ? "var(--color-accent)" : "var(--color-border)"}`,
+        color: isClient ? "var(--color-accent)" : "var(--color-warn)",
+        background: isClient ? "transparent" : "rgba(138, 90, 0, 0.06)",
+      }}
+    >
+      {isClient ? "Client" : "Draft"}
+    </span>
+  );
+}
+
+const selectStyle: React.CSSProperties = {
+  fontFamily: "var(--font-sans)",
+  fontSize: "0.85rem",
+  padding: "0.35rem 0.5rem",
+  border: "1px solid var(--color-border)",
+  borderRadius: "var(--radius)",
+  background: "var(--color-paper)",
+  color: "var(--color-ink)",
+  minWidth: "13rem",
+};
+
+const radioStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: "0.3rem",
+  fontSize: "0.82rem",
+};
+
+function buttonStyle(disabled: boolean): React.CSSProperties {
+  return {
+    fontFamily: "var(--font-sans)",
+    fontSize: "0.85rem",
+    padding: "0.4rem 0.9rem",
+    border: "1px solid var(--color-accent)",
+    borderRadius: "var(--radius)",
+    background: disabled ? "var(--color-ink-muted)" : "var(--color-accent)",
+    color: "var(--color-accent-contrast)",
+    cursor: disabled ? "default" : "pointer",
+  };
+}
+
+const linkButtonStyle: React.CSSProperties = {
+  fontFamily: "var(--font-sans)",
+  fontSize: "0.8rem",
+  padding: 0,
+  border: 0,
+  background: "none",
+  color: "var(--color-accent)",
+  cursor: "pointer",
+  textDecoration: "underline",
+};
+
+const thStyle: React.CSSProperties = { padding: "0.3rem 0.4rem", fontWeight: 500 };
+const tdStyle: React.CSSProperties = { padding: "0.4rem 0.4rem", verticalAlign: "top" };

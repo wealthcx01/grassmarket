@@ -14,7 +14,9 @@ import type {
   AssessmentDocument,
   CommsChannel,
   CommsLogEntry,
+  Deliverable,
   DeliverableSlot,
+  DeliverableType,
   Engagement,
   LiveScore,
   PipelineBoard,
@@ -358,5 +360,55 @@ export const api = {
       body: JSON.stringify(body),
       signal,
     });
+  },
+
+  // --- Deliverables (GRS-0015/0018; JWT-scoped, cross-owner → 404) ---
+  listDeliverables(engagementId: string, signal?: AbortSignal): Promise<Deliverable[]> {
+    return request<Deliverable[]>(`/engagements/${engagementId}/deliverables`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  generateDeliverable(
+    engagementId: string,
+    body: { deliverable_type: DeliverableType; client_facing: boolean },
+    signal?: AbortSignal,
+  ): Promise<Deliverable> {
+    return request<Deliverable>(`/engagements/${engagementId}/deliverables`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(body),
+      signal,
+    });
+  },
+
+  /**
+   * Download a deliverable's regenerated .docx. Not a plain link: the endpoint needs the bearer
+   * token, so we fetch the blob with auth and let the caller trigger the browser download. A gate
+   * refusal (draft coefficients, or `clientFacing` with an unapproved AI narrative) surfaces as an
+   * `ApiError` (409) with the backend's plain-English detail — never a silently broken download.
+   */
+  async downloadDeliverable(
+    id: string,
+    opts?: { clientFacing?: boolean; signal?: AbortSignal },
+  ): Promise<{ blob: Blob; filename: string }> {
+    const query = opts?.clientFacing ? "?client_facing=true" : "";
+    const url = `${API_BASE_URL}/deliverables/${id}/download${query}`;
+    let res: Response;
+    try {
+      res = await fetch(url, { method: "GET", headers: authHeaders(), signal: opts?.signal });
+    } catch (cause) {
+      throw new ApiError(0, `Cannot reach API at ${API_BASE_URL}`, cause);
+    }
+    if (!res.ok) {
+      const body = await parseBody(res);
+      throw new ApiError(res.status, messageFromBody(body, `Download failed (${res.status})`), body);
+    }
+    const blob = await res.blob();
+    const disposition = res.headers.get("content-disposition") ?? "";
+    const match = /filename="?([^"]+)"?/.exec(disposition);
+    return { blob, filename: match?.[1] ?? `${id}.docx` };
   },
 };
