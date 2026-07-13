@@ -13,6 +13,8 @@ from datetime import date
 from io import BytesIO
 
 import pytest
+from bcap_contracts.assessments import SubcomponentRating
+from bcap_contracts.common import EvidenceGrade, MaturityLevel, NonScoreState
 from bcap_contracts.deliverables import DeliverableMode, DeliverableType
 from bcap_contracts.registry import load_registry
 from docx import Document
@@ -25,6 +27,7 @@ from grassmarket.deliverables.charts import evolution_lines, index_tornado, modu
 from grassmarket.deliverables.evolution import EvolutionRun, build_score_evolution
 from grassmarket.deliverables.heatmap import (
     _BAND_FILL,
+    NOT_APPLICABLE_FILL,
     NOT_ASSESSED_FILL,
     build_infrastructure_heatmap,
     cell_fill,
@@ -48,6 +51,39 @@ def _context(*, graded: bool = True) -> DeliverableContext:
     art = compute_score(_doc(graded=graded), coeffs, _REGISTRY, _MODEL, random.Random(20260713))
     return DeliverableContext(
         subject="Meridian Securities",
+        result=art.result,
+        uncertainty=art.uncertainty,
+        coefficients=coeffs,
+        uncertainty_version=_MODEL.version,
+        generated_on=date(2026, 7, 13),
+    )
+
+
+def _all_states_context() -> DeliverableContext:
+    """A context whose heatmap renders ALL FOUR states: a Basic cell, a higher band (Advanced, from
+    `_doc`), a Not Applicable cell, and Not Assessed (the auto-filled remainder). So the §3.2
+    distinctness rule is proven against RENDERED cells, not just module constants."""
+    app = next(m for m in _REGISTRY.modules if m.key == "APP_SERVER")
+    spare = [s.key for s in app.subcomponents if s.key != "APP_SERVER_SECURITY_COMPLIANCE"]
+    base = _doc(graded=True)  # APP_SERVER_SECURITY_COMPLIANCE @ Advanced + rest Not Assessed
+    extra = (
+        SubcomponentRating(
+            module_key="APP_SERVER",
+            subcomponent_key=spare[0],
+            level=MaturityLevel.BASIC,
+            evidence_grade=EvidenceGrade.E3_ARTIFACT,
+        ),
+        SubcomponentRating(
+            module_key="APP_SERVER",
+            subcomponent_key=spare[1],
+            state=NonScoreState.NOT_APPLICABLE,
+        ),
+    )
+    doc = base.model_copy(update={"subcomponents": (*base.subcomponents, *extra)})
+    coeffs = draft_v1_coefficient_set(_REGISTRY)
+    art = compute_score(doc, coeffs, _REGISTRY, _MODEL, random.Random(1))
+    return DeliverableContext(
+        subject="Meridian",
         result=art.result,
         uncertainty=art.uncertainty,
         coefficients=coeffs,
@@ -99,9 +135,11 @@ def test_workshop_output_tolerates_partial_data() -> None:
     assert "discussion prompts" in text.lower()
 
 
-# ----------------------------------------------------------- the heatmap XML rule (§3.2)
-def test_not_assessed_cells_are_visually_distinct() -> None:
-    doc = Document(BytesIO(build_infrastructure_heatmap(_context(), _DRAFT)))
+_RED_ALARM = {"FF0000", "C00000", "E00000", "FF3333"}
+
+
+def _rating_fills(data: bytes) -> dict[str, set[str]]:
+    doc = Document(BytesIO(data))
     fills_by_text: dict[str, set[str]] = {}
     for table in doc.tables:
         for row in table.rows:
@@ -109,12 +147,37 @@ def test_not_assessed_cells_are_visually_distinct() -> None:
             fill = cell_fill(rating_cell)
             if fill is not None:
                 fills_by_text.setdefault(rating_cell.text, set()).add(fill)
+    return fills_by_text
 
+
+# ----------------------------------------------------------- the heatmap XML rule (§3.2)
+def test_all_four_states_are_pairwise_distinct_on_rendered_output() -> None:
+    # The load-bearing §3.2 rule, proven against RENDERED cells (not just constants): a fixture with
+    # all four states must render four PAIRWISE-DISTINCT fills, and none may be a red alarm.
+    fills = _rating_fills(build_infrastructure_heatmap(_all_states_context(), _DRAFT))
+    rendered = {}
+    for label, expected in (
+        ("Not Assessed", NOT_ASSESSED_FILL),
+        ("Not Applicable", NOT_APPLICABLE_FILL),
+        ("Basic", _BAND_FILL["Basic"]),
+        ("Advanced", _BAND_FILL["Advanced"]),
+    ):
+        assert fills.get(label) == {expected}, f"{label} did not render its expected fill"
+        rendered[label] = expected
+    # Pairwise distinct on the actual rendered fills — Not Assessed is never Basic, never NA, etc.
+    assert len(set(rendered.values())) == 4
+    # And none of the four is a red alarm colour (§3.2: Not Assessed is not a failure).
+    for fill in rendered.values():
+        assert fill.upper() not in _RED_ALARM
+
+
+def test_not_assessed_cells_are_visually_distinct() -> None:
+    fills_by_text = _rating_fills(build_infrastructure_heatmap(_context(), _DRAFT))
     # Not Assessed cells exist and are all the distinct neutral grey.
     assert fills_by_text.get("Not Assessed") == {NOT_ASSESSED_FILL}
     # ...distinct from Basic, and never a red alarm colour.
     assert NOT_ASSESSED_FILL != _BAND_FILL["Basic"]
-    assert NOT_ASSESSED_FILL.upper() not in {"FF0000", "C00000", "E00000"}
+    assert NOT_ASSESSED_FILL.upper() not in _RED_ALARM
     # ...and distinct from every assessed band fill actually rendered.
     assessed_fills = {
         f
@@ -193,6 +256,10 @@ def test_charts_are_byte_deterministic() -> None:
     e1 = evolution_lines(run_labels=["a", "b"], series={"V": [1.0, 2.0]})
     e2 = evolution_lines(run_labels=["a", "b"], series={"V": [1.0, 2.0]})
     assert e1 == e2
+    # The version stamp is actually stripped — no "matplotlib" tEXt chunk — so the byte-identity is
+    # host-independent (within a pinned matplotlib), not just a same-process coincidence.
+    assert b"matplotlib" not in r1
+    assert b"matplotlib" not in t1
 
 
 # ----------------------------------------------------------- service dispatcher + gate
@@ -251,7 +318,13 @@ def _engagement(client, owner: SeededConsultant) -> str:
 
 def test_http_generate_each_type_and_download(client, alice: SeededConsultant) -> None:
     eid = _engagement(client, alice)
-    for value in ("executive_summary", "infrastructure_heatmap", "technical_appendix"):
+    for value in (
+        "executive_summary",
+        "platform_power_report",
+        "infrastructure_heatmap",
+        "technical_appendix",
+        "workshop_output",
+    ):
         resp = client.post(
             f"/engagements/{eid}/deliverables",
             json={"client_facing": False, "deliverable_type": value},
@@ -265,11 +338,13 @@ def test_http_generate_each_type_and_download(client, alice: SeededConsultant) -
         assert dl.content[:2] == b"PK"
 
 
-def test_http_generate_roadmap_type_refused(client, alice: SeededConsultant) -> None:
+def test_http_generate_non_single_run_types_refused(client, alice: SeededConsultant) -> None:
     eid = _engagement(client, alice)
-    resp = client.post(
-        f"/engagements/{eid}/deliverables",
-        json={"client_facing": False, "deliverable_type": "modernisation_roadmap"},
-        headers=auth_header(alice),
-    )
-    assert resp.status_code == 422  # has its own render path, not generable here
+    # Both types with their own render path are refused at generate (422), not 500 or silently.
+    for value in ("modernisation_roadmap", "score_evolution"):
+        resp = client.post(
+            f"/engagements/{eid}/deliverables",
+            json={"client_facing": False, "deliverable_type": value},
+            headers=auth_header(alice),
+        )
+        assert resp.status_code == 422, value

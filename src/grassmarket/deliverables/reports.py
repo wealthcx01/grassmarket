@@ -10,29 +10,24 @@ from io import BytesIO
 
 from bcap_contracts.common import MaturityLevel, NonScoreState
 from bcap_contracts.deliverables import DeliverableMode
-from docx import Document
 from docx.document import Document as DocxDocument
 from docx.shared import Inches
 
 from grassmarket.atlas.montecarlo import Band
-from grassmarket.deliverables.builder import DeliverableContext, _apply_draft_watermark
+from grassmarket.deliverables.builder import DeliverableContext
 from grassmarket.deliverables.charts import index_tornado
+from grassmarket.deliverables.docx_base import save_document, start_document
 from grassmarket.deliverables.uncertainty_text import format_index_statement, to_display
 
 
 def _start(context: DeliverableContext, mode: DeliverableMode, title: str) -> DocxDocument:
-    doc = Document()
-    if mode is DeliverableMode.DRAFT_INTERNAL:
-        _apply_draft_watermark(doc)
-    doc.add_heading(f"{title} — {context.subject}", level=0)
-    doc.add_paragraph(f"Generated {context.generated_on.isoformat()}.")
-    return doc
+    return start_document(
+        title=title, subject=context.subject, generated_on=context.generated_on, mode=mode
+    )
 
 
 def _finish(doc: DocxDocument) -> bytes:
-    buffer = BytesIO()
-    doc.save(buffer)
-    return buffer.getvalue()
+    return save_document(doc)
 
 
 def _tornado_png(context: DeliverableContext) -> bytes:

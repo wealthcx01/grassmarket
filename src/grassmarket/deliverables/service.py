@@ -9,6 +9,7 @@ document is reproducible. The client-usable gate is enforced BEFORE anything is 
 from __future__ import annotations
 
 import random
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date
 
@@ -34,25 +35,49 @@ from grassmarket.deliverables.roadmap import (
     build_modernisation_roadmap,
 )
 
-# The single-run Diagnostic-pack documents — each builds from one finalised run's context.
+
+class UnsupportedDeliverableTypeError(ValueError):
+    """The requested deliverable type is not a single-run document — it has its own render path
+    (the roadmap needs the value bridge; score evolution needs multiple runs). A `ValueError`
+    subclass so callers may catch it specifically without a broad `except ValueError`."""
+
+
+@dataclass(frozen=True)
+class _SingleRunSpec:
+    build: Callable[[DeliverableContext, DeliverableMode], bytes]
+    title: str
+
+
+# THE single source of truth for the single-run Diagnostic-pack documents: builder AND display
+# title in one place, so a new type can never render fine then 500 on a missing title lookup.
 # MODERNISATION_ROADMAP (needs the value bridge) and SCORE_EVOLUTION (needs multiple runs) have
 # their own render paths and are deliberately absent here.
-_SINGLE_RUN_BUILDERS = {
-    DeliverableType.EXECUTIVE_SUMMARY: build_executive_summary,
-    DeliverableType.PLATFORM_POWER_REPORT: build_platform_power_report,
-    DeliverableType.INFRASTRUCTURE_HEATMAP: build_infrastructure_heatmap,
-    DeliverableType.TECHNICAL_APPENDIX: build_technical_appendix,
-    DeliverableType.WORKSHOP_OUTPUT: build_workshop_output,
+_SINGLE_RUN_BUILDERS: dict[DeliverableType, _SingleRunSpec] = {
+    DeliverableType.EXECUTIVE_SUMMARY: _SingleRunSpec(build_executive_summary, "Executive Summary"),
+    DeliverableType.PLATFORM_POWER_REPORT: _SingleRunSpec(
+        build_platform_power_report, "Platform Power Report"
+    ),
+    DeliverableType.INFRASTRUCTURE_HEATMAP: _SingleRunSpec(
+        build_infrastructure_heatmap, "Infrastructure Heatmap"
+    ),
+    DeliverableType.TECHNICAL_APPENDIX: _SingleRunSpec(
+        build_technical_appendix, "Technical Appendix"
+    ),
+    DeliverableType.WORKSHOP_OUTPUT: _SingleRunSpec(build_workshop_output, "Workshop Output"),
 }
 
 # The same fixed seed the finalise path uses, so re-derived bands reproduce the finalised run.
 DELIVERABLE_SEED = 20260706
 
 
-class UnsupportedDeliverableTypeError(ValueError):
-    """The requested deliverable type is not a single-run document — it has its own render path
-    (the roadmap needs the value bridge; score evolution needs multiple runs). A `ValueError`
-    subclass so callers may catch it specifically without a broad `except ValueError`."""
+def title_for(deliverable_type: DeliverableType) -> str:
+    """The display title for a single-run type. Refuses a non-single-run type loud (same registry
+    the builder is looked up from — no drift, no request-time 500)."""
+    if deliverable_type not in _SINGLE_RUN_BUILDERS:
+        raise UnsupportedDeliverableTypeError(
+            f"{deliverable_type.value} is not a single-run diagnostic document."
+        )
+    return _SINGLE_RUN_BUILDERS[deliverable_type].title
 
 
 @dataclass(frozen=True)
@@ -96,8 +121,8 @@ def render_diagnostic_document(
         uncertainty_version=model.version,
         generated_on=generated_on,
     )
-    builder = _SINGLE_RUN_BUILDERS[deliverable_type]
-    return RenderedDeliverable(mode=mode, docx_bytes=builder(context, mode))
+    build = _SINGLE_RUN_BUILDERS[deliverable_type].build
+    return RenderedDeliverable(mode=mode, docx_bytes=build(context, mode))
 
 
 def render_platform_power_report(

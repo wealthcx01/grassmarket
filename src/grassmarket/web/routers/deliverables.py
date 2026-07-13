@@ -35,20 +35,13 @@ from grassmarket.deliverables.service import (
     RenderedDeliverable,
     UnsupportedDeliverableTypeError,
     render_diagnostic_document,
+    title_for,
 )
 from grassmarket.web.dependencies import get_current_principal, get_repository
 
 router = APIRouter(tags=["deliverables"])
 
 _DOCX_MEDIA = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-
-_TITLES = {
-    DeliverableType.EXECUTIVE_SUMMARY: "Executive Summary",
-    DeliverableType.PLATFORM_POWER_REPORT: "Platform Power Report",
-    DeliverableType.INFRASTRUCTURE_HEATMAP: "Infrastructure Heatmap",
-    DeliverableType.TECHNICAL_APPENDIX: "Technical Appendix",
-    DeliverableType.WORKSHOP_OUTPUT: "Workshop Output",
-}
 
 
 class GenerateDeliverableRequest(BaseModel):
@@ -157,7 +150,7 @@ def generate_deliverable(
         principal,
         engagement_id=engagement_id,
         deliverable_type=dtype,
-        title=f"{_TITLES[dtype]} — {subject}",
+        title=f"{title_for(dtype)} — {subject}",
         mode=rendered.mode,
         scoring_run_id=record.id,
         coefficient_version=record.coefficient_version,

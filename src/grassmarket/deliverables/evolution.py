@@ -12,12 +12,11 @@ from datetime import date
 from io import BytesIO
 
 from bcap_contracts.deliverables import DeliverableMode
-from docx import Document
 from docx.shared import Inches
 
 from grassmarket.atlas.results import AtlasResult
-from grassmarket.deliverables.builder import _apply_draft_watermark
 from grassmarket.deliverables.charts import evolution_lines
+from grassmarket.deliverables.docx_base import save_document, start_document
 from grassmarket.deliverables.uncertainty_text import to_display
 
 
@@ -29,8 +28,8 @@ class EvolutionRun:
     result: AtlasResult
 
 
-def _delta(text_prev: float, text_now: float) -> str:
-    return f"{(text_now - text_prev):+.1f}"
+def _delta(prev: float, now: float) -> str:
+    return f"{(now - prev):+.1f}"
 
 
 def _version_note(prev: AtlasResult, now: AtlasResult) -> str | None:
@@ -58,11 +57,9 @@ def build_score_evolution(
     if len(runs) < 2:
         raise ValueError("Score Evolution needs at least two finalised runs to compare.")
 
-    doc = Document()
-    if mode is DeliverableMode.DRAFT_INTERNAL:
-        _apply_draft_watermark(doc)
-    doc.add_heading(f"Score Evolution — {subject}", level=0)
-    doc.add_paragraph(f"Generated {generated_on.isoformat()}.")
+    doc = start_document(
+        title="Score Evolution", subject=subject, generated_on=generated_on, mode=mode
+    )
 
     doc.add_heading("Trajectory", level=1)
     table = doc.add_table(rows=1, cols=6)
@@ -109,7 +106,4 @@ def build_score_evolution(
         },
     )
     doc.add_picture(BytesIO(png), width=Inches(6.5))
-
-    buffer = BytesIO()
-    doc.save(buffer)
-    return buffer.getvalue()
+    return save_document(doc)

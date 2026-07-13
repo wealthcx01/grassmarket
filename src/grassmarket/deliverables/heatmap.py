@@ -12,15 +12,15 @@ from io import BytesIO
 
 from bcap_contracts.common import MaturityLevel, NonScoreState
 from bcap_contracts.deliverables import DeliverableMode
-from docx import Document
 from docx.document import Document as DocxDocument
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Inches
 from docx.table import _Cell
 
-from grassmarket.deliverables.builder import DeliverableContext, _apply_draft_watermark
+from grassmarket.deliverables.builder import DeliverableContext
 from grassmarket.deliverables.charts import module_radar
+from grassmarket.deliverables.docx_base import save_document, start_document
 from grassmarket.deliverables.uncertainty_text import to_display
 
 # Ordered warm→cool by maturity. Basic is a distinct orange — NOT red — so Not Assessed (grey) can
@@ -71,17 +71,16 @@ def cell_fill(cell: _Cell) -> str | None:
 
 def build_infrastructure_heatmap(context: DeliverableContext, mode: DeliverableMode) -> bytes:
     """Render the Infrastructure Heatmap to .docx bytes."""
-    doc = Document()
-    if mode is DeliverableMode.DRAFT_INTERNAL:
-        _apply_draft_watermark(doc)
-
-    doc.add_heading(f"Infrastructure Heatmap — {context.subject}", level=0)
-    doc.add_paragraph(f"Generated {context.generated_on.isoformat()}.")
+    doc = start_document(
+        title="Infrastructure Heatmap",
+        subject=context.subject,
+        generated_on=context.generated_on,
+        mode=mode,
+    )
     _legend(doc)
     _radar(doc, context)
     _grid(doc, context)
-
-    return _save(doc)
+    return save_document(doc)
 
 
 def _legend(doc: DocxDocument) -> None:
@@ -119,9 +118,3 @@ def _grid(doc: DocxDocument, context: DeliverableContext) -> None:
             cells[1].text = text
             _shade_cell(cells[1], fill)
             cells[2].text = "critical" if row.critical else ""
-
-
-def _save(doc: DocxDocument) -> bytes:
-    buffer = BytesIO()
-    doc.save(buffer)
-    return buffer.getvalue()

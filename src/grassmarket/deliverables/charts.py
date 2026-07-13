@@ -8,6 +8,7 @@ function takes plain floats (no `Score`, no `Money` in its signature) so the AST
 
 from __future__ import annotations
 
+import math
 from collections.abc import Sequence
 from io import BytesIO
 from typing import Any, cast
@@ -17,6 +18,11 @@ import matplotlib
 matplotlib.use("Agg")  # headless: set before pyplot is imported
 
 import matplotlib.pyplot as plt  # noqa: E402  (must follow the backend selection)
+
+# Bruntsfield design tokens (CLAUDE.md): the Bottle Green accent and the DRAFT alert red, defined
+# once here so every chart draws from the same palette.
+BOTTLE_GREEN = "#1A3B26"
+ALERT_RED = "#8A2020"
 
 
 def priority_cost_scatter(
@@ -39,7 +45,7 @@ def priority_cost_scatter(
 
     fig, ax = plt.subplots(figsize=(6.2, 4.0))
     try:
-        ax.scatter(costs_major, priority_points, s=80, color="#1A3B26", zorder=3)
+        ax.scatter(costs_major, priority_points, s=80, color=BOTTLE_GREEN, zorder=3)
         for label, x, y in zip(labels, costs_major, priority_points, strict=True):
             ax.annotate(
                 label,
@@ -61,8 +67,10 @@ def priority_cost_scatter(
 
 
 def _render_png(fig) -> bytes:
-    """Deterministic PNG bytes: strip matplotlib's version stamp so the same inputs render
-    byte-identical (reproducibility — a deliverable regenerates the same on any host, GRS-0018)."""
+    """PNG bytes with matplotlib's version stamp stripped (metadata={"Software": None}) so the
+    output carries no library-version tEXt chunk — byte-identical within a pinned matplotlib/
+    freetype. Glyph rasterisation can differ across those versions, so this is not a cross-host
+    guarantee; the run's DATA is the reproducibility contract, the chart is a rendering of it."""
     buffer = BytesIO()
     fig.savefig(buffer, format="png", dpi=150, metadata={"Software": None})
     return buffer.getvalue()
@@ -78,18 +86,18 @@ def module_radar(*, labels: Sequence[str], values: Sequence[float]) -> bytes:
         raise ValueError("a radar needs at least 3 axes.")
     n = len(labels)
     # Close the polygon by repeating the first point.
-    angles = [2.0 * 3.141592653589793 * i / n for i in range(n)]
+    angles = [2.0 * math.pi * i / n for i in range(n)]
     angles_closed = [*angles, angles[0]]
     values_closed = [*values, values[0]]
     fig, ax_ = plt.subplots(figsize=(6.0, 6.0), subplot_kw={"polar": True})
     ax = cast(Any, ax_)  # PolarAxes methods aren't on matplotlib's base Axes stub
     try:
-        ax.set_theta_offset(3.141592653589793 / 2)
+        ax.set_theta_offset(math.pi / 2)
         ax.set_theta_direction(-1)
-        ax.set_thetagrids([a * 180 / 3.141592653589793 for a in angles], labels, fontsize=8)
+        ax.set_thetagrids([math.degrees(a) for a in angles], labels, fontsize=8)
         ax.set_ylim(0, 100)
-        ax.plot(angles_closed, values_closed, color="#1A3B26", linewidth=2)
-        ax.fill(angles_closed, values_closed, color="#1A3B26", alpha=0.20)
+        ax.plot(angles_closed, values_closed, color=BOTTLE_GREEN, linewidth=2)
+        ax.fill(angles_closed, values_closed, color=BOTTLE_GREEN, alpha=0.20)
         ax.set_title("Module maturity (q_m, 0–100)")
         fig.tight_layout()
         return _render_png(fig)
@@ -137,8 +145,8 @@ def index_tornado(
     try:
         y = list(range(len(labels)))
         for yi, low, mid, high in zip(y, lows, mids, highs, strict=True):
-            ax.plot([low, high], [yi, yi], color="#1A3B26", linewidth=6, solid_capstyle="round")
-            ax.plot([mid], [yi], marker="|", markersize=14, color="#8A2020")
+            ax.plot([low, high], [yi, yi], color=BOTTLE_GREEN, linewidth=6, solid_capstyle="round")
+            ax.plot([mid], [yi], marker="|", markersize=14, color=ALERT_RED)
         ax.set_yticks(y)
         ax.set_yticklabels(list(labels))
         ax.set_xlim(0, 100)
