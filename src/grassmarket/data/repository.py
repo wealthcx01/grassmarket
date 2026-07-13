@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from uuid import UUID
@@ -30,6 +31,14 @@ from bcap_contracts.assessments import (
     SubcomponentRating,
 )
 from bcap_contracts.auth import Consultant
+from bcap_contracts.calibration import (
+    CalibrationRating,
+    CalibrationResult,
+    CalibrationSession,
+    CalibrationStatus,
+    CalibrationVignette,
+    RatingEntry,
+)
 from bcap_contracts.committee import (
     CommitteeDecision,
     CommitteeDecisionStatus,
@@ -68,6 +77,8 @@ from grassmarket.atlas import AssessmentInputs, AtlasResult
 from grassmarket.data.models import (
     AINarrativeORM,
     AssessmentORM,
+    CalibrationRatingORM,
+    CalibrationSessionORM,
     CommitteeDecisionORM,
     CommsLogEntryORM,
     ConsultantORM,
@@ -81,6 +92,7 @@ from grassmarket.data.models import (
     WorkshopORM,
 )
 from grassmarket.pipeline.fees import attribution_content_hash, is_within_attribution_window
+from grassmarket.workbench.calibration import compute_calibration_result
 
 # Stages at which a prospect is "contracted or beyond" — the only prospects an engagement may link.
 _ENGAGEABLE_STAGES = frozenset(
@@ -1397,6 +1409,189 @@ class Repository:
             dissent_note=row.dissent_note,
             decided_by_consultant_id=row.decided_by_consultant_id,
             decided_at=row.decided_at,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    # ------------------------------------------------- calibration (SCOPED, Methodology §9)
+    # A calibration session is shared training content: any consultant may read it and submit their
+    # own BLIND rating; only the facilitator (an admin) opens/closes it. The per-anchor coefficients
+    # exist only once the session is CLOSED — a rater can never see the distribution before
+    # submitting (that would defeat the measurement). Each assessor's rating is owner-scoped.
+
+    def _require_calibration_session(self, session_id: UUID) -> CalibrationSessionORM:
+        row = self._session.get(CalibrationSessionORM, session_id)
+        if row is None:
+            raise NotFoundError(f"Calibration session {session_id} not found.")
+        return row
+
+    def create_calibration_session(
+        self,
+        principal: Principal,
+        *,
+        title: str,
+        vignettes: Sequence[CalibrationVignette],
+        opened_at: datetime,
+    ) -> CalibrationSession:
+        """Open a calibration round. Facilitator = an admin (§9)."""
+        if not principal.is_admin:
+            raise ScopeViolationError(
+                "Only an admin (facilitator) may open a calibration session (Methodology §9)."
+            )
+        row = CalibrationSessionORM(
+            owner_consultant_id=principal.consultant_id,
+            title=title,
+            status=CalibrationStatus.OPEN.value,
+            vignettes_json=json.dumps([v.model_dump(mode="json") for v in vignettes]),
+            opened_at=opened_at,
+        )
+        self._session.add(row)
+        self._session.flush()
+        return self._to_calibration_session(row)
+
+    def list_calibration_sessions(self, principal: Principal) -> list[CalibrationSession]:
+        """Every session — calibration is shared training content, visible org-wide (no client data
+        here). The blind is on the RESULTS, not the session's existence."""
+        rows = (
+            self._session.execute(
+                select(CalibrationSessionORM).order_by(CalibrationSessionORM.created_at)
+            )
+            .scalars()
+            .all()
+        )
+        return [self._to_calibration_session(r) for r in rows]
+
+    def get_calibration_session(self, principal: Principal, session_id: UUID) -> CalibrationSession:
+        return self._to_calibration_session(self._require_calibration_session(session_id))
+
+    def submit_calibration_rating(
+        self,
+        principal: Principal,
+        session_id: UUID,
+        *,
+        entries: Sequence[RatingEntry],
+        submitted_at: datetime,
+    ) -> CalibrationRating:
+        """An assessor submits their own blind rating. Must cover exactly the session's anchors;
+        refused once submitted (locked) or once the session is closed."""
+        session = self._require_calibration_session(session_id)
+        if session.status != CalibrationStatus.OPEN.value:
+            raise ConflictError("Calibration session is closed; no more ratings accepted.")
+        vignettes = [
+            CalibrationVignette.model_validate(v) for v in json.loads(session.vignettes_json)
+        ]
+        required = {(i, a.subcomponent_key) for i, v in enumerate(vignettes) for a in v.anchors}
+        given = {(e.vignette_index, e.subcomponent_key) for e in entries}
+        # A set comparison alone would silently accept a duplicate (vignette, anchor) with a
+        # different level, then last-wins would drop one at compute — check the count too (#3).
+        if len(given) != len(entries) or given != required:
+            raise ConflictError(
+                "A calibration rating must cover exactly the session's anchors — no missing, "
+                "extra, or duplicate entries."
+            )
+
+        stmt = select(CalibrationRatingORM).where(
+            CalibrationRatingORM.session_id == session_id,
+            CalibrationRatingORM.owner_consultant_id == principal.consultant_id,
+        )
+        row = self._session.execute(stmt).scalar_one_or_none()
+        if row is not None and row.submitted:
+            raise ConflictError("Your calibration rating is already submitted and locked.")
+        if row is None:
+            row = CalibrationRatingORM(
+                owner_consultant_id=principal.consultant_id, session_id=session_id
+            )
+        row.entries_json = json.dumps([e.model_dump(mode="json") for e in entries])
+        row.submitted = True
+        row.submitted_at = submitted_at
+        self._session.add(row)
+        try:
+            self._session.flush()
+        except IntegrityError as exc:  # concurrent first submit for the same (session, assessor)
+            self._session.rollback()
+            raise ConflictError("Your calibration rating was recorded concurrently.") from exc
+        return self._to_calibration_rating(row)
+
+    def get_my_calibration_rating(
+        self, principal: Principal, session_id: UUID
+    ) -> CalibrationRating:
+        """The caller's OWN rating for a session (never a co-rater's — that is the blind)."""
+        stmt = select(CalibrationRatingORM).where(
+            CalibrationRatingORM.session_id == session_id,
+            CalibrationRatingORM.owner_consultant_id == principal.consultant_id,
+        )
+        row = self._session.execute(stmt).scalar_one_or_none()
+        if row is None:
+            raise NotFoundError("You have not rated this calibration session.")
+        return self._to_calibration_rating(row)
+
+    def close_calibration_session(
+        self, principal: Principal, session_id: UUID, *, closed_at: datetime
+    ) -> CalibrationResult:
+        """Close the session and compute the per-anchor agreement from every submitted rating
+        (Methodology §9). Facilitator = an admin (same rule as opening); refused if already closed.
+        Raises `CalibrationStatsError` (from the compute) if fewer than two assessors submitted."""
+        session = self._require_calibration_session(session_id)
+        if not principal.is_admin:
+            raise ScopeViolationError(
+                "Only an admin (facilitator) may close a calibration session (Methodology §9)."
+            )
+        if session.status == CalibrationStatus.CLOSED.value:
+            raise ConflictError("Calibration session is already closed.")
+
+        ratings = [
+            self._to_calibration_rating(r)
+            for r in self._session.execute(
+                select(CalibrationRatingORM).where(CalibrationRatingORM.session_id == session_id)
+            )
+            .scalars()
+            .all()
+        ]
+        result = compute_calibration_result(
+            self._to_calibration_session(session), ratings, computed_at=closed_at
+        )
+        session.status = CalibrationStatus.CLOSED.value
+        session.closed_at = closed_at
+        session.results_json = result.model_dump_json()
+        self._session.add(session)
+        self._session.flush()
+        return result
+
+    def get_calibration_result(self, principal: Principal, session_id: UUID) -> CalibrationResult:
+        """The computed result of a CLOSED session (visible org-wide once closed). While the session
+        is OPEN the result does not exist — refused, so no rater sees it first (§9)."""
+        session = self._require_calibration_session(session_id)
+        if session.status != CalibrationStatus.CLOSED.value or session.results_json is None:
+            raise ConflictError(
+                "Calibration results are blind until the session closes (Methodology §9)."
+            )
+        return CalibrationResult.model_validate_json(session.results_json)
+
+    @staticmethod
+    def _to_calibration_session(row: CalibrationSessionORM) -> CalibrationSession:
+        return CalibrationSession(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            title=row.title,
+            status=CalibrationStatus(row.status),
+            vignettes=tuple(
+                CalibrationVignette.model_validate(v) for v in json.loads(row.vignettes_json)
+            ),
+            opened_at=row.opened_at,
+            closed_at=row.closed_at,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    @staticmethod
+    def _to_calibration_rating(row: CalibrationRatingORM) -> CalibrationRating:
+        return CalibrationRating(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            session_id=row.session_id,
+            entries=tuple(RatingEntry.model_validate(e) for e in json.loads(row.entries_json)),
+            submitted=row.submitted,
+            submitted_at=row.submitted_at,
             created_at=row.created_at,
             updated_at=row.updated_at,
         )

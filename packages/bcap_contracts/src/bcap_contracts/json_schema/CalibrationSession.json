@@ -1,0 +1,146 @@
+{
+  "$defs": {
+    "CalibrationStatus": {
+      "description": "A session collects while OPEN and is scored once, on CLOSE. Results exist only if CLOSED.",
+      "enum": [
+        "open",
+        "closed"
+      ],
+      "title": "CalibrationStatus",
+      "type": "string"
+    },
+    "CalibrationVignette": {
+      "additionalProperties": false,
+      "description": "A shared case excerpt and the anchors it asks assessors to rate.",
+      "properties": {
+        "anchors": {
+          "items": {
+            "$ref": "#/$defs/VignetteAnchor"
+          },
+          "minItems": 1,
+          "title": "Anchors",
+          "type": "array"
+        },
+        "excerpt": {
+          "minLength": 1,
+          "title": "Excerpt",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "excerpt",
+        "anchors"
+      ],
+      "title": "CalibrationVignette",
+      "type": "object"
+    },
+    "MaturityLevel": {
+      "description": "The four maturity levels (Methodology §3.1).\n\nThe numeric ``index`` is for computation only; clients see the label. These four indices\nare the ONLY legal subcomponent indices — any other value is a contract violation, not a\ndatum to clamp or round (ADR-0001 §1).",
+      "enum": [
+        "Basic",
+        "Developing",
+        "Advanced",
+        "Frontier"
+      ],
+      "title": "MaturityLevel",
+      "type": "string"
+    },
+    "VignetteAnchor": {
+      "additionalProperties": false,
+      "description": "One thing a vignette asks an assessor to rate: a subcomponent, with the facilitator's\nreference level (the 'model answer' — used for Practice Arena scoring and misgrading direction,\nnot for the inter-rater coefficients, which are assessor-vs-assessor).",
+      "properties": {
+        "reference_level": {
+          "$ref": "#/$defs/MaturityLevel"
+        },
+        "subcomponent_key": {
+          "minLength": 1,
+          "title": "Subcomponent Key",
+          "type": "string"
+        }
+      },
+      "required": [
+        "subcomponent_key",
+        "reference_level"
+      ],
+      "title": "VignetteAnchor",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A calibration round owned by its facilitator. Holds the shared vignettes; its status gates\nblind (OPEN collects, CLOSED reveals); the computed result is stamped on close.",
+  "properties": {
+    "closed_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Closed At"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "opened_at": {
+      "format": "date-time",
+      "title": "Opened At",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/CalibrationStatus",
+      "default": "open"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    },
+    "vignettes": {
+      "items": {
+        "$ref": "#/$defs/CalibrationVignette"
+      },
+      "minItems": 1,
+      "title": "Vignettes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "title",
+    "vignettes",
+    "opened_at"
+  ],
+  "title": "CalibrationSession",
+  "type": "object"
+}

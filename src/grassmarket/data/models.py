@@ -272,6 +272,59 @@ class AINarrativeORM(Base):
     )
 
 
+class CalibrationSessionORM(Base):
+    """A calibration round (GRS-0022, Methodology §9). Owner = the facilitator. The vignettes are
+    stored as JSON; the computed result is stamped into ``results_json`` on close (immutable
+    thereafter). Status gates the blind: OPEN collects ratings, CLOSED reveals the result."""
+
+    __tablename__ = "calibration_sessions"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    # THE scoping column — the facilitator; sessions are readable org-wide (shared content).
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    status: Mapped[str] = mapped_column(String(16), default="open", nullable=False)
+    vignettes_json: Mapped[str] = mapped_column(Text, nullable=False)
+    results_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    opened_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
+class CalibrationRatingORM(Base):
+    """One assessor's blind rating set for a session (GRS-0022). ``owner_consultant_id`` is the
+    assessor; unique per (session, assessor). Locked on submit; contributes to the result only when
+    submitted, and is never visible to a co-rater (owner-scoped) or to anyone before close."""
+
+    __tablename__ = "calibration_ratings"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    session_id: Mapped[UUID] = mapped_column(
+        ForeignKey("calibration_sessions.id"), index=True, nullable=False
+    )
+    entries_json: Mapped[str] = mapped_column(Text, default="[]", nullable=False)
+    submitted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "session_id", "owner_consultant_id", name="uq_calibration_rating_session_rater"
+        ),
+    )
+
+
 class CommitteeDecisionORM(Base):
     """A Rating Committee's recorded call on one high-stakes item of an assessment (GRS-0021,
     Methodology §8). One row per (assessment, item_type, item_key) — a re-decision updates it in

@@ -23,6 +23,16 @@ from bcap_contracts.auth import (
     LoginRequest,
     TokenResponse,
 )
+from bcap_contracts.calibration import (
+    AnchorAgreement,
+    CalibrationRating,
+    CalibrationResult,
+    CalibrationSession,
+    CalibrationStatus,
+    CalibrationVignette,
+    RatingEntry,
+    VignetteAnchor,
+)
 from bcap_contracts.commissions import CommissionKind, CommissionLine, PaymentStatus
 from bcap_contracts.committee import (
     CommitteeDecision,
@@ -126,6 +136,14 @@ __all__ = [
     "CommitteeDecision",
     "CommitteeDecisionStatus",
     "CommitteeQueueEntry",
+    "CalibrationSession",
+    "CalibrationRating",
+    "CalibrationResult",
+    "CalibrationStatus",
+    "CalibrationVignette",
+    "VignetteAnchor",
+    "RatingEntry",
+    "AnchorAgreement",
     "CertificationProgress",
     "DrillResult",
     # auth

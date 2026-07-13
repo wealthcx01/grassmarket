@@ -1,0 +1,106 @@
+{
+  "$defs": {
+    "MaturityLevel": {
+      "description": "The four maturity levels (Methodology §3.1).\n\nThe numeric ``index`` is for computation only; clients see the label. These four indices\nare the ONLY legal subcomponent indices — any other value is a contract violation, not a\ndatum to clamp or round (ADR-0001 §1).",
+      "enum": [
+        "Basic",
+        "Developing",
+        "Advanced",
+        "Frontier"
+      ],
+      "title": "MaturityLevel",
+      "type": "string"
+    },
+    "RatingEntry": {
+      "additionalProperties": false,
+      "description": "One assessor's rating of one vignette anchor.",
+      "properties": {
+        "level": {
+          "$ref": "#/$defs/MaturityLevel"
+        },
+        "subcomponent_key": {
+          "minLength": 1,
+          "title": "Subcomponent Key",
+          "type": "string"
+        },
+        "vignette_index": {
+          "minimum": 0,
+          "title": "Vignette Index",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "vignette_index",
+        "subcomponent_key",
+        "level"
+      ],
+      "title": "RatingEntry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One assessor's blind rating set for a session. `owner_consultant_id` is the assessor. Locked\non submit; invisible to co-raters (and to the results) until the session closes.",
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "entries": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/RatingEntry"
+      },
+      "title": "Entries",
+      "type": "array"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "session_id": {
+      "format": "uuid",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "submitted": {
+      "default": false,
+      "title": "Submitted",
+      "type": "boolean"
+    },
+    "submitted_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Submitted At"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "session_id"
+  ],
+  "title": "CalibrationRating",
+  "type": "object"
+}

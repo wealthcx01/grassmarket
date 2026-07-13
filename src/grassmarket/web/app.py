@@ -18,6 +18,7 @@ from grassmarket.data.database import make_engine, make_session_factory, run_mig
 from grassmarket.web.routers import (
     assessments,
     auth,
+    calibration,
     committee,
     deliverables,
     engagements,
@@ -67,6 +68,7 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
     app.include_router(narratives.router)
     app.include_router(assessments.router)
     app.include_router(committee.router)
+    app.include_router(calibration.router)
     app.include_router(guidance.router)
     app.include_router(registry.router)
     return app
