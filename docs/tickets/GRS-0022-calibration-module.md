@@ -2,7 +2,7 @@
 
 - **Loop:** 5
 - **Branch:** `grs-0022-calibration-module`
-- **Status:** Planned
+- **Status:** In review — PR #24
 - **Normative source:** Methodology v1.2 §9 (quarterly calibration; κ_w ≥ 0.75 target; AC1 alongside; anchors κ < 0.6 rewritten).
 - **Depends on:** GRS-0020 (rating capture). Content dependency: 3–5 calibration vignettes (founder track).
 
