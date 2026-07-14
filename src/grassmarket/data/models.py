@@ -158,6 +158,44 @@ class RecoveryFeeAttributionORM(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
 
+class CommissionLineORM(Base):
+    """One earned commission (GRS-0028, PRD §7). The figures are content-hash-sealed at record time
+    (immutable, non-retroactive to rate changes); `payment_status` is the one field that advances
+    (pending → invoiced → paid), stamping a fresh updated_at. Money is stored as integer minor units
+    + currency + assumption ref (never a float). The engagement provenance columns are null for a
+    recovery-fee line, which instead cites its source attribution."""
+
+    __tablename__ = "commission_lines"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    # THE scoping column — every read/list/write is filtered by this in the repository layer.
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    engagement_id: Mapped[UUID | None] = mapped_column(Uuid, index=True, nullable=True)
+    kind: Mapped[str] = mapped_column(String(32), nullable=False)
+    amount_minor: Mapped[int] = mapped_column(Integer, nullable=False)
+    amount_currency: Mapped[str] = mapped_column(String(3), nullable=False)
+    amount_assumption_ref: Mapped[str] = mapped_column(String(160), nullable=False)
+    payment_status: Mapped[str] = mapped_column(String(16), nullable=False)
+    earned_on: Mapped[date | None] = mapped_column(Date, nullable=True)
+    tier: Mapped[str | None] = mapped_column(String(24), nullable=True)
+    attribution: Mapped[str | None] = mapped_column(String(24), nullable=True)
+    rate_ref: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    base_value_minor: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    base_value_currency: Mapped[str | None] = mapped_column(String(3), nullable=True)
+    base_value_ref: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    # One commission line per recovery-fee attribution (no double-claiming the same fee).
+    source_attribution_id: Mapped[UUID | None] = mapped_column(
+        Uuid, unique=True, index=True, nullable=True
+    )
+    content_hash: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
 class EngagementORM(Base):
     """A contracted prospect's delivery record (GRS-0013, PRD §4). The linked finalised assessments
     and the deliverables progress shell are stored as JSON (a partial/growing structure saves

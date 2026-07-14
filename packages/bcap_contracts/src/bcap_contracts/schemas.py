@@ -38,7 +38,7 @@ from bcap_contracts.calibration import (
     CalibrationSession,
 )
 from bcap_contracts.certification import CertificationEvent, CertificationRecord
-from bcap_contracts.commissions import CommissionLine
+from bcap_contracts.commissions import CommissionLine, EarningsSummary
 from bcap_contracts.committee import CommitteeDecision, CommitteeItem, CommitteeQueueEntry
 from bcap_contracts.deliverables import Deliverable
 from bcap_contracts.engagements import CommsLogEntry, Engagement, Workshop
@@ -87,6 +87,7 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "Deliverable": Deliverable,
     "AINarrative": AINarrative,
     "CommissionLine": CommissionLine,
+    "EarningsSummary": EarningsSummary,
     "CommitteeItem": CommitteeItem,
     "CommitteeDecision": CommitteeDecision,
     "CommitteeQueueEntry": CommitteeQueueEntry,

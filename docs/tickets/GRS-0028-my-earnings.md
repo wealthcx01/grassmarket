@@ -2,7 +2,7 @@
 
 - **Loop:** 6
 - **Branch:** `grs-0028-my-earnings`
-- **Status:** Planned
+- **Status:** In review
 - **Normative source:** PRD §7 (rates are configuration, never code); CLAUDE.md #9.
 - **Depends on:** GRS-0011–0013 (pipeline/engagements). Commercial dependency: commission rates decision (founder track) — build with placeholder config, flagged not-final.
 
