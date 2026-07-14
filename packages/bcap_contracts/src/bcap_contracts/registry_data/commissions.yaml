@@ -1,0 +1,26 @@
+# Commission-rate configuration (GRS-0028, PRD §7) — rates/percentages are CONFIGURATION, never code.
+#
+# A commission is a percentage of an engagement's contract value, set by the consultant's tier and
+# who sourced the deal (self / Bruntsfield / co-sourced). Rates are in BASIS POINTS (100 bps = 1%)
+# so the percentage is exact. Every tier × attribution MUST have a rate (ADR-0001 completeness; a
+# missing combination is a load-time refusal, never a default).
+#
+# DRAFT v1 values — the exact commercial rates are an OPEN commercial decision (PRD §7, founder
+# track). These placeholders are internally consistent (self-sourced > co-sourced > Bruntsfield-
+# sourced; higher tier earns more) but NOT final.
+version: commissions-v1-draft
+currency: GBP
+
+rates_bps:
+  venture_associate:
+    self_sourced: 1500 # 15%
+    co_sourced: 1000 # 10%
+    bruntsfield_sourced: 750 # 7.5%
+  advisor:
+    self_sourced: 2000 # 20%
+    co_sourced: 1500 # 15%
+    bruntsfield_sourced: 1000 # 10%
+  consultant:
+    self_sourced: 2500 # 25%
+    co_sourced: 1750 # 17.5%
+    bruntsfield_sourced: 1250 # 12.5%

@@ -54,6 +54,14 @@ from bcap_contracts.certification import (
     CertificationEventKind,
     CertificationRecord,
 )
+from bcap_contracts.commissions import (
+    CommissionKind,
+    CommissionLine,
+    EarningsSummary,
+    PaymentStatus,
+    SourcingAttribution,
+    load_commission_config,
+)
 from bcap_contracts.committee import (
     CommitteeDecision,
     CommitteeDecisionStatus,
@@ -108,6 +116,7 @@ from grassmarket.data.models import (
     CalibrationSessionORM,
     CertificationEventORM,
     CertificationRecordORM,
+    CommissionLineORM,
     CommitteeDecisionORM,
     CommsLogEntryORM,
     ConsultantORM,
@@ -123,6 +132,10 @@ from grassmarket.data.models import (
     RecoveryFeeAttributionORM,
     ScoringRunORM,
     WorkshopORM,
+)
+from grassmarket.earnings.commission import (
+    commission_content_hash,
+    compute_engagement_commission,
 )
 from grassmarket.pipeline.fees import attribution_content_hash, is_within_attribution_window
 from grassmarket.workbench.arena import ArenaFeedbackDrafter, score_transcript
@@ -579,6 +592,234 @@ class Repository:
         if row is None:
             raise NotFoundError(f"Consultant {consultant_id} not found.")
         return row
+
+    def own_display_name(self, principal: Principal) -> str:
+        """The caller's own full name (for their earnings statement header)."""
+        return self._require_consultant(principal.consultant_id).full_name
+
+    # ------------------------------------------------------------------ earnings (GRS-0028)
+    # Governance split: an advisor VIEWS their own earnings (self-service transparency), but
+    # RECORDING a commission and advancing its payment status are ADMIN/finance actions — an advisor
+    # can neither set the contract value their commission derives from nor mark their own pay "paid"
+    # (objective money facts are never self-attested; the ADR-0014 principle).
+    _PAYMENT_ORDER = (PaymentStatus.PENDING, PaymentStatus.INVOICED, PaymentStatus.PAID)
+
+    def _new_commission_line(
+        self,
+        *,
+        owner_consultant_id: UUID,
+        engagement_id: UUID | None,
+        kind: CommissionKind,
+        amount: Money,
+        earned_on: date | None,
+        tier: ConsultantTier | None,
+        attribution: SourcingAttribution | None,
+        rate_ref: str | None,
+        base_value: Money | None,
+        source_attribution_id: UUID | None,
+    ) -> CommissionLine:
+        content_hash = commission_content_hash(
+            owner_consultant_id=owner_consultant_id,
+            engagement_id=engagement_id,
+            kind=kind,
+            amount=amount,
+            earned_on=earned_on,
+            tier=tier,
+            attribution=attribution,
+            rate_ref=rate_ref,
+            base_value=base_value,
+            source_attribution_id=source_attribution_id,
+        )
+        row = CommissionLineORM(
+            owner_consultant_id=owner_consultant_id,
+            engagement_id=engagement_id,
+            kind=kind.value,
+            amount_minor=amount.amount_minor,
+            amount_currency=amount.currency.value,
+            amount_assumption_ref=amount.assumption_register_ref,
+            payment_status=PaymentStatus.PENDING.value,
+            earned_on=earned_on,
+            tier=tier.value if tier else None,
+            attribution=attribution.value if attribution else None,
+            rate_ref=rate_ref,
+            base_value_minor=base_value.amount_minor if base_value else None,
+            base_value_currency=base_value.currency.value if base_value else None,
+            base_value_ref=base_value.assumption_register_ref if base_value else None,
+            source_attribution_id=source_attribution_id,
+            content_hash=content_hash,
+        )
+        self._session.add(row)
+        try:
+            self._session.flush()
+        except IntegrityError as exc:
+            self._session.rollback()
+            raise ConflictError("This recovery fee has already been claimed.") from exc
+        return self._to_commission_line(row)
+
+    def record_engagement_commission(
+        self,
+        principal: Principal,
+        *,
+        advisor_id: UUID,
+        engagement_id: UUID,
+        base_value: Money,
+        attribution: SourcingAttribution,
+        earned_on: date,
+    ) -> CommissionLine:
+        """Record an engagement commission for an advisor — ADMIN only. The rate is the config rate
+        for the advisor's tier × attribution AT RECORD TIME, stamped via rate_ref so a later config
+        change is never retroactive. Immutable + content-hash-sealed."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may record a commission.")
+        advisor = self._require_consultant(advisor_id)
+        config = load_commission_config()
+        tier = ConsultantTier(advisor.tier)
+        amount = compute_engagement_commission(base_value, tier, attribution, config)
+        return self._new_commission_line(
+            owner_consultant_id=advisor_id,
+            engagement_id=engagement_id,
+            kind=CommissionKind.ENGAGEMENT,
+            amount=amount,
+            earned_on=earned_on,
+            tier=tier,
+            attribution=attribution,
+            rate_ref=config.rate_ref(tier, attribution),
+            base_value=base_value,
+            source_attribution_id=None,
+        )
+
+    def claim_recovery_fee(
+        self, principal: Principal, *, attribution_id: UUID, earned_on: date
+    ) -> CommissionLine:
+        """Turn an eligible recovery-fee attribution into a claimed commission line — ADMIN only.
+        Idempotent per attribution: a second claim of the same fee is refused (ConflictError)."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may claim a recovery fee.")
+        attr = self._session.get(RecoveryFeeAttributionORM, attribution_id)
+        if attr is None:
+            raise NotFoundError(f"Recovery-fee attribution {attribution_id} not found.")
+        amount = Money(
+            amount_minor=attr.fee_amount_minor,
+            currency=Currency(attr.fee_currency),
+            assumption_register_ref=attr.fee_assumption_ref,
+        )
+        return self._new_commission_line(
+            owner_consultant_id=attr.owner_consultant_id,
+            engagement_id=None,
+            kind=CommissionKind.WORKSHOP_RECOVERY_FEE,
+            amount=amount,
+            earned_on=earned_on,
+            tier=None,
+            attribution=None,
+            rate_ref=attr.rate_ref,
+            base_value=None,
+            source_attribution_id=attribution_id,
+        )
+
+    def advance_commission_payment(
+        self, principal: Principal, line_id: UUID, *, to_status: PaymentStatus
+    ) -> CommissionLine:
+        """Advance a commission line's payment status — ADMIN only. Forward-only along
+        pending → invoiced → paid; a backward move or a skip is refused (ConflictError). The sealed
+        financial figures are untouched (payment_status is not part of the content hash)."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may change a commission's payment status.")
+        row = self._session.get(CommissionLineORM, line_id)
+        if row is None:
+            raise NotFoundError(f"Commission line {line_id} not found.")
+        current = PaymentStatus(row.payment_status)
+        if self._PAYMENT_ORDER.index(to_status) != self._PAYMENT_ORDER.index(current) + 1:
+            raise ConflictError(
+                f"Illegal payment transition {current.value} → {to_status.value}: status advances "
+                f"one step forward only (pending → invoiced → paid)."
+            )
+        row.payment_status = to_status.value
+        self._session.add(row)
+        self._session.flush()
+        return self._to_commission_line(row)
+
+    def list_commission_lines(self, principal: Principal) -> list[CommissionLine]:
+        """The caller's OWN commission lines — strictly self-scoped (earnings transparency is
+        self-service; the cross-advisor aggregate is Holy Corner scope, not this ticket)."""
+        rows = (
+            self._session.execute(
+                select(CommissionLineORM)
+                .where(CommissionLineORM.owner_consultant_id == principal.consultant_id)
+                .order_by(CommissionLineORM.created_at)
+            )
+            .scalars()
+            .all()
+        )
+        return [self._to_commission_line(r) for r in rows]
+
+    def earnings_summary(self, principal: Principal, *, now: datetime) -> EarningsSummary:
+        """The caller's own earnings roll-up (self only). Totals are summed within the config
+        currency; YTD counts lines earned in the current calendar year."""
+        lines = self.list_commission_lines(principal)
+        currency = load_commission_config().currency
+        totals = {status: 0 for status in PaymentStatus}
+        ytd = 0
+        for line in lines:
+            if line.amount.currency is not currency:
+                raise ConflictError(
+                    f"Commission line {line.id} is in {line.amount.currency.value}, not the "
+                    f"{currency.value} earnings currency — refusing to sum across currencies."
+                )
+            totals[line.payment_status] += line.amount.amount_minor
+            earned_year = line.earned_on.year if line.earned_on else line.created_at.year
+            if earned_year == now.year:
+                ytd += line.amount.amount_minor
+
+        def money(minor: int, ref: str) -> Money:
+            return Money(amount_minor=minor, currency=currency, assumption_register_ref=ref)
+
+        pending = totals[PaymentStatus.PENDING]
+        invoiced = totals[PaymentStatus.INVOICED]
+        return EarningsSummary(
+            owner_consultant_id=principal.consultant_id,
+            currency=currency,
+            ytd_earned=money(ytd, "earnings-summary:ytd"),
+            pending=money(pending, "earnings-summary:pending"),
+            invoiced=money(invoiced, "earnings-summary:invoiced"),
+            paid=money(totals[PaymentStatus.PAID], "earnings-summary:paid"),
+            projected_unpaid=money(pending + invoiced, "earnings-summary:projected-unpaid"),
+            line_count=len(lines),
+        )
+
+    @staticmethod
+    def _to_commission_line(row: CommissionLineORM) -> CommissionLine:
+        base_value = (
+            Money(
+                amount_minor=row.base_value_minor,
+                currency=Currency(row.base_value_currency),
+                assumption_register_ref=row.base_value_ref,
+            )
+            if row.base_value_minor is not None
+            and row.base_value_currency is not None
+            and row.base_value_ref is not None
+            else None
+        )
+        return CommissionLine(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            engagement_id=row.engagement_id,
+            kind=CommissionKind(row.kind),
+            amount=Money(
+                amount_minor=row.amount_minor,
+                currency=Currency(row.amount_currency),
+                assumption_register_ref=row.amount_assumption_ref,
+            ),
+            payment_status=PaymentStatus(row.payment_status),
+            earned_on=row.earned_on,
+            tier=ConsultantTier(row.tier) if row.tier else None,
+            attribution=SourcingAttribution(row.attribution) if row.attribution else None,
+            rate_ref=row.rate_ref,
+            base_value=base_value,
+            source_attribution_id=row.source_attribution_id,
+            content_hash=row.content_hash,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
 
     # ------------------------------------------------------------------ engagements (SCOPED)
     def create_engagement(

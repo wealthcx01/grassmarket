@@ -54,7 +54,15 @@ from bcap_contracts.certification import (
     CertificationEventKind,
     CertificationRecord,
 )
-from bcap_contracts.commissions import CommissionKind, CommissionLine, PaymentStatus
+from bcap_contracts.commissions import (
+    CommissionConfig,
+    CommissionKind,
+    CommissionLine,
+    EarningsSummary,
+    PaymentStatus,
+    SourcingAttribution,
+    load_commission_config,
+)
 from bcap_contracts.committee import (
     CommitteeDecision,
     CommitteeDecisionStatus,
@@ -162,7 +170,11 @@ __all__ = [
     "ApprovalStatus",
     "CommissionLine",
     "CommissionKind",
+    "CommissionConfig",
+    "EarningsSummary",
+    "SourcingAttribution",
     "PaymentStatus",
+    "load_commission_config",
     "CommitteeItem",
     "CommitteeItemType",
     "CommitteeDecision",
