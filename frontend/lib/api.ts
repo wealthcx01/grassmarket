@@ -11,20 +11,34 @@
 
 import type {
   AINarrative,
+  ArenaScenario,
+  ArenaSession,
+  ArenaTurn,
   Assessment,
   AssessmentDocument,
+  BenchQueue,
+  CalibrationRating,
+  CalibrationResult,
+  CalibrationSession,
+  CertificationEvent,
+  CertificationRecord,
   CommsChannel,
   CommsLogEntry,
+  ContentCompletion,
   Deliverable,
   DeliverableSlot,
   DeliverableType,
+  DrillCard,
   Engagement,
+  LearningModule,
   NarrativeSection,
   LiveScore,
+  PerformanceSummary,
   PipelineBoard,
   PipelineForecast,
   PipelineStage,
   Prospect,
+  RatingEntry,
   RecoveryFeeAttribution,
   Registry,
   RubricAnchor,
@@ -445,6 +459,167 @@ export const api = {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify(body),
+      signal,
+    });
+  },
+
+  // --- Workbench: bench queue + performance (GRS-0026) ---
+  benchQueue(signal?: AbortSignal): Promise<BenchQueue> {
+    return request<BenchQueue>("/bench/queue", { method: "GET", headers: authHeaders(), signal });
+  },
+
+  performance(advisorId: string, signal?: AbortSignal): Promise<PerformanceSummary> {
+    return request<PerformanceSummary>(`/bench/performance/${advisorId}`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  // --- Workbench: certification (GRS-0023) ---
+  certification(advisorId: string, signal?: AbortSignal): Promise<CertificationRecord> {
+    return request<CertificationRecord>(`/certification/${advisorId}`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  certificationEvents(advisorId: string, signal?: AbortSignal): Promise<CertificationEvent[]> {
+    return request<CertificationEvent[]>(`/certification/${advisorId}/events`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  // --- Workbench: learning + drills (GRS-0024) ---
+  learningModules(signal?: AbortSignal): Promise<LearningModule[]> {
+    return request<LearningModule[]>("/workbench/learning/modules", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  completeLearningModule(
+    moduleId: string,
+    body?: { score?: number },
+    signal?: AbortSignal,
+  ): Promise<ContentCompletion> {
+    return request<ContentCompletion>(`/workbench/learning/modules/${moduleId}/complete`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(body ?? {}),
+      signal,
+    });
+  },
+
+  drillCards(signal?: AbortSignal): Promise<DrillCard[]> {
+    return request<DrillCard[]>("/workbench/drills/cards", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  dueDrillCards(signal?: AbortSignal): Promise<DrillCard[]> {
+    return request<DrillCard[]>("/workbench/drills/cards/due", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  answerDrillCard(cardId: string, grade: number, signal?: AbortSignal): Promise<DrillCard> {
+    return request<DrillCard>(`/workbench/drills/cards/${cardId}/answer`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ grade }),
+      signal,
+    });
+  },
+
+  // --- Workbench: Practice Arena (GRS-0025) ---
+  arenaScenarios(signal?: AbortSignal): Promise<ArenaScenario[]> {
+    return request<ArenaScenario[]>("/arena/scenarios", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  arenaSessions(signal?: AbortSignal): Promise<ArenaSession[]> {
+    return request<ArenaSession[]>("/arena/sessions", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  startArenaSession(scenarioId: string, signal?: AbortSignal): Promise<ArenaSession> {
+    return request<ArenaSession>(`/arena/scenarios/${scenarioId}/sessions`, {
+      method: "POST",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  submitArenaSession(
+    sessionId: string,
+    transcript: ArenaTurn[],
+    signal?: AbortSignal,
+  ): Promise<ArenaSession> {
+    return request<ArenaSession>(`/arena/sessions/${sessionId}/submit`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ transcript }),
+      signal,
+    });
+  },
+
+  // --- Workbench: calibration (GRS-0022; blind while OPEN, revealed on CLOSE) ---
+  calibrationSessions(signal?: AbortSignal): Promise<CalibrationSession[]> {
+    return request<CalibrationSession[]>("/calibration/sessions", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  calibrationSession(sessionId: string, signal?: AbortSignal): Promise<CalibrationSession> {
+    return request<CalibrationSession>(`/calibration/sessions/${sessionId}`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  submitCalibrationRating(
+    sessionId: string,
+    entries: RatingEntry[],
+    signal?: AbortSignal,
+  ): Promise<CalibrationRating> {
+    return request<CalibrationRating>(`/calibration/sessions/${sessionId}/ratings`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ entries }),
+      signal,
+    });
+  },
+
+  myCalibrationRating(sessionId: string, signal?: AbortSignal): Promise<CalibrationRating> {
+    return request<CalibrationRating>(`/calibration/sessions/${sessionId}/my-rating`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  calibrationResult(sessionId: string, signal?: AbortSignal): Promise<CalibrationResult> {
+    return request<CalibrationResult>(`/calibration/sessions/${sessionId}/results`, {
+      method: "GET",
+      headers: authHeaders(),
       signal,
     });
   },

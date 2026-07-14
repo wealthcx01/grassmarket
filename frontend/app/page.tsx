@@ -23,7 +23,7 @@ const SECTIONS: ReadonlyArray<{ title: string; href: string; blurb: string; loop
   },
   {
     title: "Workbench",
-    href: "#",
+    href: "/workbench",
     blurb: "Certification ladder, practice arena, power drills, bench queue.",
     loop: "Loop 5",
   },

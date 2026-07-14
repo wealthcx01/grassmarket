@@ -1,0 +1,85 @@
+"use client";
+
+/**
+ * The Workbench (GRS-0027, PRD §6) — one coherent surface over the Loop 5 APIs: the bench-time
+ * dashboard, certification, learning + drills, the practice arena, calibration, and (members only)
+ * the rating committee. Role gating here mirrors the API's JWT claims exactly — the Committee tab is
+ * mounted only for a committee member or admin, the same gate the server enforces.
+ */
+
+import { useMemo, useState } from "react";
+import Link from "next/link";
+
+import { getSession } from "@/lib/session";
+import { BenchDashboard } from "@/components/workbench/BenchDashboard";
+import { CalibrationPanel } from "@/components/workbench/CalibrationPanel";
+import { CertificationPanel } from "@/components/workbench/CertificationPanel";
+import { CommitteePanel } from "@/components/workbench/CommitteePanel";
+import { LearningDrillsPanel } from "@/components/workbench/LearningDrillsPanel";
+import { ArenaPanel } from "@/components/workbench/ArenaPanel";
+
+type TabKey = "bench" | "certification" | "learning" | "arena" | "calibration" | "committee";
+
+export function WorkbenchClient() {
+  const session = useMemo(() => getSession(), []);
+  const tabs = useMemo(() => {
+    const base: { key: TabKey; label: string }[] = [
+      { key: "bench", label: "Bench" },
+      { key: "certification", label: "Certification" },
+      { key: "learning", label: "Learning & Drills" },
+      { key: "arena", label: "Practice Arena" },
+      { key: "calibration", label: "Calibration" },
+    ];
+    if (session?.isCommittee) base.push({ key: "committee", label: "Committee" });
+    return base;
+  }, [session]);
+  const [tab, setTab] = useState<TabKey>("bench");
+
+  if (!session) {
+    return (
+      <p style={{ fontSize: "0.9rem" }}>
+        Please{" "}
+        <Link href="/login" style={{ fontWeight: 500 }}>
+          sign in
+        </Link>{" "}
+        to use the Workbench.
+      </p>
+    );
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+      <nav role="tablist" aria-label="Workbench sections" style={{ display: "flex", gap: "0.3rem", flexWrap: "wrap", borderBottom: "1px solid var(--color-border)" }}>
+        {tabs.map((t) => (
+          <button
+            key={t.key}
+            role="tab"
+            aria-selected={tab === t.key}
+            onClick={() => setTab(t.key)}
+            style={{
+              padding: "0.5rem 0.9rem",
+              border: "none",
+              borderBottom: tab === t.key ? "2px solid var(--color-accent)" : "2px solid transparent",
+              background: "none",
+              cursor: "pointer",
+              fontSize: "0.85rem",
+              fontWeight: tab === t.key ? 600 : 400,
+              color: tab === t.key ? "var(--color-ink)" : "var(--color-ink-muted)",
+            }}
+          >
+            {t.label}
+          </button>
+        ))}
+      </nav>
+
+      <div>
+        {tab === "bench" && <BenchDashboard advisorId={session.consultantId} />}
+        {tab === "certification" && <CertificationPanel advisorId={session.consultantId} />}
+        {tab === "learning" && <LearningDrillsPanel />}
+        {tab === "arena" && <ArenaPanel />}
+        {tab === "calibration" && <CalibrationPanel />}
+        {tab === "committee" && session.isCommittee && <CommitteePanel />}
+      </div>
+    </div>
+  );
+}
