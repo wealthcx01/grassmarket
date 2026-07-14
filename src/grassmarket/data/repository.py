@@ -99,6 +99,7 @@ from bcap_contracts.learning import (
     QuizQuestion,
     QuizStatus,
 )
+from bcap_contracts.meetings import MediaKind, MeetingTranscript
 from bcap_contracts.money import Currency, Money
 from bcap_contracts.narratives import AINarrative, NarrativeSection, NarrativeStatus
 from bcap_contracts.pipeline import assert_legal_transition
@@ -127,6 +128,7 @@ from grassmarket.data.models import (
     GeneratedQuizORM,
     InvitationORM,
     LearningModuleORM,
+    MeetingTranscriptORM,
     ModuleRatingDraftORM,
     ProspectORM,
     RecoveryFeeAttributionORM,
@@ -137,6 +139,9 @@ from grassmarket.earnings.commission import (
     commission_content_hash,
     compute_engagement_commission,
 )
+from grassmarket.pathb.cipher import TranscriptCipher
+from grassmarket.pathb.scanning import MediaScanner
+from grassmarket.pathb.transcription import Transcriber, TranscriptionError
 from grassmarket.pipeline.fees import attribution_content_hash, is_within_attribution_window
 from grassmarket.workbench.arena import ArenaFeedbackDrafter, score_transcript
 from grassmarket.workbench.bench import (
@@ -817,6 +822,127 @@ class Repository:
             base_value=base_value,
             source_attribution_id=row.source_attribution_id,
             content_hash=row.content_hash,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    # ------------------------------------------- Path B: meeting transcripts (GRS-0029, SCOPED)
+    def ingest_pasted_transcript(
+        self,
+        principal: Principal,
+        *,
+        text: str,
+        source_filename: str,
+        cipher: TranscriptCipher,
+        engagement_id: UUID | None = None,
+        retention_until: date | None = None,
+    ) -> MeetingTranscript:
+        """Store a pasted transcript — no transcription needed. Encrypted at rest (plaintext never
+        hits the DB); owned by the caller."""
+        return self._store_transcript(
+            principal,
+            text=text,
+            source_kind=MediaKind.TRANSCRIPT_TEXT,
+            source_filename=source_filename,
+            transcriber_ref="pasted",
+            cipher=cipher,
+            engagement_id=engagement_id,
+            retention_until=retention_until,
+        )
+
+    def ingest_media(
+        self,
+        principal: Principal,
+        *,
+        media: bytes,
+        source_filename: str,
+        content_type: str,
+        source_kind: MediaKind,
+        transcriber: Transcriber,
+        scanner: MediaScanner,
+        cipher: TranscriptCipher,
+        engagement_id: UUID | None = None,
+        retention_until: date | None = None,
+    ) -> MeetingTranscript:
+        """Scan → transcribe → store an uploaded audio/video file. The scanner runs FIRST,
+        by raising (nothing is transcribed or stored on a refusal); the transcript is then encrypted
+        at rest. The transcriber and scanner are injected ports (swappable by config)."""
+        # Empty media is refused at the ingest boundary, so the guarantee holds regardless of which
+        # transcriber is injected (a provider without its own empty-guard cannot store a blank).
+        if not media:
+            raise TranscriptionError(f"Refusing to ingest empty media ({source_filename}).")
+        scanner.scan(media, filename=source_filename)  # raises MediaThreatError to refuse
+        text = transcriber.transcribe(media, filename=source_filename, content_type=content_type)
+        return self._store_transcript(
+            principal,
+            text=text,
+            source_kind=source_kind,
+            source_filename=source_filename,
+            transcriber_ref=transcriber.version,
+            cipher=cipher,
+            engagement_id=engagement_id,
+            retention_until=retention_until,
+        )
+
+    def _store_transcript(
+        self,
+        principal: Principal,
+        *,
+        text: str,
+        source_kind: MediaKind,
+        source_filename: str,
+        transcriber_ref: str,
+        cipher: TranscriptCipher,
+        engagement_id: UUID | None,
+        retention_until: date | None,
+    ) -> MeetingTranscript:
+        row = MeetingTranscriptORM(
+            owner_consultant_id=principal.consultant_id,
+            engagement_id=engagement_id,
+            source_kind=source_kind.value,
+            source_filename=source_filename,
+            text_ciphertext=cipher.encrypt(text),
+            transcriber_ref=transcriber_ref,
+            retention_until=retention_until,
+        )
+        self._session.add(row)
+        self._session.flush()
+        return self._to_meeting_transcript(row, cipher)
+
+    def list_transcripts(
+        self, principal: Principal, *, cipher: TranscriptCipher
+    ) -> list[MeetingTranscript]:
+        """The caller's own transcripts (an admin sees all), text decrypted for the reader."""
+        stmt = select(MeetingTranscriptORM)
+        if not principal.is_admin:
+            stmt = stmt.where(MeetingTranscriptORM.owner_consultant_id == principal.consultant_id)
+        rows = self._session.execute(stmt.order_by(MeetingTranscriptORM.created_at)).scalars().all()
+        return [self._to_meeting_transcript(r, cipher) for r in rows]
+
+    def get_transcript(
+        self, principal: Principal, transcript_id: UUID, *, cipher: TranscriptCipher
+    ) -> MeetingTranscript:
+        """A single transcript, with its text decrypted — the owner's (or an admin's). A cross-owner
+        read is refused (ScopeViolationError → 404)."""
+        row = self._session.get(MeetingTranscriptORM, transcript_id)
+        if row is None:
+            raise NotFoundError(f"Transcript {transcript_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        return self._to_meeting_transcript(row, cipher)
+
+    @staticmethod
+    def _to_meeting_transcript(
+        row: MeetingTranscriptORM, cipher: TranscriptCipher
+    ) -> MeetingTranscript:
+        return MeetingTranscript(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            engagement_id=row.engagement_id,
+            source_kind=MediaKind(row.source_kind),
+            source_filename=row.source_filename,
+            text=cipher.decrypt(row.text_ciphertext),
+            transcriber_ref=row.transcriber_ref,
+            retention_until=row.retention_until,
             created_at=row.created_at,
             updated_at=row.updated_at,
         )

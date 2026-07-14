@@ -21,6 +21,7 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     Integer,
+    LargeBinary,
     String,
     Text,
     UniqueConstraint,
@@ -156,6 +157,29 @@ class RecoveryFeeAttributionORM(Base):
     fee_assumption_ref: Mapped[str] = mapped_column(String(128), nullable=False)
     content_hash: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
+class MeetingTranscriptORM(Base):
+    """A stored Path B meeting transcript (GRS-0029). The transcript text is held ONLY as ciphertext
+    (`text_ciphertext`) — plaintext never lands in the database (encrypted at rest). Scoped by
+    owner_consultant_id; carries a retention date for the GDPR groundwork."""
+
+    __tablename__ = "meeting_transcripts"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    engagement_id: Mapped[UUID | None] = mapped_column(Uuid, index=True, nullable=True)
+    source_kind: Mapped[str] = mapped_column(String(24), nullable=False)
+    source_filename: Mapped[str] = mapped_column(String(255), nullable=False)
+    text_ciphertext: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
+    transcriber_ref: Mapped[str] = mapped_column(String(64), nullable=False)
+    retention_until: Mapped[date | None] = mapped_column(Date, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
 
 
 class CommissionLineORM(Base):

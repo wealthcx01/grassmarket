@@ -17,6 +17,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # The exact placeholder shipped in .env.example; production refuses to boot with it (below).
 _PLACEHOLDER_SECRET = "change-me-in-real-environments-use-a-48-byte-urlsafe-token"  # noqa: E501  # pragma: allowlist secret
+# A valid dev/test Fernet key so local ingestion works out of the box; prod refuses it (below).
+_PLACEHOLDER_TRANSCRIPT_KEY = "XLLj_pbyBm78QwMhfP5tNhN4Z9JfimC8EhnHa_d4FmM="  # noqa: E501  # pragma: allowlist secret
 
 
 class Settings(BaseSettings):
@@ -45,6 +47,15 @@ class Settings(BaseSettings):
         default="advisors.bruntsfieldcapital.com", validation_alias="GM_JWT_ISSUER"
     )
     jwt_audience: str = Field(default="bruntsfield", validation_alias="GM_JWT_AUDIENCE")
+
+    # Transcript encryption at rest (GRS-0029). A url-safe base64 Fernet key; the dev default
+    # works locally, production refuses it (below).
+    transcript_encryption_key: str = Field(
+        default=_PLACEHOLDER_TRANSCRIPT_KEY,
+        validation_alias=AliasChoices("GM_TRANSCRIPT_ENCRYPTION_KEY", "TRANSCRIPT_ENCRYPTION_KEY"),
+    )
+    # Upload guard (GRS-0029): reject media larger than this before scanning/transcribing.
+    max_upload_bytes: int = Field(default=25 * 1024 * 1024, validation_alias="GM_MAX_UPLOAD_BYTES")
 
     invite_ttl_hours: int = Field(default=168, validation_alias="GM_INVITE_TTL_HOURS")
     frontend_origin: str = Field(
@@ -77,6 +88,11 @@ class Settings(BaseSettings):
             if self.database_url.startswith("sqlite"):
                 raise ValueError(
                     "Refusing to run in production on SQLite. Provide a Postgres DATABASE_URL."
+                )
+            if self.transcript_encryption_key == _PLACEHOLDER_TRANSCRIPT_KEY:
+                raise ValueError(
+                    "Refusing to run in production with the placeholder transcript key."
+                    " Generate one with Fernet.generate_key()."
                 )
         return self
 

@@ -1,0 +1,98 @@
+{
+  "$defs": {
+    "MediaKind": {
+      "description": "How the transcript entered the system.",
+      "enum": [
+        "transcript_text",
+        "audio",
+        "video"
+      ],
+      "title": "MediaKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A stored meeting transcript owned by the consultant who ingested it. The text is sensitive:\nit is stored encrypted at rest and only ever returned to its owner. `transcriber_ref` records\nwhich adapter produced it ('pasted' for text) so a re-transcription is traceable.",
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "engagement_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The engagement this meeting belongs to, if linked.",
+      "title": "Engagement Id"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "retention_until": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Delete-after date — GDPR retention groundwork (GRS-0032).",
+      "title": "Retention Until"
+    },
+    "source_filename": {
+      "minLength": 1,
+      "title": "Source Filename",
+      "type": "string"
+    },
+    "source_kind": {
+      "$ref": "#/$defs/MediaKind"
+    },
+    "text": {
+      "description": "Transcript plaintext (owner-only; stored encrypted at rest).",
+      "title": "Text",
+      "type": "string"
+    },
+    "transcriber_ref": {
+      "description": "The adapter/version that produced the text ('pasted' for text).",
+      "minLength": 1,
+      "title": "Transcriber Ref",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "source_kind",
+    "source_filename",
+    "text",
+    "transcriber_ref"
+  ],
+  "title": "MeetingTranscript",
+  "type": "object"
+}
