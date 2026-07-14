@@ -14,6 +14,7 @@ from pydantic import BaseModel, EmailStr
 
 from grassmarket.auth.service import (
     AuthService,
+    ForbiddenInvitationError,
     InvalidCredentialsError,
     InvalidInvitationError,
 )
@@ -68,13 +69,17 @@ def create_invitation(
     auth: AuthService = Depends(get_auth_service),
 ) -> CreateInvitationResponse:
     """Authenticated consultants invite others. The raw token is returned once for out-of-band
-    delivery (email integration is a later loop)."""
-    raw_token = auth.create_invitation(
-        inviter_id=principal.consultant_id,
-        email=payload.email,
-        role=payload.role,
-        tier=payload.tier,
-    )
+    delivery (email integration is a later loop). Only an admin may grant an elevated role/tier."""
+    try:
+        raw_token = auth.create_invitation(
+            inviter_id=principal.consultant_id,
+            inviter_role=principal.role,
+            email=payload.email,
+            role=payload.role,
+            tier=payload.tier,
+        )
+    except ForbiddenInvitationError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
     return CreateInvitationResponse(email=payload.email, token=raw_token)
 
 
