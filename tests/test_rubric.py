@@ -53,9 +53,10 @@ def test_seeded_library_loads_all_204_anchors() -> None:
 
 def test_seeded_library_has_the_authored_oems_example() -> None:
     lib = load_rubric_library()
-    # 15 fully-authored subcomponents × 4 levels = 60: the §4 worked example (OEMS_EXEC_ALGOS)
-    # plus the 14 CRITICAL (★) subcomponents that gate module ratings (GRS-0008).
-    assert lib.authored_count() == 60
+    # The library is fully authored: all 51 subcomponents × 4 levels = 204 anchors — the §4 worked
+    # example (OEMS_EXEC_ALGOS), the 14 CRITICAL (★) subcomponents (first pass), and the remaining
+    # 36 non-critical subcomponents (second pass, GRS-0008).
+    assert lib.authored_count() == 204
     levels = lib.for_subcomponent("OEMS_EXEC_ALGOS")
     assert [a.level for a in levels] == list(_LEVELS)  # returned in rank order
     for a in levels:
@@ -75,12 +76,18 @@ def test_seeded_authored_critical_subcomponent_is_complete() -> None:
         assert a.required_evidence and a.differentiator_questions and a.misgrading_notes
 
 
-def test_seeded_unauthored_anchor_is_an_explicit_todo_point() -> None:
+def test_seeded_non_critical_subcomponent_is_fully_authored() -> None:
     lib = load_rubric_library()
-    # A non-critical subcomponent not yet authored remains an explicit TODO placeholder.
-    a = lib.get("FRONTEND_DEVICE_COVERAGE", MaturityLevel.BASIC)
-    assert a.status is AnchorStatus.TODO
-    assert a.statement == ""  # an explicit placeholder, not a fabricated anchor
+    # A non-critical subcomponent authored in the second pass (GRS-0008) now carries the full §4
+    # template at every level — no TODO placeholder remains anywhere in the library.
+    levels = lib.for_subcomponent("FRONTEND_DEVICE_COVERAGE")
+    assert [a.level for a in levels] == list(_LEVELS)
+    for a in levels:
+        assert a.status is AnchorStatus.AUTHORED
+        assert a.statement.strip()
+        assert a.required_evidence and a.differentiator_questions and a.misgrading_notes
+    # The whole library is authored — no explicit TODO pairs are left.
+    assert not any(a.status is AnchorStatus.TODO for a in lib.anchors)
 
 
 # --- Completeness & key refusals (validate_against) -------------------------------------
