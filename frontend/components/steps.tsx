@@ -384,9 +384,16 @@ export function InfrastructureDeepDiveStep({ registry, document: d, update, read
 
 export function SummaryStep(props: StepProps) {
   const { live, readOnly, onFinalise, finalising } = props;
+  const moduleLabels = Object.fromEntries(props.registry.modules.map((m) => [m.key, m.name]));
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: "42rem" }}>
-      <LiveScorePanel score={live} loading={props.liveLoading} error={props.liveError} onRefresh={props.refreshLive} />
+      <LiveScorePanel
+        score={live}
+        loading={props.liveLoading}
+        error={props.liveError}
+        onRefresh={props.refreshLive}
+        moduleLabels={moduleLabels}
+      />
       {live?.scoreable ? (
         <Card>
           <h3 style={{ margin: "0 0 0.4rem", fontSize: "1rem" }}>Platform Power triad (ordinal)</h3>
@@ -405,18 +412,9 @@ export function SummaryStep(props: StepProps) {
         <div>
           <button
             type="button"
+            className="btn btn-primary"
             onClick={onFinalise}
             disabled={finalising || !live?.scoreable}
-            style={{
-              background: "var(--color-accent)",
-              color: "var(--color-accent-contrast)",
-              border: "none",
-              borderRadius: "var(--radius)",
-              padding: "0.55rem 1.1rem",
-              fontSize: "0.9rem",
-              cursor: live?.scoreable ? "pointer" : "not-allowed",
-              opacity: live?.scoreable ? 1 : 0.5,
-            }}
           >
             {finalising ? "Finalising…" : "Finalise & lock inputs"}
           </button>
