@@ -2,7 +2,7 @@
 
 - **Loop:** 5 (closes Loop 5)
 - **Branch:** `grs-0027-workbench-frontend`
-- **Status:** Planned
+- **Status:** In review
 - **Normative source:** PRD §6; design tokens per CLAUDE.md.
 - **Depends on:** GRS-0020–0026 APIs.
 

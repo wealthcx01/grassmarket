@@ -389,3 +389,197 @@ export interface Engagement {
   created_at: string;
   updated_at: string;
 }
+
+/* --- Workbench (GRS-0027; Loop 5 APIs) ------------------------------------------------- */
+
+export type AssessorLevelValue = "trained" | "shadow" | "observed_lead" | "certified_lead";
+
+export type BenchItemKind = "certification" | "drill" | "arena" | "research";
+
+export interface BenchQueueItem {
+  kind: BenchItemKind;
+  priority: number;
+  title: string;
+  detail: string;
+  action_hint: string;
+  ref_id?: string | null;
+}
+
+export interface BenchQueue {
+  owner_consultant_id: string;
+  generated_at: string;
+  items: BenchQueueItem[];
+}
+
+export interface ArenaTrendPoint {
+  scored_at: string;
+  completeness: number;
+}
+
+export interface PerformanceSummary {
+  owner_consultant_id: string;
+  level: AssessorLevelValue;
+  engagements_active: number;
+  engagements_completed: number;
+  prospects_total: number;
+  pipeline_conversion_rate: number;
+  coursework_complete: boolean;
+  exam_passed: boolean;
+  drills_due: number;
+  drill_best_streak: number;
+  arena_sessions_scored: number;
+  arena_best_completeness?: number | null;
+  arena_trend: ArenaTrendPoint[];
+}
+
+export interface CertificationRecord {
+  id: string;
+  owner_consultant_id: string;
+  level: AssessorLevelValue;
+  coursework_complete: boolean;
+  exam_score?: number | null;
+  shadow_count: number;
+  observed_lead_logged: boolean;
+  observed_lead_signoff_by?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CertificationEvent {
+  id: string;
+  owner_consultant_id: string;
+  kind: string;
+  detail?: string | null;
+  from_level?: AssessorLevelValue | null;
+  to_level?: AssessorLevelValue | null;
+  reason?: string | null;
+  occurred_at: string;
+}
+
+export type LearningKind = "playbook" | "sales_journey" | "technical_primer" | "exam_quiz";
+export type CertificationCredit = "none" | "coursework";
+
+export interface LearningModule {
+  id: string;
+  kind: LearningKind;
+  title: string;
+  methodology_ref: string;
+  certification_credit: CertificationCredit;
+}
+
+export interface ContentCompletion {
+  id: string;
+  module_id: string;
+  score?: number | null;
+  completed_at: string;
+}
+
+export interface DrillCard {
+  id: string;
+  topic: string;
+  repetitions: number;
+  easiness: number;
+  interval_days: number;
+  due_at: string;
+  streak: number;
+  last_reviewed_at?: string | null;
+}
+
+export type ArenaSpeaker = "advisor" | "client";
+
+export interface ArenaTurn {
+  speaker: ArenaSpeaker;
+  text: string;
+}
+
+export interface PowerProbeResult {
+  power_key: string;
+  benefit_probed: boolean;
+  barrier_probed: boolean;
+}
+
+export interface ArenaScore {
+  powers: PowerProbeResult[];
+  modules_evidenced: string[];
+  evidence_questions: number;
+  completeness: number;
+}
+
+export type ArenaStatus = "in_progress" | "scored";
+
+export interface ArenaScenario {
+  id: string;
+  owner_consultant_id: string;
+  title: string;
+  brief: string;
+  client_persona: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ArenaSession {
+  id: string;
+  owner_consultant_id: string;
+  scenario_id: string;
+  status: ArenaStatus;
+  transcript: ArenaTurn[];
+  score?: ArenaScore | null;
+  feedback?: string | null;
+  feedback_is_ai_drafted: boolean;
+  drafter_version?: string | null;
+  scored_at?: string | null;
+}
+
+export type CalibrationStatus = "open" | "closed";
+
+export interface VignetteAnchor {
+  subcomponent_key: string;
+  reference_level: MaturityLevel;
+}
+
+export interface CalibrationVignette {
+  title: string;
+  excerpt: string;
+  anchors: VignetteAnchor[];
+}
+
+export interface CalibrationSession {
+  id: string;
+  owner_consultant_id: string;
+  title: string;
+  status: CalibrationStatus;
+  vignettes: CalibrationVignette[];
+  opened_at: string;
+  closed_at?: string | null;
+}
+
+export interface RatingEntry {
+  vignette_index: number;
+  subcomponent_key: string;
+  level: MaturityLevel;
+}
+
+export interface CalibrationRating {
+  id: string;
+  owner_consultant_id: string;
+  session_id: string;
+  entries: RatingEntry[];
+  submitted: boolean;
+  submitted_at?: string | null;
+}
+
+export interface AnchorAgreement {
+  subcomponent_key: string;
+  n_raters: number;
+  n_vignettes: number;
+  kappa_w: number;
+  ac1: number;
+  flagged: boolean;
+}
+
+export interface CalibrationResult {
+  session_id: string;
+  computed_at: string;
+  n_raters: number;
+  anchors: AnchorAgreement[];
+}
