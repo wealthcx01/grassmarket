@@ -263,18 +263,19 @@ def test_charts_are_byte_deterministic() -> None:
 
 
 # ----------------------------------------------------------- service dispatcher + gate
-def _render(dtype: DeliverableType, *, client_facing: bool, coeffs=None):
+def _render(dtype: DeliverableType, *, client_facing: bool, coeffs=None, model=None):
     from tests.committee_helpers import approved_decisions_for
 
     coeffs = coeffs or draft_v1_coefficient_set(_REGISTRY)
-    art = compute_score(_doc(graded=True), coeffs, _REGISTRY, _MODEL, random.Random(1))
+    model = model or _MODEL
+    art = compute_score(_doc(graded=True), coeffs, _REGISTRY, model, random.Random(1))
     return render_diagnostic_document(
         deliverable_type=dtype,
         inputs=art.inputs,
         stored_result=art.result,
         coefficients=coeffs,
         registry=_REGISTRY,
-        model=_MODEL,
+        model=model,
         subject="Meridian",
         generated_on=date(2026, 7, 13),
         client_facing=client_facing,
@@ -301,15 +302,50 @@ def test_dispatcher_refuses_non_single_run_types() -> None:
 
 
 def test_dispatcher_client_gate_still_applies() -> None:
+    from grassmarket.atlas.montecarlo import elicited_v1_uncertainty_model
     from grassmarket.deliverables.gate import ClientUsabilityError
 
     with pytest.raises(ClientUsabilityError):
         _render(DeliverableType.EXECUTIVE_SUMMARY, client_facing=True)  # draft set
-    # A client-usable set renders a CLIENT executive summary.
+    # A client-usable coefficient set AND uncertainty model render a CLIENT executive summary.
     rendered = _render(
-        DeliverableType.EXECUTIVE_SUMMARY, client_facing=True, coeffs=_client_usable_set()
+        DeliverableType.EXECUTIVE_SUMMARY,
+        client_facing=True,
+        coeffs=_client_usable_set(),
+        model=elicited_v1_uncertainty_model(),
     )
     assert rendered.mode is DeliverableMode.CLIENT
+
+
+def test_dispatcher_refuses_client_pack_on_draft_uncertainty_model() -> None:
+    # The §7 twin of the coefficient gate (GRS-0033): client-usable coefficients are NOT enough —
+    # a client pack's ranges must come from an elicited uncertainty model too. A draft model still
+    # refuses even when the weights are client-usable.
+    from grassmarket.atlas.montecarlo import elicited_v1_uncertainty_model
+    from grassmarket.deliverables.gate import UncertaintyNotClientUsableError
+
+    with pytest.raises(UncertaintyNotClientUsableError):
+        _render(
+            DeliverableType.TECHNICAL_APPENDIX,
+            client_facing=True,
+            coeffs=_client_usable_set(),
+            model=draft_v1_uncertainty_model(),  # weights client-usable, widths draft → refuse
+        )
+    # Both client-usable → the client pack renders.
+    rendered = _render(
+        DeliverableType.TECHNICAL_APPENDIX,
+        client_facing=True,
+        coeffs=_client_usable_set(),
+        model=elicited_v1_uncertainty_model(),
+    )
+    assert rendered.mode is DeliverableMode.CLIENT
+    # A draft uncertainty model is fine for a watermarked internal draft.
+    internal = _render(
+        DeliverableType.TECHNICAL_APPENDIX,
+        client_facing=False,
+        model=draft_v1_uncertainty_model(),
+    )
+    assert internal.mode is DeliverableMode.DRAFT_INTERNAL
 
 
 # ----------------------------------------------------------- HTTP (generate by type)

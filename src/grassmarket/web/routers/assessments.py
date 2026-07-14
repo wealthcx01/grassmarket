@@ -33,9 +33,8 @@ from grassmarket.assessments import (
     module_rating_errors,
     scoreability_blockers,
 )
+from grassmarket.atlas.active import active_coefficient_set, active_uncertainty_model
 from grassmarket.atlas.committee import committee_blockers, required_committee_items
-from grassmarket.atlas.draft_coefficients import draft_v1_coefficient_set
-from grassmarket.atlas.montecarlo import draft_v1_uncertainty_model
 from grassmarket.data.repository import (
     ConflictError,
     NotFoundError,
@@ -145,9 +144,9 @@ def get_live_score(
     registry = load_registry()
     return live_score(
         assessment.document,
-        draft_v1_coefficient_set(registry),
+        active_coefficient_set(registry),
         registry,
-        draft_v1_uncertainty_model(),
+        active_uncertainty_model(),
         random.Random(_LIVE_SEED),
     )
 
@@ -168,7 +167,7 @@ def evaluate_assessment_scenarios(
     registry = load_registry()
     named = [(s.name, s.document) for s in payload.scenarios]
     return evaluate_scenarios(
-        assessment.document, named, draft_v1_coefficient_set(registry), registry
+        assessment.document, named, active_coefficient_set(registry), registry
     )
 
 
@@ -190,8 +189,8 @@ def finalise_assessment(
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Already finalised.")
 
     registry = load_registry()
-    coefficients = draft_v1_coefficient_set(registry)
-    model = draft_v1_uncertainty_model()
+    coefficients = active_coefficient_set(registry)
+    model = active_uncertainty_model()
     blockers = scoreability_blockers(assessment.document, registry)
     if blockers:
         raise HTTPException(

@@ -179,6 +179,22 @@ def test_methods_appendix_carries_versions_and_elicitation() -> None:
     )
     assert "Methods Appendix" in text
     assert "Coefficient set: v1-draft-pending-elicitation" in text
+    # Under the DRAFT set the appendix must NOT claim elicitation — it states the honest placeholder
+    # provenance (GRS-0033). "Expert-elicited" wording is reserved for the client-usable set.
+    assert "Draft placeholder weights" in text and "not expert-elicited" in text
+    assert "review due" in text
+
+
+def test_methods_appendix_states_elicitation_under_client_usable_set() -> None:
+    from grassmarket.atlas.elicited_coefficients import elicited_v1_coefficient_set
+
+    text = _paragraphs(
+        build_platform_power_report(
+            _context(_doc(graded=True), elicited_v1_coefficient_set(_REGISTRY)),
+            DeliverableMode.DRAFT_INTERNAL,
+        )
+    )
+    assert "Coefficient set: v1-elicited-2026" in text
     assert "Weights expert-elicited" in text and "review due" in text
 
 

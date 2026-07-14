@@ -37,7 +37,7 @@ from docx import Document
 from grassmarket.assessments.service import compute_score
 from grassmarket.atlas.committee import committee_blockers, required_committee_items
 from grassmarket.atlas.draft_coefficients import draft_v1_coefficient_set
-from grassmarket.atlas.montecarlo import draft_v1_uncertainty_model
+from grassmarket.atlas.montecarlo import draft_v1_uncertainty_model, elicited_v1_uncertainty_model
 from grassmarket.deliverables.gate import CommitteePendingError
 from grassmarket.deliverables.service import render_platform_power_report
 from tests.committee_helpers import approve_committee_queue, committee_queue, seed_committee_member
@@ -47,6 +47,9 @@ from tests.test_assessment_lifecycle import _body, _scoreable_partial_doc
 
 _REGISTRY = load_registry()
 _MODEL = draft_v1_uncertainty_model()
+# A client pack needs a client-usable uncertainty model too (GRS-0033 §7 gate); these tests isolate
+# the COMMITTEE gate, so they pass a client-usable model to get past the uncertainty gate first.
+_CLIENT_MODEL = elicited_v1_uncertainty_model()
 _MODULE = "APP_SERVER"
 _SUB = "APP_SERVER_SECURITY_COMPLIANCE"
 
@@ -297,7 +300,7 @@ def test_client_pack_is_refused_without_committee_signoff() -> None:
             stored_result=art.result,
             coefficients=_client_usable_set(),
             registry=_REGISTRY,
-            model=_MODEL,
+            model=_CLIENT_MODEL,
             subject="Meridian",
             generated_on=date(2026, 7, 13),
             client_facing=True,
@@ -316,7 +319,7 @@ def test_client_pack_is_allowed_once_every_item_is_signed_off() -> None:
         stored_result=art.result,
         coefficients=_client_usable_set(),
         registry=_REGISTRY,
-        model=_MODEL,
+        model=_CLIENT_MODEL,
         subject="Meridian",
         generated_on=date(2026, 7, 13),
         client_facing=True,
@@ -411,7 +414,7 @@ def test_client_pack_refused_on_a_frontier_module_without_signoff() -> None:
             stored_result=art.result,
             coefficients=_client_usable_set(),
             registry=_REGISTRY,
-            model=_MODEL,
+            model=_CLIENT_MODEL,
             subject="Meridian",
             generated_on=date(2026, 7, 13),
             client_facing=True,
