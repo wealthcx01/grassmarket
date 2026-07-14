@@ -22,6 +22,7 @@ import type {
   CalibrationSession,
   CertificationEvent,
   CertificationRecord,
+  CommissionLine,
   CommsChannel,
   CommsLogEntry,
   ContentCompletion,
@@ -29,6 +30,7 @@ import type {
   DeliverableSlot,
   DeliverableType,
   DrillCard,
+  EarningsSummary,
   Engagement,
   LearningModule,
   NarrativeSection,
@@ -622,5 +624,44 @@ export const api = {
       headers: authHeaders(),
       signal,
     });
+  },
+
+  // --- Earnings / commissions (GRS-0028; self-service, principal-scoped by the JWT) ---
+  earningsSummary(signal?: AbortSignal): Promise<EarningsSummary> {
+    return request<EarningsSummary>("/earnings/summary", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  listCommissions(signal?: AbortSignal): Promise<CommissionLine[]> {
+    return request<CommissionLine[]>("/earnings/commissions", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  /**
+   * The earnings statement is a `.docx` stream, so (like `downloadDeliverable`) we fetch the blob
+   * with auth and let the caller trigger the browser save — `request()` is JSON-only.
+   */
+  async downloadEarningsStatement(signal?: AbortSignal): Promise<{ blob: Blob; filename: string }> {
+    const url = `${API_BASE_URL}/earnings/statement`;
+    let res: Response;
+    try {
+      res = await fetch(url, { method: "GET", headers: authHeaders(), signal });
+    } catch (cause) {
+      throw new ApiError(0, `Cannot reach API at ${API_BASE_URL}`, cause);
+    }
+    if (!res.ok) {
+      const body = await parseBody(res);
+      throw new ApiError(res.status, messageFromBody(body, `Download failed (${res.status})`), body);
+    }
+    const blob = await res.blob();
+    const disposition = res.headers.get("content-disposition") ?? "";
+    const match = /filename="?([^"]+)"?/.exec(disposition);
+    return { blob, filename: match?.[1] ?? "earnings-statement.docx" };
   },
 };
