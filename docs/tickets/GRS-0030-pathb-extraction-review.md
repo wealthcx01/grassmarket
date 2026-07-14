@@ -2,7 +2,7 @@
 
 - **Loop:** 6
 - **Branch:** `grs-0030-pathb-extraction-review`
-- **Status:** Planned
+- **Status:** In review
 - **Normative source:** PRD §3.3 — including its acceptance criterion verbatim: "confirmed Path B data produces identical scores to manual entry of the same data." CLAUDE.md #8.
 - **Depends on:** GRS-0029, GRS-0010 (wizard).
 

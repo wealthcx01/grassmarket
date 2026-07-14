@@ -182,6 +182,53 @@ class MeetingTranscriptORM(Base):
     )
 
 
+class ExtractionORM(Base):
+    """A gated Path B extraction proposal (GRS-0030). The proposed document lives HERE, not on the
+    assessment, until confirmed — unconfirmed AI output never reaches the engine. Owner-scoped."""
+
+    __tablename__ = "extractions"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    assessment_id: Mapped[UUID] = mapped_column(Uuid, index=True, nullable=False)
+    transcript_id: Mapped[UUID] = mapped_column(Uuid, index=True, nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False)
+    proposed_document_json: Mapped[str] = mapped_column(Text, nullable=False)
+    gaps_json: Mapped[str] = mapped_column(Text, default="[]", nullable=False)
+    extractor_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
+class FieldProvenanceORM(Base):
+    """Per-field extraction provenance (GRS-0030): transcript span, confidence, accepted."""
+
+    __tablename__ = "field_provenances"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    extraction_id: Mapped[UUID] = mapped_column(
+        ForeignKey("extractions.id"), index=True, nullable=False
+    )
+    transcript_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    field_ref: Mapped[str] = mapped_column(String(128), nullable=False)
+    confidence: Mapped[str] = mapped_column(String(8), nullable=False)
+    span_start: Mapped[int] = mapped_column(Integer, nullable=False)
+    span_end: Mapped[int] = mapped_column(Integer, nullable=False)
+    accepted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
 class CommissionLineORM(Base):
     """One earned commission (GRS-0028, PRD §7). The figures are content-hash-sealed at record time
     (immutable, non-retroactive to rate changes); `payment_status` is the one field that advances
