@@ -203,23 +203,17 @@ def test_endpoints_require_authentication(client) -> None:
 
 
 def test_guidance_returns_authored_anchors(client, alice: SeededConsultant) -> None:
+    # The rubric is now fully authored (PR #45): every anchor carries real guidance — never a blank
+    # or a silently-omitted level. (An unauthored anchor would still be returned explicitly as
+    # `todo` so the client shows "not yet authored"; none remain — the 0-TODO / 204-authored is
+    # pinned in tests/test_rubric.py. This superseded the old `..._returns_todo_anchors...` test,
+    # which asserted FRONTEND_PERFORMANCE was all-todo and broke once #45 authored it.)
     resp = client.get("/guidance/subcomponents/OEMS_EXEC_ALGOS", headers=auth_header(alice))
     assert resp.status_code == 200
     anchors = resp.json()
-    assert len(anchors) == 4
+    assert len(anchors) == 4  # one anchor per maturity level
     assert all(a["status"] == "authored" for a in anchors)
-    assert all(a["statement"] for a in anchors)
-
-
-def test_guidance_returns_todo_anchors_labelled_not_blank(client, alice: SeededConsultant) -> None:
-    resp = client.get("/guidance/subcomponents/FRONTEND_PERFORMANCE", headers=auth_header(alice))
-    assert resp.status_code == 200
-    anchors = resp.json()
-    assert len(anchors) == 4
-    # Unauthored guidance is returned as explicit `todo` (the client shows "not yet authored"),
-    # NOT silently omitted or a blank authored anchor.
-    assert all(a["status"] == "todo" for a in anchors)
-    assert all(a["statement"] == "" for a in anchors)
+    assert all(str(a["statement"]).strip() for a in anchors)
 
 
 def test_guidance_unknown_subcomponent_is_404(client, alice: SeededConsultant) -> None:
