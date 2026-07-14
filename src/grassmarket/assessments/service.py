@@ -211,6 +211,12 @@ def _band(band: Band) -> IndexBand:
     return IndexBand(p10=band.p10, p50=band.p50, p90=band.p90, modelled=band.modelled)
 
 
+def _triad_rating(rating: str | None) -> StrengthRating | None:
+    """A triad dimension with no assessed source is Not Assessed (None on the wire), never coerced
+    into the StrengthRating.NONE moat floor (D9)."""
+    return StrengthRating(rating) if rating is not None else None
+
+
 def live_score(
     document: AssessmentDocument,
     coefficients: CoefficientSet,
@@ -251,9 +257,9 @@ def live_score(
         p=_band(unc.p_band),
         l_index=_band(unc.l_band),
         module_qm={k: _band(v) for k, v in unc.module_qm.items()},
-        triad_economic=StrengthRating(triad.economic_value.rating),
-        triad_perceived=StrengthRating(triad.perceived_value.rating),
-        triad_defence=StrengthRating(triad.defence_value.rating),
+        triad_economic=_triad_rating(triad.economic_value.rating),
+        triad_perceived=_triad_rating(triad.perceived_value.rating),
+        triad_defence=_triad_rating(triad.defence_value.rating),
         overall_uncertainty=unc.overall_uncertainty,
         subcomponents_assessed=assessed,
         subcomponents_total=total,

@@ -89,12 +89,16 @@ class PowersResult(BaseModel):
 
 
 class TriadDimensionResult(BaseModel):
-    """Ordinal out (ADR-0002): `rating` is what a client sees; `score` is audit-only."""
+    """Ordinal out (ADR-0002): `rating` is what a client sees; `score` is audit-only.
+
+    `rating`/`score` are None when the dimension has no assessed source (e.g. Economic Value when
+    no scale/unit-economics metric was entered) — Not Assessed, never a "None" moat floor. This
+    mirrors the D9 discipline on `q_m`: unassessed is excluded, never zero-filled."""
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    rating: str
-    score: Score
+    rating: str | None
+    score: Score | None
 
 
 class TriadResult(BaseModel):

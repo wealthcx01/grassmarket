@@ -71,7 +71,8 @@ def build_executive_summary(
         ("Defence Value", triad.defence_value),
     ):
         p = doc.add_paragraph(style="List Bullet")
-        p.add_run(f"{label}: {dim.rating}.").bold = True
+        word = dim.rating if dim.rating is not None else "Not assessed"
+        p.add_run(f"{label}: {word}.").bold = True
 
     doc.add_heading("Where the platform is strong", level=1)
     _STRONG = (MaturityLevel.ADVANCED.value, MaturityLevel.FRONTIER.value)
