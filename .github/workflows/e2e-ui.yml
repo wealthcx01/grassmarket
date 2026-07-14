@@ -1,16 +1,18 @@
-# Playwright UI gate + screenshot gallery.
+# Visual UI gate + screenshot gallery.
 #
-# The E2E suite in ci.yml is the functional gate; THIS workflow is the *visual* gate: it runs the
-# same Playwright suite AND captures a full-page screenshot gallery of the key screens (desktop +
-# mobile) as the `ui-gallery` artifact, so every PR's UI can be eyeballed before merge. The
-# frontend shipped through many tickets with no visual verification; this closes that gap.
+# ci.yml's "E2E (Playwright)" job is the FUNCTIONAL gate; THIS workflow is the deterministic VISUAL
+# gate. It boots the seeded app and captures a full-page screenshot gallery of the key screens
+# (desktop + mobile) as the `ui-gallery` artifact, so every PR's UI can be eyeballed before merge —
+# and it fails loud if a key screen errors or the app doesn't come up. The frontend shipped through
+# many tickets with no visual verification; this closes that gap. (It deliberately does NOT re-run
+# the functional Playwright suite — that would duplicate ci.yml and inherit its cold-runner flake.)
 #
 # Runs on ubuntu-24.04 — a Playwright-SUPPORTED platform. CI must never depend on a dev box's quirks
 # (this repo's VPS runs Ubuntu 26.04, which Playwright's installer doesn't recognise). The app is
 # driven entirely against offline SQLite fixtures seeded by scripts/seed_dev.py (CLAUDE.md: no live
 # external calls in CI).
 
-name: E2E UI gate
+name: Visual UI gate
 
 on:
   pull_request:
@@ -71,29 +73,23 @@ jobs:
           npm start &
           for i in $(seq 1 40); do curl -sf http://localhost:3000/login >/dev/null && break; sleep 1; done
 
-      - name: Run Playwright E2E (the functional gate)
-        working-directory: frontend
-        run: npm run e2e
-
-      - name: Capture the UI gallery (desktop + mobile)
-        if: always() # a screenshot gallery is worth having even when a functional test failed
+      # NOTE: the functional Playwright suite (`npm run e2e`) is deliberately NOT run here — it is
+      # the FUNCTIONAL gate and already runs in ci.yml's "E2E (Playwright)" job. Duplicating it made
+      # this gate flaky (it inherited the known cold-runner deliverables-narrative flake) and slow.
+      # This workflow is the deterministic VISUAL gate: it proves every key screen renders (the
+      # gallery capture fails loud if a route errors or the app didn't come up) and publishes the
+      # screenshots for review. Functional assertions stay in ci.yml; visuals live here.
+      - name: Capture the UI gallery (desktop + mobile) — the visual gate
         working-directory: frontend
         run: node scripts/ui-gallery.mjs
 
       - name: Upload the ui-gallery artifact
-        if: always()
+        if: always() # publish whatever was captured, even if a later screen failed to render
         uses: actions/upload-artifact@v4
         with:
           name: ui-gallery
           path: frontend/ui-gallery/
           if-no-files-found: warn
-
-      - name: Upload Playwright traces on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-traces
-          path: frontend/test-results/
 
       - name: Comment the gallery summary on the PR (best effort)
         if: always() && github.event_name == 'pull_request'
