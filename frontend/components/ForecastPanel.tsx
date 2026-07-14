@@ -15,13 +15,21 @@ export function ForecastPanel({ forecast }: { forecast: PipelineForecast }) {
         background: "var(--color-paper-raised)",
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "baseline",
+          flexWrap: "wrap",
+          gap: "0.25rem 0.5rem",
+        }}
+      >
         <h2 style={{ fontSize: "1rem", margin: 0 }}>Pipeline forecast</h2>
         <span className="mono" style={{ fontSize: "0.68rem", color: "var(--color-ink-muted)" }}>
           deal volume · not £
         </span>
       </div>
-      <div style={{ display: "flex", gap: "1.5rem", margin: "0.6rem 0 0.8rem" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem 1.5rem", margin: "0.6rem 0 0.8rem" }}>
         <Stat label="Prospects" value={String(forecast.total_prospects)} />
         <Stat label="Open" value={String(forecast.open_prospects)} />
         <Stat
@@ -30,6 +38,9 @@ export function ForecastPanel({ forecast }: { forecast: PipelineForecast }) {
           hint="Σ close-probability across the book"
         />
       </div>
+      {/* The table scrolls within the panel on narrow viewports rather than forcing the whole
+          panel (and the page) to overflow horizontally. */}
+      <div style={{ overflowX: "auto" }}>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.78rem" }}>
         <thead>
           <tr style={{ textAlign: "left", color: "var(--color-ink-muted)" }}>
@@ -58,6 +69,7 @@ export function ForecastPanel({ forecast }: { forecast: PipelineForecast }) {
             ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

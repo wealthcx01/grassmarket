@@ -28,8 +28,18 @@ export function KanbanBoard({
   for (const entry of board.entries) byStage.get(entry.prospect.stage)?.push(entry);
 
   return (
-    <div style={{ display: "flex", gap: "0.75rem", overflowX: "auto", paddingBottom: "0.5rem" }}>
-      {PIPELINE_STAGES.map((col) => {
+    // The ten stages don't fit narrow viewports; the row scrolls horizontally and a right-edge fade
+    // signals there's more (otherwise later stages — and any prospect in them — look invisible).
+    <div style={{ position: "relative" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "0.75rem",
+          overflowX: "auto",
+          paddingBottom: "0.5rem",
+        }}
+      >
+        {PIPELINE_STAGES.map((col) => {
         const entries = byStage.get(col.stage) ?? [];
         return (
           <section
@@ -62,8 +72,21 @@ export function KanbanBoard({
               ))}
             </div>
           </section>
-        );
-      })}
+          );
+        })}
+      </div>
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          bottom: "0.5rem",
+          width: "2rem",
+          pointerEvents: "none",
+          background: "linear-gradient(to right, transparent, var(--color-paper))",
+        }}
+      />
     </div>
   );
 }
