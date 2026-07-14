@@ -31,7 +31,14 @@ export function KanbanBoard({
     // The ten stages don't fit narrow viewports; the row scrolls horizontally and a right-edge fade
     // signals there's more (otherwise later stages — and any prospect in them — look invisible).
     <div style={{ position: "relative" }}>
-      <div style={{ display: "flex", gap: "0.75rem", overflowX: "auto", paddingBottom: "0.5rem" }}>
+      {/* A focusable, labelled scroll region so keyboard / screen-reader users can reach the later
+          stages that overflow the viewport — not just pointer users (the fade below is decorative). */}
+      <div
+        role="region"
+        aria-label="Pipeline stages (scroll horizontally)"
+        tabIndex={0}
+        style={{ display: "flex", gap: "0.75rem", overflowX: "auto", paddingBottom: "0.5rem" }}
+      >
         {PIPELINE_STAGES.map((col) => {
         const entries = byStage.get(col.stage) ?? [];
         return (
