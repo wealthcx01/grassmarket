@@ -110,7 +110,7 @@ export function BusinessMetricsStep({ registry, document: d, update, readOnly }:
         const notAssessed = entry?.state === "Not Assessed";
         return (
           <Card key={m.key}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.55rem" }}>
               <div>
                 <strong style={{ fontSize: "0.9rem" }}>{m.name}</strong>{" "}
                 <span className="mono" style={{ fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
