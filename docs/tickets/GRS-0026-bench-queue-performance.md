@@ -2,7 +2,7 @@
 
 - **Loop:** 5
 - **Branch:** `grs-0026-bench-queue-performance`
-- **Status:** Planned
+- **Status:** In review
 - **Normative source:** PRD §6 (Bench-Time Queue; Knowledge Base & Performance).
 - **Depends on:** GRS-0023–0025 (queue sources).
 

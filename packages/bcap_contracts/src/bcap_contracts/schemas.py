@@ -31,6 +31,7 @@ from bcap_contracts.auth import (
     LoginRequest,
     TokenResponse,
 )
+from bcap_contracts.bench import BenchQueue, PerformanceSummary
 from bcap_contracts.calibration import (
     CalibrationRating,
     CalibrationResult,
@@ -102,6 +103,8 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "GeneratedQuiz": GeneratedQuiz,
     "ArenaScenario": ArenaScenario,
     "ArenaSession": ArenaSession,
+    "BenchQueue": BenchQueue,
+    "PerformanceSummary": PerformanceSummary,
     "JWTClaims": JWTClaims,
     "Consultant": Consultant,
     "Invitation": Invitation,
