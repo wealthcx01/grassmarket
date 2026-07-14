@@ -28,10 +28,6 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          # Distinct cache key per job: the backend and E2E jobs run concurrently and both save the
-          # uv cache — a shared key races on save, failing the loser's post-step (exit 2). A suffix
-          # gives each job its own key, so the saves never collide.
-          cache-suffix: backend
 
       - name: Set up Python 3.12
         run: uv python install 3.12
@@ -98,8 +94,10 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
-          enable-cache: true
-          cache-suffix: e2e  # own cache key so it doesn't race the backend job's save (see backend)
+          # No uv cache on the E2E job: its post-step (`uv cache prune` + save) hangs ~5 min on a cold
+          # runner and then exits 2, failing the job even though the Playwright tests pass. The E2E
+          # job installs deps once and is thrown away, so it gains nothing from persisting the cache.
+          enable-cache: false
       - name: Set up Python 3.12
         run: uv python install 3.12
       - name: Sync backend dependencies
