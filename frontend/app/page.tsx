@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { HealthWidget } from "./health-widget";
+import { DashboardSessionFooter } from "@/components/DashboardSessionFooter";
 
 // PRD §1 / §4–7 — the advisor's main sections. Every section now has a live page.
 const SECTIONS: ReadonlyArray<{ title: string; href: string; blurb: string }> = [
@@ -119,10 +120,7 @@ export default function DashboardPage() {
       </section>
 
       <footer style={{ fontSize: "0.8rem", color: "var(--color-ink-muted)" }}>
-        Not signed in?{" "}
-        <Link href="/login" style={{ fontWeight: 500 }}>
-          Go to sign in
-        </Link>
+        <DashboardSessionFooter />
       </footer>
     </div>
   );

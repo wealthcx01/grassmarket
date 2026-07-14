@@ -20,13 +20,27 @@ export default function EngagementDetailPage() {
   const id = params.id;
 
   const [engagement, setEngagement] = useState<Engagement | null>(null);
+  // Subjects for the linked assessments, so we show a name rather than a raw UUID (GRS-0037).
+  const [assessmentSubjects, setAssessmentSubjects] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
 
   const reload = useCallback(
     (signal?: AbortSignal) =>
       api
         .getEngagement(id, signal)
-        .then(setEngagement)
+        .then(async (eng) => {
+          setEngagement(eng);
+          // Resolve each linked assessment's subject; a failed lookup just falls back to its id.
+          const pairs = await Promise.all(
+            eng.assessment_ids.map((aid) =>
+              api
+                .getAssessment(aid, signal)
+                .then((a) => [aid, a.subject] as const)
+                .catch(() => [aid, ""] as const),
+            ),
+          );
+          setAssessmentSubjects(Object.fromEntries(pairs.filter(([, s]) => s)));
+        })
         .catch((err: unknown) => {
           if (err instanceof ApiError && err.status === 0) return;
           if (err instanceof ApiError && err.status === 404) return router.replace("/engagements");
@@ -68,7 +82,7 @@ export default function EngagementDetailPage() {
           <ul style={{ margin: 0, paddingLeft: "1.2rem", fontSize: "0.85rem" }}>
             {engagement.assessment_ids.map((aid) => (
               <li key={aid}>
-                <Link href={`/assessments/${aid}`}>{aid}</Link>
+                <Link href={`/assessments/${aid}`}>{assessmentSubjects[aid] ?? "Assessment"}</Link>
               </li>
             ))}
           </ul>

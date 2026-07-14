@@ -79,7 +79,20 @@ export default function ProspectDetailPage() {
           Stage <strong>{STAGE_LABEL[prospect.stage]}</strong> · entered{" "}
           {new Date(prospect.stage_entered_at).toLocaleDateString()}
         </p>
-        <div style={{ maxWidth: "16rem", marginTop: "0.5rem" }}>
+        <div style={{ maxWidth: "16rem", marginTop: "0.6rem" }}>
+          <label
+            className="mono"
+            style={{
+              display: "block",
+              fontSize: "0.62rem",
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              color: "var(--color-ink-muted)",
+              marginBottom: "0.2rem",
+            }}
+          >
+            Move to stage
+          </label>
           <StageMoveControl prospectId={prospect.id} currentStage={prospect.stage} onMove={onMove} />
         </div>
       </div>
