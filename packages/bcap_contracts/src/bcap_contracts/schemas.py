@@ -57,6 +57,7 @@ from bcap_contracts.meetings import MeetingTranscript
 from bcap_contracts.money import Money
 from bcap_contracts.narratives import AINarrative
 from bcap_contracts.pipeline import PipelineBoard, PipelineForecast
+from bcap_contracts.predictions import BenchmarkRow, Prediction
 from bcap_contracts.provenance import WeightProvenanceRecord
 from bcap_contracts.registry import Registry
 from bcap_contracts.rubric import RubricAnchor
@@ -93,6 +94,8 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "MeetingTranscript": MeetingTranscript,
     "Extraction": Extraction,
     "FieldProvenance": FieldProvenance,
+    "Prediction": Prediction,
+    "BenchmarkRow": BenchmarkRow,
     "CommitteeItem": CommitteeItem,
     "CommitteeDecision": CommitteeDecision,
     "CommitteeQueueEntry": CommitteeQueueEntry,

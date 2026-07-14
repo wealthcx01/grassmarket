@@ -1,0 +1,172 @@
+{
+  "$defs": {
+    "Currency": {
+      "enum": [
+        "GBP",
+        "USD",
+        "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+    },
+    "LeverKind": {
+      "description": "The evidenced cash-flow levers an upgrade maps to (Methodology §10, layer 2).",
+      "enum": [
+        "cost_to_serve",
+        "project_drag",
+        "incident_expected_loss",
+        "revenue_enablement"
+      ],
+      "title": "LeverKind",
+      "type": "string"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "description": "A currency amount that cannot exist without an explicit currency and a reference to the\nassumption register that justifies it (Methodology §10, ADR-0002 compliance test).\n\nA lever NPV or remediation cost is only meaningful under stated assumptions; a `Money`\nwithout an ``assumption_register_ref`` is not constructible.",
+      "properties": {
+        "amount_minor": {
+          "description": "Amount in integer minor units (e.g. pence).",
+          "title": "Amount Minor",
+          "type": "integer"
+        },
+        "assumption_register_ref": {
+          "description": "Reference to the assumption-register entry that justifies this figure. Mandatory: currency claims are never made without stated assumptions (Methodology §10).",
+          "minLength": 1,
+          "title": "Assumption Register Ref",
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        }
+      },
+      "required": [
+        "amount_minor",
+        "currency",
+        "assumption_register_ref"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "PredictionOutcome": {
+      "description": "A prediction is PENDING until its follow-up scores it a HIT or a MISS (directional).",
+      "enum": [
+        "pending",
+        "hit",
+        "miss"
+      ],
+      "title": "PredictionOutcome",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One lever-level prediction, pre-registered against a scoring run. The `probability`\nis the model's confidence the value moves in the predicted direction — used for the Brier score.\nRealised value + scores are stamped on follow-up; before that they are None.",
+  "properties": {
+    "brier_score": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "(probability − outcome)²; lower is better.",
+      "title": "Brier Score"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "follow_up_due": {
+      "format": "date",
+      "title": "Follow Up Due",
+      "type": "string"
+    },
+    "horizon_months": {
+      "exclusiveMinimum": 0,
+      "title": "Horizon Months",
+      "type": "integer"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "lever": {
+      "$ref": "#/$defs/LeverKind"
+    },
+    "outcome": {
+      "$ref": "#/$defs/PredictionOutcome",
+      "default": "pending"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "predicted_delta": {
+      "$ref": "#/$defs/Money",
+      "description": "The predicted signed value impact (currency)."
+    },
+    "probability": {
+      "description": "Confidence the value moves in the predicted direction (for the Brier score).",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Probability",
+      "type": "number"
+    },
+    "realised_delta": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Money"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "scored_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Scored At"
+    },
+    "scoring_run_id": {
+      "format": "uuid",
+      "title": "Scoring Run Id",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "scoring_run_id",
+    "lever",
+    "predicted_delta",
+    "horizon_months",
+    "probability",
+    "follow_up_due"
+  ],
+  "title": "Prediction",
+  "type": "object"
+}
