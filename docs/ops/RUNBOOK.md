@@ -57,6 +57,25 @@ Config errors surface as a **boot failure** (the app refuses to start), not a ru
 service — check the deploy logs for the `Refusing to run in production...` message and fix the
 offending variable.
 
+### Frontend deploy (`grassmarket-web`)
+
+The web service is **not currently GitHub-connected** — merging to `main` auto-deploys the **API
+only**. Until the service is wired to GitHub, the frontend ships **manually** from repo root:
+
+```bash
+railway link                      # project: grassmarket, env: production
+railway up frontend --path-as-root --service grassmarket-web
+```
+
+`--path-as-root` is **required**: without it, `railway up` archives the whole repo, picks up the
+root `railway.toml` (the API's `uvicorn` start command), and the web service boots the API instead
+of Next.js — which then fails on the missing `GM_JWT_SECRET`. With `--path-as-root frontend`,
+`package.json` is at the archive root and Railway's builder correctly detects Next.js.
+
+**Durable fix (do this once, in the Railway dashboard — the CLI cannot connect a repo):** connect
+`grassmarket-web` to GitHub `wealthcx01/grassmarket`, set **Root Directory = `frontend`** and branch
+`main`. After that, frontend merges auto-deploy like the API and the manual step above is retired.
+
 ## Rollback
 
 Migrations run on startup and can add schema, so rollback is two independent moves — **redeploy the
