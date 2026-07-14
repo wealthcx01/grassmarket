@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { API_BASE_URL, ApiError, api, type HealthResponse } from "@/lib/api";
+import { ApiError, api, type HealthResponse } from "@/lib/api";
 
 type State =
   | { kind: "loading" }
@@ -34,62 +34,44 @@ export function HealthWidget() {
     return () => controller.abort();
   }, []);
 
+  const label =
+    state.kind === "loading"
+      ? "Checking…"
+      : state.kind === "ok"
+        ? `System ${state.data.status}${state.data.version ? ` · v${state.data.version}` : ""}`
+        : "System unreachable";
+
   return (
     <div
+      title={state.kind === "error" ? state.message : undefined}
       style={{
-        minWidth: "13rem",
-        padding: "0.9rem 1rem",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "0.5rem",
+        padding: "0.4rem 0.75rem",
         background: "var(--color-paper-raised)",
         border: "1px solid var(--color-border)",
-        borderRadius: "var(--radius)",
+        borderRadius: "var(--radius-pill)",
+        boxShadow: "var(--shadow-sm)",
+        fontSize: "0.78rem",
+        color: state.kind === "error" ? "var(--color-error)" : "var(--color-ink-muted)",
+        whiteSpace: "nowrap",
       }}
     >
-      <div
+      <span
+        aria-hidden
         style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "0.5rem",
-          fontSize: "0.72rem",
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: "var(--color-ink-muted)",
+          width: "0.5rem",
+          height: "0.5rem",
+          borderRadius: "50%",
+          background: DOT[state.kind],
+          boxShadow:
+            state.kind === "ok" ? "0 0 0 3px color-mix(in srgb, var(--color-ok) 18%, transparent)" : "none",
         }}
-        className="mono"
-      >
-        <span
-          aria-hidden
-          style={{
-            width: "0.55rem",
-            height: "0.55rem",
-            borderRadius: "50%",
-            background: DOT[state.kind],
-          }}
-        />
-        Backend health
-      </div>
-      <div style={{ marginTop: "0.5rem", fontSize: "0.9rem" }}>
-        {state.kind === "loading" && <span>Checking…</span>}
-        {state.kind === "ok" && (
-          <span>
-            <strong>{state.data.status}</strong>
-            {state.data.version ? (
-              <span className="mono" style={{ color: "var(--color-ink-muted)" }}>
-                {" "}
-                · v{state.data.version}
-              </span>
-            ) : null}
-          </span>
-        )}
-        {state.kind === "error" && (
-          <span style={{ color: "var(--color-error)" }}>{state.message}</span>
-        )}
-      </div>
-      <div
-        className="mono"
-        style={{ marginTop: "0.4rem", fontSize: "0.62rem", color: "var(--color-ink-muted)" }}
-      >
-        {API_BASE_URL}
-      </div>
+      />
+      <span className="mono" style={{ letterSpacing: "0.04em" }}>
+        {label}
+      </span>
     </div>
   );
 }

@@ -1,34 +1,60 @@
 /*
- * Bruntsfield Advisor Studio — design tokens (single source of truth).
- * Palette/fonts from the Bruntsfield website design system (see CLAUDE.md).
- * Font family variables (--font-serif / --font-sans / --font-mono) are injected
- * by next/font in app/layout.tsx; the fallbacks below keep things sane pre-hydration.
+ * Bruntsfield Advisor Studio — design system (single source of truth).
+ * Editorial paper/ink foundation with the Bruntsfield Bottle Green accent, tuned for the
+ * calm, high-craft feel of Anthropic's Claude surfaces: warm canvas, a serif display voice,
+ * generous rhythm, one confident primary action, quiet borders, soft depth, considered focus.
+ * Font family variables (--font-serif / --font-sans / --font-mono) are injected by next/font
+ * in app/layout.tsx; the fallbacks below keep things sane pre-hydration.
  */
 
 :root {
-  /* Palette — paper/ink with Bottle Green accent */
-  --color-paper: #faf8f3; /* background: light cream / off-white */
-  --color-paper-raised: #ffffff; /* cards, panels */
-  --color-ink: #1a1a1a; /* text: near-black */
-  --color-ink-muted: #5a5a54; /* secondary text */
-  --color-accent: #1a3b26; /* Bottle Green */
-  --color-accent-contrast: #faf8f3; /* text on accent */
-  --color-border: #e4e0d6; /* hairlines on paper */
+  /* ---- Palette: paper / ink with a Bottle Green accent ---- */
+  --color-paper: #f7f4ee; /* app canvas — warm cream */
+  --color-paper-raised: #fffdf9; /* cards, panels — a hair warmer than pure white */
+  --color-paper-sunken: #f1ede4; /* insets, table headers, hover fills */
+  --color-ink: #1c1b18; /* primary text — warm near-black */
+  --color-ink-muted: #6b675e; /* secondary text */
+  --color-ink-faint: #9a958a; /* tertiary / placeholder */
+  --color-accent: #1a3b26; /* Bottle Green — the brand */
+  --color-accent-hover: #234f33; /* lifted green for hover */
+  --color-accent-contrast: #f7f4ee; /* text on accent */
+  --color-accent-tint: #eef1ec; /* selected / active wash on paper */
+  --color-accent-tint-border: #cdd8cf; /* border for tinted/selected surfaces */
+  --color-border: #e6e1d6; /* hairlines on paper */
+  --color-border-strong: #d6d0c2; /* control borders, dividers that need to read */
 
-  /* Semantic status (health widget, form errors) */
+  /* ---- Semantic status ---- */
   --color-ok: #1a3b26;
   --color-warn: #8a5a00;
+  --color-warn-tint: #fbf3e2;
   --color-error: #8a2020;
+  --color-error-tint: #f9ecea;
+  --color-info-tint: #eef1ec;
 
-  /* Typography — provided by next/font, with graceful fallbacks */
+  /* ---- Typography (next/font, with graceful fallbacks) ---- */
   --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
 
-  /* Spacing / chrome */
-  --topbar-height: 3.25rem;
-  --content-max: 68rem;
-  --radius: 4px;
+  /* ---- Spacing / chrome ---- */
+  --topbar-height: 3.5rem;
+  --content-max: 64rem; /* comfortable measure — content centres, never sprawls */
+  --content-narrow: 46rem; /* prose / single-column forms */
+
+  /* ---- Radius ---- */
+  --radius: 8px; /* controls, buttons */
+  --radius-sm: 6px;
+  --radius-lg: 14px; /* cards, panels */
+  --radius-pill: 999px;
+
+  /* ---- Depth (soft, warm-tinted) ---- */
+  --shadow-sm: 0 1px 2px rgba(28, 27, 24, 0.04), 0 1px 1px rgba(28, 27, 24, 0.03);
+  --shadow-md: 0 2px 4px rgba(28, 27, 24, 0.05), 0 4px 12px rgba(28, 27, 24, 0.05);
+  --shadow-lg: 0 8px 30px rgba(28, 27, 24, 0.09);
+
+  /* ---- Motion ---- */
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+  --dur: 140ms;
 }
 
 *,
@@ -63,9 +89,18 @@ h3,
 h4 {
   font-family: var(--font-serif);
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.15;
   margin: 0 0 0.5em;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 1.4rem + 1.6vw, 2.4rem);
+}
+
+p {
+  text-wrap: pretty;
 }
 
 code,
@@ -79,8 +114,310 @@ samp,
 a {
   color: var(--color-accent);
   text-underline-offset: 2px;
+  text-decoration-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  transition: text-decoration-color var(--dur) var(--ease);
+}
+a:hover {
+  text-decoration-color: currentColor;
 }
 
+/* ---- Eyebrow / kicker (the mono uppercase label above titles) ---- */
+.eyebrow {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+/* ---------- Form controls: one consistent, styled treatment everywhere ---------- */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="search"],
+input:not([type]),
+select,
+textarea {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  color: var(--color-ink);
+  background: var(--color-paper-raised);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius);
+  padding: 0.55rem 0.7rem;
+  line-height: 1.4;
+  transition:
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+  appearance: none;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 4.5rem;
+}
+
+/* native select chevron */
+select {
+  padding-right: 2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5L6 8l3.5-3.5' fill='none' stroke='%236b675e' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  cursor: pointer;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-ink-faint);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 16%, transparent);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background: var(--color-paper-sunken);
+  color: var(--color-ink-faint);
+  cursor: not-allowed;
+}
+
+label {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+/* ---------- Buttons: one confident primary, quiet secondary, ghost ---------- */
 button {
   font-family: inherit;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1;
+  padding: 0.6rem 1.1rem;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+.btn:active {
+  transform: translateY(0.5px);
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover {
+  background: var(--color-accent-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background: var(--color-paper-raised);
+  color: var(--color-ink);
+  border-color: var(--color-border-strong);
+}
+.btn-secondary:hover {
+  background: var(--color-paper-sunken);
+  border-color: var(--color-ink-faint);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-ink-muted);
+  padding-left: 0.6rem;
+  padding-right: 0.6rem;
+}
+.btn-ghost:hover {
+  background: var(--color-paper-sunken);
+  color: var(--color-ink);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+/* Disabled primary reads as clearly inert (grey), never a washed-out brand green. */
+.btn-primary:disabled,
+.btn-primary[aria-disabled="true"] {
+  background: var(--color-border-strong);
+  color: var(--color-paper-raised);
+}
+.btn-secondary:disabled,
+.btn-ghost:disabled {
+  opacity: 0.5;
+}
+
+/* ---------- Card ---------- */
+.card {
+  background: var(--color-paper-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------- Callouts (info / warn / error messages) ---------- */
+.callout {
+  border-radius: var(--radius);
+  padding: 0.75rem 0.9rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  border: 1px solid transparent;
+}
+.callout-info {
+  background: var(--color-info-tint);
+  border-color: var(--color-accent-tint-border);
+  color: var(--color-ink);
+}
+.callout-warn {
+  background: var(--color-warn-tint);
+  border-color: color-mix(in srgb, var(--color-warn) 30%, transparent);
+  color: var(--color-warn);
+}
+.callout-error {
+  background: var(--color-error-tint);
+  border-color: color-mix(in srgb, var(--color-error) 30%, transparent);
+  color: var(--color-error);
+}
+
+/* ---------- Pills / tabs ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.35rem 0.8rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-paper-raised);
+  color: var(--color-ink-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+.pill:hover {
+  background: var(--color-paper-sunken);
+  color: var(--color-ink);
+}
+.pill[data-active="true"],
+.pill[aria-selected="true"] {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+/* ---------- Chips / status tags ---------- */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-paper-sunken);
+  color: var(--color-ink-muted);
+  border: 1px solid var(--color-border);
+}
+
+/* ---------- Interactive card (hover-lift, for links/tiles) ---------- */
+.card-link {
+  display: block;
+  background: var(--color-paper-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+.card-link:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-accent-tint-border);
+}
+.card-link[data-disabled="true"] {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* ---------- Stat tile ---------- */
+.stat-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.5rem;
+  line-height: 1.1;
+  color: var(--color-ink);
+}
+.stat-label {
+  font-size: 0.78rem;
+  color: var(--color-ink-muted);
+  margin-top: 0.15rem;
+}
+
+/* ---------- Layout helpers ---------- */
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+.measure {
+  max-width: var(--content-narrow);
+}
+.hr {
+  height: 1px;
+  background: var(--color-border);
+  border: 0;
+  margin: 0;
+}
+
+/* respects reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
