@@ -68,7 +68,7 @@ export default function RootLayout({
               letterSpacing: "0.08em",
             }}
           >
-            Grassmarket · Loop 0
+            Grassmarket
           </span>
         </header>
         <main

@@ -1,37 +1,34 @@
 import Link from "next/link";
 import { HealthWidget } from "./health-widget";
 
-// PRD §1 / §4–7 — the advisor's main sections. Placeholders until the loops land.
-const SECTIONS: ReadonlyArray<{ title: string; href: string; blurb: string; loop: string }> = [
+// PRD §1 / §4–7 — the advisor's main sections. `href: null` = built on the backend but
+// no dedicated page yet, so the tile renders as a non-clickable "coming soon" card rather
+// than a dead link.
+const SECTIONS: ReadonlyArray<{ title: string; href: string | null; blurb: string }> = [
   {
     title: "Pipeline",
     href: "/pipeline",
     blurb: "Prospects, workshops, and kanban stages with time-in-stage flags.",
-    loop: "Loop 3",
   },
   {
     title: "Assessments",
     href: "/assessments",
     blurb: "ATLAS engine, the 7-step wizard, and live scores with uncertainty bands.",
-    loop: "Loop 1–2",
   },
   {
     title: "Deliverables",
-    href: "#",
-    blurb: "Diagnostic packs, heatmaps, and the modernisation roadmap.",
-    loop: "Loop 4",
+    href: "/engagements",
+    blurb: "Diagnostic packs, heatmaps, and the modernisation roadmap — per engagement.",
   },
   {
     title: "Workbench",
     href: "/workbench",
     blurb: "Certification ladder, practice arena, power drills, bench queue.",
-    loop: "Loop 5",
   },
   {
     title: "My Earnings",
-    href: "#",
+    href: null,
     blurb: "Commission breakdown, recovery fees, YTD and projections.",
-    loop: "Loop 6",
   },
 ];
 
@@ -64,8 +61,9 @@ export default function DashboardPage() {
             Bruntsfield Advisor Studio
           </h1>
           <p style={{ margin: 0, color: "var(--color-ink-muted)", maxWidth: "38rem" }}>
-            The advisor platform of the Bruntsfield Advisory Network. This is the Loop 0
-            shell — the sections below are placeholders wired up across the build loops.
+            The advisor platform of the Bruntsfield Advisory Network — pipeline management,
+            ATLAS assessments, client deliverables, and the Workbench. Sign in to your
+            engagements, or jump to a section below.
           </p>
         </div>
         <HealthWidget />
@@ -83,21 +81,19 @@ export default function DashboardPage() {
             gridTemplateColumns: "repeat(auto-fill, minmax(16rem, 1fr))",
           }}
         >
-          {SECTIONS.map((s) => (
-            <li key={s.title}>
-              <Link
-                href={s.href}
-                style={{
-                  display: "block",
-                  height: "100%",
-                  padding: "1.1rem 1.2rem",
-                  background: "var(--color-paper-raised)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius)",
-                  textDecoration: "none",
-                  color: "inherit",
-                }}
-              >
+          {SECTIONS.map((s) => {
+            const cardStyle = {
+              display: "block",
+              height: "100%",
+              padding: "1.1rem 1.2rem",
+              background: "var(--color-paper-raised)",
+              border: "1px solid var(--color-border)",
+              borderRadius: "var(--radius)",
+              textDecoration: "none",
+              color: "inherit",
+            } as const;
+            const inner = (
+              <>
                 <div
                   style={{
                     display: "flex",
@@ -115,12 +111,14 @@ export default function DashboardPage() {
                   >
                     {s.title}
                   </span>
-                  <span
-                    className="mono"
-                    style={{ fontSize: "0.62rem", color: "var(--color-ink-muted)" }}
-                  >
-                    {s.loop}
-                  </span>
+                  {s.href === null && (
+                    <span
+                      className="mono"
+                      style={{ fontSize: "0.62rem", color: "var(--color-ink-muted)" }}
+                    >
+                      Coming soon
+                    </span>
+                  )}
                 </div>
                 <p
                   style={{
@@ -131,9 +129,20 @@ export default function DashboardPage() {
                 >
                   {s.blurb}
                 </p>
-              </Link>
-            </li>
-          ))}
+              </>
+            );
+            return (
+              <li key={s.title}>
+                {s.href === null ? (
+                  <div style={{ ...cardStyle, opacity: 0.55, cursor: "default" }}>{inner}</div>
+                ) : (
+                  <Link href={s.href} style={cardStyle}>
+                    {inner}
+                  </Link>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </section>
 
