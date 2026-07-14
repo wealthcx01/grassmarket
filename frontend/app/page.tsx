@@ -29,7 +29,7 @@ const SECTIONS: ReadonlyArray<{ title: string; href: string; blurb: string; loop
   },
   {
     title: "My Earnings",
-    href: "#",
+    href: "/earnings",
     blurb: "Commission breakdown, recovery fees, YTD and projections.",
     loop: "Loop 6",
   },
