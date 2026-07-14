@@ -15,6 +15,7 @@ from bcap_contracts.committee import CommitteeDecision
 from bcap_contracts.common import ConsultantTier
 from bcap_contracts.deliverables import DeliverableMode
 from bcap_contracts.narratives import AINarrative, NarrativeStatus
+from bcap_contracts.uncertainty import UncertaintyModel
 
 from grassmarket.atlas.committee import committee_blockers, required_committee_items
 from grassmarket.atlas.results import AtlasResult
@@ -23,6 +24,13 @@ from grassmarket.atlas.results import AtlasResult
 class ClientUsabilityError(Exception):
     """A client-facing document was requested against a coefficient set that is not client-usable.
     A runtime refusal — the fail-safe that keeps a draft-weighted pack away from a client."""
+
+
+class UncertaintyNotClientUsableError(Exception):
+    """A client-facing pack was requested against an uncertainty model that is not client-usable.
+    The §7 twin of ``ClientUsabilityError``: a client pack's P10/P50/P90 ranges, tornado, and
+    weight-stability interval must be drawn from elicited widths, never draft placeholders (#3).
+    Defence-in-depth — the gate refuses independently of which artifact the seam serves."""
 
 
 class CommitteePendingError(Exception):
@@ -87,6 +95,21 @@ def assert_senior_approval(*, author_tier: ConsultantTier, approver_tier: Consul
         raise SeniorApprovalError(
             f"A narrative authored under tier '{author_tier.value}' requires senior "
             f"(Consultant-tier) approval; approver tier '{approver_tier.value}' is not senior."
+        )
+
+
+def assert_uncertainty_client_usable(model: UncertaintyModel, *, client_facing: bool) -> None:
+    """Refuse a client-facing pack whose §7 uncertainty model is not client-usable. The ranges,
+    tornado, and stability interval a client pack renders come from these widths; draft placeholder
+    widths must never price a client document (#3). Watermarked internal drafts are allowed."""
+    if not client_facing:
+        return
+    if not model.client_usable:
+        raise UncertaintyNotClientUsableError(
+            f"Refusing to generate a client-facing deliverable: uncertainty model "
+            f"'{model.version}' is not client-usable (client_usable=False). A client pack's ranges "
+            f"must be drawn from elicited widths; draft models may emit '{DRAFT_WATERMARK}' "
+            f"internal documents only."
         )
 
 

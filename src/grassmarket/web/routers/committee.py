@@ -23,9 +23,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
 from grassmarket.assessments import compute_score, scoreability_blockers
+from grassmarket.atlas.active import active_coefficient_set, active_uncertainty_model
 from grassmarket.atlas.committee import required_committee_items
-from grassmarket.atlas.draft_coefficients import draft_v1_coefficient_set
-from grassmarket.atlas.montecarlo import draft_v1_uncertainty_model
 from grassmarket.data.repository import (
     ConflictError,
     NotFoundError,
@@ -75,9 +74,9 @@ def committee_queue(
         return []
     art = compute_score(
         assessment.document,
-        draft_v1_coefficient_set(registry),
+        active_coefficient_set(registry),
         registry,
-        draft_v1_uncertainty_model(),
+        active_uncertainty_model(),
         random.Random(_SEED),
     )
     items = required_committee_items(art.result)

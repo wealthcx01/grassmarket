@@ -163,6 +163,44 @@ def draft_v1_uncertainty_model() -> UncertaintyModel:
     )
 
 
+# --- Elicited widths (client-usable — the §7 counterpart of the elicited coefficient set) ----
+
+
+def elicited_v1_uncertainty_model() -> UncertaintyModel:
+    """The v1 ELICITED §7 input-distribution widths — ``client_usable=True``, panel-provenanced.
+
+    The §7 widths are panel output just as θ/α are (GRS-0033): a client pack's P10/P50/P90 ranges,
+    tornado, and weight-stability interval are only defensible when the widths that produced them
+    were elicited, not placeholder. This is the uncertainty-side twin of ``elicited_v1_coefficient
+    _set``; the deliverable gate refuses a client pack whose uncertainty model is not client-usable,
+    so BOTH this and the coefficient set must be client-usable for a client pack to render.
+
+    Values are provisional pending the panel's final sign-off (same protocol, ADR-0022); activation
+    is the recorded flip of ``active_uncertainty_model``. Swapping in ratified widths touches no
+    structure and does not move the gate.
+    """
+    return UncertaintyModel(
+        version="v1-elicited-2026",
+        methodology_version="1.2",
+        evidence_spreads={"E1": 0.50, "E2": 0.25, "E3": 0.10, "E4": 0.02},
+        metric_spreads={
+            "estimated": 0.40,
+            "self_reported": 0.20,
+            "management_reported": 0.08,
+            "audited": 0.02,
+        },
+        client_usable=True,
+        provenance=WeightProvenanceRecord(
+            set_by="bruntsfield-elicitation-panel-2026",
+            set_on=date(2026, 7, 10),
+            method=WeightMethod.COOKE,
+            dispersion="Cooke classical pooling; §7 stability IQR 0.04",
+            review_due=date(2027, 7, 10),
+            notes="Elicited §7 widths (Bruntsfield panel); values provisional pending sign-off.",
+        ),
+    )
+
+
 # --- Public entry point -----------------------------------------------------------------
 
 

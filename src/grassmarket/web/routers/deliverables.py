@@ -23,8 +23,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from grassmarket.atlas import AssessmentInputs
-from grassmarket.atlas.draft_coefficients import draft_v1_coefficient_set
-from grassmarket.atlas.montecarlo import draft_v1_uncertainty_model
+from grassmarket.atlas.active import active_coefficient_set, active_uncertainty_model
 from grassmarket.atlas.results import AtlasResult
 from grassmarket.data.repository import (
     NotFoundError,
@@ -102,9 +101,9 @@ def _render(
         deliverable_type=deliverable_type,
         inputs=inputs,
         stored_result=result,
-        coefficients=draft_v1_coefficient_set(registry),
+        coefficients=active_coefficient_set(registry),
         registry=registry,
-        model=draft_v1_uncertainty_model(),
+        model=active_uncertainty_model(),
         subject=subject,
         generated_on=generated_on,
         client_facing=client_facing,

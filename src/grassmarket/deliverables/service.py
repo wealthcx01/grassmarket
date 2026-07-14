@@ -24,7 +24,11 @@ from bcap_contracts.value import ScenarioResult, ValueBridge
 from grassmarket.atlas import AssessmentInputs, run_monte_carlo
 from grassmarket.atlas.results import AtlasResult
 from grassmarket.deliverables.builder import DeliverableContext, build_platform_power_report
-from grassmarket.deliverables.gate import assert_committee_approved, resolve_mode
+from grassmarket.deliverables.gate import (
+    assert_committee_approved,
+    assert_uncertainty_client_usable,
+    resolve_mode,
+)
 from grassmarket.deliverables.heatmap import build_infrastructure_heatmap
 from grassmarket.deliverables.reports import (
     build_executive_summary,
@@ -119,6 +123,8 @@ def render_diagnostic_document(
             f"render path (roadmap needs the value bridge; score evolution needs multiple runs)."
         )
     mode = resolve_mode(coefficients, client_facing=client_facing)  # the gate — refuses first
+    # The §7 twin: a client pack's ranges must come from elicited widths, not draft placeholders.
+    assert_uncertainty_client_usable(model, client_facing=client_facing)
     # High-stakes ratings need committee sign-off before a client pack (Methodology §8).
     assert_committee_approved(stored_result, committee_decisions, client_facing=client_facing)
     uncertainty = run_monte_carlo(

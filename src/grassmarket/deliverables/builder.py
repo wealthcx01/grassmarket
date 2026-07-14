@@ -20,6 +20,7 @@ from io import BytesIO
 
 from bcap_contracts.assessments import CoefficientSet
 from bcap_contracts.committee import CommitteeDecision, CommitteeDecisionStatus, CommitteeItemType
+from bcap_contracts.common import WeightMethod
 from bcap_contracts.deliverables import DeliverableMode
 from bcap_contracts.narratives import AINarrative, NarrativeStatus
 from docx import Document
@@ -161,29 +162,42 @@ def _methods_appendix(doc: DocxDocument, context: DeliverableContext) -> None:
     provenance = context.coefficients.provenance
     theta = provenance.get("theta")
     if theta is not None:
-        doc.add_paragraph(
-            f"Weights expert-elicited {theta.set_on.isoformat()} "
-            f"({theta.method.value}), review due {theta.review_due.isoformat()}."
-        )
+        if theta.method is WeightMethod.DIRECT:
+            # A DIRECT weight family is a draft placeholder, not panel output — say so plainly
+            # rather than claim elicitation. (Draft sets only render watermarked internal docs.)
+            doc.add_paragraph(
+                f"Draft placeholder weights (method {theta.method.value}, not expert-elicited), "
+                f"set {theta.set_on.isoformat()}, review due {theta.review_due.isoformat()}."
+            )
+        else:
+            # Attribute the method to θ specifically — families differ (θ/α swing, λ/δ AHP, strength
+            # Delphi); the per-family table below carries each family's own record.
+            doc.add_paragraph(
+                f"Weights expert-elicited {theta.set_on.isoformat()} (headline θ by "
+                f"{theta.method.value}), review due {theta.review_due.isoformat()}. "
+                f"Per-family method and dispersion below."
+            )
 
     doc.add_heading("Weight-stability summary", level=2)
     doc.add_paragraph(
         "Recorded dispersion for each coefficient family — the spread the §7 stability interval is "
         "drawn from."
     )
-    table = doc.add_table(rows=1, cols=4)
+    table = doc.add_table(rows=1, cols=5)
     hdr = table.rows[0].cells
     hdr[0].text = "Family"
-    hdr[1].text = "Set on"
-    hdr[2].text = "Dispersion"
-    hdr[3].text = "Review due"
+    hdr[1].text = "Method"
+    hdr[2].text = "Set on"
+    hdr[3].text = "Dispersion"
+    hdr[4].text = "Review due"
     for family in sorted(provenance):
         record = provenance[family]
         row = table.add_row().cells
         row[0].text = family
-        row[1].text = record.set_on.isoformat()
-        row[2].text = record.dispersion
-        row[3].text = record.review_due.isoformat()
+        row[1].text = record.method.value
+        row[2].text = record.set_on.isoformat()
+        row[3].text = record.dispersion
+        row[4].text = record.review_due.isoformat()
 
     doc.add_paragraph(
         f"Headline platform value V = {to_display(result.composite.v_index):.1f} "

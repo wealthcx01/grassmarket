@@ -22,7 +22,7 @@ from pydantic import ValidationError
 
 from grassmarket.assessments.service import compute_score
 from grassmarket.atlas.draft_coefficients import draft_v1_coefficient_set
-from grassmarket.atlas.montecarlo import draft_v1_uncertainty_model
+from grassmarket.atlas.montecarlo import draft_v1_uncertainty_model, elicited_v1_uncertainty_model
 from grassmarket.auth.security import create_access_token, hash_password
 from grassmarket.data.repository import Repository
 from grassmarket.deliverables.builder import AI_DRAFTED_LABEL, append_narrative_appendix
@@ -466,14 +466,16 @@ def test_approved_narrative_renders_into_client_pack() -> None:
     from tests.committee_helpers import approved_decisions_for
 
     coeffs = _client_usable_set()
-    art = compute_score(_doc(graded=True), coeffs, _REGISTRY, _REGISTRY_MODEL, random.Random(1))
+    # A client pack needs a client-usable uncertainty model too (GRS-0033 §7 gate).
+    model = elicited_v1_uncertainty_model()
+    art = compute_score(_doc(graded=True), coeffs, _REGISTRY, model, random.Random(1))
     approved = _narrative(NarrativeSection.INTERPRETATION, approved=True)
     rendered = render_platform_power_report(
         inputs=art.inputs,
         stored_result=art.result,
         coefficients=coeffs,
         registry=_REGISTRY,
-        model=_REGISTRY_MODEL,
+        model=model,
         subject="Meridian",
         generated_on=date(2026, 7, 13),
         client_facing=True,
