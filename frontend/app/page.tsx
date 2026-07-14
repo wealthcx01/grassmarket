@@ -1,37 +1,32 @@
 import Link from "next/link";
 import { HealthWidget } from "./health-widget";
 
-// PRD §1 / §4–7 — the advisor's main sections. Placeholders until the loops land.
-const SECTIONS: ReadonlyArray<{ title: string; href: string; blurb: string; loop: string }> = [
+// PRD §1 / §4–7 — the advisor's main sections. Every section now has a live page.
+const SECTIONS: ReadonlyArray<{ title: string; href: string; blurb: string }> = [
   {
     title: "Pipeline",
     href: "/pipeline",
     blurb: "Prospects, workshops, and kanban stages with time-in-stage flags.",
-    loop: "Loop 3",
   },
   {
     title: "Assessments",
     href: "/assessments",
     blurb: "ATLAS engine, the 7-step wizard, and live scores with uncertainty bands.",
-    loop: "Loop 1–2",
   },
   {
     title: "Deliverables",
-    href: "#",
-    blurb: "Diagnostic packs, heatmaps, and the modernisation roadmap.",
-    loop: "Loop 4",
+    href: "/engagements",
+    blurb: "Diagnostic packs, heatmaps, and the modernisation roadmap — per engagement.",
   },
   {
     title: "Workbench",
     href: "/workbench",
     blurb: "Certification ladder, practice arena, power drills, bench queue.",
-    loop: "Loop 5",
   },
   {
     title: "My Earnings",
     href: "/earnings",
     blurb: "Commission breakdown, recovery fees, YTD and projections.",
-    loop: "Loop 6",
   },
 ];
 
@@ -64,8 +59,9 @@ export default function DashboardPage() {
             Bruntsfield Advisor Studio
           </h1>
           <p style={{ margin: 0, color: "var(--color-ink-muted)", maxWidth: "38rem" }}>
-            The advisor platform of the Bruntsfield Advisory Network. This is the Loop 0
-            shell — the sections below are placeholders wired up across the build loops.
+            The advisor platform of the Bruntsfield Advisory Network — pipeline management,
+            ATLAS assessments, client deliverables, and the Workbench. Sign in to your
+            engagements, or jump to a section below.
           </p>
         </div>
         <HealthWidget />
@@ -98,30 +94,15 @@ export default function DashboardPage() {
                   color: "inherit",
                 }}
               >
-                <div
+                <span
                   style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "baseline",
-                    gap: "0.5rem",
+                    fontFamily: "var(--font-serif)",
+                    fontWeight: 600,
+                    fontSize: "1.1rem",
                   }}
                 >
-                  <span
-                    style={{
-                      fontFamily: "var(--font-serif)",
-                      fontWeight: 600,
-                      fontSize: "1.1rem",
-                    }}
-                  >
-                    {s.title}
-                  </span>
-                  <span
-                    className="mono"
-                    style={{ fontSize: "0.62rem", color: "var(--color-ink-muted)" }}
-                  >
-                    {s.loop}
-                  </span>
-                </div>
+                  {s.title}
+                </span>
                 <p
                   style={{
                     margin: "0.4rem 0 0",
