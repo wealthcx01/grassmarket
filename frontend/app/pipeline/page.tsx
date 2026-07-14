@@ -97,21 +97,8 @@ export default function PipelinePage() {
             background: "var(--color-paper-raised)",
           }}
         />
-        <button
-          type="submit"
-          disabled={creating || !company.trim()}
-          style={{
-            padding: "0.5rem 1.1rem",
-            fontSize: "0.9rem",
-            color: "var(--color-accent-contrast)",
-            background: "var(--color-accent)",
-            border: "none",
-            borderRadius: "var(--radius)",
-            cursor: creating || !company.trim() ? "not-allowed" : "pointer",
-            opacity: creating || !company.trim() ? 0.6 : 1,
-          }}
-        >
-          Add prospect
+        <button type="submit" className="btn btn-primary" disabled={creating || !company.trim()}>
+          {creating ? "Adding…" : "Add prospect"}
         </button>
       </form>
 

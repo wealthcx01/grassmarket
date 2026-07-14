@@ -1,69 +1,67 @@
 /**
  * The live-score panel — V/L/B/P and per-module q_m, each rendered through `BandDisplay` so the
- * ADR-0008 honesty flag is honoured (an unmodelled B or P shows a point, never a tight range). When
- * the document is not yet scoreable it shows what is still blocking rather than a fake number.
+ * ADR-0008 honesty flag is honoured (an unmodelled B or P shows a point, never a tight range). It
+ * also surfaces the platform BOTTLENECK (the weakest module by q_m — "numbers rank", per the guide)
+ * and the full module breakdown, and turns raw blocking/finalise keys into human prose.
  */
 
 import { BandDisplay } from "@/components/BandDisplay";
-import type { LiveScore } from "@/lib/types";
+import { toDisplay } from "@/lib/band";
+import { humanizeKey, summarizeBlocking } from "@/lib/labels";
+import type { IndexBand, LiveScore } from "@/lib/types";
 
 export function LiveScorePanel({
   score,
   loading,
   error,
   onRefresh,
+  moduleLabels,
 }: {
   score: LiveScore | null;
   loading: boolean;
   error: string | null;
   onRefresh: () => void;
+  moduleLabels?: Record<string, string>;
 }) {
   return (
     <aside
-      style={{
-        position: "sticky",
-        top: "1rem",
-        background: "var(--color-paper-raised)",
-        border: "1px solid var(--color-border)",
-        borderRadius: "var(--radius)",
-        padding: "1rem",
-      }}
+      className="card"
+      style={{ position: "sticky", top: "1rem", padding: "1.1rem 1.15rem" }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.6rem" }}>
         <h3 style={{ margin: 0, fontSize: "1rem" }}>Live score</h3>
-        <button type="button" onClick={onRefresh} disabled={loading} style={ghostBtn}>
+        <button type="button" className="btn btn-ghost" onClick={onRefresh} disabled={loading} style={{ padding: "0.25rem 0.6rem", fontSize: "0.78rem" }}>
           {loading ? "…" : "Refresh"}
         </button>
       </div>
 
       {error ? (
-        <p style={{ color: "var(--color-error)", fontSize: "0.85rem" }}>{error}</p>
+        <Blocking heading="Can't finalise yet" blocking={error} tone="error" />
       ) : !score ? (
-        <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem" }}>
+        <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem", margin: 0 }}>
           Enter data to see a live score.
         </p>
       ) : !score.scoreable ? (
-        <div>
-          <p style={{ margin: "0.5rem 0", color: "var(--color-warn)", fontSize: "0.85rem" }}>
-            Not yet scoreable:
-          </p>
-          <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.82rem" }}>
-            {score.blocking.map((b) => (
-              <li key={b}>{b}</li>
-            ))}
-          </ul>
+        <>
+          <Blocking heading="Not yet scoreable" blocking={score.blocking} tone="warn" />
           <Coverage score={score} />
-        </div>
+        </>
       ) : (
-        <div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
-            <BandDisplay label="V — Platform Value" band={score.v} />
-            <BandDisplay label="L — Infrastructure" band={score.l_index} />
-            <BandDisplay label="B — Business" band={score.b} />
-            <BandDisplay label="P — Strategic Power" band={score.p} />
+        <div className="stack" style={{ gap: "0.85rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem 1rem" }}>
+            <BandDisplay label="V — PLATFORM VALUE" band={score.v} />
+            <BandDisplay label="L — INFRASTRUCTURE" band={score.l_index} />
+            <BandDisplay label="B — BUSINESS" band={score.b} />
+            <BandDisplay label="P — STRATEGIC POWER" band={score.p} />
           </div>
-          <p style={{ margin: "0.75rem 0 0", fontSize: "0.78rem", color: "var(--color-ink-muted)" }}>
-            Assessment uncertainty: <strong>{score.overall_uncertainty ?? "—"}</strong>
+
+          <Bottleneck score={score} moduleLabels={moduleLabels} />
+          <ModuleBreakdown score={score} moduleLabels={moduleLabels} />
+
+          <div className="hr" />
+          <p style={{ margin: 0, fontSize: "0.78rem", color: "var(--color-ink-muted)" }}>
+            Assessment uncertainty:{" "}
+            <strong style={{ color: "var(--color-ink)" }}>{score.overall_uncertainty ?? "—"}</strong>
           </p>
           <Coverage score={score} />
         </div>
@@ -72,21 +70,112 @@ export function LiveScorePanel({
   );
 }
 
+function label(key: string, moduleLabels?: Record<string, string>): string {
+  return moduleLabels?.[key] ?? humanizeKey(key);
+}
+
+/** Modules sorted weakest → strongest by q_m P50 (display scale). */
+function sortedModules(score: LiveScore): Array<[string, IndexBand, number]> {
+  return Object.entries(score.module_qm)
+    .map(([k, band]) => [k, band, toDisplay(band.p50)] as [string, IndexBand, number])
+    .sort((a, b) => a[2] - b[2]);
+}
+
+function Bottleneck({ score, moduleLabels }: { score: LiveScore; moduleLabels?: Record<string, string> }) {
+  const mods = sortedModules(score);
+  const weakest = mods[0];
+  if (!weakest) return null;
+  const [key, , value] = weakest;
+  return (
+    <div className="callout callout-warn" style={{ padding: "0.6rem 0.75rem" }}>
+      <span className="mono" style={{ fontSize: "0.6rem", letterSpacing: "0.08em", textTransform: "uppercase", opacity: 0.8 }}>
+        Likely constraint
+      </span>
+      <div style={{ marginTop: "0.15rem", fontSize: "0.9rem", color: "var(--color-ink)" }}>
+        <strong>{label(key, moduleLabels)}</strong>{" "}
+        <span className="mono" style={{ color: "var(--color-ink-muted)", fontSize: "0.8rem" }}>
+          q<sub>m</sub> {value.toFixed(1)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function ModuleBreakdown({ score, moduleLabels }: { score: LiveScore; moduleLabels?: Record<string, string> }) {
+  const mods = sortedModules(score);
+  if (mods.length === 0) return null;
+  return (
+    <div>
+      <p className="mono" style={{ margin: "0 0 0.4rem", fontSize: "0.62rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-ink-muted)" }}>
+        Modules · weakest first
+      </p>
+      <ul className="stack" style={{ listStyle: "none", margin: 0, padding: 0, gap: "0.4rem" }}>
+        {mods.map(([key, , value], i) => (
+          <li key={key} style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "0.5rem", alignItems: "center" }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: "0.8rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {label(key, moduleLabels)}
+              </div>
+              <div
+                aria-hidden
+                style={{ height: "4px", borderRadius: "999px", background: "var(--color-paper-sunken)", overflow: "hidden", marginTop: "0.2rem" }}
+              >
+                <div
+                  style={{
+                    height: "100%",
+                    width: `${Math.max(2, Math.min(100, value))}%`,
+                    background: i === 0 ? "var(--color-warn)" : "var(--color-accent)",
+                    borderRadius: "999px",
+                  }}
+                />
+              </div>
+            </div>
+            <span className="mono" style={{ fontSize: "0.78rem", color: "var(--color-ink-muted)", fontVariantNumeric: "tabular-nums" }}>
+              {value.toFixed(1)}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function Blocking({
+  heading,
+  blocking,
+  tone,
+}: {
+  heading: string;
+  blocking: string[] | string;
+  tone: "warn" | "error";
+}) {
+  const { headline, reasons } = summarizeBlocking(blocking);
+  const color = tone === "error" ? "var(--color-error)" : "var(--color-warn)";
+  return (
+    <div>
+      <p style={{ margin: "0 0 0.4rem", color, fontSize: "0.85rem", fontWeight: 500 }}>{heading}</p>
+      {headline ? (
+        <p style={{ margin: "0 0 0.4rem", fontSize: "0.83rem", color: "var(--color-ink)" }}>{headline}</p>
+      ) : null}
+      {reasons.length > 0 ? (
+        <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.82rem", color: "var(--color-ink)" }}>
+          {reasons.map((r) => (
+            <li key={r} style={{ marginBottom: "0.15rem" }}>
+              {r}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
 function Coverage({ score }: { score: LiveScore }) {
   const pct = score.coverage != null ? Math.round(score.coverage * 100) : null;
   return (
-    <p style={{ margin: "0.4rem 0 0", fontSize: "0.75rem", color: "var(--color-ink-muted)" }}>
+    <p style={{ margin: 0, fontSize: "0.75rem", color: "var(--color-ink-muted)" }}>
       Coverage: {score.subcomponents_assessed}/{score.subcomponents_total} subcomponents
       {pct != null ? ` (${pct}% of applicable)` : ""}
     </p>
   );
 }
-
-const ghostBtn: React.CSSProperties = {
-  border: "1px solid var(--color-border)",
-  background: "transparent",
-  borderRadius: "var(--radius)",
-  padding: "0.2rem 0.55rem",
-  fontSize: "0.75rem",
-  cursor: "pointer",
-};

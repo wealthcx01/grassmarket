@@ -157,7 +157,7 @@ function WorkshopsSection({
       <form onSubmit={schedule} style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
         <input type="date" value={scheduledFor} onChange={(e) => setScheduledFor(e.target.value)} style={inputStyle} />
         <input type="text" value={brief} onChange={(e) => setBrief(e.target.value)} placeholder="Pre-workshop brief (optional)" style={{ ...inputStyle, flex: "1 1 16rem" }} />
-        <button type="submit" disabled={busy} style={btnStyle}>
+        <button type="submit" className="btn btn-primary" disabled={busy}>
           Schedule workshop
         </button>
       </form>
@@ -211,7 +211,7 @@ function EngagementsSection({
       {canEngage ? (
         <form onSubmit={open} style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
           <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Engagement title" required style={{ ...inputStyle, flex: "1 1 16rem" }} />
-          <button type="submit" disabled={busy || !title.trim()} style={btnStyle}>
+          <button type="submit" className="btn btn-primary" disabled={busy || !title.trim()}>
             Open engagement
           </button>
         </form>
@@ -225,21 +225,7 @@ function EngagementsSection({
   );
 }
 
+// Controls inherit the global form styling; we only nudge the size for density.
 const inputStyle: React.CSSProperties = {
-  padding: "0.45rem 0.6rem",
-  fontFamily: "inherit",
   fontSize: "0.85rem",
-  border: "1px solid var(--color-border)",
-  borderRadius: "var(--radius)",
-  background: "var(--color-paper-raised)",
-};
-
-const btnStyle: React.CSSProperties = {
-  padding: "0.45rem 1rem",
-  fontSize: "0.85rem",
-  color: "var(--color-accent-contrast)",
-  background: "var(--color-accent)",
-  border: "none",
-  borderRadius: "var(--radius)",
-  cursor: "pointer",
 };

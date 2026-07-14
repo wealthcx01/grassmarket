@@ -75,57 +75,3555 @@ anchors:
       Frontier is rational for flow-heavy multi-venue brokers; it is NOT economically rational for a
       single-market wealth platform — do not treat it as the target there (§3.1).
 
+  # === CRITICAL (★) subcomponents — these gate module ratings (§5.2). Authored first. =======
+
+  # --- FRONTEND ★ Performance & Responsiveness ---------------------------------------------
+  - subcomponent_key: FRONTEND_PERFORMANCE
+    level: Basic
+    status: authored
+    statement: >-
+      Screens are slow and untested. There are no performance budgets and p95 load is unknown;
+      advisors and clients routinely wait on spinners, and regressions ship unnoticed because
+      nothing measures Core Web Vitals or load time.
+    required_evidence:
+      - Live page-load observation across the main task screens (trade, deposit, dashboard)
+      - Confirmation that no performance dashboard or monitoring exists
+    differentiator_questions:
+      - Is p95 load time for the main task flows measured at all, or only guessed at from feel?
+    misgrading_notes: >-
+      A fast marketing homepage is not the authenticated app — measure the actual trade/deposit
+      flows, not the landing page. Absence of any field measurement caps this at Basic.
+
+  - subcomponent_key: FRONTEND_PERFORMANCE
+    level: Developing
+    status: authored
+    statement: >-
+      Performance is measured occasionally (ad-hoc Lighthouse/PageSpeed runs) but no budgets are
+      enforced in CI. p95 is known for a few pages only, degrades on mid-range devices or under
+      load, and fixes are reactive after users complain.
+    required_evidence:
+      - Ad-hoc Lighthouse / PageSpeed reports for key pages
+      - A p95 figure for at least the main screens
+      - Evidence that CI has no performance-budget gate
+    differentiator_questions:
+      - Do performance regressions block a release, or are they only found after users complain?
+    misgrading_notes: >-
+      Occasional lab runs are not continuous monitoring — a screenshot of one good Lighthouse
+      score is not a cadence. Grade on whether regressions are caught before release.
+
+  - subcomponent_key: FRONTEND_PERFORMANCE
+    level: Advanced
+    status: authored
+    statement: >-
+      Core Web Vitals (LCP/INP/CLS) and p95 load are tracked continuously with dashboards and
+      alerting. Performance budgets are enforced in CI so regressions block release, and targets
+      are met across device tiers and documented.
+    required_evidence:
+      - Core Web Vitals / p95 dashboard with alerting
+      - CI performance-budget configuration that fails the build on regression
+      - Device-tier test-matrix results
+    differentiator_questions:
+      - Is a performance budget enforced automatically in the pipeline, or is it a guideline?
+    misgrading_notes: >-
+      Lab/synthetic scores can look great while real users on mid-range mobiles suffer — confirm
+      the targets hold in field/RUM data, not just a clean CI lab run.
+
+  - subcomponent_key: FRONTEND_PERFORMANCE
+    level: Frontier
+    status: authored
+    statement: >-
+      Performance is a differentiator: sub-second interactions, real-user monitoring (RUM)
+      segmented by geography and device, per-commit budget gating, and a measured link between
+      speed and a business outcome (conversion, engagement, retention).
+    required_evidence:
+      - RUM dashboard segmented by device and geography
+      - Per-commit performance-budget gating in the deployment pipeline
+      - A study linking latency to a business metric
+    differentiator_questions:
+      - Is real-user performance monitored in production and tied to a business outcome, not just
+        synthetic lab tests?
+    misgrading_notes: >-
+      Frontier here is warranted for high-traffic, self-serve retail/mass-market platforms; a
+      low-volume advisory-only tool does not need RUM at that scale — do not treat it as the
+      target (§3.1). RUM must be field data, not more lab tooling relabelled.
+
+  # --- FRONTEND ★ UX Coherence & Navigation ------------------------------------------------
+  - subcomponent_key: FRONTEND_UX_NAVIGATION
+    level: Basic
+    status: authored
+    statement: >-
+      Navigation is inconsistent across the product and core task flows (trade, deposit, support)
+      are hard to find or need workarounds. There is no usability testing; users get lost or call
+      support to complete basic tasks.
+    required_evidence:
+      - Live walk-through of the core flows showing dead ends or inconsistent patterns
+      - Confirmation that no usability testing has been done
+    differentiator_questions:
+      - Can a new user complete the top three task flows without contacting support?
+    misgrading_notes: >-
+      A polished visual design can mask a broken flow — grade the completion of the trade,
+      deposit and support tasks, not the aesthetics.
+
+  - subcomponent_key: FRONTEND_UX_NAVIGATION
+    level: Developing
+    status: authored
+    statement: >-
+      Main flows work but inconsistencies persist — different patterns per module, occasional
+      dead ends. Some usability feedback is gathered informally, but task-success rates are not
+      measured and new features bolt on their own navigation.
+    required_evidence:
+      - An information-architecture / navigation map (even if inconsistent)
+      - Informal user-feedback notes
+      - Evidence that task-success rates are not measured
+    differentiator_questions:
+      - Are task-success rates measured from real usability testing, or asserted from the team's
+        intuition?
+    misgrading_notes: >-
+      The existence of a style guide is not consistency — check whether modules actually share
+      navigation patterns in production, or each invented its own.
+
+  - subcomponent_key: FRONTEND_UX_NAVIGATION
+    level: Advanced
+    status: authored
+    statement: >-
+      A coherent information architecture and consistent navigation patterns, enforced by a design
+      system. Key task flows (trade, deposit, support) are validated by usability testing with
+      measured completion/success rates, and the IA is documented.
+    required_evidence:
+      - Usability-test reports with task-success rates for trade/deposit/support
+      - A design system / shared component library in active use
+      - Information-architecture documentation
+    differentiator_questions:
+      - Are the core journeys validated by measured usability testing, not just design review?
+    misgrading_notes: >-
+      Design-system existence is not adoption — verify new modules actually consume it in prod.
+      Usability "testing" must have measured task-success numbers, not a heuristic walkthrough.
+
+  - subcomponent_key: FRONTEND_UX_NAVIGATION
+    level: Frontier
+    status: authored
+    statement: >-
+      UX is a competitive asset: continuous usability research, task-success and time-on-task
+      tracked as product KPIs, accessibility-first patterns, and journey friction measured from
+      product analytics and actively reduced release over release.
+    required_evidence:
+      - An ongoing UX-research cadence with logged studies
+      - Product-analytics funnels for the key journeys with completion KPIs
+      - Drop-off / friction analysis feeding the roadmap
+    differentiator_questions:
+      - Is journey friction measured continuously and driven down as a tracked KPI, or reviewed
+        only when someone complains?
+    misgrading_notes: >-
+      Frontier matters most for self-serve mass-market platforms; a concierge advisory model with
+      few power-users rationally needs less — do not present it as the universal target (§3.1).
+
+  # --- APP_SERVER ★ Resilience & Disaster Recovery -----------------------------------------
+  - subcomponent_key: APP_SERVER_RESILIENCE_DR
+    level: Basic
+    status: authored
+    statement: >-
+      There is no tested DR plan. Backups are ad-hoc or unverified, failover is manual or absent,
+      and a single-node or single-region failure takes the platform down. RTO/RPO are undefined.
+    required_evidence:
+      - Backup configuration (or evidence of its absence)
+      - Confirmation that no DR test or restore drill has occurred
+    differentiator_questions:
+      - Has a backup ever been successfully restored, and what happens today if the primary node
+        fails?
+    misgrading_notes: >-
+      Backups that have never been restored are unproven — ask for the last successful restore,
+      not the last backup job.
+
+  - subcomponent_key: APP_SERVER_RESILIENCE_DR
+    level: Developing
+    status: authored
+    statement: >-
+      Backups run and a DR plan exists on paper, but restores are rarely or never tested. RTO/RPO
+      are defined but unvalidated, failover is manual and slow, and single points of failure
+      remain in critical services.
+    required_evidence:
+      - A written DR plan with RTO/RPO targets
+      - Backup schedule and logs
+      - Absence of a dated restore-test or failover-drill record
+    differentiator_questions:
+      - When was the last full restore or failover actually tested — with a dated result, not a
+        plan?
+    misgrading_notes: >-
+      A documented DR plan is not a tested one — a plan with no dated restore drill is Developing,
+      not Advanced, however thorough the document looks.
+
+  - subcomponent_key: APP_SERVER_RESILIENCE_DR
+    level: Advanced
+    status: authored
+    statement: >-
+      RTO/RPO targets are defined and DR is tested on a schedule (restore drills, failover
+      exercises) with documented results. Automated backups are verified by restore, critical
+      services are redundant across zones, and runbooks are maintained.
+    required_evidence:
+      - Dated DR-test / failover-drill reports with outcomes against RTO/RPO
+      - Verified restore records
+      - Multi-zone redundancy topology for critical services and a maintained DR runbook
+    differentiator_questions:
+      - Is DR exercised on a schedule with measured recovery times, or only planned?
+    misgrading_notes: >-
+      "We could fail over" is not evidence — require a dated drill. A plan that meets RTO on paper
+      but has never been exercised has not earned Advanced.
+
+  - subcomponent_key: APP_SERVER_RESILIENCE_DR
+    level: Frontier
+    status: authored
+    statement: >-
+      Resilience is continuously proven: automated failover, active-active or rapid multi-region
+      recovery, chaos/GameDay exercises, and RTO/RPO continuously measured against real and
+      simulated events.
+    required_evidence:
+      - Chaos-engineering / GameDay reports
+      - Automated-failover evidence and multi-region topology
+      - Recovery telemetry from a real or simulated zone/region loss
+    differentiator_questions:
+      - Does the system recover automatically from a zone or region loss, or does recovery still
+        require a manual runbook?
+    misgrading_notes: >-
+      Multi-region active-active is warranted for always-on trading/custody at scale; a regional
+      wealth platform may rationally target tested single-region recovery — do not over-target it
+      (§3.1).
+
+  # --- APP_SERVER ★ Security & Compliance --------------------------------------------------
+  - subcomponent_key: APP_SERVER_SECURITY_COMPLIANCE
+    level: Basic
+    status: authored
+    statement: >-
+      AuthN/Z is weak or inconsistent, secrets live in code or config, there is no vulnerability
+      scanning, and audit trails are absent or incomplete. Encryption at rest and in transit is
+      patchy and security is purely reactive.
+    required_evidence:
+      - Live inspection of the auth flow and config for plaintext secrets
+      - Confirmation that no vulnerability scanning runs
+    differentiator_questions:
+      - Are credentials and access controls enforced consistently, or are there plaintext secrets
+        and shared logins in production?
+    misgrading_notes: >-
+      A security policy PDF is not a running control — verify in the prod config (E3/E4), for
+      example that secrets are not in the repo, before crediting anything above Basic.
+
+  - subcomponent_key: APP_SERVER_SECURITY_COMPLIANCE
+    level: Developing
+    status: authored
+    statement: >-
+      Basic controls exist (auth, TLS, some access control) but gaps remain: irregular patching,
+      no formal vulnerability management, partial audit logging, and no penetration-testing
+      cadence. Compliance evidence is assembled ad-hoc under deadline.
+    required_evidence:
+      - Access-control policy and TLS/encryption configuration
+      - Patch history showing irregular cadence
+      - Absence of an independent penetration-test report
+    differentiator_questions:
+      - Is there a regular vulnerability-management and patching process, or is patching reactive?
+    misgrading_notes: >-
+      A clean scan the vendor chose to show you is not a scanning cadence — ask for the schedule
+      and the backlog of open findings. Partial audit logging is not tamper-evident audit.
+
+  - subcomponent_key: APP_SERVER_SECURITY_COMPLIANCE
+    level: Advanced
+    status: authored
+    statement: >-
+      Enforced AuthN/Z (RBAC/least-privilege), encryption at rest and in transit, managed secrets,
+      regular vulnerability scanning with patching SLAs, complete tamper-evident audit trails, and
+      periodic third-party penetration tests with tracked remediation.
+    required_evidence:
+      - RBAC/IAM configuration and secrets-management setup
+      - Vulnerability-scan reports with remediation SLAs
+      - A third-party penetration-test report within the last 12 months with tracked findings
+      - Audit-log samples
+    differentiator_questions:
+      - Is there an independent penetration test within the last 12 months with tracked
+        remediation, or only internal assurance?
+    misgrading_notes: >-
+      Vendors show the policy, not the enforcement — confirm RBAC is actually enforced in prod and
+      the pen-test findings are being closed, not just filed.
+
+  - subcomponent_key: APP_SERVER_SECURITY_COMPLIANCE
+    level: Frontier
+    status: authored
+    statement: >-
+      Security is a demonstrable strength: continuous automated security testing in CI/CD, threat
+      modelling, SIEM with active detection and response, a maintained recognised certification
+      (e.g. SOC 2 / ISO 27001), and audit trails that support real-time compliance reporting.
+    required_evidence:
+      - SAST/DAST integrated in the CI pipeline
+      - SIEM / detection-and-response dashboards
+      - A current SOC 2 / ISO 27001 certificate or audit report, plus threat-model documentation
+    differentiator_questions:
+      - Are security tests automated in the deployment pipeline and backed by continuous
+        monitoring, or point-in-time?
+    misgrading_notes: >-
+      Formal certification is expected where institutional clients or regulators demand it; a
+      small B2B tool may rationally stop at Advanced — do not treat certification as universally
+      required (§3.1).
+
+  # --- MARKET_DATA ★ Depth & Quality of Data -----------------------------------------------
+  - subcomponent_key: MARKET_DATA_DEPTH_QUALITY
+    level: Basic
+    status: authored
+    statement: >-
+      Prices are last-trade or delayed snapshots only, with no order-book depth. Reference data
+      (corporate actions, splits, symbology) is maintained manually and is error-prone;
+      corrections are missed and bad ticks reach users.
+    required_evidence:
+      - Live inspection of a quote showing last-trade / delayed data only
+      - Confirmation that reference data is maintained manually
+    differentiator_questions:
+      - When a price is wrong or a corporate action is missed, is it caught by an automated check
+        or by a user complaint?
+    misgrading_notes: >-
+      A rich data feed in the demo may be a premium entitlement not licensed in prod — check the
+      actual production entitlements and depth level, not the sales environment.
+
+  - subcomponent_key: MARKET_DATA_DEPTH_QUALITY
+    level: Developing
+    status: authored
+    statement: >-
+      Some depth (top-of-book) and reference data exist but quality is inconsistent. Corrections
+      and adjustments are handled reactively, there are no systematic data-quality checks, and
+      stale or erroneous data surfaces before anyone catches it.
+    required_evidence:
+      - Data-feed spec showing top-of-book coverage
+      - A corporate-actions handling process
+      - Evidence that no automated data-quality checks run
+    differentiator_questions:
+      - Is order-book depth actually captured and stored, or only top-of-book?
+    misgrading_notes: >-
+      Reference-data "accuracy" is only credible with monitoring — ask how a missed split would be
+      detected. Reactive correction after a complaint is Developing, not Advanced.
+
+  - subcomponent_key: MARKET_DATA_DEPTH_QUALITY
+    level: Advanced
+    status: authored
+    statement: >-
+      Full order-book depth where relevant, accurate reference data with automated corporate-action
+      processing, systematic data-quality validation (outlier/gap detection, cross-source checks),
+      and monitored data-quality metrics with alerting.
+    required_evidence:
+      - Data-quality monitoring dashboard (gap/outlier detection)
+      - Corporate-action processing logs
+      - Reference-data accuracy metrics and a depth-of-book sample
+    differentiator_questions:
+      - Are data-quality problems detected by automated validation before they reach users?
+    misgrading_notes: >-
+      Automated corporate-actions coverage is often partial (mandatory events only) — check
+      voluntary/election handling, not just dividends, before crediting full processing.
+
+  - subcomponent_key: MARKET_DATA_DEPTH_QUALITY
+    level: Frontier
+    status: authored
+    statement: >-
+      Data quality is a differentiator: real-time cross-vendor validation, automated anomaly
+      detection with auto-correction, full L2/L3 depth, and measured quality SLAs published to
+      data consumers.
+    required_evidence:
+      - Cross-vendor validation / reconciliation configuration
+      - Anomaly-detection and auto-correction logs
+      - A published data-quality SLA and its compliance report
+    differentiator_questions:
+      - Is data continuously validated across vendors with automated correction, or checked
+        against a single source?
+    misgrading_notes: >-
+      Full L2/L3 depth matters for active-trading/execution platforms; a long-only wealth platform
+      may rationally need only clean top-of-book and reference data — do not over-target (§3.1).
+
+  # --- MARKET_DATA ★ Latency & Timeliness --------------------------------------------------
+  - subcomponent_key: MARKET_DATA_LATENCY_TIMELINESS
+    level: Basic
+    status: authored
+    statement: >-
+      Data is delayed (e.g. 15-minute) or of unknown latency, with no measurement. Users cannot
+      tell whether a quote is current, and timeliness problems are discovered anecdotally.
+    required_evidence:
+      - Live check of a quote's timestamp versus wall-clock showing delay
+      - Confirmation that latency is not measured
+    differentiator_questions:
+      - Is the data known to be real-time or delayed, and is that latency actually measured?
+    misgrading_notes: >-
+      "Real-time" on a marketing page often means 15-minute delayed in prod for the entitlement
+      actually purchased — verify the licensed feed, not the brochure.
+
+  - subcomponent_key: MARKET_DATA_LATENCY_TIMELINESS
+    level: Developing
+    status: authored
+    statement: >-
+      Latency is roughly known for the main feeds but not measured continuously against source.
+      Occasional lag spikes occur, there is no alerting on staleness, and timeliness varies by
+      feed with no SLA.
+    required_evidence:
+      - Feed documentation stating expected latency
+      - Anecdotal lag / staleness reports
+      - Absence of continuous latency monitoring
+    differentiator_questions:
+      - Is feed latency measured continuously against the source timestamp, or just assumed from
+        the vendor's spec sheet?
+    misgrading_notes: >-
+      A vendor's stated latency is a spec, not a measurement — Developing means nobody is watching
+      staleness in prod. No heartbeat/staleness alert caps it here.
+
+  - subcomponent_key: MARKET_DATA_LATENCY_TIMELINESS
+    level: Advanced
+    status: authored
+    statement: >-
+      Feed latency is measured continuously against source timestamps, with staleness/heartbeat
+      monitoring and alerting. Timeliness SLAs are defined per feed and met, and the system fails
+      over to a backup feed on lag or gap.
+    required_evidence:
+      - Latency/staleness monitoring dashboard with source-timestamp deltas
+      - Per-feed timeliness SLA
+      - Alerting and feed-failover configuration
+    differentiator_questions:
+      - Does the platform alert and fail over when a feed goes stale, or does it keep showing old
+        prices?
+    misgrading_notes: >-
+      A single average-latency number hides tail lag — confirm staleness alerting exists, not just
+      a mean figure on a dashboard.
+
+  - subcomponent_key: MARKET_DATA_LATENCY_TIMELINESS
+    level: Frontier
+    status: authored
+    statement: >-
+      Latency is a competitive edge: low latency measured end-to-end with percentiles, co-located
+      or direct feeds where relevant, continuous latency telemetry, and enforced latency budgets
+      with a breach-response process.
+    required_evidence:
+      - End-to-end latency telemetry with percentiles (p50/p99)
+      - Co-location / direct-feed evidence
+      - Enforced latency budgets and a breach-response record
+    differentiator_questions:
+      - Are latency percentiles monitored end-to-end with enforced budgets, or is "real-time" just
+        a label?
+    misgrading_notes: >-
+      Ultra-low latency matters for execution/HFT-adjacent platforms; a wealth or research platform
+      rationally targets real-time-enough with monitored staleness, not microseconds (§3.1).
+
+  # --- ORCHESTRATION ★ Workflow Engine Maturity --------------------------------------------
+  - subcomponent_key: ORCHESTRATION_WORKFLOW_ENGINE
+    level: Basic
+    status: authored
+    statement: >-
+      Processes are hard-coded, scripted, or run manually. There is no workflow engine;
+      long-running processes have no state tracking, retries, or visibility, and failures require
+      manual intervention and re-runs.
+    required_evidence:
+      - Inspection of how a multi-step process runs (scripts / manual steps)
+      - Confirmation that no workflow engine exists
+    differentiator_questions:
+      - When a multi-step process fails halfway, does anything track its state, or does someone
+        re-run it by hand?
+    misgrading_notes: >-
+      A cron scheduler is not a workflow engine — scheduled jobs without durable state, retries,
+      and recovery are Basic/Developing however reliable the schedule.
+
+  - subcomponent_key: ORCHESTRATION_WORKFLOW_ENGINE
+    level: Developing
+    status: authored
+    statement: >-
+      Some workflow tooling or scheduled jobs exist, but state, retries, and error handling are
+      inconsistent and partly hard-coded. Workflows are brittle, failures are handled reactively,
+      and there is limited visibility into in-flight processes.
+    required_evidence:
+      - Scheduler / job configuration
+      - Examples of workflow definitions
+      - Evidence of inconsistent retry or error handling
+    differentiator_questions:
+      - Are workflows defined declaratively and versioned, or embedded in application code?
+    misgrading_notes: >-
+      Check whether "orchestration" survives a mid-run crash, not just the happy-path demo — a
+      workflow that cannot resume from state is Developing.
+
+  - subcomponent_key: ORCHESTRATION_WORKFLOW_ENGINE
+    level: Advanced
+    status: authored
+    statement: >-
+      A managed workflow/orchestration engine provides durable state, automatic retries,
+      idempotency, error handling, and observability. Workflows are versioned and declarative, and
+      in-flight and failed workflows are visible and recoverable.
+    required_evidence:
+      - Workflow-engine configuration with retry / idempotency settings
+      - A monitoring view of in-flight and failed workflows
+      - Versioned, declarative workflow definitions
+    differentiator_questions:
+      - When a step fails, does the workflow retry and resume from durable state automatically?
+    misgrading_notes: >-
+      A tool with a nice UI is not durability — confirm state survives process restart and failed
+      runs can be resumed, not just re-triggered from the start.
+
+  - subcomponent_key: ORCHESTRATION_WORKFLOW_ENGINE
+    level: Frontier
+    status: authored
+    statement: >-
+      Orchestration is a strength: self-healing workflows, dynamic/adaptive routing, full audit
+      and replay, SLA-tracked processes, and business users can safely author and modify flows.
+    required_evidence:
+      - Self-healing / auto-remediation configuration
+      - Workflow replay / audit logs
+      - Per-process SLA dashboards and business-user authoring tooling
+    differentiator_questions:
+      - Can workflows self-heal and be replayed for audit, and can non-engineers safely change
+        them?
+    misgrading_notes: >-
+      A sophisticated engine is warranted where many long-running multi-step processes exist; a
+      simple CRUD platform does not need a heavyweight orchestrator — do not over-target (§3.1).
+
+  # --- CMS ★ CRM Data Model & Integration --------------------------------------------------
+  - subcomponent_key: CMS_CRM_MODEL
+    level: Basic
+    status: authored
+    statement: >-
+      Client and relationship data is fragmented across spreadsheets and disconnected systems,
+      with duplicate and conflicting records. There is no single client view, and integration is
+      manual re-keying.
+    required_evidence:
+      - Inspection of where client data lives (spreadsheets / disconnected systems)
+      - Examples of duplicate or conflicting client records
+    differentiator_questions:
+      - Is there one authoritative client record, or is the client view stitched together from
+        several systems each time?
+    misgrading_notes: >-
+      The presence of a named CRM product does not mean an integrated data model — check whether
+      other systems actually read/write it or keep their own client copies.
+
+  - subcomponent_key: CMS_CRM_MODEL
+    level: Developing
+    status: authored
+    statement: >-
+      A CRM exists but the data model is inconsistent (duplicates, unclear ownership). Integration
+      to other systems is partial or batch/manual, a single client view is assembled with effort,
+      and data quality is unmanaged.
+    required_evidence:
+      - CRM data-model / schema
+      - Integration inventory showing batch or manual links
+      - Evidence of unmanaged duplicate records
+    differentiator_questions:
+      - Do other systems integrate with the CRM automatically, or is client data re-keyed between
+        them?
+    misgrading_notes: >-
+      A "single client view" screen may be a read-only mashup, not a governed source — ask where
+      the data is actually mastered before crediting integration.
+
+  - subcomponent_key: CMS_CRM_MODEL
+    level: Advanced
+    status: authored
+    statement: >-
+      A coherent CRM data model with clear entity ownership and a single client view, integrated
+      via APIs with core systems so client data is consistent across the platform. Data-quality
+      rules (dedup, validation) and stewardship are in place.
+    required_evidence:
+      - Documented data model with entity ownership
+      - API-integration configuration to core systems
+      - Data-quality / dedup rules, a stewardship process, and a single-client-view screen
+    differentiator_questions:
+      - Is client data consistent across the estate because systems integrate with one model, or
+        reconciled after the fact?
+    misgrading_notes: >-
+      Integration claims should be verified at the API level — confirm systems actually read/write
+      the model rather than syncing overnight copies.
+
+  - subcomponent_key: CMS_CRM_MODEL
+    level: Frontier
+    status: authored
+    statement: >-
+      The CRM is a strategic asset: a unified real-time client data model (single source of truth)
+      integrated bidirectionally across the estate, with a 360-degree view, event-driven updates,
+      and analytics/segmentation built on trusted data.
+    required_evidence:
+      - Real-time bidirectional integration architecture
+      - A 360-degree client view backed by a single source of truth
+      - Event-driven update logs and segmentation/analytics built on the model
+    differentiator_questions:
+      - Do client updates propagate across the estate in real time from a single source of truth,
+        or via overnight batch?
+    misgrading_notes: >-
+      A CDP-grade unified model matters for firms competing on relationship intelligence; a small
+      advisory book may rationally stop at a clean, integrated CRM — do not over-target (§3.1).
+
+  # --- BACKOFFICE ★ Custody & Asset Servicing ----------------------------------------------
+  - subcomponent_key: BACKOFFICE_CUSTODY
+    level: Basic
+    status: authored
+    statement: >-
+      Custody positions are reconciled manually and infrequently. Corporate actions are processed
+      by hand from notices, often late or missed; there are no asset-servicing SLAs, and breaks are
+      discovered late and resolved ad-hoc.
+    required_evidence:
+      - Inspection of the reconciliation method (manual / spreadsheet)
+      - Examples of missed or late corporate actions
+    differentiator_questions:
+      - When a custody position breaks or a corporate action is due, is it caught by a process or
+        found by luck?
+    misgrading_notes: >-
+      A daily reconciliation report does not mean automated break management — if breaks are still
+      chased by email and spreadsheet it is Basic/Developing.
+
+  - subcomponent_key: BACKOFFICE_CUSTODY
+    level: Developing
+    status: authored
+    statement: >-
+      Reconciliation runs (often daily) but break investigation is manual. Corporate actions are
+      handled semi-manually with a checklist, some SLAs exist but are not consistently met, and
+      asset servicing is reactive under volume.
+    required_evidence:
+      - Reconciliation run logs
+      - A corporate-actions processing checklist
+      - SLA definitions with evidence of misses
+    differentiator_questions:
+      - Are corporate-action entitlements and elections processed systematically, or case-by-case
+        from notices?
+    misgrading_notes: >-
+      Corporate-actions coverage is often partial — mandatory events (dividends) may be handled
+      while voluntary/election events are not; check the full lifecycle.
+
+  - subcomponent_key: BACKOFFICE_CUSTODY
+    level: Advanced
+    status: authored
+    statement: >-
+      Automated custody reconciliation with exception-based break management, systematic
+      corporate-actions processing (capture, entitlement calculation, election handling) against
+      monitored SLAs, and full audit trails for asset servicing.
+    required_evidence:
+      - Automated reconciliation with a break-exception dashboard
+      - Corporate-action processing records (entitlements, elections) against monitored SLAs
+      - Asset-servicing audit trail
+    differentiator_questions:
+      - Are custody breaks worked by an automated exception process against an SLA, or manually
+        chased?
+    misgrading_notes: >-
+      Automation must cover break management, not just the reconciliation run — a matched-vs-unmatched
+      report that humans then work by hand is Developing.
+
+  - subcomponent_key: BACKOFFICE_CUSTODY
+    level: Frontier
+    status: authored
+    statement: >-
+      Custody and asset servicing is a strength: near-real-time multi-custodian reconciliation,
+      straight-through corporate-actions processing with automated elections, predictive break
+      detection, and SLA performance reported to clients.
+    required_evidence:
+      - Multi-custodian real-time reconciliation architecture
+      - Straight-through corporate-action processing logs
+      - Predictive break-detection metrics and client-facing SLA performance reports
+    differentiator_questions:
+      - Is reconciliation near-real-time across multiple custodians with predictive break
+        detection, or end-of-day single-custodian?
+    misgrading_notes: >-
+      Multi-custodian STP matters for a scaled custodian/platform; a single-custodian wealth firm
+      may rationally target automated single-custodian reconciliation — do not over-target (§3.1).
+
+  # --- BACKOFFICE ★ Regulatory Reporting ---------------------------------------------------
+  - subcomponent_key: BACKOFFICE_REG_REPORTING
+    level: Basic
+    status: authored
+    statement: >-
+      Regulatory reports are compiled manually from extracts each period — error-prone and late,
+      with no validation before submission. Reporting scope may have gaps and the audit trail is
+      thin.
+    required_evidence:
+      - Inspection of how a report is produced (manual extract / spreadsheet)
+      - Evidence of late or corrected submissions
+    differentiator_questions:
+      - Is each report assembled by hand from extracts, or generated from system data?
+    misgrading_notes: >-
+      Meeting deadlines by heroic manual effort is not maturity — a report assembled by hand each
+      quarter is Basic/Developing however punctual.
+
+  - subcomponent_key: BACKOFFICE_REG_REPORTING
+    level: Developing
+    status: authored
+    statement: >-
+      Reports are largely produced from system data with some manual assembly. Deadlines are
+      usually met but with last-minute effort, validation is partial, regulatory changes are
+      handled reactively, and occasional resubmissions occur.
+    required_evidence:
+      - Report-generation process with manual steps documented
+      - Submission history showing deadline pressure or resubmissions
+      - Partial validation checks
+    differentiator_questions:
+      - Are reports validated against the regulator's rules before submission, or is the first
+        check the regulator's rejection?
+    misgrading_notes: >-
+      Check completeness of scope (all applicable regimes and fields), not just that something is
+      filed on time — a partial-scope report filed punctually is still Developing.
+
+  - subcomponent_key: BACKOFFICE_REG_REPORTING
+    level: Advanced
+    status: authored
+    statement: >-
+      Automated regulatory-report generation with pre-submission validation rules, complete
+      coverage of applicable regimes, monitored deadlines reconciled to source, full audit trails,
+      and a controlled process for regulatory-change updates.
+    required_evidence:
+      - Automated report-generation configuration with a validation-rule set
+      - Submission calendar with an on-time record and reconciliation-to-source evidence
+      - Audit trail and a regulatory-change control process
+    differentiator_questions:
+      - Are reports generated and validated automatically against the applicable regime before
+        submission?
+    misgrading_notes: >-
+      Validation must be against the regulator's actual schema/rules, not a generic sanity check —
+      confirm the rule set matches the regime, and that scope is complete.
+
+  - subcomponent_key: BACKOFFICE_REG_REPORTING
+    level: Frontier
+    status: authored
+    statement: >-
+      Regulatory reporting is a strength: near-real-time/on-demand reporting, automated validation
+      against regulator schemas, exception dashboards, proactive regulatory-change management, and
+      demonstrable lineage from report back to source transaction.
+    required_evidence:
+      - On-demand / real-time reporting capability
+      - Schema-validation and exception dashboards
+      - Data-lineage from report field to source transaction and a proactive regulatory-change
+        register
+    differentiator_questions:
+      - Can any reported figure be traced automatically back to its source transaction, and can
+        reports be produced on demand?
+    misgrading_notes: >-
+      On-demand transaction reporting matters for firms under MiFIR/EMIR-scale obligations; a
+      lightly-regulated firm rationally targets accurate, timely periodic reporting (§3.1).
+
+  # --- OEMS ★ Pre-trade Risk & Compliance --------------------------------------------------
+  - subcomponent_key: OEMS_PRE_TRADE_RISK
+    level: Basic
+    status: authored
+    statement: >-
+      There are few or no automated pre-trade checks. Limits and restrictions are enforced manually
+      or after the fact, fat-finger, credit, and restricted-list breaches can reach the market, and
+      compliance is post-trade only.
+    required_evidence:
+      - Inspection of the order path for automated checks (their absence)
+      - Evidence that compliance checking is post-trade
+    differentiator_questions:
+      - Can an obviously wrong or non-compliant order reach the market with no automated check
+        stopping it?
+    misgrading_notes: >-
+      Post-trade surveillance is not a pre-trade control — catching a breach after execution does
+      not lift this above Basic.
+
+  - subcomponent_key: OEMS_PRE_TRADE_RISK
+    level: Developing
+    status: authored
+    statement: >-
+      Some pre-trade checks exist (basic limit or buying-power checks) but coverage is incomplete
+      or inconsistent across order paths and can be bypassed. Restricted lists are updated manually
+      and alerts are noisy or ignored.
+    required_evidence:
+      - Configuration of the checks that exist
+      - Evidence of gaps or bypassable order paths
+      - A manual restricted-list process
+    differentiator_questions:
+      - Are the checks applied consistently on every order-entry channel (UI, API, algo), or only
+        the main one?
+    misgrading_notes: >-
+      A check demoed on the main UI may be absent on the API/FIX path — verify every order channel
+      enforces it before crediting coverage.
+
+  - subcomponent_key: OEMS_PRE_TRADE_RISK
+    level: Advanced
+    status: authored
+    statement: >-
+      Comprehensive automated pre-trade risk and compliance checks (credit/margin, position and
+      exposure limits, fat-finger, restricted/watch lists, suitability) applied consistently on
+      every order path, with configurable rules, hard blocks, and a full audit trail of checks and
+      overrides.
+    required_evidence:
+      - Pre-trade rule configuration covering the full check set
+      - Logs showing checks, blocks, and overrides on every order path
+      - Audit trail of overrides with authorisation
+    differentiator_questions:
+      - Can an order that breaches a limit or hits a restricted name actually reach the market, or
+        is it hard-blocked pre-trade on every path?
+    misgrading_notes: >-
+      "Warn-only" alerts that can be clicked through are not controls — distinguish soft warnings
+      from hard blocks, and confirm the audit trail records overrides.
+
+  - subcomponent_key: OEMS_PRE_TRADE_RISK
+    level: Frontier
+    status: authored
+    statement: >-
+      Pre-trade risk is a strength: real-time cross-asset/cross-account risk aggregation,
+      low-latency checks that do not impede execution, scenario/what-if limits, and automated
+      tuning, with overrides governed and analysed.
+    required_evidence:
+      - Real-time cross-account risk-aggregation architecture
+      - Latency measurements for the check path
+      - Governed override analytics and scenario/limit-tuning evidence
+    differentiator_questions:
+      - Is risk aggregated in real time across accounts and asset classes, or checked per order in
+        isolation?
+    misgrading_notes: >-
+      Real-time cross-portfolio aggregation matters for multi-desk/prime brokers; a single-strategy
+      platform rationally needs solid per-account checks, not firm-wide netting (§3.1).
+
+  # --- EMS_GATEWAY ★ Risk & Throttling -----------------------------------------------------
+  - subcomponent_key: EMS_GATEWAY_RISK_THROTTLING
+    level: Basic
+    status: authored
+    statement: >-
+      The gateway has no meaningful rate/throttling or risk controls. A runaway client or algo can
+      flood a venue, message rates and order counts are unmonitored, and the kill-switch is manual
+      or absent.
+    required_evidence:
+      - Inspection of gateway config for rate / risk controls (their absence)
+      - Confirmation that there is no tested kill-switch
+    differentiator_questions:
+      - If a client or algo started flooding orders, is there anything at the gateway to stop it?
+    misgrading_notes: >-
+      A manual "pull the plug" is not a kill-switch control — absence of automated throttling or a
+      tested cut-off is Basic.
+
+  - subcomponent_key: EMS_GATEWAY_RISK_THROTTLING
+    level: Developing
+    status: authored
+    statement: >-
+      Basic throttling or message-rate caps exist but are coarse and static, and some gateway risk
+      limits exist but are incomplete. A kill-switch exists but is untested, and controls are not
+      tuned to venue limits.
+    required_evidence:
+      - Throttling / rate-cap configuration
+      - Gateway risk-limit settings showing gaps
+      - A kill-switch that lacks a test record
+    differentiator_questions:
+      - Are throttle limits actually aligned to the venue's thresholds, or set arbitrarily high?
+    misgrading_notes: >-
+      Throttle limits set far above any real venue limit are decorative — check they map to the
+      venue's actual thresholds. An untested kill-switch caps this at Developing.
+
+  - subcomponent_key: EMS_GATEWAY_RISK_THROTTLING
+    level: Advanced
+    status: authored
+    statement: >-
+      Configurable per-session/per-client throttling aligned to venue limits, gateway-level risk
+      controls (max order rate, max order size/notional, duplicate/self-trade prevention), a tested
+      kill-switch, and monitoring/alerting on throttle and risk events.
+    required_evidence:
+      - Per-session throttle configuration mapped to venue limits
+      - Gateway risk-control settings (rate/size/notional, self-trade prevention)
+      - A dated kill-switch test and throttle/risk event monitoring
+    differentiator_questions:
+      - If a client or algo goes rogue, does the gateway throttle or halt it automatically, and has
+        the kill-switch been tested?
+    misgrading_notes: >-
+      A kill-switch that exists but has never been fired in a drill is Developing — require a dated
+      test, not a described procedure.
+
+  - subcomponent_key: EMS_GATEWAY_RISK_THROTTLING
+    level: Frontier
+    status: authored
+    statement: >-
+      Gateway risk is a strength: dynamic/adaptive throttling, real-time risk aggregation at the
+      gateway, automated circuit-breakers, and fine-grained per-strategy controls with full
+      telemetry.
+    required_evidence:
+      - Adaptive-throttling logic
+      - Real-time gateway risk-aggregation dashboard
+      - Automated circuit-breaker configuration with trigger logs and per-strategy telemetry
+    differentiator_questions:
+      - Is throttling adaptive to real-time conditions, or a fixed static cap?
+    misgrading_notes: >-
+      Adaptive gateway throttling matters for high-message-rate DMA/algo flow; a low-volume order
+      gateway rationally needs static caps and a tested kill-switch — do not over-target (§3.1).
+
+  # --- LIQ_CONNECT ★ Local Exchange Connectivity -------------------------------------------
+  - subcomponent_key: LIQ_CONNECT_LOCAL_EXCHANGES
+    level: Basic
+    status: authored
+    statement: >-
+      Connectivity to local exchanges is via a single link or a manual/third-party workaround.
+      Outages disconnect the firm, there is no redundancy, and connection health is unmonitored.
+    required_evidence:
+      - Inspection of the connectivity path (single link / third-party)
+      - Confirmation that there is no redundancy or connection monitoring
+    differentiator_questions:
+      - Is there a second, independent path to the exchange, or does one line failing stop trading?
+    misgrading_notes: >-
+      Connectivity via a broker's infrastructure may be adequate but should not be graded as the
+      firm's own direct connection — describe what the firm actually operates.
+
+  - subcomponent_key: LIQ_CONNECT_LOCAL_EXCHANGES
+    level: Developing
+    status: authored
+    statement: >-
+      Direct connectivity exists to the main local exchange(s) but with limited redundancy.
+      Failover is manual, monitoring is basic, adding a venue is a slow bespoke project, and
+      occasional session drops disrupt trading.
+    required_evidence:
+      - Network / connectivity diagram to the local exchange(s)
+      - Evidence of manual failover
+      - Basic session-drop logs
+    differentiator_questions:
+      - If the primary line drops, does connectivity fail over automatically, or does someone
+        reconnect manually?
+    misgrading_notes: >-
+      A single "direct" connection with no second path is not resilient — redundancy means an
+      independent failover line, not a documented reconnect procedure.
+
+  - subcomponent_key: LIQ_CONNECT_LOCAL_EXCHANGES
+    level: Advanced
+    status: authored
+    statement: >-
+      Resilient direct connectivity to relevant local exchanges with redundant links, automated
+      session management and failover, monitored connection health with alerting, and a documented,
+      repeatable venue-onboarding process.
+    required_evidence:
+      - Redundant-link topology
+      - Automated session-management / failover configuration
+      - Connection-health monitoring dashboard and a venue-onboarding runbook
+    differentiator_questions:
+      - Does connectivity fail over automatically without losing the session, and is health
+        actively monitored?
+    misgrading_notes: >-
+      Failover must be automated and session-preserving — a redundant line that still requires a
+      manual cutover is Developing.
+
+  - subcomponent_key: LIQ_CONNECT_LOCAL_EXCHANGES
+    level: Frontier
+    status: authored
+    statement: >-
+      Exchange connectivity is a strength: fully redundant low-latency links (co-location/direct
+      market access), automated failover with no session loss, proactive line monitoring, and rapid
+      onboarding of new venues.
+    required_evidence:
+      - Co-location / DMA evidence
+      - Latency-measured redundant paths and automated no-loss failover records
+      - New-venue onboarding lead-time metrics
+    differentiator_questions:
+      - Is connectivity co-located/direct and latency-measured, or routed indirectly?
+    misgrading_notes: >-
+      Co-located DMA matters for latency-sensitive trading; a wealth platform routing via a broker
+      rationally needs reliable, monitored connectivity, not co-location — do not over-target
+      (§3.1).
+
+  # --- LIQ_CONNECT ★ Settlement & Clearing Links -------------------------------------------
+  - subcomponent_key: LIQ_CONNECT_SETTLEMENT_CLEARING
+    level: Basic
+    status: authored
+    statement: >-
+      Settlement and clearing instructions are sent manually (re-keyed, emailed, or via a portal)
+      to CSDs/clearers. Fails are frequent and discovered late, there is no automated status
+      tracking, and reconciliation is manual.
+    required_evidence:
+      - Inspection of how settlement instructions are sent (manual / portal)
+      - Evidence of frequent, late-discovered settlement fails
+    differentiator_questions:
+      - Are settlement instructions sent straight-through, or re-keyed and chased manually?
+    misgrading_notes: >-
+      A portal that a human types into is still manual — the presence of an electronic channel does
+      not make it straight-through processing.
+
+  - subcomponent_key: LIQ_CONNECT_SETTLEMENT_CLEARING
+    level: Developing
+    status: authored
+    statement: >-
+      Links to the main clearers/CSDs exist with some automation (batch messaging) but manual
+      intervention is common. Settlement status is tracked with effort, fails are managed
+      reactively, and coverage of markets/instruments is limited.
+    required_evidence:
+      - Settlement-messaging configuration (batch)
+      - The settlement-status tracking method
+      - A fail-management process showing manual effort
+    differentiator_questions:
+      - Is settlement status matched automatically, or reconciled by hand each day?
+    misgrading_notes: >-
+      Batch messaging with manual repair is Developing, not STP — verify the exception rate and how
+      fails are actually worked.
+
+  - subcomponent_key: LIQ_CONNECT_SETTLEMENT_CLEARING
+    level: Advanced
+    status: authored
+    statement: >-
+      Automated settlement/clearing connectivity (e.g. SWIFT/CSD/CCP messaging) with straight-through
+      instruction, automated status/matching, fail monitoring and management against SLAs, and
+      reconciliation with audit trails across covered markets.
+    required_evidence:
+      - STP settlement/clearing connectivity configuration (SWIFT/CSD/CCP)
+      - Automated matching/status and a fail-monitoring dashboard against SLAs
+      - Reconciliation and audit trail plus the covered-market list
+    differentiator_questions:
+      - Are instructions straight-through with automated status matching across every market the
+        firm trades?
+    misgrading_notes: >-
+      A link to one CSD does not mean coverage — check every market the firm trades settles
+      automatically, not just the home market.
+
+  - subcomponent_key: LIQ_CONNECT_SETTLEMENT_CLEARING
+    level: Frontier
+    status: authored
+    statement: >-
+      Settlement and clearing is a strength: real-time settlement status, predictive fail
+      prevention, broad multi-market CSD/CCP coverage with automated exception handling, and
+      readiness for accelerated (T+1/T+0) cycles.
+    required_evidence:
+      - Real-time settlement-status architecture
+      - Predictive fail-prevention metrics
+      - Multi-market CSD/CCP coverage with automated exception handling and a T+1/T+0 readiness
+        assessment
+    differentiator_questions:
+      - Is settlement status available in real time with predictive fail prevention, and is the
+        operation ready for a T+1/T+0 cycle?
+    misgrading_notes: >-
+      Multi-market STP and T+1 readiness matter for cross-border/scaled operations; a single-market
+      firm rationally targets automated links to its home CSD/CCP — do not over-target (§3.1).
+
+  # === NON-CRITICAL subcomponents — authored second (GRS-0008 second pass). ================
+
+  # --- FRONTEND Device & Channel Coverage --------------------------------------------------
+  - subcomponent_key: FRONTEND_DEVICE_COVERAGE
+    level: Basic
+    status: authored
+    statement: >-
+      The product is web-only and effectively desktop-first — there is no native mobile app and the
+      site breaks or is unusable on a phone. Clients wanting mobile squint at a cramped browser view;
+      there is no deliberate channel strategy.
+    required_evidence:
+      - Live check of the core screens on a phone-sized viewport showing breakage or unusability
+      - Confirmation that no native/mobile app exists
+    differentiator_questions:
+      - Can a client actually complete a core task on a phone today, or only on a desktop browser?
+    misgrading_notes: >-
+      A page that merely loads on mobile is not mobile support — grade whether the core tasks are
+      usable on a phone, not whether the URL resolves.
+
+  - subcomponent_key: FRONTEND_DEVICE_COVERAGE
+    level: Developing
+    status: authored
+    statement: >-
+      A responsive web app and perhaps a thin mobile app exist, but feature parity is poor — key
+      tasks (trade, deposit) work well on one channel only, the mobile experience lags web, and
+      features ship to web first so the channels drift apart.
+    required_evidence:
+      - A feature-by-channel comparison showing parity gaps
+      - Evidence that features land on one channel before the other
+      - The mobile app / responsive build in use
+    differentiator_questions:
+      - Are the core journeys fully supported on every channel offered, or only on the primary one?
+    misgrading_notes: >-
+      An app in the store is not parity — verify the top tasks actually work there, rather than the
+      app deep-linking back into a web view for anything real.
+
+  - subcomponent_key: FRONTEND_DEVICE_COVERAGE
+    level: Advanced
+    status: authored
+    statement: >-
+      Full-featured web and mobile experiences with deliberate feature parity for the core journeys,
+      a documented device/channel support matrix, and releases coordinated across channels so
+      capabilities stay aligned.
+    required_evidence:
+      - A documented device/channel support matrix
+      - Feature-parity evidence across channels for the core journeys
+      - Coordinated cross-channel release notes
+    differentiator_questions:
+      - Is feature parity across channels maintained deliberately and documented, or incidental?
+    misgrading_notes: >-
+      Parity must be maintained, not a snapshot — check that the last few releases kept channels
+      aligned rather than one channel quietly falling behind.
+
+  - subcomponent_key: FRONTEND_DEVICE_COVERAGE
+    level: Frontier
+    status: authored
+    statement: >-
+      Channel coverage is a strength: seamless cross-device continuity (start on mobile, finish on
+      web), platform-native capabilities (biometrics, widgets, push) exploited, and channel usage
+      measured and optimised per segment.
+    required_evidence:
+      - Cross-device continuity / session-handoff evidence
+      - Platform-native feature usage (biometrics, push, widgets)
+      - Per-channel usage analytics driving investment
+    differentiator_questions:
+      - Can a client move mid-task between devices seamlessly, and is channel usage measured and
+        optimised?
+    misgrading_notes: >-
+      Rich multi-channel continuity matters for mass-market self-serve clients; a concierge advisory
+      model serving clients through advisors rationally needs fewer channels — do not over-target
+      (§3.1).
+
+  # --- FRONTEND Personalisation & Recommendations ------------------------------------------
+  - subcomponent_key: FRONTEND_PERSONALISATION
+    level: Basic
+    status: authored
+    statement: >-
+      Every user sees the same static screens. There are no saved preferences, watchlists, or
+      tailored content; nothing adapts to who is looking or what they hold.
+    required_evidence:
+      - Inspection showing identical, non-configurable screens for all users
+      - Confirmation that no per-user preferences or watchlists are stored
+    differentiator_questions:
+      - Can a user save any preference (a watchlist, a dashboard layout) that persists, or is the UI
+        identical for everyone?
+    misgrading_notes: >-
+      A settings page with a theme toggle is not personalisation of content — grade whether what the
+      user sees adapts to them, not whether cosmetic options exist.
+
+  - subcomponent_key: FRONTEND_PERSONALISATION
+    level: Developing
+    status: authored
+    statement: >-
+      Basic personalisation exists — a user can build a watchlist or reorder a dashboard — but it is
+      manual and static, with no behaviour-driven suggestions, and preferences may not persist
+      reliably across devices or sessions.
+    required_evidence:
+      - Examples of user-configurable watchlists / dashboards
+      - Evidence that suggestions are absent or purely static
+      - A check of whether preferences sync across devices
+    differentiator_questions:
+      - Does the platform ever suggest anything based on behaviour or holdings, or only show what the
+        user manually configured?
+    misgrading_notes: >-
+      Manual customisation is not recommendation — distinguish "the user arranged it" from "the
+      system tailored it". No behavioural suggestion caps this at Developing.
+
+  - subcomponent_key: FRONTEND_PERSONALISATION
+    level: Advanced
+    status: authored
+    statement: >-
+      Persistent per-user personalisation (dashboards, watchlists, saved views synced across
+      devices) plus rule- or model-driven recommendations — relevant news, suggested actions,
+      holdings-aware content — with relevance monitored.
+    required_evidence:
+      - Cross-device persisted personalisation state
+      - A recommendation/relevance mechanism (rules or model) in production
+      - Relevance / engagement monitoring for the recommendations
+    differentiator_questions:
+      - Are recommendations driven by the user's holdings or behaviour and their relevance measured,
+        or are they the same generic feed for everyone?
+    misgrading_notes: >-
+      "Recommended" panels that are actually editorial picks for all users are not personalisation —
+      confirm the content varies by user and relevance is tracked.
+
+  - subcomponent_key: FRONTEND_PERSONALISATION
+    level: Frontier
+    status: authored
+    statement: >-
+      Personalisation is a differentiator: real-time adaptive recommendations from a recommendation
+      engine, measured uplift on engagement/conversion, and continuous model improvement from
+      feedback.
+    required_evidence:
+      - A recommendation-engine architecture with real-time adaptation
+      - A study measuring engagement/conversion uplift from personalisation
+      - Model-retraining / feedback-loop evidence
+    differentiator_questions:
+      - Is there a measured business uplift from personalisation with a model that improves over
+        time, not just tailored panels?
+    misgrading_notes: >-
+      A recommendation engine matters for high-volume self-directed platforms competing on
+      engagement; an advisory model where the advisor curates rationally needs less — do not
+      over-target (§3.1).
+
+  # --- FRONTEND Accessibility & Localisation -----------------------------------------------
+  - subcomponent_key: FRONTEND_ACCESSIBILITY_LOCALISATION
+    level: Basic
+    status: authored
+    statement: >-
+      There is no accessibility work and no localisation — hardcoded English, a single locale for
+      dates/numbers/currency, and the UI fails basic screen-reader and keyboard use. Accessibility
+      barriers and wrong local formats are common.
+    required_evidence:
+      - A keyboard-only / screen-reader pass showing the core flow is not operable
+      - Evidence of hardcoded strings and single-locale formatting
+    differentiator_questions:
+      - Can the core flow be completed with a keyboard and screen reader at all, and does the app
+        format dates/currency for anything but one locale?
+    misgrading_notes: >-
+      A single accessible page (e.g. login) does not lift the whole app — grade the core task flow.
+      Absence of any WCAG target or i18n framework caps this at Basic.
+
+  - subcomponent_key: FRONTEND_ACCESSIBILITY_LOCALISATION
+    level: Developing
+    status: authored
+    statement: >-
+      Some accessibility is considered (alt text, some contrast) and perhaps one or two extra
+      languages exist, but there is no WCAG conformance target, no audit, and localisation is partial
+      — strings may be translated while dates, currency, or right-to-left handling are not.
+      Compliance risk is unmanaged.
+    required_evidence:
+      - Evidence of partial accessibility effort without a stated conformance target
+      - A localisation implementation with gaps (e.g. untranslated flows or wrong formats)
+      - Confirmation that no accessibility audit has been run
+    differentiator_questions:
+      - Is there a stated WCAG conformance target verified by audit, or only scattered good
+        intentions?
+    misgrading_notes: >-
+      Translated strings are not full localisation — check locale-correct dates/numbers/currency and
+      RTL where relevant. No conformance target and no audit caps this at Developing.
+
+  - subcomponent_key: FRONTEND_ACCESSIBILITY_LOCALISATION
+    level: Advanced
+    status: authored
+    statement: >-
+      A stated WCAG conformance target (e.g. 2.1 AA) is verified by audit and automated checks in CI,
+      and proper internationalisation (externalised strings, locale-correct dates/numbers/currency)
+      covers the markets served, with accessibility regressions caught before release.
+    required_evidence:
+      - A WCAG audit report against a stated conformance level
+      - Automated accessibility checks in the CI pipeline
+      - An i18n implementation covering the served locales (formats, not just strings)
+    differentiator_questions:
+      - Is WCAG conformance verified by audit and guarded in CI, or asserted?
+    misgrading_notes: >-
+      Automated checks catch only a fraction of WCAG issues — an audit plus manual testing is needed
+      for a credible AA claim; automated-only is nearer Developing.
+
+  - subcomponent_key: FRONTEND_ACCESSIBILITY_LOCALISATION
+    level: Frontier
+    status: authored
+    statement: >-
+      Accessibility and localisation are a strength: WCAG AA/AAA maintained with assistive-technology
+      user testing, full localisation including RTL and locale nuances, and inclusive design applied
+      as a product principle.
+    required_evidence:
+      - Assistive-technology user-testing records
+      - Evidence of full localisation including RTL / locale nuances
+      - An inclusive-design standard embedded in the design system
+    differentiator_questions:
+      - Is the product tested with real assistive-technology users and localised beyond strings to
+        full locale behaviour?
+    misgrading_notes: >-
+      AAA and deep localisation matter where regulation (public-sector/EU accessibility rules) or a
+      broad multilingual base demands it; a single-jurisdiction English-only firm rationally targets
+      AA — do not over-target (§3.1).
+
+  # --- FRONTEND Experimentation & Product Analytics ----------------------------------------
+  - subcomponent_key: FRONTEND_EXPERIMENTATION_ANALYTICS
+    level: Basic
+    status: authored
+    statement: >-
+      There is no product analytics beyond crude page counts, no event tracking, and no A/B testing.
+      Product decisions are made on opinion because nobody can see how features are actually used.
+    required_evidence:
+      - Inspection showing only page-view counts or no analytics
+      - Confirmation that there is no event instrumentation or experimentation tooling
+    differentiator_questions:
+      - Can the team see how a specific feature is actually used, or are decisions made purely on
+        opinion?
+    misgrading_notes: >-
+      Server logs or a hit counter are not product analytics — grade whether user behaviour on
+      features is measurable, not whether traffic is counted.
+
+  - subcomponent_key: FRONTEND_EXPERIMENTATION_ANALYTICS
+    level: Developing
+    status: authored
+    statement: >-
+      Basic analytics (e.g. off-the-shelf web analytics) and some event tracking exist, but
+      instrumentation is inconsistent, there is no experimentation platform, and changes ship without
+      controlled testing. Funnels are incomplete and data is not trusted.
+    required_evidence:
+      - An analytics tool with partial event coverage
+      - Evidence that changes ship without controlled A/B testing
+      - Incomplete or inconsistent funnel instrumentation
+    differentiator_questions:
+      - Are significant changes validated by controlled experiments, or shipped and judged by gut?
+    misgrading_notes: >-
+      Having an analytics tool installed is not instrumentation coverage — check whether the key
+      events/funnels are actually tracked consistently. No experimentation caps this at Developing.
+
+  - subcomponent_key: FRONTEND_EXPERIMENTATION_ANALYTICS
+    level: Advanced
+    status: authored
+    statement: >-
+      Comprehensive, governed event instrumentation feeds product-analytics dashboards (funnels,
+      retention, feature adoption), and an A/B-testing capability is used to validate significant
+      changes, with results acted on.
+    required_evidence:
+      - A governed tracking plan and product-analytics dashboards (funnels/retention)
+      - A/B-test results feeding real decisions
+      - Evidence of consistent event coverage across the key journeys
+    differentiator_questions:
+      - Is there a working A/B-testing capability whose results actually drive decisions, backed by
+        trustworthy instrumentation?
+    misgrading_notes: >-
+      One historical A/B test is not an experimentation practice — confirm testing is routine and the
+      tracking plan is governed, not a single anecdote.
+
+  - subcomponent_key: FRONTEND_EXPERIMENTATION_ANALYTICS
+    level: Frontier
+    status: authored
+    statement: >-
+      Experimentation is a strength: a mature experimentation platform runs continuous controlled
+      experiments with statistical rigour, the tracking plan is governed as a contract, and product
+      decisions are systematically evidence-driven.
+    required_evidence:
+      - An experimentation platform with a cadence of statistically-analysed experiments
+      - A tracking plan governed as a contract with schema enforcement
+      - Evidence that a decision cadence is driven by experiment results
+    differentiator_questions:
+      - Are experiments continuous and statistically rigorous, with a governed tracking contract, or
+        occasional and informal?
+    misgrading_notes: >-
+      A mature experimentation platform matters for high-traffic product-led platforms with the
+      volume to reach significance; a low-user advisory tool cannot power experiments and rationally
+      relies on qualitative feedback — do not over-target (§3.1).
+
+  # --- APP_SERVER Hosting & Elasticity -----------------------------------------------------
+  - subcomponent_key: APP_SERVER_HOSTING_ELASTICITY
+    level: Basic
+    status: authored
+    statement: >-
+      Hosting is fixed-capacity (a single server or static VM) with no autoscaling. Load spikes cause
+      slowdowns or outages, capacity is provisioned by guesswork, and there is no regional
+      redundancy.
+    required_evidence:
+      - Inspection of the hosting topology showing fixed capacity / single node
+      - Evidence of load-related slowdowns or outages
+    differentiator_questions:
+      - What happens under a load spike today — does anything scale, or does the platform degrade?
+    misgrading_notes: >-
+      Being on a cloud provider is not elasticity — a cloud VM of fixed size with no autoscaling is
+      Basic. Grade the scaling behaviour, not the hosting brand.
+
+  - subcomponent_key: APP_SERVER_HOSTING_ELASTICITY
+    level: Developing
+    status: authored
+    statement: >-
+      The platform is cloud-hosted with some manual scaling, but elasticity is limited — scaling is
+      reactive and hand-operated, capacity headroom is uncertain, and the deployment is
+      single-region/single-AZ with redundancy gaps.
+    required_evidence:
+      - Cloud-hosting configuration showing manual or limited scaling
+      - Evidence of single-region / single-AZ deployment
+      - Records of manual capacity interventions
+    differentiator_questions:
+      - Does the platform scale automatically to demand, or does someone resize it by hand when load
+        rises?
+    misgrading_notes: >-
+      Manual "spin up another instance" is not autoscaling — require automated demand-driven scaling
+      for Advanced. Single-AZ redundancy gaps cap this at Developing.
+
+  - subcomponent_key: APP_SERVER_HOSTING_ELASTICITY
+    level: Advanced
+    status: authored
+    statement: >-
+      Elastic hosting with automated horizontal autoscaling to demand, multi-AZ redundancy,
+      infrastructure-as-code provisioning, and monitored capacity/cost. The platform absorbs normal
+      load spikes without manual intervention.
+    required_evidence:
+      - Autoscaling configuration tied to demand metrics
+      - Multi-AZ redundancy topology
+      - Infrastructure-as-code definitions and capacity/cost monitoring
+    differentiator_questions:
+      - Does the platform autoscale across availability zones without manual intervention under
+        normal spikes?
+    misgrading_notes: >-
+      Autoscaling configured but never exercised may not work — prefer evidence it has actually
+      scaled under real load, and confirm redundancy is multi-AZ not single-AZ.
+
+  - subcomponent_key: APP_SERVER_HOSTING_ELASTICITY
+    level: Frontier
+    status: authored
+    statement: >-
+      Hosting is a strength: multi-region active deployment, fine-grained auto-scaling (and
+      scale-to-zero where apt), capacity managed against cost with proven headroom under load tests,
+      and elasticity validated by peak-event drills.
+    required_evidence:
+      - Multi-region active deployment topology
+      - Load-test / peak-event drill results proving headroom
+      - Cost-aware fine-grained scaling evidence
+    differentiator_questions:
+      - Is the platform multi-region and its elasticity proven by load/peak-event drills, not just
+        configured?
+    misgrading_notes: >-
+      Multi-region elasticity matters for global always-on scale; a regional platform with
+      predictable load rationally targets single-region multi-AZ autoscaling — do not over-target
+      (§3.1).
+
+  # --- APP_SERVER API Design & Integration -------------------------------------------------
+  - subcomponent_key: APP_SERVER_API_DESIGN
+    level: Basic
+    status: authored
+    statement: >-
+      APIs are ad-hoc or absent — inconsistent conventions, no versioning, and no documentation.
+      Integrations are brittle point-to-point hacks, and every consumer is a bespoke effort.
+    required_evidence:
+      - Inspection of the API surface showing inconsistent conventions or no API
+      - Confirmation that there is no versioning or published documentation
+    differentiator_questions:
+      - Is there any consistent API standard and documentation, or is each integration a bespoke
+        hand-built link?
+    misgrading_notes: >-
+      An internal endpoint that happens to return JSON is not a designed API — grade conventions,
+      versioning, and documentation, not the mere existence of HTTP endpoints.
+
+  - subcomponent_key: APP_SERVER_API_DESIGN
+    level: Developing
+    status: authored
+    statement: >-
+      APIs exist with partial conventions and some documentation, but versioning is inconsistent and
+      breaking changes reach consumers unexpectedly. The integration surface is only partly
+      documented, and onboarding a partner is slow.
+    required_evidence:
+      - API documentation that is partial or out of date
+      - Evidence of a breaking change that hit consumers
+      - An inconsistent or absent versioning scheme
+    differentiator_questions:
+      - Is there an explicit versioning and deprecation policy consumers can rely on, or do breaking
+        changes just happen?
+    misgrading_notes: >-
+      Auto-generated docs that don't match behaviour are worse than none — verify the docs are
+      accurate. Inconsistent versioning caps this at Developing.
+
+  - subcomponent_key: APP_SERVER_API_DESIGN
+    level: Advanced
+    status: authored
+    statement: >-
+      Consistent API standards (REST/gRPC conventions, a shared error model), explicit versioning
+      with a deprecation policy, published and accurate documentation, and a managed
+      partner/integration surface with authentication and rate limits.
+    required_evidence:
+      - Documented API standards and a shared error model
+      - A versioning and deprecation policy in force
+      - Accurate published documentation with auth and rate-limit configuration
+    differentiator_questions:
+      - Are versioning and a deprecation policy actually enforced so consumers are not broken without
+        notice?
+    misgrading_notes: >-
+      A style guide document is not adherence — confirm the live APIs actually follow the standards
+      and the deprecation policy has been honoured in practice.
+
+  - subcomponent_key: APP_SERVER_API_DESIGN
+    level: Frontier
+    status: authored
+    statement: >-
+      The API is a strength or product in itself: a developer portal with self-service onboarding,
+      contract-tested and backward-compatible APIs, SDKs and a sandbox, and API usage tracked as a
+      growth channel with SLAs.
+    required_evidence:
+      - A developer portal with self-service onboarding
+      - Contract tests guarding backward compatibility, plus SDKs / sandbox
+      - API SLAs and usage analytics as a channel
+    differentiator_questions:
+      - Can a third-party developer self-serve onboard and rely on contract-tested, SLA-backed APIs?
+    misgrading_notes: >-
+      An API-as-product posture matters for platform/ecosystem plays; an internally-integrated firm
+      with few partners rationally targets clean, versioned, documented APIs — do not over-target
+      (§3.1).
+
+  # --- APP_SERVER DevOps & Deployment ------------------------------------------------------
+  - subcomponent_key: APP_SERVER_DEVOPS_DEPLOYMENT
+    level: Basic
+    status: authored
+    statement: >-
+      Deployments are manual and infrequent, done by hand with no CI/CD. Releases are risky
+      "big-bang" events, rollback is a scramble, and environments differ from production so
+      "works on my machine" surprises are routine.
+    required_evidence:
+      - Inspection of the deployment process (manual steps, no pipeline)
+      - Evidence of environment drift between dev/staging and production
+    differentiator_questions:
+      - Is there any automated pipeline building, testing, and deploying the app, or is release a
+        manual hand-crafted event?
+    misgrading_notes: >-
+      A build script someone runs locally is not CI/CD — grade whether the pipeline is automated and
+      gates release, not whether a script exists.
+
+  - subcomponent_key: APP_SERVER_DEVOPS_DEPLOYMENT
+    level: Developing
+    status: authored
+    statement: >-
+      A CI pipeline runs builds and tests and deployment is semi-automated, but releases are still
+      occasional and partly manual, rollback is possible but clumsy, and environment parity is
+      imperfect so production still surprises the team.
+    required_evidence:
+      - A CI configuration running builds/tests
+      - Evidence of manual steps remaining in deployment
+      - Records of environment-parity issues or awkward rollbacks
+    differentiator_questions:
+      - Is deployment fully automated with a clean rollback, or does releasing still need manual
+        steps and careful timing?
+    misgrading_notes: >-
+      CI (build/test) without CD (automated deploy) is Developing — distinguish the two. A rollback
+      that means redeploying an old build by hand is not one-click rollback.
+
+  - subcomponent_key: APP_SERVER_DEVOPS_DEPLOYMENT
+    level: Advanced
+    status: authored
+    statement: >-
+      Automated CI/CD with tests gating release, frequent low-drama deployments, automated or
+      one-click rollback, and environment parity (IaC-managed) so staging predicts production.
+      Release health is monitored.
+    required_evidence:
+      - An automated CI/CD pipeline with test gates
+      - Automated/one-click rollback capability
+      - IaC-managed environment parity and release-health monitoring
+    differentiator_questions:
+      - Can the team deploy frequently and roll back automatically, with staging that genuinely
+        mirrors production?
+    misgrading_notes: >-
+      Frequent deploys with no fast rollback are still fragile — require both. Confirm parity is
+      real (IaC), not "staging is close enough".
+
+  - subcomponent_key: APP_SERVER_DEVOPS_DEPLOYMENT
+    level: Frontier
+    status: authored
+    statement: >-
+      Delivery is a strength: continuous deployment with progressive delivery (canary/blue-green/
+      feature flags), automated rollback on health-metric regression, and elite DORA metrics (lead
+      time, deploy frequency, MTTR, change-fail rate) tracked and improving.
+    required_evidence:
+      - Progressive-delivery configuration (canary/blue-green/flags)
+      - Automated rollback triggered by health metrics
+      - Tracked DORA metrics showing elite performance and improvement
+    differentiator_questions:
+      - Does the pipeline do progressive delivery with automated metric-driven rollback, and are DORA
+        metrics tracked and elite?
+    misgrading_notes: >-
+      Continuous deployment matters for fast-moving product orgs shipping many times a day; a stable
+      platform under change-control may rationally target reliable frequent releases, not CD — do not
+      over-target (§3.1).
+
+  # --- APP_SERVER Data Architecture & Domain Model -----------------------------------------
+  - subcomponent_key: APP_SERVER_DATA_ARCHITECTURE
+    level: Basic
+    status: authored
+    statement: >-
+      Data is scattered across ad-hoc schemas with no coherent domain model, unclear ownership, and
+      duplicated or inconsistent representations. There is no lineage — nobody can say where a figure
+      came from.
+    required_evidence:
+      - Inspection showing fragmented schemas and duplicated entities
+      - Confirmation that data ownership and lineage are undefined
+    differentiator_questions:
+      - Is there a single agreed source of truth for core entities, or does the same data live in
+        several inconsistent places?
+    misgrading_notes: >-
+      A single database is not a domain model — grade the coherence and ownership of the model, not
+      whether the tables share a server.
+
+  - subcomponent_key: APP_SERVER_DATA_ARCHITECTURE
+    level: Developing
+    status: authored
+    statement: >-
+      A domain model exists but is inconsistent across services (overlapping entities, unclear source
+      of truth), ownership is loosely defined, and lineage is partial or manual so tracing a figure
+      to its origin is effortful.
+    required_evidence:
+      - A domain-model / schema with evidence of cross-service inconsistency
+      - Loosely-defined ownership documentation
+      - Evidence that lineage tracing is manual
+    differentiator_questions:
+      - Is there a clear source of truth per domain with defined ownership, or are entities
+        duplicated and reconciled after the fact?
+    misgrading_notes: >-
+      An ER diagram is not governance — check whether ownership and source-of-truth are actually
+      enforced, or just drawn once. Manual lineage caps this at Developing.
+
+  - subcomponent_key: APP_SERVER_DATA_ARCHITECTURE
+    level: Advanced
+    status: authored
+    statement: >-
+      A coherent, documented domain model with clear entity ownership and a defined source of truth
+      per domain, governed schemas, and data lineage captured for the key flows so figures can be
+      traced to source.
+    required_evidence:
+      - Documented domain model with entity ownership and source-of-truth
+      - Schema-governance process (change control, review)
+      - Lineage captured for the key data flows
+    differentiator_questions:
+      - Can a key figure be traced to its source through captured lineage, and is each domain's
+        ownership clear and enforced?
+    misgrading_notes: >-
+      Lineage for one flagship report is not lineage coverage — confirm the key flows are covered,
+      not a single showcase. Verify governance is active, not aspirational.
+
+  - subcomponent_key: APP_SERVER_DATA_ARCHITECTURE
+    level: Frontier
+    status: authored
+    statement: >-
+      Data architecture is a strength: a governed domain model (e.g. domain ownership / data-mesh)
+      with automated end-to-end lineage, data contracts between domains, and quality/observability
+      treating data as a first-class asset.
+    required_evidence:
+      - Data contracts between domains with enforcement
+      - Automated end-to-end lineage tooling
+      - Data-quality / observability metrics on core datasets
+    differentiator_questions:
+      - Are there enforced data contracts and automated lineage across domains, with data quality
+        actively observed?
+    misgrading_notes: >-
+      A governed data-mesh with contracts matters for data-intensive firms competing on analytics; a
+      smaller operation rationally targets a coherent, owned, documented model — do not over-target
+      (§3.1).
+
+  # --- APP_SERVER Observability & Monitoring -----------------------------------------------
+  - subcomponent_key: APP_SERVER_OBSERVABILITY
+    level: Basic
+    status: authored
+    statement: >-
+      There is little to no observability — logs are scattered or absent, no metrics or traces exist,
+      and problems are discovered when users complain. Diagnosing an incident means guesswork.
+    required_evidence:
+      - Inspection showing scattered/absent logs and no metrics or traces
+      - Evidence that incidents are typically user-reported
+    differentiator_questions:
+      - When something breaks, does anything alert the team, or do they hear about it from users?
+    misgrading_notes: >-
+      SSHing into a box to tail a log is not observability — grade whether there is centralised,
+      queryable telemetry and alerting, not whether logs exist somewhere.
+
+  - subcomponent_key: APP_SERVER_OBSERVABILITY
+    level: Developing
+    status: authored
+    statement: >-
+      Basic logging and some metrics/dashboards exist, but coverage is patchy, there is no
+      distributed tracing, alerting is noisy or missing, and there are no SLOs — so incidents are
+      still often user-reported.
+    required_evidence:
+      - Centralised logs and some metric dashboards
+      - Evidence of no distributed tracing and no defined SLOs
+      - Examples of noisy or missing alerting
+    differentiator_questions:
+      - Are alerts tied to defined SLOs and actionable, or noisy/absent so incidents still surface
+        from users?
+    misgrading_notes: >-
+      A dashboard nobody watches is not monitoring — grade whether alerting is actionable and tied to
+      SLOs. No tracing across services caps distributed diagnosis at Developing.
+
+  - subcomponent_key: APP_SERVER_OBSERVABILITY
+    level: Advanced
+    status: authored
+    statement: >-
+      Metrics, centralised logs, and distributed tracing span the services, alerting is actionable
+      and tied to defined SLOs/SLIs, and dashboards let an on-call engineer find root cause quickly.
+      Most incidents are detected before users report them.
+    required_evidence:
+      - Metrics, logs, and distributed tracing across the main services
+      - Defined SLOs/SLIs with alerting mapped to them
+      - Evidence that incidents are mostly detected before user reports
+    differentiator_questions:
+      - Is there distributed tracing and SLO-based alerting that catches incidents before users do?
+    misgrading_notes: >-
+      Three pillars installed but not correlated is weak — confirm an engineer can actually pivot
+      metrics-to-traces-to-logs to root-cause, not just that each tool exists.
+
+  - subcomponent_key: APP_SERVER_OBSERVABILITY
+    level: Frontier
+    status: authored
+    statement: >-
+      Observability is a strength: full-stack telemetry with high-cardinality querying, SLO error
+      budgets driving engineering decisions, proactive anomaly detection, and correlation across
+      metrics/logs/traces enabling fast MTTR.
+    required_evidence:
+      - High-cardinality querying / exploratory observability tooling
+      - SLO error budgets influencing prioritisation decisions
+      - Anomaly detection and MTTR metrics
+    differentiator_questions:
+      - Do error budgets actually drive engineering decisions, with anomaly detection and fast
+        correlated root-causing?
+    misgrading_notes: >-
+      Deep high-cardinality observability matters for complex high-scale distributed systems; a
+      simple platform rationally targets solid metrics/logs/alerting on its SLOs — do not over-target
+      (§3.1).
+
+  # --- MARKET_DATA Exchange & Venue Coverage -----------------------------------------------
+  - subcomponent_key: MARKET_DATA_EXCHANGE_COVERAGE
+    level: Basic
+    status: authored
+    statement: >-
+      Coverage is limited to one or a few home-market exchanges. Instruments on other venues are
+      unavailable or entered manually, and clients cannot see or trade much of the market they
+      expect.
+    required_evidence:
+      - The covered-venue list showing narrow home-market-only coverage
+      - Examples of client-relevant venues that are missing or manual
+    differentiator_questions:
+      - Are all the venues the client base actually trades covered, or only the home market?
+    misgrading_notes: >-
+      A vendor capable of many venues is not coverage — check the venues actually entitled and live
+      in production, not the vendor's full catalogue.
+
+  - subcomponent_key: MARKET_DATA_EXCHANGE_COVERAGE
+    level: Developing
+    status: authored
+    statement: >-
+      The main domestic exchanges and a few major international venues are covered, but breadth is
+      patchy, adding a venue is a slow project, and some client-relevant markets are missing or
+      delivered via workarounds.
+    required_evidence:
+      - A covered-venue list showing partial international coverage
+      - Evidence that venue onboarding is a slow bespoke effort
+      - Examples of gaps filled by workarounds
+    differentiator_questions:
+      - Is there a repeatable process to onboard a new venue, or is each addition a one-off project?
+    misgrading_notes: >-
+      Coverage of the "big" venues can still miss client-relevant niche markets — grade against what
+      the client base needs, not against a generic global list.
+
+  - subcomponent_key: MARKET_DATA_EXCHANGE_COVERAGE
+    level: Advanced
+    status: authored
+    statement: >-
+      Broad coverage of the exchanges and venues relevant to the client base, sourced through
+      established feeds, with a documented venue list and a repeatable process to onboard new venues
+      as needs arise.
+    required_evidence:
+      - A documented, maintained covered-venue list matching client needs
+      - Established feed arrangements for those venues
+      - A repeatable venue-onboarding process
+    differentiator_questions:
+      - Does coverage match the client base's needs with a repeatable onboarding process, rather than
+        leaving material gaps?
+    misgrading_notes: >-
+      "We can add any venue" is a claim, not coverage — verify the venues clients need are actually
+      live now, and onboarding has been done before, not just theorised.
+
+  - subcomponent_key: MARKET_DATA_EXCHANGE_COVERAGE
+    level: Frontier
+    status: authored
+    statement: >-
+      Coverage is a strength: comprehensive global multi-venue coverage including alternative/OTC
+      venues, rapid onboarding of new markets, and coverage breadth used as a client selling point.
+    required_evidence:
+      - Comprehensive multi-venue coverage including alternative/OTC venues
+      - Venue-onboarding lead-time metrics showing rapid addition
+      - Evidence coverage breadth is marketed as client value
+    differentiator_questions:
+      - Is coverage comprehensively global with rapid onboarding, or scoped to the venues actually
+        traded?
+    misgrading_notes: >-
+      Global venue breadth matters for internationally-active brokers; a domestic wealth platform
+      rationally covers the venues its clients trade — do not over-target (§3.1).
+
+  # --- MARKET_DATA Instrument Universe -----------------------------------------------------
+  - subcomponent_key: MARKET_DATA_INSTRUMENT_UNIVERSE
+    level: Basic
+    status: authored
+    statement: >-
+      Only a narrow instrument set (e.g. domestic equities) is referenced. Other asset classes
+      clients hold or want — funds, bonds, ETFs, derivatives — are absent or tracked off-system.
+    required_evidence:
+      - Inspection of the instrument universe showing a narrow single-class set
+      - Examples of client-held instruments tracked off-system
+    differentiator_questions:
+      - Are all the asset classes clients actually hold referenced in the platform, or only one?
+    misgrading_notes: >-
+      Showing a ticker is not full reference data — grade whether instruments across the served
+      classes carry the reference data the platform needs, not just a symbol.
+
+  - subcomponent_key: MARKET_DATA_INSTRUMENT_UNIVERSE
+    level: Developing
+    status: authored
+    statement: >-
+      Several asset classes are covered but with gaps — some instruments lack reference data or
+      pricing, coverage is uneven across classes, and new instrument types require manual setup.
+    required_evidence:
+      - Instrument coverage showing uneven quality across asset classes
+      - Examples of instruments missing reference data or pricing
+      - A manual instrument-setup process
+    differentiator_questions:
+      - Is instrument setup systematic across all served classes, or manual and uneven?
+    misgrading_notes: >-
+      Covering an asset class in name is not covering it in depth — check reference-data completeness
+      per class, not merely that the class appears.
+
+  - subcomponent_key: MARKET_DATA_INSTRUMENT_UNIVERSE
+    level: Advanced
+    status: authored
+    statement: >-
+      A well-maintained instrument universe spans the asset classes the business serves (equities,
+      funds, fixed income, ETFs, etc.) with complete reference data, systematic instrument setup, and
+      monitored coverage completeness.
+    required_evidence:
+      - A maintained multi-class instrument universe with complete reference data
+      - A systematic instrument-onboarding process
+      - Coverage-completeness monitoring
+    differentiator_questions:
+      - Is the instrument universe complete and systematically maintained across every served asset
+        class?
+    misgrading_notes: >-
+      Reference data goes stale — confirm the universe is monitored for completeness and freshness,
+      not populated once and left.
+
+  - subcomponent_key: MARKET_DATA_INSTRUMENT_UNIVERSE
+    level: Frontier
+    status: authored
+    statement: >-
+      Instrument coverage is a strength: a comprehensive multi-asset universe including complex and
+      alternative instruments, automated instrument onboarding and enrichment, and breadth that
+      supports whole-of-wealth reporting.
+    required_evidence:
+      - A comprehensive multi-asset universe including complex/alternative instruments
+      - Automated instrument onboarding and enrichment pipelines
+      - Evidence supporting whole-of-wealth / cross-asset reporting
+    differentiator_questions:
+      - Is the universe comprehensive across complex instruments with automated onboarding, or scoped
+        to the core product set?
+    misgrading_notes: >-
+      Full multi-asset breadth matters for multi-asset/institutional platforms; a focused equity or
+      fund platform rationally covers its actual product set — do not over-target (§3.1).
+
+  # --- MARKET_DATA History Depth -----------------------------------------------------------
+  - subcomponent_key: MARKET_DATA_HISTORY_DEPTH
+    level: Basic
+    status: authored
+    statement: >-
+      Little historical data is retained — only recent prices, if any. Charts are short, longer
+      history is fetched manually or unavailable, and trend or performance analysis is impossible in
+      the platform.
+    required_evidence:
+      - Inspection showing only short-range price history
+      - Confirmation that longer history is unavailable or manually fetched
+    differentiator_questions:
+      - How far back does stored history go, and can the platform chart or analyse a multi-year
+        trend without manual work?
+    misgrading_notes: >-
+      A chart that can display history by calling a vendor live is not stored history — grade what is
+      retained and reliably retrievable, not what could be fetched ad-hoc.
+
+  - subcomponent_key: MARKET_DATA_HISTORY_DEPTH
+    level: Developing
+    status: authored
+    statement: >-
+      Some history is stored (e.g. a couple of years of end-of-day) but depth and granularity are
+      limited, gaps exist, corporate-action adjustments to history are inconsistent, and intraday
+      history is thin or absent.
+    required_evidence:
+      - The historical store showing limited depth/granularity
+      - Evidence of gaps or inconsistent corporate-action adjustment
+      - Confirmation intraday history is thin or absent
+    differentiator_questions:
+      - Is stored history adjusted for corporate actions and free of gaps, or patchy and
+        unadjusted?
+    misgrading_notes: >-
+      Unadjusted history silently corrupts performance analysis — check corporate-action adjustment,
+      not just the date range. Gaps cap this at Developing.
+
+  - subcomponent_key: MARKET_DATA_HISTORY_DEPTH
+    level: Advanced
+    status: authored
+    statement: >-
+      A deep, clean historical store (multi-year, corporate-action-adjusted) at the granularities the
+      product needs (EOD and intraday where relevant), with gap monitoring, backfill, and reliable
+      retrieval for charting and analytics.
+    required_evidence:
+      - A multi-year, corporate-action-adjusted historical store
+      - Gap-monitoring and backfill process
+      - Evidence of the granularities served (EOD/intraday) and reliable retrieval
+    differentiator_questions:
+      - Is history deep, adjusted, gap-monitored, and reliably retrievable at the needed
+        granularity?
+    misgrading_notes: >-
+      Depth without adjustment or gap monitoring is not "clean" — confirm both. A deep EOD store may
+      still be Developing for a product that needs intraday history.
+
+  - subcomponent_key: MARKET_DATA_HISTORY_DEPTH
+    level: Frontier
+    status: authored
+    statement: >-
+      History is a strength: extensive tick/intraday and long-horizon history, point-in-time-correct
+      and survivorship-bias-aware datasets, and history that powers analytics and backtesting as a
+      differentiator.
+    required_evidence:
+      - Extensive tick/intraday and long-horizon datasets
+      - Point-in-time / survivorship-bias-aware data handling
+      - Evidence history powers analytics/backtesting features
+    differentiator_questions:
+      - Is history tick-level and point-in-time-correct enough to support backtesting, or adjusted
+        EOD sufficient for the product?
+    misgrading_notes: >-
+      Deep tick history and point-in-time correctness matter for quant/backtesting-oriented
+      platforms; a wealth platform rationally holds adjusted EOD plus recent intraday — do not
+      over-target (§3.1).
+
+  # --- MARKET_DATA Vendor Redundancy & Entitlements ----------------------------------------
+  - subcomponent_key: MARKET_DATA_VENDOR_REDUNDANCY
+    level: Basic
+    status: authored
+    statement: >-
+      A single data vendor with no fallback, and entitlements tracked informally. A vendor outage
+      blanks the platform, and entitlement/licensing compliance is unmanaged and at risk.
+    required_evidence:
+      - Inspection showing a single-vendor dependency with no fallback
+      - Confirmation that entitlements are tracked informally
+    differentiator_questions:
+      - If the data vendor has an outage, does the platform have any fallback, or does it go blank?
+    misgrading_notes: >-
+      A contract with a backup vendor that is not wired in is not redundancy — grade whether a
+      fallback actually serves data, not whether a second vendor is on paper.
+
+  - subcomponent_key: MARKET_DATA_VENDOR_REDUNDANCY
+    level: Developing
+    status: authored
+    statement: >-
+      One primary vendor with, at most, a partial backup that is not automatically used, and basic
+      entitlement tracking. Failover to an alternate source is manual and slow, and entitlement
+      reporting is effortful.
+    required_evidence:
+      - A primary vendor plus a partial/manual backup arrangement
+      - Evidence that failover is manual
+      - A basic entitlement-tracking method
+    differentiator_questions:
+      - Does the platform fail over to an alternate data source automatically, or does someone switch
+        it by hand?
+    misgrading_notes: >-
+      A backup that requires a manual cutover under pressure often fails when needed — manual
+      failover caps this at Developing. Entitlement spreadsheets are not managed entitlements.
+
+  - subcomponent_key: MARKET_DATA_VENDOR_REDUNDANCY
+    level: Advanced
+    status: authored
+    statement: >-
+      More than one vendor with a defined failover path for critical feeds, and managed entitlements
+      (per-user/venue permissioning, usage reporting for licensing compliance) with monitored feed
+      health.
+    required_evidence:
+      - Multi-vendor arrangement with a defined failover path for critical feeds
+      - An entitlement-management system with usage reporting
+      - Feed-health monitoring
+    differentiator_questions:
+      - Is there a defined, tested failover to a second vendor for critical feeds and managed
+        entitlement reporting?
+    misgrading_notes: >-
+      A failover path that has never been exercised is unproven — prefer evidence it has been tested.
+      Confirm entitlement reporting supports the actual licence audit, not just internal counts.
+
+  - subcomponent_key: MARKET_DATA_VENDOR_REDUNDANCY
+    level: Frontier
+    status: authored
+    statement: >-
+      Vendor resilience is a strength: automatic multi-vendor failover with cross-vendor validation,
+      fully automated entitlement management and licence-cost optimisation, and no single-vendor
+      dependency for critical data.
+    required_evidence:
+      - Automatic multi-vendor failover with cross-vendor validation
+      - Automated entitlement management and licence-cost optimisation
+      - Evidence of no single-vendor dependency for critical data
+    differentiator_questions:
+      - Does the platform fail over automatically across vendors with cross-validation, and optimise
+        entitlement cost automatically?
+    misgrading_notes: >-
+      Automatic multi-vendor redundancy matters where data is mission-critical and outages are
+      costly; a smaller platform may rationally accept a single reputable vendor with a documented
+      fallback — do not over-target (§3.1).
+
+  # --- MARKET_DATA Widgets / AI / Video Services -------------------------------------------
+  - subcomponent_key: MARKET_DATA_VALUE_ADD_SERVICES
+    level: Basic
+    status: authored
+    statement: >-
+      There are no value-add data services — just raw prices. No news widgets, research overlays, AI
+      insights, or video; the data experience is bare.
+    required_evidence:
+      - Inspection showing prices only, with no value-add services
+      - Confirmation that no news/research/AI/video services are integrated
+    differentiator_questions:
+      - Beyond raw prices, does the platform surface any contextual news, insight, or media at all?
+    misgrading_notes: >-
+      A raw feed with no context is Basic even if the prices are excellent — grade the value-add
+      layer, not the underlying data quality (which is a separate subcomponent).
+
+  - subcomponent_key: MARKET_DATA_VALUE_ADD_SERVICES
+    level: Developing
+    status: authored
+    statement: >-
+      A few embedded third-party widgets (basic news, simple charts) exist but are bolted on
+      inconsistently, not integrated with the client's context, and add limited value.
+    required_evidence:
+      - Embedded third-party widgets in use
+      - Evidence they are generic and not tied to the client's holdings/context
+      - Inconsistent placement across the product
+    differentiator_questions:
+      - Are the value-add services relevant to the client's own holdings and context, or generic
+        widgets pasted in?
+    misgrading_notes: >-
+      An off-the-shelf news widget on the homepage is not contextual value-add — grade relevance and
+      integration, not the mere presence of a widget.
+
+  - subcomponent_key: MARKET_DATA_VALUE_ADD_SERVICES
+    level: Advanced
+    status: authored
+    statement: >-
+      A curated set of integrated value-add services (contextual news, analyst data, interactive
+      charting, and market commentary or video) that are relevant to the user's holdings and
+      maintained, enriching the core data meaningfully.
+    required_evidence:
+      - Integrated value-add services tied to the user's holdings/context
+      - Evidence the services are curated and maintained
+      - Usage indicating they add value
+    differentiator_questions:
+      - Are the value-add services integrated and holdings-relevant, and actively maintained rather
+        than a stale bolt-on?
+    misgrading_notes: >-
+      Integration must be genuine — a widget that ignores what the user holds is Developing however
+      polished. Confirm the content is curated, not an unmaintained feed.
+
+  - subcomponent_key: MARKET_DATA_VALUE_ADD_SERVICES
+    level: Frontier
+    status: authored
+    statement: >-
+      Value-add data is a strength: AI-driven insights and summaries tailored to the client, rich
+      integrated media, and differentiated content that drives engagement and is measured for
+      uptake.
+    required_evidence:
+      - AI-driven, client-tailored insights/summaries in production
+      - Rich integrated media offering
+      - Engagement/uptake metrics for the value-add content
+    differentiator_questions:
+      - Are insights AI-tailored to the client and their engagement measured, or the same content for
+        everyone?
+    misgrading_notes: >-
+      Rich AI value-add services matter for engagement-driven self-directed platforms; an advisory
+      model where insight comes from the advisor rationally needs fewer in-app services — do not
+      over-target (§3.1).
+
+  # --- ORCHESTRATION Routing Logic & Rules -------------------------------------------------
+  - subcomponent_key: ORCHESTRATION_ROUTING_LOGIC
+    level: Basic
+    status: authored
+    statement: >-
+      Process routing is hard-coded or manual — where a task, order, or case goes next is decided in
+      code or by a person, with no configurable rules. Changing routing means a code change.
+    required_evidence:
+      - Inspection showing routing decisions embedded in code or made manually
+      - Confirmation that there is no configurable rules layer
+    differentiator_questions:
+      - Can routing be changed without a code release, or is every routing decision baked into the
+        code?
+    misgrading_notes: >-
+      A few if-statements are not a rules layer — grade whether routing is configurable and
+      externalised, not whether logic exists.
+
+  - subcomponent_key: ORCHESTRATION_ROUTING_LOGIC
+    level: Developing
+    status: authored
+    statement: >-
+      Some configurable routing rules exist but are scattered, partly hard-coded, and hard to reason
+      about. Rule changes are risky, there is little testing, and edge cases fall through to manual
+      handling.
+    required_evidence:
+      - A partial routing-rules configuration alongside hard-coded logic
+      - Evidence of untested or risky rule changes
+      - Examples of edge cases handled manually
+    differentiator_questions:
+      - Are routing rules coherent, versioned, and testable, or scattered and risky to change?
+    misgrading_notes: >-
+      Configurable-but-untested rules are still fragile — check whether rule changes can be tested
+      before rollout. Scattered rules across code and config cap this at Developing.
+
+  - subcomponent_key: ORCHESTRATION_ROUTING_LOGIC
+    level: Advanced
+    status: authored
+    statement: >-
+      Routing is driven by a coherent, configurable rules layer that is versioned, testable, and
+      documented, covering the main decision paths with clear precedence and an audit of how each
+      item was routed.
+    required_evidence:
+      - A coherent, versioned routing-rules configuration
+      - Test coverage for rule changes
+      - A routing audit trail showing how items were routed
+    differentiator_questions:
+      - Are routing rules centralised, versioned, and testable with an audit of routing decisions?
+    misgrading_notes: >-
+      An audit trail must record the actual routing decision and the rule that fired — a generic log
+      is not routing audit. Confirm precedence is defined, not emergent.
+
+  - subcomponent_key: ORCHESTRATION_ROUTING_LOGIC
+    level: Frontier
+    status: authored
+    statement: >-
+      Routing is a strength: dynamic, data-driven routing (including ML-assisted decisions where
+      apt), simulation/what-if testing of rule changes before rollout, and business users able to
+      adjust routing safely with full traceability.
+    required_evidence:
+      - Dynamic/data-driven routing logic in production
+      - Simulation / what-if testing of rule changes
+      - Business-user authoring with traceability
+    differentiator_questions:
+      - Is routing dynamic and simulated before rollout, with safe business-user authoring, or static
+        rules?
+    misgrading_notes: >-
+      Sophisticated dynamic routing matters where routing decisions are numerous and high-value; a
+      simple linear process rationally uses clear static rules — do not over-target (§3.1).
+
+  # --- ORCHESTRATION Event-driven Architecture ---------------------------------------------
+  - subcomponent_key: ORCHESTRATION_EVENT_DRIVEN
+    level: Basic
+    status: authored
+    statement: >-
+      Components are tightly coupled and synchronous — no messaging or eventing. Work happens in-line
+      and blocking; a slow or failed downstream call stalls the whole chain, and there is no
+      idempotency.
+    required_evidence:
+      - Inspection showing synchronous, tightly-coupled calls with no messaging
+      - Evidence that a downstream failure stalls the whole flow
+    differentiator_questions:
+      - Is any work done asynchronously via events/messaging, or is everything a blocking synchronous
+        call chain?
+    misgrading_notes: >-
+      A background cron job is not event-driven architecture — grade whether components communicate
+      via durable events, not whether anything runs asynchronously at all.
+
+  - subcomponent_key: ORCHESTRATION_EVENT_DRIVEN
+    level: Developing
+    status: authored
+    statement: >-
+      Some asynchronous messaging or events exist but inconsistently — a mix of synchronous calls and
+      ad-hoc queues, at-least-once delivery without reliable idempotency, so duplicate or lost
+      messages cause occasional inconsistencies.
+    required_evidence:
+      - Evidence of ad-hoc queues alongside synchronous calls
+      - Delivery semantics without reliable idempotency
+      - Examples of duplicate/lost-message inconsistencies
+    differentiator_questions:
+      - Are consumers idempotent and events durable, or do duplicate/lost messages cause
+        inconsistencies?
+    misgrading_notes: >-
+      A message queue in the stack does not mean idempotent consumers — check how duplicates are
+      handled. Lack of idempotency caps this at Developing.
+
+  - subcomponent_key: ORCHESTRATION_EVENT_DRIVEN
+    level: Advanced
+    status: authored
+    statement: >-
+      A defined event-driven architecture with durable messaging/streaming, idempotent consumers, and
+      clear event contracts, giving loose coupling and resilience to downstream slowness, with
+      dead-letter handling and monitoring.
+    required_evidence:
+      - Durable messaging/streaming with idempotent consumers
+      - Defined event contracts/schemas
+      - Dead-letter handling and messaging monitoring
+    differentiator_questions:
+      - Are consumers idempotent with durable delivery, dead-letter handling, and defined event
+        contracts?
+    misgrading_notes: >-
+      Idempotency claimed but not implemented is a common trap — verify consumers actually dedupe.
+      Confirm dead-letters are worked, not silently accumulating.
+
+  - subcomponent_key: ORCHESTRATION_EVENT_DRIVEN
+    level: Frontier
+    status: authored
+    statement: >-
+      Event-driven design is a strength: event streaming as the backbone (event sourcing/CQRS where
+      apt), exactly-once or robust idempotent semantics, replayable event logs, and schema-governed
+      events enabling new consumers without disruption.
+    required_evidence:
+      - Event-streaming backbone with replayable logs
+      - Robust exactly-once / idempotent semantics
+      - Schema governance (registry) enabling new consumers safely
+    differentiator_questions:
+      - Is event streaming the backbone with replayable, schema-governed events, or selective async
+        messaging?
+    misgrading_notes: >-
+      A full event-streaming architecture matters for high-throughput real-time systems; a low-volume
+      CRUD platform rationally uses selective async messaging — do not over-target (§3.1).
+
+  # --- ORCHESTRATION Config vs Code --------------------------------------------------------
+  - subcomponent_key: ORCHESTRATION_CONFIG_VS_CODE
+    level: Basic
+    status: authored
+    statement: >-
+      Business behaviour (fees, limits, workflows, rules) is hard-coded. Any change needs a developer
+      and a release, so the business waits on engineering for routine adjustments.
+    required_evidence:
+      - Inspection showing business parameters embedded in code
+      - Evidence that routine business changes require a code release
+    differentiator_questions:
+      - Can the business change a routine parameter (a fee, a limit) without a code deployment?
+    misgrading_notes: >-
+      A config file that only a developer edits and redeploys is still effectively code — grade
+      whether the business can change behaviour without engineering, not whether a config file
+      exists.
+
+  - subcomponent_key: ORCHESTRATION_CONFIG_VS_CODE
+    level: Developing
+    status: authored
+    statement: >-
+      Some behaviour is externalised to configuration but much remains in code, config is scattered
+      and unvalidated, and changing it is still risky (no validation, no clear audit), so teams often
+      fall back to code changes.
+    required_evidence:
+      - Partial configuration externalisation with much still in code
+      - Evidence config changes are unvalidated or unaudited
+      - Examples of falling back to code for changes
+    differentiator_questions:
+      - Is configuration validated, audited, and safe for non-developers to change, or scattered and
+        risky?
+    misgrading_notes: >-
+      Externalised-but-unvalidated config invites outages from a typo — grade the guardrails, not
+      just the externalisation. No validation/audit caps this at Developing.
+
+  - subcomponent_key: ORCHESTRATION_CONFIG_VS_CODE
+    level: Advanced
+    status: authored
+    statement: >-
+      Business rules and parameters are configuration-driven through a managed, validated config
+      layer with versioning, audit, and environment promotion, so authorised non-developers can make
+      routine changes safely without a release.
+    required_evidence:
+      - A managed config layer with validation and versioning
+      - An audit trail of configuration changes
+      - Environment-promotion process for config
+    differentiator_questions:
+      - Can authorised non-developers change routine behaviour safely, with validation and audit, and
+        no release?
+    misgrading_notes: >-
+      "Non-developers can change it" must come with validation and audit or it is a footgun — confirm
+      guardrails exist. Verify changes are actually promoted through environments, not edited in
+      prod.
+
+  - subcomponent_key: ORCHESTRATION_CONFIG_VS_CODE
+    level: Frontier
+    status: authored
+    statement: >-
+      Config-driven flexibility is a strength: a governed rules/config platform with validation,
+      testing, staged rollout, and full audit, letting the business self-serve most changes, with
+      guardrails preventing bad config.
+    required_evidence:
+      - A governed config/rules platform with test and staged-rollout support
+      - Evidence the business self-serves most changes
+      - Guardrails / validation preventing bad config reaching production
+    differentiator_questions:
+      - Does the business self-serve most changes through a governed, tested, staged config platform?
+    misgrading_notes: >-
+      A rich configuration platform matters where business rules change often and vary by segment; a
+      stable, simple ruleset rationally lives in well-tested code — do not over-target (§3.1).
+
+  # --- ORCHESTRATION Monitoring & Control --------------------------------------------------
+  - subcomponent_key: ORCHESTRATION_MONITORING
+    level: Basic
+    status: authored
+    statement: >-
+      There is no operational view of running processes and no control surface — you cannot see what
+      is in flight, stuck, or failed, and cannot pause/retry/cancel without direct intervention in
+      the system.
+    required_evidence:
+      - Confirmation that there is no console showing in-flight/stuck/failed processes
+      - Evidence that operator controls require direct system intervention
+    differentiator_questions:
+      - Can an operator see what processes are running or stuck right now, and act on them without a
+        developer?
+    misgrading_notes: >-
+      Reading raw logs to infer process state is not a control surface — grade whether operators have
+      visibility and safe controls, not whether logs exist.
+
+  - subcomponent_key: ORCHESTRATION_MONITORING
+    level: Developing
+    status: authored
+    statement: >-
+      Basic visibility exists (some logs or a queue view) but it is incomplete and reactive, and
+      operational controls (retry, reprocess, hold) are limited or require engineering help, so stuck
+      work is often found late.
+    required_evidence:
+      - A partial process-visibility view (queue/logs)
+      - Evidence that operator controls are limited or need engineering
+      - Examples of stuck work found late
+    differentiator_questions:
+      - Are in-flight and failed processes visible with safe operator controls, or is intervention
+        still an engineering task?
+    misgrading_notes: >-
+      A queue depth number is not process visibility — grade whether operators can see and safely act
+      on individual stuck items. Engineering-only controls cap this at Developing.
+
+  - subcomponent_key: ORCHESTRATION_MONITORING
+    level: Advanced
+    status: authored
+    statement: >-
+      A monitoring/control console shows in-flight, delayed, and failed processes with alerting, and
+      operators have safe controls (retry, replay, cancel, reprioritise) with audit, so operational
+      issues are seen and handled promptly.
+    required_evidence:
+      - A process monitoring/control console with alerting
+      - Operator controls (retry/replay/cancel) with an audit trail
+      - Evidence issues are detected and handled promptly
+    differentiator_questions:
+      - Do operators have a console with alerting and audited safe controls over in-flight and failed
+        processes?
+    misgrading_notes: >-
+      Controls without audit are dangerous — confirm operator actions are logged. A view-only console
+      with no safe controls is nearer Developing.
+
+  - subcomponent_key: ORCHESTRATION_MONITORING
+    level: Frontier
+    status: authored
+    statement: >-
+      Operational control is a strength: real-time end-to-end process visibility with SLA tracking,
+      predictive alerting on at-risk processes, self-healing/auto-remediation, and rich operator
+      tooling with full audit.
+    required_evidence:
+      - Real-time end-to-end process visibility with SLA tracking
+      - Predictive alerting on at-risk processes
+      - Self-healing / auto-remediation evidence
+    differentiator_questions:
+      - Is process health tracked to SLA with predictive alerting and self-healing, or monitored
+        reactively?
+    misgrading_notes: >-
+      A sophisticated control plane matters where many long-running processes carry SLAs; a simple
+      system rationally needs clear status plus basic retry controls — do not over-target (§3.1).
+
+  # --- CMS Research Authoring & Tagging ----------------------------------------------------
+  - subcomponent_key: CMS_RESEARCH_AUTHORING
+    level: Basic
+    status: authored
+    statement: >-
+      Research is authored in disconnected documents (Word/PDF) with no central system, no consistent
+      tagging or metadata, so content cannot be found, reused, or targeted later.
+    required_evidence:
+      - Inspection showing research held as loose documents with no central system
+      - Confirmation that tagging/metadata is absent or ad-hoc
+    differentiator_questions:
+      - Is research held in a managed system with consistent tagging, or scattered across documents
+        and inboxes?
+    misgrading_notes: >-
+      A shared drive full of PDFs is not a content system — grade whether authoring is managed and
+      tagged, not whether documents are stored somewhere central.
+
+  - subcomponent_key: CMS_RESEARCH_AUTHORING
+    level: Developing
+    status: authored
+    statement: >-
+      A content repository exists but authoring is inconsistent — tagging/metadata is optional and
+      applied unevenly, versioning is weak, and finding or repurposing past research is hard.
+    required_evidence:
+      - A content repository with inconsistent tagging
+      - Evidence of weak versioning
+      - Examples where past research was hard to find or reuse
+    differentiator_questions:
+      - Is tagging governed by a taxonomy and consistently applied, or optional and uneven?
+    misgrading_notes: >-
+      Free-text tags are not a governed taxonomy — check whether tagging is consistent and
+      controlled. Optional metadata caps this at Developing.
+
+  - subcomponent_key: CMS_RESEARCH_AUTHORING
+    level: Advanced
+    status: authored
+    statement: >-
+      A managed authoring workflow (drafting, review/approval, versioning) with a governed taxonomy
+      so research is consistently tagged with instrument/sector/theme metadata, making it
+      discoverable and reusable across channels.
+    required_evidence:
+      - A managed authoring/review/approval workflow with versioning
+      - A governed taxonomy consistently applied
+      - Evidence content is discoverable and reused across channels
+    differentiator_questions:
+      - Is research authored through a governed workflow and consistently tagged against a taxonomy?
+    misgrading_notes: >-
+      An approval workflow without consistent tagging leaves content undiscoverable — both are
+      required. Confirm the taxonomy is actually applied, not merely defined.
+
+  - subcomponent_key: CMS_RESEARCH_AUTHORING
+    level: Frontier
+    status: authored
+    statement: >-
+      Authoring is a strength: structured content with rich, partly AI-assisted tagging and entity
+      linking, reusable content components, and metadata that powers precise targeting and
+      personalisation downstream.
+    required_evidence:
+      - Structured content with AI-assisted tagging / entity linking
+      - Reusable content components
+      - Evidence metadata drives downstream targeting/personalisation
+    differentiator_questions:
+      - Is content structured with rich AI-assisted tagging that feeds precise downstream targeting?
+    misgrading_notes: >-
+      Rich structured authoring matters for research-led firms publishing at volume; a firm producing
+      occasional notes rationally needs a tidy tagged repository — do not over-target (§3.1).
+
+  # --- CMS Research Distribution & Targeting -----------------------------------------------
+  - subcomponent_key: CMS_RESEARCH_DISTRIBUTION
+    level: Basic
+    status: authored
+    statement: >-
+      Research is distributed by manual, untargeted broadcast (one email to everyone, or handed out
+      ad-hoc). There is no segmentation and no record of who received or read what.
+    required_evidence:
+      - Inspection of the distribution method showing untargeted broadcast
+      - Confirmation there is no delivery/readership record
+    differentiator_questions:
+      - Is research targeted to relevant recipients with delivery tracking, or broadcast to everyone
+        with no record?
+    misgrading_notes: >-
+      A mailing list is not targeting — grade whether distribution is segmented and tracked, not
+      whether an email goes out.
+
+  - subcomponent_key: CMS_RESEARCH_DISTRIBUTION
+    level: Developing
+    status: authored
+    statement: >-
+      Distribution reaches defined lists with basic segmentation, but targeting is coarse and manual,
+      delivery/readership tracking is limited, and compliance controls on who may receive what are
+      informal.
+    required_evidence:
+      - Defined distribution lists with coarse segmentation
+      - Limited delivery/readership tracking
+      - Informal entitlement/compliance controls on distribution
+    differentiator_questions:
+      - Is targeting driven by client attributes (holdings, type) with tracked delivery, or coarse
+        manual lists?
+    misgrading_notes: >-
+      Segmenting by a hand-maintained list is not attribute-based targeting — check whether targeting
+      derives from client data. Informal compliance controls cap this at Developing.
+
+  - subcomponent_key: CMS_RESEARCH_DISTRIBUTION
+    level: Advanced
+    status: authored
+    statement: >-
+      Research is distributed through managed channels with segment-based targeting (by client type,
+      holdings, preferences), delivery and engagement tracked, and entitlement/compliance rules
+      enforced on distribution.
+    required_evidence:
+      - Managed distribution with segment-based targeting rules
+      - Delivery and engagement tracking
+      - Enforced entitlement/compliance rules on distribution
+    differentiator_questions:
+      - Is distribution targeted by client attributes with tracked engagement and enforced compliance
+        rules?
+    misgrading_notes: >-
+      Compliance enforcement must be a control, not a guideline — confirm restricted research is
+      actually blocked from ineligible recipients, not merely policy.
+
+  - subcomponent_key: CMS_RESEARCH_DISTRIBUTION
+    level: Frontier
+    status: authored
+    statement: >-
+      Distribution is a strength: precision targeting driven by client holdings/behaviour,
+      multi-channel orchestrated delivery, measured engagement feeding back into targeting, and
+      demonstrable relevance uplift.
+    required_evidence:
+      - Precision targeting driven by holdings/behaviour
+      - Multi-channel orchestrated delivery
+      - Engagement feedback loops and a measured relevance uplift
+    differentiator_questions:
+      - Is targeting precision-driven by holdings/behaviour across channels with measured relevance
+        uplift?
+    misgrading_notes: >-
+      Precision multi-channel targeting matters for scaled research franchises; a small client base
+      rationally uses clean segmented lists — do not over-target (§3.1).
+
+  # --- CMS Email & Campaign Engine ---------------------------------------------------------
+  - subcomponent_key: CMS_EMAIL_CAMPAIGNS
+    level: Basic
+    status: authored
+    statement: >-
+      Emails are sent manually or from a personal mailbox/basic tool, one-off, with no templates,
+      scheduling, or tracking. There is no lifecycle or triggered messaging, and unsubscribes and
+      bounces are handled by hand.
+    required_evidence:
+      - Inspection showing manual/one-off email sending
+      - Confirmation there is no tracking, templating, or consent/bounce handling
+    differentiator_questions:
+      - Are emails sent through a campaign engine with tracking and consent handling, or manually
+        with none?
+    misgrading_notes: >-
+      Sending a newsletter from a shared mailbox is Basic even if it goes to a big list — grade the
+      engine capabilities, not the audience size.
+
+  - subcomponent_key: CMS_EMAIL_CAMPAIGNS
+    level: Developing
+    status: authored
+    statement: >-
+      A campaign tool exists for broadcast emails with templates and basic lists, but there is little
+      automation, triggered/lifecycle journeys are minimal, deliverability and consent management are
+      only partly handled, and reporting is basic.
+    required_evidence:
+      - A campaign tool with templates and basic lists
+      - Evidence of minimal automation / no lifecycle journeys
+      - Partial deliverability/consent handling
+    differentiator_questions:
+      - Are there automated triggered/lifecycle journeys with managed deliverability, or only manual
+        broadcasts?
+    misgrading_notes: >-
+      A campaign tool used only for manual blasts is Developing — grade the automation and
+      deliverability management actually in use, not the tool's brochure capabilities.
+
+  - subcomponent_key: CMS_EMAIL_CAMPAIGNS
+    level: Advanced
+    status: authored
+    statement: >-
+      A proper campaign/marketing-automation engine with templates, segmentation, scheduling,
+      triggered lifecycle journeys, managed consent/deliverability (SPF/DKIM, suppression), and
+      campaign analytics (open/click/conversion).
+    required_evidence:
+      - A marketing-automation engine with triggered lifecycle journeys
+      - Managed deliverability (SPF/DKIM) and consent/suppression handling
+      - Campaign analytics (open/click/conversion)
+    differentiator_questions:
+      - Are triggered lifecycle journeys running with managed deliverability and campaign analytics?
+    misgrading_notes: >-
+      Templates and scheduling without triggered journeys is closer to Developing — confirm
+      behavioural/lifecycle triggers exist. Verify consent and suppression are actually enforced.
+
+  - subcomponent_key: CMS_EMAIL_CAMPAIGNS
+    level: Frontier
+    status: authored
+    statement: >-
+      Campaigns are a strength: automated multi-step lifecycle journeys with behavioural triggers,
+      A/B-tested and personalised content, deliverability actively optimised, and campaigns tied to
+      measured business outcomes.
+    required_evidence:
+      - Multi-step behaviourally-triggered lifecycle journeys
+      - A/B-tested, personalised campaign content
+      - Campaigns linked to measured business outcomes
+    differentiator_questions:
+      - Are campaigns behaviourally triggered, personalised, A/B-tested, and tied to measured
+        outcomes?
+    misgrading_notes: >-
+      Sophisticated lifecycle automation matters for marketing-led acquisition/engagement; an
+      advisory model with relationship-led contact rationally needs a solid but simpler engine — do
+      not over-target (§3.1).
+
+  # --- CMS Consolidated Statements ---------------------------------------------------------
+  - subcomponent_key: CMS_STATEMENTS
+    level: Basic
+    status: authored
+    statement: >-
+      Statements are assembled manually (spreadsheets, hand-built PDFs), error-prone and slow, may
+      not consolidate all holdings, and are produced late. Corrections mean redoing them by hand.
+    required_evidence:
+      - Inspection showing manual statement assembly
+      - Evidence of late or error-prone statements, or missing consolidation
+    differentiator_questions:
+      - Are statements generated automatically from reconciled data, or assembled by hand each
+        period?
+    misgrading_notes: >-
+      A templated Word merge a person runs is still manual assembly — grade whether generation is
+      automated and reconciled, not whether a template exists.
+
+  - subcomponent_key: CMS_STATEMENTS
+    level: Developing
+    status: authored
+    statement: >-
+      Statements are generated from the system for standard cases but need manual assembly for
+      consolidated/multi-account views, templates are rigid, and reconciliation to source data is
+      partial so errors occur.
+    required_evidence:
+      - System-generated statements for standard cases
+      - Evidence of manual assembly for consolidated/multi-account views
+      - Partial reconciliation to source data
+    differentiator_questions:
+      - Are consolidated multi-account statements generated automatically and reconciled, or
+        hand-assembled?
+    misgrading_notes: >-
+      Single-account automation with manual consolidation is Developing — grade the consolidated
+      case, which is the hard one. Partial reconciliation means errors ship.
+
+  - subcomponent_key: CMS_STATEMENTS
+    level: Advanced
+    status: authored
+    statement: >-
+      Automated consolidated statement generation across accounts/asset classes from reconciled data,
+      with validated figures, consistent templates, scheduled delivery, and an audit trail;
+      exceptions are flagged rather than shipped.
+    required_evidence:
+      - Automated consolidated statement generation from reconciled data
+      - Validation rules and an exception-flagging process
+      - Scheduled delivery and an audit trail
+    differentiator_questions:
+      - Are consolidated statements generated automatically from reconciled, validated data with
+        exceptions flagged?
+    misgrading_notes: >-
+      Automation that ships unreconciled figures is worse than manual — confirm reconciliation and
+      validation gate the output, and exceptions are held not sent.
+
+  - subcomponent_key: CMS_STATEMENTS
+    level: Frontier
+    status: authored
+    statement: >-
+      Statements are a strength: on-demand and interactive consolidated reporting, fully reconciled
+      with lineage to source, personalised/white-labelled output across channels, and self-serve
+      client access.
+    required_evidence:
+      - On-demand / interactive consolidated reporting
+      - Lineage from statement figure to source
+      - Self-serve client access and personalised/white-labelled output
+    differentiator_questions:
+      - Can clients self-serve interactive consolidated statements on demand with figures traceable
+        to source?
+    misgrading_notes: >-
+      Interactive on-demand consolidated reporting matters for complex multi-account wealth clients;
+      a single-account product rationally targets accurate automated periodic statements — do not
+      over-target (§3.1).
+
+  # --- CMS Search & Personalisation --------------------------------------------------------
+  - subcomponent_key: CMS_CONTENT_SEARCH_PERSONALISATION
+    level: Basic
+    status: authored
+    statement: >-
+      There is no real search — users scroll or browse folders — and no personalisation of content.
+      Finding a document or relevant research is manual and often unsuccessful.
+    required_evidence:
+      - Inspection showing no search, only browse/scroll
+      - Confirmation that content is not personalised to the user
+    differentiator_questions:
+      - Can a user search content and get relevant results, or must they browse folders manually?
+    misgrading_notes: >-
+      A browser Ctrl-F over one page is not search — grade whether there is a search capability over
+      the content estate, not whether text can be found on a single page.
+
+  - subcomponent_key: CMS_CONTENT_SEARCH_PERSONALISATION
+    level: Developing
+    status: authored
+    statement: >-
+      Basic keyword search exists but results are poor (no relevance ranking, misses metadata), and
+      personalisation is minimal, so users struggle to find relevant content quickly.
+    required_evidence:
+      - A keyword-search capability with poor relevance
+      - Evidence that metadata/filters are not used in search
+      - Minimal or no personalisation of results
+    differentiator_questions:
+      - Does search rank by relevance and use the content taxonomy, or return crude keyword matches?
+    misgrading_notes: >-
+      Keyword search that ignores the taxonomy returns noise — grade relevance and use of metadata,
+      not whether a search box exists.
+
+  - subcomponent_key: CMS_CONTENT_SEARCH_PERSONALISATION
+    level: Advanced
+    status: authored
+    statement: >-
+      Good search with relevance ranking, filters/facets on the content taxonomy, and personalised
+      surfacing of content based on the client's profile/holdings, with search quality monitored.
+    required_evidence:
+      - Relevance-ranked search with taxonomy-based facets/filters
+      - Personalised content surfacing tied to client profile/holdings
+      - Search-quality monitoring
+    differentiator_questions:
+      - Does search rank by relevance with facets and surface content personalised to the client's
+        profile?
+    misgrading_notes: >-
+      Faceted search without personalisation, or personalisation without decent search, is only half
+      — both are required. Confirm search quality is actually monitored.
+
+  - subcomponent_key: CMS_CONTENT_SEARCH_PERSONALISATION
+    level: Frontier
+    status: authored
+    statement: >-
+      Search/personalisation is a strength: semantic/AI-powered search and recommendations, results
+      tuned to the individual, measured findability and engagement, and continuously improved
+      relevance.
+    required_evidence:
+      - Semantic / AI-powered search and recommendations
+      - Individually-tuned results
+      - Findability/engagement metrics driving relevance improvement
+    differentiator_questions:
+      - Is search semantic and individually tuned with measured findability, or keyword-based?
+    misgrading_notes: >-
+      Advanced semantic search matters for large content estates and self-serve discovery; a small
+      content set rationally needs solid keyword search with good metadata — do not over-target
+      (§3.1).
+
+  # --- BACKOFFICE Payments & Funding -------------------------------------------------------
+  - subcomponent_key: BACKOFFICE_PAYMENTS_FUNDING
+    level: Basic
+    status: authored
+    statement: >-
+      Deposits and withdrawals are handled manually (manual bank transfers, hand-keyed entries), slow
+      and error-prone, with client-money reconciliation done by spreadsheet after the fact. Fund
+      availability is delayed and breaks are common.
+    required_evidence:
+      - Inspection showing manual payment/funding handling
+      - Evidence of spreadsheet-based, after-the-fact client-money reconciliation
+    differentiator_questions:
+      - Are payments and funding automated and reconciled, or hand-keyed and reconciled later by
+        spreadsheet?
+    misgrading_notes: >-
+      A bank portal a person types into is manual — grade straight-through automation and
+      reconciliation, not the existence of an electronic banking channel.
+
+  - subcomponent_key: BACKOFFICE_PAYMENTS_FUNDING
+    level: Developing
+    status: authored
+    statement: >-
+      Some payment automation exists (a payment gateway or bank file) but funding involves manual
+      steps, reconciliation is daily-batch with manual break-fixing, and edge cases (failed payments,
+      returns) are handled reactively.
+    required_evidence:
+      - A payment gateway or bank-file integration with manual steps remaining
+      - Daily-batch reconciliation with manual break handling
+      - Reactive handling of failed payments/returns
+    differentiator_questions:
+      - Is funding straight-through with automated reconciliation, or automated in part with manual
+        break-fixing?
+    misgrading_notes: >-
+      Automated in-payments but manual reconciliation is Developing — grade the whole cycle including
+      breaks. Batch reconciliation with manual repair is not exception-based automation.
+
+  - subcomponent_key: BACKOFFICE_PAYMENTS_FUNDING
+    level: Advanced
+    status: authored
+    statement: >-
+      Automated payments/funding (integrated gateways/bank connectivity, supported rails) with
+      automated client-money reconciliation, exception-based break handling, monitored SLAs, and full
+      audit for funding movements.
+    required_evidence:
+      - Integrated payment/bank connectivity across supported rails
+      - Automated client-money reconciliation with exception-based break handling
+      - Monitored SLAs and a funding audit trail
+    differentiator_questions:
+      - Are payments automated end-to-end with exception-based reconciliation and monitored SLAs?
+    misgrading_notes: >-
+      Client-money reconciliation is the regulated core — confirm it is automated and exception-based
+      (CASS-grade), not a report humans then work by hand.
+
+  - subcomponent_key: BACKOFFICE_PAYMENTS_FUNDING
+    level: Frontier
+    status: authored
+    statement: >-
+      Payments are a strength: real-time payments/instant funding where available, automated
+      multi-currency handling, near-real-time reconciliation with predictive break detection, and
+      resilient multi-provider payment routing.
+    required_evidence:
+      - Real-time payment/instant-funding capability
+      - Automated multi-currency handling and near-real-time reconciliation
+      - Multi-provider payment routing with predictive break detection
+    differentiator_questions:
+      - Is funding real-time/instant with near-real-time reconciliation and resilient multi-provider
+        routing?
+    misgrading_notes: >-
+      Real-time multi-rail payments matter for high-volume consumer platforms; a firm with periodic
+      funding flows rationally targets automated, reconciled batch payments — do not over-target
+      (§3.1).
+
+  # --- BACKOFFICE KYC & Onboarding ---------------------------------------------------------
+  - subcomponent_key: BACKOFFICE_KYC_ONBOARDING
+    level: Basic
+    status: authored
+    statement: >-
+      Onboarding and KYC are manual and paper-heavy — documents collected and checked by hand, no
+      automated identity/AML screening, slow turnaround, and inconsistent record-keeping create
+      compliance risk.
+    required_evidence:
+      - Inspection showing manual, paper-heavy onboarding
+      - Confirmation that identity/AML screening is not automated
+    differentiator_questions:
+      - Are identity and AML checks automated and consistent, or done by hand with no systematic
+        screening?
+    misgrading_notes: >-
+      A digital form that still routes to manual checking is not automated KYC — grade whether
+      verification and screening are automated, not whether the intake form is online.
+
+  - subcomponent_key: BACKOFFICE_KYC_ONBOARDING
+    level: Developing
+    status: authored
+    statement: >-
+      Digital onboarding exists with some automated checks (basic ID verification or a sanctions
+      screen) but with manual gaps, inconsistent risk-scoring, ongoing monitoring largely manual, and
+      periodic-review backlogs.
+    required_evidence:
+      - Digital onboarding with some automated checks
+      - Evidence of manual gaps and inconsistent risk-scoring
+      - Backlogs in ongoing monitoring / periodic review
+    differentiator_questions:
+      - Is KYC risk-based and screening comprehensive with automated ongoing monitoring, or partial
+        with manual gaps?
+    misgrading_notes: >-
+      Automated ID check but manual sanctions/PEP screening (or vice versa) is partial — grade the
+      full check set. Manual ongoing monitoring caps this at Developing.
+
+  - subcomponent_key: BACKOFFICE_KYC_ONBOARDING
+    level: Advanced
+    status: authored
+    statement: >-
+      Automated KYC/AML — integrated identity verification, sanctions/PEP screening, risk-based due
+      diligence, and ongoing monitoring with case management — giving a controlled, auditable
+      onboarding flow that meets regulatory expectations.
+    required_evidence:
+      - Integrated identity verification and sanctions/PEP screening
+      - Risk-based due-diligence and ongoing-monitoring configuration
+      - Case management with an audit trail
+    differentiator_questions:
+      - Is onboarding automated end-to-end with risk-based screening, ongoing monitoring, and audited
+        case management?
+    misgrading_notes: >-
+      Screening at onboarding only, with no ongoing monitoring, is not complete AML — confirm
+      periodic and event-driven re-screening runs, with cases worked to closure.
+
+  - subcomponent_key: BACKOFFICE_KYC_ONBOARDING
+    level: Frontier
+    status: authored
+    statement: >-
+      Onboarding/KYC is a strength: near-instant straight-through onboarding with orchestrated
+      verification, perpetual KYC (continuous monitoring and auto-refresh), AI-assisted risk
+      detection with low false positives, and strong conversion.
+    required_evidence:
+      - Straight-through near-instant onboarding evidence
+      - Perpetual-KYC continuous monitoring and auto-refresh
+      - AI-assisted risk detection with false-positive metrics
+    differentiator_questions:
+      - Is onboarding straight-through and near-instant with perpetual KYC and low-false-positive risk
+        detection?
+    misgrading_notes: >-
+      Instant STP onboarding and perpetual KYC matter for high-volume retail acquisition; a
+      low-volume high-touch firm rationally targets automated, auditable onboarding — do not
+      over-target (§3.1).
+
+  # --- BACKOFFICE Portfolio Management -----------------------------------------------------
+  - subcomponent_key: BACKOFFICE_PORTFOLIO_MGMT
+    level: Basic
+    status: authored
+    statement: >-
+      Portfolio accounting is manual/spreadsheet-based — positions, cost basis, and valuations
+      maintained by hand, prone to error and lag, with no reliable performance or income tracking.
+    required_evidence:
+      - Inspection showing spreadsheet-based portfolio accounting
+      - Evidence of error-prone or lagging valuations / no reliable performance tracking
+    differentiator_questions:
+      - Are positions, cost basis, and valuations maintained by an accounting system, or by hand in
+        spreadsheets?
+    misgrading_notes: >-
+      A valuation shown on screen may still be spreadsheet-fed behind the scenes — grade the
+      accounting engine, not the display.
+
+  - subcomponent_key: BACKOFFICE_PORTFOLIO_MGMT
+    level: Developing
+    status: authored
+    statement: >-
+      A portfolio system exists for core accounting but with gaps — some asset classes or corporate
+      actions handled manually, valuations not always timely, and performance/tax lots computed with
+      effort or partial accuracy.
+    required_evidence:
+      - A portfolio-accounting system with coverage gaps
+      - Evidence of manual handling for some asset classes / corporate actions
+      - Partial or effortful performance/tax-lot computation
+    differentiator_questions:
+      - Does the system accurately account for all supported asset classes and corporate actions, or
+        leave gaps to manual handling?
+    misgrading_notes: >-
+      Core accounting that mishandles corporate actions produces wrong cost basis silently — check
+      corporate-action and multi-asset coverage, not just position keeping.
+
+  - subcomponent_key: BACKOFFICE_PORTFOLIO_MGMT
+    level: Advanced
+    status: authored
+    statement: >-
+      A portfolio-management/accounting system maintains positions, cost basis, valuations, income,
+      and performance accurately across the supported asset classes, with automated corporate-action
+      and pricing updates and reconciliation to custody.
+    required_evidence:
+      - Accurate multi-asset position/cost-basis/valuation accounting
+      - Automated corporate-action and pricing updates
+      - Reconciliation to custody and performance/income tracking
+    differentiator_questions:
+      - Is portfolio accounting accurate and automated across all supported classes with
+        reconciliation to custody?
+    misgrading_notes: >-
+      Accounting that is not reconciled to custody can drift undetected — confirm the reconciliation
+      link. Performance figures must be computed, not eyeballed.
+
+  - subcomponent_key: BACKOFFICE_PORTFOLIO_MGMT
+    level: Frontier
+    status: authored
+    statement: >-
+      Portfolio management is a strength: real-time multi-asset portfolio accounting with
+      sophisticated performance/attribution and tax-lot optimisation, model-portfolio and rebalancing
+      tooling, and analytics that feed advice.
+    required_evidence:
+      - Real-time multi-asset accounting with performance attribution
+      - Tax-lot optimisation and model-portfolio/rebalancing tooling
+      - Analytics feeding the advice process
+    differentiator_questions:
+      - Is there real-time accounting with attribution, tax-lot optimisation, and rebalancing tooling,
+        or accurate periodic accounting?
+    misgrading_notes: >-
+      Advanced attribution/rebalancing matters for discretionary/multi-asset managers; an
+      execution-only or simple-holdings platform rationally targets accurate accounting and valuation
+      — do not over-target (§3.1).
+
+  # --- BACKOFFICE Credit & Risk Engine -----------------------------------------------------
+  - subcomponent_key: BACKOFFICE_CREDIT_RISK
+    level: Basic
+    status: authored
+    statement: >-
+      Credit/margin and exposure are monitored manually or after the fact — no real-time engine, so
+      limits can be breached before anyone notices, and risk is assessed by periodic manual review.
+    required_evidence:
+      - Inspection showing manual/after-the-fact exposure monitoring
+      - Confirmation there is no automated risk/margin engine
+    differentiator_questions:
+      - Is exposure against limits computed by an engine, or reviewed manually after positions are
+        taken?
+    misgrading_notes: >-
+      A daily risk report is not a risk engine — grade whether limits are computed and enforced
+      systematically, not whether a spreadsheet is reviewed.
+
+  - subcomponent_key: BACKOFFICE_CREDIT_RISK
+    level: Developing
+    status: authored
+    statement: >-
+      A basic risk/margin engine computes exposures but not in real time (batch or delayed), coverage
+      is incomplete across products/accounts, and limit breaches are flagged late with manual
+      follow-up.
+    required_evidence:
+      - A batch/delayed risk-margin engine
+      - Evidence of incomplete coverage across products/accounts
+      - Late breach flagging with manual follow-up
+    differentiator_questions:
+      - Does the engine compute exposure across all products/accounts near-real-time, or in delayed
+        batch with gaps?
+    misgrading_notes: >-
+      Batch risk that lags the market can miss intraday breaches — grade timeliness and coverage.
+      Partial product coverage caps this at Developing.
+
+  - subcomponent_key: BACKOFFICE_CREDIT_RISK
+    level: Advanced
+    status: authored
+    statement: >-
+      An automated credit/risk engine computes margin and exposure across products and accounts
+      near-real-time, with enforced limits, alerting on breaches, stress/what-if capability, and audit
+      of limit changes and overrides.
+    required_evidence:
+      - Near-real-time margin/exposure computation across products and accounts
+      - Enforced limits with breach alerting
+      - Stress/what-if capability and an audit of limit changes/overrides
+    differentiator_questions:
+      - Are limits enforced near-real-time across products with breach alerting and stress capability?
+    misgrading_notes: >-
+      "Enforced" must mean the limit actually blocks or escalates, not just alerts — confirm the
+      control, and that overrides are audited.
+
+  - subcomponent_key: BACKOFFICE_CREDIT_RISK
+    level: Frontier
+    status: authored
+    statement: >-
+      Risk is a strength: real-time firm-wide risk aggregation across asset classes, sophisticated
+      margining (e.g. portfolio/SPAN-style) and scenario/stress analytics, automated limit
+      management, and pre-emptive risk controls.
+    required_evidence:
+      - Real-time firm-wide cross-asset risk aggregation
+      - Sophisticated margining and scenario/stress analytics
+      - Automated limit management with pre-emptive controls
+    differentiator_questions:
+      - Is risk aggregated firm-wide in real time with portfolio margining and pre-emptive controls?
+    misgrading_notes: >-
+      Real-time cross-product risk engines matter for leveraged/derivatives and prime businesses; a
+      cash, long-only platform rationally targets solid exposure monitoring with enforced limits — do
+      not over-target (§3.1).
+
+  # --- OEMS Coverage by Asset Class --------------------------------------------------------
+  - subcomponent_key: OEMS_ASSET_COVERAGE
+    level: Basic
+    status: authored
+    statement: >-
+      The OEMS handles only one asset class (e.g. cash equities); orders in other asset classes are
+      placed manually, off-system, or not supported, forcing workarounds.
+    required_evidence:
+      - Inspection showing single-asset-class order handling
+      - Examples of other-asset-class orders placed off-system
+    differentiator_questions:
+      - Are all asset classes the firm trades handled in the OEMS, or only one with the rest done
+        manually?
+    misgrading_notes: >-
+      Displaying a multi-asset blotter is not handling the lifecycle — grade whether orders in each
+      class are actually managed through the OEMS, not merely shown.
+
+  - subcomponent_key: OEMS_ASSET_COVERAGE
+    level: Developing
+    status: authored
+    statement: >-
+      A few asset classes are supported but unevenly — some order flows are second-class, missing
+      order types or lifecycle handling per class, and adding an asset class is a major effort.
+    required_evidence:
+      - Multi-asset support with uneven lifecycle handling
+      - Evidence some classes lack full order-type/lifecycle support
+      - Evidence adding an asset class is a major effort
+    differentiator_questions:
+      - Is every supported asset class handled to the same lifecycle standard, or are some
+        second-class?
+    misgrading_notes: >-
+      "Supports funds" may mean order entry only, without proper lifecycle/settlement handling —
+      check the full lifecycle per class, not just order capture.
+
+  - subcomponent_key: OEMS_ASSET_COVERAGE
+    level: Advanced
+    status: authored
+    statement: >-
+      The OEMS supports the asset classes the business trades with proper order lifecycle handling per
+      class (equities, funds, fixed income, ETFs, etc.), consistent workflows, and a documented path
+      to add classes.
+    required_evidence:
+      - Full order-lifecycle handling across the traded asset classes
+      - Consistent workflows across classes
+      - A documented process to onboard a new asset class
+    differentiator_questions:
+      - Does the OEMS handle the full order lifecycle consistently across every asset class the firm
+        trades?
+    misgrading_notes: >-
+      Consistency matters — a strong equity workflow beside a weak fixed-income one is not full
+      coverage. Confirm each traded class is handled to standard.
+
+  - subcomponent_key: OEMS_ASSET_COVERAGE
+    level: Frontier
+    status: authored
+    statement: >-
+      Multi-asset coverage is a strength: a unified multi-asset OEMS spanning complex instruments
+      (derivatives, FX, structured) with cross-asset workflows and a single blotter, coverage as a
+      competitive edge.
+    required_evidence:
+      - A unified multi-asset OEMS including complex instruments
+      - Cross-asset workflows on a single blotter
+      - Evidence coverage breadth is a competitive edge
+    differentiator_questions:
+      - Is there a unified multi-asset OEMS spanning complex instruments, or coverage scoped to the
+        core classes?
+    misgrading_notes: >-
+      Broad multi-asset execution matters for multi-asset brokers/managers; a single-asset-class
+      platform rationally covers its own products well — do not over-target (§3.1).
+
+  # --- OEMS Order Types & Complexity -------------------------------------------------------
+  - subcomponent_key: OEMS_ORDER_TYPES
+    level: Basic
+    status: authored
+    statement: >-
+      Only the simplest orders (market, basic limit) are supported. Anything more — stops,
+      conditionals, algos, multi-leg — is unavailable or done manually, limiting execution options.
+    required_evidence:
+      - Inspection of supported order types showing only market/basic limit
+      - Confirmation that stops/conditionals/algos are unavailable or manual
+    differentiator_questions:
+      - Are order types beyond market and basic limit supported, or must they be worked manually?
+    misgrading_notes: >-
+      A stop order that a human watches and fires manually is not a supported stop type — grade what
+      the system natively supports, not what a trader simulates by hand.
+
+  - subcomponent_key: OEMS_ORDER_TYPES
+    level: Developing
+    status: authored
+    statement: >-
+      A moderate set of order types exists (limit, stop, some time-in-force) but advanced/conditional
+      and multi-leg orders are missing or partially implemented, and behaviour across venues is
+      inconsistent.
+    required_evidence:
+      - A moderate order-type set with gaps in advanced/conditional types
+      - Evidence multi-leg orders are missing or partial
+      - Inconsistent order-type behaviour across venues
+    differentiator_questions:
+      - Do the order types behave consistently across venues, and are advanced/conditional types
+        supported?
+    misgrading_notes: >-
+      Order types that behave differently per venue are a hidden trap — check cross-venue
+      consistency. Missing conditional/multi-leg support caps this at Developing.
+
+  - subcomponent_key: OEMS_ORDER_TYPES
+    level: Advanced
+    status: authored
+    statement: >-
+      A comprehensive set of order types (market/limit/stop/conditional, time-in-force variants,
+      basic algos) with consistent, well-tested behaviour across supported venues, matching the
+      trading strategies the business runs.
+    required_evidence:
+      - A comprehensive order-type set matching the firm's strategies
+      - Consistent cross-venue behaviour
+      - Test evidence for order-type behaviour
+    differentiator_questions:
+      - Does the order-type set cover the firm's strategies with tested, consistent cross-venue
+        behaviour?
+    misgrading_notes: >-
+      Comprehensiveness is relative to the firm's strategies — confirm the types the business
+      actually needs are covered and tested, not an impressive but unused catalogue.
+
+  - subcomponent_key: OEMS_ORDER_TYPES
+    level: Frontier
+    status: authored
+    statement: >-
+      Order sophistication is a strength: advanced conditional/algorithmic, multi-leg, and basket
+      orders, custom strategies, and order behaviour validated and tuned — an execution-capability
+      differentiator.
+    required_evidence:
+      - Advanced conditional/algorithmic, multi-leg, and basket order support
+      - Custom-strategy capability
+      - Validation/tuning of order behaviour
+    differentiator_questions:
+      - Are advanced algorithmic, multi-leg, and custom order strategies supported and tuned, or the
+        standard set?
+    misgrading_notes: >-
+      Rich order-type breadth matters for active/professional trading platforms; a buy-and-hold
+      wealth platform rationally supports market/limit/stop well — do not over-target (§3.1).
+
+  # --- OEMS Latency & Reliability ----------------------------------------------------------
+  - subcomponent_key: OEMS_LATENCY_RELIABILITY
+    level: Basic
+    status: authored
+    statement: >-
+      The order path is slow and/or unreliable — orders lag, occasionally fail or duplicate, and
+      there is no measurement of order latency or fill reliability. Users are unsure an order went
+      through.
+    required_evidence:
+      - Evidence of order lag, failures, or duplicates
+      - Confirmation that order latency/reliability is not measured
+    differentiator_questions:
+      - Is order-path latency and success/reject rate measured at all, or is reliability a matter of
+        anecdote?
+    misgrading_notes: >-
+      "It usually works" is not reliability — grade whether the order path is measured and monitored,
+      not whether it feels fine day to day.
+
+  - subcomponent_key: OEMS_LATENCY_RELIABILITY
+    level: Developing
+    status: authored
+    statement: >-
+      The order path generally works but latency and reliability are not measured continuously,
+      occasional failures or delays occur under load, and there is limited alerting on order-path
+      health.
+    required_evidence:
+      - Evidence the order path works but is not continuously measured
+      - Records of occasional failures/delays under load
+      - Limited or missing order-path health alerting
+    differentiator_questions:
+      - Is order-path health continuously monitored with alerting, or only noticed when something
+        breaks?
+    misgrading_notes: >-
+      Spot-checks are not continuous monitoring — grade whether order-path health is watched with
+      alerting. Degradation under load caps this at Developing.
+
+  - subcomponent_key: OEMS_LATENCY_RELIABILITY
+    level: Advanced
+    status: authored
+    statement: >-
+      The order path is reliable with monitored latency and success/reject rates, alerting on
+      degradation, tested behaviour under load, and clear order-state feedback, so orders are timely
+      and their status is trustworthy.
+    required_evidence:
+      - Monitored order-path latency and success/reject metrics with alerting
+      - Load-test results for the order path
+      - Clear order-state feedback to users
+    differentiator_questions:
+      - Is the order path monitored for latency and reliability with alerting and proven under load?
+    misgrading_notes: >-
+      A mean-latency figure hides tail failures — confirm reject rates and tail latency are watched,
+      and behaviour under load has actually been tested.
+
+  - subcomponent_key: OEMS_LATENCY_RELIABILITY
+    level: Frontier
+    status: authored
+    statement: >-
+      Order-path performance is a strength: low-latency execution measured end-to-end with
+      percentiles, high availability with graceful degradation and failover, and reliability/latency
+      SLAs met and reported.
+    required_evidence:
+      - End-to-end latency percentiles (p50/p99) for the order path
+      - High-availability with graceful degradation/failover evidence
+      - Reliability/latency SLAs met and reported
+    differentiator_questions:
+      - Is execution low-latency measured to percentiles with HA failover and SLAs, or reliable
+        "fast-enough"?
+    misgrading_notes: >-
+      Ultra-low latency and five-nines matter for high-frequency/active-flow platforms; a wealth
+      platform rationally targets reliable, monitored, fast-enough execution — do not over-target
+      (§3.1).
+
+  # --- OEMS APIs & Co-location -------------------------------------------------------------
+  - subcomponent_key: OEMS_APIS_COLOCATION
+    level: Basic
+    status: authored
+    statement: >-
+      There is no execution API — orders only via the UI — and no co-location. Clients or systems
+      cannot integrate programmatically, and latency-sensitive access is not offered.
+    required_evidence:
+      - Confirmation that ordering is UI-only with no execution API
+      - Confirmation that no co-location/DMA option exists
+    differentiator_questions:
+      - Can a client or system place orders programmatically via an API, or only through the UI?
+    misgrading_notes: >-
+      An internal API the UI calls is not a client-facing execution API — grade whether external
+      programmatic access is offered, not whether the UI talks to a backend.
+
+  - subcomponent_key: OEMS_APIS_COLOCATION
+    level: Developing
+    status: authored
+    statement: >-
+      A basic order API exists but is limited (partial coverage, weak docs, no FIX or sandbox) and
+      co-location is not offered, so programmatic and low-latency access is constrained.
+    required_evidence:
+      - A basic order API with partial coverage
+      - Weak or missing documentation / no sandbox or FIX
+      - Confirmation co-location is not offered
+    differentiator_questions:
+      - Does the execution API cover the order lifecycle with docs and a sandbox, or only basic
+        placement?
+    misgrading_notes: >-
+      An order-placement endpoint without lifecycle coverage, docs, or a sandbox is Developing —
+      grade the whole integration surface, not the ability to submit one order.
+
+  - subcomponent_key: OEMS_APIS_COLOCATION
+    level: Advanced
+    status: authored
+    statement: >-
+      A documented execution API (e.g. REST and/or FIX) covers the order lifecycle with
+      authentication, sandbox, and support, and hosting/connectivity is arranged for good latency,
+      meeting the integration needs of clients/partners.
+    required_evidence:
+      - A documented lifecycle-complete execution API (REST/FIX)
+      - Authentication, sandbox, and support for integrators
+      - Hosting/connectivity arranged for good latency
+    differentiator_questions:
+      - Is there a documented lifecycle-complete execution API with a sandbox meeting integrator
+        needs?
+    misgrading_notes: >-
+      FIX connectivity claimed but uncertified is not production-ready — confirm certification and
+      that a sandbox exists. Good latency need not mean co-location at this level.
+
+  - subcomponent_key: OEMS_APIS_COLOCATION
+    level: Frontier
+    status: authored
+    statement: >-
+      Execution connectivity is a strength: full-featured FIX/API with co-location and
+      direct-market-access options, low-latency infrastructure, and a supported developer/partner
+      ecosystem.
+    required_evidence:
+      - Full-featured FIX/API with co-location / DMA options
+      - Low-latency infrastructure evidence
+      - A supported developer/partner ecosystem
+    differentiator_questions:
+      - Are co-location and DMA offered on low-latency infrastructure with a partner ecosystem, or a
+        solid API without co-lo?
+    misgrading_notes: >-
+      Co-location and DMA matter for latency-sensitive institutional/broker clients; a retail wealth
+      platform rationally offers a solid documented API without co-location — do not over-target
+      (§3.1).
+
+  # --- EMS_GATEWAY Connectivity Breadth ----------------------------------------------------
+  - subcomponent_key: EMS_GATEWAY_CONNECTIVITY
+    level: Basic
+    status: authored
+    statement: >-
+      The gateway connects to only one or two venues, via bespoke or manual links. Reaching another
+      venue is a fresh project, and there is no standard FIX connectivity layer.
+    required_evidence:
+      - Inspection showing one/two bespoke venue connections
+      - Confirmation there is no standard FIX connectivity layer
+    differentiator_questions:
+      - Is there a standard connectivity layer covering multiple venues, or a couple of bespoke
+        links?
+    misgrading_notes: >-
+      Reaching a venue via a third party is not the firm's own gateway connectivity — describe what
+      the gateway itself connects to directly.
+
+  - subcomponent_key: EMS_GATEWAY_CONNECTIVITY
+    level: Developing
+    status: authored
+    statement: >-
+      Several venues are connected, mostly via FIX, but each is somewhat bespoke, onboarding a new
+      venue is slow, and certification/maintenance of sessions is effortful and inconsistent.
+    required_evidence:
+      - Multiple FIX venue connections with bespoke elements
+      - Evidence venue onboarding is slow
+      - Inconsistent session certification/maintenance
+    differentiator_questions:
+      - Is there a normalised FIX layer with repeatable certification, or is each venue a bespoke
+        connection?
+    misgrading_notes: >-
+      Multiple connections built one-off do not make a connectivity layer — grade normalisation and
+      repeatable onboarding, not the count of venues.
+
+  - subcomponent_key: EMS_GATEWAY_CONNECTIVITY
+    level: Advanced
+    status: authored
+    statement: >-
+      Broad, standardised venue connectivity (a FIX engine/normalisation layer) covers the venues the
+      firm trades, with a repeatable certification/onboarding process and maintained, monitored
+      sessions.
+    required_evidence:
+      - A FIX engine / normalisation layer covering the traded venues
+      - A repeatable certification/onboarding process
+      - Maintained, monitored sessions
+    differentiator_questions:
+      - Is connectivity standardised through a normalisation layer with repeatable onboarding across
+        the traded venues?
+    misgrading_notes: >-
+      Coverage should match what the firm trades — confirm the venues actually used are all
+      connected via the standard layer, and onboarding is genuinely repeatable.
+
+  - subcomponent_key: EMS_GATEWAY_CONNECTIVITY
+    level: Frontier
+    status: authored
+    statement: >-
+      Connectivity breadth is a strength: a large pre-certified venue network with rapid onboarding,
+      normalised access across many venues/asset classes, and connectivity breadth offered as client
+      value.
+    required_evidence:
+      - A large pre-certified venue network
+      - Rapid onboarding lead-time metrics
+      - Normalised access across many venues/asset classes offered as client value
+    differentiator_questions:
+      - Is there a large pre-certified venue network with rapid onboarding, or coverage of the few
+        venues traded?
+    misgrading_notes: >-
+      A large venue network matters for multi-venue brokers/aggregators; a firm trading a few venues
+      rationally maintains those well — do not over-target (§3.1).
+
+  # --- EMS_GATEWAY Routing Policy Sophistication -------------------------------------------
+  - subcomponent_key: EMS_GATEWAY_ROUTING_POLICY
+    level: Basic
+    status: authored
+    statement: >-
+      The gateway sends orders to a single destination or a hard-coded venue per instrument — there is
+      no routing policy to speak of, and changing destinations means code changes.
+    required_evidence:
+      - Inspection showing single-destination or hard-coded venue routing
+      - Confirmation that destination changes require code changes
+    differentiator_questions:
+      - Is there any configurable routing policy at the gateway, or a fixed hard-coded destination?
+    misgrading_notes: >-
+      Sending everything to one venue is Basic even if that venue is well-chosen — grade whether a
+      routing policy exists, not whether the single destination is sensible.
+
+  - subcomponent_key: EMS_GATEWAY_ROUTING_POLICY
+    level: Developing
+    status: authored
+    statement: >-
+      Configurable routing policies exist but are static and simple (by instrument or account), not
+      driven by execution data, and changes are release-bound with limited testing.
+    required_evidence:
+      - Static configurable routing policies (by instrument/account)
+      - Evidence policy is not driven by execution data
+      - Release-bound policy changes with limited testing
+    differentiator_questions:
+      - Is routing policy configurable and testable, or static rules changed only by release?
+    misgrading_notes: >-
+      Static config is better than hard-coding but is not best-execution routing — grade whether
+      policy responds to venue/execution data, which caps static rules at Developing.
+
+  - subcomponent_key: EMS_GATEWAY_ROUTING_POLICY
+    level: Advanced
+    status: authored
+    statement: >-
+      A configurable routing-policy layer supports rules by instrument, order characteristics, and
+      venue, versioned and testable, with monitoring of where flow goes and why, aligned to
+      best-execution obligations.
+    required_evidence:
+      - A versioned, testable routing-policy configuration
+      - Monitoring of routed flow (where and why)
+      - Evidence of alignment to best-execution obligations
+    differentiator_questions:
+      - Is routing policy versioned, testable, and monitored against best-execution obligations?
+    misgrading_notes: >-
+      Best-execution alignment must be evidenced (monitoring/RTS-style records), not asserted —
+      confirm flow is monitored and justified, not just that rules exist.
+
+  - subcomponent_key: EMS_GATEWAY_ROUTING_POLICY
+    level: Frontier
+    status: authored
+    statement: >-
+      Routing policy is a strength: dynamic best-execution routing informed by real-time venue
+      analytics, policy simulation/what-if before rollout, and measured execution-quality outcomes
+      against benchmark. This is gateway-side policy, distinct from OEMS smart-order-routing.
+    required_evidence:
+      - Dynamic best-execution routing driven by real-time venue analytics
+      - Policy simulation / what-if testing before rollout
+      - Measured execution-quality outcomes against benchmark
+    differentiator_questions:
+      - Is routing dynamic and benchmarked on execution quality with pre-rollout simulation, or static
+        policy?
+    misgrading_notes: >-
+      Sophisticated dynamic routing matters for multi-venue best-ex-driven flow; a single-venue or
+      broker-routed platform rationally uses clear static policy — do not over-target (§3.1).
+
+  # --- EMS_GATEWAY Monitoring & Diagnostics ------------------------------------------------
+  - subcomponent_key: EMS_GATEWAY_MONITORING
+    level: Basic
+    status: authored
+    statement: >-
+      There is little visibility into gateway/session health — a dropped FIX session or rejected
+      orders may go unnoticed until trading is affected, and diagnosing an issue means digging
+      through raw logs.
+    required_evidence:
+      - Confirmation there is no gateway/session health monitoring
+      - Evidence that issues are diagnosed from raw logs after impact
+    differentiator_questions:
+      - Would a dropped session or a spike in rejects be noticed proactively, or only after trading is
+        hit?
+    misgrading_notes: >-
+      Raw FIX logs on disk are not monitoring — grade whether session health is surfaced and alerted,
+      not whether the data exists somewhere.
+
+  - subcomponent_key: EMS_GATEWAY_MONITORING
+    level: Developing
+    status: authored
+    statement: >-
+      Basic session monitoring exists (up/down status, some logs) but alerting is limited,
+      message-level diagnostics are manual, and problems (sequence gaps, rejects) are often found
+      reactively.
+    required_evidence:
+      - Basic up/down session monitoring
+      - Limited alerting and manual message-level diagnostics
+      - Evidence problems are found reactively
+    differentiator_questions:
+      - Is there alerting and searchable message-level diagnostics, or only up/down status found
+        reactively?
+    misgrading_notes: >-
+      Up/down status without message-level diagnostics leaves reject storms and sequence gaps
+      opaque — grade the depth of diagnostics, not just liveness.
+
+  - subcomponent_key: EMS_GATEWAY_MONITORING
+    level: Advanced
+    status: authored
+    statement: >-
+      Comprehensive gateway monitoring — session health, message rates, reject/latency metrics — with
+      alerting and searchable message-level diagnostics, so issues are detected early and root-caused
+      quickly.
+    required_evidence:
+      - Session-health, message-rate, and reject/latency dashboards with alerting
+      - Searchable message-level diagnostics
+      - Evidence issues are detected early and root-caused quickly
+    differentiator_questions:
+      - Is gateway health monitored with alerting and message-level diagnostics enabling fast
+        root-cause?
+    misgrading_notes: >-
+      Metrics without message-level drill-down slow root-cause — confirm diagnostics reach individual
+      messages/sessions, not just aggregate rates.
+
+  - subcomponent_key: EMS_GATEWAY_MONITORING
+    level: Frontier
+    status: authored
+    statement: >-
+      Gateway observability is a strength: real-time end-to-end monitoring with automated anomaly
+      detection, replay/drill-down diagnostics, proactive session-health management, and diagnostics
+      that shorten incident resolution to minutes.
+    required_evidence:
+      - Real-time end-to-end gateway monitoring with anomaly detection
+      - Replay / drill-down diagnostic capability
+      - MTTR evidence and proactive session-health management
+    differentiator_questions:
+      - Is gateway monitoring real-time with anomaly detection and replay diagnostics, or dashboards
+        with alerting?
+    misgrading_notes: >-
+      Deep real-time diagnostics matter for high-message-rate multi-venue gateways; a low-volume
+      gateway rationally needs solid session monitoring and alerting — do not over-target (§3.1).
+
+  # --- LIQ_CONNECT Foreign Broker Relationships --------------------------------------------
+  - subcomponent_key: LIQ_CONNECT_FOREIGN_BROKERS
+    level: Basic
+    status: authored
+    statement: >-
+      Access to foreign markets depends on ad-hoc arrangements with a single foreign broker (or
+      none), handled manually, with limited reach and no redundancy — foreign orders are slow and
+      dependent on one relationship.
+    required_evidence:
+      - Inspection of foreign-market access showing single/ad-hoc broker dependence
+      - Confirmation of manual handling and no redundancy
+    differentiator_questions:
+      - Is foreign-market access served by managed broker relationships, or one ad-hoc arrangement
+        with no backup?
+    misgrading_notes: >-
+      Reaching a foreign market through a single correspondent with no alternative is Basic — grade
+      reach and redundancy, not whether any foreign access exists at all.
+
+  - subcomponent_key: LIQ_CONNECT_FOREIGN_BROKERS
+    level: Developing
+    status: authored
+    statement: >-
+      A few foreign-broker relationships exist covering key markets, but connectivity/instruction is
+      semi-manual, reach is patchy, and there is little redundancy or performance oversight of these
+      brokers.
+    required_evidence:
+      - A few foreign-broker relationships covering key markets
+      - Evidence of semi-manual instruction and patchy reach
+      - Little broker-performance oversight or redundancy
+    differentiator_questions:
+      - Is instruction to foreign brokers electronic with performance oversight, or semi-manual with
+        gaps?
+    misgrading_notes: >-
+      Relationships covering the "important" markets can still leave client-needed markets uncovered
+      — grade reach against client needs, not against a shortlist of majors.
+
+  - subcomponent_key: LIQ_CONNECT_FOREIGN_BROKERS
+    level: Advanced
+    status: authored
+    statement: >-
+      Established relationships with foreign brokers cover the markets clients need, with electronic
+      instruction where possible, monitored broker performance/SLAs, and defined fallbacks for the
+      important markets.
+    required_evidence:
+      - Foreign-broker relationships covering client-needed markets
+      - Electronic instruction and monitored broker performance/SLAs
+      - Defined fallbacks for the important markets
+    differentiator_questions:
+      - Do foreign-broker relationships cover client needs with electronic instruction, SLA
+        monitoring, and fallbacks?
+    misgrading_notes: >-
+      A relationship with no fallback for a key market is a single point of failure — confirm defined
+      alternatives, and that broker performance is actually monitored.
+
+  - subcomponent_key: LIQ_CONNECT_FOREIGN_BROKERS
+    level: Frontier
+    status: authored
+    statement: >-
+      Foreign-market reach is a strength: a broad, redundant network of foreign brokers with
+      electronic connectivity, benchmarked execution/cost, and global reach offered as client value.
+    required_evidence:
+      - A broad, redundant foreign-broker network with electronic connectivity
+      - Benchmarked execution/cost across brokers
+      - Global reach offered as client value
+    differentiator_questions:
+      - Is there a broad, redundant, benchmarked foreign-broker network, or a few relationships for
+        the markets used?
+    misgrading_notes: >-
+      Broad global broker networks matter for internationally-active firms; a domestically-focused
+      firm rationally maintains a few reliable relationships for the markets it uses — do not
+      over-target (§3.1).
+
+  # --- LIQ_CONNECT Fund House Connectivity -------------------------------------------------
+  - subcomponent_key: LIQ_CONNECT_FUND_HOUSES
+    level: Basic
+    status: authored
+    statement: >-
+      Fund orders (subscriptions/redemptions) are placed manually — by fax, email, or portal
+      re-keying — to fund houses or a platform, slow and error-prone, with manual tracking of order
+      status and settlement.
+    required_evidence:
+      - Inspection showing manual fund-order placement (fax/email/portal)
+      - Evidence of manual status/settlement tracking
+    differentiator_questions:
+      - Are fund orders routed electronically straight-through, or re-keyed and chased manually?
+    misgrading_notes: >-
+      Typing into a fund-house portal is manual — grade whether fund dealing is electronic
+      straight-through, not whether an electronic channel is used by a human.
+
+  - subcomponent_key: LIQ_CONNECT_FUND_HOUSES
+    level: Developing
+    status: authored
+    statement: >-
+      Some electronic fund-order routing exists (e.g. via a fund network) for major houses but
+      coverage is partial, with manual handling for many funds, and status/settlement tracking is
+      only partly automated.
+    required_evidence:
+      - Electronic fund routing for major houses via a fund network
+      - Evidence of manual handling for many funds
+      - Partly-automated status/settlement tracking
+    differentiator_questions:
+      - Is electronic fund dealing broad across the offered range, or limited to major houses with
+        the rest manual?
+    misgrading_notes: >-
+      Electronic dealing for the big houses only, with the tail handled manually, is Developing —
+      grade coverage across the whole fund range offered.
+
+  - subcomponent_key: LIQ_CONNECT_FUND_HOUSES
+    level: Advanced
+    status: authored
+    statement: >-
+      Automated fund-order connectivity (e.g. via a fund settlement network/hub) covers the fund
+      range offered, with electronic order routing, status, and settlement, monitored against SLAs
+      and reconciled.
+    required_evidence:
+      - Automated fund connectivity via a settlement network/hub covering the offered range
+      - Electronic routing, status, and settlement
+      - SLA monitoring and reconciliation
+    differentiator_questions:
+      - Is fund dealing electronic straight-through across the offered range with status, settlement,
+        and reconciliation?
+    misgrading_notes: >-
+      "Connected to the network" is not full coverage — confirm the funds actually offered to clients
+      all deal electronically, with settlement reconciled.
+
+  - subcomponent_key: LIQ_CONNECT_FUND_HOUSES
+    level: Frontier
+    status: authored
+    statement: >-
+      Fund connectivity is a strength: comprehensive automated straight-through fund dealing across a
+      wide universe with real-time status, automated exception handling, and broad house coverage as a
+      differentiator.
+    required_evidence:
+      - Comprehensive STP fund dealing across a wide universe
+      - Real-time status and automated exception handling
+      - Broad fund-house coverage offered as client value
+    differentiator_questions:
+      - Is fund dealing comprehensive STP across a wide universe with real-time status and automated
+        exceptions?
+    misgrading_notes: >-
+      Broad automated fund STP matters for fund-supermarket/platform businesses; a firm offering a
+      curated fund list rationally automates that list's dealing — do not over-target (§3.1).
+
 # --- Explicitly not-yet-authored (all four levels TODO) -----------------------------------
-# Each subcomponent below has all four levels explicitly marked TODO. Authoring one moves it out of
-# this list into `anchors:` above. This list is the explicit acknowledgement of the content gap.
-todo_all_levels:
-  - APP_SERVER_API_DESIGN
-  - APP_SERVER_DATA_ARCHITECTURE
-  - APP_SERVER_DEVOPS_DEPLOYMENT
-  - APP_SERVER_HOSTING_ELASTICITY
-  - APP_SERVER_OBSERVABILITY
-  - APP_SERVER_RESILIENCE_DR
-  - APP_SERVER_SECURITY_COMPLIANCE
-  - BACKOFFICE_CREDIT_RISK
-  - BACKOFFICE_CUSTODY
-  - BACKOFFICE_KYC_ONBOARDING
-  - BACKOFFICE_PAYMENTS_FUNDING
-  - BACKOFFICE_PORTFOLIO_MGMT
-  - BACKOFFICE_REG_REPORTING
-  - CMS_CONTENT_SEARCH_PERSONALISATION
-  - CMS_CRM_MODEL
-  - CMS_EMAIL_CAMPAIGNS
-  - CMS_RESEARCH_AUTHORING
-  - CMS_RESEARCH_DISTRIBUTION
-  - CMS_STATEMENTS
-  - EMS_GATEWAY_CONNECTIVITY
-  - EMS_GATEWAY_MONITORING
-  - EMS_GATEWAY_RISK_THROTTLING
-  - EMS_GATEWAY_ROUTING_POLICY
-  - FRONTEND_ACCESSIBILITY_LOCALISATION
-  - FRONTEND_DEVICE_COVERAGE
-  - FRONTEND_EXPERIMENTATION_ANALYTICS
-  - FRONTEND_PERFORMANCE
-  - FRONTEND_PERSONALISATION
-  - FRONTEND_UX_NAVIGATION
-  - LIQ_CONNECT_FOREIGN_BROKERS
-  - LIQ_CONNECT_FUND_HOUSES
-  - LIQ_CONNECT_LOCAL_EXCHANGES
-  - LIQ_CONNECT_SETTLEMENT_CLEARING
-  - MARKET_DATA_DEPTH_QUALITY
-  - MARKET_DATA_EXCHANGE_COVERAGE
-  - MARKET_DATA_HISTORY_DEPTH
-  - MARKET_DATA_INSTRUMENT_UNIVERSE
-  - MARKET_DATA_LATENCY_TIMELINESS
-  - MARKET_DATA_VALUE_ADD_SERVICES
-  - MARKET_DATA_VENDOR_REDUNDANCY
-  - OEMS_APIS_COLOCATION
-  - OEMS_ASSET_COVERAGE
-  - OEMS_LATENCY_RELIABILITY
-  - OEMS_ORDER_TYPES
-  - OEMS_PRE_TRADE_RISK
-  - ORCHESTRATION_CONFIG_VS_CODE
-  - ORCHESTRATION_EVENT_DRIVEN
-  - ORCHESTRATION_MONITORING
-  - ORCHESTRATION_ROUTING_LOGIC
-  - ORCHESTRATION_WORKFLOW_ENGINE
+# All 51 subcomponents are now authored (14 critical in the first pass, the OEMS §4 worked example,
+# and the remaining 36 non-critical in the second pass). This list is retained, empty, as the
+# explicit statement that no (subcomponent, level) pair is left un-authored. Any future new
+# subcomponent added to the registry must appear here (or under `todo:`) until its anchor is written.
+todo_all_levels: []

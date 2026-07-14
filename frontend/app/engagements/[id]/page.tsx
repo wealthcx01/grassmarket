@@ -49,26 +49,44 @@ export default function EngagementDetailPage() {
   if (!engagement) return <p>Loading…</p>;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", maxWidth: "46rem" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem", maxWidth: "48rem" }}>
       <div>
-        <Link href={`/prospects/${engagement.prospect_id}`} style={{ fontSize: "0.8rem" }}>
+        <Link href={`/prospects/${engagement.prospect_id}`} style={{ fontSize: "0.82rem" }}>
           ← Prospect
         </Link>
-        <h1 style={{ fontSize: "1.6rem", margin: "0.2rem 0 0.3rem" }}>{engagement.title}</h1>
-        <p style={{ margin: 0, color: "var(--color-ink-muted)", fontSize: "0.85rem" }}>
-          Status <strong>{engagement.status}</strong>
+        <p className="eyebrow" style={{ marginTop: "0.5rem" }}>
+          Engagement
         </p>
+        <h1 style={{ fontSize: "1.7rem", margin: "0.3rem 0 0.5rem" }}>{engagement.title}</h1>
+        <span className="tag">{engagement.status}</span>
       </div>
 
       <section>
-        <h2 style={{ fontSize: "1.05rem", marginBottom: "0.4rem" }}>Linked assessments</h2>
+        <h2 style={{ fontSize: "1.1rem", marginBottom: "0.6rem" }}>Assessments</h2>
         {engagement.assessment_ids.length === 0 ? (
-          <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem" }}>None linked.</p>
+          <div className="card" style={{ padding: "1.1rem 1.25rem", display: "flex", gap: "1rem", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
+            <p style={{ margin: 0, color: "var(--color-ink-muted)", fontSize: "0.9rem", maxWidth: "30rem" }}>
+              No assessment yet. Start an ATLAS assessment for{" "}
+              <strong style={{ color: "var(--color-ink)" }}>{engagement.title}</strong> — the deliverables
+              below generate from it once it&rsquo;s finalised.
+            </p>
+            <Link
+              href={`/assessments?subject=${encodeURIComponent(engagement.title)}`}
+              className="btn btn-primary"
+            >
+              Start an assessment →
+            </Link>
+          </div>
         ) : (
-          <ul style={{ margin: 0, paddingLeft: "1.2rem", fontSize: "0.85rem" }}>
-            {engagement.assessment_ids.map((aid) => (
+          <ul className="stack" style={{ listStyle: "none", margin: 0, padding: 0, gap: "0.5rem" }}>
+            {engagement.assessment_ids.map((aid, i) => (
               <li key={aid}>
-                <Link href={`/assessments/${aid}`}>{aid}</Link>
+                <Link href={`/assessments/${aid}`} className="card-link" style={{ padding: "0.8rem 1rem", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem" }}>
+                  <span style={{ fontWeight: 500 }}>Assessment {i + 1}</span>
+                  <span aria-hidden className="mono" style={{ color: "var(--color-ink-faint)" }}>
+                    Open →
+                  </span>
+                </Link>
               </li>
             ))}
           </ul>
@@ -130,7 +148,7 @@ function CommsLog({ engagement, onAdded }: { engagement: Engagement; onAdded: ()
           ))}
         </select>
         <input type="text" value={body} onChange={(e) => setBody(e.target.value)} placeholder="Log a communication…" style={{ ...inputStyle, flex: "1 1 18rem" }} />
-        <button type="submit" disabled={busy || !body.trim()} style={btnStyle}>
+        <button type="submit" className="btn btn-primary" disabled={busy || !body.trim()}>
           Add entry
         </button>
       </form>
@@ -139,20 +157,7 @@ function CommsLog({ engagement, onAdded }: { engagement: Engagement; onAdded: ()
   );
 }
 
+// Controls inherit the global form styling; we only nudge the size for this dense log.
 const inputStyle: React.CSSProperties = {
-  padding: "0.45rem 0.6rem",
-  fontFamily: "inherit",
   fontSize: "0.85rem",
-  border: "1px solid var(--color-border)",
-  borderRadius: "var(--radius)",
-  background: "var(--color-paper-raised)",
-};
-const btnStyle: React.CSSProperties = {
-  padding: "0.45rem 1rem",
-  fontSize: "0.85rem",
-  color: "var(--color-accent-contrast)",
-  background: "var(--color-accent)",
-  border: "none",
-  borderRadius: "var(--radius)",
-  cursor: "pointer",
 };

@@ -26,6 +26,13 @@ export default function AssessmentsPage() {
   const [subject, setSubject] = useState("");
   const [creating, setCreating] = useState(false);
 
+  // Prefill the subject when arriving from an engagement's "Start an assessment" CTA
+  // (?subject=…). Read from location rather than useSearchParams to avoid a Suspense boundary.
+  useEffect(() => {
+    const s = new URLSearchParams(window.location.search).get("subject");
+    if (s) setSubject(s);
+  }, []);
+
   useEffect(() => {
     if (!getToken()) {
       router.replace("/login");
@@ -98,21 +105,7 @@ export default function AssessmentsPage() {
             }}
           />
         </label>
-        <button
-          type="submit"
-          disabled={creating || !subject.trim()}
-          style={{
-            padding: "0.6rem 1.2rem",
-            fontSize: "0.9rem",
-            fontWeight: 500,
-            color: "var(--color-accent-contrast)",
-            background: "var(--color-accent)",
-            border: "none",
-            borderRadius: "var(--radius)",
-            cursor: creating || !subject.trim() ? "not-allowed" : "pointer",
-            opacity: creating || !subject.trim() ? 0.6 : 1,
-          }}
-        >
+        <button type="submit" className="btn btn-primary" disabled={creating || !subject.trim()}>
           {creating ? "Creating…" : "Create & open"}
         </button>
       </form>

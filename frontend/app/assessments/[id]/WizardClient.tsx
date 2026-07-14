@@ -161,10 +161,15 @@ export function WizardClient({ id }: { id: string }) {
           <h2 style={{ fontSize: "1.15rem" }}>{WIZARD_STEPS[step]!.title}</h2>
           <Current {...stepProps} />
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1.5rem" }}>
-            <button type="button" disabled={step === 0} onClick={() => setStep((s) => s - 1)} style={navBtn}>
+            <button type="button" className="btn btn-secondary" disabled={step === 0} onClick={() => setStep((s) => s - 1)}>
               ← Back
             </button>
-            <button type="button" disabled={step === WIZARD_STEPS.length - 1} onClick={() => setStep((s) => s + 1)} style={navBtn}>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              disabled={step === WIZARD_STEPS.length - 1}
+              onClick={() => setStep((s) => s + 1)}
+            >
               Next →
             </button>
           </div>
@@ -182,16 +187,10 @@ function Stepper({ current, onSelect }: { current: number; onSelect: (i: number)
         <li key={s.title}>
           <button
             type="button"
+            className="pill"
+            data-active={i === current}
             onClick={() => onSelect(i)}
-            style={{
-              border: "1px solid var(--color-border)",
-              borderRadius: "999px",
-              padding: "0.25rem 0.7rem",
-              fontSize: "0.75rem",
-              cursor: "pointer",
-              background: i === current ? "var(--color-accent)" : "transparent",
-              color: i === current ? "var(--color-accent-contrast)" : "var(--color-ink)",
-            }}
+            style={{ fontSize: "0.75rem", padding: "0.3rem 0.75rem" }}
           >
             {i + 1}. {s.title}
           </button>
@@ -222,14 +221,7 @@ function LiveSummary({ live }: { live: LiveScore | null }) {
   return (
     <div>
       {live?.scoreable && live.v ? (
-        <div
-          style={{
-            border: "1px solid var(--color-border)",
-            borderRadius: "var(--radius)",
-            padding: "0.75rem",
-            background: "var(--color-paper-raised)",
-          }}
-        >
+        <div className="card" style={{ padding: "0.9rem 1rem", position: "sticky", top: "1rem" }}>
           <span className="mono" style={{ fontSize: "0.66rem", letterSpacing: "0.08em", color: "var(--color-ink-muted)" }}>
             V — PLATFORM VALUE
           </span>
@@ -254,12 +246,3 @@ function LiveSummary({ live }: { live: LiveScore | null }) {
     </div>
   );
 }
-
-const navBtn: React.CSSProperties = {
-  border: "1px solid var(--color-border)",
-  background: "var(--color-paper-raised)",
-  borderRadius: "var(--radius)",
-  padding: "0.4rem 0.9rem",
-  fontSize: "0.85rem",
-  cursor: "pointer",
-};
