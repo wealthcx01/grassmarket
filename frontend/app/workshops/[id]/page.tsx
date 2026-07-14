@@ -125,7 +125,7 @@ function DeliverForm({ workshopId, onDone }: { workshopId: string; onDone: () =>
         Workshop output
         <textarea rows={3} value={output} onChange={(e) => setOutput(e.target.value)} style={inputStyle} />
       </label>
-      <button type="submit" disabled={busy || !deliveredOn} style={btnStyle}>
+      <button type="submit" className="btn btn-primary" disabled={busy || !deliveredOn}>
         Mark delivered
       </button>
       {error ? <p style={{ color: "var(--color-error)", fontSize: "0.8rem" }}>{error}</p> : null}
@@ -187,7 +187,7 @@ function RecoveryFeeSection({
         Contracted on
         <input type="date" required value={contractedOn} onChange={(e) => setContractedOn(e.target.value)} style={inputStyle} />
       </label>
-      <button type="submit" disabled={busy || !contractedOn} style={btnStyle}>
+      <button type="submit" className="btn btn-primary" disabled={busy || !contractedOn}>
         Check &amp; attribute fee
       </button>
       {error ? <p role="alert" style={{ color: "var(--color-warn)", fontSize: "0.82rem" }}>{error}</p> : null}
@@ -196,21 +196,7 @@ function RecoveryFeeSection({
 }
 
 const labelStyle: React.CSSProperties = { display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.82rem" };
+// Controls inherit the global form styling; only the size is nudged here.
 const inputStyle: React.CSSProperties = {
-  padding: "0.45rem 0.6rem",
-  fontFamily: "inherit",
   fontSize: "0.85rem",
-  border: "1px solid var(--color-border)",
-  borderRadius: "var(--radius)",
-  background: "var(--color-paper-raised)",
-};
-const btnStyle: React.CSSProperties = {
-  alignSelf: "flex-start",
-  padding: "0.5rem 1.1rem",
-  fontSize: "0.85rem",
-  color: "var(--color-accent-contrast)",
-  background: "var(--color-accent)",
-  border: "none",
-  borderRadius: "var(--radius)",
-  cursor: "pointer",
 };

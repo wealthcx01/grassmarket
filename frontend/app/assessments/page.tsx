@@ -26,6 +26,13 @@ export default function AssessmentsPage() {
   const [subject, setSubject] = useState("");
   const [creating, setCreating] = useState(false);
 
+  // Prefill the subject when arriving from an engagement's "Start an assessment" CTA
+  // (?subject=…). Read from location rather than useSearchParams to avoid a Suspense boundary.
+  useEffect(() => {
+    const s = new URLSearchParams(window.location.search).get("subject");
+    if (s) setSubject(s);
+  }, []);
+
   useEffect(() => {
     if (!getToken()) {
       router.replace("/login");
