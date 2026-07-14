@@ -1,0 +1,47 @@
+# Auto-deploy the Next.js frontend to Railway on merges to main.
+#
+# WHY THIS EXISTS: the backend service is GitHub-connected in Railway and redeploys itself on push.
+# The frontend service (`grassmarket-web`) is a monorepo subdirectory (`frontend/`), and Railway's
+# CLI cannot connect a repo with a root directory (that is dashboard-only). So instead of the
+# dashboard connection, this workflow deploys the frontend from CI using the documented monorepo
+# fix: `railway up frontend --path-as-root` (upload the frontend/ dir as the build root, not the
+# repo root — otherwise the CLI archives the repo root and tries to build the Python backend).
+#
+# SETUP (one-time, operator): create a Railway PROJECT token scoped to the `production` environment
+# (Railway dashboard -> grassmarket project -> Settings -> Tokens) and add it as a GitHub Actions
+# secret named RAILWAY_TOKEN. Until that secret exists this job no-ops (it does not fail the build).
+
+name: Deploy frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/deploy-frontend.yml"
+  workflow_dispatch: {} # allow a manual redeploy from the Actions tab
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy frontend to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          if [ -z "$RAILWAY_TOKEN" ]; then
+            echo "::warning::RAILWAY_TOKEN secret is not set — skipping frontend deploy."
+            echo "Add a Railway project token as the RAILWAY_TOKEN Actions secret to enable this."
+            exit 0
+          fi
+          npm install -g @railway/cli
+          # --path-as-root: use frontend/ as the archive root so Railway builds the Next.js app,
+          # not the backend at the repo root. --service targets the web service; the project token
+          # scopes the project + environment. --ci streams build logs then exits non-zero on failure.
+          railway up frontend --path-as-root --service grassmarket-web --ci
