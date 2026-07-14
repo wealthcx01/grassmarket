@@ -182,6 +182,54 @@ class MeetingTranscriptORM(Base):
     )
 
 
+class PredictionORM(Base):
+    """A lever-level prediction pre-registered against a scoring run (GRS-0031). Money stored as
+    integer minor units + currency + ref. Owner-scoped; realised value + scores set on follow-up."""
+
+    __tablename__ = "predictions"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    scoring_run_id: Mapped[UUID] = mapped_column(Uuid, index=True, nullable=False)
+    lever: Mapped[str] = mapped_column(String(32), nullable=False)
+    predicted_delta_minor: Mapped[int] = mapped_column(Integer, nullable=False)
+    predicted_delta_currency: Mapped[str] = mapped_column(String(3), nullable=False)
+    predicted_delta_ref: Mapped[str] = mapped_column(String(160), nullable=False)
+    horizon_months: Mapped[int] = mapped_column(Integer, nullable=False)
+    probability: Mapped[float] = mapped_column(Float, nullable=False)
+    follow_up_due: Mapped[date] = mapped_column(Date, index=True, nullable=False)
+    outcome: Mapped[str] = mapped_column(String(16), nullable=False)
+    realised_delta_minor: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    realised_delta_currency: Mapped[str | None] = mapped_column(String(3), nullable=True)
+    realised_delta_ref: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    brier_score: Mapped[float | None] = mapped_column(Float, nullable=True)
+    scored_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
+class BenchmarkRowORM(Base):
+    """An ANONYMISED finalised score in the benchmark population (GRS-0031). No client identity, no
+    owner, no run/assessment link — only the score, uncertainty, versions, and a non-identifying
+    sector. Provably de-identified: no column could re-identify a client or advisor."""
+
+    __tablename__ = "benchmark_rows"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    v_index: Mapped[float] = mapped_column(Float, nullable=False)
+    v_p10: Mapped[float | None] = mapped_column(Float, nullable=True)
+    v_p90: Mapped[float | None] = mapped_column(Float, nullable=True)
+    uncertainty_rating: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    methodology_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    coefficient_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    sector: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    ingested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
 class ExtractionORM(Base):
     """A gated Path B extraction proposal (GRS-0030). The proposed document lives HERE, not on the
     assessment, until confirmed — unconfirmed AI output never reaches the engine. Owner-scoped."""

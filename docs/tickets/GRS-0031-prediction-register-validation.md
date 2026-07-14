@@ -2,7 +2,7 @@
 
 - **Loop:** 6
 - **Branch:** `grs-0031-prediction-register-validation`
-- **Status:** Planned
+- **Status:** In review
 - **Normative source:** Methodology v1.2 §11 (validation loop, pre-registered staging); PRD §3.4.
 - **Depends on:** GRS-0016 (levers exist in deliverables), GRS-0013 (engagements).
 

@@ -1,0 +1,121 @@
+{
+  "$defs": {
+    "BenchmarkSector": {
+      "description": "A CONTROLLED industry vocabulary for a benchmark row. A closed set (not free text) so a\nclient name can never be typed into the one otherwise-descriptive field — the anonymisation\nguarantee has no data-entry soft spot.",
+      "enum": [
+        "brokerage",
+        "asset_management",
+        "wealth_management",
+        "exchange",
+        "market_infrastructure",
+        "banking",
+        "insurance",
+        "fintech",
+        "other"
+      ],
+      "title": "BenchmarkSector",
+      "type": "string"
+    },
+    "UncertaintyRating": {
+      "description": "Assessment Uncertainty Rating (Methodology §7), Morningstar pattern.",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Very High"
+      ],
+      "title": "UncertaintyRating",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "An anonymised finalised score in the benchmark population. Provably de-identified: it carries\nONLY the score, its uncertainty, the methodology/coefficient versions, and a non-identifying\nsector — NEVER a name, entity id, contact, owner, assessment id, or scoring-run id.",
+  "properties": {
+    "coefficient_version": {
+      "minLength": 1,
+      "title": "Coefficient Version",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "ingested_at": {
+      "format": "date-time",
+      "title": "Ingested At",
+      "type": "string"
+    },
+    "methodology_version": {
+      "minLength": 1,
+      "title": "Methodology Version",
+      "type": "string"
+    },
+    "sector": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BenchmarkSector"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "A non-identifying industry category (closed vocabulary)."
+    },
+    "uncertainty_rating": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/UncertaintyRating"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "v_index": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "V Index",
+      "type": "number"
+    },
+    "v_p10": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "V P10"
+    },
+    "v_p90": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "V P90"
+    }
+  },
+  "required": [
+    "id",
+    "v_index",
+    "methodology_version",
+    "coefficient_version",
+    "ingested_at"
+  ],
+  "title": "BenchmarkRow",
+  "type": "object"
+}

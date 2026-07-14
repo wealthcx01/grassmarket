@@ -115,6 +115,12 @@ from bcap_contracts.meetings import MediaKind, MeetingTranscript
 from bcap_contracts.money import Currency, Money
 from bcap_contracts.narratives import AINarrative, NarrativeSection, NarrativeStatus
 from bcap_contracts.pipeline import assert_legal_transition
+from bcap_contracts.predictions import (
+    BenchmarkRow,
+    BenchmarkSector,
+    Prediction,
+    PredictionOutcome,
+)
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -125,6 +131,7 @@ from grassmarket.data.models import (
     ArenaScenarioORM,
     ArenaSessionORM,
     AssessmentORM,
+    BenchmarkRowORM,
     CalibrationRatingORM,
     CalibrationSessionORM,
     CertificationEventORM,
@@ -144,6 +151,7 @@ from grassmarket.data.models import (
     LearningModuleORM,
     MeetingTranscriptORM,
     ModuleRatingDraftORM,
+    PredictionORM,
     ProspectORM,
     RecoveryFeeAttributionORM,
     ScoringRunORM,
@@ -158,6 +166,7 @@ from grassmarket.pathb.extraction import Extractor
 from grassmarket.pathb.scanning import MediaScanner
 from grassmarket.pathb.transcription import Transcriber, TranscriptionError
 from grassmarket.pipeline.fees import attribution_content_hash, is_within_attribution_window
+from grassmarket.predictions.logic import PredictionSpec, score_prediction
 from grassmarket.workbench.arena import ArenaFeedbackDrafter, score_transcript
 from grassmarket.workbench.bench import (
     assemble_queue,
@@ -1128,6 +1137,197 @@ class Repository:
             accepted=row.accepted,
             created_at=row.created_at,
             updated_at=row.updated_at,
+        )
+
+    # ------------------------------------------------- prediction register + benchmark (GRS-0031)
+    def register_predictions(
+        self,
+        principal: Principal,
+        *,
+        scoring_run_id: UUID,
+        specs: Sequence[PredictionSpec],
+        horizon_months: int,
+        probability: float,
+        follow_up_due: date,
+    ) -> list[Prediction]:
+        """Pre-register one prediction per lever against an immutable scoring run — the
+        falsifiability record. The run must be the caller's own (scoped)."""
+        self.get_scoring_run(principal, scoring_run_id)  # own + exists (raises otherwise)
+        created: list[Prediction] = []
+        for spec in specs:
+            row = PredictionORM(
+                owner_consultant_id=principal.consultant_id,
+                scoring_run_id=scoring_run_id,
+                lever=spec.lever.value,
+                predicted_delta_minor=spec.predicted_delta.amount_minor,
+                predicted_delta_currency=spec.predicted_delta.currency.value,
+                predicted_delta_ref=spec.predicted_delta.assumption_register_ref,
+                horizon_months=horizon_months,
+                probability=probability,
+                follow_up_due=follow_up_due,
+                outcome=PredictionOutcome.PENDING.value,
+            )
+            self._session.add(row)
+            self._session.flush()
+            created.append(self._to_prediction(row))
+        return created
+
+    def list_predictions(self, principal: Principal) -> list[Prediction]:
+        """The caller's own predictions."""
+        rows = (
+            self._session.execute(
+                select(PredictionORM)
+                .where(PredictionORM.owner_consultant_id == principal.consultant_id)
+                .order_by(PredictionORM.created_at)
+            )
+            .scalars()
+            .all()
+        )
+        return [self._to_prediction(r) for r in rows]
+
+    def list_due_follow_ups(self, principal: Principal, *, now: datetime) -> list[Prediction]:
+        """The caller's predictions whose follow-up is due (follow_up_due ≤ today) and still
+        PENDING — the re-contacts to chase for realised value."""
+        rows = (
+            self._session.execute(
+                select(PredictionORM)
+                .where(
+                    PredictionORM.owner_consultant_id == principal.consultant_id,
+                    PredictionORM.outcome == PredictionOutcome.PENDING.value,
+                    PredictionORM.follow_up_due <= now.date(),
+                )
+                .order_by(PredictionORM.follow_up_due)
+            )
+            .scalars()
+            .all()
+        )
+        return [self._to_prediction(r) for r in rows]
+
+    def get_prediction(self, principal: Principal, prediction_id: UUID) -> Prediction:
+        row = self._session.get(PredictionORM, prediction_id)
+        if row is None:
+            raise NotFoundError(f"Prediction {prediction_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        return self._to_prediction(row)
+
+    def record_realised_value(
+        self, principal: Principal, prediction_id: UUID, *, realised_delta: Money, now: datetime
+    ) -> Prediction:
+        """Record a follow-up's realised value and score the prediction — a directional hit/miss and
+        a Brier score. Single-shot: refused once already scored."""
+        row = self._session.get(PredictionORM, prediction_id)
+        if row is None:
+            raise NotFoundError(f"Prediction {prediction_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        if row.outcome != PredictionOutcome.PENDING.value:
+            raise ConflictError(f"Prediction {prediction_id} has already been scored.")
+        predicted = Money(
+            amount_minor=row.predicted_delta_minor,
+            currency=Currency(row.predicted_delta_currency),
+            assumption_register_ref=row.predicted_delta_ref,
+        )
+        outcome, brier = score_prediction(
+            predicted_delta=predicted, realised_delta=realised_delta, probability=row.probability
+        )
+        row.outcome = outcome.value
+        row.realised_delta_minor = realised_delta.amount_minor
+        row.realised_delta_currency = realised_delta.currency.value
+        row.realised_delta_ref = realised_delta.assumption_register_ref
+        row.brier_score = brier
+        row.scored_at = now
+        self._session.add(row)
+        self._session.flush()
+        return self._to_prediction(row)
+
+    def ingest_benchmark(
+        self,
+        principal: Principal,
+        scoring_run_id: UUID,
+        *,
+        sector: BenchmarkSector | None,
+        now: datetime,
+    ) -> BenchmarkRow:
+        """Ingest a FINALISED scoring run into the anonymised benchmark population. The row is
+        de-identified by construction — only the score, uncertainty, versions, and a non-identifying
+        sector are copied; no owner, assessment id, run id, or client detail crosses over."""
+        run = self.get_scoring_run(principal, scoring_run_id)  # own + exists
+        if not run.finalised:
+            raise ConflictError("Only a finalised scoring run may enter the benchmark population.")
+        if run.v_index is None:
+            raise ConflictError("Scoring run has no V index to benchmark.")
+        row = BenchmarkRowORM(
+            v_index=run.v_index,
+            v_p10=run.v_p10,
+            v_p90=run.v_p90,
+            uncertainty_rating=run.uncertainty_rating.value if run.uncertainty_rating else None,
+            methodology_version=run.methodology_version,
+            coefficient_version=run.coefficient_version,
+            sector=sector.value if sector else None,
+            ingested_at=now,
+        )
+        self._session.add(row)
+        self._session.flush()
+        return self._to_benchmark_row(row)
+
+    def list_benchmark_rows(self) -> list[BenchmarkRow]:
+        """The anonymised benchmark population — org-wide and de-identified, so not owner-scoped."""
+        rows = (
+            self._session.execute(select(BenchmarkRowORM).order_by(BenchmarkRowORM.ingested_at))
+            .scalars()
+            .all()
+        )
+        return [self._to_benchmark_row(r) for r in rows]
+
+    @staticmethod
+    def _to_prediction(row: PredictionORM) -> Prediction:
+        from bcap_contracts.value import LeverKind
+
+        realised = (
+            Money(
+                amount_minor=row.realised_delta_minor,
+                currency=Currency(row.realised_delta_currency),
+                assumption_register_ref=row.realised_delta_ref,
+            )
+            if row.realised_delta_minor is not None
+            and row.realised_delta_currency is not None
+            and row.realised_delta_ref is not None
+            else None
+        )
+        return Prediction(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            scoring_run_id=row.scoring_run_id,
+            lever=LeverKind(row.lever),
+            predicted_delta=Money(
+                amount_minor=row.predicted_delta_minor,
+                currency=Currency(row.predicted_delta_currency),
+                assumption_register_ref=row.predicted_delta_ref,
+            ),
+            horizon_months=row.horizon_months,
+            probability=row.probability,
+            follow_up_due=row.follow_up_due,
+            outcome=PredictionOutcome(row.outcome),
+            realised_delta=realised,
+            brier_score=row.brier_score,
+            scored_at=row.scored_at,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    @staticmethod
+    def _to_benchmark_row(row: BenchmarkRowORM) -> BenchmarkRow:
+        return BenchmarkRow(
+            id=row.id,
+            v_index=row.v_index,
+            v_p10=row.v_p10,
+            v_p90=row.v_p90,
+            uncertainty_rating=UncertaintyRating(row.uncertainty_rating)
+            if row.uncertainty_rating
+            else None,
+            methodology_version=row.methodology_version,
+            coefficient_version=row.coefficient_version,
+            sector=BenchmarkSector(row.sector) if row.sector else None,
+            ingested_at=row.ingested_at,
         )
 
     # ------------------------------------------------------------------ engagements (SCOPED)

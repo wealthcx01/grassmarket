@@ -109,6 +109,12 @@ from bcap_contracts.learning import (
 )
 from bcap_contracts.meetings import MediaKind, MeetingTranscript
 from bcap_contracts.money import Currency, Money
+from bcap_contracts.predictions import (
+    BenchmarkRow,
+    BenchmarkSector,
+    Prediction,
+    PredictionOutcome,
+)
 from bcap_contracts.provenance import WeightProvenanceRecord
 from bcap_contracts.registry import (
     AnchorPoint,
@@ -188,6 +194,10 @@ __all__ = [
     "ExtractionConfidence",
     "ExtractionStatus",
     "FieldProvenance",
+    "Prediction",
+    "PredictionOutcome",
+    "BenchmarkRow",
+    "BenchmarkSector",
     "CommitteeItem",
     "CommitteeItemType",
     "CommitteeDecision",
