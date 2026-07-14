@@ -23,6 +23,7 @@ from bcap_contracts.assessments import (
     SubcomponentRating,
     TriadResult,
 )
+from bcap_contracts.audit import AuditEvent, PersonalDataExport
 from bcap_contracts.auth import (
     AcceptInvitationRequest,
     Consultant,
@@ -120,6 +121,8 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "LoginRequest": LoginRequest,
     "TokenResponse": TokenResponse,
     "AcceptInvitationRequest": AcceptInvitationRequest,
+    "AuditEvent": AuditEvent,
+    "PersonalDataExport": PersonalDataExport,
 }
 
 _SCHEMA_DIR = Path(__file__).parent / "json_schema"

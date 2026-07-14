@@ -1,0 +1,34 @@
+{
+  "additionalProperties": false,
+  "description": "A GDPR subject-access bundle: every record the platform holds about one person, keyed by\nresource type. Values are plain dicts of each row's columns (ids + timestamps included).",
+  "properties": {
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "records": {
+      "additionalProperties": {
+        "items": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "title": "Records",
+      "type": "object"
+    },
+    "subject_consultant_id": {
+      "format": "uuid",
+      "title": "Subject Consultant Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "subject_consultant_id",
+    "generated_at",
+    "records"
+  ],
+  "title": "PersonalDataExport",
+  "type": "object"
+}

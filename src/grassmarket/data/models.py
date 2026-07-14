@@ -182,6 +182,26 @@ class MeetingTranscriptORM(Base):
     )
 
 
+class AuditEventORM(Base):
+    """An append-only audit record (GRS-0032). Inserted, never updated or deleted. `actor` is who
+    did it; the target is resource_type + resource_id. `actor_consultant_id` is nullable for system
+    events. Survives a subject's GDPR deletion (a de-identified compliance record)."""
+
+    __tablename__ = "audit_events"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    actor_consultant_id: Mapped[UUID | None] = mapped_column(Uuid, index=True, nullable=True)
+    event_type: Mapped[str] = mapped_column(String(48), index=True, nullable=False)
+    resource_type: Mapped[str | None] = mapped_column(String(48), nullable=True)
+    resource_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    detail: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
 class PredictionORM(Base):
     """A lever-level prediction pre-registered against a scoring run (GRS-0031). Money stored as
     integer minor units + currency + ref. Owner-scoped; realised value + scores set on follow-up."""

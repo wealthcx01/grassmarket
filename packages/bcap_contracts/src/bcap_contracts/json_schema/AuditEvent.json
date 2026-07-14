@@ -1,0 +1,101 @@
+{
+  "$defs": {
+    "AuditEventType": {
+      "description": "The security-relevant action classes the audit log records (PRD §2).",
+      "enum": [
+        "auth_login",
+        "assessment_finalised",
+        "deliverable_generated",
+        "deliverable_downloaded",
+        "committee_decision",
+        "certification_override",
+        "commission_recorded",
+        "gdpr_export",
+        "gdpr_deletion"
+      ],
+      "title": "AuditEventType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One append-only audit record. `owner_consultant_id` is the ACTOR (who did it); the target is\n`resource_type` + `resource_id`. Never mutated after write.",
+  "properties": {
+    "at": {
+      "format": "date-time",
+      "title": "At",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "detail": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "A short human-readable note, no secrets.",
+      "title": "Detail"
+    },
+    "event_type": {
+      "$ref": "#/$defs/AuditEventType"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "resource_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Resource Id"
+    },
+    "resource_type": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Resource Type"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "event_type",
+    "at"
+  ],
+  "title": "AuditEvent",
+  "type": "object"
+}
