@@ -26,6 +26,7 @@ from grassmarket.web.routers import (
     deliverables,
     earnings,
     engagements,
+    extraction,
     guidance,
     health,
     narratives,
@@ -81,6 +82,7 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
     app.include_router(bench.router)
     app.include_router(earnings.router)
     app.include_router(transcripts.router)
+    app.include_router(extraction.router)
     app.include_router(guidance.router)
     app.include_router(registry.router)
     return app

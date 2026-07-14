@@ -43,6 +43,7 @@ from bcap_contracts.committee import CommitteeDecision, CommitteeItem, Committee
 from bcap_contracts.deliverables import Deliverable
 from bcap_contracts.engagements import CommsLogEntry, Engagement, Workshop
 from bcap_contracts.entities import Prospect
+from bcap_contracts.extraction import Extraction, FieldProvenance
 from bcap_contracts.fees import RecoveryFeeAttribution
 from bcap_contracts.learning import (
     CertificationProgress,
@@ -90,6 +91,8 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "CommissionLine": CommissionLine,
     "EarningsSummary": EarningsSummary,
     "MeetingTranscript": MeetingTranscript,
+    "Extraction": Extraction,
+    "FieldProvenance": FieldProvenance,
     "CommitteeItem": CommitteeItem,
     "CommitteeDecision": CommitteeDecision,
     "CommitteeQueueEntry": CommitteeQueueEntry,

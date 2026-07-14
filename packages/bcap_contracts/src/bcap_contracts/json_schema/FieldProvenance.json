@@ -1,0 +1,89 @@
+{
+  "$defs": {
+    "ExtractionConfidence": {
+      "description": "The model's confidence in an extracted field (PRD §3.3).",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ],
+      "title": "ExtractionConfidence",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The audit record for one extracted field: which schema field, from which transcript span, at\nwhat confidence, and whether the consultant accepted it. Persisted per field (PRD §3.3).",
+  "properties": {
+    "accepted": {
+      "default": false,
+      "description": "Set true when the consultant confirms this field (per-field).",
+      "title": "Accepted",
+      "type": "boolean"
+    },
+    "confidence": {
+      "$ref": "#/$defs/ExtractionConfidence"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "extraction_id": {
+      "format": "uuid",
+      "title": "Extraction Id",
+      "type": "string"
+    },
+    "field_ref": {
+      "description": "The assessment-schema field, e.g. 'subcomponent:OEMS_LATENCY'.",
+      "minLength": 1,
+      "title": "Field Ref",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "span_end": {
+      "minimum": 0,
+      "title": "Span End",
+      "type": "integer"
+    },
+    "span_start": {
+      "description": "Character offset of the supporting span in the text.",
+      "minimum": 0,
+      "title": "Span Start",
+      "type": "integer"
+    },
+    "transcript_id": {
+      "format": "uuid",
+      "title": "Transcript Id",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "extraction_id",
+    "transcript_id",
+    "field_ref",
+    "confidence",
+    "span_start",
+    "span_end"
+  ],
+  "title": "FieldProvenance",
+  "type": "object"
+}

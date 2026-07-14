@@ -89,6 +89,12 @@ from bcap_contracts.common import (
 from bcap_contracts.deliverables import ApprovalStatus, Deliverable, DeliverableType
 from bcap_contracts.engagements import Engagement, EngagementStatus, Workshop
 from bcap_contracts.entities import PipelineStage, Prospect
+from bcap_contracts.extraction import (
+    Extraction,
+    ExtractionConfidence,
+    ExtractionStatus,
+    FieldProvenance,
+)
 from bcap_contracts.learning import (
     CertificationCredit,
     CertificationProgress,
@@ -178,6 +184,10 @@ __all__ = [
     "load_commission_config",
     "MeetingTranscript",
     "MediaKind",
+    "Extraction",
+    "ExtractionConfidence",
+    "ExtractionStatus",
+    "FieldProvenance",
     "CommitteeItem",
     "CommitteeItemType",
     "CommitteeDecision",

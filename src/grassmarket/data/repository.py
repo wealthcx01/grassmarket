@@ -67,7 +67,13 @@ from bcap_contracts.committee import (
     CommitteeDecisionStatus,
     CommitteeItemType,
 )
-from bcap_contracts.common import AssessorLevel, ConsultantTier, Role, UncertaintyRating
+from bcap_contracts.common import (
+    AssessorLevel,
+    ConsultantTier,
+    EvidenceGrade,
+    Role,
+    UncertaintyRating,
+)
 from bcap_contracts.deliverables import (
     ApprovalStatus,
     Deliverable,
@@ -84,6 +90,12 @@ from bcap_contracts.engagements import (
     WorkshopState,
 )
 from bcap_contracts.entities import PipelineStage, Prospect
+from bcap_contracts.extraction import (
+    Extraction,
+    ExtractionConfidence,
+    ExtractionStatus,
+    FieldProvenance,
+)
 from bcap_contracts.fees import (
     RecoveryFeeAttribution,
     RecoveryFeeConfig,
@@ -125,6 +137,8 @@ from grassmarket.data.models import (
     DeliverableORM,
     DrillCardORM,
     EngagementORM,
+    ExtractionORM,
+    FieldProvenanceORM,
     GeneratedQuizORM,
     InvitationORM,
     LearningModuleORM,
@@ -140,6 +154,7 @@ from grassmarket.earnings.commission import (
     compute_engagement_commission,
 )
 from grassmarket.pathb.cipher import TranscriptCipher
+from grassmarket.pathb.extraction import Extractor
 from grassmarket.pathb.scanning import MediaScanner
 from grassmarket.pathb.transcription import Transcriber, TranscriptionError
 from grassmarket.pipeline.fees import attribution_content_hash, is_within_attribution_window
@@ -188,6 +203,38 @@ def _strip_governance_fields(document: AssessmentDocument) -> AssessmentDocument
             )
         }
     )
+
+
+_HIGH_EVIDENCE = (EvidenceGrade.E3_ARTIFACT, EvidenceGrade.E4_OBSERVED)
+
+
+def _cap_grade(grade: EvidenceGrade | None) -> EvidenceGrade | None:
+    """Knock an artifact-level grade down to E1 (used where no artifact link can exist)."""
+    return EvidenceGrade.E1_SELF_REPORTED if grade in _HIGH_EVIDENCE else grade
+
+
+def _cap_extraction_evidence(document: AssessmentDocument) -> AssessmentDocument:
+    """Extracted ratings default to E1 and are never above E2 without an artifact (GRS-0030, PRD
+    §3.3): AI cannot manufacture a high evidence grade from a transcript alone. For a SUBCOMPONENT
+    E3/E4 grade with no `evidence_refs` is knocked to E1. A POWER carries no evidence-ref field at
+    all, so an extracted power grade can never be artifact-backed — every E3/E4 benefit/barrier
+    is unconditionally knocked to E1 (these grades drive the Monte Carlo uncertainty band)."""
+    capped_subs = tuple(
+        s.model_copy(update={"evidence_grade": EvidenceGrade.E1_SELF_REPORTED})
+        if s.evidence_grade in _HIGH_EVIDENCE and not s.evidence_refs
+        else s
+        for s in document.subcomponents
+    )
+    capped_powers = tuple(
+        p.model_copy(
+            update={
+                "benefit_grade": _cap_grade(p.benefit_grade),
+                "barrier_grade": _cap_grade(p.barrier_grade),
+            }
+        )
+        for p in document.powers
+    )
+    return document.model_copy(update={"subcomponents": capped_subs, "powers": capped_powers})
 
 
 class RepositoryError(Exception):
@@ -943,6 +990,142 @@ class Repository:
             text=cipher.decrypt(row.text_ciphertext),
             transcriber_ref=row.transcriber_ref,
             retention_until=row.retention_until,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    # ------------------------------------------- Path B: extraction → review (GRS-0030, SCOPED, #8)
+    def propose_extraction(
+        self,
+        principal: Principal,
+        *,
+        assessment_id: UUID,
+        transcript_id: UUID,
+        extractor: Extractor,
+        cipher: TranscriptCipher,
+    ) -> Extraction:
+        """Extract one of the caller's transcripts into a PROPOSED assessment document — a GATED
+        proposal (#8). The proposed document lives on the extraction, NOT the assessment, so nothing
+        unconfirmed can reach the engine. Extracted evidence grades are capped (E1 default, never
+        above E2 without an artifact). Per-field provenance is persisted."""
+        assessment = self._require_assessment(principal, assessment_id)  # own + exists
+        transcript = self.get_transcript(principal, transcript_id, cipher=cipher)  # own + decrypts
+        result = extractor.extract(transcript.text, subject=assessment.subject)
+        proposed = _cap_extraction_evidence(result.proposed_document)
+        row = ExtractionORM(
+            owner_consultant_id=principal.consultant_id,
+            assessment_id=assessment_id,
+            transcript_id=transcript_id,
+            status=ExtractionStatus.PROPOSED.value,
+            proposed_document_json=proposed.model_dump_json(),
+            gaps_json=json.dumps(list(result.gaps)),
+            extractor_version=extractor.version,
+        )
+        self._session.add(row)
+        self._session.flush()
+        for spec in result.fields:
+            self._session.add(
+                FieldProvenanceORM(
+                    owner_consultant_id=principal.consultant_id,
+                    extraction_id=row.id,
+                    transcript_id=transcript_id,
+                    field_ref=spec.field_ref,
+                    confidence=spec.confidence.value,
+                    span_start=spec.span_start,
+                    span_end=spec.span_end,
+                    accepted=False,
+                )
+            )
+        self._session.flush()
+        return self._to_extraction(row)
+
+    def confirm_extraction(
+        self,
+        principal: Principal,
+        extraction_id: UUID,
+        *,
+        now: datetime,
+        corrected_document: AssessmentDocument | None = None,
+    ) -> Extraction:
+        """Confirm an extraction: apply the (optionally corrected) document to the assessment via
+        the SAME Path A save path (`update_assessment`), so confirmed Path B data is indistinct
+        from manual entry downstream — the byte-identical-scoring guarantee. Marks the extraction
+        CONFIRMED and every field accepted. Refused once confirmed (ConflictError)."""
+        row = self._session.get(ExtractionORM, extraction_id)
+        if row is None:
+            raise NotFoundError(f"Extraction {extraction_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        if row.status != ExtractionStatus.PROPOSED.value:
+            raise ConflictError(f"Extraction {extraction_id} is already confirmed.")
+        document = corrected_document or AssessmentDocument.model_validate_json(
+            row.proposed_document_json
+        )
+        document = _cap_extraction_evidence(document)  # a correction is capped the same way
+        # THE convergence: the confirmed document enters the assessment through the identical Path A
+        # path, so a scoring run over it is byte-identical to the same data typed into the wizard.
+        self.update_assessment(principal, row.assessment_id, document=document)
+        row.status = ExtractionStatus.CONFIRMED.value
+        row.confirmed_at = now
+        self._session.add(row)
+        for prov in self._session.execute(
+            select(FieldProvenanceORM).where(FieldProvenanceORM.extraction_id == extraction_id)
+        ).scalars():
+            prov.accepted = True
+            self._session.add(prov)
+        self._session.flush()
+        return self._to_extraction(row)
+
+    def get_extraction(self, principal: Principal, extraction_id: UUID) -> Extraction:
+        row = self._session.get(ExtractionORM, extraction_id)
+        if row is None:
+            raise NotFoundError(f"Extraction {extraction_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        return self._to_extraction(row)
+
+    def list_field_provenance(
+        self, principal: Principal, extraction_id: UUID
+    ) -> list[FieldProvenance]:
+        """The per-field audit trail for an extraction — the caller's own."""
+        self.get_extraction(principal, extraction_id)  # own + exists (raises on foreign)
+        rows = (
+            self._session.execute(
+                select(FieldProvenanceORM)
+                .where(FieldProvenanceORM.extraction_id == extraction_id)
+                .order_by(FieldProvenanceORM.created_at)
+            )
+            .scalars()
+            .all()
+        )
+        return [self._to_field_provenance(r) for r in rows]
+
+    @staticmethod
+    def _to_extraction(row: ExtractionORM) -> Extraction:
+        return Extraction(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            assessment_id=row.assessment_id,
+            transcript_id=row.transcript_id,
+            status=ExtractionStatus(row.status),
+            proposed_document=AssessmentDocument.model_validate_json(row.proposed_document_json),
+            gaps=tuple(json.loads(row.gaps_json)),
+            extractor_version=row.extractor_version,
+            confirmed_at=row.confirmed_at,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    @staticmethod
+    def _to_field_provenance(row: FieldProvenanceORM) -> FieldProvenance:
+        return FieldProvenance(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            extraction_id=row.extraction_id,
+            transcript_id=row.transcript_id,
+            field_ref=row.field_ref,
+            confidence=ExtractionConfidence(row.confidence),
+            span_start=row.span_start,
+            span_end=row.span_end,
+            accepted=row.accepted,
             created_at=row.created_at,
             updated_at=row.updated_at,
         )
