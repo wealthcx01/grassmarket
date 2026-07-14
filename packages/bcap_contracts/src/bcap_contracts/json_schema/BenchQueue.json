@@ -1,0 +1,96 @@
+{
+  "$defs": {
+    "BenchItemKind": {
+      "description": "What a queue item points the advisor at — the four bench sources in priority order.",
+      "enum": [
+        "certification",
+        "drill",
+        "arena",
+        "research"
+      ],
+      "title": "BenchItemKind",
+      "type": "string"
+    },
+    "BenchQueueItem": {
+      "additionalProperties": false,
+      "description": "One prioritised next action. `ref_id` links to the concrete record (learning module, drill\ncard, arena scenario, prospect) where one applies; a pure-guidance item has none.",
+      "properties": {
+        "action_hint": {
+          "description": "complete / review / practise / research",
+          "minLength": 1,
+          "title": "Action Hint",
+          "type": "string"
+        },
+        "detail": {
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/BenchItemKind"
+        },
+        "priority": {
+          "description": "1 is the single most important next action.",
+          "minimum": 1,
+          "title": "Priority",
+          "type": "integer"
+        },
+        "ref_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ref Id"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "priority",
+        "title",
+        "detail",
+        "action_hint"
+      ],
+      "title": "BenchQueueItem",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The advisor's prioritised bench-time queue — recomputed on read, never stored.",
+  "properties": {
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "items": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/BenchQueueItem"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "owner_consultant_id": {
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "owner_consultant_id",
+    "generated_at"
+  ],
+  "title": "BenchQueue",
+  "type": "object"
+}

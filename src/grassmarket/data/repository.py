@@ -40,6 +40,7 @@ from bcap_contracts.assessments import (
     SubcomponentRating,
 )
 from bcap_contracts.auth import Consultant
+from bcap_contracts.bench import BenchQueue, PerformanceSummary
 from bcap_contracts.calibration import (
     CalibrationRating,
     CalibrationResult,
@@ -125,6 +126,13 @@ from grassmarket.data.models import (
 )
 from grassmarket.pipeline.fees import attribution_content_hash, is_within_attribution_window
 from grassmarket.workbench.arena import ArenaFeedbackDrafter, score_transcript
+from grassmarket.workbench.bench import (
+    assemble_queue,
+    pick_arena_scenario,
+    pick_next_coursework,
+    pick_research_prospect,
+    summarise_performance,
+)
 from grassmarket.workbench.calibration import compute_calibration_result
 from grassmarket.workbench.certification import next_level, promotion_blockers
 from grassmarket.workbench.drills import PASSING_GRADE, DrillState, next_due, review
@@ -2313,6 +2321,98 @@ class Repository:
             scored_at=row.scored_at,
             created_at=row.created_at,
             updated_at=row.updated_at,
+        )
+
+    # ------------------------------------------------- bench queue + performance (GRS-0026, SCOPED)
+    def _own_prospects(self, consultant_id: UUID) -> list[Prospect]:
+        """The consultant's OWN prospects — strictly owner-scoped, no admin-sees-all branch. The
+        bench views are self-only for everyone (ADR-0016), so they must not borrow the admin-aware
+        list_prospects, which would otherwise fold the whole org's pipeline into an admin's view."""
+        rows = (
+            self._session.execute(
+                select(ProspectORM)
+                .where(ProspectORM.owner_consultant_id == consultant_id)
+                .order_by(ProspectORM.created_at)
+            )
+            .scalars()
+            .all()
+        )
+        return [self._to_prospect(r) for r in rows]
+
+    def _own_engagement_statuses(self, consultant_id: UUID) -> list[str]:
+        """The status values of the consultant's OWN engagements — strictly owner-scoped (see
+        _own_prospects for why this does not reuse the admin-aware list_engagements)."""
+        return list(
+            self._session.execute(
+                select(EngagementORM.status).where(
+                    EngagementORM.owner_consultant_id == consultant_id
+                )
+            )
+            .scalars()
+            .all()
+        )
+
+    def list_content_completions(self, principal: Principal) -> list[ContentCompletion]:
+        """The caller's own learning-module completions."""
+        rows = (
+            self._session.execute(
+                select(ContentCompletionORM)
+                .where(ContentCompletionORM.owner_consultant_id == principal.consultant_id)
+                .order_by(ContentCompletionORM.completed_at)
+            )
+            .scalars()
+            .all()
+        )
+        return [self._to_content_completion(r) for r in rows]
+
+    def get_bench_queue(self, principal: Principal, *, now: datetime) -> BenchQueue:
+        """The caller's prioritised bench-time queue — recomputed from their own workbench state
+        (certification, due drills, arena scenarios, early-stage pipeline). Never persisted."""
+        cert_record = self._to_certification_record(
+            self._get_or_create_cert_record(principal.consultant_id)
+        )
+        completed_ids = frozenset(c.module_id for c in self.list_content_completions(principal))
+        next_coursework = pick_next_coursework(self.list_learning_modules(principal), completed_ids)
+        due_drills = self.list_due_drill_cards(principal, now=now)
+        arena_scenario = pick_arena_scenario(
+            self.list_arena_scenarios(principal), self.list_arena_sessions(principal)
+        )
+        research_prospect = pick_research_prospect(self._own_prospects(principal.consultant_id))
+
+        items = assemble_queue(
+            cert_record=cert_record,
+            next_coursework=next_coursework,
+            due_drills=due_drills,
+            arena_scenario=arena_scenario,
+            research_prospect=research_prospect,
+        )
+        return BenchQueue(
+            owner_consultant_id=principal.consultant_id, generated_at=now, items=items
+        )
+
+    def get_performance_summary(
+        self, principal: Principal, advisor_id: UUID, *, now: datetime
+    ) -> PerformanceSummary:
+        """An advisor's own development picture. Self only — the cross-advisor/admin aggregate is
+        Holy Corner scope (not this ticket), so a foreign id is a 404 (not shown to exist), even
+        for an admin."""
+        if advisor_id != principal.consultant_id:
+            raise NotFoundError(f"Performance summary {advisor_id} not found.")
+        cert_record = self._to_certification_record(
+            self._get_or_create_cert_record(principal.consultant_id)
+        )
+        engagement_statuses = self._own_engagement_statuses(principal.consultant_id)
+        prospects = self._own_prospects(principal.consultant_id)
+        drill_cards = self.list_drill_cards(principal)
+        due_drills = self.list_due_drill_cards(principal, now=now)
+        return summarise_performance(
+            owner_consultant_id=principal.consultant_id,
+            cert_record=cert_record,
+            engagement_statuses=engagement_statuses,
+            prospect_stages=[p.stage for p in prospects],
+            due_drill_count=len(due_drills),
+            drill_streaks=[c.streak for c in drill_cards],
+            arena_sessions=self.list_arena_sessions(principal),
         )
 
     # ------------------------------------------------------------------ mappers

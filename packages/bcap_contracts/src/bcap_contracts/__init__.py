@@ -32,6 +32,13 @@ from bcap_contracts.auth import (
     LoginRequest,
     TokenResponse,
 )
+from bcap_contracts.bench import (
+    ArenaTrendPoint,
+    BenchItemKind,
+    BenchQueue,
+    BenchQueueItem,
+    PerformanceSummary,
+)
 from bcap_contracts.calibration import (
     AnchorAgreement,
     CalibrationRating,
@@ -189,6 +196,11 @@ __all__ = [
     "ArenaSpeaker",
     "ArenaStatus",
     "PowerProbeResult",
+    "BenchQueue",
+    "BenchQueueItem",
+    "BenchItemKind",
+    "PerformanceSummary",
+    "ArenaTrendPoint",
     # auth
     "JWTClaims",
     "Consultant",

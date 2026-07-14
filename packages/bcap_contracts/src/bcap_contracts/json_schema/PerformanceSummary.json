@@ -1,0 +1,132 @@
+{
+  "$defs": {
+    "ArenaTrendPoint": {
+      "additionalProperties": false,
+      "description": "One scored practice-arena session on the advisor's completeness trend line.",
+      "properties": {
+        "completeness": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Completeness",
+          "type": "number"
+        },
+        "scored_at": {
+          "format": "date-time",
+          "title": "Scored At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scored_at",
+        "completeness"
+      ],
+      "title": "ArenaTrendPoint",
+      "type": "object"
+    },
+    "AssessorLevel": {
+      "description": "Certification ladder (Methodology §9). High-stakes ratings require CERTIFIED_LEAD.",
+      "enum": [
+        "trained",
+        "shadow",
+        "observed_lead",
+        "certified_lead"
+      ],
+      "title": "AssessorLevel",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "An advisor's own development picture — self-scoped (no cross-advisor comparison here).",
+  "properties": {
+    "arena_best_completeness": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Arena Best Completeness"
+    },
+    "arena_sessions_scored": {
+      "minimum": 0,
+      "title": "Arena Sessions Scored",
+      "type": "integer"
+    },
+    "arena_trend": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ArenaTrendPoint"
+      },
+      "title": "Arena Trend",
+      "type": "array"
+    },
+    "coursework_complete": {
+      "title": "Coursework Complete",
+      "type": "boolean"
+    },
+    "drill_best_streak": {
+      "minimum": 0,
+      "title": "Drill Best Streak",
+      "type": "integer"
+    },
+    "drills_due": {
+      "minimum": 0,
+      "title": "Drills Due",
+      "type": "integer"
+    },
+    "engagements_active": {
+      "minimum": 0,
+      "title": "Engagements Active",
+      "type": "integer"
+    },
+    "engagements_completed": {
+      "minimum": 0,
+      "title": "Engagements Completed",
+      "type": "integer"
+    },
+    "exam_passed": {
+      "title": "Exam Passed",
+      "type": "boolean"
+    },
+    "level": {
+      "$ref": "#/$defs/AssessorLevel"
+    },
+    "owner_consultant_id": {
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "pipeline_conversion_rate": {
+      "description": "Share of the advisor's prospects that reached contracted-or-beyond (0 if none)",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Pipeline Conversion Rate",
+      "type": "number"
+    },
+    "prospects_total": {
+      "minimum": 0,
+      "title": "Prospects Total",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "owner_consultant_id",
+    "level",
+    "engagements_active",
+    "engagements_completed",
+    "prospects_total",
+    "pipeline_conversion_rate",
+    "coursework_complete",
+    "exam_passed",
+    "drills_due",
+    "drill_best_streak",
+    "arena_sessions_scored"
+  ],
+  "title": "PerformanceSummary",
+  "type": "object"
+}
