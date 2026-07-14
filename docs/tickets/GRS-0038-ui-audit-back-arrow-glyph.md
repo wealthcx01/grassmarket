@@ -1,7 +1,7 @@
 # GRS-0038 — UI audit: back-arrow "←" renders as tofu (VERIFY before fixing)
 
 - **Loop:** UI retro-audit (grs-ui-retro-audit)
-- **Status:** Triage — needs verification. May be a local-environment artifact, not a product bug.
+- **Status:** RESOLVED — verified as a local-environment artifact, not a product bug. No code change. See "Resolution" below.
 - **Severity:** Low.
 - **Found by:** Visual audit on the dev VPS's freshly-repaired browser. Repro screenshot:
   `assets/ui-audit-prospect-detail.desktop.png` (top-left "▯ Pipeline").
@@ -28,3 +28,18 @@ Unicode arrow with an inline SVG / icon that doesn't depend on font coverage.
 
 - Confirmed reproduction (or not) in the CI gallery + a real browser.
 - If real: back-affordances no longer depend on a font glyph that can be missing.
+
+## Resolution (2026-07-14) — environment artifact, closed with no code change
+
+Verified directly. The tofu is caused **solely** by the dev VPS's minimal, hand-installed font set
+(it had no font covering U+2190). Proof: installed a normal font that covers the Arrows block
+(`fonts-dejavu-core`, extracted to `~/.local/share/fonts`) and re-rendered the same page in the same
+local browser — the back-link then renders **"← Pipeline"** correctly (evidence:
+`assets/ui-audit-back-arrow-with-font.png`), versus **"▯ Pipeline"** before
+(`assets/ui-audit-prospect-detail.desktop.png`).
+
+Conclusion: real users (whose browsers have standard fonts) and CI (which runs
+`npx playwright install --with-deps`, installing the full font set) render `←` correctly. This is
+not a product defect. **No code change** — closing per this ticket's own "verify first" directive.
+(A defensive inline-SVG for back-affordances remains possible if we ever want belt-and-braces
+independence from font coverage, but it is not warranted for a non-bug.)
