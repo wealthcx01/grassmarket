@@ -10,6 +10,7 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
+from bcap_contracts.audit import AuditEventType
 from bcap_contracts.auth import Consultant
 from bcap_contracts.common import ConsultantTier, Role
 
@@ -108,6 +109,13 @@ class AuthService:
             raise InvalidCredentialsError("Account is inactive.")
         if not verify_password(password, stored.hashed_password):
             raise InvalidCredentialsError("Invalid email or password.")
+        self._repo.record_audit(
+            actor_consultant_id=stored.id,
+            event_type=AuditEventType.AUTH_LOGIN,
+            resource_type="consultant",
+            resource_id=stored.id,
+            now=datetime.now(UTC),
+        )
         return create_access_token(
             self._settings,
             consultant_id=stored.id,

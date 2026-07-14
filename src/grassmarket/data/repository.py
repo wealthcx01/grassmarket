@@ -39,6 +39,7 @@ from bcap_contracts.assessments import (
     ScoringRun,
     SubcomponentRating,
 )
+from bcap_contracts.audit import AuditEvent, AuditEventType, PersonalDataExport
 from bcap_contracts.auth import Consultant
 from bcap_contracts.bench import BenchQueue, PerformanceSummary
 from bcap_contracts.calibration import (
@@ -121,16 +122,18 @@ from bcap_contracts.predictions import (
     Prediction,
     PredictionOutcome,
 )
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from grassmarket.atlas import AssessmentInputs, AtlasResult
+from grassmarket.data.database import Base
 from grassmarket.data.models import (
     AINarrativeORM,
     ArenaScenarioORM,
     ArenaSessionORM,
     AssessmentORM,
+    AuditEventORM,
     BenchmarkRowORM,
     CalibrationRatingORM,
     CalibrationSessionORM,
@@ -220,6 +223,42 @@ _HIGH_EVIDENCE = (EvidenceGrade.E3_ARTIFACT, EvidenceGrade.E4_OBSERVED)
 def _cap_grade(grade: EvidenceGrade | None) -> EvidenceGrade | None:
     """Knock an artifact-level grade down to E1 (used where no artifact link can exist)."""
     return EvidenceGrade.E1_SELF_REPORTED if grade in _HIGH_EVIDENCE else grade
+
+
+# A sentinel actor id for system-originated audit events (no human actor).
+_SYSTEM_ACTOR = UUID(int=0)
+
+
+def _owned_orm_classes() -> list[type]:
+    """Every mapped ORM that carries `owner_consultant_id` — found by reflection so GDPR export and
+    deletion cover ALL owned tables, present and future, with no hand-maintained list to drift."""
+    classes: list[type] = []
+    for mapper in Base.registry.mappers:
+        cls = mapper.class_
+        if "owner_consultant_id" in cls.__table__.columns:
+            classes.append(cls)
+    return classes
+
+
+def _json_safe(value: object) -> object:
+    """Make an ORM column value JSON-serialisable for a GDPR export. Raw ciphertext is not exported
+    as bytes — the encrypted transcript is marked, not dumped."""
+    if isinstance(value, bytes):
+        return "[encrypted]"
+    if isinstance(value, UUID):
+        return str(value)
+    if isinstance(value, datetime | date):
+        return value.isoformat()
+    return value
+
+
+def _row_to_dict(row: object, redact: frozenset[str] = frozenset()) -> dict:
+    """A JSON-safe dict of an ORM row's columns, named columns redacted (e.g. password hash)."""
+    columns = row.__table__.columns  # type: ignore[attr-defined]
+    return {
+        col.name: "[redacted]" if col.name in redact else _json_safe(getattr(row, col.name))
+        for col in columns
+    }
 
 
 def _cap_extraction_evidence(document: AssessmentDocument) -> AssessmentDocument:
@@ -736,7 +775,7 @@ class Repository:
         config = load_commission_config()
         tier = ConsultantTier(advisor.tier)
         amount = compute_engagement_commission(base_value, tier, attribution, config)
-        return self._new_commission_line(
+        line = self._new_commission_line(
             owner_consultant_id=advisor_id,
             engagement_id=engagement_id,
             kind=CommissionKind.ENGAGEMENT,
@@ -748,6 +787,14 @@ class Repository:
             base_value=base_value,
             source_attribution_id=None,
         )
+        self.record_audit(
+            actor_consultant_id=principal.consultant_id,
+            event_type=AuditEventType.COMMISSION_RECORDED,
+            resource_type="commission_line",
+            resource_id=line.id,
+            now=datetime.now(UTC),
+        )
+        return line
 
     def claim_recovery_fee(
         self, principal: Principal, *, attribution_id: UUID, earned_on: date
@@ -1330,6 +1377,185 @@ class Repository:
             ingested_at=row.ingested_at,
         )
 
+    # ---------------------------------------------- audit log + GDPR compliance (GRS-0032)
+    def record_audit(
+        self,
+        *,
+        actor_consultant_id: UUID | None,
+        event_type: AuditEventType,
+        now: datetime,
+        resource_type: str | None = None,
+        resource_id: UUID | None = None,
+        detail: str | None = None,
+    ) -> None:
+        """Write one APPEND-ONLY audit event. Never updated or deleted. `detail` must carry no
+        secret (no tokens, no passwords, no plaintext transcript)."""
+        self._session.add(
+            AuditEventORM(
+                actor_consultant_id=actor_consultant_id,
+                event_type=event_type.value,
+                resource_type=resource_type,
+                resource_id=resource_id,
+                detail=detail,
+                at=now,
+            )
+        )
+        self._session.flush()
+
+    def list_audit_events(self, principal: Principal) -> list[AuditEvent]:
+        """The audit log — ADMIN only (compliance). Newest last."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may read the audit log.")
+        rows = (
+            self._session.execute(select(AuditEventORM).order_by(AuditEventORM.at)).scalars().all()
+        )
+        return [
+            AuditEvent(
+                id=r.id,
+                owner_consultant_id=r.actor_consultant_id or _SYSTEM_ACTOR,
+                event_type=AuditEventType(r.event_type),
+                resource_type=r.resource_type,
+                resource_id=r.resource_id,
+                detail=r.detail,
+                at=r.at,
+                created_at=r.created_at,
+                updated_at=r.updated_at,
+            )
+            for r in rows
+        ]
+
+    def _require_self_or_admin(self, principal: Principal, subject_id: UUID) -> None:
+        if not (principal.is_admin or subject_id == principal.consultant_id):
+            raise ScopeViolationError("You may export or delete only your own personal data.")
+
+    def export_personal_data(
+        self, principal: Principal, subject_id: UUID, *, now: datetime
+    ) -> PersonalDataExport:
+        """The GDPR subject-access bundle — every record the platform holds about `subject_id`, self
+        or admin. Reflection over the ORM registry means EVERY owned table is covered (present and
+        future) — no manual list to drift. The password hash and raw ciphertext are redacted."""
+        self._require_self_or_admin(principal, subject_id)
+        records: dict[str, list[dict]] = {}
+        consultant = self._require_consultant(subject_id)
+        records["consultant"] = [_row_to_dict(consultant, redact=frozenset({"hashed_password"}))]
+        for orm in _owned_orm_classes():
+            rows = (
+                self._session.execute(select(orm).where(orm.owner_consultant_id == subject_id))
+                .scalars()
+                .all()
+            )
+            records[orm.__tablename__] = [_row_to_dict(r) for r in rows]
+        # Invitations are not owner-scoped but carry the subject's PII (their inbound invite holds
+        # their email; outbound invites carry their id) — include them so the SAR is complete.
+        invitations = (
+            self._session.execute(
+                select(InvitationORM).where(
+                    (InvitationORM.email == consultant.email)
+                    | (InvitationORM.invited_by_consultant_id == subject_id)
+                )
+            )
+            .scalars()
+            .all()
+        )
+        records["invitations"] = [
+            _row_to_dict(r, redact=frozenset({"token_hash"})) for r in invitations
+        ]
+        self.record_audit(
+            actor_consultant_id=principal.consultant_id,
+            event_type=AuditEventType.GDPR_EXPORT,
+            resource_type="consultant",
+            resource_id=subject_id,
+            now=now,
+        )
+        return PersonalDataExport(
+            subject_consultant_id=subject_id, generated_at=now, records=records
+        )
+
+    def delete_personal_data(
+        self, principal: Principal, subject_id: UUID, *, now: datetime
+    ) -> dict[str, int]:
+        """GDPR erasure — self or admin. Deletes every owned row EXCEPT scoring runs, and anonymises
+        the consultant (PII stripped, id kept). Scoring runs are immutable (#6): NOT deleted but
+        become de-identified — their now-anonymised owner id is an opaque key with no PII. The
+        audit log survives (compliance). Deletion runs children-before-parents (FK-safe)."""
+        self._require_self_or_admin(principal, subject_id)
+        counts: dict[str, int] = {}
+
+        # CROSS-OWNER FK children first. Some tables are owned by ANOTHER consultant yet
+        # FK-reference a row the SUBJECT owns: a rater's module draft on the subject's assessment,
+        # or an advisor's arena session on the subject's authored scenario. The owner-scoped loop
+        # below never touches them, so deleting the subject's parent row would orphan the FK and (on
+        # Postgres) abort the whole erasure. Delete them by their PARENT's ownership up front.
+        subject_assessments = select(AssessmentORM.id).where(
+            AssessmentORM.owner_consultant_id == subject_id
+        )
+        counts["module_rating_drafts"] = (
+            getattr(
+                self._session.execute(
+                    delete(ModuleRatingDraftORM).where(
+                        ModuleRatingDraftORM.assessment_id.in_(subject_assessments)
+                    )
+                ),
+                "rowcount",
+                0,
+            )
+            or 0
+        )
+        subject_scenarios = select(ArenaScenarioORM.id).where(
+            ArenaScenarioORM.owner_consultant_id == subject_id
+        )
+        counts["arena_sessions"] = (
+            getattr(
+                self._session.execute(
+                    delete(ArenaSessionORM).where(
+                        ArenaSessionORM.scenario_id.in_(subject_scenarios)
+                    )
+                ),
+                "rowcount",
+                0,
+            )
+            or 0
+        )
+
+        owned = {orm.__table__: orm for orm in _owned_orm_classes()}
+        # metadata.sorted_tables is parent→child; reversed is child→parent, the safe delete order.
+        for table in reversed(Base.metadata.sorted_tables):
+            orm = owned.get(table)
+            if orm is None or table.name == "scoring_runs":  # runs are anonymised, not deleted
+                continue
+            result = self._session.execute(delete(orm).where(orm.owner_consultant_id == subject_id))
+            # Accumulate — module_rating_drafts / arena_sessions partly deleted cross-owner above.
+            counts[table.name] = counts.get(table.name, 0) + (getattr(result, "rowcount", 0) or 0)
+
+        consultant = self._require_consultant(subject_id)
+        # Invitations are NOT owner-scoped but carry the subject's PII: the invite that created them
+        # holds their email, and invites they sent carry their id. Scrub both (email captured BEFORE
+        # the consultant row is anonymised below).
+        inv_result = self._session.execute(
+            delete(InvitationORM).where(
+                (InvitationORM.email == consultant.email)
+                | (InvitationORM.invited_by_consultant_id == subject_id)
+            )
+        )
+        counts["invitations"] = getattr(inv_result, "rowcount", 0) or 0
+
+        consultant.email = f"deleted-{subject_id}@anonymised.invalid"
+        consultant.full_name = "[deleted]"
+        consultant.hashed_password = "!"  # unusable — no login
+        consultant.is_active = False
+        self._session.add(consultant)
+
+        self.record_audit(
+            actor_consultant_id=principal.consultant_id,
+            event_type=AuditEventType.GDPR_DELETION,
+            resource_type="consultant",
+            resource_id=subject_id,
+            detail="Owned data erased; consultant anonymised; scoring runs de-identified.",
+            now=now,
+        )
+        self._session.flush()
+        return counts
+
     # ------------------------------------------------------------------ engagements (SCOPED)
     def create_engagement(
         self,
@@ -1460,6 +1686,14 @@ class Repository:
         )
         self._session.add(row)
         self._session.flush()
+        self.record_audit(
+            actor_consultant_id=principal.consultant_id,
+            event_type=AuditEventType.DELIVERABLE_GENERATED,
+            resource_type="deliverable",
+            resource_id=row.id,
+            detail=deliverable_type.value,
+            now=datetime.now(UTC),
+        )
         return self._to_deliverable(row)
 
     def get_deliverable(self, principal: Principal, deliverable_id: UUID) -> Deliverable:
@@ -1778,6 +2012,13 @@ class Repository:
         row.coefficient_version = coefficient_version
         row.uncertainty_version = uncertainty_version
         self._session.add(row)
+        self.record_audit(
+            actor_consultant_id=principal.consultant_id,
+            event_type=AuditEventType.ASSESSMENT_FINALISED,
+            resource_type="assessment",
+            resource_id=assessment_id,
+            now=finalised_at,
+        )
         self._session.flush()
         return self._to_assessment(row)
 
@@ -2186,6 +2427,14 @@ class Repository:
                 f"A committee decision on {item_type.value} {item_key!r} was recorded "
                 f"concurrently; re-read the queue and try again."
             ) from exc
+        self.record_audit(
+            actor_consultant_id=principal.consultant_id,
+            event_type=AuditEventType.COMMITTEE_DECISION,
+            resource_type="assessment",
+            resource_id=assessment_id,
+            detail=f"{item_type.value}:{status.value}",
+            now=datetime.now(UTC),
+        )
         return self._to_committee_decision(row)
 
     @staticmethod
@@ -2588,6 +2837,14 @@ class Repository:
             occurred_at,
             detail=detail,
             reason=reason,
+        )
+        self.record_audit(
+            actor_consultant_id=principal.consultant_id,
+            event_type=AuditEventType.CERTIFICATION_OVERRIDE,
+            resource_type="consultant",
+            resource_id=advisor_id,
+            detail=reason[:200],
+            now=occurred_at,
         )
         self._session.flush()
 

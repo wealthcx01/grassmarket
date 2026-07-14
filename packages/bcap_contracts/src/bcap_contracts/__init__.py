@@ -24,6 +24,7 @@ from bcap_contracts.assessments import (
     SubcomponentRating,
     TriadResult,
 )
+from bcap_contracts.audit import AuditEvent, AuditEventType, PersonalDataExport
 from bcap_contracts.auth import (
     AcceptInvitationRequest,
     Consultant,
@@ -243,4 +244,7 @@ __all__ = [
     "LoginRequest",
     "TokenResponse",
     "AcceptInvitationRequest",
+    "AuditEvent",
+    "AuditEventType",
+    "PersonalDataExport",
 ]
