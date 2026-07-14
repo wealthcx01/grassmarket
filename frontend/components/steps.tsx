@@ -43,22 +43,22 @@ export interface StepProps {
   finalising: boolean;
 }
 
+// Controls inherit the global form styling (border, radius, focus ring, select chevron);
+// we only nudge the size down for the dense wizard.
 const selectStyle: React.CSSProperties = {
-  padding: "0.35rem 0.4rem",
-  border: "1px solid var(--color-border)",
-  borderRadius: "var(--radius)",
-  background: "var(--color-paper-raised)",
-  fontFamily: "inherit",
   fontSize: "0.85rem",
 };
+// A compact secondary button for inline wizard controls (Guidance, scenario add/remove).
+const smallBtn = "btn btn-secondary";
+const smallBtnStyle: React.CSSProperties = { padding: "0.4rem 0.7rem", fontSize: "0.82rem" };
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
         border: "1px solid var(--color-border)",
-        borderRadius: "var(--radius)",
-        padding: "0.75rem 0.9rem",
+        borderRadius: "var(--radius-lg)",
+        padding: "0.85rem 1rem",
         background: "var(--color-paper-raised)",
       }}
     >
@@ -360,7 +360,7 @@ export function InfrastructureDeepDiveStep({ registry, document: d, update, read
                           onChange={(g) => update((x) => doc.setSub(x, s.key, doc.subAssessed(m.key, s.key, r.level as MaturityLevel, g ?? "E1")))}
                         />
                       ) : null}
-                      <button type="button" onClick={() => setOpenGuidance(openGuidance === s.key ? null : s.key)} style={{ ...selectStyle, cursor: "pointer" }}>
+                      <button type="button" className={smallBtn} style={smallBtnStyle} onClick={() => setOpenGuidance(openGuidance === s.key ? null : s.key)}>
                         {openGuidance === s.key ? "Hide guidance" : "Guidance"}
                       </button>
                     </div>
@@ -479,7 +479,7 @@ export function ScenariosStep({ registry, document: d, assessmentId }: StepProps
                 </option>
               ))}
             </select>
-            <button type="button" onClick={() => setRows((xs) => xs.filter((_, j) => j !== i))} style={{ ...selectStyle, cursor: "pointer" }}>
+            <button type="button" className={smallBtn} style={smallBtnStyle} onClick={() => setRows((xs) => xs.filter((_, j) => j !== i))}>
               Remove
             </button>
           </div>
@@ -488,12 +488,13 @@ export function ScenariosStep({ registry, document: d, assessmentId }: StepProps
       <div style={{ display: "flex", gap: "0.5rem" }}>
         <button
           type="button"
+          className={smallBtn}
+          style={smallBtnStyle}
           onClick={() => setRows((xs) => [...xs, { key: allSubs[0]!.key, level: "Advanced" }])}
-          style={{ ...selectStyle, cursor: "pointer" }}
         >
           + Add scenario
         </button>
-        <button type="button" onClick={run} disabled={busy || rows.length === 0} style={{ ...selectStyle, cursor: "pointer" }}>
+        <button type="button" className="btn btn-primary" style={smallBtnStyle} onClick={run} disabled={busy || rows.length === 0}>
           {busy ? "Evaluating…" : "Rank by ΔV"}
         </button>
       </div>
