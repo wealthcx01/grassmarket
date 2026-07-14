@@ -14,6 +14,7 @@ from bcap_contracts.common import EvidenceGrade, MaturityLevel, NonScoreState, S
 from bcap_contracts.registry import Registry, load_registry
 
 from grassmarket.atlas import AssessmentInputs, MetricObservation, PowerObservation, score
+from grassmarket.atlas import engine as _engine
 from grassmarket.atlas.draft_coefficients import draft_v1_coefficient_set
 
 _L = MaturityLevel
@@ -180,6 +181,26 @@ def test_na_subcomponent_renormalises_not_zero_fills(registry: Registry, coeffs)
     assert m.n_not_applicable == 1
     assert m.n_applicable == len(keys) - 1
     assert m.coverage == 1.0  # every APPLICABLE subcomponent is assessed
+
+
+def test_b_refuses_when_no_metric_assessed(registry: Registry, coeffs) -> None:
+    """GRS-0047 (F3): with every business metric Not Assessed, B is undefined — the engine refuses
+    loudly and diagnosably (not a bare ZeroDivisionError), matching the L path."""
+    all_na = {m.key: NonScoreState.NOT_ASSESSED for m in registry.metrics}
+    with pytest.raises(ValueError, match="Cannot compute B: no business metric is assessed"):
+        score(build_inputs(registry, metrics=all_na), coeffs, registry)
+
+
+def test_triad_source_literals_must_be_in_registry(registry: Registry, monkeypatch) -> None:
+    """GRS-0047 (F2): the triad's hardcoded source keys are validated against the registry at score
+    time — a rename that leaves them dangling refuses to score, never silently skews the ordinal."""
+    monkeypatch.setattr(_engine, "_PERCEIVED_POWERS", ("BRANDING", "NOT_A_REAL_POWER"))
+    with pytest.raises(ValueError, match="not in the registry"):
+        _engine._assert_triad_sources_registered(registry)
+    monkeypatch.setattr(_engine, "_PERCEIVED_POWERS", ("BRANDING", "SWITCHING_COSTS"))
+    monkeypatch.setattr(_engine, "_ECONOMIC_GROUPS", ("scale", "not_a_group"))
+    with pytest.raises(ValueError, match="not in the registry"):
+        _engine._assert_triad_sources_registered(registry)
 
 
 def test_na_metric_renormalises_its_group(registry: Registry, coeffs) -> None:
