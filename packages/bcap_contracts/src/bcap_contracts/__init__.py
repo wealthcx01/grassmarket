@@ -101,6 +101,7 @@ from bcap_contracts.learning import (
     QuizQuestion,
     QuizStatus,
 )
+from bcap_contracts.meetings import MediaKind, MeetingTranscript
 from bcap_contracts.money import Currency, Money
 from bcap_contracts.provenance import WeightProvenanceRecord
 from bcap_contracts.registry import (
@@ -175,6 +176,8 @@ __all__ = [
     "SourcingAttribution",
     "PaymentStatus",
     "load_commission_config",
+    "MeetingTranscript",
+    "MediaKind",
     "CommitteeItem",
     "CommitteeItemType",
     "CommitteeDecision",

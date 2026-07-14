@@ -2,7 +2,11 @@
 
 - **Loop:** 6
 - **Branch:** `grs-0029-pathb-ingestion-transcription`
-- **Status:** Planned
+- **Status:** In review
+- **Transcriber choice (recorded per scope #2):** production default is **local Whisper**
+  (`whisper-local-v1`), selected by config and wired at the composition root (not imported in the
+  package, so CI pulls no model). CI + the swap-proof contract test use a deterministic offline
+  `EchoTranscriber`; a second fake (`ReversingTranscriber`) proves the provider swap. See ADR-0018.
 - **Normative source:** PRD §3.3 (Path B); Viewforth-inherited data-protection standards.
 - **Depends on:** GRS-0009 (assessment lifecycle).
 

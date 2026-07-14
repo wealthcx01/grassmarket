@@ -52,6 +52,7 @@ from bcap_contracts.learning import (
     GeneratedQuiz,
     LearningModule,
 )
+from bcap_contracts.meetings import MeetingTranscript
 from bcap_contracts.money import Money
 from bcap_contracts.narratives import AINarrative
 from bcap_contracts.pipeline import PipelineBoard, PipelineForecast
@@ -88,6 +89,7 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "AINarrative": AINarrative,
     "CommissionLine": CommissionLine,
     "EarningsSummary": EarningsSummary,
+    "MeetingTranscript": MeetingTranscript,
     "CommitteeItem": CommitteeItem,
     "CommitteeDecision": CommitteeDecision,
     "CommitteeQueueEntry": CommitteeQueueEntry,

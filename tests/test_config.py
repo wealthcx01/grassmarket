@@ -7,6 +7,7 @@ the secret-scan hook so, since its high-signal Postgres pattern scans test files
 from __future__ import annotations
 
 import pytest
+from cryptography.fernet import Fernet
 
 from grassmarket.config import Settings
 
@@ -50,6 +51,17 @@ def test_production_accepts_postgres_and_strong_secret() -> None:
         env="production",
         jwt_secret=_SECRET,
         database_url="postgresql://u:p@h/d",  # pragma: allowlist secret
+        transcript_encryption_key=Fernet.generate_key().decode(),  # not the dev placeholder
     )
     assert settings.is_production
     assert settings.database_url.startswith("postgresql+psycopg://")
+
+
+def test_production_refuses_the_placeholder_transcript_key() -> None:
+    with pytest.raises(ValueError, match="placeholder transcript key"):
+        Settings(
+            env="production",
+            jwt_secret=_SECRET,
+            database_url="postgresql://u:p@h/d",  # pragma: allowlist secret
+            # transcript_encryption_key left at the dev placeholder default
+        )
