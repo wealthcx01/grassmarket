@@ -300,6 +300,40 @@ export interface RecoveryFeeAttribution {
   updated_at: string;
 }
 
+// --- Earnings / commissions (GRS-0028 backend `CommissionLine` / `EarningsSummary` contracts) ---
+export type CommissionKind = "engagement" | "workshop_recovery_fee" | "retainer";
+export type SourcingAttribution = "self_sourced" | "bruntsfield_sourced" | "co_sourced";
+export type PaymentStatus = "pending" | "invoiced" | "paid";
+
+export interface CommissionLine {
+  id: string;
+  owner_consultant_id: string;
+  engagement_id?: string | null;
+  kind: CommissionKind;
+  amount: Money;
+  payment_status: PaymentStatus;
+  earned_on?: string | null;
+  tier?: ConsultantTier | null;
+  attribution?: SourcingAttribution | null;
+  rate_ref?: string | null;
+  base_value?: Money | null;
+  source_attribution_id?: string | null;
+  content_hash: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EarningsSummary {
+  owner_consultant_id: string;
+  currency: Currency;
+  ytd_earned: Money;
+  pending: Money;
+  invoiced: Money;
+  paid: Money;
+  projected_unpaid: Money;
+  line_count: number;
+}
+
 export type EngagementStatus = "scoped" | "contracted" | "active" | "delivered" | "closed";
 export type DeliverableStatus = "not_started" | "in_progress" | "drafted" | "delivered";
 export type CommsChannel = "note" | "email" | "call" | "meeting";

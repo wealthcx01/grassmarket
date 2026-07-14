@@ -1,10 +1,8 @@
 import Link from "next/link";
 import { HealthWidget } from "./health-widget";
 
-// PRD §1 / §4–7 — the advisor's main sections. `href: null` = built on the backend but
-// no dedicated page yet, so the tile renders as a non-clickable "coming soon" card rather
-// than a dead link.
-const SECTIONS: ReadonlyArray<{ title: string; href: string | null; blurb: string }> = [
+// PRD §1 / §4–7 — the advisor's main sections. Every section now has a live page.
+const SECTIONS: ReadonlyArray<{ title: string; href: string; blurb: string }> = [
   {
     title: "Pipeline",
     href: "/pipeline",
@@ -27,7 +25,7 @@ const SECTIONS: ReadonlyArray<{ title: string; href: string | null; blurb: strin
   },
   {
     title: "My Earnings",
-    href: null,
+    href: "/earnings",
     blurb: "Commission breakdown, recovery fees, YTD and projections.",
   },
 ];
@@ -81,45 +79,30 @@ export default function DashboardPage() {
             gridTemplateColumns: "repeat(auto-fill, minmax(16rem, 1fr))",
           }}
         >
-          {SECTIONS.map((s) => {
-            const cardStyle = {
-              display: "block",
-              height: "100%",
-              padding: "1.1rem 1.2rem",
-              background: "var(--color-paper-raised)",
-              border: "1px solid var(--color-border)",
-              borderRadius: "var(--radius)",
-              textDecoration: "none",
-              color: "inherit",
-            } as const;
-            const inner = (
-              <>
-                <div
+          {SECTIONS.map((s) => (
+            <li key={s.title}>
+              <Link
+                href={s.href}
+                style={{
+                  display: "block",
+                  height: "100%",
+                  padding: "1.1rem 1.2rem",
+                  background: "var(--color-paper-raised)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "var(--radius)",
+                  textDecoration: "none",
+                  color: "inherit",
+                }}
+              >
+                <span
                   style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "baseline",
-                    gap: "0.5rem",
+                    fontFamily: "var(--font-serif)",
+                    fontWeight: 600,
+                    fontSize: "1.1rem",
                   }}
                 >
-                  <span
-                    style={{
-                      fontFamily: "var(--font-serif)",
-                      fontWeight: 600,
-                      fontSize: "1.1rem",
-                    }}
-                  >
-                    {s.title}
-                  </span>
-                  {s.href === null && (
-                    <span
-                      className="mono"
-                      style={{ fontSize: "0.62rem", color: "var(--color-ink-muted)" }}
-                    >
-                      Coming soon
-                    </span>
-                  )}
-                </div>
+                  {s.title}
+                </span>
                 <p
                   style={{
                     margin: "0.4rem 0 0",
@@ -129,20 +112,9 @@ export default function DashboardPage() {
                 >
                   {s.blurb}
                 </p>
-              </>
-            );
-            return (
-              <li key={s.title}>
-                {s.href === null ? (
-                  <div style={{ ...cardStyle, opacity: 0.55, cursor: "default" }}>{inner}</div>
-                ) : (
-                  <Link href={s.href} style={cardStyle}>
-                    {inner}
-                  </Link>
-                )}
-              </li>
-            );
-          })}
+              </Link>
+            </li>
+          ))}
         </ul>
       </section>
 
