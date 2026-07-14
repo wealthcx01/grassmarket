@@ -42,6 +42,10 @@ class CommsEntryRequest(BaseModel):
     body: str = Field(min_length=1)
 
 
+class LinkAssessmentRequest(BaseModel):
+    assessment_id: UUID
+
+
 @router.post("", response_model=Engagement, status_code=status.HTTP_201_CREATED)
 def create_engagement(
     payload: CreateEngagementRequest,
@@ -82,6 +86,23 @@ def get_engagement(
         return repo.get_engagement(principal, engagement_id)
     except (NotFoundError, ScopeViolationError) as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=_NOT_FOUND) from exc
+
+
+@router.post("/{engagement_id}/assessments", response_model=Engagement)
+def link_assessment(
+    engagement_id: UUID,
+    payload: LinkAssessmentRequest,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> Engagement:
+    """Link a finalised assessment to an existing engagement (closes the contract → assessment →
+    deliverable loop). Cross-owner/missing → 404; unfinalised or already-linked → 409."""
+    try:
+        return repo.link_assessment_to_engagement(principal, engagement_id, payload.assessment_id)
+    except (NotFoundError, ScopeViolationError) as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found.") from exc
+    except EngagementLinkError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
 
 
 @router.post(

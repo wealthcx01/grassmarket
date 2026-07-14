@@ -1637,6 +1637,33 @@ class Repository:
         self._session.flush()
         return self._to_comms_entry(row)
 
+    def link_assessment_to_engagement(
+        self, principal: Principal, engagement_id: UUID, assessment_id: UUID
+    ) -> Engagement:
+        """Link a finalised assessment to one of the principal's OWN engagements (GRS-0039).
+
+        Engagements can be opened before any assessment exists, so this closes the loop:
+        contract -> open engagement -> run + finalise an assessment -> link it here -> generate
+        deliverables. Same guards as engagement-open: a cross-owner (or missing)
+        engagement/assessment is not-found (no existence leak); an unfinalised assessment or one
+        already linked is an
+        `EngagementLinkError` (409). The owner is the principal, never caller-supplied."""
+        row = self._require_engagement(principal, engagement_id)  # scoped ORM row
+        assessment = self.get_assessment(principal, assessment_id)  # scoped: cross-owner refused
+        if assessment.state != AssessmentState.FINALISED:
+            raise EngagementLinkError(
+                f"Assessment {assessment_id} is not finalised; only finalised assessments link."
+            )
+        linked = json.loads(row.assessment_ids_json)
+        if str(assessment_id) in linked:
+            raise EngagementLinkError(
+                f"Assessment {assessment_id} is already linked to this engagement."
+            )
+        linked.append(str(assessment_id))
+        row.assessment_ids_json = json.dumps(linked)
+        self._session.flush()
+        return self._to_engagement(row)
+
     def _require_engagement(self, principal: Principal, engagement_id: UUID) -> EngagementORM:
         row = self._session.get(EngagementORM, engagement_id)
         if row is None:

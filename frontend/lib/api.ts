@@ -367,6 +367,17 @@ export const api = {
     });
   },
 
+  // Link a finalised assessment to an existing engagement (GRS-0039) — closes the
+  // contract -> assessment -> deliverable loop. 409 if unfinalised or already linked.
+  linkAssessment(engagementId: string, assessmentId: string, signal?: AbortSignal): Promise<Engagement> {
+    return request<Engagement>(`/engagements/${engagementId}/assessments`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ assessment_id: assessmentId }),
+      signal,
+    });
+  },
+
   appendComms(
     id: string,
     body: { channel: CommsChannel; body: string },

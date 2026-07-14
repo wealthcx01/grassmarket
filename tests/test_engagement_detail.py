@@ -173,6 +173,70 @@ def test_http_refuses_cross_owner_prospect(
     assert resp.status_code == 404
 
 
+def test_http_link_assessment_to_existing_engagement(client, alice: SeededConsultant) -> None:
+    # The GRS-0039 loop: open an engagement with NO assessment, then link a finalised one later.
+    pid = _contracted_prospect_http(client, alice)
+    eid = client.post(
+        "/engagements", json={"prospect_id": pid, "title": "Delivery"}, headers=auth_header(alice)
+    ).json()["id"]
+    aid = _finalised_assessment_http(client, alice)
+    resp = client.post(
+        f"/engagements/{eid}/assessments",
+        json={"assessment_id": aid},
+        headers=auth_header(alice),
+    )
+    assert resp.status_code == 200, resp.text
+    assert resp.json()["assessment_ids"] == [aid]
+    # And it persists on the detail.
+    detail = client.get(f"/engagements/{eid}", headers=auth_header(alice)).json()
+    assert detail["assessment_ids"] == [aid]
+
+
+def test_http_link_refuses_unfinalised_assessment(client, alice: SeededConsultant) -> None:
+    pid = _contracted_prospect_http(client, alice)
+    eid = client.post(
+        "/engagements", json={"prospect_id": pid, "title": "E"}, headers=auth_header(alice)
+    ).json()["id"]
+    draft = client.post("/assessments", json={"subject": "D"}, headers=auth_header(alice)).json()[
+        "id"
+    ]
+    resp = client.post(
+        f"/engagements/{eid}/assessments", json={"assessment_id": draft}, headers=auth_header(alice)
+    )
+    assert resp.status_code == 409
+
+
+def test_http_link_refuses_duplicate(client, alice: SeededConsultant) -> None:
+    pid = _contracted_prospect_http(client, alice)
+    eid = client.post(
+        "/engagements", json={"prospect_id": pid, "title": "E"}, headers=auth_header(alice)
+    ).json()["id"]
+    aid = _finalised_assessment_http(client, alice)
+    first = client.post(
+        f"/engagements/{eid}/assessments", json={"assessment_id": aid}, headers=auth_header(alice)
+    )
+    assert first.status_code == 200
+    dup = client.post(
+        f"/engagements/{eid}/assessments", json={"assessment_id": aid}, headers=auth_header(alice)
+    )
+    assert dup.status_code == 409
+
+
+def test_http_link_cross_owner_engagement_refused(
+    client, alice: SeededConsultant, bob: SeededConsultant
+) -> None:
+    pid = _contracted_prospect_http(client, alice)
+    eid = client.post(
+        "/engagements", json={"prospect_id": pid, "title": "E"}, headers=auth_header(alice)
+    ).json()["id"]
+    aid = _finalised_assessment_http(client, bob)  # bob's own finalised assessment
+    # Bob cannot link to Alice's engagement — 404, no existence leak.
+    resp = client.post(
+        f"/engagements/{eid}/assessments", json={"assessment_id": aid}, headers=auth_header(bob)
+    )
+    assert resp.status_code == 404
+
+
 def test_http_comms_append_and_detail(client, alice: SeededConsultant) -> None:
     pid = _contracted_prospect_http(client, alice)
     eid = client.post(
