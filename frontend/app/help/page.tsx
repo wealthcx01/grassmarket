@@ -271,7 +271,8 @@ export default function HelpPage() {
       </section>
 
       <footer style={{ fontSize: "0.85rem", color: "var(--color-ink-muted)" }}>
-        <Link href="/">← Dashboard</Link> · <Link href="/guide">ATLAS primer</Link>
+        <Link href="/">← Dashboard</Link> · <Link href="/guide">ATLAS primer</Link> ·{" "}
+        <Link href="/?tour=1">Replay the welcome tour</Link>
       </footer>
     </div>
   );

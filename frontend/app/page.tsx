@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { HealthWidget } from "./health-widget";
 import { DashboardSessionFooter } from "@/components/DashboardSessionFooter";
+import { FirstRunWalkthrough } from "@/components/FirstRunWalkthrough";
 
 // PRD §1 / §4–7 — the advisor's main sections. Every section has a live page.
 const SECTIONS: ReadonlyArray<{ title: string; href: string; blurb: string; kicker: string }> = [
@@ -39,6 +40,7 @@ const SECTIONS: ReadonlyArray<{ title: string; href: string; blurb: string; kick
 export default function DashboardPage() {
   return (
     <div className="stack" style={{ gap: "2.75rem" }}>
+      <FirstRunWalkthrough />
       {/* Hero */}
       <section
         style={{
