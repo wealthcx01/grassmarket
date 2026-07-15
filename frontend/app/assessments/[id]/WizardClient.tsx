@@ -79,6 +79,12 @@ export function WizardClient({ id }: { id: string }) {
         setRegistry(reg);
         setAssessment(a);
         setDocument(a.document);
+        // A finalised assessment is opened to be READ, not filled in — land on the scored Summary
+        // (the result the advisor came for), not the blank Overview form.
+        if (a.state === "finalised") {
+          const summary = WIZARD_STEPS.findIndex((s) => s.title.startsWith("Summary"));
+          if (summary >= 0) setStep(summary);
+        }
       })
       .catch((err: unknown) => {
         if (err instanceof ApiError && err.status === 0) return;
