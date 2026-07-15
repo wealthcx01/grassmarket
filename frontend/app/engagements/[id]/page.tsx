@@ -13,6 +13,7 @@ import Link from "next/link";
 import { ApiError, api, getToken } from "@/lib/api";
 import { COMMS_CHANNELS, type CommsChannel, type Engagement } from "@/lib/types";
 import { DeliverablesPanel } from "@/components/DeliverablesPanel";
+import { LinkAssessmentControl } from "@/components/LinkAssessmentControl";
 
 export default function EngagementDetailPage() {
   const router = useRouter();
@@ -91,6 +92,7 @@ export default function EngagementDetailPage() {
             ))}
           </ul>
         )}
+        <LinkAssessmentControl engagement={engagement} onLinked={reload} />
       </section>
 
       <DeliverablesPanel engagementId={id} />
@@ -100,6 +102,9 @@ export default function EngagementDetailPage() {
   );
 }
 
+// Link an already-finalised assessment to this engagement (GRS-0039). Offers the advisor's own
+// finalised assessments that aren't linked here yet — closing the contract -> assessment ->
+// deliverable loop that engagement-open alone couldn't (assessment_ids was create-time only).
 function CommsLog({ engagement, onAdded }: { engagement: Engagement; onAdded: () => Promise<unknown> }) {
   const [channel, setChannel] = useState<CommsChannel>("note");
   const [body, setBody] = useState("");
