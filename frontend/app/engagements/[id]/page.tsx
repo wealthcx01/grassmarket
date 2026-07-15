@@ -11,8 +11,9 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { ApiError, api, getToken } from "@/lib/api";
-import { COMMS_CHANNELS, type Assessment, type CommsChannel, type Engagement } from "@/lib/types";
+import { COMMS_CHANNELS, type CommsChannel, type Engagement } from "@/lib/types";
 import { DeliverablesPanel } from "@/components/DeliverablesPanel";
+import { LinkAssessmentControl } from "@/components/LinkAssessmentControl";
 
 export default function EngagementDetailPage() {
   const router = useRouter();
@@ -104,82 +105,6 @@ export default function EngagementDetailPage() {
 // Link an already-finalised assessment to this engagement (GRS-0039). Offers the advisor's own
 // finalised assessments that aren't linked here yet — closing the contract -> assessment ->
 // deliverable loop that engagement-open alone couldn't (assessment_ids was create-time only).
-function LinkAssessmentControl({
-  engagement,
-  onLinked,
-}: {
-  engagement: Engagement;
-  onLinked: () => Promise<unknown>;
-}) {
-  const [available, setAvailable] = useState<Assessment[]>([]);
-  const [target, setTarget] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const linked = new Set(engagement.assessment_ids);
-  const refresh = useCallback(
-    (signal?: AbortSignal) =>
-      api
-        .listAssessments(signal)
-        .then((all) =>
-          setAvailable(all.filter((a) => a.state === "finalised" && !linked.has(a.id))),
-        )
-        .catch((err: unknown) => {
-          if (err instanceof ApiError && err.status === 0) return;
-        }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [engagement.assessment_ids.join(",")],
-  );
-
-  useEffect(() => {
-    const ctrl = new AbortController();
-    refresh(ctrl.signal);
-    return () => ctrl.abort();
-  }, [refresh]);
-
-  if (available.length === 0) return null;
-
-  async function link(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!target) return;
-    setBusy(true);
-    setError(null);
-    try {
-      await api.linkAssessment(engagement.id, target);
-      setTarget("");
-      await onLinked();
-    } catch (err: unknown) {
-      setError(err instanceof ApiError ? err.message : "Could not link the assessment.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <form onSubmit={link} style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center", marginTop: "0.75rem" }}>
-      <label className="eyebrow" htmlFor="link-assessment" style={{ width: "100%", margin: 0 }}>
-        Link a finalised assessment
-      </label>
-      <select id="link-assessment" value={target} onChange={(e) => setTarget(e.target.value)} style={{ ...inputStyle, flex: "1 1 16rem" }}>
-        <option value="">Choose an assessment…</option>
-        {available.map((a) => (
-          <option key={a.id} value={a.id}>
-            {a.subject}
-          </option>
-        ))}
-      </select>
-      <button type="submit" className="btn btn-secondary" disabled={busy || !target}>
-        {busy ? "Linking…" : "Link"}
-      </button>
-      {error ? (
-        <p role="alert" style={{ width: "100%", margin: 0, color: "var(--color-error)", fontSize: "0.8rem" }}>
-          {error}
-        </p>
-      ) : null}
-    </form>
-  );
-}
-
 function CommsLog({ engagement, onAdded }: { engagement: Engagement; onAdded: () => Promise<unknown> }) {
   const [channel, setChannel] = useState<CommsChannel>("note");
   const [body, setBody] = useState("");
