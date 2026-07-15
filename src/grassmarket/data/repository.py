@@ -228,6 +228,19 @@ def _cap_grade(grade: EvidenceGrade | None) -> EvidenceGrade | None:
 # A sentinel actor id for system-originated audit events (no human actor).
 _SYSTEM_ACTOR = UUID(int=0)
 
+# Pagination bounds for list endpoints. A caller may never pull an unbounded result set (an
+# append-only table like the audit log or benchmark population grows without limit) — the default
+# caps an unparameterised call and the max caps a hostile one.
+DEFAULT_PAGE_LIMIT = 100
+MAX_PAGE_LIMIT = 500
+
+
+def _clamp_limit(limit: int | None) -> int:
+    """Resolve a page size to the allowed range: unset → default, else clamp to [1, max]."""
+    if limit is None:
+        return DEFAULT_PAGE_LIMIT
+    return max(1, min(limit, MAX_PAGE_LIMIT))
+
 
 def _owned_orm_classes() -> list[type]:
     """Every mapped ORM that carries `owner_consultant_id` — found by reflection so GDPR export and
@@ -1316,10 +1329,18 @@ class Repository:
         self._session.flush()
         return self._to_benchmark_row(row)
 
-    def list_benchmark_rows(self) -> list[BenchmarkRow]:
-        """The anonymised benchmark population — org-wide and de-identified, so not owner-scoped."""
+    def list_benchmark_rows(
+        self, *, limit: int | None = None, offset: int = 0
+    ) -> list[BenchmarkRow]:
+        """The anonymised benchmark population — org-wide and de-identified, so not owner-scoped.
+        Paginated (capped) — the population grows without bound as runs are ingested."""
         rows = (
-            self._session.execute(select(BenchmarkRowORM).order_by(BenchmarkRowORM.ingested_at))
+            self._session.execute(
+                select(BenchmarkRowORM)
+                .order_by(BenchmarkRowORM.ingested_at)
+                .limit(_clamp_limit(limit))
+                .offset(max(0, offset))
+            )
             .scalars()
             .all()
         )
@@ -1402,12 +1423,22 @@ class Repository:
         )
         self._session.flush()
 
-    def list_audit_events(self, principal: Principal) -> list[AuditEvent]:
-        """The audit log — ADMIN only (compliance). Newest last."""
+    def list_audit_events(
+        self, principal: Principal, *, limit: int | None = None, offset: int = 0
+    ) -> list[AuditEvent]:
+        """The audit log — ADMIN only (compliance). Newest first, paginated (capped) — the log is
+        append-only and org-wide, so it must never be returned unbounded."""
         if not principal.is_admin:
             raise ScopeViolationError("Only an admin may read the audit log.")
         rows = (
-            self._session.execute(select(AuditEventORM).order_by(AuditEventORM.at)).scalars().all()
+            self._session.execute(
+                select(AuditEventORM)
+                .order_by(AuditEventORM.at.desc(), AuditEventORM.id.desc())
+                .limit(_clamp_limit(limit))
+                .offset(max(0, offset))
+            )
+            .scalars()
+            .all()
         )
         return [
             AuditEvent(
