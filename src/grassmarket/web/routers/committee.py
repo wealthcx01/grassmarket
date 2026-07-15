@@ -98,7 +98,41 @@ def decide_committee_item(
     repo: Repository = Depends(get_repository),
 ) -> CommitteeDecision:
     """Record the committee's call on one high-stakes item. Committee member or admin only, and
-    never on their own assessment (peer challenge). Rationale required; dissent optional (§8)."""
+    never on their own assessment (peer challenge). Rationale required; dissent optional (§8).
+
+    The decision must target an item that is CURRENTLY required at the CURRENT rating — a member
+    cannot pre-approve a speculative rating the score has not (yet) reached, which would let the
+    finalise gate clear later with no contemporaneous review."""
+    try:
+        assessment = repo.get_assessment_for_committee(principal, assessment_id)
+    except (NotFoundError, ScopeViolationError) as exc:
+        raise _not_found() from exc
+
+    registry = load_registry()
+    required = ()
+    if not scoreability_blockers(assessment.document, registry):
+        art = compute_score(
+            assessment.document,
+            active_coefficient_set(registry),
+            registry,
+            active_uncertainty_model(),
+            random.Random(_SEED),
+        )
+        required = required_committee_items(art.result)
+    if not any(
+        i.item_type == payload.item_type
+        and i.item_key == payload.item_key
+        and i.rating == payload.rating
+        for i in required
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                f"{payload.item_type.value} {payload.item_key!r} at {payload.rating!r} is not a "
+                "currently-required high-stakes item — re-read the committee queue."
+            ),
+        )
+
     try:
         return repo.decide_committee_item(
             principal,
