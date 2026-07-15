@@ -70,6 +70,9 @@ export function DeliverablesPanel({ engagementId }: { engagementId: string }) {
   const [type, setType] = useState<DeliverableType>("platform_power_report");
   const [clientFacing, setClientFacing] = useState(false);
   const [busy, setBusy] = useState(false);
+  // A client-facing document leaves the building — generating one goes through an explicit review
+  // step first (proportional friction, rubric #8). Internal drafts generate immediately.
+  const [confirmingClient, setConfirmingClient] = useState(false);
   const [notice, setNotice] = useState<{ kind: "error" | "ok"; text: string } | null>(null);
   const [reviewing, setReviewing] = useState<string | null>(null);
   // Per-deliverable AI-narrative approval status — drives the "not client-ready" gate + the queue.
@@ -105,6 +108,13 @@ export function DeliverablesPanel({ engagementId }: { engagementId: string }) {
     return () => ctrl.abort();
   }, [reload]);
 
+  // Internal drafts generate immediately; a client-facing document opens the review step first.
+  function onGenerateClick() {
+    setNotice(null);
+    if (clientFacing) setConfirmingClient(true);
+    else void generate();
+  }
+
   async function generate() {
     setBusy(true);
     setNotice(null);
@@ -113,6 +123,7 @@ export function DeliverablesPanel({ engagementId }: { engagementId: string }) {
         deliverable_type: type,
         client_facing: clientFacing,
       });
+      setConfirmingClient(false);
       setNotice({ kind: "ok", text: `Generated ${TYPE_LABEL[created.type]} (${created.mode === "client" ? "client" : "internal draft"}).` });
       await reload();
     } catch (err) {
@@ -191,7 +202,15 @@ export function DeliverablesPanel({ engagementId }: { engagementId: string }) {
             Audience
           </legend>
           <label style={radioStyle}>
-            <input type="radio" name="audience" checked={!clientFacing} onChange={() => setClientFacing(false)} />
+            <input
+              type="radio"
+              name="audience"
+              checked={!clientFacing}
+              onChange={() => {
+                setClientFacing(false);
+                setConfirmingClient(false); // leaving client-facing cancels a pending review
+              }}
+            />
             Internal draft
           </label>
           <label style={radioStyle}>
@@ -200,10 +219,20 @@ export function DeliverablesPanel({ engagementId }: { engagementId: string }) {
           </label>
         </fieldset>
 
-        <button type="button" onClick={() => void generate()} disabled={busy} style={buttonStyle(busy)}>
-          {busy ? "Generating…" : "Generate"}
+        <button type="button" onClick={onGenerateClick} disabled={busy || confirmingClient} style={buttonStyle(busy || confirmingClient)}>
+          {busy ? "Generating…" : clientFacing ? "Review & generate" : "Generate"}
         </button>
       </div>
+
+      {confirmingClient && (
+        <ClientReviewPanel
+          documentLabel={TYPE_LABEL[type]}
+          pending={Object.values(narr).reduce((s, x) => s + x.pending, 0)}
+          busy={busy}
+          onConfirm={() => void generate()}
+          onCancel={() => setConfirmingClient(false)}
+        />
+      )}
 
       {notice && (
         <p
@@ -303,6 +332,77 @@ export function DeliverablesPanel({ engagementId }: { engagementId: string }) {
         </table>
       )}
     </section>
+  );
+}
+
+/** The review-before-send step: a client-facing document can reach a client, so its generation is
+ * confirmed explicitly against the release gates (rubric #8 — friction proportional to consequence). */
+function ClientReviewPanel({
+  documentLabel,
+  pending,
+  busy,
+  onConfirm,
+  onCancel,
+}: {
+  documentLabel: string;
+  pending: number;
+  busy: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div
+      role="group"
+      aria-label="Review before generating a client-facing document"
+      style={{
+        margin: "0 0 0.8rem",
+        padding: "0.9rem 1rem",
+        borderRadius: "var(--radius)",
+        border: "1px solid var(--color-accent)",
+        background: "var(--color-accent-tint, rgba(26,59,38,0.06))",
+      }}
+    >
+      <p className="eyebrow" style={{ margin: "0 0 0.35rem", color: "var(--color-accent)" }}>
+        Review before it goes to the client
+      </p>
+      <p style={{ margin: "0 0 0.5rem", fontSize: "0.88rem" }}>
+        You&rsquo;re about to generate the <strong>{documentLabel}</strong> as a{" "}
+        <strong>client-facing</strong> document. A client-facing pack is only released when it uses
+        ratified (client-usable) coefficients, every AI-drafted section is approved, and any
+        high-stakes rating has committee sign-off — generation is refused if any gate is unmet.
+      </p>
+      {pending > 0 && (
+        <p
+          role="alert"
+          style={{ margin: "0 0 0.5rem", fontSize: "0.82rem", color: "var(--color-warn)", fontWeight: 600 }}
+        >
+          {pending} AI section{pending === 1 ? "" : "s"} still await approval — approve them first, or
+          this will be refused.
+        </p>
+      )}
+      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+        <button type="button" onClick={onConfirm} disabled={busy} style={buttonStyle(busy)}>
+          {busy ? "Generating…" : "Generate client-facing document"}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={busy}
+          style={{
+            fontFamily: "var(--font-sans)",
+            fontSize: "0.85rem",
+            padding: "0.4rem 0.9rem",
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius)",
+            background: "var(--color-paper)",
+            color: "var(--color-ink)",
+            cursor: busy ? "default" : "pointer",
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
   );
 }
 
