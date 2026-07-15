@@ -617,3 +617,51 @@ export interface CalibrationResult {
   n_raters: number;
   anchors: AnchorAgreement[];
 }
+
+// --- Rating Committee sign-off (Methodology §8, GRS-0061) ---------------------------------
+export type CommitteeItemType = "power" | "triad" | "module";
+export type CommitteeDecisionStatus = "approved" | "rejected";
+
+export interface CommitteeItem {
+  item_type: CommitteeItemType;
+  item_key: string;
+  rating: string;
+  label: string;
+  reason: string;
+}
+
+export interface CommitteeDecision {
+  id: string;
+  owner_consultant_id: string;
+  created_at: string;
+  updated_at: string;
+  assessment_id: string;
+  item_type: CommitteeItemType;
+  item_key: string;
+  rating: string;
+  status: CommitteeDecisionStatus;
+  rationale: string;
+  dissent_note?: string | null;
+  decided_by_consultant_id: string;
+  decided_at: string;
+}
+
+export interface CommitteeQueueEntry {
+  item: CommitteeItem;
+  decision?: CommitteeDecision | null;
+}
+
+export interface CommitteeDecisionRequest {
+  item_type: CommitteeItemType;
+  item_key: string;
+  rating: string;
+  status: CommitteeDecisionStatus;
+  rationale: string;
+  dissent_note?: string | null;
+}
+
+export interface CommitteeReviewSummary {
+  assessment_id: string;
+  subject: string;
+  pending_count: number;
+}

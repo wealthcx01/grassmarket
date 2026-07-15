@@ -8,6 +8,7 @@
 
 import { useState } from "react";
 
+import { CommitteeReviewPanel } from "@/components/CommitteeReviewPanel";
 import { GuidancePanel } from "@/components/GuidancePanel";
 import { LiveScorePanel } from "@/components/LiveScorePanel";
 import * as doc from "@/lib/doc";
@@ -404,6 +405,9 @@ export function SummaryStep(props: StepProps) {
           </div>
         </Card>
       ) : null}
+
+      {/* Governance: the §8 committee sign-off surface (resolves that finalise blocker in-product). */}
+      {live?.scoreable ? <CommitteeReviewPanel assessmentId={props.assessmentId} /> : null}
       {readOnly ? (
         <p style={{ color: "var(--color-accent)", fontWeight: 600 }}>
           This assessment is finalised — its inputs are locked.

@@ -23,6 +23,10 @@ import type {
   CertificationEvent,
   CertificationRecord,
   CommissionLine,
+  CommitteeDecision,
+  CommitteeDecisionRequest,
+  CommitteeQueueEntry,
+  CommitteeReviewSummary,
   CommsChannel,
   CommsLogEntry,
   ContentCompletion,
@@ -224,6 +228,36 @@ export const api = {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify({ scenarios }),
+      signal,
+    });
+  },
+
+  // --- Rating Committee sign-off (§8, GRS-0061) ---
+  committeeReviewQueue(signal?: AbortSignal): Promise<CommitteeReviewSummary[]> {
+    return request<CommitteeReviewSummary[]>(`/committee/queue`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  committeeQueue(id: string, signal?: AbortSignal): Promise<CommitteeQueueEntry[]> {
+    return request<CommitteeQueueEntry[]>(`/assessments/${id}/committee`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  decideCommitteeItem(
+    id: string,
+    decision: CommitteeDecisionRequest,
+    signal?: AbortSignal,
+  ): Promise<CommitteeDecision> {
+    return request<CommitteeDecision>(`/assessments/${id}/committee/decide`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(decision),
       signal,
     });
   },

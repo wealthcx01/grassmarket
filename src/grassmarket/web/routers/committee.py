@@ -35,9 +35,19 @@ from grassmarket.data.repository import (
 from grassmarket.web.dependencies import get_current_principal, get_repository
 
 router = APIRouter(prefix="/assessments", tags=["committee"])
+# The committee work-queue lives at /committee (not under a specific assessment).
+queue_router = APIRouter(prefix="/committee", tags=["committee"])
 
 # Same fixed seed as the live-score / finalise paths so the derived high-stakes set is stable.
 _SEED = 20260706
+
+
+class CommitteeReviewSummary(BaseModel):
+    """One assessment awaiting committee sign-off, for the reviewer's work-queue."""
+
+    assessment_id: UUID
+    subject: str
+    pending_count: int
 
 
 class CommitteeDecisionRequest(BaseModel):
@@ -88,6 +98,45 @@ def committee_queue(
         CommitteeQueueEntry(item=item, decision=decisions.get((item.item_type, item.item_key)))
         for item in items
     ]
+
+
+@queue_router.get("/queue", response_model=list[CommitteeReviewSummary])
+def committee_work_queue(
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> list[CommitteeReviewSummary]:
+    """Every in-progress assessment that still has high-stakes items awaiting committee sign-off —
+    how a reviewer finds their work. Committee members / admins only (a plain consultant is 403)."""
+    try:
+        assessments = repo.list_assessments_for_committee(principal)
+    except ScopeViolationError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+    registry = load_registry()
+    coeffs = active_coefficient_set(registry)
+    model = active_uncertainty_model()
+    out: list[CommitteeReviewSummary] = []
+    for a in assessments:
+        if scoreability_blockers(a.document, registry):
+            continue
+        art = compute_score(a.document, coeffs, registry, model, random.Random(_SEED))
+        items = required_committee_items(art.result)
+        if not items:
+            continue
+        approved = {
+            (d.item_type, d.item_key, d.rating)
+            for d in repo.list_committee_decisions(principal, a.id)
+            if d.status is CommitteeDecisionStatus.APPROVED
+        }
+        pending = sum(1 for i in items if (i.item_type, i.item_key, i.rating) not in approved)
+        if pending:
+            out.append(
+                CommitteeReviewSummary(
+                    assessment_id=a.id,
+                    subject=a.subject or "Untitled assessment",
+                    pending_count=pending,
+                )
+            )
+    return out
 
 
 @router.post("/{assessment_id}/committee/decide", response_model=CommitteeDecision)
