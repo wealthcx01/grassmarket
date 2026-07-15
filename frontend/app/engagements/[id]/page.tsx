@@ -145,7 +145,7 @@ function CommsLog({ engagement, onAdded }: { engagement: Engagement; onAdded: ()
         </ol>
       )}
       <form onSubmit={add} style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "flex-start" }}>
-        <select value={channel} onChange={(e) => setChannel(e.target.value as CommsChannel)} style={inputStyle}>
+        <select aria-label="Channel" value={channel} onChange={(e) => setChannel(e.target.value as CommsChannel)} style={inputStyle}>
           {COMMS_CHANNELS.map((c) => (
             <option key={c} value={c}>
               {c}
