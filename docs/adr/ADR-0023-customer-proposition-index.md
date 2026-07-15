@@ -1,58 +1,74 @@
-# ADR-0023 — Customer Proposition Index (C) as ATLAS's fourth index
+# ADR-0023 — Customer Proposition Index (C): promote from v2 agenda to a scheduled build
 
-- **Status:** Accepted (2026-07-15). Ratifies the strategic addition proposed in `ATLAS Golden Master — Suggested Changes` §C1–C2. **θ_C and the C-internal weights remain draft-pending-elicitation** (swing-weighted by the panel, as with B/P/L); the C golden-master fixture (v2) and rubric anchors are follow-on build work.
+- **Status:** **Proposed** (2026-07-15). This ADR promotes `docs/METHODOLOGY-V2-SCOPE.md` §1 (agreed direction, non-normative) into a decision record. **Two founder decisions remain open** (§Decisions required) — until they are taken, `docs/ATLAS-Methodology-v1.3.md` is **draft, not normative**.
 - **Date:** 2026-07-15
-- **Deciders:** Founder + engineering (post-delivery review)
-- **Normative source:** `docs/ATLAS-Methodology-v1.3.md` §2 (amended), §5.1 (amended composite), §13 (new).
-- **Raised by:** delivery review `docs/reviews/ATLAS-Delivery-Review-2026-07-15.md`; `Suggested Changes` §C1–C3.
+- **Deciders:** Founder (decisions below) + engineering
+- **Normative source (once accepted):** `docs/ATLAS-Methodology-v1.3.md` §13.
+- **Supersedes/absorbs:** `METHODOLOGY-V2-SCOPE.md` §1 (C-index) and §3 (the "widgets" aspiration). §2 (operating-model profiles) stays in that note and gets its own ADR.
+- **Raised by:** delivery review `docs/reviews/ATLAS-Delivery-Review-2026-07-15.md`; founder feedback that widget assessment and a Customer Proposition Index are missing from the product.
 
 ## Context
 
-ATLAS as ratified through v1.2 scores the **producer**: economics (B), moat (P), infrastructure (L), composed as `V = θ_B·B + θ_P·P + θ_L·L`. Every published retail-brokerage methodology (StockBrokers 309 variables, BrokerChooser 1,200+ points, Which?, NerdWallet, Finder, Boring Money, …) instead weights the **customer proposition** — fees, safety, range/wrappers, execution, experience, research — at **80–100%** of the score (Which? puts 60% on customer experience; UK frameworks put 27–35% on fees alone). ATLAS is therefore complete as an *infrastructure diligence* tool but silent on the surface a retail client actually experiences.
+ATLAS v1.x scores the **producer**: economics (B), moat (P), infrastructure (L) → `V = θ_B·B + θ_P·P + θ_L·L`. It does not score what the customer experiences. This is **not an oversight**: the C-index was proposed and **deliberately deferred by the founder at the GRS-0003 golden-master review** ("deferred to Methodology v2 / a new loop"), and captured in `METHODOLOGY-V2-SCOPE.md` so it survived as an agenda rather than fragments. The 2026-07-15 delivery review re-raised it as the P0 product gap. This ADR schedules it.
 
-Two facts make closing this gap low-risk:
-1. Bruntsfield already owns a **field-tested evidence instrument** — the "Brokerage App World Cup" **93-widget × 15-category** checklist (Present / Ease-to-find / Usability / Depth 1–5, rarity Common/Uncommon/Rare), with **seven** apps already scored (the March 2026 `_Claude` set is canonical). This is the natural evidence layer for a customer-proposition index and partly for L-FRONTEND.
-2. The unique product is B/P/L **connected to C**: "weak charting → single-sourced market-data vendor → high cost-to-serve." No competitor connects the customer surface to the producing infrastructure.
+**The evidence corpus already exists and is larger than the scope note assumes.** `OneDrive\…\Briefing\Content-Bank\Projects\Brokerage-App-Reviews\`:
+- **16 app folders**; **7 fully scored** with completed `_Claude` checklists (Saxo, IBKR, Lightyear, Revolut, Trading212, WeBull, Hargreaves Lansdown); 9 more (Capital, Charles Schwab, EFG Hermes, EasyEquities, Futu, Hapi, Robinhood, Trii, eToro) have captured evidence but no scoring.
+- The instrument is **93 widgets × 15 categories** (Present Y/N · Ease-to-find 1–5 · Usability 1–5 · Depth 1–5 · Notes), each widget tagged **Common / Uncommon / Rare** in the brief's annex. Worked results: IBKR 76/93 (82%), Saxo 61/93 (65.6%), Revolut 54/93 (58%), WeBull 47/93 (50.5%), Lightyear 39/93 (41.9%).
+- **Correction to `METHODOLOGY-V2-SCOPE.md`:** it records "~70-widget checklist" and 7 platforms — the live instrument is **93 widgets** and the corpus is **16 platforms (7 scored)**. That note should be amended.
+- The brief's **Phase E** defines the scoring categories and states *"Final weightings and scores will be determined collaboratively later"* — i.e. the weights were always intended to be elicited, exactly as ATLAS does for θ/λ/δ.
 
-Per CLAUDE.md non-negotiable #2 ("the methodology is settled: implement it, don't re-invent; changes to scoring are ADRs + new methodology versions"), adding a fourth index is a **deterministic methodology change** and must be ratified here, not added silently.
+**Why it matters:** every published brokerage methodology weights the customer proposition at 80–100%. The unique Bruntsfield product is B/P/L **connected to C** ("weak charting → single-sourced market-data vendor → high cost-to-serve"). And per the scope note's flywheel: the Briefing reviews *are* the benchmark corpus, so **C can launch with peer-relative benchmarking already populated** — 7 scored platforms before the first paid C engagement.
 
 ## Decision
 
-**Add C — Customer Proposition — as ATLAS's fourth index**, composed alongside B/P/L:
+**1. Adopt C as a fourth ATLAS lens, built on the L aggregation family.** Subcomponents → modules → C, with the bottleneck blend, rating gates, `NOT_APPLICABLE`/`NOT_ASSESSED` renormalisation and E1–E4 evidence grades already proven for L. No new scoring machinery.
 
-```
-V = θ_B·B + θ_P·P + θ_L·L + θ_C·C        (θ_B + θ_P + θ_L + θ_C = 1)
-```
+**2. Module set = the World Cup Phase E categories (10), not the 6-module industry synthesis.** The `ATLAS Golden Master — Suggested Changes` §C1 proposed 6 modules (Costs & Value / Safety & Protection / Range & Wrappers / Trading & Execution / Experience & Support / Research & Education). **Rejected in favour of Phase E** because the 7-app corpus is *already scored against Phase E*, making the benchmark usable on day one; the 6-set would require re-scoring every review. Phase E also preserves two modules the 6-set drops (AI & personalisation; Innovation & differentiators) that are central to the Bruntsfield thesis.
 
-**Structure of C** — 6 modules mirroring industry consensus, each observable largely in-app:
+| # | C module (Phase E) | Covers | 6-set equivalent |
+|---|---|---|---|
+| 1 | `CUST_ONBOARDING` | ease, speed, clarity, KYC burden | Experience & Support |
+| 2 | `CUST_UI_NAVIGATION` | layout logic, visual design, accessibility, customisation | Experience & Support |
+| 3 | `CUST_TRADING_EXPERIENCE` | order types, execution flow, fee transparency, real-time feedback | Trading & Execution |
+| 4 | `CUST_PRODUCT_RANGE` | asset classes, fractional, global vs local market access, wrappers | Range & Wrappers |
+| 5 | `CUST_RESEARCH_EDUCATION` | market-data depth, educational quality, interactive tools | Research & Education |
+| 6 | `CUST_AI_PERSONALISATION` | AI recommendations, chatbots, personalised content | *(dropped by 6-set)* |
+| 7 | `CUST_SECURITY_REGULATION` | investor protection (FSCS/SIPC), authentication, compliance | Safety & Protection |
+| 8 | `CUST_SUPPORT_COMMUNITY` | support availability/quality, social features | Experience & Support |
+| 9 | `CUST_FEES_PRICING` | commissions, spreads, **FX fees**, subscriptions, inactivity fees | Costs & Value |
+| 10 | `CUST_INNOVATION_DIFFERENTIATORS` | social trading, gamification, referrals, direct custody | *(dropped by 6-set)* |
 
-| C module | Indicative subcomponents |
-|---|---|
-| `CUST_COSTS_VALUE` | dealing commissions; platform fee by wrapper; **FX fee**; spreads; cash interest paid vs retained; subscription-tier value; TCO at £5k/£50k/£250k bands |
-| `CUST_SAFETY` | legal entity; FSCS £85k vs EU €20k mapping; CASS/nominee disclosure; 2FA/biometrics/device mgmt; outage history |
-| `CUST_RANGE_WRAPPERS` | asset classes; markets; fractional; funds/bonds/options; GIA / ISA (flexible?) / LISA / JISA / SIPP; ISA-allowance tooling |
-| `CUST_TRADING_EXECUTION` | order types (trailing/OCO/bracket); extended hours; margin rates; paper trading; execution-disclosure quality; sampled fills / FX markup |
-| `CUST_EXPERIENCE_SUPPORT` | onboarding minutes-to-funded; taps-to-trade; UX rubric; notification granularity; timed support mystery-contacts |
-| `CUST_RESEARCH_EDUCATION` | data latency (real-time vs 15-min); charting/screeners; third-party research; portfolio analytics & tax reporting; education depth |
+Wrapper/TCO depth from the 6-set (GIA/ISA/LISA/JISA/SIPP, TCO at £5k/£50k/£250k) folds into `CUST_PRODUCT_RANGE` and `CUST_FEES_PRICING` as subcomponents — nothing is lost.
 
-**Scoring** reuses the L machinery so the engine stays uniform and fail-loud:
-- Each C subcomponent is rated on the **same Basic→Frontier maturity scale** with an **E1–E4 evidence grade** (§3.3), and rolls up to a module quality `q_c,m` and then to `C` exactly as L does (bottleneck-aware, `NOT_APPLICABLE`/`NOT_ASSESSED` renormalisation, ADR-0001/0003). **A firm that deliberately omits a capability marks it `NOT_APPLICABLE` — scope is separated from execution-within-scope**, so a focused low-coverage app (Lightyear) is not punished for positioning.
-- The **widget taxonomy is the evidence layer, not a parallel score.** The 93×15 checklist (Present / Ease / Usability / Depth, rarity-weighted) is captured as **structured E4 evidence** attached to the relevant C subcomponents (and to L-FRONTEND where it corroborates); its rolled-up coverage/quality informs the assessor's maturity rating rather than replacing it. Rarity tags weight the roll-up (a Rare yield-curve chart ≠ a Common price alert).
-- **Dual-layer presence states** extend the existing states: `PRESENT_PAYWALLED` and `PRESENT_DEFECTIVE` are distinct from Present and from Not-Applicable, so a paywalled order book or a broken data feed is captured honestly (ADR-0001 fail-loud extended, not defaulted).
+**3. The widget checklist is the Level-1 data for C, not a parallel score.** The 93 widgets map into the 10 modules by their category. Per-widget capture: **Present (Y/N)** + **Ease / Usability / Depth (1–5)**, with **rarity as the differentiation weight** — a missing **Common** widget is a proposition bottleneck; a **Rare** widget done well scores differentiation. **Scope ≠ execution:** a capability the firm deliberately doesn't offer is `NOT_APPLICABLE` and renormalises out, so a focused app (Lightyear 41.9%) is not punished for positioning. This resolves `METHODOLOGY-V2-SCOPE` §3: the "assess all the widgets" aspiration **is** C's Level-1 layer; the lone L subcomponent `MARKET_DATA_VALUE_ADD_SERVICES` **stays** (it assesses the *infrastructure to deliver* value-add services; C assesses the services *as experienced*).
 
-**Uncertainty (§7) applies unchanged:** C is modelled from its subcomponents' evidence grades exactly like L; C and the C-modules carry P10/P50/P90 ranges and an Assessment Uncertainty Rating.
+**4. Staged entry into V (the scope note's lower-risk option — adopted).**
+- **Stage 1 (Methodology v1.3):** C is defined, scored, gated and **reported alongside V — not inside it**. `V` stays the three-index composite, so **§5.1 is unchanged, the deterministic engine keeps its `1.1` stamp, and the ratified golden master remains valid**. This is additive and reversible.
+- **Stage 2 (Methodology v1.4, after 2–3 engagements + θ re-elicitation):** C enters the composite — `V = θ_B·B + θ_P·P + θ_L·L + θ_C·C`, Σθ = 1 **re-elicited together** (the v1.1 θ of 0.25/0.35/0.40 may not simply be reused with a bolted-on θ_C). That is a deterministic change requiring **golden-master v2**.
+- An engine with no elicited `θ_C` **must refuse** to emit a four-index V (fail-loud, ADR-0001) — never default `θ_C = 0`.
+
+**5. Presence states extend, not default.** Adds `PRESENT_PAYWALLED` and `PRESENT_DEFECTIVE` alongside Present / `NOT_APPLICABLE` / `NOT_ASSESSED` — a paywalled order book or a broken feed is captured honestly.
+
+**6. Profiles interaction (deferred, but binding).** C inherits the operating-model profile mechanism (`METHODOLOGY-V2-SCOPE` §2): an exchange's customers are members and issuers, not retail investors — **a different widget set entirely**. The retail-brokerage widget taxonomy is the *retail* profile's C instrument only. Given the active book is exchange-side (ASX, NSE — see `ESTATE-RECONCILIATION` §3), the profile ADR should land close behind this one.
+
+## Decisions required from the founder (blocking normative status)
+
+1. **Ratify the Phase E 10-module set** (recommended above) — or select the 6-module synthesis and accept re-scoring the corpus.
+2. **Confirm staged entry** (Stage 1 report-alongside → Stage 2 into V) vs. going straight to a fourth θ.
+3. *(Related, not blocking)* Confirm the θ_C elicitation panel shares a session with the v1 annual re-elicitation (`BACKLOG` founder track), and whether the **exchange profile** is promoted ahead of C (`ESTATE-RECONCILIATION` §3 argues revenue reality says exchange-first).
 
 ## Consequences
 
-- **Methodology v1.3** (`docs/ATLAS-Methodology-v1.3.md`) supersedes v1.2: it amends §2 (framework is now B/P/L/**C**), §5.1 (four-term composite + weight renormalisation), and adds §13 (Customer Proposition). Unlike v1.2, **this is a deterministic change** — the composite formula moves, so the ratified golden master must advance to **v2** and re-stamp; v1.1/v1.2 fixtures remain valid for the three-index sub-result.
-- **Coefficient elicitation:** the panel must elicit `θ_C` (and re-elicit θ_B/θ_P/θ_L to sum to 1), plus C-internal δ/λ/group weights and the widget rarity weights, with provenance (§6). Until then C ships `draft-pending-ratification` behind a flag, exactly as B/P/L did.
-- **Registry + rubric:** add the 6 C modules and their subcomponents to `modules`-style registry data (or a parallel `customer_modules.yaml`), and author their §4 rubric anchors (the Brokerage-App-Reviews scorings are the first anchor mine, per `Suggested Changes` B9/C2).
-- **Engine:** `engine.py` composite gains the C term and a C-index computation reusing the L aggregation path; contracts (`bcap_contracts`) gain `theta_c`, a `CustomerResult`, and the `PRESENT_*` states; Monte-Carlo and the value bridge extend to C.
-- **Golden-master v2:** synthesise Meridian's customer-proposition profile from the seven real app reviews (validates the widget-taxonomy-as-evidence pipeline in the same step).
-- **Deferred to their own ADRs:** Consumer Duty & Behavioural Design module (`Suggested Changes` C3), knockout gates (C4), persona-weighted views (C5), voice-of-customer proxies (C7). C6 (dual-layer presence) is folded in here.
+- **Methodology v1.3** (draft until accepted) adds §13; **§5.1 composite unchanged** — the golden master and `1.1` deterministic stamp survive Stage 1.
+- **New loop (Loop 7 / GRS-01xx)** — the `METHODOLOGY-V2-SCOPE` sequencing stands: C registry (10 modules + 93 widget subcomponents + rarity tags), C rubric anchors seeded from the 7 completed checklists, wizard C-step, benchmark ingestion of the review corpus (approval-gated, per ADR-0009), deliverable sections (proposition heatmap, differentiation-vs-rarity map).
+- **Benchmark flywheel:** the 7 scored apps become benchmark rows at launch; the 9 unscored folders are the next content batch — Briefing's cadence feeds the index, and each review is dual-use (thought leadership + benchmark), like calibration vignettes doubling as Practice Arena content.
+- **Contracts:** `bcap_contracts` gains a C registry, `CustomerResult`, the `PRESENT_*` states; `theta_c` only at Stage 2.
+- **Amend `METHODOLOGY-V2-SCOPE.md`** for the corpus corrections (93 widgets, 16 apps / 7 scored).
+- **Deferred to their own ADRs:** operating-model profiles (§2 of the scope note), Consumer Duty & Behavioural Design, knockout gates, persona-weighted views.
 
 ## Alternatives considered
 
-- **Leave ATLAS as a pure infrastructure tool.** Rejected: it omits 80–100% of what every buyer's frame weights, and forfeits the B/P/L↔C connection that is the product's moat.
-- **Score the widget taxonomy as a standalone percentage** (as the World Cup project did). Rejected: a flat coverage-% treats rare and common widgets alike and conflates scope with execution — the reasons the `Suggested Changes` doc gives for wiring it in *as evidence under maturity-rated C subcomponents* instead.
-- **Fold customer items into the existing L-FRONTEND module.** Rejected: fees/safety/wrappers/service are not infrastructure; burying them in L would distort both indices and hide the customer story the client came for.
+- **Leave ATLAS producer-only.** Rejected: forfeits 80–100% of every buyer's frame and the B/P/L↔C connection that is the moat.
+- **Score the widget checklist as a standalone coverage-%** (as the World Cup project did). Rejected: flat coverage treats a Rare yield-curve chart like a Common price alert and conflates scope with execution — hence rarity weighting + N/A renormalisation under maturity-rated modules instead.
+- **Fold customer items into L-FRONTEND.** Rejected: fees/safety/wrappers/support are not infrastructure; burying them distorts both indices.
+- **Go straight to a fourth θ in V.** Rejected for Stage 1: it is a deterministic change that invalidates the ratified golden master before we have a single C engagement's evidence — the scope note's staged option is strictly lower-risk.
