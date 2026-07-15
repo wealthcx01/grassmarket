@@ -256,6 +256,49 @@ def test_a_committee_member_cannot_sign_off_their_own_assessment(client) -> None
     assert "peer challenge" in resp.json()["detail"]
 
 
+def test_a_speculative_pre_approval_is_refused(client, alice: SeededConsultant) -> None:
+    """GRS-0051: a member cannot pre-approve a rating the score has not reached — only an item that
+    is currently required, at its current rating, may be decided. Otherwise the finalise gate could
+    clear later at that rating with no contemporaneous review."""
+    aid = _scoreable(client, alice)
+    member = seed_committee_member(client)
+    item = committee_queue(client, aid, alice)[0]["item"]
+
+    # Same item, but at a rating it does not currently hold → speculative, refused.
+    speculative = {**item, "rating": "Wide" if item["rating"] != "Wide" else "Established"}
+    bad = client.post(
+        f"/assessments/{aid}/committee/decide",
+        json={
+            **speculative,
+            "status": "approved",
+            "rationale": "Pre-approving ahead of the score.",
+        },
+        headers=auth_header(member),
+    )
+    assert bad.status_code == 409
+    assert "currently-required" in bad.json()["detail"]
+
+    # A bogus item key is likewise refused.
+    ghost = client.post(
+        f"/assessments/{aid}/committee/decide",
+        json={**item, "item_key": "NOT_A_REAL_ITEM", "status": "approved", "rationale": "x."},
+        headers=auth_header(member),
+    )
+    assert ghost.status_code == 409
+
+    # The genuine (item, rating) still works.
+    ok = client.post(
+        f"/assessments/{aid}/committee/decide",
+        json={
+            **item,
+            "status": "approved",
+            "rationale": "Reviewed against the moat-duration rubric.",
+        },
+        headers=auth_header(member),
+    )
+    assert ok.status_code == 200
+
+
 def test_a_non_committee_consultant_cannot_decide(
     client, alice: SeededConsultant, bob: SeededConsultant
 ) -> None:
