@@ -203,6 +203,29 @@ def test_triad_source_literals_must_be_in_registry(registry: Registry, monkeypat
         _engine._assert_triad_sources_registered(registry)
 
 
+def test_empty_module_excluded_from_l_not_zero_filled(registry: Registry, coeffs) -> None:
+    """Review A1: a module with NO assessed subcomponent has q_m None and is EXCLUDED from L's
+    δ-weighted term — never zero-filled (the old 'empty module = 0' bug). Emptying a non-critical
+    module that would otherwise equal every other module's q_m leaves L IDENTICAL after δ
+    renormalisation; a zero-fill would drag L down."""
+    module = "EMS_GATEWAY"  # not critical-for-L, so the min term is unaffected
+    keys = [s.key for s in registry.require_module(module).subcomponents]
+    full = score(build_inputs(registry, default_level=_L.DEVELOPING), coeffs, registry)
+    emptied = score(
+        build_inputs(
+            registry,
+            default_level=_L.DEVELOPING,
+            subs={k: NonScoreState.NOT_ASSESSED for k in keys},
+        ),
+        coeffs,
+        registry,
+    )
+    m = next(x for x in emptied.modules if x.key == module)
+    assert m.q_m is None and m.coverage == 0.0  # genuinely empty: nothing assessed
+    # Excluded + renormalised, not zero-filled → L unchanged (zero-fill would lower it materially).
+    assert emptied.l_index.value == pytest.approx(full.l_index.value, abs=1e-9)
+
+
 def test_triad_economic_is_not_assessed_never_a_none_floor(registry: Registry, coeffs) -> None:
     """GRS-0043 / D9: when no scale or unit-economics metric is assessed, Economic Value is Not
     Assessed (rating/score None) — never silently floored to the "None" moat rating. B stays

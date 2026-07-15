@@ -2,7 +2,9 @@
 
 **Status: agreed direction, not yet normative.** This document captures the three deferred extensions to ATLAS so they survive as a deliberate v2 agenda rather than scattered fragments (a ticket footnote, a registry line, an N/A workaround). Nothing here changes v1.x behaviour; each item lands via the standard ADR + methodology-version process when scheduled.
 
-Provenance: the C-index was proposed and deferred during the GRS-0003 golden-master review ("deferred to Methodology v2 / a new loop, per John"). Its source material is the Briefing pillar's Brokerage-App-Reviews project (`OneDrive\...\Business\Briefing\Content-Bank\Projects\Brokerage-App-Reviews`): the Brokerage App World Cup 2026 brief, the ~70-widget checklist annex (15 categories, each widget tagged Common/Uncommon/Rare), completed widget checklists for Trading212, Saxo, Revolut, WeBull, IBKR, Lightyear and Hargreaves Lansdown, and the Phase E scoring matrix whose weightings were explicitly left "to be determined collaboratively later."
+> **Corpus figures corrected (GRS-0066, 2026-07-15).** This note was written against an early read of the review corpus. The live instrument is **93 widgets × 15 categories** (not "~70"), and the corpus is **16 app folders, 7 fully scored** (Saxo, IBKR, Lightyear, Revolut, Trading212, WeBull, Hargreaves Lansdown) with 9 more captured-but-unscored — not "7 platforms" total. Where the numbers below say "~70" or imply seven is the corpus size, read 93 / 16 (7 scored). §1 and §3 of this note are otherwise **superseded by `adr/ADR-0023`**; §2 (operating-model profiles) stays live and gets its own ADR. Full accounting: `NEXT-STEPS-2026-07.md` §2/§6 and ADR-0023 §Context.
+
+Provenance: the C-index was proposed and deferred during the GRS-0003 golden-master review ("deferred to Methodology v2 / a new loop, per John"). Its source material is the Briefing pillar's Brokerage-App-Reviews project (`OneDrive\...\Business\Briefing\Content-Bank\Projects\Brokerage-App-Reviews`): the Brokerage App World Cup 2026 brief, the 93-widget checklist annex (15 categories, each widget tagged Common/Uncommon/Rare), completed widget checklists for Trading212, Saxo, Revolut, WeBull, IBKR, Lightyear and Hargreaves Lansdown (7 scored of 16 captured), and the Phase E scoring matrix whose weightings were explicitly left "to be determined collaboratively later."
 
 ---
 
@@ -14,7 +16,7 @@ Provenance: the C-index was proposed and deferred during the GRS-0003 golden-mas
 
 | World Cup artefact | ATLAS v2 equivalent |
 |---|---|
-| Widget checklist (~70 widgets, 15 categories) | C-index subcomponent registry — presence, usability, depth, customisation, integration, regional relevance per widget group |
+| Widget checklist (93 widgets, 15 categories) | C-index subcomponent registry — presence, usability, depth, customisation, integration, regional relevance per widget group |
 | Common / Uncommon / Rare tags | Differentiation weighting: a Rare widget done well scores differentiation; a missing Common widget is a proposition bottleneck |
 | Phase E categories (onboarding, UI/UX, trading experience, product range, research/education, AI & personalisation, security, support, fees, innovation) | C-index module set (~10 modules), same two-track scoring as L: continuous score + rating gate |
 | Novice-reviewer UX journal (steps, time-to-task, friction) | Evidence artifacts for C ratings (E3-grade by construction) |
