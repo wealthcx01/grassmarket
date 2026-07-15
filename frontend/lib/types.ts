@@ -41,6 +41,10 @@ export interface SubcomponentRating {
   evidence_grade?: EvidenceGrade | null;
   evidence_refs?: string[];
   notes?: string | null;
+  // Dual-rating governance (§9), set by consensus resolution (read-only on the client).
+  rater_ids?: string[];
+  consensus?: boolean;
+  dissent_note?: string | null;
 }
 
 export interface MetricEntry {
@@ -664,4 +668,32 @@ export interface CommitteeReviewSummary {
   assessment_id: string;
   subject: string;
   pending_count: number;
+}
+
+// --- Dual rating (Methodology §9, GRS-0062) ----------------------------------------------
+export interface ModuleRatingDraft {
+  id: string;
+  owner_consultant_id: string;
+  created_at: string;
+  updated_at: string;
+  assessment_id: string;
+  module_key: string;
+  ratings: SubcomponentRating[];
+  submitted: boolean;
+  submitted_at?: string | null;
+}
+
+export interface RaterCandidate {
+  id: string;
+  full_name: string;
+  email: string;
+  is_active: boolean;
+}
+
+export interface RatingRequestSummary {
+  assessment_id: string;
+  subject: string;
+  module_key: string;
+  module_name: string;
+  submitted: boolean;
 }

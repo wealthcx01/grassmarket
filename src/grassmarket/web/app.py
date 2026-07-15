@@ -34,6 +34,7 @@ from grassmarket.web.routers import (
     certification,
     committee,
     compliance,
+    consultants,
     deliverables,
     earnings,
     engagements,
@@ -101,6 +102,7 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
     app.include_router(compliance.router)
     app.include_router(guidance.router)
     app.include_router(registry.router)
+    app.include_router(consultants.router)
     _register_exception_handlers(app)
     return app
 

@@ -58,6 +58,49 @@ def _rating(level: MaturityLevel, *, dissent_note: str | None = None) -> dict:
     return body
 
 
+# --- GRS-0062: co-rater discovery + colleague lookup (the dual-rating UI's plumbing) -----
+
+
+def test_consultant_lookup_by_email(client, alice: SeededConsultant) -> None:
+    """A colleague resolves by EXACT email to the minimum needed to assign them as a rater — never
+    the password hash. An unknown email is a 404."""
+    ok = client.get(
+        f"/consultants/by-email?email={alice.stored.email}", headers=auth_header(alice)
+    )
+    assert ok.status_code == 200
+    assert ok.json()["id"] == str(alice.stored.id)
+    assert ok.json()["full_name"] == alice.stored.full_name
+    assert "hashed_password" not in ok.json()
+    assert (
+        client.get(
+            "/consultants/by-email?email=nobody@bruntsfieldcapital.com", headers=auth_header(alice)
+        ).status_code
+        == 404
+    )
+
+
+def test_rating_requests_lists_modules_assigned_to_me(client, alice: SeededConsultant) -> None:
+    """GRS-0062: a co-rater finds the ratings requested of them via GET /assessments/rating-requests
+    — every module they've been assigned to rate on an in-progress assessment."""
+    aid = _new_assessment(client, alice)
+    co = seed_corater(client)
+    assign_rater(client, aid, alice, _MODULE, co.principal.consultant_id)
+
+    reqs = client.get("/assessments/rating-requests", headers=auth_header(co))
+    assert reqs.status_code == 200
+    row = next(
+        (r for r in reqs.json() if r["assessment_id"] == aid and r["module_key"] == _MODULE), None
+    )
+    assert row is not None and row["submitted"] is False and row["module_name"]
+
+    # The lead who never asked to rate has no request for this (they only assigned the co-rater).
+    assert all(
+        r["assessment_id"] != aid for r in client.get(
+            "/assessments/rating-requests", headers=auth_header(alice)
+        ).json()
+    )
+
+
 # --- A solo-rated assessment cannot finalise --------------------------------------------
 
 

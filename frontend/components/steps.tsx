@@ -9,6 +9,7 @@
 import { useState } from "react";
 
 import { CommitteeReviewPanel } from "@/components/CommitteeReviewPanel";
+import { DualRatingPanel } from "@/components/DualRatingPanel";
 import { GuidancePanel } from "@/components/GuidancePanel";
 import { LiveScorePanel } from "@/components/LiveScorePanel";
 import * as doc from "@/lib/doc";
@@ -406,7 +407,14 @@ export function SummaryStep(props: StepProps) {
         </Card>
       ) : null}
 
-      {/* Governance: the §8 committee sign-off surface (resolves that finalise blocker in-product). */}
+      {/* Governance (resolves the finalise blockers in-product): §9 dual rating + §8 committee. */}
+      {readOnly ? null : (
+        <DualRatingPanel
+          assessmentId={props.assessmentId}
+          moduleLabels={moduleLabels}
+          onChanged={props.refreshLive}
+        />
+      )}
       {live?.scoreable ? <CommitteeReviewPanel assessmentId={props.assessmentId} /> : null}
       {readOnly ? (
         <p style={{ color: "var(--color-accent)", fontWeight: 600 }}>
