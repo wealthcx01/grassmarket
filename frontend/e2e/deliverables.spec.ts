@@ -52,7 +52,10 @@ test.describe("GRS-0019 slice 1 — deliverable library", () => {
     await openSeededEngagement(page);
 
     await page.getByLabel("Client-facing").check();
-    await page.getByRole("button", { name: "Generate" }).click();
+    // A client-facing document goes through the explicit review step first (GRS-0056), then confirm.
+    await page.getByRole("button", { name: "Review & generate" }).click();
+    await expect(page.getByText("Review before it goes to the client")).toBeVisible();
+    await page.getByRole("button", { name: "Generate client-facing document" }).click();
 
     // The client-usable gate refuses (draft coefficient set) — the human sees WHY, not a 409.
     // Filter past Next.js's always-present empty #__next-route-announcer__ (also role="alert").
