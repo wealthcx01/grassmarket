@@ -61,12 +61,30 @@ const SECTIONS: ReadonlyArray<Section> = [
     ],
     note: {
       tone: "warn",
-      text: "Finalising is gated on governance: every rated subcomponent needs a second independent rater and a resolved consensus (dual rating, §9), and any high-stakes rating needs Rating Committee sign-off (§8). The wizard tells you exactly what's still outstanding.",
+      text: "Finalising is gated on governance: every rated subcomponent needs a second independent rater and a resolved consensus (dual rating, §9), and any high-stakes rating needs Rating Committee sign-off (§8). The Summary step shows exactly what's outstanding and lets you resolve it — see Consensus & sign-off, next.",
+    },
+  },
+  {
+    id: "consensus",
+    kicker: "04 · Consensus & sign-off",
+    title: "Reach consensus, then sign off",
+    lead: "Two governance gates stand between a scored assessment and a finalised one, and you clear both from the Summary step. A solo rating is a draft, never a deliverable — so every rated subcomponent needs a genuine second opinion, and every high-stakes rating needs peer sign-off.",
+    href: { label: "Open assessments", to: "/assessments" },
+    steps: [
+      { do: "On the Summary step, the Dual rating & consensus panel lists each module that still needs a second opinion. Assign a co-rater by their email address.", then: "You're added as the first rater automatically; §9 needs two." },
+      { do: "Submit your own rating, then let your co-rater rate independently. They find the request under Workbench → Rating requests and rate blind — they never see your ratings.", then: "Blind by construction: the second opinion is genuinely independent." },
+      { do: "Once both ratings are in, press Resolve consensus. If you agreed, it clears; if you differed, record a dissent note.", then: "The module now reads “agreed”, and that finalise blocker lifts." },
+      { do: "Below it, the Rating Committee sign-off panel shows every high-stakes rating (a power Established+, a triad dimension above None, a module gated Frontier). You see the status but can never sign off your own — peer challenge.", then: "A committee member finds the work under Workbench → Committee and approves or rejects each with a recorded rationale." },
+      { do: "When every module is agreed and every high-stakes item is approved, Finalise & lock succeeds — and only then can you generate a client deliverable." },
+    ],
+    note: {
+      tone: "info",
+      text: "You never sign off your own high-stakes ratings, and a solo rating never becomes a deliverable. These are runtime guarantees, not conventions — the platform refuses, loudly, until both gates clear.",
     },
   },
   {
     id: "read",
-    kicker: "04 · Reading the score",
+    kicker: "05 · Reading the score",
     title: "Read the result honestly",
     lead: "A finalised assessment opens straight to Summary & Interpretation — the answer, not a form. Everything here is built to show confidence and its limits together.",
     steps: [
@@ -78,7 +96,7 @@ const SECTIONS: ReadonlyArray<Section> = [
   },
   {
     id: "deliver",
-    kicker: "05 · Deliverables",
+    kicker: "06 · Deliverables",
     title: "Turn a score into a client document",
     lead: "From an engagement, a finalised assessment generates client documents — a Platform Power Report, Executive Summary, Heatmap, and more. AI drafts the prose; you approve it. Nothing AI-written reaches a client without your sign-off.",
     href: { label: "Open engagements", to: "/engagements" },
@@ -94,7 +112,7 @@ const SECTIONS: ReadonlyArray<Section> = [
   },
   {
     id: "earnings",
-    kicker: "06 · Earnings",
+    kicker: "07 · Earnings",
     title: "See what you've earned",
     lead: "Your commission, workshop recovery fees, and projections in one place — every figure disclosed plainly, with a downloadable statement.",
     href: { label: "Open earnings", to: "/earnings" },
@@ -105,7 +123,7 @@ const SECTIONS: ReadonlyArray<Section> = [
   },
   {
     id: "workbench",
-    kicker: "07 · Workbench",
+    kicker: "08 · Workbench",
     title: "Sharpen your practice",
     lead: "Certification, practice arena, power drills, and calibration — how you earn and keep the assessor level that unlocks high-stakes ratings.",
     href: { label: "Open the workbench", to: "/workbench" },
