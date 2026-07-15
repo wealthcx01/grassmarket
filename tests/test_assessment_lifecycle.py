@@ -260,6 +260,24 @@ def test_scenarios_rank_by_delta_v(client, alice: SeededConsultant) -> None:
     )  # bigger ΔV first, regardless of input order
 
 
+def test_scenario_missing_powers_reports_blocking_not_500(client, alice: SeededConsultant) -> None:
+    """GRS-0045: a schema-valid but structurally-incomplete scenario (here, no powers) must be
+    reported as unscoreable, never crash the endpoint with a KeyError → 500."""
+    aid = client.post("/assessments", json={}, headers=auth_header(alice)).json()["id"]
+    client.put(
+        f"/assessments/{aid}", json=_body(_scoreable_partial_doc()), headers=auth_header(alice)
+    )
+    incomplete = _scoreable_partial_doc().model_copy(update={"powers": ()})
+    resp = client.post(
+        f"/assessments/{aid}/scenarios",
+        json={"scenarios": [{"name": "Broken", "document": _body(incomplete)}]},
+        headers=auth_header(alice),
+    )
+    assert resp.status_code == 200
+    assert resp.json()["scoreable"] is False
+    assert any("Broken" in b for b in resp.json()["blocking"])
+
+
 def test_scenarios_on_unscoreable_baseline_reports_blocking(
     client, alice: SeededConsultant
 ) -> None:

@@ -284,6 +284,17 @@ def evaluate_scenarios(
     if blockers:
         return ScenarioComparison(scoreable=False, blocking=tuple(blockers))
 
+    # Each scenario is a full what-if document completed to engine inputs the same way — but
+    # _complete_inputs indexes powers directly, so an unscoreable scenario (e.g. a missing power)
+    # would raise rather than report. Check scoreability first and surface it, never a 500.
+    scenario_blockers = [
+        f"Scenario '{name}': {b}"
+        for name, doc in named_scenarios
+        for b in scoreability_blockers(doc, registry)
+    ]
+    if scenario_blockers:
+        return ScenarioComparison(scoreable=False, blocking=tuple(scenario_blockers))
+
     baseline_inputs = _complete_inputs(baseline, registry)
     scenario_inputs = [(name, _complete_inputs(doc, registry)) for name, doc in named_scenarios]
     results = tuple(
