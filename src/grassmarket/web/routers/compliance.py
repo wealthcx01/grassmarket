@@ -11,10 +11,11 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from bcap_contracts.audit import AuditEvent, PersonalDataExport
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
 
 from grassmarket.data.repository import (
+    MAX_PAGE_LIMIT,
     NotFoundError,
     Principal,
     Repository,
@@ -38,9 +39,11 @@ def _forbidden(exc: Exception) -> HTTPException:
 def audit_log(
     principal: Principal = Depends(get_current_principal),
     repo: Repository = Depends(get_repository),
+    limit: int = Query(default=100, ge=1, le=MAX_PAGE_LIMIT),
+    offset: int = Query(default=0, ge=0),
 ) -> list[AuditEvent]:
     try:
-        return repo.list_audit_events(principal)
+        return repo.list_audit_events(principal, limit=limit, offset=offset)
     except ScopeViolationError as exc:
         raise _forbidden(exc) from exc
 

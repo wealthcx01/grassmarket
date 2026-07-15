@@ -43,6 +43,32 @@ def test_the_audit_log_is_admin_only(repo: Repository, alice: SeededConsultant) 
         repo.list_audit_events(alice.principal)
 
 
+def test_audit_log_is_paginated_newest_first(repo: Repository, admin: SeededConsultant) -> None:
+    """GRS-0050: the append-only log must never return unbounded. A limit caps the page and a
+    hostile over-limit is clamped, not honoured; ordering is newest-first for a useful page."""
+    for i in range(10):
+        repo.record_audit(
+            actor_consultant_id=admin.principal.consultant_id,
+            event_type=AuditEventType.AUTH_LOGIN,
+            now=datetime(2026, 7, 14, 12, i, tzinfo=UTC),
+        )
+    page = repo.list_audit_events(admin.principal, limit=3)
+    assert len(page) == 3
+    assert page[0].at >= page[1].at >= page[2].at  # newest first
+    # offset walks the pages; an over-limit request is clamped to MAX_PAGE_LIMIT, never unbounded.
+    next_page = repo.list_audit_events(admin.principal, limit=3, offset=3)
+    assert {e.id for e in page}.isdisjoint({e.id for e in next_page})
+    assert len(repo.list_audit_events(admin.principal, limit=10_000)) <= 500
+
+
+def test_audit_endpoint_rejects_out_of_range_limit(client, admin: SeededConsultant) -> None:
+    assert client.get("/compliance/audit?limit=0", headers=auth_header(admin)).status_code == 422
+    assert (
+        client.get("/compliance/audit?limit=99999", headers=auth_header(admin)).status_code == 422
+    )
+    assert client.get("/compliance/audit?limit=50", headers=auth_header(admin)).status_code == 200
+
+
 def test_login_is_audited(client, alice: SeededConsultant, admin: SeededConsultant) -> None:
     resp = client.post(
         "/auth/login",

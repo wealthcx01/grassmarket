@@ -14,10 +14,11 @@ from uuid import UUID
 from bcap_contracts.money import Currency, Money
 from bcap_contracts.predictions import BenchmarkRow, BenchmarkSector, Prediction
 from bcap_contracts.value import LeverValuation
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
 from grassmarket.data.repository import (
+    MAX_PAGE_LIMIT,
     ConflictError,
     NotFoundError,
     Principal,
@@ -131,5 +132,7 @@ def ingest(
 def list_benchmark(
     _principal: Principal = Depends(get_current_principal),
     repo: Repository = Depends(get_repository),
+    limit: int = Query(default=100, ge=1, le=MAX_PAGE_LIMIT),
+    offset: int = Query(default=0, ge=0),
 ) -> list[BenchmarkRow]:
-    return repo.list_benchmark_rows()
+    return repo.list_benchmark_rows(limit=limit, offset=offset)
