@@ -82,14 +82,20 @@ def ingest_text(
     repo: Repository = Depends(get_repository),
     cipher: TranscriptCipher = Depends(_cipher),
 ) -> MeetingTranscript:
-    return repo.ingest_pasted_transcript(
-        principal,
-        text=payload.text,
-        source_filename=payload.source_filename,
-        cipher=cipher,
-        engagement_id=payload.engagement_id,
-        retention_until=payload.retention_until,
-    )
+    try:
+        return repo.ingest_pasted_transcript(
+            principal,
+            text=payload.text,
+            source_filename=payload.source_filename,
+            cipher=cipher,
+            engagement_id=payload.engagement_id,
+            retention_until=payload.retention_until,
+        )
+    except (NotFoundError, ScopeViolationError) as exc:
+        # A cross-owner / missing engagement link is refused, never revealed.
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Engagement not found."
+        ) from exc
 
 
 @router.post("/media", response_model=MeetingTranscript, status_code=status.HTTP_201_CREATED)
@@ -136,6 +142,11 @@ def ingest_media(
             engagement_id=payload.engagement_id,
             retention_until=payload.retention_until,
         )
+    except (NotFoundError, ScopeViolationError) as exc:
+        # A cross-owner / missing engagement link is refused, never revealed.
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Engagement not found."
+        ) from exc
     except MediaThreatError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)

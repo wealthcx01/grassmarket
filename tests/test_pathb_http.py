@@ -86,6 +86,51 @@ def test_a_transcript_is_owner_scoped(
     assert client.get("/transcripts", headers=auth_header(bob)).json() == []
 
 
+def _own_engagement_id(client, owner: SeededConsultant) -> str:
+    """A contracted prospect → an engagement owned by `owner`, over HTTP."""
+    from tests.test_engagement_detail import _contracted_prospect_http
+
+    pid = _contracted_prospect_http(client, owner)
+    return client.post(
+        "/engagements", json={"prospect_id": pid, "title": "Eng"}, headers=auth_header(owner)
+    ).json()["id"]
+
+
+def test_transcript_engagement_link_is_scoped(
+    client, alice: SeededConsultant, bob: SeededConsultant
+) -> None:
+    """GRS-0052: a transcript may be attached only to the caller's own engagement. A missing or
+    cross-owner engagement_id is refused (404), never stored as a dangling/foreign reference."""
+    from uuid import uuid4
+
+    # Alice's own engagement links fine and is recorded.
+    eid = _own_engagement_id(client, alice)
+    ok = client.post(
+        "/transcripts/text",
+        json={"text": "note", "source_filename": "n.txt", "engagement_id": eid},
+        headers=auth_header(alice),
+    )
+    assert ok.status_code == 201, ok.text
+    assert ok.json()["engagement_id"] == eid
+
+    # A non-existent engagement → 404.
+    ghost = client.post(
+        "/transcripts/text",
+        json={"text": "n", "source_filename": "n.txt", "engagement_id": str(uuid4())},
+        headers=auth_header(alice),
+    )
+    assert ghost.status_code == 404
+
+    # Bob's engagement used by Alice → 404 (cross-owner), and nothing is stored.
+    beid = _own_engagement_id(client, bob)
+    cross = client.post(
+        "/transcripts/text",
+        json={"text": "n", "source_filename": "n.txt", "engagement_id": beid},
+        headers=auth_header(alice),
+    )
+    assert cross.status_code == 404
+
+
 def test_media_upload_rejects_oversize(client, alice: SeededConsultant) -> None:
     # Shrink the limit on the running app, then post one byte over it.
     client.app.state.settings.max_upload_bytes = 8

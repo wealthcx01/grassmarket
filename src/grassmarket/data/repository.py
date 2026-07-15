@@ -1012,6 +1012,11 @@ class Repository:
         engagement_id: UUID | None,
         retention_until: date | None,
     ) -> MeetingTranscript:
+        # A supplied engagement must exist and belong to the caller — otherwise a transcript could
+        # be attached to another consultant's (or a non-existent) engagement, a dangling/foreign
+        # reference. Cross-owner or missing → refused (NotFound/Scope → 404), like every other link.
+        if engagement_id is not None:
+            self._require_engagement(principal, engagement_id)
         row = MeetingTranscriptORM(
             owner_consultant_id=principal.consultant_id,
             engagement_id=engagement_id,
