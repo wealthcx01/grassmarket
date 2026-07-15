@@ -37,6 +37,16 @@ class InvalidInvitationError(AuthError):
     """The invitation is unknown, expired, or already used."""
 
 
+class ForbiddenInvitationError(AuthError):
+    """The inviter is not allowed to grant the requested role or tier (privilege escalation)."""
+
+
+# The role and tier a non-admin inviter may grant. Anything above these requires admin — otherwise
+# any consultant could self-mint an ADMIN account (GRS-0042) and defeat the whole ownership model.
+_DEFAULT_INVITE_ROLE = Role.CONSULTANT
+_DEFAULT_INVITE_TIER = ConsultantTier.VENTURE_ASSOCIATE
+
+
 class AuthService:
     def __init__(self, repo: Repository, settings: Settings) -> None:
         self._repo = repo
@@ -47,13 +57,24 @@ class AuthService:
         self,
         *,
         inviter_id: UUID,
+        inviter_role: Role,
         email: str,
         role: Role = Role.CONSULTANT,
         tier: ConsultantTier = ConsultantTier.VENTURE_ASSOCIATE,
         now: datetime | None = None,
     ) -> str:
         """Create an invitation and return the RAW token (delivered out of band; only its hash is
-        stored). Signup is invitation-only (PRD §2)."""
+        stored). Signup is invitation-only (PRD §2).
+
+        Only an admin may grant an elevated role or tier. A non-admin inviting anything above the
+        default consultant/entry-tier is refused loud (GRS-0042) — the whole ownership model rests
+        on the JWT `role`, so the invite flow must not let an unprivileged user forge it."""
+        if inviter_role is not Role.ADMIN and (
+            role is not _DEFAULT_INVITE_ROLE or tier is not _DEFAULT_INVITE_TIER
+        ):
+            raise ForbiddenInvitationError(
+                "Only an admin may invite a consultant with an elevated role or tier."
+            )
         issued = now or datetime.now(UTC)
         raw_token, token_hash = generate_invite_token()
         self._repo.create_invitation(

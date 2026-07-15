@@ -6,9 +6,11 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 
 import pytest
+from bcap_contracts.common import ConsultantTier, Role
 
 from grassmarket.auth.service import (
     AuthService,
+    ForbiddenInvitationError,
     InvalidInvitationError,
 )
 from grassmarket.data.repository import Repository
@@ -22,7 +24,11 @@ def _service(session_factory, settings) -> tuple[AuthService, object]:
 
 def test_invitation_signup_then_login_and_me(session_factory, settings, alice, client) -> None:
     svc, session = _service(session_factory, settings)
-    token = svc.create_invitation(inviter_id=alice.stored.id, email="carol@bruntsfieldcapital.com")
+    token = svc.create_invitation(
+        inviter_id=alice.stored.id,
+        inviter_role=alice.principal.role,
+        email="carol@bruntsfieldcapital.com",
+    )
     consultant = svc.accept_invitation(
         token=token, full_name="Carol", password="a-very-strong-passphrase"
     )
@@ -59,7 +65,11 @@ def test_login_unknown_email_is_401(client) -> None:
 
 def test_invitation_cannot_be_reused(session_factory, settings, alice) -> None:
     svc, session = _service(session_factory, settings)
-    token = svc.create_invitation(inviter_id=alice.stored.id, email="dave@bruntsfieldcapital.com")
+    token = svc.create_invitation(
+        inviter_id=alice.stored.id,
+        inviter_role=alice.principal.role,
+        email="dave@bruntsfieldcapital.com",
+    )
     svc.accept_invitation(token=token, full_name="Dave", password="a-very-strong-passphrase")
     session.commit()
     with pytest.raises(InvalidInvitationError):
@@ -71,7 +81,10 @@ def test_expired_invitation_refused(session_factory, settings, alice) -> None:
     svc, session = _service(session_factory, settings)
     long_ago = datetime.now(UTC) - timedelta(hours=settings.invite_ttl_hours + 1)
     token = svc.create_invitation(
-        inviter_id=alice.stored.id, email="erin@bruntsfieldcapital.com", now=long_ago
+        inviter_id=alice.stored.id,
+        inviter_role=alice.principal.role,
+        email="erin@bruntsfieldcapital.com",
+        now=long_ago,
     )
     session.commit()
     with pytest.raises(InvalidInvitationError):
@@ -92,3 +105,66 @@ def test_create_invitation_endpoint_authenticated(client, alice: SeededConsultan
     assert resp.status_code == 201
     assert resp.json()["email"] == "frank@bruntsfieldcapital.com"
     assert resp.json()["token"]  # raw token returned once for out-of-band delivery
+
+
+# --- GRS-0042: invitation privilege-escalation is refused ---------------------------------
+
+
+def test_consultant_cannot_invite_an_admin(client, alice: SeededConsultant) -> None:
+    """A non-admin inviting role=admin must be refused (403) — otherwise any consultant could
+    self-mint an admin and defeat data scoping entirely."""
+    resp = client.post(
+        "/auth/invitations",
+        json={"email": "attacker@bruntsfieldcapital.com", "role": "admin"},
+        headers=auth_header(alice),
+    )
+    assert resp.status_code == 403
+
+
+def test_consultant_cannot_invite_an_elevated_tier(client, alice: SeededConsultant) -> None:
+    resp = client.post(
+        "/auth/invitations",
+        json={"email": "climber@bruntsfieldcapital.com", "tier": "consultant"},
+        headers=auth_header(alice),
+    )
+    assert resp.status_code == 403
+
+
+def test_admin_can_invite_an_admin(client, admin: SeededConsultant) -> None:
+    resp = client.post(
+        "/auth/invitations",
+        json={"email": "second-admin@bruntsfieldcapital.com", "role": "admin"},
+        headers=auth_header(admin),
+    )
+    assert resp.status_code == 201
+    assert resp.json()["token"]
+
+
+def test_service_refuses_role_elevation_from_non_admin(session_factory, settings, alice) -> None:
+    svc, session = _service(session_factory, settings)
+    with pytest.raises(ForbiddenInvitationError):
+        svc.create_invitation(
+            inviter_id=alice.stored.id,
+            inviter_role=Role.CONSULTANT,
+            email="x@bruntsfieldcapital.com",
+            role=Role.ADMIN,
+        )
+    session.close()
+
+
+def test_service_allows_default_invite_and_admin_elevation(
+    session_factory, settings, alice
+) -> None:
+    svc, session = _service(session_factory, settings)
+    # default (consultant / entry tier) from a consultant is fine
+    assert svc.create_invitation(
+        inviter_id=alice.stored.id, inviter_role=Role.CONSULTANT, email="ok@bruntsfieldcapital.com"
+    )
+    # admin may grant an elevated tier
+    assert svc.create_invitation(
+        inviter_id=alice.stored.id,
+        inviter_role=Role.ADMIN,
+        email="tiered@bruntsfieldcapital.com",
+        tier=ConsultantTier.CONSULTANT,
+    )
+    session.close()
