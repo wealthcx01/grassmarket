@@ -399,13 +399,17 @@ def _score_triad(
     perceived = (
         sum(enc[o.benefit.value] for o in perceived_src) / len(perceived_src)
         if perceived_src
-        else 0.0
+        else None
     )
 
     econ_src = [group_means[g] for g in _ECONOMIC_GROUPS if g in group_means]
-    economic = sum(econ_src) / len(econ_src) if econ_src else 0.0
+    # No assessed scale/unit-economics metric ⟹ Economic Value is Not Assessed (None), never a
+    # "None" moat floor. Zero-filling would conflate unassessed with "no economic value" (D9).
+    economic = sum(econ_src) / len(econ_src) if econ_src else None
 
-    def _dim(v: float) -> TriadDimensionResult:
+    def _dim(v: float | None) -> TriadDimensionResult:
+        if v is None:
+            return TriadDimensionResult(rating=None, score=None)
         return TriadDimensionResult(rating=_to_ordinal(v, thresholds), score=_round(v))
 
     return TriadResult(

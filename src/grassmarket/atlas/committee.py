@@ -54,7 +54,9 @@ def required_committee_items(result: AtlasResult) -> tuple[CommitteeItem, ...]:
 
     for attr, label in _TRIAD_LABELS.items():
         dimension = getattr(result.triad, attr)
-        if dimension.rating != "None":
+        # A Not-Assessed dimension (rating is None) is not a high-stakes rating — only a rating
+        # strictly above the "None" moat floor needs committee sign-off.
+        if dimension.rating is not None and dimension.rating != "None":
             items.append(
                 CommitteeItem(
                     item_type=CommitteeItemType.TRIAD,
