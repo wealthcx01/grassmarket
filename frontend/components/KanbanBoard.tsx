@@ -67,9 +67,23 @@ export function KanbanBoard({
               </span>
             </header>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-              {entries.map((entry) => (
-                <ProspectCard key={entry.prospect.id} entry={entry} onMove={onMove} />
-              ))}
+              {entries.length === 0 ? (
+                // A muted placeholder so an empty stage reads as intentionally empty, not broken.
+                <p
+                  style={{
+                    margin: "0.25rem 0",
+                    fontSize: "0.72rem",
+                    fontStyle: "italic",
+                    color: "var(--color-ink-faint)",
+                  }}
+                >
+                  No prospects
+                </p>
+              ) : (
+                entries.map((entry) => (
+                  <ProspectCard key={entry.prospect.id} entry={entry} onMove={onMove} />
+                ))
+              )}
             </div>
           </section>
           );
