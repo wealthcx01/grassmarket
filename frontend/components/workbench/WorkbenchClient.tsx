@@ -7,7 +7,7 @@
  * mounted only for a committee member or admin, the same gate the server enforces.
  */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
 import { getSession } from "@/lib/session";
@@ -21,7 +21,12 @@ import { ArenaPanel } from "@/components/workbench/ArenaPanel";
 type TabKey = "bench" | "certification" | "learning" | "arena" | "calibration" | "committee";
 
 export function WorkbenchClient() {
-  const session = useMemo(() => getSession(), []);
+  // The session comes from localStorage, which the server can't read — reading it during render
+  // makes the first client paint diverge from the server HTML (hydration mismatch, React #418).
+  // Gate on `mounted` so the server and first client render agree, then read it after mount.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const session = useMemo(() => (mounted ? getSession() : null), [mounted]);
   const tabs = useMemo(() => {
     const base: { key: TabKey; label: string }[] = [
       { key: "bench", label: "Bench" },
@@ -34,6 +39,11 @@ export function WorkbenchClient() {
     return base;
   }, [session]);
   const [tab, setTab] = useState<TabKey>("bench");
+
+  // Stable placeholder for the server render and the first client paint (matches, no #418).
+  if (!mounted) {
+    return <p style={{ fontSize: "0.9rem", color: "var(--color-ink-muted)" }}>Loading…</p>;
+  }
 
   if (!session) {
     return (
