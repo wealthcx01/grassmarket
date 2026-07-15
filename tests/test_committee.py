@@ -256,6 +256,23 @@ def test_a_committee_member_cannot_sign_off_their_own_assessment(client) -> None
     assert "peer challenge" in resp.json()["detail"]
 
 
+def test_committee_work_queue_lists_pending_and_is_members_only(
+    client, alice: SeededConsultant
+) -> None:
+    """GRS-0061: a committee member finds work via GET /committee/queue — every in-progress
+    assessment with pending high-stakes items. A plain consultant is refused (403)."""
+    aid = _scoreable(client, alice)  # triad rates above None → high-stakes items pending
+    member = seed_committee_member(client)
+
+    q = client.get("/committee/queue", headers=auth_header(member))
+    assert q.status_code == 200
+    row = next((r for r in q.json() if r["assessment_id"] == aid), None)
+    assert row is not None and row["pending_count"] >= 1
+
+    # A non-committee consultant has no work-queue.
+    assert client.get("/committee/queue", headers=auth_header(alice)).status_code == 403
+
+
 def test_a_speculative_pre_approval_is_refused(client, alice: SeededConsultant) -> None:
     """GRS-0051: a member cannot pre-approve a rating the score has not reached — only an item that
     is currently required, at its current rating, may be decided. Otherwise the finalise gate could

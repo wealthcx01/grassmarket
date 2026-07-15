@@ -2024,6 +2024,22 @@ class Repository:
             out.append(self._to_assessment(row))
         return out
 
+    def list_assessments_for_committee(self, principal: Principal) -> list[Assessment]:
+        """Every in-progress assessment across owners — so a committee member/admin can find the
+        work that needs their sign-off. NOT owner-scoped (committee visibility, ADR-0011); a plain
+        consultant is refused. Finalised assessments are excluded (their gate has cleared)."""
+        if not (principal.is_committee or principal.is_admin):
+            raise ScopeViolationError(
+                "Only a committee member or an admin may list assessments for committee review."
+            )
+        stmt = (
+            select(AssessmentORM)
+            .where(AssessmentORM.state == AssessmentState.IN_PROGRESS.value)
+            .order_by(AssessmentORM.updated_at.desc())
+        )
+        rows = self._session.execute(stmt).scalars().all()
+        return [self._to_assessment(r) for r in rows]
+
     def update_assessment(
         self, principal: Principal, assessment_id: UUID, *, document: AssessmentDocument
     ) -> Assessment:
