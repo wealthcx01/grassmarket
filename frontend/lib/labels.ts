@@ -68,9 +68,21 @@ export function humanizeKey(key: string): string {
   return words(key);
 }
 
-/** Replace every ALL_CAPS registry-key token inside a free-text string with its humanized label. */
+// A standard UUID — redacted before anything else so a raw id can never reach an advisor's screen,
+// even if the backend ever embeds one in a message ("no raw id reaches the client").
+const UUID_RE = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi;
+
+// A registry-key token: ALL-CAPS with a `_`/`/` separator AND at least one underscore (the lookahead)
+// — the real shape of BACK_OFFICE / FRONTEND_PERFORMANCE / FRONTEND/FRONTEND_PERFORMANCE. Requiring
+// an underscore deliberately leaves ordinary slashed/hyphen-free text alone: EUR/USD, A/B, TCP/IP,
+// Q1/Q2 carry no underscore and are NOT registry keys, so they must render verbatim.
+const KEY_RE = /\b(?=[A-Z0-9/_]*_)[A-Z][A-Z0-9]*(?:[_/][A-Z0-9]+)+\b/g;
+
+/** Replace every registry-key token inside a free-text string with its humanized label, and redact
+ * any raw UUID. Ordinary uppercase text without an underscore (currency pairs, A/B, TCP/IP) is left
+ * untouched. */
 export function humanizeKeysInText(text: string): string {
-  return text.replace(/\b[A-Z][A-Z0-9]*(?:[_/][A-Z0-9]+)+\b/g, (m) => humanizeKey(m));
+  return text.replace(UUID_RE, "…").replace(KEY_RE, (m) => humanizeKey(m));
 }
 
 export interface BlockingSummary {

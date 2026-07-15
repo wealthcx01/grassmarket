@@ -203,6 +203,31 @@ def test_triad_source_literals_must_be_in_registry(registry: Registry, monkeypat
         _engine._assert_triad_sources_registered(registry)
 
 
+def test_triad_economic_is_not_assessed_never_a_none_floor(registry: Registry, coeffs) -> None:
+    """GRS-0043 / D9: when no scale or unit-economics metric is assessed, Economic Value is Not
+    Assessed (rating/score None) — never silently floored to the "None" moat rating. B stays
+    scoreable off the momentum group, so this is a live, valid partial assessment."""
+    economic_metrics = {
+        k: NonScoreState.NOT_ASSESSED
+        for k in (
+            "AUA",
+            "ACTIVE_CLIENTS",
+            "NET_REVENUE",
+            "REVENUE_PER_CLIENT",
+            "GROSS_MARGIN",
+            "COST_TO_SERVE",
+            "TAKE_RATE_LEVEL",
+        )
+    }
+    res = score(build_inputs(registry, metrics=economic_metrics), coeffs, registry)
+    assert res.triad.economic_value.rating is None
+    assert res.triad.economic_value.score is None
+    # Momentum keeps B scoreable, and the other two dimensions still rate honestly.
+    assert "momentum" in res.business.group_means
+    assert res.triad.defence_value.rating is not None
+    assert res.triad.perceived_value.rating is not None
+
+
 def test_na_metric_renormalises_its_group(registry: Registry, coeffs) -> None:
     # AUA is a `scale` metric; mark it N/A and the scale-group mean must be the mean of the OTHER
     # scale metrics only — the group renormalises, AUA is not zero-filled.

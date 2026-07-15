@@ -211,6 +211,12 @@ def _band(band: Band) -> IndexBand:
     return IndexBand(p10=band.p10, p50=band.p50, p90=band.p90, modelled=band.modelled)
 
 
+def _triad_rating(rating: str | None) -> StrengthRating | None:
+    """A triad dimension with no assessed source is Not Assessed (None on the wire), never coerced
+    into the StrengthRating.NONE moat floor (D9)."""
+    return StrengthRating(rating) if rating is not None else None
+
+
 def live_score(
     document: AssessmentDocument,
     coefficients: CoefficientSet,
@@ -251,9 +257,9 @@ def live_score(
         p=_band(unc.p_band),
         l_index=_band(unc.l_band),
         module_qm={k: _band(v) for k, v in unc.module_qm.items()},
-        triad_economic=StrengthRating(triad.economic_value.rating),
-        triad_perceived=StrengthRating(triad.perceived_value.rating),
-        triad_defence=StrengthRating(triad.defence_value.rating),
+        triad_economic=_triad_rating(triad.economic_value.rating),
+        triad_perceived=_triad_rating(triad.perceived_value.rating),
+        triad_defence=_triad_rating(triad.defence_value.rating),
         overall_uncertainty=unc.overall_uncertainty,
         subcomponents_assessed=assessed,
         subcomponents_total=total,
@@ -277,6 +283,17 @@ def evaluate_scenarios(
     blockers = scoreability_blockers(baseline, registry)
     if blockers:
         return ScenarioComparison(scoreable=False, blocking=tuple(blockers))
+
+    # Each scenario is a full what-if document completed to engine inputs the same way — but
+    # _complete_inputs indexes powers directly, so an unscoreable scenario (e.g. a missing power)
+    # would raise rather than report. Check scoreability first and surface it, never a 500.
+    scenario_blockers = [
+        f"Scenario '{name}': {b}"
+        for name, doc in named_scenarios
+        for b in scoreability_blockers(doc, registry)
+    ]
+    if scenario_blockers:
+        return ScenarioComparison(scoreable=False, blocking=tuple(scenario_blockers))
 
     baseline_inputs = _complete_inputs(baseline, registry)
     scenario_inputs = [(name, _complete_inputs(doc, registry)) for name, doc in named_scenarios]

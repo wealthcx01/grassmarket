@@ -12,7 +12,7 @@ import Link from "next/link";
 
 import { ForecastPanel } from "@/components/ForecastPanel";
 import { KanbanBoard } from "@/components/KanbanBoard";
-import { ApiError, api, getToken } from "@/lib/api";
+import { ApiError, api, clearToken, getToken } from "@/lib/api";
 import type { PipelineBoard, PipelineForecast, PipelineStage } from "@/lib/types";
 
 export default function PipelinePage() {
@@ -23,17 +23,25 @@ export default function PipelinePage() {
   const [company, setCompany] = useState("");
   const [creating, setCreating] = useState(false);
 
-  const reload = useCallback((signal?: AbortSignal) => {
-    return Promise.all([api.pipelineBoard(signal), api.pipelineForecast(signal)])
-      .then(([b, f]) => {
-        setBoard(b);
-        setForecast(f);
-      })
-      .catch((err: unknown) => {
-        if (err instanceof ApiError && err.status === 0) return;
-        setError(err instanceof ApiError ? err.message : "Could not load the pipeline.");
-      });
-  }, []);
+  const reload = useCallback(
+    (signal?: AbortSignal) => {
+      return Promise.all([api.pipelineBoard(signal), api.pipelineForecast(signal)])
+        .then(([b, f]) => {
+          setBoard(b);
+          setForecast(f);
+        })
+        .catch((err: unknown) => {
+          if (err instanceof ApiError && err.status === 0) return;
+          if (err instanceof ApiError && err.status === 401) {
+            clearToken();
+            router.replace("/login");
+            return;
+          }
+          setError(err instanceof ApiError ? err.message : "Could not load the pipeline.");
+        });
+    },
+    [router],
+  );
 
   useEffect(() => {
     if (!getToken()) {

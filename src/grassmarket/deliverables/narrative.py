@@ -40,6 +40,12 @@ class NarrativeContext:
     defence_value: str
 
 
+def _triad_word(rating: str | None) -> str:
+    """A triad rating for prose — "Not assessed" when the dimension had no assessed source, never
+    the bare "None" moat word (which would read as a real, weak rating)."""
+    return rating if rating is not None else "Not assessed"
+
+
 def context_from_result(result: AtlasResult, subject: str) -> NarrativeContext:
     """Derive the drafting context from an immutable stored result — reproducible by design."""
     triad = result.triad
@@ -50,9 +56,9 @@ def context_from_result(result: AtlasResult, subject: str) -> NarrativeContext:
         b_index=to_display(composite.b_index),
         p_index=to_display(composite.p_index),
         l_index=to_display(composite.l_index),
-        economic_value=str(triad.economic_value.rating),
-        perceived_value=str(triad.perceived_value.rating),
-        defence_value=str(triad.defence_value.rating),
+        economic_value=_triad_word(triad.economic_value.rating),
+        perceived_value=_triad_word(triad.perceived_value.rating),
+        defence_value=_triad_word(triad.defence_value.rating),
     )
 
 

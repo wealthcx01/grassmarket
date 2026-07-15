@@ -10,9 +10,10 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
-import { ApiError, api, getToken } from "@/lib/api";
+import { ApiError, api, clearToken, getToken } from "@/lib/api";
 import { COMMS_CHANNELS, type CommsChannel, type Engagement } from "@/lib/types";
 import { DeliverablesPanel } from "@/components/DeliverablesPanel";
+import { LinkAssessmentControl } from "@/components/LinkAssessmentControl";
 
 export default function EngagementDetailPage() {
   const router = useRouter();
@@ -29,6 +30,10 @@ export default function EngagementDetailPage() {
         .then(setEngagement)
         .catch((err: unknown) => {
           if (err instanceof ApiError && err.status === 0) return;
+          if (err instanceof ApiError && err.status === 401) {
+            clearToken();
+            return router.replace("/login");
+          }
           if (err instanceof ApiError && err.status === 404) return router.replace("/engagements");
           setError(err instanceof ApiError ? err.message : "Could not load the engagement.");
         }),
@@ -91,6 +96,7 @@ export default function EngagementDetailPage() {
             ))}
           </ul>
         )}
+        <LinkAssessmentControl engagement={engagement} onLinked={reload} />
       </section>
 
       <DeliverablesPanel engagementId={id} />
@@ -100,6 +106,9 @@ export default function EngagementDetailPage() {
   );
 }
 
+// Link an already-finalised assessment to this engagement (GRS-0039). Offers the advisor's own
+// finalised assessments that aren't linked here yet — closing the contract -> assessment ->
+// deliverable loop that engagement-open alone couldn't (assessment_ids was create-time only).
 function CommsLog({ engagement, onAdded }: { engagement: Engagement; onAdded: () => Promise<unknown> }) {
   const [channel, setChannel] = useState<CommsChannel>("note");
   const [body, setBody] = useState("");
@@ -140,7 +149,7 @@ function CommsLog({ engagement, onAdded }: { engagement: Engagement; onAdded: ()
         </ol>
       )}
       <form onSubmit={add} style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "flex-start" }}>
-        <select value={channel} onChange={(e) => setChannel(e.target.value as CommsChannel)} style={inputStyle}>
+        <select aria-label="Channel" value={channel} onChange={(e) => setChannel(e.target.value as CommsChannel)} style={inputStyle}>
           {COMMS_CHANNELS.map((c) => (
             <option key={c} value={c}>
               {c}
