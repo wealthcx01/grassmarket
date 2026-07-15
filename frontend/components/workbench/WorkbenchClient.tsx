@@ -17,8 +17,16 @@ import { CertificationPanel } from "@/components/workbench/CertificationPanel";
 import { CommitteePanel } from "@/components/workbench/CommitteePanel";
 import { LearningDrillsPanel } from "@/components/workbench/LearningDrillsPanel";
 import { ArenaPanel } from "@/components/workbench/ArenaPanel";
+import { RatingRequestsPanel } from "@/components/workbench/RatingRequestsPanel";
 
-type TabKey = "bench" | "certification" | "learning" | "arena" | "calibration" | "committee";
+type TabKey =
+  | "bench"
+  | "certification"
+  | "learning"
+  | "arena"
+  | "calibration"
+  | "requests"
+  | "committee";
 
 export function WorkbenchClient() {
   // The session comes from localStorage, which the server can't read — reading it during render
@@ -34,6 +42,7 @@ export function WorkbenchClient() {
       { key: "learning", label: "Learning & Drills" },
       { key: "arena", label: "Practice Arena" },
       { key: "calibration", label: "Calibration" },
+      { key: "requests", label: "Rating requests" },
     ];
     if (session?.isCommittee) base.push({ key: "committee", label: "Committee" });
     return base;
@@ -88,6 +97,7 @@ export function WorkbenchClient() {
         {tab === "learning" && <LearningDrillsPanel />}
         {tab === "arena" && <ArenaPanel />}
         {tab === "calibration" && <CalibrationPanel />}
+        {tab === "requests" && <RatingRequestsPanel />}
         {tab === "committee" && session.isCommittee && <CommitteePanel />}
       </div>
     </div>

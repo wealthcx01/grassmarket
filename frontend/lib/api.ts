@@ -37,8 +37,12 @@ import type {
   EarningsSummary,
   Engagement,
   LearningModule,
+  ModuleRatingDraft,
   NarrativeSection,
   LiveScore,
+  RaterCandidate,
+  RatingRequestSummary,
+  SubcomponentRating,
   PerformanceSummary,
   PipelineBoard,
   PipelineForecast,
@@ -258,6 +262,74 @@ export const api = {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify(decision),
+      signal,
+    });
+  },
+
+  // --- Dual rating (§9, GRS-0062) ---
+  lookupConsultantByEmail(email: string, signal?: AbortSignal): Promise<RaterCandidate> {
+    return request<RaterCandidate>(`/consultants/by-email?email=${encodeURIComponent(email)}`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  myRatingRequests(signal?: AbortSignal): Promise<RatingRequestSummary[]> {
+    return request<RatingRequestSummary[]>(`/assessments/rating-requests`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  assignRater(id: string, moduleKey: string, raterId: string, signal?: AbortSignal): Promise<ModuleRatingDraft> {
+    return request<ModuleRatingDraft>(`/assessments/${id}/modules/${moduleKey}/raters`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ rater_consultant_id: raterId }),
+      signal,
+    });
+  },
+
+  getMyModuleRating(id: string, moduleKey: string, signal?: AbortSignal): Promise<ModuleRatingDraft> {
+    return request<ModuleRatingDraft>(`/assessments/${id}/modules/${moduleKey}/my-rating`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  updateMyModuleRating(id: string, moduleKey: string, ratings: SubcomponentRating[], signal?: AbortSignal): Promise<ModuleRatingDraft> {
+    return request<ModuleRatingDraft>(`/assessments/${id}/modules/${moduleKey}/my-rating`, {
+      method: "PUT",
+      headers: authHeaders(),
+      body: JSON.stringify({ ratings }),
+      signal,
+    });
+  },
+
+  submitMyModuleRating(id: string, moduleKey: string, signal?: AbortSignal): Promise<ModuleRatingDraft> {
+    return request<ModuleRatingDraft>(`/assessments/${id}/modules/${moduleKey}/my-rating/submit`, {
+      method: "POST",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  listModuleRatings(id: string, moduleKey: string, signal?: AbortSignal): Promise<ModuleRatingDraft[]> {
+    return request<ModuleRatingDraft[]>(`/assessments/${id}/modules/${moduleKey}/ratings`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  resolveModuleConsensus(id: string, moduleKey: string, resolved: SubcomponentRating[], signal?: AbortSignal): Promise<Assessment> {
+    return request<Assessment>(`/assessments/${id}/modules/${moduleKey}/consensus`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ resolved }),
       signal,
     });
   },

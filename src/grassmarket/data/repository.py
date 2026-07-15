@@ -2302,6 +2302,22 @@ class Repository:
         ]
         return [self._to_module_rating_draft(r) for r in visible]
 
+    def list_my_rating_assignments(
+        self, principal: Principal
+    ) -> list[tuple[ModuleRatingDraft, str]]:
+        """Every module the caller has been assigned to rate, with the assessment's subject — how a
+        co-rater finds the ratings requested of them. Owner-scoped to the caller's own draft rows;
+        it never reveals a co-rater's ratings (only that an assignment exists)."""
+        stmt = (
+            select(ModuleRatingDraftORM, AssessmentORM.subject)
+            .join(AssessmentORM, AssessmentORM.id == ModuleRatingDraftORM.assessment_id)
+            .where(ModuleRatingDraftORM.owner_consultant_id == principal.consultant_id)
+            .where(AssessmentORM.state != AssessmentState.FINALISED.value)
+            .order_by(ModuleRatingDraftORM.created_at.desc())
+        )
+        rows = self._session.execute(stmt).all()
+        return [(self._to_module_rating_draft(d), subject) for d, subject in rows]
+
     def resolve_module_consensus(
         self,
         principal: Principal,

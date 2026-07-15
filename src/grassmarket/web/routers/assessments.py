@@ -103,6 +103,38 @@ def list_assessments(
     return repo.list_assessments(principal)
 
 
+class RatingRequestSummary(BaseModel):
+    """One module the caller has been asked to rate (co-rater's work-queue, §9)."""
+
+    assessment_id: UUID
+    subject: str
+    module_key: str
+    module_name: str
+    submitted: bool
+
+
+# Declared BEFORE `/{assessment_id}` so "rating-requests" isn't parsed as an assessment UUID.
+@router.get("/rating-requests", response_model=list[RatingRequestSummary])
+def my_rating_requests(
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> list[RatingRequestSummary]:
+    """Every module the caller has been assigned to rate on an in-progress assessment — how a
+    co-rater finds the ratings requested of them."""
+    registry = load_registry()
+    module_names = {m.key: m.name for m in registry.modules}
+    return [
+        RatingRequestSummary(
+            assessment_id=draft.assessment_id,
+            subject=subject or "Untitled assessment",
+            module_key=draft.module_key,
+            module_name=module_names.get(draft.module_key, draft.module_key),
+            submitted=draft.submitted,
+        )
+        for draft, subject in repo.list_my_rating_assignments(principal)
+    ]
+
+
 @router.get("/{assessment_id}", response_model=Assessment)
 def get_assessment(
     assessment_id: UUID,
