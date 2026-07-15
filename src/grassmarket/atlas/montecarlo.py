@@ -7,8 +7,9 @@ the untouched deterministic engine, so the point estimate and every band come fr
 Randomness is the first in the codebase, and it is contained: the RNG is **injected and seeded**
 (a `random.Random` or a numpy `Generator` — both satisfy the `.random()` protocol), never module
 -global and never time-seeded. Same seed + same draws ⇒ byte-identical bands, so the determinism
-guarantee that protects the golden master is preserved. Draws consume the RNG in a fixed registry
-order for exact reproducibility.
+guarantee that protects the golden master is preserved. Draws consume the RNG in a fixed order —
+subcomponents in registry order, then metrics and powers in input-tuple order (the app builds both
+canonically via `_complete_inputs`) — so reproducibility holds for a given input ordering.
 
 §7 mechanism (Methodology v1.2, ADR-0008): every input that carries a confidence signal gets a
 distribution — subcomponents and powers by an ordinal evidence grade (adjacent-level categorical),
@@ -270,8 +271,9 @@ def _perturb(
     model: UncertaintyModel,
     rng: SupportsRandom,
 ) -> AssessmentInputs:
-    """Draw one perturbed assessment. Inputs are sampled in a FIXED order (subcomponents in registry
-    order, then metrics, then powers) so the RNG stream is exactly reproducible. An input with no
+    """Draw one perturbed assessment. Inputs are sampled in a FIXED order — subcomponents in
+    registry order, then metrics and powers in input-tuple order — so the RNG stream is exactly
+    reproducible for a given input ordering (the app builds inputs canonically). An input with no
     confidence grade consumes NO RNG and passes through at its point value (honest labelling)."""
     new_subs: list[SubcomponentRating] = []
     for module in registry.modules:
