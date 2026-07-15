@@ -64,9 +64,7 @@ def _rating(level: MaturityLevel, *, dissent_note: str | None = None) -> dict:
 def test_consultant_lookup_by_email(client, alice: SeededConsultant) -> None:
     """A colleague resolves by EXACT email to the minimum needed to assign them as a rater — never
     the password hash. An unknown email is a 404."""
-    ok = client.get(
-        f"/consultants/by-email?email={alice.stored.email}", headers=auth_header(alice)
-    )
+    ok = client.get(f"/consultants/by-email?email={alice.stored.email}", headers=auth_header(alice))
     assert ok.status_code == 200
     assert ok.json()["id"] == str(alice.stored.id)
     assert ok.json()["full_name"] == alice.stored.full_name
@@ -95,9 +93,8 @@ def test_rating_requests_lists_modules_assigned_to_me(client, alice: SeededConsu
 
     # The lead who never asked to rate has no request for this (they only assigned the co-rater).
     assert all(
-        r["assessment_id"] != aid for r in client.get(
-            "/assessments/rating-requests", headers=auth_header(alice)
-        ).json()
+        r["assessment_id"] != aid
+        for r in client.get("/assessments/rating-requests", headers=auth_header(alice)).json()
     )
 
 
