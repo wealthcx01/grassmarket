@@ -92,10 +92,24 @@ export default function RootLayout({
               Bruntsfield Advisor Studio
             </span>
           </Link>
+          <Link
+            href="/help"
+            style={{
+              marginLeft: "auto",
+              color: "inherit",
+              textDecoration: "none",
+              fontSize: "0.85rem",
+              opacity: 0.92,
+              padding: "0.3rem 0.7rem",
+              border: "1px solid rgba(255,255,255,0.28)",
+              borderRadius: "999px",
+            }}
+          >
+            Guide
+          </Link>
           <span
             className="mono"
             style={{
-              marginLeft: "auto",
               fontSize: "0.68rem",
               opacity: 0.72,
               textTransform: "uppercase",
