@@ -61,6 +61,7 @@ def score(
     """Score one complete assessment end-to-end (two-track, Methodology v1.1 §5)."""
     coefficients.validate_against(registry)
     _assert_inputs_cover_registry(inputs, registry)
+    _assert_triad_sources_registered(registry)
 
     subs_by_key = {r.subcomponent_key: r for r in inputs.subcomponents}
     metrics_by_key = {m.metric_key: m for m in inputs.metrics}
@@ -311,6 +312,11 @@ def _score_business(
             acc_num, acc_den = group_terms.get(metric.group, (0.0, 0.0))
             group_terms[metric.group] = (acc_num + w * n_k, acc_den + w)
 
+    if not group_terms:
+        # No metric is assessed → B is undefined. Refuse loudly and diagnosably, matching the L
+        # path (_score_l), instead of a bare ZeroDivisionError. (Scoreability normally prevents
+        # this; the engine still fails loud if scored directly.)
+        raise ValueError("Cannot compute B: no business metric is assessed.")
     group_means = {g: num / den for g, (num, den) in group_terms.items()}
     b_num = sum(coefficients.group_weights[g] * mean for g, mean in group_means.items())
     b_den = sum(coefficients.group_weights[g] for g in group_means)
@@ -441,4 +447,23 @@ def _assert_exact(dimension: str, legal: frozenset[str], supplied: set[str]) -> 
         raise ValueError(
             f"{dimension} inputs must cover the registry exactly. "
             f"Missing: {sorted(missing)}; extra: {sorted(extra)}."
+        )
+
+
+def _assert_triad_sources_registered(registry: Registry) -> None:
+    """The triad reads specific powers and metric groups by hardcoded key (`_PERCEIVED_POWERS`,
+    `_ECONOMIC_GROUPS`). Those literals are outside the coefficient/registry coverage checks, so a
+    registry rename (e.g. BRANDING→BRAND) would otherwise be silently dropped by the `if k in`
+    guards in `_score_triad` and skew the ordinal. Validate them up front — a mismatch refuses to
+    score (CLAUDE.md #3/#4: every key validates against the registry, fail loud)."""
+    unknown_powers = set(_PERCEIVED_POWERS) - registry.power_keys()
+    if unknown_powers:
+        raise ValueError(
+            f"Triad perceived-value powers are not in the registry: {sorted(unknown_powers)}."
+        )
+    groups = {m.group for m in registry.metrics if m.group is not None}
+    unknown_groups = set(_ECONOMIC_GROUPS) - groups
+    if unknown_groups:
+        raise ValueError(
+            f"Triad economic-value metric groups are not in the registry: {sorted(unknown_groups)}."
         )
