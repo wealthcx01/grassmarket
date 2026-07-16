@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { DashboardSessionFooter } from "@/components/DashboardSessionFooter";
 import { FirstRunWalkthrough } from "@/components/FirstRunWalkthrough";
 
 // PRD §1 / §4–7 — the advisor's main sections. Every section has a live page.
@@ -149,9 +148,6 @@ export default function DashboardPage() {
         </ul>
       </section>
 
-      <footer style={{ fontSize: "0.85rem", color: "var(--color-ink-muted)" }}>
-        <DashboardSessionFooter />
-      </footer>
     </div>
   );
 }
