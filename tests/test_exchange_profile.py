@@ -64,9 +64,10 @@ def test_exchange_coefficient_set_covers_the_exchange_view_exactly() -> None:
     # A DISTINCT coefficient_version → benchmark rows are segmentable by profile (never pooled with
     # retail; a benchmark comparison filters on it — GRS-0084).
     assert coeffs.version == "exchange-v1-draft-pending-elicitation"
-    assert coeffs.version != draft_v1_coefficient_set(load_registry().for_profile(
-        load_profile("retail")
-    )).version
+    assert (
+        coeffs.version
+        != draft_v1_coefficient_set(load_registry().for_profile(load_profile("retail"))).version
+    )
 
 
 def test_an_exchange_assessment_scores_over_the_exchange_module_set() -> None:
