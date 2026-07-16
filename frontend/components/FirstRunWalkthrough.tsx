@@ -35,7 +35,7 @@ const SLIDES: Slide[] = [
           <b>Pipeline</b> — track prospects across ten stages, with a currency-free forecast.
         </li>
         <li>
-          <b>Assessments</b> — score a company with the ATLAS wizard (7 Powers, Platform Value, 9
+          <b>Assessments</b> — score a company with the Platform Power wizard (7 Powers, Platform Value, 9
           infrastructure modules).
         </li>
         <li>
@@ -64,7 +64,7 @@ const SLIDES: Slide[] = [
     title: "You're set",
     body: (
       <>
-        New to ATLAS? Start with the ten-minute primer. Otherwise, jump into your pipeline — and the{" "}
+        New to Platform Power? Start with the ten-minute primer. Otherwise, jump into your pipeline — and the{" "}
         <b>Guide</b> in the top bar is always there when you need the how-to.
       </>
     ),
