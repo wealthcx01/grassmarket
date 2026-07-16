@@ -13,6 +13,7 @@ import { DualRatingPanel } from "@/components/DualRatingPanel";
 import { GuidancePanel } from "@/components/GuidancePanel";
 import { LiveScorePanel } from "@/components/LiveScorePanel";
 import * as doc from "@/lib/doc";
+import { POWER_GUIDANCE } from "@/lib/powerGuidance";
 import type {
   AssessmentDocument,
   EvidenceGrade,
@@ -239,32 +240,95 @@ function GradeSelect({
   );
 }
 
+// Friendly labels for the Helmer lifecycle stage a power tends to arise in.
+const LIFECYCLE_LABEL: Record<string, string> = {
+  origination: "Origination",
+  takeoff: "Take-off",
+  stability: "Stability",
+};
+
 export function StrategicPowersStep({ registry, document: d, update, readOnly }: StepProps) {
+  const [openExample, setOpenExample] = useState<string | null>(null);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
       <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem" }}>
-        Each power carries a Benefit and a Barrier; the engine takes the weaker side (Helmer). Grade
-        the evidence to model uncertainty — ungraded powers score as a point (labelled honestly).
+        Each power carries a Benefit (the upside the leader enjoys) and a Barrier (why a rival can&rsquo;t
+        copy it); the engine takes the <strong>weaker</strong> side (Helmer). Grade the evidence to model
+        uncertainty — ungraded powers score as a point (labelled honestly).
       </p>
       {registry.powers.map((p) => {
         const e = doc.findPower(d, p.key);
+        const g = POWER_GUIDANCE[p.key];
         const set = (
           benefit: StrengthRating,
           barrier: StrengthRating,
           bg: EvidenceGrade | null,
           rg: EvidenceGrade | null,
-        ) => update((x) => doc.setPower(x, doc.powerEntry(p.key, benefit, barrier, bg, rg)));
+          be: string | null = e?.benefit_evidence ?? null,
+          ba: string | null = e?.barrier_evidence ?? null,
+        ) => update((x) => doc.setPower(x, doc.powerEntry(p.key, benefit, barrier, bg, rg, be, ba)));
+        const showExample = openExample === p.key;
         return (
           <Card key={p.key}>
-            <strong style={{ fontSize: "0.9rem" }}>{p.name}</strong>
-            <div style={{ display: "grid", gridTemplateColumns: "auto 1fr auto", gap: "0.4rem 0.6rem", marginTop: "0.4rem", alignItems: "center", maxWidth: "34rem" }}>
-              <span style={{ fontSize: "0.8rem" }}>Benefit</span>
-              <StrengthSelect value={e?.benefit} disabled={readOnly} title="Benefit strength" onChange={(v) => set(v, e?.barrier ?? "None", e?.benefit_grade ?? null, e?.barrier_grade ?? null)} />
-              <GradeSelect value={e?.benefit_grade} disabled={readOnly} onChange={(g) => set(e?.benefit ?? "None", e?.barrier ?? "None", g, e?.barrier_grade ?? null)} />
-              <span style={{ fontSize: "0.8rem" }}>Barrier</span>
-              <StrengthSelect value={e?.barrier} disabled={readOnly} title="Barrier strength" onChange={(v) => set(e?.benefit ?? "None", v, e?.benefit_grade ?? null, e?.barrier_grade ?? null)} />
-              <GradeSelect value={e?.barrier_grade} disabled={readOnly} onChange={(g) => set(e?.benefit ?? "None", e?.barrier ?? "None", e?.benefit_grade ?? null, g)} />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.5rem", flexWrap: "wrap" }}>
+              <strong style={{ fontSize: "0.9rem" }}>{p.name}</strong>
+              {p.lifecycle_stage ? (
+                <span className="tag" title="The lifecycle stage this power typically arises in (Helmer)">
+                  {LIFECYCLE_LABEL[p.lifecycle_stage] ?? p.lifecycle_stage}
+                </span>
+              ) : null}
             </div>
+            {/* Plain-English definition — surfaced from the registry (was previously unused). */}
+            {p.description ? (
+              <p style={{ margin: "0.3rem 0 0", fontSize: "0.78rem", color: "var(--color-ink-muted)", lineHeight: 1.5 }}>
+                {p.description}
+              </p>
+            ) : null}
+            <div style={{ display: "grid", gridTemplateColumns: "auto 1fr auto", gap: "0.4rem 0.6rem", marginTop: "0.55rem", alignItems: "center", maxWidth: "34rem" }}>
+              <span style={{ fontSize: "0.8rem" }} title={g?.benefitHint}>Benefit</span>
+              <StrengthSelect value={e?.benefit} disabled={readOnly} title={g?.benefitHint ?? "Benefit strength"} onChange={(v) => set(v, e?.barrier ?? "None", e?.benefit_grade ?? null, e?.barrier_grade ?? null)} />
+              <GradeSelect value={e?.benefit_grade} disabled={readOnly} onChange={(gr) => set(e?.benefit ?? "None", e?.barrier ?? "None", gr, e?.barrier_grade ?? null)} />
+              <span style={{ fontSize: "0.8rem" }} title={g?.barrierHint}>Barrier</span>
+              <StrengthSelect value={e?.barrier} disabled={readOnly} title={g?.barrierHint ?? "Barrier strength"} onChange={(v) => set(e?.benefit ?? "None", v, e?.benefit_grade ?? null, e?.barrier_grade ?? null)} />
+              <GradeSelect value={e?.barrier_grade} disabled={readOnly} onChange={(gr) => set(e?.benefit ?? "None", e?.barrier ?? "None", e?.benefit_grade ?? null, gr)} />
+            </div>
+            {/* Optional rationale per side — records WHY, using the contract's evidence fields. */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", marginTop: "0.5rem", maxWidth: "34rem" }}>
+              <label style={{ fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
+                Why this benefit?
+                <input
+                  type="text"
+                  disabled={readOnly}
+                  value={e?.benefit_evidence ?? ""}
+                  placeholder="evidence / rationale"
+                  onChange={(ev) => set(e?.benefit ?? "None", e?.barrier ?? "None", e?.benefit_grade ?? null, e?.barrier_grade ?? null, ev.target.value || null, e?.barrier_evidence ?? null)}
+                  style={{ ...selectStyle, display: "block", width: "100%", marginTop: "0.2rem" }}
+                />
+              </label>
+              <label style={{ fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
+                Why this barrier?
+                <input
+                  type="text"
+                  disabled={readOnly}
+                  value={e?.barrier_evidence ?? ""}
+                  placeholder="evidence / rationale"
+                  onChange={(ev) => set(e?.benefit ?? "None", e?.barrier ?? "None", e?.benefit_grade ?? null, e?.barrier_grade ?? null, e?.benefit_evidence ?? null, ev.target.value || null)}
+                  style={{ ...selectStyle, display: "block", width: "100%", marginTop: "0.2rem" }}
+                />
+              </label>
+            </div>
+            {g ? (
+              <div style={{ marginTop: "0.5rem" }}>
+                <button type="button" className={smallBtn} style={smallBtnStyle} onClick={() => setOpenExample(showExample ? null : p.key)}>
+                  {showExample ? "Hide example" : "In a brokerage…"}
+                </button>
+                {showExample ? (
+                  <div className="callout callout-info" style={{ marginTop: "0.5rem", fontSize: "0.8rem", lineHeight: 1.5 }}>
+                    {g.example}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
           </Card>
         );
       })}
