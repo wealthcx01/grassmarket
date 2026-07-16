@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { HealthWidget } from "./health-widget";
 import { DashboardSessionFooter } from "@/components/DashboardSessionFooter";
 import { FirstRunWalkthrough } from "@/components/FirstRunWalkthrough";
 
@@ -60,7 +59,6 @@ export default function DashboardPage() {
             with the primer if ATLAS is new to you.
           </p>
         </div>
-        <HealthWidget />
       </section>
 
       {/* New-advisor primer strip */}
