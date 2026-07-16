@@ -25,3 +25,47 @@ profiles:
       - EMS_GATEWAY
       - LIQ_CONNECT
     # No additions and no critical overrides: the retail view == the full registry.
+
+  exchange:
+    name: Exchange / market infrastructure
+    # An exchange runs the trading platform, matching engine, market surveillance, member
+    # connectivity, clearing & settlement, and market-data distribution — NOT a retail client CMS
+    # (dropped). Modules selected in superset order; the additions below name what an exchange runs
+    # that the retail L taxonomy never did. DRAFT structure authored from the ASX/NSE engagement
+    # packs (reference-only, never committed); the exchange panel ratifies it.
+    modules:
+      - FRONTEND
+      - APP_SERVER
+      - MARKET_DATA
+      - ORCHESTRATION
+      - BACKOFFICE
+      - OEMS
+      - EMS_GATEWAY
+      - LIQ_CONNECT
+    subcomponent_additions:
+      - key: OEMS_MATCHING_ENGINE
+        name: Matching engine
+        module_key: OEMS
+        description: Order matching / auction engine — throughput, determinism, fairness, resilience.
+        critical: true
+      - key: BACKOFFICE_MARKET_SURVEILLANCE
+        name: Market surveillance
+        module_key: BACKOFFICE
+        description: Real-time + post-trade surveillance, alerting, and case management (regulatory).
+        critical: true
+      - key: EMS_GATEWAY_MEMBER_CONNECTIVITY
+        name: Member / participant connectivity
+        module_key: EMS_GATEWAY
+        description: Member gateways, session management, protocol coverage (FIX/binary), conformance.
+      - key: LIQ_CONNECT_CLEARING_SETTLEMENT_IF
+        name: Clearing & settlement interfaces
+        module_key: LIQ_CONNECT
+        description: CCP / CSD interfaces, trade feeds, novation and settlement instruction flows.
+      - key: MARKET_DATA_DISTRIBUTION
+        name: Market-data distribution
+        module_key: MARKET_DATA
+        description: Real-time + reference data dissemination to members and vendors; feed products.
+    critical_overrides:
+      # A broker's pre-trade risk gate is not the exchange's critical control — the matching engine
+      # (added, critical) is. DRAFT judgement pending the exchange panel.
+      OEMS_PRE_TRADE_RISK: false
