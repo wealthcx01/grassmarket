@@ -205,6 +205,58 @@ export default function GuidePage() {
         </p>
       </section>
 
+      {/* The lenses in depth — letter↔word mapping (GRS-0093) */}
+      <section>
+        <SectionTitle kicker="Reading the lenses">What the letters mean</SectionTitle>
+        <p style={{ margin: "0 0 1rem", color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
+          A <strong>&ldquo;platform&rdquo;</strong> here is the whole operating system of a brokerage or
+          fintech — its economics, its strategic position, and the technology that runs it.{" "}
+          <strong>&ldquo;Platform Power&rdquo;</strong> is how much durable value that whole creates, which
+          is why the headline is <strong>V, Platform Value</strong>. The letters are not arbitrary once you
+          read them:
+        </p>
+        <dl style={{ margin: 0, display: "grid", gap: "0.9rem" }}>
+          <div>
+            <dt style={{ fontFamily: "var(--font-serif)", fontWeight: 600 }}>B — Business</dt>
+            <dd style={{ margin: "0.15rem 0 0", color: "var(--color-ink-muted)", fontSize: "0.92rem", lineHeight: 1.55 }}>
+              The economic reality: does it make money, and is that improving? AUA, revenue, unit
+              economics, growth — the hard numbers, normalised so a £2bn platform and a £50m one compare
+              fairly.
+            </dd>
+          </div>
+          <div>
+            <dt style={{ fontFamily: "var(--font-serif)", fontWeight: 600 }}>P — Power</dt>
+            <dd style={{ margin: "0.15rem 0 0", color: "var(--color-ink-muted)", fontSize: "0.92rem", lineHeight: 1.55 }}>
+              The letter is literally <em>Power</em>. Straight from Helmer&rsquo;s seven Powers: a power
+              counts only when a real <strong>benefit</strong> is protected by a <strong>barrier</strong> a
+              rival cannot cheaply cross — and the engine takes the <strong>weaker</strong> of the two.
+            </dd>
+          </div>
+          <div>
+            <dt style={{ fontFamily: "var(--font-serif)", fontWeight: 600 }}>L — Infrastructure · the technology Layer</dt>
+            <dd style={{ margin: "0.15rem 0 0", color: "var(--color-ink-muted)", fontSize: "0.92rem", lineHeight: 1.55 }}>
+              The letter is <em>Layer</em> — the technology layer under the business. Nine modules, front
+              end to liquidity: is the plumbing an <strong>asset</strong> (a moat) or a{" "}
+              <strong>constraint</strong> (a liability waiting to surface)?
+            </dd>
+          </div>
+          <div>
+            <dt style={{ fontFamily: "var(--font-serif)", fontWeight: 600 }}>V — Platform Value</dt>
+            <dd style={{ margin: "0.15rem 0 0", color: "var(--color-ink-muted)", fontSize: "0.92rem", lineHeight: 1.55 }}>
+              The composite headline that blends B, P and L. But the number a client remembers is usually
+              the <strong>bottleneck</strong> — the weakest critical link, which no amount of strength
+              elsewhere fully hides.
+            </dd>
+          </div>
+        </dl>
+        <p style={{ marginTop: "1rem", fontSize: "0.9rem", color: "var(--color-ink-muted)", lineHeight: 1.55 }}>
+          Sitting on top, the <strong>Platform Power triad</strong> re-reads the same evidence as three
+          plain words a board understands instantly: <strong>Economic</strong> value (is it worth money?),{" "}
+          <strong>Perceived</strong> value (do customers feel it?), and <strong>Defence</strong> value (can
+          it be protected?).
+        </p>
+      </section>
+
       {/* Four levels */}
       <section>
         <SectionTitle kicker="Rating infrastructure">The four maturity levels</SectionTitle>
