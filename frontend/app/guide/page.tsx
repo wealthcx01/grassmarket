@@ -6,6 +6,41 @@ export const metadata: Metadata = {
   description: "A ten-minute primer on the Platform Power framework for new advisors.",
 };
 
+// The end-to-end pipeline (GRS-0092) — evidence in, board-defensible report out. Numbered because it
+// genuinely is a sequence.
+const PIPELINE: ReadonlyArray<{ step: string; detail: string }> = [
+  {
+    step: "Gather evidence and grade it",
+    detail:
+      "You learn how the platform works — from documents, interviews, dashboards, or your own inspection — and record how sure you are (E1–E4). The grade is not bureaucracy; it decides how wide the final ranges are.",
+  },
+  {
+    step: "Rate each element against a rubric anchor",
+    detail:
+      "Every subcomponent gets a maturity level (Basic → Frontier) against a written anchor, every power a benefit and a barrier, every business metric a value against its normalisation curve. You judge; the anchor keeps two advisors consistent.",
+  },
+  {
+    step: "The engine computes B, P and L",
+    detail:
+      "Each index is an evidence-weighted blend where the weakest critical part caps the score — a module can't outrun its bottleneck. Nothing is guessed or zero-filled: Not Assessed stays first-class and simply widens the uncertainty.",
+  },
+  {
+    step: "Monte Carlo turns grades into honest ranges",
+    detail:
+      "Instead of a false-precise point, the engine simulates the assessment thousands of times within the bounds your evidence grades allow, and reports P10 / P50 / P90. Weak evidence → wide range, honestly.",
+  },
+  {
+    step: "Rule-based gates produce the headline words",
+    detail:
+      "The words a board sees (Basic → Frontier per module, the triad ordinals) come from rules, not arithmetic: a module can't be Advanced if a critical part is Basic. Numbers rank what to fix; words rate what you defend.",
+  },
+  {
+    step: "The value bridge prices the gaps",
+    detail:
+      "Upgrades are costed (£), the cash-flow levers they move are valued (NPV on the client's own baselines), and strategic worth is stated in words — never “your score gap is worth £X”. The result is the Platform Power Report a board can trust.",
+  },
+];
+
 const LENSES: ReadonlyArray<{ letter: string; name: string; question: string }> = [
   { letter: "B", name: "Business", question: "What does this platform achieve economically? Hard numbers — AUA, revenue, margins, growth, acquisition costs." },
   { letter: "P", name: "Power", question: "What stops a competitor taking it away? Helmer's 7 Powers, each scored on benefit AND barrier." },
@@ -58,6 +93,79 @@ export default function GuidePage() {
           to make it consistent, comparable, and defensible. Here&rsquo;s the whole thing in ten minutes.
         </p>
       </header>
+
+      {/* Why it exists (GRS-0092) */}
+      <section>
+        <SectionTitle kicker="The problem it solves">Why Platform Power exists</SectionTitle>
+        <p style={{ margin: "0 0 0.75rem", color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
+          One question sits under every brokerage or fintech engagement: <strong>can this platform
+          create value and hold onto it?</strong> Answering it well means looking at three things at
+          once — the economics (does it make money?), the strategy (what stops a rival taking the
+          business?), and the technology (is the plumbing an asset or a liability?). Most reviews look
+          hard at one and hand-wave the other two.
+        </p>
+        <p style={{ margin: 0, color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
+          Platform Power scores all three on one comparable scale, from graded evidence, and prices the
+          gaps honestly. The point is not to replace your judgement — it is your judgement, made{" "}
+          <strong>consistent</strong> (two advisors reach the same score from the same facts),{" "}
+          <strong>comparable</strong> (this platform against its peers and against last year), and{" "}
+          <strong>defensible</strong> (it survives a board&rsquo;s — or an acquirer&rsquo;s — technical
+          due diligence).
+        </p>
+      </section>
+
+      {/* Where it comes from (GRS-0092) */}
+      <section>
+        <SectionTitle kicker="Provenance">Where the framework comes from</SectionTitle>
+        <p style={{ margin: "0 0 0.75rem", color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
+          The strategy lens is not invented here. <strong>P (Power)</strong> is Hamilton Helmer&rsquo;s{" "}
+          <em>7 Powers</em> — the modern canon on durable competitive advantage — used verbatim: seven
+          structural sources of power, each real only when a genuine <em>benefit</em> is protected by a
+          <em> barrier</em> a competitor cannot cheaply cross.
+        </p>
+        <p style={{ margin: 0, color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
+          <strong>L (Infrastructure · the technology Layer)</strong> comes from the infrastructure
+          deep-dive lineage — a structured technology assessment of nine modules and fifty-one
+          subcomponents, front end to liquidity, that turns &ldquo;is the plumbing an asset or a
+          constraint?&rdquo; into evidence-graded ratings rather than opinion. <strong>B (Business)</strong>{" "}
+          is the hard economic register — AUA, revenue, unit economics, growth. Bringing strategy,
+          technology and economics under one graded, uncertainty-aware method is the whole idea:
+          nothing is scored on gut feel, and nothing is priced by dividing a score gap into pounds.
+        </p>
+      </section>
+
+      {/* How it works, end to end (GRS-0092) */}
+      <section>
+        <SectionTitle kicker="The pipeline">How it works, end to end</SectionTitle>
+        <ol style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: "0.75rem", counterReset: "step" }}>
+          {PIPELINE.map((p, i) => (
+            <li key={p.step} className="card" style={{ padding: "1rem 1.15rem", display: "flex", gap: "1rem", alignItems: "flex-start" }}>
+              <span
+                aria-hidden
+                className="mono"
+                style={{
+                  flex: "none",
+                  width: "1.9rem",
+                  height: "1.9rem",
+                  borderRadius: "50%",
+                  background: "var(--color-accent)",
+                  color: "var(--color-paper)",
+                  display: "grid",
+                  placeItems: "center",
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                }}
+              >
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div>
+                <div style={{ fontWeight: 600, fontFamily: "var(--font-serif)", fontSize: "1.02rem" }}>{p.step}</div>
+                <p style={{ margin: "0.2rem 0 0", color: "var(--color-ink-muted)", fontSize: "0.9rem", lineHeight: 1.5 }}>{p.detail}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
 
       {/* Three lenses + headline */}
       <section>
