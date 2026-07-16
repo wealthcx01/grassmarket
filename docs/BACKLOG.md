@@ -60,6 +60,24 @@ ratified-v1 scope only — the deltas are tracked as new tickets below, not sile
 | GRS-0077, 0078, 0079 | Operating-model profiles (exchange-first) | ADR-0025 |
 | GRS-0080–0086 | C-index / Loop 7 (Stage 1 v1.3; 0086 = Stage 2 v1.4, gated) | ADR-0023 · Methodology v1.3 |
 
+## Planned — Part 2: Advisor Studio UI/UX & product review (founder-greenlit 2026-07-16) — see `planning/PART2-uiux-review.md`
+
+Section-by-section founder review → 48 tickets (GRS-0087–0134) + 4 ADRs. Suggested order: session fix →
+Home/Primer/rename → Deliverables + Revolut demo → Wizard Phase A → Pipeline program → Academy program →
+earnings/guide → Phase-B flags.
+
+| Tickets | Section / workstream | ADR |
+|---|---|---|
+| GRS-0087–0091 | §1 Home / Dashboard (account menu, health chip, welcome, rename, IA) | ADR-0030 (rename) |
+| GRS-0092–0097 | §2 Primer depth + P/L label refinement | ADR-0030 (labels) |
+| GRS-0098–0110 | §3 Portfolio + Wizard rigor (Phase A now; 0100/0101/0109 Phase B) | ADR-0025 / ADR-0023 (overlap) |
+| GRS-0111–0115 | §4 Pipeline / GTM engine (one program) | ADR-0027 |
+| GRS-0116–0119 | §5 Deliverables / Engagements (0117 demo now, 0119 sandbox later) | ADR-0029 |
+| GRS-0120 | §0 Session persistence / stop random sign-outs | ADR-0024 |
+| GRS-0121–0132 | §6 Workbench → Bruntsfield Academy (one program) | ADR-0028 |
+| GRS-0133 | §7 My Earnings — gamify + chart | ADR-0026 (reuse) |
+| GRS-0134 | §8 Guide navigation shell (last) | — |
+
 ## Sequencing notes
 
 - Track A (GRS-0066–0072) needed **no** methodology decision — the advisor-day-1 guided-consulting program; shipped.
