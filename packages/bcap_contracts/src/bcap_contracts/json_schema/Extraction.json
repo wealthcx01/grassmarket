@@ -32,6 +32,17 @@
           "title": "Powers",
           "type": "array"
         },
+        "profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BusinessProfile"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "subcomponents": {
           "default": [],
           "items": {
@@ -47,6 +58,71 @@
         }
       },
       "title": "AssessmentDocument",
+      "type": "object"
+    },
+    "BusinessProfile": {
+      "additionalProperties": false,
+      "description": "Descriptive context for the business being assessed (GRS-0068): where it operates, what it\noffers, and how it's regulated. Purely informational — it frames the assessment and feeds the\nportfolio view; it is **NEVER a scoring input** (the engine reads only subcomponents, metrics\nand powers) and never enters the scoring-run content hash. Partial by design, like the document\nthat carries it: every field is optional.\n\nThe operating-model *profile selector* (exchange vs broker, which changes module selection and\nweights) is a separate, deferred concern (METHODOLOGY-V2-SCOPE §2 / the profile ADR) — `segment`\nhere is a free-text descriptor, not that selector.",
+      "properties": {
+        "asset_classes": {
+          "default": [],
+          "description": "Asset classes offered (equities, funds, FX, crypto, …).",
+          "items": {
+            "type": "string"
+          },
+          "title": "Asset Classes",
+          "type": "array"
+        },
+        "country": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Primary domicile / HQ jurisdiction.",
+          "title": "Country"
+        },
+        "licensing": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Regulatory status / key licences (free text).",
+          "title": "Licensing"
+        },
+        "regions": {
+          "default": [],
+          "description": "Markets / regions served.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Regions",
+          "type": "array"
+        },
+        "segment": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Business model descriptor, e.g. 'Retail broker', 'Exchange'.",
+          "title": "Segment"
+        }
+      },
+      "title": "BusinessProfile",
       "type": "object"
     },
     "EvidenceGrade": {

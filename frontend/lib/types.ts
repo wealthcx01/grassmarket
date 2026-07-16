@@ -65,8 +65,18 @@ export interface PowerEntry {
   trend?: TrendDirection | null;
 }
 
+/** Descriptive context for the business (GRS-0068). Never a scoring input — frames the assessment. */
+export interface BusinessProfile {
+  country?: string | null;
+  segment?: string | null;
+  asset_classes: string[];
+  regions: string[];
+  licensing?: string | null;
+}
+
 export interface AssessmentDocument {
   subject: string;
+  profile?: BusinessProfile | null;
   subcomponents: SubcomponentRating[];
   metrics: MetricEntry[];
   powers: PowerEntry[];
