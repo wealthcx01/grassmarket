@@ -42,7 +42,10 @@ class ConsultantORM(Base):
     id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
     email: Mapped[str] = mapped_column(String(320), unique=True, index=True, nullable=False)
     full_name: Mapped[str] = mapped_column(String(200), nullable=False)
-    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
+    # Nullable since ADR-0024: an OAuth-only consultant has no password.
+    hashed_password: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    # The bound Google account id (`sub`), set on first Google sign-in (ADR-0024). Nullable+unique.
+    google_sub: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
     role: Mapped[Role] = mapped_column(String(32), default=Role.CONSULTANT, nullable=False)
     tier: Mapped[ConsultantTier] = mapped_column(
         String(32), default=ConsultantTier.VENTURE_ASSOCIATE, nullable=False

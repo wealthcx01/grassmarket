@@ -12,6 +12,11 @@ from uuid import UUID
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
+from grassmarket.auth.google_oauth import (
+    GoogleOAuthClient,
+    GoogleOAuthNotConfiguredError,
+    build_google_client,
+)
 from grassmarket.auth.security import InvalidTokenError, decode_access_token
 from grassmarket.auth.service import AuthService
 from grassmarket.config import Settings, get_settings
@@ -44,6 +49,19 @@ def get_auth_service(
     settings: Settings = Depends(get_app_settings),
 ) -> AuthService:
     return AuthService(repo, settings)
+
+
+def get_google_oauth_client(
+    settings: Settings = Depends(get_app_settings),
+) -> GoogleOAuthClient:
+    """The Google OAuth client, or a 503 if the operator has not provisioned the credentials.
+    Tests override this dependency with a fake so CI never makes a live Google call."""
+    try:
+        return build_google_client(settings)
+    except GoogleOAuthNotConfiguredError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)
+        ) from exc
 
 
 def get_current_principal(
