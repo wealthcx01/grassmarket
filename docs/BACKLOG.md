@@ -51,11 +51,19 @@ ratified-v1 scope only — the deltas are tracked as new tickets below, not sile
 | Approve harvesting ASX/NSI pack structure (anonymised) as deliverable templates | GRS-0072–0073 |
 | θ re-elicitation panel — share a session with v1 annual re-elicitation? | v1.4 (θ_C) |
 
+## Planned — Part 1 (founder-greenlit 2026-07-16) — see `planning/PART1-oauth-earnings-profiles-cindex.md`
+
+| Tickets | Workstream | ADR |
+|---|---|---|
+| GRS-0073, 0074 | Google OAuth sign-in + public-site → app login handoff | ADR-0024 |
+| GRS-0075, 0076 | Earnings: Commission Schedule v7 (two-stream) | ADR-0026 (amends ADR-0017) |
+| GRS-0077, 0078, 0079 | Operating-model profiles (exchange-first) | ADR-0025 |
+| GRS-0080–0086 | C-index / Loop 7 (Stage 1 v1.3; 0086 = Stage 2 v1.4, gated) | ADR-0023 · Methodology v1.3 |
+
 ## Sequencing notes
 
-- Track A (GRS-0066–0073) needs **no** methodology decision — it is the advisor-day-1 guided-consulting
-  program and proceeds in parallel with the founder decisions.
-- Track B (Loop 7 / exchange profile / v1.4) is **gated** on founder D1/D2 and on the review corpus
-  being ingested through the app's scoped storage (never committed to this repo).
+- Track A (GRS-0066–0072) needed **no** methodology decision — the advisor-day-1 guided-consulting program; shipped.
+- **Part 1 (GRS-0073–0086)** is unblocked: founder D-1..D-7 resolved (`PENDING-FOUNDER-REVIEW.md`). Suggested order: OAuth → Earnings v7 → profiles mechanism/exchange → C-index Stage 1; C into V (v1.4, GRS-0086) is gated on the θ_C panel + golden-master v2.
+- Track B (Loop 7 / exchange profile / v1.4) consumes the review corpus through the app's scoped storage (never committed to this repo).
 - After Track B: phase 2 = Holy Corner (Elite Vault adaptation, new ticket prefix), phase 3 = Viewforth.
   Both consume `bcap-contracts` as-is.
