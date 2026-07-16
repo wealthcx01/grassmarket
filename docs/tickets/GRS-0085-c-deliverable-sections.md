@@ -1,5 +1,39 @@
 # GRS-0085 — C deliverable sections
 
+**Status:** Shipped
+**Loop:** Loop 7 — C-index (Customer Proposition)
+**Depends on:** GRS-0082/0083/0084, ADR-0023, ADR-0009, ATLAS-Methodology-v1.3
+**Branch:** `grs-0085-c-deliverable-sections`
+
+## What shipped
+
+Two C sections in the Platform Power Report (`deliverables/builder.py`), rendered only when the run
+carries a C result and omitted cleanly otherwise (no blanks/zeros):
+
+1. **Proposition heatmap** (`_customer_proposition_section`) — a table of the 10 C modules with the
+   subject's rating (gate band), q_m (0–100), and the **peer-benchmark average** per module (from the
+   GRS-0084 approved rows; a module no peer scored shows "—", never a fabricated 0), plus the
+   subject's aggregate rank against the peer set. Peer *names* are not printed — only the position.
+2. **Differentiation-vs-rarity map** (`_differentiation_rarity_section`) — widgets read against
+   rarity: **Rare-present** = differentiation assets, **Common-absent** = table-stakes gaps, with
+   present-but-paywalled/defective features surfaced separately. Rarity comes from the registry
+   (`c_widget_defs`), never re-stored.
+
+`DeliverableContext` gains optional `c_peers` / `widgets` / `c_widget_defs` (default-empty, so every
+existing caller/test is unchanged). The methods appendix gets a **C provenance note**: C is reported
+alongside V (not summed), the C coefficients are draft, and peer benchmarks are approval-gated
+(ADR-0009). Deliverable mode/gating is unchanged (draft sets still emit only watermarked internal
+docs).
+
+## Acceptance / verification
+
+`tests/test_c_deliverable.py` — both sections render for a C-carrying run and are omitted cleanly
+without one; the differentiation map classifies Rare-present vs Common-absent; a paywalled widget is
+surfaced separately; peer names are not printed (only the aggregate position). Golden master
+unchanged (Stage-1 reporting only); pyright + ruff clean; schema parity green.
+
+## Original plan
+
 **Status:** Planned
 **Loop:** Loop 7 — C-index (Customer Proposition)
 **Depends on:** ADR-0023 (Accepted), ATLAS-Methodology-v1.3
