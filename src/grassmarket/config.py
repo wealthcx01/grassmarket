@@ -58,9 +58,29 @@ class Settings(BaseSettings):
     max_upload_bytes: int = Field(default=25 * 1024 * 1024, validation_alias="GM_MAX_UPLOAD_BYTES")
 
     invite_ttl_hours: int = Field(default=168, validation_alias="GM_INVITE_TTL_HOURS")
+    # The canonical advisory-app origin — the OAuth callback redirects here, and it is always CORS-
+    # allowed. Back-compat: GM_FRONTEND_ORIGIN still works unchanged.
     frontend_origin: str = Field(
         default="http://localhost:3000", validation_alias="GM_FRONTEND_ORIGIN"
     )
+    # Additional CORS-allowed origins (GRS-0074), comma-separated — e.g. the public Bruntsfield
+    # Capital marketing site that carries "LOG IN". Empty by default.
+    frontend_origins_extra: str = Field(default="", validation_alias="GM_FRONTEND_ORIGINS")
+    # One-time login hand-off code TTL (ADR-0024): short enough to bound replay across the redirect.
+    login_handoff_ttl_seconds: int = Field(
+        default=60, validation_alias="GM_LOGIN_HANDOFF_TTL_SECONDS"
+    )
+
+    @property
+    def cors_origins(self) -> list[str]:
+        """The CORS allow-list: the advisory app plus any GM_FRONTEND_ORIGINS extras, de-duped and
+        order-preserving (advisory app first)."""
+        ordered: list[str] = []
+        extras = [o.strip() for o in self.frontend_origins_extra.split(",") if o.strip()]
+        for origin in [self.frontend_origin, *extras]:
+            if origin and origin not in ordered:
+                ordered.append(origin)
+        return ordered
 
     # --- Google OAuth (ADR-0024) ---
     # Operator-supplied (Google Cloud Console); no default — an unconfigured OAuth client makes the

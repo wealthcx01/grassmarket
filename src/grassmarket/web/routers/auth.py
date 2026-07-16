@@ -30,7 +30,7 @@ from grassmarket.auth.service import (
     UnprovisionedGoogleAccountError,
 )
 from grassmarket.config import Settings
-from grassmarket.data.repository import ConflictError, Principal, Repository
+from grassmarket.data.repository import ConflictError, NotFoundError, Principal, Repository
 from grassmarket.web.dependencies import (
     get_app_settings,
     get_auth_service,
@@ -168,16 +168,39 @@ def google_callback(
     except GoogleOAuthError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
     try:
-        token = auth.login_with_google(email=identity.email, google_sub=identity.sub)
+        handoff_code = auth.begin_google_session(email=identity.email, google_sub=identity.sub)
     except UnprovisionedGoogleAccountError as exc:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
     except InvalidCredentialsError as exc:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc)) from exc
     except ConflictError as exc:  # email already bound to a different Google identity
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+    # Carry ONLY the opaque one-time code back to the advisory app — never the JWT (ADR-0024). The
+    # app exchanges it server-side via POST /auth/session/exchange.
     response = RedirectResponse(
-        f"{settings.frontend_origin}/login#access_token={token}",
+        f"{settings.frontend_origin}/login?code={handoff_code}",
         status_code=status.HTTP_303_SEE_OTHER,
     )
     response.delete_cookie(_OAUTH_TXN_COOKIE, path="/auth")
     return response
+
+
+class ExchangeSessionRequest(BaseModel):
+    code: str
+
+
+@router.post("/session/exchange", response_model=TokenResponse)
+def exchange_session(
+    payload: ExchangeSessionRequest, auth: AuthService = Depends(get_auth_service)
+) -> TokenResponse:
+    """Exchange a single-use login hand-off code for the GM JWT (GRS-0074). The only place a JWT
+    crosses back to the browser, over POST — never a URL. Reuse/expiry is refused loud."""
+    try:
+        token = auth.exchange_handoff_code(code=payload.code)
+    except NotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    except ConflictError as exc:  # already used or expired
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    except InvalidCredentialsError as exc:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc)) from exc
+    return TokenResponse(access_token=token)

@@ -169,6 +169,15 @@ export const api = {
     });
   },
 
+  // Exchange a single-use Google login hand-off code for the GM JWT (GRS-0074).
+  exchangeSession(code: string, signal?: AbortSignal): Promise<LoginResponse> {
+    return request<LoginResponse>("/auth/session/exchange", {
+      method: "POST",
+      body: JSON.stringify({ code }),
+      signal,
+    });
+  },
+
   // --- Assessments (all JWT-scoped server-side; the client carries the token) ---
   registry(signal?: AbortSignal): Promise<Registry> {
     return request<Registry>("/registry", { method: "GET", headers: authHeaders(), signal });

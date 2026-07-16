@@ -17,20 +17,30 @@ export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Google sign-in hand-off (GRS-0073): the OAuth callback returns the app here with the JWT in the
-  // URL *fragment* (#access_token=…) — never a query string, never sent to a server. Store it and
-  // continue. (GRS-0074 replaces the fragment with a one-time ?code= exchange for the cross-origin
-  // case.)
+  // Google sign-in hand-off (GRS-0074): the OAuth callback returns the app here with a single-use
+  // ?code=… (NEVER the JWT). Exchange it server-side over POST for the real token, store that, and
+  // continue. The code is stripped from the URL bar immediately.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const hash = window.location.hash;
-    if (!hash) return;
-    const token = new URLSearchParams(hash.slice(1)).get("access_token");
-    if (!token) return;
-    window.localStorage.setItem(TOKEN_KEY, token);
-    // Strip the token from the URL bar before routing on.
+    const code = new URLSearchParams(window.location.search).get("code");
+    if (!code) return;
+    // Strip the code from the URL before the async exchange so a refresh can't replay it.
     window.history.replaceState(null, "", window.location.pathname);
-    router.push("/");
+    let cancelled = false;
+    (async () => {
+      try {
+        const { access_token } = await api.exchangeSession(code);
+        if (cancelled) return;
+        window.localStorage.setItem(TOKEN_KEY, access_token);
+        router.push("/");
+      } catch (err: unknown) {
+        if (cancelled) return;
+        setError(err instanceof ApiError ? err.message : "Sign in failed. Please try again.");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {

@@ -7,6 +7,7 @@ return a partial success.
 
 from __future__ import annotations
 
+import secrets
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
@@ -151,12 +152,10 @@ class AuthService:
             assessor_level=stored.assessor_level,
         )
 
-    def login_with_google(self, *, email: str, google_sub: str) -> str:
-        """Invite-only Google sign-in (ADR-0024). Google has already verified `email`/`sub`; here we
-        resolve a *pre-provisioned* consultant by email — an unknown email is refused (no
-        auto-provisioning), an inactive account is refused, and the Google id is bound on first use.
-        On success we record an `AUTH_LOGIN` audit event and mint the existing GM JWT via the single
-        mint point — no second token path."""
+    def _resolve_google_consultant(self, *, email: str, google_sub: str):
+        """Invite-only Google resolution (ADR-0024). Google has already verified `email`/`sub`; here
+        we resolve a *pre-provisioned* consultant — an unknown email is refused (no auto-provision),
+        an inactive account is refused, and the Google id is bound on first use."""
         stored = self._repo.get_consultant_by_email(email)
         if stored is None:
             raise UnprovisionedGoogleAccountError(
@@ -166,12 +165,39 @@ class AuthService:
         if not stored.is_active:
             raise InvalidCredentialsError("Account is inactive.")
         self._repo.bind_google_sub(stored.id, google_sub)  # set-if-null; refuse a different sub
+        return stored
+
+    def begin_google_session(self, *, email: str, google_sub: str) -> str:
+        """Resolve the invited consultant, then issue a single-use, short-TTL hand-off code bound to
+        them (GRS-0074). The OAuth callback carries this opaque code back to the advisory app in a
+        query string — never the JWT — and the app exchanges it. Only the code's hash is stored."""
+        stored = self._resolve_google_consultant(email=email, google_sub=google_sub)
+        raw_code = secrets.token_urlsafe(32)
+        self._repo.create_login_handoff_code(
+            consultant_id=stored.id,
+            code_hash=hash_invite_token(raw_code),
+            expires_at=datetime.now(UTC)
+            + timedelta(seconds=self._settings.login_handoff_ttl_seconds),
+        )
+        return raw_code
+
+    def exchange_handoff_code(self, *, code: str, now: datetime | None = None) -> str:
+        """Redeem a single-use hand-off code for the GM JWT (GRS-0074) — the only place a JWT
+        crosses back to the browser, over POST, never a URL. Fail loud on unknown/expired/reused;
+        on success record `AUTH_LOGIN` (the login completes here) and mint at the single point."""
+        moment = now or datetime.now(UTC)
+        consultant_id = self._repo.consume_login_handoff_code(
+            code_hash=hash_invite_token(code), now=moment
+        )
+        stored = self._repo.get_consultant_by_id(consultant_id)
+        if stored is None or not stored.is_active:
+            raise InvalidCredentialsError("Account is inactive.")
         self._repo.record_audit(
             actor_consultant_id=stored.id,
             event_type=AuditEventType.AUTH_LOGIN,
             resource_type="consultant",
             resource_id=stored.id,
-            now=datetime.now(UTC),
+            now=moment,
         )
         return create_access_token(
             self._settings,
