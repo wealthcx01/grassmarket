@@ -1,10 +1,10 @@
-# ATLAS Methodology v1.3 — DRAFT (not normative until ADR-0023 is accepted)
+# ATLAS Methodology v1.3
 
 **Bruntsfield Capital — CONFIDENTIAL — July 2026**
 
-**Status: DRAFT.** This document becomes normative only when **ADR-0023** is accepted (it carries two
-open founder decisions: the C module set and staged entry into V). Until then, **v1.2 remains the
-normative methodology** and nothing here changes engine behaviour.
+**Status: NORMATIVE for Stage 1** (ADR-0023 Accepted 2026-07-16; the Phase-E 10-module set and staged
+entry are ratified). It supersedes v1.2 for the **additive, reported** C-index. Build tickets:
+GRS-0080–0086.
 
 v1.3 introduces a **fourth lens — C (Customer Proposition)** — as an **additive, reported** index.
 It **adds §13** and amends **§2 (framework)** only. **§5.1 (the composite) is deliberately

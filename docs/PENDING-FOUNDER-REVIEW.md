@@ -19,17 +19,17 @@ What's new to look at (all in the wizard + portfolio):
 - **Summary** step: diagnostic visuals — maturity radar, B→P→L→V waterfall, weighted module table,
   scenario impact bars.
 
-## 1. Decisions that gate remaining builds
+## 1. Decisions that gate remaining builds — **RESOLVED 2026-07-16**
 
-| # | Decision | Unblocks | Recommendation | Status |
-|---|---|---|---|---|
-| D-4 | Confirm **Commission Schedule v7** as the earnings config source | GRS-0067 earnings build | Confirm (placeholder is known-wrong) | ⏳ awaiting |
-| D-5 | Approve harvesting **ASX/NSI pack structure** (anonymised) as deliverable templates | GRS-0072/0073 house deliverables | Approve | ⏳ awaiting |
-| D-1 | Ratify the **C-index Phase-E 10-module set** (vs 6-module synthesis) | ADR-0023 → v1.3 normative → Loop 7 | Phase-E 10 | ⏳ awaiting |
-| D-2 | Confirm **staged C entry** (v1.3 report-alongside → v1.4 into V) vs straight to a 4th θ | ADR-0023 | Staged | ⏳ awaiting |
-| D-3 | Sequence: **exchange operating-model profile** vs C-index first | Loop 7 / profile ADR scope | Exchange profile first or in parallel | ⏳ awaiting |
-| D-6 | Commission the **Power Primers** (Foundation Package strand 1, unwritten) | GRS-0024 Power Drills quiz depth | Commission | ⏳ awaiting |
-| D-7 | Share the **θ_C re-elicitation** session with the v1 annual re-elicitation? | v1.4 (θ_C) | Share | ⏳ awaiting |
+| # | Decision | Resolution | Now planned as |
+|---|---|---|---|
+| D-4 | Commission Schedule v7 as earnings config source | ✅ **Confirmed.** Encode the two-stream v7 model; model independent-consultant contracts (Byoung = first hire) | ADR-0026 · GRS-0075/0076 |
+| D-5 | Harvest ASX/NSI packs as deliverable templates | ✅ **Approved** — as *exchange* templates; elevated to a **profiles program of work** (wealth, exchange, …) | ADR-0025 · GRS-0078 |
+| D-1 | C-index Phase-E 10-module set | ✅ **Phase-E 10 ratified** | ADR-0023 Accepted |
+| D-2 | Staged C entry | ✅ **Staged** (v1.3 report-alongside → v1.4 into V) | ADR-0023 · v1.3 normative |
+| D-3 | Exchange profile vs C-index first | ✅ **Exchange profile ahead / in parallel** | ADR-0025 |
+| D-6 | Power Primers (unwritten) | ✅ Proceed — content dependency; scaffold in the quiz bank | founder content track |
+| D-7 | θ_C re-elicitation session | ✅ **Share** the v1 annual re-elicitation | GRS-0086 (Stage 2) |
 
 ## 2. Content / data only John can provide (not decisions — inputs)
 
@@ -38,19 +38,19 @@ config/seed through the app's scoped storage, or read reference-only. I need the
 
 | # | Input | Needed for | Status |
 |---|---|---|---|
-| I-1 | **Commission Schedule v7** template (OneDrive) | Build the earnings v7 config (after D-4) | ⏳ awaiting |
-| I-2 | **ASX / NSI deliverable packs** (OneDrive) | House deliverable templates (after D-5) | ⏳ awaiting |
-| I-3 | **Brokerage-App-Reviews corpus** — 16 apps, 7 scored, 93 widgets (OneDrive) | C-index benchmark seed (Loop 7, after D-1/D-2) | ⏳ awaiting |
-| I-4 | **θ / λ / δ weight elicitation** (4–8 experts) | Client-usable coefficients — the **launch bottleneck** (GRS-0033) | ⏳ awaiting |
+| I-1 | **Commission Schedule v7** template + `Resources/` contracts (OneDrive) | Earnings v7 config | ✅ **provided** (path given; read for ADR-0026/GRS-0075) |
+| I-2 | **ASX / NSI deliverable packs** (`Engagements/Active`) | Exchange deliverable templates | ✅ **provided** |
+| I-3 | **Brokerage-App-Reviews corpus** — 16 apps, 7 scored, 93 widgets | C-index benchmark seed | ✅ **provided** |
+| I-4 | **θ / λ / δ weight elicitation** (4–8 experts) | Client-usable coefficients | ⚙️ **proceed on the existing elicited set** as launch default; a real panel = post-launch validation |
 
 ## 3. Ops / platform items for John
 
 | # | Item | Impact | Status |
 |---|---|---|---|
-| O1 | **GitHub Actions halted account-wide (billing)** since 2026-07-15 | CI can't run; frontend auto-deploy (rides on Actions) is down — frontend now needs manual `railway up`. Merges are on **local green** by your authorisation. | 🔴 needs billing fix |
-| O2 | **No change-password endpoint** exists | Needed for launch + to rotate the password that was echoed to chat at cutover | ⏳ open (build candidate) |
-| O3 | Custom domain `advisors.bruntsfieldcapital.com` not pointed | Prod runs on the `*.up.railway.app` URL | ⏳ awaiting DNS |
-| O4 | `nixpacks.toml` uv pin still a manual service var (`NIXPACKS_UV_VERSION`) | Build fragility on the API service | ⏳ open (build candidate) |
+| O1 (3.01) | GitHub Actions / billing | CI + frontend auto-deploy | ✅ **completed** (restored) |
+| O2 (3.02) | Login / password | Not change-password — **Google OAuth sign-in** (all consultants have Gmail); this *is* the public-site → app login→redirect mechanism | 🔁 **superseded** → ADR-0024 · GRS-0073/0074 |
+| O3 (3.03) | Custom domain `advisors.bruntsfieldcapital.com` | Prod on `*.up.railway.app` | ⏳ **do last, pre-release** |
+| O4 (3.04) | `nixpacks.toml` uv pin (manual `NIXPACKS_UV_VERSION`) | API build fragility | ⚙️ **proceed** — just fix it |
 
 ## Notes
 

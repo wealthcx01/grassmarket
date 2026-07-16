@@ -1,6 +1,6 @@
 # ADR-0023 — Customer Proposition Index (C): promote from v2 agenda to a scheduled build
 
-- **Status:** **Proposed** (2026-07-15). This ADR promotes `docs/METHODOLOGY-V2-SCOPE.md` §1 (agreed direction, non-normative) into a decision record. **Two founder decisions remain open** (§Decisions required) — until they are taken, `docs/ATLAS-Methodology-v1.3.md` is **draft, not normative**.
+- **Status:** **Accepted** (2026-07-16). Promotes `docs/METHODOLOGY-V2-SCOPE.md` §1 into a decision record; the two open founder decisions are now **ratified** (§Decisions — resolved): **(1) Phase-E 10-module set** and **(2) staged entry** (v1.3 report-alongside → v1.4 into V). `docs/ATLAS-Methodology-v1.3.md` is therefore **normative for Stage 1**. Build tickets: GRS-0080–0086.
 - **Date:** 2026-07-15
 - **Deciders:** Founder (decisions below) + engineering
 - **Normative source (once accepted):** `docs/ATLAS-Methodology-v1.3.md` §13.
@@ -51,11 +51,11 @@ Wrapper/TCO depth from the 6-set (GIA/ISA/LISA/JISA/SIPP, TCO at £5k/£50k/£25
 
 **6. Profiles interaction (deferred, but binding).** C inherits the operating-model profile mechanism (`METHODOLOGY-V2-SCOPE` §2): an exchange's customers are members and issuers, not retail investors — **a different widget set entirely**. The retail-brokerage widget taxonomy is the *retail* profile's C instrument only. Given the active book is exchange-side (ASX, NSE — see `ESTATE-RECONCILIATION` §3), the profile ADR should land close behind this one.
 
-## Decisions required from the founder (blocking normative status)
+## Decisions — resolved by the founder (2026-07-16)
 
-1. **Ratify the Phase E 10-module set** (recommended above) — or select the 6-module synthesis and accept re-scoring the corpus.
-2. **Confirm staged entry** (Stage 1 report-alongside → Stage 2 into V) vs. going straight to a fourth θ.
-3. *(Related, not blocking)* Confirm the θ_C elicitation panel shares a session with the v1 annual re-elicitation (`BACKLOG` founder track), and whether the **exchange profile** is promoted ahead of C (`ESTATE-RECONCILIATION` §3 argues revenue reality says exchange-first).
+1. **Phase-E 10-module set — RATIFIED** (over the 6-module synthesis: the 7-app corpus is already scored against Phase E).
+2. **Staged entry — CONFIRMED** (Stage 1 v1.3 report-alongside, §5.1 untouched, golden master survives → Stage 2 v1.4 into V with re-elicited Σθ=1 and golden-master v2).
+3. **θ_C elicitation** shares the v1 annual re-elicitation session (D-7); **the exchange operating-model profile is promoted ahead of / alongside C** (D-3/D-5) — see ADR-0025. Weight source until the panel convenes: the existing elicited coefficients (I-4).
 
 ## Consequences
 
