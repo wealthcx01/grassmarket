@@ -23,11 +23,28 @@ masters; the only thing missing is the panel's sign-off on the numbers. Flip bot
 from __future__ import annotations
 
 from bcap_contracts.assessments import CoefficientSet
-from bcap_contracts.registry import Registry
+from bcap_contracts.registry import (
+    RETAIL_PROFILE_KEY,
+    Registry,
+    load_profile,
+    load_registry,
+)
 from bcap_contracts.uncertainty import UncertaintyModel
 
 from grassmarket.atlas.draft_coefficients import draft_v1_coefficient_set
 from grassmarket.atlas.montecarlo import draft_v1_uncertainty_model
+
+
+def profile_scoring_context(
+    profile_key: str = RETAIL_PROFILE_KEY,
+) -> tuple[Registry, CoefficientSet]:
+    """Resolve the (registry VIEW, coefficient set) an assessment scores against for an operating-
+    model profile (ADR-0025). The retail default view is byte-identical to the full registry, so the
+    golden master and every existing retail assessment are unchanged. Routes through
+    :func:`active_coefficient_set` so the client-usability activation stays a single-point change.
+    An unknown profile key fails loud (ADR-0001)."""
+    view = load_registry().for_profile(load_profile(profile_key))
+    return view, active_coefficient_set(view)
 
 
 def active_coefficient_set(registry: Registry) -> CoefficientSet:

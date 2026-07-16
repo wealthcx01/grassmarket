@@ -1,0 +1,27 @@
+# Operating-model assessment profiles (ADR-0025). A profile is a validated VIEW over the registry
+# superset: which modules apply to an operating model, plus optional profile-specific subcomponent
+# additions and per-profile `critical` overrides. The registry stays the superset; a profile selects.
+#
+# `retail` is the default and MUST reproduce the v1 taxonomy exactly — its view is byte-identical to
+# the full registry, so the golden master is unchanged. Non-retail profiles (exchange, wealth,
+# infrastructure) are added as content in their own tickets (GRS-0078+).
+#
+# Criticals here layer over a base set still `draft-pending-ratification` (modules.yaml) — a later
+# base ratification may change what a profile need only override.
+status: draft-pending-ratification
+
+profiles:
+  retail:
+    name: Retail brokerage
+    # All nine superset modules, in superset order — the v1 default, byte-identical.
+    modules:
+      - FRONTEND
+      - APP_SERVER
+      - MARKET_DATA
+      - ORCHESTRATION
+      - CMS
+      - BACKOFFICE
+      - OEMS
+      - EMS_GATEWAY
+      - LIQ_CONNECT
+    # No additions and no critical overrides: the retail view == the full registry.
