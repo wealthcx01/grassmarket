@@ -15,7 +15,7 @@ from datetime import date, datetime
 from enum import StrEnum
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from bcap_contracts.base import OwnedResource
 from bcap_contracts.common import Score, UncertaintyRating, UnitInterval
@@ -88,3 +88,46 @@ class BenchmarkRow(BaseModel):
         default=None, description="A non-identifying industry category (closed vocabulary)."
     )
     ingested_at: datetime
+
+
+class CBenchmarkRow(BaseModel):
+    """A NAMED peer's Customer-Proposition (C) score in the C benchmark set (ADR-0023 / GRS-0084).
+
+    Unlike the anonymised V benchmark, C peers are PUBLIC brokerage apps (Saxo, IBKR, Revolut, …) —
+    a named, shared reference set, not client data. AI/consultant-derived scores are APPROVAL-GATED
+    (ADR-0009, CLAUDE.md #8): a row is `approved=False` on ingestion and only an approved row is
+    'live' for peer comparison — nothing AI-proposed enters the benchmark without a recorded human
+    sign-off. `module_scores` are per-C-module q_m, keyed to the C registry (validated at ingest —
+    an unknown key fails loud, never silently dropped)."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    peer_name: str = Field(min_length=1, description="Public app/product name, e.g. 'Saxo'.")
+    profile_key: str = Field(min_length=1, description="Operating-model profile scored under.")
+    c_index: Score
+    module_scores: dict[str, Score] = Field(
+        default_factory=dict, description="Per-C-module q_m, keyed to the registry's C module keys."
+    )
+    methodology_version: str = Field(min_length=1)
+    coefficient_version: str = Field(min_length=1)
+    # A non-committed provenance pointer to the source review (e.g. a review slug) — never the
+    # review content itself, which stays the founder's IP (read reference-only, never committed).
+    source_ref: str | None = None
+    approved: bool = False
+    approved_by: UUID | None = None
+    approved_at: datetime | None = None
+    ingested_at: datetime
+
+    @model_validator(mode="after")
+    def _approval_is_consistent(self) -> CBenchmarkRow:
+        """`approved` ⟺ both `approved_by` and `approved_at` are set — the ADR-0009
+        recorded-approval invariant, so an approved row can't lack its approver/timestamp, nor
+        the reverse."""
+        stamped = self.approved_by is not None and self.approved_at is not None
+        if self.approved != stamped:
+            raise ValueError(
+                "A C benchmark row is approved IFF it records both approved_by and approved_at "
+                "(ADR-0009): AI proposes, a human approves, and the approval is recorded."
+            )
+        return self

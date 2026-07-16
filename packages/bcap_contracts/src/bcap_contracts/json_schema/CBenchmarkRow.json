@@ -1,0 +1,108 @@
+{
+  "additionalProperties": false,
+  "description": "A NAMED peer's Customer-Proposition (C) score in the C benchmark set (ADR-0023 / GRS-0084).\n\nUnlike the anonymised V benchmark, C peers are PUBLIC brokerage apps (Saxo, IBKR, Revolut, …) —\na named, shared reference set, not client data. AI/consultant-derived scores are APPROVAL-GATED\n(ADR-0009, CLAUDE.md #8): a row is `approved=False` on ingestion and only an approved row is\n'live' for peer comparison — nothing AI-proposed enters the benchmark without a recorded human\nsign-off. `module_scores` are per-C-module q_m, keyed to the C registry (validated at ingest —\nan unknown key fails loud, never silently dropped).",
+  "properties": {
+    "approved": {
+      "default": false,
+      "title": "Approved",
+      "type": "boolean"
+    },
+    "approved_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Approved At"
+    },
+    "approved_by": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Approved By"
+    },
+    "c_index": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "C Index",
+      "type": "number"
+    },
+    "coefficient_version": {
+      "minLength": 1,
+      "title": "Coefficient Version",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "ingested_at": {
+      "format": "date-time",
+      "title": "Ingested At",
+      "type": "string"
+    },
+    "methodology_version": {
+      "minLength": 1,
+      "title": "Methodology Version",
+      "type": "string"
+    },
+    "module_scores": {
+      "additionalProperties": {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "type": "number"
+      },
+      "description": "Per-C-module q_m, keyed to the registry's C module keys.",
+      "title": "Module Scores",
+      "type": "object"
+    },
+    "peer_name": {
+      "description": "Public app/product name, e.g. 'Saxo'.",
+      "minLength": 1,
+      "title": "Peer Name",
+      "type": "string"
+    },
+    "profile_key": {
+      "description": "Operating-model profile scored under.",
+      "minLength": 1,
+      "title": "Profile Key",
+      "type": "string"
+    },
+    "source_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Ref"
+    }
+  },
+  "required": [
+    "id",
+    "peer_name",
+    "profile_key",
+    "c_index",
+    "methodology_version",
+    "coefficient_version",
+    "ingested_at"
+  ],
+  "title": "CBenchmarkRow",
+  "type": "object"
+}

@@ -15,6 +15,7 @@ from bcap_contracts.common import AssessorLevel, ConsultantTier, Role
 from bcap_contracts.engagements import EngagementStatus, WorkshopState
 from bcap_contracts.entities import PipelineStage
 from sqlalchemy import (
+    JSON,
     Boolean,
     Date,
     DateTime,
@@ -271,6 +272,29 @@ class BenchmarkRowORM(Base):
     methodology_version: Mapped[str] = mapped_column(String(64), nullable=False)
     coefficient_version: Mapped[str] = mapped_column(String(64), nullable=False)
     sector: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    ingested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
+class CBenchmarkRowORM(Base):
+    """A NAMED peer's Customer-Proposition score in the C benchmark set (ADR-0023 / GRS-0084). Peers
+    are PUBLIC apps (not client data); scores are APPROVAL-GATED (ADR-0009) — `approved` is False on
+    ingestion and only an approved row is live for comparison. A shared org-wide reference set."""
+
+    __tablename__ = "c_benchmark_rows"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    peer_name: Mapped[str] = mapped_column(String(120), nullable=False)
+    profile_key: Mapped[str] = mapped_column(String(64), nullable=False)
+    c_index: Mapped[float] = mapped_column(Float, nullable=False)
+    module_scores: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    methodology_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    coefficient_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    source_ref: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    approved: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    approved_by: Mapped[UUID | None] = mapped_column(
+        Uuid, ForeignKey("consultants.id"), nullable=True
+    )
+    approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     ingested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
 

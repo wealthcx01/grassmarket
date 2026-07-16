@@ -113,6 +113,7 @@ from bcap_contracts.money import Currency, Money
 from bcap_contracts.predictions import (
     BenchmarkRow,
     BenchmarkSector,
+    CBenchmarkRow,
     Prediction,
     PredictionOutcome,
 )
@@ -198,6 +199,7 @@ __all__ = [
     "Prediction",
     "PredictionOutcome",
     "BenchmarkRow",
+    "CBenchmarkRow",
     "BenchmarkSector",
     "CommitteeItem",
     "CommitteeItemType",
