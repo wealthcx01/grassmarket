@@ -73,31 +73,115 @@ function Card({ children }: { children: React.ReactNode }) {
 
 // --- 1. Overview ------------------------------------------------------------------------
 
+// Suggested segments — a datalist (not an enum): the operating-model profile selector is deferred.
+const SEGMENT_SUGGESTIONS = [
+  "Retail broker",
+  "Neobroker",
+  "Multi-asset broker",
+  "Wealth / advisory platform",
+  "Exchange",
+  "Infrastructure vendor",
+];
+
 export function OverviewStep({ document: d, update, readOnly }: StepProps) {
+  const profile = d.profile ?? null;
+  const labelStyle: React.CSSProperties = { fontSize: "0.85rem" };
+  const fieldStyle: React.CSSProperties = { ...selectStyle, display: "block", width: "100%", marginTop: "0.3rem" };
   return (
     <div style={{ maxWidth: "40rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
       <p style={{ color: "var(--color-ink-muted)" }}>
         Manual assessment (Path A). Enter what you know — a partial assessment is valid and autosaves.
         Leave anything you have not assessed unrated; unrated is never treated as zero.
       </p>
-      <label style={{ fontSize: "0.85rem" }}>
+      <label style={labelStyle}>
         Subject (the business being assessed)
         <input
           type="text"
           value={d.subject}
           disabled={readOnly}
           onChange={(e) => update((x) => ({ ...x, subject: e.target.value }))}
-          style={{ ...selectStyle, display: "block", width: "100%", marginTop: "0.3rem" }}
+          style={fieldStyle}
         />
       </label>
-      <label style={{ fontSize: "0.85rem" }}>
+
+      {/* Structured business profile (GRS-0068) — context, never a scoring input. */}
+      <fieldset style={{ border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "0.85rem 1rem", margin: 0 }}>
+        <legend style={{ fontSize: "0.8rem", color: "var(--color-ink-muted)", padding: "0 0.4rem" }}>
+          Business profile <span style={{ color: "var(--color-ink-faint)" }}>· context only, not scored</span>
+        </legend>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+          <label style={labelStyle}>
+            Country / domicile
+            <input
+              type="text"
+              placeholder="e.g. United Kingdom"
+              value={profile?.country ?? ""}
+              disabled={readOnly}
+              onChange={(e) => update((x) => doc.setProfile(x, { country: e.target.value || null }))}
+              style={fieldStyle}
+            />
+          </label>
+          <label style={labelStyle}>
+            Segment
+            <input
+              type="text"
+              list="segment-suggestions"
+              placeholder="e.g. Retail broker"
+              value={profile?.segment ?? ""}
+              disabled={readOnly}
+              onChange={(e) => update((x) => doc.setProfile(x, { segment: e.target.value || null }))}
+              style={fieldStyle}
+            />
+            <datalist id="segment-suggestions">
+              {SEGMENT_SUGGESTIONS.map((s) => (
+                <option key={s} value={s} />
+              ))}
+            </datalist>
+          </label>
+          <label style={labelStyle}>
+            Asset classes <span style={{ color: "var(--color-ink-faint)" }}>(comma-separated)</span>
+            <input
+              type="text"
+              placeholder="equities, funds, FX, crypto"
+              defaultValue={(profile?.asset_classes ?? []).join(", ")}
+              disabled={readOnly}
+              onBlur={(e) => update((x) => doc.setProfile(x, { asset_classes: doc.parseList(e.target.value) }))}
+              style={fieldStyle}
+            />
+          </label>
+          <label style={labelStyle}>
+            Regions served <span style={{ color: "var(--color-ink-faint)" }}>(comma-separated)</span>
+            <input
+              type="text"
+              placeholder="UK, EU, US"
+              defaultValue={(profile?.regions ?? []).join(", ")}
+              disabled={readOnly}
+              onBlur={(e) => update((x) => doc.setProfile(x, { regions: doc.parseList(e.target.value) }))}
+              style={fieldStyle}
+            />
+          </label>
+        </div>
+        <label style={{ ...labelStyle, display: "block", marginTop: "0.75rem" }}>
+          Licensing / regulatory status
+          <input
+            type="text"
+            placeholder="e.g. FCA-authorised; MiFID II passported"
+            value={profile?.licensing ?? ""}
+            disabled={readOnly}
+            onChange={(e) => update((x) => doc.setProfile(x, { licensing: e.target.value || null }))}
+            style={fieldStyle}
+          />
+        </label>
+      </fieldset>
+
+      <label style={labelStyle}>
         Notes
         <textarea
           value={d.notes ?? ""}
           disabled={readOnly}
           rows={4}
           onChange={(e) => update((x) => ({ ...x, notes: e.target.value || null }))}
-          style={{ ...selectStyle, display: "block", width: "100%", marginTop: "0.3rem" }}
+          style={fieldStyle}
         />
       </label>
     </div>

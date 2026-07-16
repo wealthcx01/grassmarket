@@ -350,6 +350,32 @@ class PowerEntry(BaseModel):
     trend: TrendDirection | None = None
 
 
+class BusinessProfile(BaseModel):
+    """Descriptive context for the business being assessed (GRS-0068): where it operates, what it
+    offers, and how it's regulated. Purely informational — it frames the assessment and feeds the
+    portfolio view; it is **NEVER a scoring input** (the engine reads only subcomponents, metrics
+    and powers) and never enters the scoring-run content hash. Partial by design, like the document
+    that carries it: every field is optional.
+
+    The operating-model *profile selector* (exchange vs broker, which changes module selection and
+    weights) is a separate, deferred concern (METHODOLOGY-V2-SCOPE §2 / the profile ADR) — `segment`
+    here is a free-text descriptor, not that selector."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    country: str | None = Field(default=None, description="Primary domicile / HQ jurisdiction.")
+    segment: str | None = Field(
+        default=None, description="Business model descriptor, e.g. 'Retail broker', 'Exchange'."
+    )
+    asset_classes: tuple[str, ...] = Field(
+        default=(), description="Asset classes offered (equities, funds, FX, crypto, …)."
+    )
+    regions: tuple[str, ...] = Field(default=(), description="Markets / regions served.")
+    licensing: str | None = Field(
+        default=None, description="Regulatory status / key licences (free text)."
+    )
+
+
 class AssessmentDocument(BaseModel):
     """The single intermediate schema BOTH Path A (wizard) and Path B (meeting intelligence) feed.
 
@@ -360,6 +386,7 @@ class AssessmentDocument(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     subject: str = ""
+    profile: BusinessProfile | None = None
     subcomponents: tuple[SubcomponentRating, ...] = ()
     metrics: tuple[MetricEntry, ...] = ()
     powers: tuple[PowerEntry, ...] = ()

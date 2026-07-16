@@ -6,6 +6,7 @@
 
 import type {
   AssessmentDocument,
+  BusinessProfile,
   EvidenceGrade,
   MaturityLevel,
   MetricConfidence,
@@ -15,6 +16,30 @@ import type {
   StrengthRating,
   SubcomponentRating,
 } from "@/lib/types";
+
+const EMPTY_PROFILE: BusinessProfile = {
+  country: null,
+  segment: null,
+  asset_classes: [],
+  regions: [],
+  licensing: null,
+};
+
+/** Merge a partial business-profile update into the document (GRS-0068), creating it if absent. */
+export function setProfile(
+  doc: AssessmentDocument,
+  patch: Partial<BusinessProfile>,
+): AssessmentDocument {
+  return { ...doc, profile: { ...EMPTY_PROFILE, ...doc.profile, ...patch } };
+}
+
+/** Parse a comma-separated field into a trimmed, non-empty list (for asset classes / regions). */
+export function parseList(raw: string): string[] {
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
 
 export function emptyDoc(subject = ""): AssessmentDocument {
   return { subject, subcomponents: [], metrics: [], powers: [], notes: null };
