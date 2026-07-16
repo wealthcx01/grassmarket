@@ -31,6 +31,7 @@ from bcap_contracts.auth import (
     Invitation,
     JWTClaims,
     LoginRequest,
+    RefreshRequest,
     TokenResponse,
 )
 from bcap_contracts.bench import (
@@ -244,6 +245,7 @@ __all__ = [
     "Consultant",
     "Invitation",
     "LoginRequest",
+    "RefreshRequest",
     "TokenResponse",
     "AcceptInvitationRequest",
     "AuditEvent",

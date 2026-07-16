@@ -1,0 +1,15 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "refresh_token": {
+      "minLength": 1,
+      "title": "Refresh Token",
+      "type": "string"
+    }
+  },
+  "required": [
+    "refresh_token"
+  ],
+  "title": "RefreshRequest",
+  "type": "object"
+}

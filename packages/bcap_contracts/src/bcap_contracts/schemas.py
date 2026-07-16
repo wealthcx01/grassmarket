@@ -31,6 +31,7 @@ from bcap_contracts.auth import (
     Invitation,
     JWTClaims,
     LoginRequest,
+    RefreshRequest,
     TokenResponse,
 )
 from bcap_contracts.bench import BenchQueue, PerformanceSummary
@@ -122,6 +123,7 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "Consultant": Consultant,
     "Invitation": Invitation,
     "LoginRequest": LoginRequest,
+    "RefreshRequest": RefreshRequest,
     "TokenResponse": TokenResponse,
     "AcceptInvitationRequest": AcceptInvitationRequest,
     "AuditEvent": AuditEvent,

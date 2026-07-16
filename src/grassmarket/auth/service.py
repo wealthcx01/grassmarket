@@ -8,6 +8,7 @@ return a partial success.
 from __future__ import annotations
 
 import secrets
+from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
@@ -23,7 +24,16 @@ from grassmarket.auth.security import (
     verify_password,
 )
 from grassmarket.config import Settings
-from grassmarket.data.repository import ConflictError, Repository
+from grassmarket.data.repository import ConflictError, Repository, StoredConsultant
+
+
+@dataclass(frozen=True)
+class IssuedTokens:
+    """An access token + its rotated single-use refresh token (GRS-0120). The router wraps this in
+    the `TokenResponse` contract; the service is the single mint point for both."""
+
+    access_token: str
+    refresh_token: str
 
 
 class AuthError(Exception):
@@ -123,9 +133,10 @@ class AuthService:
         return stored.to_contract()
 
     # -------------------------------------------------------------- login
-    def login(self, *, email: str, password: str) -> str:
-        """Return a signed access token, or raise `InvalidCredentialsError`. Runs the password
-        verification even when the email is unknown, to avoid a user-enumeration timing oracle."""
+    def login(self, *, email: str, password: str) -> IssuedTokens:
+        """Return an access + refresh token pair, or raise `InvalidCredentialsError`. Runs the
+        password verification even when the email is unknown, to avoid a user-enumeration timing
+        oracle."""
         stored = self._repo.get_consultant_by_email(email)
         if stored is None or stored.hashed_password is None:
             # Verify against a dummy hash so timing does not reveal whether the email exists — and
@@ -136,21 +147,49 @@ class AuthService:
             raise InvalidCredentialsError("Account is inactive.")
         if not verify_password(password, stored.hashed_password):
             raise InvalidCredentialsError("Invalid email or password.")
+        now = datetime.now(UTC)
         self._repo.record_audit(
             actor_consultant_id=stored.id,
             event_type=AuditEventType.AUTH_LOGIN,
             resource_type="consultant",
             resource_id=stored.id,
-            now=datetime.now(UTC),
+            now=now,
         )
-        return create_access_token(
+        return self._issue_tokens(stored, now=now)
+
+    def _issue_tokens(self, stored: StoredConsultant, *, now: datetime) -> IssuedTokens:
+        """Mint the access token + a fresh single-use refresh token (its hash persisted, GRS-0120).
+        The single mint point for BOTH tokens on every login/refresh path."""
+        access_token = create_access_token(
             self._settings,
             consultant_id=stored.id,
             email=stored.email,
             role=stored.role,
             tier=stored.tier,
             assessor_level=stored.assessor_level,
+            now=now,
         )
+        raw_refresh = secrets.token_urlsafe(32)
+        self._repo.create_refresh_token(
+            consultant_id=stored.id,
+            token_hash=hash_invite_token(raw_refresh),
+            expires_at=now + timedelta(days=self._settings.jwt_refresh_ttl_days),
+        )
+        return IssuedTokens(access_token=access_token, refresh_token=raw_refresh)
+
+    def refresh_session(self, *, refresh_token: str, now: datetime | None = None) -> IssuedTokens:
+        """Rotate a refresh token → a NEW access + refresh pair (GRS-0120). The presented token is
+        consumed (single-use), so a stolen/replayed token is refused once its successor is minted.
+        Fail loud on unknown / used / revoked / expired (the repository raises), and on an
+        inactive/removed account. This is the load-bearing 'stay signed in' path."""
+        moment = now or datetime.now(UTC)
+        consultant_id = self._repo.rotate_refresh_token(
+            token_hash=hash_invite_token(refresh_token), now=moment
+        )
+        stored = self._repo.get_consultant_by_id(consultant_id)
+        if stored is None or not stored.is_active:
+            raise InvalidCredentialsError("Account is inactive.")
+        return self._issue_tokens(stored, now=moment)
 
     def _resolve_google_consultant(self, *, email: str, google_sub: str):
         """Invite-only Google resolution (ADR-0024). Google has already verified `email`/`sub`; here
@@ -181,9 +220,10 @@ class AuthService:
         )
         return raw_code
 
-    def exchange_handoff_code(self, *, code: str, now: datetime | None = None) -> str:
-        """Redeem a single-use hand-off code for the GM JWT (GRS-0074) — the only place a JWT
-        crosses back to the browser, over POST, never a URL. Fail loud on unknown/expired/reused;
+    def exchange_handoff_code(self, *, code: str, now: datetime | None = None) -> IssuedTokens:
+        """Redeem a single-use hand-off code for the GM token pair (GRS-0074/0120) — the only
+        place a JWT crosses back to the browser, over POST, never a URL. Fail loud on
+        unknown/expired/reused;
         on success record `AUTH_LOGIN` (the login completes here) and mint at the single point."""
         moment = now or datetime.now(UTC)
         consultant_id = self._repo.consume_login_handoff_code(
@@ -199,14 +239,7 @@ class AuthService:
             resource_id=stored.id,
             now=moment,
         )
-        return create_access_token(
-            self._settings,
-            consultant_id=stored.id,
-            email=stored.email,
-            role=stored.role,
-            tier=stored.tier,
-            assessor_level=stored.assessor_level,
-        )
+        return self._issue_tokens(stored, now=moment)
 
 
 # A precomputed bcrypt hash of a random string, used only to equalise login timing on the

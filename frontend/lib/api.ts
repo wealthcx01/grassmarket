@@ -61,21 +61,69 @@ import type {
 export const API_BASE_URL: string =
   process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, "") ?? "http://localhost:8000";
 
-/** Where the (skeleton) access token lives — mirrors the login page (Loop 6 replaces this). */
+/** Where the access + refresh tokens live (GRS-0120). The access token is short-lived; the refresh
+ *  token rotates it silently so an active advisor is not signed out at the 30-min TTL. */
 export const TOKEN_KEY = "bas.access_token";
+export const REFRESH_TOKEN_KEY = "bas.refresh_token";
 
 export function getToken(): string | null {
   if (typeof window === "undefined") return null;
   return window.localStorage.getItem(TOKEN_KEY);
 }
 
+export function getRefreshToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem(REFRESH_TOKEN_KEY);
+}
+
+/** Persist a freshly-issued pair (login, hand-off exchange, or a refresh rotation). */
+export function setTokens(accessToken: string, refreshToken: string): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(TOKEN_KEY, accessToken);
+  window.localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+}
+
 export function clearToken(): void {
-  if (typeof window !== "undefined") window.localStorage.removeItem(TOKEN_KEY);
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(TOKEN_KEY);
+  window.localStorage.removeItem(REFRESH_TOKEN_KEY);
 }
 
 function authHeaders(): Record<string, string> {
   const token = getToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+// Single-flight refresh: many concurrent 401s share ONE /auth/refresh call, so a rotated (single-use)
+// refresh token is not spent by a stampede. Returns true when a fresh pair was stored.
+let refreshInFlight: Promise<boolean> | null = null;
+
+async function tryRefresh(): Promise<boolean> {
+  const refresh = getRefreshToken();
+  if (!refresh) return false;
+  if (!refreshInFlight) {
+    refreshInFlight = (async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
+          method: "POST",
+          headers: { Accept: "application/json", "Content-Type": "application/json" },
+          body: JSON.stringify({ refresh_token: refresh }),
+        });
+        if (!res.ok) {
+          clearToken(); // a dead refresh token → genuinely signed out; fall back to full login
+          return false;
+        }
+        const body = (await res.json()) as LoginResponse;
+        setTokens(body.access_token, body.refresh_token);
+        return true;
+      } catch {
+        return false;
+      } finally {
+        refreshInFlight = null;
+      }
+    })();
+  }
+  return refreshInFlight;
 }
 
 /** Backend GET /health — coded defensively; fields beyond `status` are optional. */
@@ -93,6 +141,7 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   access_token: string;
+  refresh_token: string;
   token_type: string;
 }
 
@@ -133,7 +182,7 @@ function messageFromBody(body: unknown, fallback: string): string {
   return fallback;
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+async function request<T>(path: string, init?: RequestInit, retried = false): Promise<T> {
   const url = `${API_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
   let res: Response;
   try {
@@ -148,6 +197,17 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   } catch (cause) {
     // Network failure (backend not running, CORS, DNS). Surface it, don't swallow.
     throw new ApiError(0, `Cannot reach API at ${API_BASE_URL}`, cause);
+  }
+
+  // Expiry-aware retry (GRS-0120): a 401 on an authed call means the access token likely lapsed —
+  // transparently refresh once and retry before surfacing signed-out. `/auth/*` calls are never
+  // intercepted (that would loop the login/refresh flow itself).
+  if (res.status === 401 && !retried && !path.startsWith("/auth/")) {
+    if (await tryRefresh()) {
+      // Swap in the freshly-rotated access token (authHeaders() now reads the new one).
+      const newInit: RequestInit = { ...init, headers: { ...init?.headers, ...authHeaders() } };
+      return request<T>(path, newInit, true);
+    }
   }
 
   const body = await parseBody(res);

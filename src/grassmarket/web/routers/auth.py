@@ -8,6 +8,7 @@ from bcap_contracts.auth import (
     AcceptInvitationRequest,
     Consultant,
     LoginRequest,
+    RefreshRequest,
     TokenResponse,
 )
 from bcap_contracts.common import ConsultantTier, Role
@@ -60,10 +61,26 @@ class CreateInvitationResponse(BaseModel):
 @router.post("/login", response_model=TokenResponse)
 def login(payload: LoginRequest, auth: AuthService = Depends(get_auth_service)) -> TokenResponse:
     try:
-        token = auth.login(email=payload.email, password=payload.password)
+        tokens = auth.login(email=payload.email, password=payload.password)
     except InvalidCredentialsError as exc:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc)) from exc
-    return TokenResponse(access_token=token)
+    return TokenResponse(access_token=tokens.access_token, refresh_token=tokens.refresh_token)
+
+
+@router.post("/refresh", response_model=TokenResponse)
+def refresh(
+    payload: RefreshRequest, auth: AuthService = Depends(get_auth_service)
+) -> TokenResponse:
+    """Rotate a refresh token for a new access + refresh pair (GRS-0120), so an active advisor is
+    not signed out at the 30-minute access TTL. A used/expired/unknown refresh token is refused
+    loud — the client then falls back to a full re-login."""
+    try:
+        tokens = auth.refresh_session(refresh_token=payload.refresh_token)
+    except (NotFoundError, ConflictError) as exc:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc)) from exc
+    except InvalidCredentialsError as exc:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc)) from exc
+    return TokenResponse(access_token=tokens.access_token, refresh_token=tokens.refresh_token)
 
 
 @router.post("/accept-invitation", response_model=Consultant, status_code=status.HTTP_201_CREATED)
@@ -196,11 +213,11 @@ def exchange_session(
     """Exchange a single-use login hand-off code for the GM JWT (GRS-0074). The only place a JWT
     crosses back to the browser, over POST — never a URL. Reuse/expiry is refused loud."""
     try:
-        token = auth.exchange_handoff_code(code=payload.code)
+        tokens = auth.exchange_handoff_code(code=payload.code)
     except NotFoundError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
     except ConflictError as exc:  # already used or expired
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
     except InvalidCredentialsError as exc:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc)) from exc
-    return TokenResponse(access_token=token)
+    return TokenResponse(access_token=tokens.access_token, refresh_token=tokens.refresh_token)

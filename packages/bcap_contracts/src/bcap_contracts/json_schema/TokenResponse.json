@@ -5,6 +5,10 @@
       "title": "Access Token",
       "type": "string"
     },
+    "refresh_token": {
+      "title": "Refresh Token",
+      "type": "string"
+    },
     "token_type": {
       "default": "bearer",
       "title": "Token Type",
@@ -12,7 +16,8 @@
     }
   },
   "required": [
-    "access_token"
+    "access_token",
+    "refresh_token"
   ],
   "title": "TokenResponse",
   "type": "object"

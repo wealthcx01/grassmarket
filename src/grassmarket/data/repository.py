@@ -164,6 +164,7 @@ from grassmarket.data.models import (
     PredictionORM,
     ProspectORM,
     RecoveryFeeAttributionORM,
+    RefreshTokenORM,
     ScoringRunORM,
     WorkshopORM,
 )
@@ -3841,6 +3842,42 @@ class Repository:
             expires_at = expires_at.replace(tzinfo=UTC)
         if expires_at < now:
             raise ConflictError("Login hand-off code has expired.")
+        row.consumed_at = now
+        self._session.add(row)
+        self._session.flush()
+        return row.consultant_id
+
+    # ---------------------------------------------------------- refresh tokens (GRS-0120)
+    def create_refresh_token(
+        self, *, consultant_id: UUID, token_hash: str, expires_at: datetime
+    ) -> None:
+        """Store a single-use refresh token (its hash only) bound to a consultant (GRS-0120)."""
+        self._session.add(
+            RefreshTokenORM(
+                token_hash=token_hash, consultant_id=consultant_id, expires_at=expires_at
+            )
+        )
+        self._session.flush()
+
+    def rotate_refresh_token(self, *, token_hash: str, now: datetime) -> UUID:
+        """Redeem a refresh token → the bound consultant id, marking it consumed so the SAME
+        never be replayed (rotation: the caller mints a fresh token to replace it). Fail loud on
+        unknown / already-consumed / revoked / expired — a reused refresh token is a hard refusal,
+        a silent re-auth (mirrors the hand-off code single-use logic)."""
+        row = self._session.execute(
+            select(RefreshTokenORM).where(RefreshTokenORM.token_hash == token_hash)
+        ).scalar_one_or_none()
+        if row is None:
+            raise NotFoundError("Unknown refresh token.")
+        if row.consumed_at is not None:
+            raise ConflictError("Refresh token has already been used.")
+        if row.revoked_at is not None:
+            raise ConflictError("Refresh token has been revoked.")
+        expires_at = row.expires_at
+        if expires_at.tzinfo is None:  # SQLite may return naive datetimes
+            expires_at = expires_at.replace(tzinfo=UTC)
+        if expires_at < now:
+            raise ConflictError("Refresh token has expired.")
         row.consumed_at = now
         self._session.add(row)
         self._session.flush()

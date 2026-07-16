@@ -74,7 +74,16 @@ class TokenResponse(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     access_token: str
+    # A rotated, single-use refresh token (GRS-0120) the client exchanges at /auth/refresh for a new
+    # pair when the short-lived access token nears/passes expiry. Present on every issue path.
+    refresh_token: str
     token_type: str = "bearer"
+
+
+class RefreshRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    refresh_token: str = Field(min_length=1)
 
 
 class AcceptInvitationRequest(BaseModel):

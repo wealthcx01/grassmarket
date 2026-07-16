@@ -43,6 +43,10 @@ class Settings(BaseSettings):
     jwt_secret: str = Field(validation_alias=AliasChoices("GM_JWT_SECRET", "JWT_SECRET"))
     jwt_algorithm: str = Field(default="HS256", validation_alias="GM_JWT_ALGORITHM")
     jwt_access_ttl_minutes: int = Field(default=30, validation_alias="GM_JWT_ACCESS_TTL_MINUTES")
+    # Refresh-token TTL (GRS-0120): a long-lived, rotated, single-use refresh token keeps an active
+    # advisor signed in past the short access TTL without a manual re-login. Stored hashed; rotated
+    # on every use (ADR-0024 groundwork for the Holy Corner SSO handoff).
+    jwt_refresh_ttl_days: int = Field(default=30, validation_alias="GM_JWT_REFRESH_TTL_DAYS")
     jwt_issuer: str = Field(
         default="advisors.bruntsfieldcapital.com", validation_alias="GM_JWT_ISSUER"
     )
