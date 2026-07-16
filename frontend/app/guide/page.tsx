@@ -420,21 +420,52 @@ export default function GuidePage() {
         </p>
       </section>
 
-      {/* Outputs */}
+      {/* Reading the outputs (GRS-0096) */}
       <section>
-        <SectionTitle kicker="Reading the outputs">Numbers rank; words rate</SectionTitle>
-        <p style={{ margin: "0 0 0.6rem", color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
-          Scores are <strong>ranges, not points</strong> — &ldquo;V = 61 (55–68)&rdquo;. Never quote a bare point score;
-          the range is the honest answer. The continuous scores decide <em>what to fix first</em>; the headline words
-          (Basic→Frontier per module) are <em>what you defend in the boardroom</em>, and they come from rules, not
-          arithmetic — a module can&rsquo;t be Advanced if a critical part is Basic.
-        </p>
-        <p style={{ margin: 0, color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
-          On money, Platform Power keeps three layers apart and never says &ldquo;your score gap is worth £X&rdquo;: the{" "}
-          <strong>cost</strong> of an upgrade, the <strong>cash-flow levers</strong> it moves (each an NPV on the
-          client&rsquo;s own baselines), and the <strong>strategic value</strong> (stated in words). The Upgrade Priority
-          Index says <em>what first</em>; the value bridge says <em>what it&rsquo;s worth</em>. Never divide one by the other.
-        </p>
+        <SectionTitle kicker="Reading the outputs">Reading the outputs</SectionTitle>
+        <div style={{ display: "grid", gap: "1.1rem" }}>
+          <div>
+            <h3 style={{ margin: "0 0 0.3rem", fontSize: "1rem" }}>Ranges, not points</h3>
+            <p style={{ margin: 0, color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
+              A result is a range — &ldquo;V = 61 (55&ndash;68)&rdquo; — never a bare number. The middle
+              (P50) is the best estimate; the ends (P10 / P90) are how far it could reasonably sit given
+              how good your evidence was. Weak evidence widens the range honestly; that is a feature, not a
+              hedge. <strong>Quote the range, always.</strong> A point score alone is the fastest way to
+              lose a technical audience.
+            </p>
+          </div>
+          <div>
+            <h3 style={{ margin: "0 0 0.3rem", fontSize: "1rem" }}>Words rate; numbers rank</h3>
+            <p style={{ margin: 0, color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
+              Two outputs, two jobs. The <strong>rating</strong> — the headline <em>word</em> (Basic →
+              Frontier per module, the triad ordinals) — is what a board understands and what you defend;
+              it comes from <em>rules</em>, not arithmetic. The <strong>ranking</strong> — the continuous
+              score — is what decides <em>what to fix first</em>. Use the word to communicate, the number
+              to prioritise; don&rsquo;t swap their jobs.
+            </p>
+          </div>
+          <div>
+            <h3 style={{ margin: "0 0 0.3rem", fontSize: "1rem" }}>The bottleneck sets the score</h3>
+            <p style={{ margin: 0, color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
+              The weakest <em>critical</em> element caps the whole. A module can&rsquo;t be Advanced if a
+              critical part is Basic, however strong everything else is — just as a chain is only as strong
+              as its weakest link. This is why the headline word can sit below what a simple average would
+              suggest, and why the fix that moves the score most is usually the bottleneck, not the
+              already-strong part.
+            </p>
+          </div>
+          <div>
+            <h3 style={{ margin: "0 0 0.3rem", fontSize: "1rem" }}>The value bridge — how a gap is priced</h3>
+            <p style={{ margin: 0, color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
+              Money is kept in three layers that never collapse into one number: the <strong>cost</strong>{" "}
+              to upgrade (£), the <strong>cash-flow levers</strong> it moves (each an NPV on the client&rsquo;s
+              own baselines, £), and the <strong>strategic value</strong> (stated in words). The Upgrade
+              Priority Index says <em>what to do first</em>; the value bridge says <em>what it&rsquo;s
+              worth</em>. Platform Power never says &ldquo;your score gap is worth £X&rdquo; — dividing a
+              score into pounds is the one sentence that fails technical due diligence instantly.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* Mistakes */}
