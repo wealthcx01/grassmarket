@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 /**
  * The in-platform Advisor Guide (GRS-0057). A practical, plain-language how-to for the whole advisor
- * workflow — distinct from /guide, which is the ATLAS *concepts* primer (B·P·L·V, evidence grades).
+ * workflow — distinct from /guide, which is the Platform Power *concepts* primer (B·P·L·V, evidence grades).
  * Static and public: it carries guidance, never a user's data.
  */
 
@@ -31,7 +31,7 @@ const SECTIONS: ReadonlyArray<Section> = [
     lead: "Access is invitation-only. Once you're in, the dashboard is home — five sections, each with a one-line description of what it's for.",
     steps: [
       { do: "Sign in with the email you were invited on.", then: "Forgotten where you are? The Bruntsfield mark, top-left, always returns you to the dashboard." },
-      { do: "New to the ATLAS framework? Read the ten-minute primer first — it explains B · P · L · V, the four maturity levels, and evidence grades.", then: "It's linked from the dashboard and from Principles, below." },
+      { do: "New to the Platform Power framework? Read the ten-minute primer first — it explains B · P · L · V, the four maturity levels, and evidence grades.", then: "It's linked from the dashboard and from Principles, below." },
       { do: "Pick a section: Pipeline, Assessments, Deliverables, Workbench, or Earnings." },
     ],
   },
@@ -50,7 +50,7 @@ const SECTIONS: ReadonlyArray<Section> = [
   {
     id: "assess",
     kicker: "03 · Assessment",
-    title: "Run an ATLAS assessment",
+    title: "Run a Platform Power assessment",
     lead: "The seven-step wizard scores a company across the 7 Powers, Platform Value, and the 9 infrastructure modules. It autosaves every edit, so a partial assessment is always safe to leave and resume.",
     href: { label: "Open assessments", to: "/assessments" },
     steps: [
@@ -200,7 +200,7 @@ export default function HelpPage() {
           A practical walk through the whole advisor workflow — from a first prospect to a finalised
           assessment, a client deliverable, and the commission that follows. For the concepts behind
           the scoring, read{" "}
-          <Link href="/guide">the ten-minute ATLAS primer</Link>.
+          <Link href="/guide">the ten-minute Platform Power primer</Link>.
         </p>
       </section>
 
@@ -271,7 +271,7 @@ export default function HelpPage() {
       </section>
 
       <footer style={{ fontSize: "0.85rem", color: "var(--color-ink-muted)" }}>
-        <Link href="/">← Dashboard</Link> · <Link href="/guide">ATLAS primer</Link> ·{" "}
+        <Link href="/">← Dashboard</Link> · <Link href="/guide">Platform Power primer</Link> ·{" "}
         <Link href="/?tour=1">Replay the welcome tour</Link>
       </footer>
     </div>

@@ -1,8 +1,39 @@
 # GRS-0090 — Rename "ATLAS" → "Platform Power" product-wide
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
-**Depends on:** ADR (ATLAS → Platform Power rename)
+**Depends on:** ADR-0030 (ATLAS → Platform Power rename)
+**Branch:** `grs-0090-rename-atlas-platform-power`
+
+## What shipped
+
+Every **advisor- and client-facing** surface now reads **"Platform Power"**, never "ATLAS".
+
+**(a) UI copy** — all 19 "ATLAS" occurrences across `app/page.tsx`, `app/guide/page.tsx`,
+`app/assessments/page.tsx`, `app/engagements/[id]/page.tsx`, `app/help/page.tsx`, and
+`components/FirstRunWalkthrough.tsx` renamed to "Platform Power" (with the "an ATLAS" → "a Platform
+Power" grammar fix). The naming nuance holds: the process is "the Platform Power assessment/method",
+the deliverable is "the Platform Power Report" (already present), and the recursion antipattern
+("…methodology produces the …Report") appears nowhere.
+
+**(c) Engine internals unchanged** — the `atlas/` package, the `b`/`p`/`l`/`v` keys, `theta_*`, and
+the golden master (`V = 0.478565`) are untouched (ADR-0030). Only human-facing strings changed.
+
+**(d) Public-site coordination note** — recorded in ADR-0030: the public BC Advisory page also says
+"ATLAS" and must be renamed in step by the site design (operator action, outside this repo).
+
+**(b) Internal engineering name — deliberate scoping decision.** "ATLAS" is **retained as the
+internal engineering codename** for the engine, its package (`atlas/`), and the normative methodology
+documents (`docs/ATLAS-Methodology-*.md`). These are the SAME internal artifact ADR-0030 keeps named
+`atlas` to protect the golden master; renaming their prose would churn normative, engine-referenced
+docs for zero user value. This mirrors ADR-0030's "leave internal identifiers alone" — internal =
+ATLAS, user/client-facing = Platform Power.
+
+## Acceptance / verification
+
+No advisor-/client-facing surface displays "ATLAS" (grep-clean across `frontend/`); the recursion
+antipattern appears nowhere; engine identifiers + golden master unchanged (frontend-only change);
+the public-site coordination note is recorded in ADR-0030. Frontend type-check · lint · vitest green.
 
 ## Why
 

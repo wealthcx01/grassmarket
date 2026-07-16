@@ -71,7 +71,7 @@ export default function EngagementDetailPage() {
         {engagement.assessment_ids.length === 0 ? (
           <div className="card" style={{ padding: "1.1rem 1.25rem", display: "flex", gap: "1rem", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
             <p style={{ margin: 0, color: "var(--color-ink-muted)", fontSize: "0.9rem", maxWidth: "30rem" }}>
-              No assessment yet. Start an ATLAS assessment for{" "}
+              No assessment yet. Start a Platform Power assessment for{" "}
               <strong style={{ color: "var(--color-ink)" }}>{engagement.title}</strong> — the deliverables
               below generate from it once it&rsquo;s finalised.
             </p>

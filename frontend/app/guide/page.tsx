@@ -2,8 +2,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "How ATLAS works — Advisor Studio",
-  description: "A ten-minute primer on the ATLAS framework for new advisors.",
+  title: "How Platform Power works — Advisor Studio",
+  description: "A ten-minute primer on the Platform Power framework for new advisors.",
 };
 
 const LENSES: ReadonlyArray<{ letter: string; name: string; question: string }> = [
@@ -50,10 +50,10 @@ export default function GuidePage() {
   return (
     <article className="stack measure" style={{ gap: "2.5rem", margin: "0 auto" }}>
       <header>
-        <p className="eyebrow">Advisor primer · ATLAS</p>
-        <h1 style={{ margin: "0.4rem 0 0.6rem" }}>How ATLAS works</h1>
+        <p className="eyebrow">Advisor primer · Platform Power</p>
+        <h1 style={{ margin: "0.4rem 0 0.6rem" }}>How Platform Power works</h1>
         <p style={{ margin: 0, fontSize: "1.05rem", color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
-          ATLAS turns what you learn about a client&rsquo;s platform into scores, ratings, and a
+          Platform Power turns what you learn about a client&rsquo;s platform into scores, ratings, and a
           modernisation plan a board can trust. Your judgment is the input; the framework&rsquo;s job is
           to make it consistent, comparable, and defensible. Here&rsquo;s the whole thing in ten minutes.
         </p>
@@ -166,7 +166,7 @@ export default function GuidePage() {
           arithmetic — a module can&rsquo;t be Advanced if a critical part is Basic.
         </p>
         <p style={{ margin: 0, color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
-          On money, ATLAS keeps three layers apart and never says &ldquo;your score gap is worth £X&rdquo;: the{" "}
+          On money, Platform Power keeps three layers apart and never says &ldquo;your score gap is worth £X&rdquo;: the{" "}
           <strong>cost</strong> of an upgrade, the <strong>cash-flow levers</strong> it moves (each an NPV on the
           client&rsquo;s own baselines), and the <strong>strategic value</strong> (stated in words). The Upgrade Priority
           Index says <em>what first</em>; the value bridge says <em>what it&rsquo;s worth</em>. Never divide one by the other.

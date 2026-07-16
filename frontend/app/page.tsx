@@ -12,7 +12,7 @@ const SECTIONS: ReadonlyArray<{ title: string; href: string; blurb: string; kick
   {
     title: "Your Brokerages",
     href: "/assessments",
-    kicker: "Portfolio · the ATLAS wizard",
+    kicker: "Portfolio · the Platform Power wizard",
     blurb: "Your portfolio of assessments — segment, last score and status at a glance — and the 7-step wizard: business metrics, the 7 Powers, and the infrastructure deep dive, scored live with uncertainty bands.",
   },
   {
@@ -53,9 +53,9 @@ export default function DashboardPage() {
           <p className="eyebrow">Advisor dashboard</p>
           <h1 style={{ margin: "0.4rem 0 0.5rem" }}>Bruntsfield Advisor Studio</h1>
           <p style={{ margin: 0, color: "var(--color-ink-muted)", fontSize: "1.05rem", lineHeight: 1.55 }}>
-            The advisor platform of the Bruntsfield Advisory Network — pipeline management, ATLAS
+            The advisor platform of the Bruntsfield Advisory Network — pipeline management, Platform Power
             assessments, client deliverables, and the Workbench. Jump to a section below, or start
-            with the primer if ATLAS is new to you.
+            with the primer if Platform Power is new to you.
           </p>
         </div>
       </section>
@@ -93,7 +93,7 @@ export default function DashboardPage() {
         </span>
         <span style={{ flex: 1 }}>
           <span style={{ display: "block", fontWeight: 600, fontFamily: "var(--font-serif)", fontSize: "1.05rem" }}>
-            New to ATLAS? Start with the primer
+            New to Platform Power? Start with the primer
           </span>
           <span style={{ display: "block", color: "var(--color-ink-muted)", fontSize: "0.9rem", marginTop: "0.15rem" }}>
             B · P · L · V, the four maturity levels, evidence grades, and the benefit-vs-barrier rule — in ten minutes.

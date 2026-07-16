@@ -84,7 +84,7 @@ export default function BrokeragesPage() {
     <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
       <section>
         <p className="eyebrow" style={{ margin: 0 }}>
-          ATLAS · Path A (manual)
+          Platform Power · Path A (manual)
         </p>
         <h1 style={{ fontSize: "2rem", margin: "0.3rem 0 0.4rem" }}>Your Brokerages</h1>
         <p style={{ margin: 0, color: "var(--color-ink-muted)", maxWidth: "40rem" }}>
