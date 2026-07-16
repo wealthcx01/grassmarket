@@ -80,6 +80,27 @@ class InvitationORM(Base):
     )
 
 
+class LoginHandoffCodeORM(Base):
+    """A single-use, short-TTL code for the cross-site login hand-off (ADR-0024 / GRS-0074). The
+    OAuth callback issues one bound to the verified consultant; the advisory app exchanges it for
+    the GM JWT. Only the HASH is stored (like invite tokens); the raw code is carried once in the
+    redirect. `consumed_at` enforces single use."""
+
+    __tablename__ = "login_handoff_codes"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    code_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
+    consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    consumed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
 class ProspectORM(Base):
     __tablename__ = "prospects"
 

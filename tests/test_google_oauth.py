@@ -47,17 +47,19 @@ def _run_flow(
     )
 
 
-def test_google_callback_happy_path_mints_valid_jwt(
+def test_google_callback_hands_off_code_then_exchange_mints_jwt(
     client: TestClient, app: FastAPI, settings: Settings, alice: SeededConsultant
 ) -> None:
     resp = _run_flow(client, app, FakeGoogleClient(email=alice.stored.email))
     assert resp.status_code == 303
     location = resp.headers["location"]
-    # The JWT rides in the fragment, NEVER a query string.
-    assert "#access_token=" in location
-    assert urlparse(location).query == ""
-    token = location.split("#access_token=", 1)[1]
-    claims = decode_access_token(settings, token)  # accepts → valid GM JWT
+    # The redirect carries ONLY the opaque one-time code — never the JWT (GRS-0074).
+    assert "access_token" not in location
+    code = parse_qs(urlparse(location).query)["code"][0]
+
+    exch = client.post("/auth/session/exchange", json={"code": code})
+    assert exch.status_code == 200
+    claims = decode_access_token(settings, exch.json()["access_token"])  # valid GM JWT
     assert claims.email == alice.stored.email
 
     # The Google id is bound on first sign-in.

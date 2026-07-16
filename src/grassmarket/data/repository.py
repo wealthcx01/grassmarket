@@ -153,6 +153,7 @@ from grassmarket.data.models import (
     GeneratedQuizORM,
     InvitationORM,
     LearningModuleORM,
+    LoginHandoffCodeORM,
     MeetingTranscriptORM,
     ModuleRatingDraftORM,
     PredictionORM,
@@ -3601,6 +3602,39 @@ class Repository:
             row.google_sub = google_sub
             self._session.add(row)
             self._session.flush()
+
+    # ------------------------------------------------------------------ login hand-off (UNSCOPED)
+    def create_login_handoff_code(
+        self, *, consultant_id: UUID, code_hash: str, expires_at: datetime
+    ) -> None:
+        """Store a single-use hand-off code (its hash only) bound to a consultant (GRS-0074)."""
+        self._session.add(
+            LoginHandoffCodeORM(
+                code_hash=code_hash, consultant_id=consultant_id, expires_at=expires_at
+            )
+        )
+        self._session.flush()
+
+    def consume_login_handoff_code(self, *, code_hash: str, now: datetime) -> UUID:
+        """Redeem a hand-off code → the bound consultant id. Fail loud on unknown / already-consumed
+        / expired, and mark it consumed so a second exchange is refused (single-use, mirrors the
+        invitation single-use logic)."""
+        row = self._session.execute(
+            select(LoginHandoffCodeORM).where(LoginHandoffCodeORM.code_hash == code_hash)
+        ).scalar_one_or_none()
+        if row is None:
+            raise NotFoundError("Unknown login hand-off code.")
+        if row.consumed_at is not None:
+            raise ConflictError("Login hand-off code has already been used.")
+        expires_at = row.expires_at
+        if expires_at.tzinfo is None:  # SQLite may return naive datetimes
+            expires_at = expires_at.replace(tzinfo=UTC)
+        if expires_at < now:
+            raise ConflictError("Login hand-off code has expired.")
+        row.consumed_at = now
+        self._session.add(row)
+        self._session.flush()
+        return row.consultant_id
 
     @staticmethod
     def _to_prospect(row: ProspectORM) -> Prospect:

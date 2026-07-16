@@ -71,7 +71,7 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[settings.frontend_origin],
+        allow_origins=settings.cors_origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
