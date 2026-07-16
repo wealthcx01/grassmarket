@@ -357,13 +357,14 @@ class StoredConsultant:
     id: UUID
     email: str
     full_name: str
-    hashed_password: str
+    hashed_password: str | None  # None for an OAuth-only account (ADR-0024)
     role: Role
     tier: ConsultantTier
     assessor_level: AssessorLevel
     is_active: bool
     created_at: datetime
     updated_at: datetime
+    google_sub: str | None = None  # bound on first Google sign-in (ADR-0024)
 
     def to_contract(self) -> Consultant:
         return Consultant(
@@ -3584,7 +3585,22 @@ class Repository:
             is_active=row.is_active,
             created_at=row.created_at,
             updated_at=row.updated_at,
+            google_sub=row.google_sub,
         )
+
+    def bind_google_sub(self, consultant_id: UUID, google_sub: str) -> None:
+        """Bind a verified Google account id to a consultant on first Google sign-in (ADR-0024).
+        Idempotent when already bound to the SAME sub; a DIFFERENT sub for the same account is
+        refused loud (a distinct Google identity must not silently take over an account)."""
+        row = self._session.get(ConsultantORM, consultant_id)
+        if row is None:
+            raise NotFoundError(f"Consultant {consultant_id} not found.")
+        if row.google_sub is not None and row.google_sub != google_sub:
+            raise ConflictError("This account is already bound to a different Google identity.")
+        if row.google_sub is None:
+            row.google_sub = google_sub
+            self._session.add(row)
+            self._session.flush()
 
     @staticmethod
     def _to_prospect(row: ProspectORM) -> Prospect:

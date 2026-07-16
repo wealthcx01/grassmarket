@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
-import { ApiError, api } from "@/lib/api";
+import { useEffect, useState, type FormEvent } from "react";
+import { API_BASE_URL, ApiError, api } from "@/lib/api";
 
 // Placeholder token storage key. Loop 6 replaces this with real session management
 // (httpOnly cookie / refresh flow matching the Holy Corner claim shape). Storing an
@@ -16,6 +16,22 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Google sign-in hand-off (GRS-0073): the OAuth callback returns the app here with the JWT in the
+  // URL *fragment* (#access_token=…) — never a query string, never sent to a server. Store it and
+  // continue. (GRS-0074 replaces the fragment with a one-time ?code= exchange for the cross-origin
+  // case.)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash;
+    if (!hash) return;
+    const token = new URLSearchParams(hash.slice(1)).get("access_token");
+    if (!token) return;
+    window.localStorage.setItem(TOKEN_KEY, token);
+    // Strip the token from the URL bar before routing on.
+    window.history.replaceState(null, "", window.location.pathname);
+    router.push("/");
+  }, [router]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -71,6 +87,21 @@ export default function LoginPage() {
             {submitting ? "Signing in…" : "Sign in"}
           </button>
         </form>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", margin: "1.25rem 0" }}>
+          <span className="hr" style={{ flex: 1 }} />
+          <span style={{ fontSize: "0.75rem", color: "var(--color-ink-faint)" }}>or</span>
+          <span className="hr" style={{ flex: 1 }} />
+        </div>
+
+        {/* Google sign-in: a plain link to the backend's OAuth start (backend is the OAuth client). */}
+        <a
+          href={`${API_BASE_URL}/auth/google/start`}
+          className="btn btn-secondary"
+          style={{ width: "100%", padding: "0.7rem 1rem", fontSize: "0.95rem", textAlign: "center", textDecoration: "none" }}
+        >
+          Sign in with Google
+        </a>
       </div>
 
       <p style={{ marginTop: "1.25rem", fontSize: "0.82rem", color: "var(--color-ink-muted)", textAlign: "center" }}>

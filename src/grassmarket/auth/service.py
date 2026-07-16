@@ -41,6 +41,10 @@ class ForbiddenInvitationError(AuthError):
     """The inviter is not allowed to grant the requested role or tier (privilege escalation)."""
 
 
+class UnprovisionedGoogleAccountError(AuthError):
+    """A Google-verified email has no invited consultant. Sign-in stays invite-only (403)."""
+
+
 # The role and tier a non-admin inviter may grant. Anything above these requires admin — otherwise
 # any consultant could self-mint an ADMIN account (GRS-0042) and defeat the whole ownership model.
 _DEFAULT_INVITE_ROLE = Role.CONSULTANT
@@ -122,14 +126,46 @@ class AuthService:
         """Return a signed access token, or raise `InvalidCredentialsError`. Runs the password
         verification even when the email is unknown, to avoid a user-enumeration timing oracle."""
         stored = self._repo.get_consultant_by_email(email)
-        if stored is None:
-            # Verify against a dummy hash so timing does not reveal whether the email exists.
+        if stored is None or stored.hashed_password is None:
+            # Verify against a dummy hash so timing does not reveal whether the email exists — and
+            # an OAuth-only account (no password hash) is a password-login miss, not a crash.
             verify_password(password, _DUMMY_HASH)
             raise InvalidCredentialsError("Invalid email or password.")
         if not stored.is_active:
             raise InvalidCredentialsError("Account is inactive.")
         if not verify_password(password, stored.hashed_password):
             raise InvalidCredentialsError("Invalid email or password.")
+        self._repo.record_audit(
+            actor_consultant_id=stored.id,
+            event_type=AuditEventType.AUTH_LOGIN,
+            resource_type="consultant",
+            resource_id=stored.id,
+            now=datetime.now(UTC),
+        )
+        return create_access_token(
+            self._settings,
+            consultant_id=stored.id,
+            email=stored.email,
+            role=stored.role,
+            tier=stored.tier,
+            assessor_level=stored.assessor_level,
+        )
+
+    def login_with_google(self, *, email: str, google_sub: str) -> str:
+        """Invite-only Google sign-in (ADR-0024). Google has already verified `email`/`sub`; here we
+        resolve a *pre-provisioned* consultant by email — an unknown email is refused (no
+        auto-provisioning), an inactive account is refused, and the Google id is bound on first use.
+        On success we record an `AUTH_LOGIN` audit event and mint the existing GM JWT via the single
+        mint point — no second token path."""
+        stored = self._repo.get_consultant_by_email(email)
+        if stored is None:
+            raise UnprovisionedGoogleAccountError(
+                "No Grassmarket consultant is provisioned for this Google account. "
+                "Sign-in is invitation-only."
+            )
+        if not stored.is_active:
+            raise InvalidCredentialsError("Account is inactive.")
+        self._repo.bind_google_sub(stored.id, google_sub)  # set-if-null; refuse a different sub
         self._repo.record_audit(
             actor_consultant_id=stored.id,
             event_type=AuditEventType.AUTH_LOGIN,

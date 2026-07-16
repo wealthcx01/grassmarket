@@ -62,6 +62,22 @@ class Settings(BaseSettings):
         default="http://localhost:3000", validation_alias="GM_FRONTEND_ORIGIN"
     )
 
+    # --- Google OAuth (ADR-0024) ---
+    # Operator-supplied (Google Cloud Console); no default — an unconfigured OAuth client makes the
+    # /auth/google/* endpoints refuse loud (GoogleOAuthNotConfiguredError → 503), never a weak
+    # fallback. None until the operator provisions them.
+    google_client_id: str | None = Field(
+        default=None, validation_alias=AliasChoices("GM_GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_ID")
+    )
+    google_client_secret: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("GM_GOOGLE_CLIENT_SECRET", "GOOGLE_CLIENT_SECRET"),
+    )
+    google_redirect_uri: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("GM_GOOGLE_REDIRECT_URI", "GOOGLE_REDIRECT_URI"),
+    )
+
     @field_validator("database_url", mode="after")
     @classmethod
     def _normalise_db_scheme(cls, value: str) -> str:

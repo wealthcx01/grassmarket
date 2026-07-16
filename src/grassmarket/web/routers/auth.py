@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import secrets
+
 from bcap_contracts.auth import (
     AcceptInvitationRequest,
     Consultant,
@@ -9,23 +11,39 @@ from bcap_contracts.auth import (
     TokenResponse,
 )
 from bcap_contracts.common import ConsultantTier, Role
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Cookie, Depends, HTTPException, status
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, EmailStr
 
+from grassmarket.auth.google_oauth import (
+    GoogleOAuthClient,
+    GoogleOAuthError,
+    pkce_pair,
+    sign_oauth_txn,
+    verify_oauth_txn,
+)
 from grassmarket.auth.service import (
     AuthService,
     ForbiddenInvitationError,
     InvalidCredentialsError,
     InvalidInvitationError,
+    UnprovisionedGoogleAccountError,
 )
-from grassmarket.data.repository import Principal, Repository
+from grassmarket.config import Settings
+from grassmarket.data.repository import ConflictError, Principal, Repository
 from grassmarket.web.dependencies import (
+    get_app_settings,
     get_auth_service,
     get_current_principal,
+    get_google_oauth_client,
     get_repository,
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+# The signed OAuth-transaction cookie (state + PKCE verifier). Path-scoped to /auth, httpOnly, and
+# SameSite=Lax so it survives Google's top-level redirect back to the callback.
+_OAUTH_TXN_COOKIE = "gm_oauth_txn"
 
 
 class CreateInvitationRequest(BaseModel):
@@ -92,3 +110,74 @@ def me(
     if stored is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Consultant not found.")
     return stored.to_contract()
+
+
+# --- Google OAuth (ADR-0024, GRS-0073) --------------------------------------------------------
+
+
+@router.get("/google/start")
+def google_start(
+    settings: Settings = Depends(get_app_settings),
+    client: GoogleOAuthClient = Depends(get_google_oauth_client),
+) -> RedirectResponse:
+    """Begin the authorization-code flow: build Google's consent URL (with `state` + PKCE) and
+    redirect there, stashing the state + PKCE verifier in a signed, short-TTL cookie the callback
+    validates. The public site's "LOG IN" simply links here."""
+    state = secrets.token_urlsafe(24)
+    verifier, challenge = pkce_pair()
+    consent_url = client.authorization_url(state=state, code_challenge=challenge)
+    response = RedirectResponse(consent_url, status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+    response.set_cookie(
+        _OAUTH_TXN_COOKIE,
+        sign_oauth_txn(settings, state=state, code_verifier=verifier),
+        max_age=600,
+        httponly=True,
+        secure=settings.is_production,
+        samesite="lax",
+        path="/auth",
+    )
+    return response
+
+
+@router.get("/google/callback")
+def google_callback(
+    code: str,
+    state: str,
+    settings: Settings = Depends(get_app_settings),
+    auth: AuthService = Depends(get_auth_service),
+    client: GoogleOAuthClient = Depends(get_google_oauth_client),
+    gm_oauth_txn: str | None = Cookie(default=None),
+) -> RedirectResponse:
+    """Google's redirect target: validate `state` against the signed cookie, exchange the code for a
+    Google-verified identity, resolve the invited consultant, mint the GM JWT, and hand it to the
+    advisory app. The JWT rides back in the URL **fragment** (never a query string; not sent to the
+    server) — GRS-0074 replaces this with a one-time code + `/auth/session/exchange` for the
+    cross-origin case."""
+    if not gm_oauth_txn:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing OAuth transaction."
+        )
+    try:
+        cookie_state, verifier = verify_oauth_txn(settings, gm_oauth_txn)
+    except GoogleOAuthError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    if not secrets.compare_digest(state, cookie_state):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="OAuth state mismatch.")
+    try:
+        identity = client.exchange_code(code=code, code_verifier=verifier)
+    except GoogleOAuthError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    try:
+        token = auth.login_with_google(email=identity.email, google_sub=identity.sub)
+    except UnprovisionedGoogleAccountError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+    except InvalidCredentialsError as exc:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc)) from exc
+    except ConflictError as exc:  # email already bound to a different Google identity
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+    response = RedirectResponse(
+        f"{settings.frontend_origin}/login#access_token={token}",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+    response.delete_cookie(_OAUTH_TXN_COOKIE, path="/auth")
+    return response
