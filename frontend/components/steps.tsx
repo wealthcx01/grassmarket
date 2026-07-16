@@ -300,7 +300,7 @@ export function BusinessMetricsStep({ registry, document: d, update, readOnly }:
   );
 }
 
-// --- 3. Strategic Powers ----------------------------------------------------------------
+// --- 3. Powers (Helmer) ----------------------------------------------------------------
 
 function StrengthSelect({
   value,
@@ -968,7 +968,7 @@ export function ScenariosStep({ registry, document: d, assessmentId }: StepProps
 export const WIZARD_STEPS: { title: string; component: (p: StepProps) => React.ReactElement }[] = [
   { title: "Overview", component: OverviewStep },
   { title: "Business Metrics", component: BusinessMetricsStep },
-  { title: "Strategic Powers", component: StrategicPowersStep },
+  { title: "Powers", component: StrategicPowersStep },
   { title: "Module Overview", component: ModuleOverviewStep },
   { title: "Infrastructure Deep Dive", component: InfrastructureDeepDiveStep },
   { title: "Customer Proposition", component: CustomerPropositionStep },

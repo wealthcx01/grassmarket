@@ -50,9 +50,9 @@ export function LiveScorePanel({
         <div className="stack" style={{ gap: "0.85rem" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem 1rem" }}>
             <BandDisplay label="V — PLATFORM VALUE" band={score.v} />
-            <BandDisplay label="L — INFRASTRUCTURE" band={score.l_index} />
+            <BandDisplay label="L — INFRASTRUCTURE · THE TECHNOLOGY LAYER" band={score.l_index} />
             <BandDisplay label="B — BUSINESS" band={score.b} />
-            <BandDisplay label="P — STRATEGIC POWER" band={score.p} />
+            <BandDisplay label="P — POWER" band={score.p} />
           </div>
 
           <Bottleneck score={score} moduleLabels={moduleLabels} />

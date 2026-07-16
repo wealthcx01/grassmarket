@@ -1,8 +1,38 @@
 # GRS-0097 — Refine the P & L labels product-wide (UI copy)
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
-**Depends on:** ADR (ATLAS → Platform Power rename)
+**Depends on:** ADR-0030 (ATLAS → Platform Power rename)
+**Branch:** `grs-0097-refine-p-l-labels`
+
+## What shipped
+
+Refined the two arbitrary-reading lens labels, keeping the **B/P/L/V letters** and leaving the engine
+untouched (ADR-0030):
+
+- **P: "Strategic Power" → "Power"** (Helmer's Powers — matches the letter).
+- **L captioned so the letter reads: "Infrastructure · the technology Layer"** (L = Layer).
+
+Applied where the labels appear:
+- **Live-score / summary panel** (`components/LiveScorePanel.tsx`) — band labels now `P — POWER` and
+  `L — INFRASTRUCTURE · THE TECHNOLOGY LAYER`.
+- **Wizard** (`components/steps.tsx`) — the step title `Strategic Powers → Powers`.
+- **Primer lens labels** (`app/guide/page.tsx`) — `Power` and `Infrastructure · the technology Layer`
+  (the primer's explanatory prose is GRS-0093's).
+- **Advisor guide** (`app/help/page.tsx`) — `P (Power)`, `L (Infrastructure · the technology Layer)`,
+  and the step name `Strategic Powers → Powers`.
+- **Diagnostics waterfall** (`lib/diagnostics.ts`) — `P → "Power (P)"`; the compact SVG axis keeps the
+  terse `Infrastructure (L)` (the fuller caption rides the live-score band label + the primer, where
+  there is room — a chart axis stays terse by design).
+
+**Engine identifiers unchanged** — `b_index`/`p_index`/`l_index`, `theta_*`, and the golden master are
+untouched (user-facing copy only). The **public-site coordination note** is recorded in ADR-0030.
+
+## Acceptance / verification
+
+`grep`-clean of "Strategic Power" across `frontend/`. P reads as "Power" and L is captioned in the
+live-score/summary panel, wizard step title, primer, and guide; the B/P/L/V letters are retained;
+engine + golden master unchanged; frontend type-check · lint · vitest green.
 
 ## Why
 

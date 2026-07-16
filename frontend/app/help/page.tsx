@@ -54,7 +54,7 @@ const SECTIONS: ReadonlyArray<Section> = [
     lead: "The seven-step wizard scores a company across the 7 Powers, Platform Value, and the 9 infrastructure modules. It autosaves every edit, so a partial assessment is always safe to leave and resume.",
     href: { label: "Open assessments", to: "/assessments" },
     steps: [
-      { do: "Start an assessment for the subject company, then work the steps left to right: Business Metrics, Strategic Powers, Module Overview, the Infrastructure Deep Dive.", then: "Your work saves automatically — the badge moves from “Saving…” to “All changes saved”." },
+      { do: "Start an assessment for the subject company, then work the steps left to right: Business Metrics, Powers, Module Overview, the Infrastructure Deep Dive.", then: "Your work saves automatically — the badge moves from “Saving…” to “All changes saved”." },
       { do: "Rate what you know. For each subcomponent pick a maturity level and record how sure you are with an evidence grade (E1 hearsay → E4 you saw it work).", then: "The grade widens or tightens the uncertainty on the score — honest by design." },
       { do: "Leave anything you haven't looked at as Not Assessed. Never guess.", then: "Not Assessed is a first-class state; it lowers coverage and widens the range, but it never counts as zero." },
       { do: "When it's ready, finalise. Finalising locks the inputs and produces an immutable, versioned scoring run." },
@@ -88,7 +88,7 @@ const SECTIONS: ReadonlyArray<Section> = [
     title: "Read the result honestly",
     lead: "A finalised assessment opens straight to Summary & Interpretation — the answer, not a form. Everything here is built to show confidence and its limits together.",
     steps: [
-      { do: "Read Platform Value (V) as the headline, always with its P10–P90 range — never the point number alone.", then: "B (Business), P (Strategic Power) and L (Infrastructure) each carry their own range." },
+      { do: "Read Platform Value (V) as the headline, always with its P10–P90 range — never the point number alone.", then: "B (Business), P (Power) and L (Infrastructure · the technology Layer) each carry their own range." },
       { do: "Check coverage and the overall uncertainty. “1/51 rated · 2% of applicable · uncertainty Very High” means treat the number as directional.", then: "More assessed subcomponents → tighter, more defensible ranges." },
       { do: "Find the likely constraint — the weakest module. It's usually the number a client remembers, and where the next pound of effort pays back most.", then: "The module bars are ordered weakest-first for exactly this reason." },
       { do: "Read the Platform Power triad in words (Economic, Perceived, Defence — e.g. Established, Emerging). Ordinal ratings, never decimals.", then: "Words rate; numbers rank. They are kept in separate equations on purpose." },
