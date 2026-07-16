@@ -1,8 +1,17 @@
 # GRS-0088 — Remove the dev health chip from the dashboard
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** —
+**Branch:** `grs-0088-remove-dev-health-chip`
+
+## What shipped
+
+Removed the dev-facing "System ok · v0.0.1" health chip from the advisor dashboard — it surfaced
+API/DB health + build version, which mean nothing to an advisor and would alarm them on a non-ok
+state. `HealthWidget` was mounted only on the home hero (`app/page.tsx`); deleted `app/health-widget.tsx`
+and its import/render. No advisor-facing surface now renders health or build version. The `api.health`
+client method stays for a future admin-only system-status view (nothing else consumed the widget).
 
 ## Why
 
