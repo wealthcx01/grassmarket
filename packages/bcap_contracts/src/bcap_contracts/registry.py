@@ -226,6 +226,48 @@ class ProfileDef(BaseModel):
     critical_overrides: dict[str, bool] = {}
 
 
+WidgetRarity = Literal["Common", "Uncommon", "Rare"]
+
+
+class CSubcomponentDef(BaseModel):
+    """A Customer-Proposition (C) subcomponent (ADR-0023). Same shape as an L subcomponent — C rides
+    the L aggregation family — but lives in the C keyspace."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    key: str
+    name: str
+    module_key: str
+    description: str | None = None
+    critical: bool = False
+
+
+class CModuleDef(BaseModel):
+    """One of the 10 Phase-E Customer-Proposition modules (ADR-0023)."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    key: str
+    name: str
+    description: str
+    subcomponents: tuple[CSubcomponentDef, ...] = ()
+
+
+class WidgetDef(BaseModel):
+    """One Level-1 customer-proposition widget (ADR-0023 / GRS-0080). The 93-widget checklist is C's
+    Level-1 evidence layer: presence + ease/usability/depth per widget, differentiated by RARITY
+    (a missing Common widget is a bottleneck; a Rare widget done well scores differentiation).
+    `rarity` has no default — a missing/unknown value is a load-time refusal (ADR-0001)."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    key: str
+    name: str
+    category: str  # one of the 15 checklist categories
+    rarity: WidgetRarity
+    module_key: str  # the C module this widget informs
+
+
 class Registry(BaseModel):
     """The whole legal key-space in one immutable object.
 
@@ -245,6 +287,14 @@ class Registry(BaseModel):
     subcomponent_status: str = "settled"
     metric_status: str = "settled"
 
+    # --- Customer-Proposition (C) section (ADR-0023 / GRS-0080). A PARALLEL dimension to B/P/L:
+    # the engine's L path never iterates these, so the golden master is untouched (C rides alongside
+    # V in Stage 1). The widget taxonomy is scoped to one operating-model profile (retail today).
+    c_modules: tuple[CModuleDef, ...] = ()
+    c_widgets: tuple[WidgetDef, ...] = ()
+    c_status: str = "settled"
+    c_widget_profile: str = "retail"  # the profile the widget taxonomy applies to
+
     # --- Key sets (frozen) ---
     def power_keys(self) -> frozenset[str]:
         return frozenset(p.key for p in self.powers)
@@ -260,6 +310,27 @@ class Registry(BaseModel):
 
     def all_subcomponent_keys(self) -> frozenset[str]:
         return frozenset(s.key for m in self.modules for s in m.subcomponents)
+
+    # --- C key sets + accessors ---
+    def c_module_keys(self) -> frozenset[str]:
+        return frozenset(m.key for m in self.c_modules)
+
+    def all_c_subcomponent_keys(self) -> frozenset[str]:
+        return frozenset(s.key for m in self.c_modules for s in m.subcomponents)
+
+    def widget_keys(self) -> frozenset[str]:
+        return frozenset(w.key for w in self.c_widgets)
+
+    def require_c_module(self, key: str) -> CModuleDef:
+        for m in self.c_modules:
+            if m.key == key:
+                return m
+        raise UnknownKeyError("c_module", key, self.c_module_keys())
+
+    def widgets_for_profile(self, profile_key: str) -> tuple[WidgetDef, ...]:
+        """The Level-1 widgets a profile is assessed against — the retail taxonomy is retail-only
+        (ADR-0023). A non-retail profile sees no retail widgets (never scored against them)."""
+        return self.c_widgets if profile_key == self.c_widget_profile else ()
 
     # --- Strict accessors: raise UnknownKeyError, never default ---
     def require_power(self, key: str) -> PowerDef:
@@ -392,7 +463,8 @@ def load_registry() -> Registry:
     powers_raw = _load_yaml("powers.yaml") or {}
     modules_raw = _load_yaml("modules.yaml") or {}
     metrics_raw = _load_yaml("metrics.yaml") or {}
-    return _build_registry(powers_raw, modules_raw, metrics_raw)
+    c_raw = _load_yaml("registry_c.yaml") or {}
+    return _build_registry(powers_raw, modules_raw, metrics_raw, c_raw)
 
 
 # The default operating-model profile: retail brokerage (the v1 taxonomy, byte-identical).
@@ -434,7 +506,10 @@ def load_profile(key: str) -> ProfileDef:
 
 
 def _build_registry(
-    powers_raw: dict[str, Any], modules_raw: dict[str, Any], metrics_raw: dict[str, Any]
+    powers_raw: dict[str, Any],
+    modules_raw: dict[str, Any],
+    metrics_raw: dict[str, Any],
+    c_raw: dict[str, Any] | None = None,
 ) -> Registry:
     """Assemble a Registry from parsed YAML mappings. Split out from :func:`load_registry` so the
     fail-loud requirements (required ``status``, closed sets, anchor invariants) are unit-testable
@@ -457,12 +532,31 @@ def _build_registry(
     )
     metrics = tuple(_parse_metric(m) for m in metrics_raw.get("metrics", []))
 
+    c_raw = c_raw or {}
+    c_modules = tuple(
+        CModuleDef(
+            key=m["key"],
+            name=m["name"],
+            description=m["description"],
+            subcomponents=tuple(
+                CSubcomponentDef(module_key=m["key"], **s) for s in m.get("subcomponents", [])
+            ),
+        )
+        for m in c_raw.get("c_modules", [])
+    )
+    # WidgetDef.rarity is a closed Literal with no default → a missing/unknown rarity refuses here.
+    c_widgets = tuple(WidgetDef(**w) for w in c_raw.get("widgets", []))
+
     registry = Registry(
         powers=powers,
         modules=modules,
         metrics=metrics,
         subcomponent_status=_require(modules_raw, "status", "modules.yaml"),
         metric_status=_require(metrics_raw, "status", "metrics.yaml"),
+        c_modules=c_modules,
+        c_widgets=c_widgets,
+        c_status=_require(c_raw, "status", "registry_c.yaml") if c_raw else "settled",
+        c_widget_profile=c_raw.get("profile", "retail") if c_raw else "retail",
     )
     _assert_unique_keys(registry)
     return registry
@@ -491,7 +585,8 @@ def _assert_unique_keys(registry: Registry) -> None:
     """Duplicate keys within a dimension are a load-time error, never a last-wins overwrite."""
     for dimension, keys in (
         ("power", [p.key for p in registry.powers]),
-        ("module", [m.key for m in registry.modules]),
+        # B/P/L modules and C modules share one module keyspace (a C module can't shadow an L one).
+        ("module", [m.key for m in registry.modules] + [m.key for m in registry.c_modules]),
         ("metric", [m.key for m in registry.metrics]),
     ):
         seen: set[str] = set()
@@ -502,7 +597,8 @@ def _assert_unique_keys(registry: Registry) -> None:
     # Subcomponent keys are GLOBALLY unique (not merely unique within a module). Now that every key
     # is fully qualified to <MODULE_KEY>_<LEAF> (GRS-0002a), a collision across modules would signal
     # a naming mistake — and the engine and coefficient sets address subcomponents by key alone, so
-    # a global duplicate would let one shadow another. Refuse it at load time.
+    # a global duplicate would let one shadow another. Refuse it at load time. C subcomponents and
+    # widgets (ADR-0023) share this global keyspace with the B/P/L subcomponents.
     global_seen: dict[str, str] = {}
     for m in registry.modules:
         for s in m.subcomponents:
@@ -512,3 +608,18 @@ def _assert_unique_keys(registry: Registry) -> None:
                     f"in module {global_seen[s.key]!r}. Subcomponent keys must be globally unique."
                 )
             global_seen[s.key] = m.key
+    for m in registry.c_modules:
+        for s in m.subcomponents:
+            if s.key in global_seen:
+                raise RegistryError(
+                    f"Duplicate C subcomponent key {s.key!r} in C module {m.key!r} — already "
+                    f"defined in {global_seen[s.key]!r}. Keys must be globally unique (ADR-0023)."
+                )
+            global_seen[s.key] = m.key
+    for w in registry.c_widgets:
+        if w.key in global_seen:
+            raise RegistryError(
+                f"Duplicate widget key {w.key!r} — already defined in {global_seen[w.key]!r}. "
+                f"Widget keys must be globally unique (ADR-0023)."
+            )
+        global_seen[w.key] = f"widget[{w.category}]"

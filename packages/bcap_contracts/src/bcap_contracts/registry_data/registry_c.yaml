@@ -1,0 +1,599 @@
+# Customer-Proposition (C) registry section — 10 Phase-E modules + the 93-widget × 15-category
+# Level-1 evidence layer (ADR-0023 / GRS-0080). C is a PARALLEL dimension to B/P/L: the engine's
+# L path never iterates it, so the golden master is untouched (C rides alongside V in Stage 1).
+#
+# STATUS: draft-pending-ratification. The module/subcomponent structure is the Phase-E set; the
+# widget taxonomy is authored from standard retail-brokerage-app-review structure and MUST be
+# reconciled against the founder's WidgetChecklist_COMPLETED (OneDrive, reference-only, never
+# committed). Every widget carries a rarity (Common/Uncommon/Rare) and applies to the RETAIL
+# profile only. Keys are globally unique across the B/P/L keyspace (fail loud on collision).
+status: draft-pending-ratification
+profile: retail
+
+c_modules:
+  - key: CUST_ONBOARDING
+    name: Onboarding
+    description: Ease, speed, and clarity of account opening and the KYC burden.
+    subcomponents:
+      - key: CUST_ONBOARDING_SPEED_TIME_TO_TRADE
+        name: Speed / time-to-first-trade
+      - key: CUST_ONBOARDING_KYC_FRICTION
+        name: KYC & verification friction
+      - key: CUST_ONBOARDING_FUNDING_EASE
+        name: Funding & first-deposit ease
+      - key: CUST_ONBOARDING_GUIDANCE_CLARITY
+        name: Guidance & clarity
+  - key: CUST_UI_NAVIGATION
+    name: UI & Navigation
+    description: Layout logic, visual design, accessibility, and customisation.
+    subcomponents:
+      - key: CUST_UI_NAVIGATION_LAYOUT_LOGIC
+        name: Layout logic & IA
+      - key: CUST_UI_NAVIGATION_VISUAL_DESIGN
+        name: Visual design & polish
+      - key: CUST_UI_NAVIGATION_CUSTOMISATION
+        name: Customisation & layouts
+      - key: CUST_UI_NAVIGATION_PORTFOLIO_VIEW
+        name: Portfolio & positions view
+  - key: CUST_TRADING_EXPERIENCE
+    name: Trading Experience
+    description: Order types, execution flow, fee transparency, real-time feedback.
+    subcomponents:
+      - key: CUST_TRADING_EXPERIENCE_ORDER_TYPES
+        name: Order-type coverage
+      - key: CUST_TRADING_EXPERIENCE_EXECUTION_FLOW
+        name: Execution flow & feedback
+      - key: CUST_TRADING_EXPERIENCE_FEE_TRANSPARENCY_AT_TRADE
+        name: Fee transparency at trade
+      - key: CUST_TRADING_EXPERIENCE_REALTIME_FEEDBACK
+        name: Real-time confirmation
+  - key: CUST_PRODUCT_RANGE
+    name: Product Range
+    description: Asset classes, fractional, global vs local access, and wrappers.
+    subcomponents:
+      - key: CUST_PRODUCT_RANGE_ASSET_CLASSES
+        name: Asset-class breadth
+      - key: CUST_PRODUCT_RANGE_FRACTIONAL
+        name: Fractional & small-lot
+      - key: CUST_PRODUCT_RANGE_GLOBAL_ACCESS
+        name: Global vs local access
+      - key: CUST_PRODUCT_RANGE_WRAPPERS
+        name: Tax wrappers (ISA/SIPP/…)
+  - key: CUST_RESEARCH_EDUCATION
+    name: Research & Education
+    description: Market-data depth, educational quality, interactive tools.
+    subcomponents:
+      - key: CUST_RESEARCH_EDUCATION_MARKET_DATA_DEPTH
+        name: Market-data depth
+      - key: CUST_RESEARCH_EDUCATION_SCREENERS_TOOLS
+        name: Screeners & interactive tools
+      - key: CUST_RESEARCH_EDUCATION_EDUCATION_QUALITY
+        name: Education quality
+      - key: CUST_RESEARCH_EDUCATION_NEWS_CONTENT
+        name: News & content
+  - key: CUST_AI_PERSONALISATION
+    name: AI & Personalisation
+    description: AI recommendations, chatbots, personalised content.
+    subcomponents:
+      - key: CUST_AI_PERSONALISATION_RECOMMENDATIONS
+        name: AI recommendations
+      - key: CUST_AI_PERSONALISATION_CHATBOTS
+        name: Conversational / chatbot
+      - key: CUST_AI_PERSONALISATION_PERSONALISED_CONTENT
+        name: Personalised content
+      - key: CUST_AI_PERSONALISATION_SMART_ALERTS
+        name: Smart alerts
+  - key: CUST_SECURITY_REGULATION
+    name: Security & Regulation
+    description: Investor protection, authentication, compliance.
+    subcomponents:
+      - key: CUST_SECURITY_REGULATION_INVESTOR_PROTECTION
+        name: Investor protection (FSCS/SIPC)
+      - key: CUST_SECURITY_REGULATION_AUTHENTICATION
+        name: Authentication & 2FA
+      - key: CUST_SECURITY_REGULATION_COMPLIANCE_DISCLOSURE
+        name: Compliance & disclosure
+      - key: CUST_SECURITY_REGULATION_ACCOUNT_PROTECTION
+        name: Account protection
+  - key: CUST_SUPPORT_COMMUNITY
+    name: Support & Community
+    description: Support availability/quality and social features.
+    subcomponents:
+      - key: CUST_SUPPORT_COMMUNITY_SUPPORT_AVAILABILITY
+        name: Support availability
+      - key: CUST_SUPPORT_COMMUNITY_SUPPORT_QUALITY
+        name: Support quality
+      - key: CUST_SUPPORT_COMMUNITY_SELF_SERVICE_HELP
+        name: Self-service help
+  - key: CUST_FEES_PRICING
+    name: Fees & Pricing
+    description: Commissions, spreads, FX fees, subscriptions, inactivity fees.
+    subcomponents:
+      - key: CUST_FEES_PRICING_COMMISSIONS_SPREADS
+        name: Commissions & spreads
+      - key: CUST_FEES_PRICING_FX_FEES
+        name: FX fees
+      - key: CUST_FEES_PRICING_SUBSCRIPTIONS
+        name: Subscriptions & tiers
+      - key: CUST_FEES_PRICING_INACTIVITY_OTHER
+        name: Inactivity & other fees
+  - key: CUST_INNOVATION_DIFFERENTIATORS
+    name: Innovation & Differentiators
+    description: Social trading, gamification, referrals, direct custody.
+    subcomponents:
+      - key: CUST_INNOVATION_DIFFERENTIATORS_SOCIAL_TRADING
+        name: Social / copy trading
+      - key: CUST_INNOVATION_DIFFERENTIATORS_GAMIFICATION
+        name: Gamification & rewards
+      - key: CUST_INNOVATION_DIFFERENTIATORS_REFERRALS
+        name: Referrals & incentives
+      - key: CUST_INNOVATION_DIFFERENTIATORS_DIRECT_CUSTODY
+        name: Direct custody & DRS
+
+# 93 widgets across 15 categories.
+widgets:
+  - key: WDG_EMAIL_SIGNUP
+    name: Email / social sign-up
+    category: Onboarding & Account
+    rarity: Common
+    module_key: CUST_ONBOARDING
+  - key: WDG_ID_UPLOAD
+    name: In-app ID upload
+    category: Onboarding & Account
+    rarity: Common
+    module_key: CUST_ONBOARDING
+  - key: WDG_INSTANT_VERIFY
+    name: Instant identity verification
+    category: Onboarding & Account
+    rarity: Uncommon
+    module_key: CUST_ONBOARDING
+  - key: WDG_APPROPRIATENESS_TEST
+    name: Appropriateness/knowledge test
+    category: Onboarding & Account
+    rarity: Common
+    module_key: CUST_ONBOARDING
+  - key: WDG_PROGRESS_SAVE
+    name: Save & resume application
+    category: Onboarding & Account
+    rarity: Uncommon
+    module_key: CUST_ONBOARDING
+  - key: WDG_DEMO_ON_SIGNUP
+    name: Demo account on sign-up
+    category: Onboarding & Account
+    rarity: Uncommon
+    module_key: CUST_ONBOARDING
+  - key: WDG_GLOBAL_SEARCH
+    name: Global instrument search
+    category: Navigation & Layout
+    rarity: Common
+    module_key: CUST_UI_NAVIGATION
+  - key: WDG_DARK_MODE
+    name: Dark mode
+    category: Navigation & Layout
+    rarity: Common
+    module_key: CUST_UI_NAVIGATION
+  - key: WDG_CUSTOM_DASHBOARD
+    name: Customisable dashboard
+    category: Navigation & Layout
+    rarity: Uncommon
+    module_key: CUST_UI_NAVIGATION
+  - key: WDG_MULTI_WATCHLIST
+    name: Multiple watchlists
+    category: Navigation & Layout
+    rarity: Common
+    module_key: CUST_UI_NAVIGATION
+  - key: WDG_WORKSPACE_LAYOUTS
+    name: Saveable workspace layouts
+    category: Navigation & Layout
+    rarity: Rare
+    module_key: CUST_UI_NAVIGATION
+  - key: WDG_ACCESSIBILITY_AA
+    name: WCAG AA accessibility
+    category: Navigation & Layout
+    rarity: Uncommon
+    module_key: CUST_UI_NAVIGATION
+  - key: WDG_HOLDINGS_VIEW
+    name: Holdings & positions view
+    category: Portfolio & Positions
+    rarity: Common
+    module_key: CUST_UI_NAVIGATION
+  - key: WDG_PNL_REALTIME
+    name: Real-time P&L
+    category: Portfolio & Positions
+    rarity: Common
+    module_key: CUST_UI_NAVIGATION
+  - key: WDG_PERFORMANCE_CHART
+    name: Portfolio performance chart
+    category: Portfolio & Positions
+    rarity: Common
+    module_key: CUST_UI_NAVIGATION
+  - key: WDG_ALLOCATION_BREAKDOWN
+    name: Allocation breakdown
+    category: Portfolio & Positions
+    rarity: Uncommon
+    module_key: CUST_UI_NAVIGATION
+  - key: WDG_DIVIDEND_TRACKER
+    name: Dividend tracker
+    category: Portfolio & Positions
+    rarity: Uncommon
+    module_key: CUST_UI_NAVIGATION
+  - key: WDG_TAX_LOTS
+    name: Tax-lot / cost-basis view
+    category: Portfolio & Positions
+    rarity: Rare
+    module_key: CUST_UI_NAVIGATION
+  - key: WDG_MARKET_ORDER
+    name: Market order
+    category: Order Entry & Types
+    rarity: Common
+    module_key: CUST_TRADING_EXPERIENCE
+  - key: WDG_LIMIT_ORDER
+    name: Limit order
+    category: Order Entry & Types
+    rarity: Common
+    module_key: CUST_TRADING_EXPERIENCE
+  - key: WDG_STOP_ORDERS
+    name: Stop / stop-limit
+    category: Order Entry & Types
+    rarity: Common
+    module_key: CUST_TRADING_EXPERIENCE
+  - key: WDG_TRAILING_STOP
+    name: Trailing stop
+    category: Order Entry & Types
+    rarity: Uncommon
+    module_key: CUST_TRADING_EXPERIENCE
+  - key: WDG_OCO_BRACKET
+    name: OCO / bracket orders
+    category: Order Entry & Types
+    rarity: Rare
+    module_key: CUST_TRADING_EXPERIENCE
+  - key: WDG_RECURRING_INVEST
+    name: Recurring / auto-invest
+    category: Order Entry & Types
+    rarity: Uncommon
+    module_key: CUST_TRADING_EXPERIENCE
+  - key: WDG_CONDITIONAL_ORDERS
+    name: Conditional orders
+    category: Order Entry & Types
+    rarity: Rare
+    module_key: CUST_TRADING_EXPERIENCE
+  - key: WDG_ORDER_PREVIEW
+    name: Order preview / est. cost
+    category: Execution & Feedback
+    rarity: Common
+    module_key: CUST_TRADING_EXPERIENCE
+  - key: WDG_FILL_NOTIFICATION
+    name: Fill notification
+    category: Execution & Feedback
+    rarity: Common
+    module_key: CUST_TRADING_EXPERIENCE
+  - key: WDG_ORDER_HISTORY
+    name: Order & trade history
+    category: Execution & Feedback
+    rarity: Common
+    module_key: CUST_TRADING_EXPERIENCE
+  - key: WDG_PARTIAL_FILL_INFO
+    name: Partial-fill detail
+    category: Execution & Feedback
+    rarity: Uncommon
+    module_key: CUST_TRADING_EXPERIENCE
+  - key: WDG_EXECUTION_QUALITY
+    name: Execution-quality reporting
+    category: Execution & Feedback
+    rarity: Rare
+    module_key: CUST_TRADING_EXPERIENCE
+  - key: WDG_ONE_TAP_TRADE
+    name: One-tap trade
+    category: Execution & Feedback
+    rarity: Uncommon
+    module_key: CUST_TRADING_EXPERIENCE
+  - key: WDG_EQUITIES
+    name: Equities
+    category: Product Range & Wrappers
+    rarity: Common
+    module_key: CUST_PRODUCT_RANGE
+  - key: WDG_ETFS_FUNDS
+    name: ETFs & funds
+    category: Product Range & Wrappers
+    rarity: Common
+    module_key: CUST_PRODUCT_RANGE
+  - key: WDG_FRACTIONAL_SHARES
+    name: Fractional shares
+    category: Product Range & Wrappers
+    rarity: Uncommon
+    module_key: CUST_PRODUCT_RANGE
+  - key: WDG_OPTIONS
+    name: Options
+    category: Product Range & Wrappers
+    rarity: Uncommon
+    module_key: CUST_PRODUCT_RANGE
+  - key: WDG_BONDS
+    name: Bonds / fixed income
+    category: Product Range & Wrappers
+    rarity: Rare
+    module_key: CUST_PRODUCT_RANGE
+  - key: WDG_CRYPTO
+    name: Crypto
+    category: Product Range & Wrappers
+    rarity: Uncommon
+    module_key: CUST_PRODUCT_RANGE
+  - key: WDG_ISA_SIPP
+    name: ISA / SIPP wrappers
+    category: Product Range & Wrappers
+    rarity: Uncommon
+    module_key: CUST_PRODUCT_RANGE
+  - key: WDG_INTERACTIVE_CHART
+    name: Interactive charts
+    category: Charting & Analysis
+    rarity: Common
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_TECHNICAL_INDICATORS
+    name: Technical indicators
+    category: Charting & Analysis
+    rarity: Common
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_DRAWING_TOOLS
+    name: Drawing tools
+    category: Charting & Analysis
+    rarity: Uncommon
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_MULTI_TIMEFRAME
+    name: Multi-timeframe
+    category: Charting & Analysis
+    rarity: Uncommon
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_CHART_TRADING
+    name: Trade-from-chart
+    category: Charting & Analysis
+    rarity: Rare
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_COMPARISON_OVERLAY
+    name: Comparison overlays
+    category: Charting & Analysis
+    rarity: Uncommon
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_STOCK_SCREENER
+    name: Stock screener
+    category: Research & Screeners
+    rarity: Uncommon
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_ANALYST_RATINGS
+    name: Analyst ratings
+    category: Research & Screeners
+    rarity: Uncommon
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_FUNDAMENTALS
+    name: Fundamentals data
+    category: Research & Screeners
+    rarity: Common
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_ESG_DATA
+    name: ESG data
+    category: Research & Screeners
+    rarity: Rare
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_ETF_XRAY
+    name: Fund / ETF x-ray
+    category: Research & Screeners
+    rarity: Rare
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_CONSENSUS_TARGETS
+    name: Consensus price targets
+    category: Research & Screeners
+    rarity: Uncommon
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_REALTIME_NEWS
+    name: Real-time news feed
+    category: News & Education
+    rarity: Common
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_EARNINGS_CALENDAR
+    name: Earnings / economic calendar
+    category: News & Education
+    rarity: Common
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_LEARN_ARTICLES
+    name: Learn articles / academy
+    category: News & Education
+    rarity: Common
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_VIDEO_LESSONS
+    name: Video lessons
+    category: News & Education
+    rarity: Uncommon
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_GLOSSARY
+    name: Glossary / help tips
+    category: News & Education
+    rarity: Common
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_PODCASTS_WEBINARS
+    name: Podcasts / webinars
+    category: News & Education
+    rarity: Rare
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_MARKET_SUMMARY
+    name: Daily market summary
+    category: News & Education
+    rarity: Common
+    module_key: CUST_RESEARCH_EDUCATION
+  - key: WDG_AI_INSIGHTS
+    name: AI stock insights
+    category: AI & Personalisation
+    rarity: Uncommon
+    module_key: CUST_AI_PERSONALISATION
+  - key: WDG_AI_CHAT_ASSIST
+    name: AI chat assistant
+    category: AI & Personalisation
+    rarity: Rare
+    module_key: CUST_AI_PERSONALISATION
+  - key: WDG_PERSONALISED_FEED
+    name: Personalised discovery feed
+    category: AI & Personalisation
+    rarity: Uncommon
+    module_key: CUST_AI_PERSONALISATION
+  - key: WDG_SMART_SUGGESTIONS
+    name: Smart suggestions
+    category: AI & Personalisation
+    rarity: Uncommon
+    module_key: CUST_AI_PERSONALISATION
+  - key: WDG_SENTIMENT_SIGNALS
+    name: AI sentiment signals
+    category: AI & Personalisation
+    rarity: Rare
+    module_key: CUST_AI_PERSONALISATION
+  - key: WDG_AUTO_SUMMARIES
+    name: AI news summaries
+    category: AI & Personalisation
+    rarity: Rare
+    module_key: CUST_AI_PERSONALISATION
+  - key: WDG_PRICE_ALERTS
+    name: Price alerts
+    category: Alerts & Notifications
+    rarity: Common
+    module_key: CUST_AI_PERSONALISATION
+  - key: WDG_NEWS_ALERTS
+    name: News alerts
+    category: Alerts & Notifications
+    rarity: Common
+    module_key: CUST_AI_PERSONALISATION
+  - key: WDG_PUSH_NOTIFS
+    name: Push notifications
+    category: Alerts & Notifications
+    rarity: Common
+    module_key: CUST_AI_PERSONALISATION
+  - key: WDG_TECHNICAL_ALERTS
+    name: Technical-indicator alerts
+    category: Alerts & Notifications
+    rarity: Uncommon
+    module_key: CUST_AI_PERSONALISATION
+  - key: WDG_EARNINGS_ALERTS
+    name: Earnings alerts
+    category: Alerts & Notifications
+    rarity: Uncommon
+    module_key: CUST_AI_PERSONALISATION
+  - key: WDG_VOLATILITY_ALERTS
+    name: Volatility / % move alerts
+    category: Alerts & Notifications
+    rarity: Uncommon
+    module_key: CUST_AI_PERSONALISATION
+  - key: WDG_FEE_SCHEDULE
+    name: Clear fee schedule
+    category: Fees & Pricing Transparency
+    rarity: Common
+    module_key: CUST_FEES_PRICING
+  - key: WDG_FX_FEE_DISCLOSURE
+    name: FX-fee disclosure
+    category: Fees & Pricing Transparency
+    rarity: Uncommon
+    module_key: CUST_FEES_PRICING
+  - key: WDG_SPREAD_DISCLOSURE
+    name: Spread disclosure
+    category: Fees & Pricing Transparency
+    rarity: Uncommon
+    module_key: CUST_FEES_PRICING
+  - key: WDG_NO_INACTIVITY
+    name: No / low inactivity fee
+    category: Fees & Pricing Transparency
+    rarity: Common
+    module_key: CUST_FEES_PRICING
+  - key: WDG_TIERED_PRICING
+    name: Tiered / subscription pricing
+    category: Fees & Pricing Transparency
+    rarity: Uncommon
+    module_key: CUST_FEES_PRICING
+  - key: WDG_TOTAL_COST_CALC
+    name: Total-cost calculator
+    category: Fees & Pricing Transparency
+    rarity: Rare
+    module_key: CUST_FEES_PRICING
+  - key: WDG_TWO_FACTOR
+    name: Two-factor authentication
+    category: Security & Protection
+    rarity: Common
+    module_key: CUST_SECURITY_REGULATION
+  - key: WDG_BIOMETRIC_LOGIN
+    name: Biometric login
+    category: Security & Protection
+    rarity: Common
+    module_key: CUST_SECURITY_REGULATION
+  - key: WDG_PROTECTION_DISCLOSURE
+    name: FSCS/SIPC disclosure
+    category: Security & Protection
+    rarity: Common
+    module_key: CUST_SECURITY_REGULATION
+  - key: WDG_DEVICE_MGMT
+    name: Device management
+    category: Security & Protection
+    rarity: Uncommon
+    module_key: CUST_SECURITY_REGULATION
+  - key: WDG_WITHDRAWAL_LOCK
+    name: Withdrawal lock / whitelist
+    category: Security & Protection
+    rarity: Uncommon
+    module_key: CUST_SECURITY_REGULATION
+  - key: WDG_SECURITY_CENTER
+    name: Security centre
+    category: Security & Protection
+    rarity: Rare
+    module_key: CUST_SECURITY_REGULATION
+  - key: WDG_LIVE_CHAT
+    name: Live chat
+    category: Support & Help
+    rarity: Common
+    module_key: CUST_SUPPORT_COMMUNITY
+  - key: WDG_PHONE_SUPPORT
+    name: Phone support
+    category: Support & Help
+    rarity: Uncommon
+    module_key: CUST_SUPPORT_COMMUNITY
+  - key: WDG_EMAIL_TICKET
+    name: Email / ticketing
+    category: Support & Help
+    rarity: Common
+    module_key: CUST_SUPPORT_COMMUNITY
+  - key: WDG_HELP_CENTER
+    name: Help centre / FAQ
+    category: Support & Help
+    rarity: Common
+    module_key: CUST_SUPPORT_COMMUNITY
+  - key: WDG_IN_APP_CONTEXT_HELP
+    name: In-app contextual help
+    category: Support & Help
+    rarity: Uncommon
+    module_key: CUST_SUPPORT_COMMUNITY
+  - key: WDG_STATUS_PAGE
+    name: Status / incident page
+    category: Support & Help
+    rarity: Rare
+    module_key: CUST_SUPPORT_COMMUNITY
+  - key: WDG_COPY_TRADING
+    name: Copy / social trading
+    category: Social, Community & Differentiators
+    rarity: Rare
+    module_key: CUST_INNOVATION_DIFFERENTIATORS
+  - key: WDG_COMMUNITY_FEED
+    name: Community feed
+    category: Social, Community & Differentiators
+    rarity: Uncommon
+    module_key: CUST_INNOVATION_DIFFERENTIATORS
+  - key: WDG_LEADERBOARDS
+    name: Leaderboards
+    category: Social, Community & Differentiators
+    rarity: Uncommon
+    module_key: CUST_INNOVATION_DIFFERENTIATORS
+  - key: WDG_REFERRAL_PROGRAM
+    name: Referral program
+    category: Social, Community & Differentiators
+    rarity: Common
+    module_key: CUST_INNOVATION_DIFFERENTIATORS
+  - key: WDG_REWARDS_GAMIFY
+    name: Rewards / gamification
+    category: Social, Community & Differentiators
+    rarity: Uncommon
+    module_key: CUST_INNOVATION_DIFFERENTIATORS
+  - key: WDG_DRS_DIRECT_CUSTODY
+    name: DRS / direct custody
+    category: Social, Community & Differentiators
+    rarity: Rare
+    module_key: CUST_INNOVATION_DIFFERENTIATORS

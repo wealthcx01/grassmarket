@@ -24,6 +24,81 @@
       "title": "AnchorPoint",
       "type": "object"
     },
+    "CModuleDef": {
+      "additionalProperties": false,
+      "description": "One of the 10 Phase-E Customer-Proposition modules (ADR-0023).",
+      "properties": {
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "subcomponents": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CSubcomponentDef"
+          },
+          "title": "Subcomponents",
+          "type": "array"
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "description"
+      ],
+      "title": "CModuleDef",
+      "type": "object"
+    },
+    "CSubcomponentDef": {
+      "additionalProperties": false,
+      "description": "A Customer-Proposition (C) subcomponent (ADR-0023). Same shape as an L subcomponent — C rides\nthe L aggregation family — but lives in the C keyspace.",
+      "properties": {
+        "critical": {
+          "default": false,
+          "title": "Critical",
+          "type": "boolean"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "module_key": {
+          "title": "Module Key",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "module_key"
+      ],
+      "title": "CSubcomponentDef",
+      "type": "object"
+    },
     "MetricDef": {
       "additionalProperties": false,
       "properties": {
@@ -230,11 +305,77 @@
       ],
       "title": "SubcomponentDef",
       "type": "object"
+    },
+    "WidgetDef": {
+      "additionalProperties": false,
+      "description": "One Level-1 customer-proposition widget (ADR-0023 / GRS-0080). The 93-widget checklist is C's\nLevel-1 evidence layer: presence + ease/usability/depth per widget, differentiated by RARITY\n(a missing Common widget is a bottleneck; a Rare widget done well scores differentiation).\n`rarity` has no default — a missing/unknown value is a load-time refusal (ADR-0001).",
+      "properties": {
+        "category": {
+          "title": "Category",
+          "type": "string"
+        },
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "module_key": {
+          "title": "Module Key",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "rarity": {
+          "enum": [
+            "Common",
+            "Uncommon",
+            "Rare"
+          ],
+          "title": "Rarity",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "category",
+        "rarity",
+        "module_key"
+      ],
+      "title": "WidgetDef",
+      "type": "object"
     }
   },
   "additionalProperties": false,
   "description": "The whole legal key-space in one immutable object.\n\nConstructable directly (tests build small in-memory registries) or via\n:func:`load_registry` (reads the canonical YAML). The strict accessors below never default.",
   "properties": {
+    "c_modules": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/CModuleDef"
+      },
+      "title": "C Modules",
+      "type": "array"
+    },
+    "c_status": {
+      "default": "settled",
+      "title": "C Status",
+      "type": "string"
+    },
+    "c_widget_profile": {
+      "default": "retail",
+      "title": "C Widget Profile",
+      "type": "string"
+    },
+    "c_widgets": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/WidgetDef"
+      },
+      "title": "C Widgets",
+      "type": "array"
+    },
     "metric_status": {
       "default": "settled",
       "title": "Metric Status",
