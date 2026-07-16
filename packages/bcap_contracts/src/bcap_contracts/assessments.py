@@ -352,20 +352,24 @@ class PowerEntry(BaseModel):
 
 class BusinessProfile(BaseModel):
     """Descriptive context for the business being assessed (GRS-0068): where it operates, what it
-    offers, and how it's regulated. Purely informational — it frames the assessment and feeds the
-    portfolio view; it is **NEVER a scoring input** (the engine reads only subcomponents, metrics
-    and powers) and never enters the scoring-run content hash. Partial by design, like the document
-    that carries it: every field is optional.
-
-    The operating-model *profile selector* (exchange vs broker, which changes module selection and
-    weights) is a separate, deferred concern (METHODOLOGY-V2-SCOPE §2 / the profile ADR) — `segment`
-    here is a free-text descriptor, not that selector."""
+    offers, and how it's regulated. Most fields are purely informational (never a scoring input,
+    in the content hash). The one exception is `operating_model` (GRS-0079): the assessment PROFILE
+    key (retail / exchange / …), which selects the registry view + coefficient set the assessment
+    scores against (ADR-0025). It is not a *value* the engine reads, but it does decide WHICH keys
+    and weights apply — so it is scoring-relevant config, not free-text. `segment` stays the
+    free-text descriptor. Partial by design: every field is optional; `operating_model` unset means
+    the retail default (byte-identical to v1)."""
 
     model_config = ConfigDict(extra="forbid")
 
     country: str | None = Field(default=None, description="Primary domicile / HQ jurisdiction.")
     segment: str | None = Field(
-        default=None, description="Business model descriptor, e.g. 'Retail broker', 'Exchange'."
+        default=None, description="Free-text business descriptor, e.g. 'Neobroker'."
+    )
+    # The operating-model profile key (ADR-0025). None → retail default. Validated against the
+    # profile registry at score time (an unknown key fails loud, ADR-0001).
+    operating_model: str | None = Field(
+        default=None, description="Operating-model profile key: 'retail' (default), 'exchange', …"
     )
     asset_classes: tuple[str, ...] = Field(
         default=(), description="Asset classes offered (equities, funds, FX, crypto, …)."

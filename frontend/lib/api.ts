@@ -52,6 +52,7 @@ import type {
   RatingEntry,
   RecoveryFeeAttribution,
   Registry,
+  RegistryProfile,
   RubricAnchor,
   ScenarioComparison,
   Workshop,
@@ -179,8 +180,23 @@ export const api = {
   },
 
   // --- Assessments (all JWT-scoped server-side; the client carries the token) ---
-  registry(signal?: AbortSignal): Promise<Registry> {
-    return request<Registry>("/registry", { method: "GET", headers: authHeaders(), signal });
+  // The registry the wizard renders — for an operating-model profile view (GRS-0079). Retail
+  // (default/omitted) is the full superset.
+  registry(profile?: string, signal?: AbortSignal): Promise<Registry> {
+    const query = profile ? `?profile=${encodeURIComponent(profile)}` : "";
+    return request<Registry>(`/registry${query}`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  registryProfiles(signal?: AbortSignal): Promise<RegistryProfile[]> {
+    return request<RegistryProfile[]>("/registry/profiles", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
   },
 
   createAssessment(subject: string, signal?: AbortSignal): Promise<Assessment> {

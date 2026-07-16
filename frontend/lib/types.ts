@@ -65,13 +65,21 @@ export interface PowerEntry {
   trend?: TrendDirection | null;
 }
 
-/** Descriptive context for the business (GRS-0068). Never a scoring input — frames the assessment. */
+/** Business context (GRS-0068). Mostly descriptive; `operating_model` (GRS-0079) is the profile key
+ * that selects the registry view + coefficient set the assessment scores against (ADR-0025). */
 export interface BusinessProfile {
   country?: string | null;
   segment?: string | null;
+  operating_model?: string | null; // profile key: 'retail' (default) | 'exchange' | …
   asset_classes: string[];
   regions: string[];
   licensing?: string | null;
+}
+
+/** One selectable operating-model profile (GRS-0079) from GET /registry/profiles. */
+export interface RegistryProfile {
+  key: string;
+  name: string;
 }
 
 export interface AssessmentDocument {

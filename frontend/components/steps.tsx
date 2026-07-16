@@ -22,6 +22,7 @@ import type {
   MaturityLevel,
   MetricConfidence,
   Registry,
+  RegistryProfile,
   ScenarioComparison,
   StrengthRating,
 } from "@/lib/types";
@@ -35,6 +36,7 @@ import { api, ApiError } from "@/lib/api";
 
 export interface StepProps {
   registry: Registry;
+  profiles: RegistryProfile[];
   document: AssessmentDocument;
   update: (fn: (d: AssessmentDocument) => AssessmentDocument) => void;
   readOnly: boolean;
@@ -83,8 +85,9 @@ const SEGMENT_SUGGESTIONS = [
   "Infrastructure vendor",
 ];
 
-export function OverviewStep({ document: d, update, readOnly }: StepProps) {
+export function OverviewStep({ document: d, update, readOnly, profiles }: StepProps) {
   const profile = d.profile ?? null;
+  const operatingModel = profile?.operating_model || "retail";
   const labelStyle: React.CSSProperties = { fontSize: "0.85rem" };
   const fieldStyle: React.CSSProperties = { ...selectStyle, display: "block", width: "100%", marginTop: "0.3rem" };
   return (
@@ -104,7 +107,35 @@ export function OverviewStep({ document: d, update, readOnly }: StepProps) {
         />
       </label>
 
-      {/* Structured business profile (GRS-0068) — context, never a scoring input. */}
+      {/* Operating-model profile (GRS-0079) — SCORING-relevant: it reshapes the module set and the
+          weights the assessment scores against. Retail is the default; choosing another reshapes
+          the wizard. */}
+      <label style={labelStyle}>
+        Operating model
+        <select
+          value={operatingModel}
+          disabled={readOnly}
+          onChange={(e) =>
+            update((x) => doc.setProfile(x, { operating_model: e.target.value }))
+          }
+          style={fieldStyle}
+          title="Which operating model this business runs — reshapes the modules assessed and the weights."
+        >
+          {(profiles.length ? profiles : [{ key: "retail", name: "Retail brokerage" }]).map((p) => (
+            <option key={p.key} value={p.key}>
+              {p.name}
+            </option>
+          ))}
+        </select>
+        {operatingModel !== "retail" ? (
+          <span style={{ display: "block", marginTop: "0.35rem", fontSize: "0.75rem", color: "var(--color-warn)" }}>
+            Non-retail profiles are <strong>draft</strong> (weights &amp; criticals pending
+            elicitation) — scores are indicative, not client-usable.
+          </span>
+        ) : null}
+      </label>
+
+      {/* Structured business profile (GRS-0068) — descriptive context, never a scoring input. */}
       <fieldset style={{ border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", padding: "0.85rem 1rem", margin: 0 }}>
         <legend style={{ fontSize: "0.8rem", color: "var(--color-ink-muted)", padding: "0 0.4rem" }}>
           Business profile <span style={{ color: "var(--color-ink-faint)" }}>· context only, not scored</span>

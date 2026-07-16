@@ -41,7 +41,8 @@ export default function CoRaterModulePage() {
     async (signal?: AbortSignal) => {
       try {
         const [registry, draft] = await Promise.all([
-          api.registry(signal),
+          // The full superset view; profile-aware co-rating of non-retail assessments is a follow-up.
+          api.registry(undefined, signal),
           api.getMyModuleRating(assessmentId, moduleKey, signal),
         ]);
         if (!mounted.current) return;
