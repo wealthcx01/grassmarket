@@ -318,6 +318,9 @@ class Registry(BaseModel):
     def all_c_subcomponent_keys(self) -> frozenset[str]:
         return frozenset(s.key for m in self.c_modules for s in m.subcomponents)
 
+    def c_subcomponent_keys(self, module_key: str) -> frozenset[str]:
+        return frozenset(s.key for s in self.require_c_module(module_key).subcomponents)
+
     def widget_keys(self) -> frozenset[str]:
         return frozenset(w.key for w in self.c_widgets)
 

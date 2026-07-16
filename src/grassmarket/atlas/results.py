@@ -51,6 +51,21 @@ class LResult(BaseModel):
     value: Score
 
 
+class CustomerResult(BaseModel):
+    """The C-index (Customer Proposition, ADR-0023) — the L-shaped aggregation over the separate C
+    registry dimension. `weighted_term` / `min_term` / `value` mirror `LResult`; `modules` carries
+    the per-C-module detail (the proposition-heatmap source, GRS-0085). Present on an `AtlasResult`
+    only when the coefficient set scores C. Stage 1: reported alongside V, never summed into it
+    (that is v1.4 / GRS-0086)."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    weighted_term: Score
+    min_term: Score
+    value: Score
+    modules: tuple[ModuleResult, ...]
+
+
 class MetricRow(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
@@ -116,6 +131,9 @@ class CompositeResult(BaseModel):
     p_index: Score
     l_index: Score
     v_index: Score
+    # C-index (ADR-0023 Stage 1): REPORTED alongside V, never summed into it until v1.4. None on a
+    # B/P/L-only run — a missing C is first-class absence, never a zero (D9 discipline).
+    c_index: Score | None = None
 
 
 class AtlasResult(BaseModel):
@@ -132,6 +150,9 @@ class AtlasResult(BaseModel):
     business: BusinessResult
     powers: PowersResult
     triad: TriadResult
+    # C-index detail (ADR-0023 Stage 1). None on a B/P/L-only run; present when the coefficient set
+    # scores C. Reported alongside V — the composite V sum is unchanged (v1.4/GRS-0086 folds it in).
+    customer: CustomerResult | None = None
     composite: CompositeResult
     gate_bands: dict[str, str]  # module_key → headline band (the two-track headline)
     v_display_0_100: float

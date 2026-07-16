@@ -65,3 +65,7 @@ class AssessmentInputs(BaseModel):
     subcomponents: tuple[SubcomponentRating, ...]
     metrics: tuple[MetricObservation, ...]
     powers: tuple[PowerObservation, ...]
+    # C-index subcomponent ratings (ADR-0023 Stage 1). Empty unless the coefficient set scores C;
+    # when it does, they must cover the C registry's subcomponents exactly (enforced fail-loud in
+    # the engine). A separate tuple keeps C keys out of the B/P/L coverage check entirely.
+    c_subcomponents: tuple[SubcomponentRating, ...] = ()

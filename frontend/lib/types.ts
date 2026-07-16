@@ -5,7 +5,12 @@
  */
 
 export type MaturityLevel = "Basic" | "Developing" | "Advanced" | "Frontier";
-export type NonScoreState = "Not Applicable" | "Not Assessed";
+export type NonScoreState =
+  | "Not Applicable"
+  | "Not Assessed"
+  // C-index Level-1 widget-observation states (ADR-0023) — present-yet-not-a-clean-pass.
+  | "Present (Paywalled)"
+  | "Present (Defective)";
 export type EvidenceGrade = "E1" | "E2" | "E3" | "E4";
 export type StrengthRating = "None" | "Emerging" | "Established" | "Wide";
 export type MetricConfidence =

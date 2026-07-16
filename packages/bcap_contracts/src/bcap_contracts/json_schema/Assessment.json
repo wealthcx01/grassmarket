@@ -234,7 +234,9 @@
       "description": "First-class non-score states (Methodology §3.2). Never imputed, never scored as zero.\n\nAn unassessed subcomponent contributes to NO score — the empty-module → q_m = 0.0\nbehaviour of the prototype (defect D9) is prohibited by construction.",
       "enum": [
         "Not Applicable",
-        "Not Assessed"
+        "Not Assessed",
+        "Present (Paywalled)",
+        "Present (Defective)"
       ],
       "title": "NonScoreState",
       "type": "string"

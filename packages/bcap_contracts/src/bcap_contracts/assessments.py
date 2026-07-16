@@ -46,6 +46,13 @@ _PROVENANCE_FAMILIES = (
     "w_metric",
     "group_weights",  # W_g for the group-weighted B (ADR-0006)
     "strength_encoding",  # ordinal power strength → numeric encoding for P (ADR-0004)
+    # C-index families (ADR-0023, Stage 1). Populated only on a set that scores C; a B/P/L-only
+    # set leaves them empty, so the golden-master coefficient set is unaffected.
+    "alpha_c",
+    "alpha_c_module",
+    "lambda_c",
+    "delta_c",
+    "rarity_weight",  # Level-1 widget rarity weighting (ADR-0023); populated in GRS-0084
 )
 
 # Closed value sets for the non-registry-keyed coefficient families (ADR-0004, ADR-0006). Kept as
@@ -85,6 +92,22 @@ class CoefficientSet(BaseModel):
         default_factory=dict, description="Module weights δ_m for the L blend."
     )
     critical_modules_for_l: tuple[str, ...] = ()
+
+    # --- C-index coefficients (ADR-0023, Stage 1: report-alongside) ---
+    # OPTIONAL and all-or-nothing. A set with `alpha_c is None` does not score C at all: B/P/L is
+    # scored exactly as before and the golden master is untouched (C rides the L aggregation shape
+    # over the separate C registry dimension, never mixing into the B/P/L keyspace). When C is
+    # scored, all four families + provenance are required and validated against the C registry.
+    alpha_c: UnitInterval | None = None
+    alpha_c_module: dict[str, UnitInterval] = Field(default_factory=dict)
+    lambda_c_loadings: dict[str, dict[str, float]] = Field(
+        default_factory=dict, description="Per-C-module subcomponent loadings λ_{m,c}."
+    )
+    delta_c: dict[str, float] = Field(
+        default_factory=dict, description="C-module weights δ_m for the C blend."
+    )
+    critical_modules_for_c: tuple[str, ...] = ()
+
     w_power: dict[str, float] = Field(default_factory=dict, description="Power weights w_j.")
     w_metric: dict[str, float] = Field(default_factory=dict, description="Metric weights w_k.")
 
@@ -104,7 +127,32 @@ class CoefficientSet(BaseModel):
     # Every coefficient family present must carry provenance (Methodology §6).
     provenance: dict[str, WeightProvenanceRecord] = Field(default_factory=dict)
 
+    @property
+    def scores_c(self) -> bool:
+        """Whether this set carries the C-index coefficients (ADR-0023 Stage 1). `alpha_c is not
+        None` is the single source of truth — the all-or-nothing validator guarantees that when
+        `alpha_c` is set, the other three C families are populated too."""
+        return self.alpha_c is not None
+
     # --- Construction-time invariants (registry-independent) ---
+    @model_validator(mode="after")
+    def _enforce_c_all_or_nothing(self) -> CoefficientSet:
+        """The C families are all-or-nothing: a half-populated C set (e.g. δ_c without α_c) would
+        make `scores_c` ambiguous and could validate B/P/L while silently skipping C completeness.
+        Refuse it at construction (ADR-0023, ADR-0001 §3)."""
+        c_populated = (
+            self.alpha_c is not None,
+            bool(self.alpha_c_module),
+            bool(self.lambda_c_loadings),
+            bool(self.delta_c),
+        )
+        if any(c_populated) and not all(c_populated):
+            raise ValueError(
+                "C-index coefficients are all-or-nothing (ADR-0023): provide alpha_c, "
+                "alpha_c_module, lambda_c_loadings, and delta_c together, or none of them."
+            )
+        return self
+
     @model_validator(mode="after")
     def _enforce_theta_sum(self) -> CoefficientSet:
         total = self.theta_b + self.theta_p + self.theta_l
@@ -133,6 +181,14 @@ class CoefficientSet(BaseModel):
             populated.add("group_weights")
         if self.strength_encoding:
             populated.add("strength_encoding")
+        if self.alpha_c is not None:
+            populated.add("alpha_c")
+        if self.alpha_c_module:
+            populated.add("alpha_c_module")
+        if self.lambda_c_loadings:
+            populated.add("lambda_c")
+        if self.delta_c:
+            populated.add("delta_c")
         missing = populated - set(self.provenance)
         if missing:
             raise ValueError(
@@ -213,6 +269,33 @@ class CoefficientSet(BaseModel):
             registry.assert_covers_keys(
                 "metric_group (group_weights)", groups_present, set(self.group_weights)
             )
+
+        # C-index dimension (ADR-0023). Validated only when the set scores C; a B/P/L-only set
+        # leaves the C families empty, so this whole block is a no-op and the golden master path
+        # is unchanged. When present, δ_c / α_c_module / λ_c must be EXACTLY the C registry's keys.
+        if self.scores_c:
+            registry.assert_covers_keys(
+                "c_module (delta_c)", registry.c_module_keys(), set(self.delta_c)
+            )
+            registry.assert_covers_keys(
+                "c_module (alpha_c_module)", registry.c_module_keys(), set(self.alpha_c_module)
+            )
+            unknown_c_critical = set(self.critical_modules_for_c) - registry.c_module_keys()
+            if unknown_c_critical:
+                from bcap_contracts.registry import UnknownKeyError
+
+                raise UnknownKeyError(
+                    "critical_c_module", sorted(unknown_c_critical)[0], registry.c_module_keys()
+                )
+            registry.assert_covers_keys(
+                "c_module (lambda_c)", registry.c_module_keys(), set(self.lambda_c_loadings)
+            )
+            for module_key in self.lambda_c_loadings:
+                registry.assert_covers_keys(
+                    f"c_subcomponent[{module_key}]",
+                    registry.c_subcomponent_keys(module_key),
+                    set(self.lambda_c_loadings[module_key]),
+                )
 
 
 # --- Assessment resources (PRD §3.1) — the data model the wizard/Path B fill (Loop 2+) ---

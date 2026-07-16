@@ -27,6 +27,15 @@ _CRITICAL_MODULES_FOR_L = ("APP_SERVER", "BACKOFFICE", "OEMS")
 # panel refines these; provenance stays draft-pending-elicitation.
 _EXCHANGE_CRITICAL_MODULES_FOR_L = ("APP_SERVER", "OEMS", "LIQ_CONNECT")
 
+# The draft's critical-for-C modules (ADR-0023): the customer-facing core — first-trade onboarding,
+# the trading experience, and security/regulation (trust). A ratified DRAFT judgement; the θ_C panel
+# (post-launch, ADR-0023 I-4) refines these. Provenance stays draft-pending-elicitation.
+_CRITICAL_MODULES_FOR_C = (
+    "CUST_ONBOARDING",
+    "CUST_TRADING_EXPERIENCE",
+    "CUST_SECURITY_REGULATION",
+)
+
 _STRENGTH_ENCODING = {"None": 0.0, "Emerging": 0.4, "Established": 0.7, "Wide": 1.0}
 
 _DRAFT_PROVENANCE = WeightProvenanceRecord(
@@ -58,6 +67,8 @@ def draft_v1_coefficient_set(
     *,
     version: str = "v1-draft-pending-elicitation",
     critical_modules_for_l: tuple[str, ...] = _CRITICAL_MODULES_FOR_L,
+    score_c: bool = False,
+    critical_modules_for_c: tuple[str, ...] = _CRITICAL_MODULES_FOR_C,
 ) -> CoefficientSet:
     """Build the uniform draft coefficient set that covers ``registry`` exactly (ADR-0001).
 
@@ -67,8 +78,27 @@ def draft_v1_coefficient_set(
     ``critical_modules_for_l`` and ``version`` are parameterised so an operating-model profile
     (ADR-0025) can supply its own critical-for-L set over its registry VIEW; the retail defaults
     reproduce the golden master byte-identically.
+
+    ``score_c`` opts into the C-index coefficients (ADR-0023 Stage 1): uniform α_C/λ_c/δ_c
+    placeholders over the registry's C dimension, reusing the same draft provenance. Default False —
+    a set without C scores B/P/L exactly as before, so the golden master is untouched.
     """
     groups = sorted({m.group for m in registry.metrics if m.group is not None})
+    c_kwargs: dict[str, object] = {}
+    if score_c:
+        c_kwargs = {
+            "alpha_c": 0.7,
+            "alpha_c_module": {k: 0.7 for k in registry.c_module_keys()},
+            "lambda_c_loadings": {
+                k: {s: 1.0 for s in registry.c_subcomponent_keys(k)}
+                for k in registry.c_module_keys()
+            },
+            "delta_c": {k: 1.0 for k in registry.c_module_keys()},
+            "critical_modules_for_c": critical_modules_for_c,
+        }
+    provenance_families = _PROVENANCE_FAMILIES + (
+        ("alpha_c", "alpha_c_module", "lambda_c", "delta_c") if score_c else ()
+    )
     cs = CoefficientSet(
         version=version,
         methodology_version="1.1",
@@ -87,7 +117,8 @@ def draft_v1_coefficient_set(
         group_weights={g: 1.0 for g in groups},
         strength_encoding=dict(_STRENGTH_ENCODING),
         client_usable=False,
-        provenance={family: _DRAFT_PROVENANCE for family in _PROVENANCE_FAMILIES},
+        provenance={family: _DRAFT_PROVENANCE for family in provenance_families},
+        **c_kwargs,  # type: ignore[arg-type]
     )
     cs.validate_against(registry)  # fail loud now, not at score time
     return cs
