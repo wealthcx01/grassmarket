@@ -16,12 +16,13 @@ from bcap_contracts.assessments import (
     Assessment,
     AssessmentDocument,
     BrokeragePortfolioEntry,
+    CoefficientSet,
     LiveScore,
     ModuleRatingDraft,
     SubcomponentRating,
 )
 from bcap_contracts.common import AssessorLevel
-from bcap_contracts.registry import load_registry
+from bcap_contracts.registry import Registry, UnknownKeyError, load_registry
 from bcap_contracts.value import ScenarioComparison
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
@@ -34,7 +35,11 @@ from grassmarket.assessments import (
     module_rating_errors,
     scoreability_blockers,
 )
-from grassmarket.atlas.active import active_coefficient_set, active_uncertainty_model
+from grassmarket.atlas.active import (
+    active_uncertainty_model,
+    profile_key_of,
+    profile_scoring_context,
+)
 from grassmarket.atlas.committee import committee_blockers, required_committee_items
 from grassmarket.data.repository import (
     ConflictError,
@@ -85,6 +90,18 @@ class ConsensusRequest(BaseModel):
 
 def _not_found(exc: Exception) -> HTTPException:
     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Assessment not found.")
+
+
+def _profile_context(document: AssessmentDocument) -> tuple[Registry, CoefficientSet]:
+    """The (registry VIEW, coefficient set) an assessment scores against, by its operating-model
+    profile (ADR-0025/GRS-0079). Retail (default) is byte-identical to the full registry. An
+    unknown profile key on the document is a 422 (fail loud, never a silent retail fallback)."""
+    try:
+        return profile_scoring_context(profile_key_of(document))
+    except UnknownKeyError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
+        ) from exc
 
 
 @router.post("", response_model=Assessment, status_code=status.HTTP_201_CREATED)
@@ -185,10 +202,12 @@ def get_live_score(
         assessment = repo.get_assessment(principal, assessment_id)
     except (NotFoundError, ScopeViolationError) as exc:
         raise _not_found(exc) from exc
-    registry = load_registry()
+    # Score against the document's operating-model profile view + coeffs (ADR-0025/GRS-0079);
+    # retail (default) is byte-identical to before.
+    registry, coefficients = _profile_context(assessment.document)
     return live_score(
         assessment.document,
-        active_coefficient_set(registry),
+        coefficients,
         registry,
         active_uncertainty_model(),
         random.Random(_LIVE_SEED),
@@ -208,11 +227,9 @@ def evaluate_assessment_scenarios(
         assessment = repo.get_assessment(principal, assessment_id)
     except (NotFoundError, ScopeViolationError) as exc:
         raise _not_found(exc) from exc
-    registry = load_registry()
+    registry, coefficients = _profile_context(assessment.document)
     named = [(s.name, s.document) for s in payload.scenarios]
-    return evaluate_scenarios(
-        assessment.document, named, active_coefficient_set(registry), registry
-    )
+    return evaluate_scenarios(assessment.document, named, coefficients, registry)
 
 
 @router.post("/{assessment_id}/finalise", response_model=Assessment)
@@ -232,8 +249,9 @@ def finalise_assessment(
     if assessment.state.value == "finalised":
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Already finalised.")
 
-    registry = load_registry()
-    coefficients = active_coefficient_set(registry)
+    # Finalise against the document's operating-model profile (ADR-0025/GRS-0079); the run records
+    # WHICH profile scored it via the profile's distinct coefficient_version (immutable, #6).
+    registry, coefficients = _profile_context(assessment.document)
     model = active_uncertainty_model()
     blockers = scoreability_blockers(assessment.document, registry)
     if blockers:

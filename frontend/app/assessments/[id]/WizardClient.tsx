@@ -14,13 +14,20 @@ import Link from "next/link";
 import { BandDisplay } from "@/components/BandDisplay";
 import { WIZARD_STEPS, type StepProps } from "@/components/steps";
 import { ApiError, api, clearToken, getToken } from "@/lib/api";
-import type { Assessment, AssessmentDocument, LiveScore, Registry } from "@/lib/types";
+import type {
+  Assessment,
+  AssessmentDocument,
+  LiveScore,
+  Registry,
+  RegistryProfile,
+} from "@/lib/types";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 
 export function WizardClient({ id }: { id: string }) {
   const router = useRouter();
   const [registry, setRegistry] = useState<Registry | null>(null);
+  const [profiles, setProfiles] = useState<RegistryProfile[]>([]);
   const [assessment, setAssessment] = useState<Assessment | null>(null);
   const [document, setDocument] = useState<AssessmentDocument | null>(null);
   const [step, setStep] = useState(0);
@@ -73,12 +80,14 @@ export function WizardClient({ id }: { id: string }) {
       return;
     }
     const ctrl = new AbortController();
-    Promise.all([api.registry(ctrl.signal), api.getAssessment(id, ctrl.signal)])
-      .then(([reg, a]) => {
+    // The registry is fetched by the profile effect below (it depends on the document's profile);
+    // here we load the assessment + the selectable profiles.
+    Promise.all([api.getAssessment(id, ctrl.signal), api.registryProfiles(ctrl.signal)])
+      .then(([a, profs]) => {
         if (!mounted.current) return;
-        setRegistry(reg);
         setAssessment(a);
         setDocument(a.document);
+        setProfiles(profs);
         // A finalised assessment is opened to be READ, not filled in — land on the scored Summary
         // (the result the advisor came for), not the blank Overview form.
         if (a.state === "finalised") {
@@ -94,6 +103,26 @@ export function WizardClient({ id }: { id: string }) {
       });
     return () => ctrl.abort();
   }, [id, router, handleAuth]);
+
+  // Fetch the registry for the document's operating-model profile (GRS-0079). Re-runs only when the
+  // profile KEY changes (a primitive dep) — not on every keystroke — so choosing "Exchange" reshapes
+  // the module set the wizard renders. Retail (default) is the full superset.
+  const profileKey = document?.profile?.operating_model || "retail";
+  useEffect(() => {
+    if (!getToken()) return;
+    const ctrl = new AbortController();
+    api
+      .registry(profileKey === "retail" ? undefined : profileKey, ctrl.signal)
+      .then((reg) => {
+        if (mounted.current) setRegistry(reg);
+      })
+      .catch((err: unknown) => {
+        if (err instanceof ApiError && err.status === 0) return;
+        if (handleAuth(err)) return;
+        setLoadError(err instanceof ApiError ? err.message : "Could not load the registry.");
+      });
+    return () => ctrl.abort();
+  }, [profileKey, handleAuth]);
 
   const refreshLive = useCallback(() => {
     liveCtrl.current?.abort();
@@ -190,6 +219,7 @@ export function WizardClient({ id }: { id: string }) {
   const Current = WIZARD_STEPS[step]!.component;
   const stepProps: StepProps = {
     registry,
+    profiles,
     document,
     update,
     readOnly: !!readOnly,

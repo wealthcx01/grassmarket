@@ -22,7 +22,7 @@ masters; the only thing missing is the panel's sign-off on the numbers. Flip bot
 
 from __future__ import annotations
 
-from bcap_contracts.assessments import CoefficientSet
+from bcap_contracts.assessments import AssessmentDocument, CoefficientSet
 from bcap_contracts.registry import (
     RETAIL_PROFILE_KEY,
     Registry,
@@ -38,6 +38,14 @@ from grassmarket.atlas.draft_coefficients import (
 from grassmarket.atlas.montecarlo import draft_v1_uncertainty_model
 
 _EXCHANGE_PROFILE_KEY = "exchange"
+
+
+def profile_key_of(document: AssessmentDocument) -> str:
+    """The operating-model profile key an assessment document scores under (ADR-0025/GRS-0079).
+    An unset `operating_model` means the retail default (byte-identical to v1)."""
+    if document.profile is not None and document.profile.operating_model:
+        return document.profile.operating_model
+    return RETAIL_PROFILE_KEY
 
 
 def profile_scoring_context(
