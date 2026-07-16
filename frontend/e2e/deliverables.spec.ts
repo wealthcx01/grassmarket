@@ -112,14 +112,16 @@ test.describe("GRS-0019 slice 3 — review gate + approval queue", () => {
     const row = page.getByRole("row").filter({ hasText: "Executive Summary" }).last();
     await row.getByRole("button", { name: "Review AI" }).click();
     const draft = page.getByRole("button", { name: "Draft AI narratives" });
-    const awaitingApproval = page.getByText(/awaiting approval/i);
-    // Wait for the panel to finish loading before the conditional draft (see slice 2): a bare
-    // isVisible() check races listNarratives and skips the click on a cold runner.
-    await expect(draft.or(awaitingApproval)).toBeVisible();
+    // Settle the panel on its OWN state before the conditional draft — the draft button (fresh
+    // deliverable) or an existing edit box (already drafted). The engagement-wide "awaiting
+    // approval" banner is NOT a settle signal: a prior test can leave it visible, so
+    // `draft.or(bannerText)` matched two elements and tripped Playwright strict mode.
+    const editBox = page.getByRole("textbox", { name: /Edit/ }).first();
+    await expect(draft.or(editBox)).toBeVisible();
     if (await draft.isVisible().catch(() => false)) await draft.click();
 
     // The review gate is visible: the queue banner warns the pack cannot go to a client yet
     // (the banner counts pending sections engagement-wide, so the fresh draft must land first).
-    await expect(awaitingApproval).toBeVisible();
+    await expect(page.getByText(/awaiting approval/i).first()).toBeVisible();
   });
 });
