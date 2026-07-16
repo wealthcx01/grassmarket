@@ -433,6 +433,53 @@ class PowerEntry(BaseModel):
     trend: TrendDirection | None = None
 
 
+class WidgetObservation(BaseModel):
+    """One Level-1 widget observation for the C-index grid (ADR-0023 / GRS-0083).
+
+    A widget is either PRESENT (then scored 1–5 on ease / usability / depth) or NOT present — and a
+    non-present widget can still carry a first-class reason it isn't a clean pass:
+    `PRESENT_PAYWALLED` (gated behind a paywall) or `PRESENT_DEFECTIVE` (shipped but broken).
+    Absent-and-nothing-else is `present=False` with no `state`. The rarity tag is NOT stored here:
+    it is read from the registry (a single source of truth), never copied onto the observation."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    widget_key: str
+    present: bool
+    # A non-present widget's first-class qualifier (ADR-0023). Only PRESENT_PAYWALLED /
+    # PRESENT_DEFECTIVE are legal here, and only when `present` is False (validated below).
+    state: NonScoreState | None = None
+    ease: int | None = Field(default=None, ge=1, le=5)
+    usability: int | None = Field(default=None, ge=1, le=5)
+    depth: int | None = Field(default=None, ge=1, le=5)
+    notes: str | None = None
+
+    @model_validator(mode="after")
+    def _present_and_scores_are_consistent(self) -> WidgetObservation:
+        scores = (self.ease, self.usability, self.depth)
+        if self.present:
+            if self.state is not None:
+                raise ValueError(
+                    f"Widget {self.widget_key!r} is present — it carries no non-score state "
+                    f"(paywalled/defective describe a NON-present widget)."
+                )
+        else:
+            if any(s is not None for s in scores):
+                raise ValueError(
+                    f"Widget {self.widget_key!r} is not present — it carries no 1–5 quality "
+                    f"scores (ease/usability/depth are for a present widget)."
+                )
+            if self.state is not None and self.state not in (
+                NonScoreState.PRESENT_PAYWALLED,
+                NonScoreState.PRESENT_DEFECTIVE,
+            ):
+                raise ValueError(
+                    f"Widget {self.widget_key!r}: a non-present widget's state must be "
+                    f"PRESENT_PAYWALLED or PRESENT_DEFECTIVE (or none), not {self.state.value!r}."
+                )
+        return self
+
+
 class BusinessProfile(BaseModel):
     """Descriptive context for the business being assessed (GRS-0068): where it operates, what it
     offers, and how it's regulated. Most fields are purely informational (never a scoring input,
@@ -477,6 +524,11 @@ class AssessmentDocument(BaseModel):
     subcomponents: tuple[SubcomponentRating, ...] = ()
     metrics: tuple[MetricEntry, ...] = ()
     powers: tuple[PowerEntry, ...] = ()
+    # C-index capture (ADR-0023 / GRS-0083). Both partial by design and default-empty, so every
+    # existing document deserialises unchanged. `c_subcomponents` are Level-2 C ratings (same shape
+    # as B/P/L); `widgets` are the Level-1 grid rows. A non-retail profile captures no widgets.
+    c_subcomponents: tuple[SubcomponentRating, ...] = ()
+    widgets: tuple[WidgetObservation, ...] = ()
     notes: str | None = None
 
 
@@ -588,6 +640,10 @@ class LiveScore(BaseModel):
     b: IndexBand | None = None
     p: IndexBand | None = None
     l_index: IndexBand | None = None
+    # C-index (ADR-0023 Stage 1): a DETERMINISTIC value reported alongside V, never summed in and
+    # never a Monte Carlo band (uncertainty modelling of C is post-Stage-1). None until C is
+    # scoreable (a rated C subcomponent in a critical-for-C module), independent of V-scoreability.
+    c: Score | None = None
     module_qm: dict[str, IndexBand] = Field(default_factory=dict)
     # Derived Platform Power triad — ordinal out (ADR-0002), never a decimal to the client.
     triad_economic: StrengthRating | None = None

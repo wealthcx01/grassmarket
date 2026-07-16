@@ -425,6 +425,13 @@ class Registry(BaseModel):
             metrics=self.metrics,
             subcomponent_status=self.subcomponent_status,
             metric_status=self.metric_status,
+            # The C dimension (ADR-0023) is parallel to B/P/L — the profile selects B/P/L modules
+            # only, so C passes through unchanged. The widget taxonomy stays retail-scoped via
+            # `c_widget_profile`; a non-retail view won't match it (widgets_for_profile → ()).
+            c_modules=self.c_modules,
+            c_widgets=self.c_widgets,
+            c_status=self.c_status,
+            c_widget_profile=self.c_widget_profile,
         )
         _assert_unique_keys(view)  # additions must not clash with the superset (fail loud)
         return view

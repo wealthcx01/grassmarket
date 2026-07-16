@@ -39,6 +39,20 @@ def test_retail_view_is_structurally_identical_to_the_superset() -> None:
     assert view.power_keys() == r.power_keys() and view.metric_keys() == r.metric_keys()
 
 
+def test_a_profile_view_carries_the_c_dimension() -> None:
+    # C (ADR-0023) is parallel to B/P/L — the profile view must carry the C modules/widgets, or the
+    # wizard C step and the live C read would be silently empty for every profile-scoped assessment.
+    r = load_registry()
+    for profile_key in ("retail", "exchange"):
+        view = r.for_profile(load_profile(profile_key))
+        assert view.all_c_subcomponent_keys() == r.all_c_subcomponent_keys()
+        assert view.widget_keys() == r.widget_keys()
+    # The retail widget taxonomy stays retail-scoped in every view.
+    exchange_view = r.for_profile(load_profile("exchange"))
+    assert exchange_view.widgets_for_profile("exchange") == ()
+    assert len(r.for_profile(load_profile("retail")).widgets_for_profile("retail")) == 93
+
+
 def test_retail_profile_reproduces_the_golden_master() -> None:
     gm = json.loads(_FIXTURE.read_text())
     r = load_registry()

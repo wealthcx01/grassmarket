@@ -43,6 +43,9 @@ LIVE_DRAWS = 400  # modest draw count for a responsive on-demand live panel
 
 # Core modules the L min-term ranges over (the draft critical-for-L set, GRS-0003).
 _CRITICAL_MODULES_FOR_L = ("APP_SERVER", "BACKOFFICE", "OEMS")
+# Core C modules the C min-term ranges over (the draft critical-for-C set, ADR-0023 — mirrors
+# draft_coefficients._CRITICAL_MODULES_FOR_C). C is scoreable once one of these has a rated sub.
+_CRITICAL_MODULES_FOR_C = ("CUST_ONBOARDING", "CUST_TRADING_EXPERIENCE", "CUST_SECURITY_REGULATION")
 
 
 @dataclass(frozen=True)
@@ -154,6 +157,58 @@ def _complete_inputs(document: AssessmentDocument, registry: Registry) -> Assess
     return AssessmentInputs(subcomponents=tuple(subs), metrics=tuple(metrics), powers=tuple(powers))
 
 
+def complete_c_subcomponents(
+    document: AssessmentDocument, registry: Registry
+) -> tuple[SubcomponentRating, ...]:
+    """Complete the C dimension from a partial document: untouched C subcomponents become Not
+    Assessed (first-class, never zero-filled — D9). C is scored INDEPENDENTLY of B/P/L (ADR-0023
+    Stage 1), so it needs no powers/metrics and can be reported before they are entered."""
+    doc_c = {r.subcomponent_key: r for r in document.c_subcomponents}
+    out: list[SubcomponentRating] = []
+    for module in registry.c_modules:
+        for sub in module.subcomponents:
+            if sub.key in doc_c:
+                out.append(doc_c[sub.key])
+            else:
+                out.append(
+                    SubcomponentRating(
+                        module_key=module.key,
+                        subcomponent_key=sub.key,
+                        state=NonScoreState.NOT_ASSESSED,
+                    )
+                )
+    return tuple(out)
+
+
+def c_scoreable(document: AssessmentDocument, registry: Registry) -> bool:
+    """Whether C can be reported yet (ADR-0023 Stage 1): at least one rated C subcomponent in a
+    critical-for-C module — mirroring the L min-term's need for a rated core subcomponent. Until
+    then C is Not Assessed across the board and `_score_c` would (correctly) refuse."""
+    if not registry.c_modules:
+        return False
+    core = {
+        s.key for k in _CRITICAL_MODULES_FOR_C for s in registry.require_c_module(k).subcomponents
+    }
+    return any(r.level is not None and r.subcomponent_key in core for r in document.c_subcomponents)
+
+
+def c_index_of(document: AssessmentDocument, registry: Registry) -> float | None:
+    """The deterministic C-index for the current document, reported alongside V (ADR-0023 Stage 1),
+    or None when C is not yet scoreable / the registry has no C dimension. C is deterministic in
+    Stage 1 (no Monte Carlo band) and scored INDEPENDENTLY of B/P/L — no powers/metrics required —
+    so it can surface before the rest of the assessment. Routes through the C activation seam."""
+    from grassmarket.atlas import score_customer
+    from grassmarket.atlas.active import active_c_coefficient_set
+
+    if not c_scoreable(document, registry):
+        return None
+    c_coefficients = active_c_coefficient_set(registry)
+    if c_coefficients is None:
+        return None
+    c_subs = complete_c_subcomponents(document, registry)
+    return score_customer(c_subs, c_coefficients, registry).value
+
+
 def _to_metric_obs(m: MetricEntry) -> MetricObservation:
     return MetricObservation(
         metric_key=m.metric_key, raw=m.raw, state=m.state, confidence=m.confidence
@@ -233,11 +288,16 @@ def live_score(
     coefficient_version = coefficients.version
     uncertainty_version = model.version
 
+    # C is reported alongside V and is independent of V-scoreability — a document can have enough C
+    # captured to report C while B/P/L is still blocked, and vice versa (ADR-0023 Stage 1).
+    c = c_index_of(document, registry)
+
     blockers = scoreability_blockers(document, registry)
     if blockers:
         return LiveScore(
             scoreable=False,
             blocking=tuple(blockers),
+            c=c,
             subcomponents_assessed=assessed,
             subcomponents_total=total,
             coverage=coverage,
@@ -256,6 +316,7 @@ def live_score(
         b=_band(unc.b_band),
         p=_band(unc.p_band),
         l_index=_band(unc.l_band),
+        c=c,
         module_qm={k: _band(v) for k, v in unc.module_qm.items()},
         triad_economic=_triad_rating(triad.economic_value.rating),
         triad_perceived=_triad_rating(triad.perceived_value.rating),

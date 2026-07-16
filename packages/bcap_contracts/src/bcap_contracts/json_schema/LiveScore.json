@@ -81,6 +81,20 @@
       "title": "Blocking",
       "type": "array"
     },
+    "c": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "C"
+    },
     "coefficient_version": {
       "title": "Coefficient Version",
       "type": "string"

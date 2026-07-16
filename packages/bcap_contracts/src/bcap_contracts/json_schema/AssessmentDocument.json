@@ -369,11 +369,104 @@
       ],
       "title": "TrendDirection",
       "type": "string"
+    },
+    "WidgetObservation": {
+      "additionalProperties": false,
+      "description": "One Level-1 widget observation for the C-index grid (ADR-0023 / GRS-0083).\n\nA widget is either PRESENT (then scored 1–5 on ease / usability / depth) or NOT present — and a\nnon-present widget can still carry a first-class reason it isn't a clean pass:\n`PRESENT_PAYWALLED` (gated behind a paywall) or `PRESENT_DEFECTIVE` (shipped but broken).\nAbsent-and-nothing-else is `present=False` with no `state`. The rarity tag is NOT stored here:\nit is read from the registry (a single source of truth), never copied onto the observation.",
+      "properties": {
+        "depth": {
+          "anyOf": [
+            {
+              "maximum": 5,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Depth"
+        },
+        "ease": {
+          "anyOf": [
+            {
+              "maximum": 5,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ease"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
+        "present": {
+          "title": "Present",
+          "type": "boolean"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonScoreState"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "usability": {
+          "anyOf": [
+            {
+              "maximum": 5,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Usability"
+        },
+        "widget_key": {
+          "title": "Widget Key",
+          "type": "string"
+        }
+      },
+      "required": [
+        "widget_key",
+        "present"
+      ],
+      "title": "WidgetObservation",
+      "type": "object"
     }
   },
   "additionalProperties": false,
   "description": "The single intermediate schema BOTH Path A (wizard) and Path B (meeting intelligence) feed.\n\nIt is **partial by design**: a half-filled document is valid and persistable (autosave). It is\nNOT the engine input — the engine requires exact registry coverage; the live-score service\ncompletes the missing subcomponents/metrics to Not Assessed (first-class, never zero-filled).",
   "properties": {
+    "c_subcomponents": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SubcomponentRating"
+      },
+      "title": "C Subcomponents",
+      "type": "array"
+    },
     "metrics": {
       "default": [],
       "items": {
@@ -425,6 +518,14 @@
       "default": "",
       "title": "Subject",
       "type": "string"
+    },
+    "widgets": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/WidgetObservation"
+      },
+      "title": "Widgets",
+      "type": "array"
     }
   },
   "title": "AssessmentDocument",

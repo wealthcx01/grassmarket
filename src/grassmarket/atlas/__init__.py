@@ -10,7 +10,7 @@ comes from an injected, seeded RNG, so the golden-master determinism guarantee i
 from __future__ import annotations
 
 from grassmarket.atlas.active import active_coefficient_set, active_uncertainty_model
-from grassmarket.atlas.engine import ENGINE_VERSION, score
+from grassmarket.atlas.engine import ENGINE_VERSION, score, score_customer
 from grassmarket.atlas.inputs import AssessmentInputs, MetricObservation, PowerObservation
 from grassmarket.atlas.montecarlo import (
     DEFAULT_DRAWS,
@@ -26,6 +26,7 @@ from grassmarket.atlas.results import (
     AtlasResult,
     BusinessResult,
     CompositeResult,
+    CustomerResult,
     LResult,
     MetricRow,
     ModuleResult,
@@ -41,12 +42,14 @@ __all__ = [
     "active_coefficient_set",
     "active_uncertainty_model",
     "score",
+    "score_customer",
     "AssessmentInputs",
     "MetricObservation",
     "PowerObservation",
     "AtlasResult",
     "BusinessResult",
     "CompositeResult",
+    "CustomerResult",
     "LResult",
     "MetricRow",
     "ModuleResult",

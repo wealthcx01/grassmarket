@@ -15,6 +15,7 @@ import type {
   PowerEntry,
   StrengthRating,
   SubcomponentRating,
+  WidgetObservation,
 } from "@/lib/types";
 
 const EMPTY_PROFILE: BusinessProfile = {
@@ -42,7 +43,15 @@ export function parseList(raw: string): string[] {
 }
 
 export function emptyDoc(subject = ""): AssessmentDocument {
-  return { subject, subcomponents: [], metrics: [], powers: [], notes: null };
+  return {
+    subject,
+    subcomponents: [],
+    metrics: [],
+    powers: [],
+    c_subcomponents: [],
+    widgets: [],
+    notes: null,
+  };
 }
 
 export function findSub(doc: AssessmentDocument, key: string): SubcomponentRating | undefined {
@@ -138,4 +147,56 @@ export function powerEntry(
     benefit_evidence: benefitEvidence ? benefitEvidence : null,
     barrier_evidence: barrierEvidence ? barrierEvidence : null,
   };
+}
+
+// --- C-index capture (ADR-0023 / GRS-0083) ---------------------------------------------
+// C subcomponent ratings reuse the SubcomponentRating shape and the subAssessed/subState builders
+// above — only the collection differs (c_subcomponents, not subcomponents).
+
+export function findCSub(doc: AssessmentDocument, key: string): SubcomponentRating | undefined {
+  return doc.c_subcomponents.find((s) => s.subcomponent_key === key);
+}
+
+/** Replace (or remove, when `rating` is null) a C subcomponent rating by key. */
+export function setCSub(
+  doc: AssessmentDocument,
+  key: string,
+  rating: SubcomponentRating | null,
+): AssessmentDocument {
+  const rest = doc.c_subcomponents.filter((s) => s.subcomponent_key !== key);
+  return { ...doc, c_subcomponents: rating ? [...rest, rating] : rest };
+}
+
+export function findWidget(doc: AssessmentDocument, key: string): WidgetObservation | undefined {
+  return doc.widgets.find((w) => w.widget_key === key);
+}
+
+/** Upsert (or remove, when `obs` is null) one widget observation by key. */
+export function setWidget(
+  doc: AssessmentDocument,
+  key: string,
+  obs: WidgetObservation | null,
+): AssessmentDocument {
+  const rest = doc.widgets.filter((w) => w.widget_key !== key);
+  return { ...doc, widgets: obs ? [...rest, obs] : rest };
+}
+
+/** A present widget with optional 1–5 ease/usability/depth scores. */
+export function widgetPresent(
+  key: string,
+  scores?: { ease?: number | null; usability?: number | null; depth?: number | null },
+): WidgetObservation {
+  return {
+    widget_key: key,
+    present: true,
+    state: null,
+    ease: scores?.ease ?? null,
+    usability: scores?.usability ?? null,
+    depth: scores?.depth ?? null,
+  };
+}
+
+/** A non-present widget, optionally flagged Present (Paywalled) / Present (Defective). */
+export function widgetAbsent(key: string, state: NonScoreState | null = null): WidgetObservation {
+  return { widget_key: key, present: false, state, ease: null, usability: null, depth: null };
 }
