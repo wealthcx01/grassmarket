@@ -1,7 +1,7 @@
 /**
- * Assessments index (GRS-0010) — the consultant's own assessments (server-scoped by JWT) plus a
- * "New assessment" create. Resume is a click through to the wizard. A partial draft is valid, so
- * everything here is listed regardless of state.
+ * "Your Brokerages" — the advisor's portfolio home (GRS-0071). One row per assessment (server-scoped
+ * by JWT): the business, its segment, its last finalised Platform Value, status, and when it was last
+ * touched. Create a new one or resume a draft — a partial assessment is valid and autosaves.
  */
 
 "use client";
@@ -10,24 +10,40 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+import { toDisplay } from "@/lib/band";
 import { ApiError, api, getToken } from "@/lib/api";
-import type { Assessment } from "@/lib/types";
+import type { BrokeragePortfolioEntry } from "@/lib/types";
 
-const STATE_LABEL: Record<Assessment["state"], string> = {
+const STATE_LABEL: Record<BrokeragePortfolioEntry["state"], string> = {
   draft: "Draft",
   in_progress: "In progress",
   finalised: "Finalised · locked",
 };
 
-export default function AssessmentsPage() {
+function LastScore({ entry }: { entry: BrokeragePortfolioEntry }) {
+  if (entry.v_index == null) {
+    return <span style={{ color: "var(--color-ink-faint)" }}>—</span>;
+  }
+  return (
+    <span style={{ display: "inline-flex", alignItems: "baseline", gap: "0.4rem" }}>
+      <strong className="mono">{toDisplay(entry.v_index).toFixed(1)}</strong>
+      {entry.uncertainty_rating ? (
+        <span className="tag" title="Overall uncertainty of the finalised score">
+          {entry.uncertainty_rating}
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
+export default function BrokeragesPage() {
   const router = useRouter();
-  const [items, setItems] = useState<Assessment[] | null>(null);
+  const [items, setItems] = useState<BrokeragePortfolioEntry[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [subject, setSubject] = useState("");
   const [creating, setCreating] = useState(false);
 
-  // Prefill the subject when arriving from an engagement's "Start an assessment" CTA
-  // (?subject=…). Read from location rather than useSearchParams to avoid a Suspense boundary.
+  // Prefill the subject when arriving from an engagement's "Start an assessment" CTA (?subject=…).
   useEffect(() => {
     const s = new URLSearchParams(window.location.search).get("subject");
     if (s) setSubject(s);
@@ -40,12 +56,12 @@ export default function AssessmentsPage() {
     }
     const ctrl = new AbortController();
     api
-      .listAssessments(ctrl.signal)
+      .brokeragePortfolio(ctrl.signal)
       .then(setItems)
       .catch((err: unknown) => {
         if (err instanceof ApiError && err.status === 0) return;
         if (err instanceof ApiError && err.status === 401) return router.replace("/login");
-        setError(err instanceof ApiError ? err.message : "Could not load assessments.");
+        setError(err instanceof ApiError ? err.message : "Could not load your brokerages.");
       });
     return () => ctrl.abort();
   }, [router]);
@@ -67,16 +83,13 @@ export default function AssessmentsPage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
       <section>
-        <p
-          className="mono"
-          style={{ margin: 0, fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-ink-muted)" }}
-        >
+        <p className="eyebrow" style={{ margin: 0 }}>
           ATLAS · Path A (manual)
         </p>
-        <h1 style={{ fontSize: "2rem", margin: "0.3rem 0 0.4rem" }}>Assessments</h1>
-        <p style={{ margin: 0, color: "var(--color-ink-muted)", maxWidth: "38rem" }}>
-          Your assessments only. Start a new one or resume a draft — a partial assessment is valid and
-          autosaves as you go.
+        <h1 style={{ fontSize: "2rem", margin: "0.3rem 0 0.4rem" }}>Your Brokerages</h1>
+        <p style={{ margin: 0, color: "var(--color-ink-muted)", maxWidth: "40rem" }}>
+          Your portfolio of assessments. Start a new one or resume a draft — a partial assessment is
+          valid and autosaves. A score appears once the assessment is finalised.
         </p>
       </section>
 
@@ -86,7 +99,7 @@ export default function AssessmentsPage() {
       >
         <label style={{ fontSize: "0.85rem", flex: "1 1 20rem" }}>
           <span style={{ display: "block", marginBottom: "0.3rem", fontWeight: 500 }}>
-            New assessment — subject (business name)
+            New brokerage — subject (business name)
           </span>
           <input
             type="text"
@@ -117,60 +130,63 @@ export default function AssessmentsPage() {
       ) : null}
 
       <section>
-        <h2 style={{ fontSize: "1.05rem", marginBottom: "1rem" }}>Your assessments</h2>
+        <h2 style={{ fontSize: "1.05rem", marginBottom: "1rem" }}>Portfolio</h2>
         {items === null ? (
           <p style={{ color: "var(--color-ink-muted)" }}>Loading…</p>
         ) : items.length === 0 ? (
           <p style={{ color: "var(--color-ink-muted)" }}>
-            No assessments yet. Create one above to begin.
+            No brokerages yet. Create one above to begin.
           </p>
         ) : (
-          <ul
-            style={{
-              listStyle: "none",
-              margin: 0,
-              padding: 0,
-              display: "grid",
-              gap: "0.75rem",
-              gridTemplateColumns: "repeat(auto-fill, minmax(18rem, 1fr))",
-            }}
-          >
-            {items.map((a) => (
-              <li key={a.id}>
-                <Link
-                  href={`/assessments/${a.id}`}
-                  style={{
-                    display: "block",
-                    height: "100%",
-                    padding: "0.9rem 1rem",
-                    background: "var(--color-paper-raised)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: "var(--radius)",
-                    textDecoration: "none",
-                    color: "inherit",
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.5rem" }}>
-                    <span style={{ fontFamily: "var(--font-serif)", fontWeight: 600, fontSize: "1.05rem" }}>
-                      {a.subject || "Untitled"}
-                    </span>
-                    <span
-                      className="mono"
-                      style={{
-                        fontSize: "0.62rem",
-                        color: a.state === "finalised" ? "var(--color-accent)" : "var(--color-ink-muted)",
-                      }}
-                    >
-                      {STATE_LABEL[a.state]}
-                    </span>
-                  </div>
-                  <p style={{ margin: "0.4rem 0 0", fontSize: "0.75rem", color: "var(--color-ink-muted)" }}>
-                    Updated {new Date(a.updated_at).toLocaleString()}
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.88rem" }}>
+              <thead>
+                <tr style={{ textAlign: "left", color: "var(--color-ink-muted)", fontSize: "0.78rem" }}>
+                  <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }}>Brokerage</th>
+                  <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }}>Segment</th>
+                  <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }} title="Last finalised Platform Value (0–100)">
+                    Last score
+                  </th>
+                  <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }}>Status</th>
+                  <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }}>Last updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((e) => (
+                  <tr key={e.assessment_id} style={{ borderTop: "1px solid var(--color-border)" }}>
+                    <td style={{ padding: "0.55rem 0.6rem" }}>
+                      <Link
+                        href={`/assessments/${e.assessment_id}`}
+                        style={{ fontFamily: "var(--font-serif)", fontWeight: 600, color: "inherit", textDecoration: "none" }}
+                      >
+                        {e.subject || "Untitled"}
+                      </Link>
+                    </td>
+                    <td style={{ padding: "0.55rem 0.6rem", color: e.segment ? "inherit" : "var(--color-ink-faint)" }}>
+                      {e.segment ?? "—"}
+                    </td>
+                    <td style={{ padding: "0.55rem 0.6rem" }}>
+                      <LastScore entry={e} />
+                    </td>
+                    <td style={{ padding: "0.55rem 0.6rem" }}>
+                      <span
+                        className="mono"
+                        style={{
+                          fontSize: "0.7rem",
+                          color: e.state === "finalised" ? "var(--color-accent)" : "var(--color-ink-muted)",
+                        }}
+                      >
+                        {STATE_LABEL[e.state]}
+                      </span>
+                    </td>
+                    <td className="mono" style={{ padding: "0.55rem 0.6rem", fontSize: "0.78rem", color: "var(--color-ink-muted)" }}>
+                      {new Date(e.updated_at).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
 

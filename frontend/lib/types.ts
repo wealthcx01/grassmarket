@@ -99,6 +99,18 @@ export interface Assessment {
   updated_at: string;
 }
 
+/** One row of the "Your Brokerages" portfolio (GRS-0071). v_index is the last finalised V (P50). */
+export interface BrokeragePortfolioEntry {
+  assessment_id: string;
+  subject: string;
+  segment?: string | null;
+  state: AssessmentState;
+  v_index?: number | null;
+  uncertainty_rating?: UncertaintyRating | null;
+  finalised_at?: string | null;
+  updated_at: string;
+}
+
 /** P10/P50/P90 band + the ADR-0008 honesty flag. modelled=false ⟹ a point estimate. */
 export interface IndexBand {
   p10: number;

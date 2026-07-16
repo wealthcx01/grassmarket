@@ -17,6 +17,7 @@ import type {
   Assessment,
   AssessmentDocument,
   BenchQueue,
+  BrokeragePortfolioEntry,
   CalibrationRating,
   CalibrationResult,
   CalibrationSession,
@@ -184,6 +185,14 @@ export const api = {
 
   listAssessments(signal?: AbortSignal): Promise<Assessment[]> {
     return request<Assessment[]>("/assessments", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  brokeragePortfolio(signal?: AbortSignal): Promise<BrokeragePortfolioEntry[]> {
+    return request<BrokeragePortfolioEntry[]>("/assessments/portfolio", {
       method: "GET",
       headers: authHeaders(),
       signal,

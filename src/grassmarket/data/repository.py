@@ -35,6 +35,7 @@ from bcap_contracts.assessments import (
     Assessment,
     AssessmentDocument,
     AssessmentState,
+    BrokeragePortfolioEntry,
     ModuleRatingDraft,
     ScoringRun,
     SubcomponentRating,
@@ -2023,6 +2024,36 @@ class Repository:
             self._assert_can_access(principal, row.owner_consultant_id)  # belt and braces
             out.append(self._to_assessment(row))
         return out
+
+    def list_brokerage_portfolio(self, principal: Principal) -> list[BrokeragePortfolioEntry]:
+        """The advisor's "Your Brokerages" portfolio (GRS-0071): one summary row per assessment,
+        newest-touched first, each carrying its segment (from the business profile) and — when
+        finalised — its last Platform Value + uncertainty rating from the immutable scoring run.
+        Reuses `list_assessments` for scoping, so the owner-only guarantee is inherited, not
+        re-implemented."""
+        entries: list[BrokeragePortfolioEntry] = []
+        for a in self.list_assessments(principal):
+            v_index = None
+            uncertainty_rating = None
+            if a.scoring_run_id is not None:
+                run = self.get_scoring_run(principal, a.scoring_run_id)  # own + exists
+                v_index = run.v_index
+                uncertainty_rating = run.uncertainty_rating
+            segment = a.document.profile.segment if a.document.profile else None
+            entries.append(
+                BrokeragePortfolioEntry(
+                    assessment_id=a.id,
+                    subject=a.subject or "Untitled assessment",
+                    segment=segment,
+                    state=a.state,
+                    v_index=v_index,
+                    uncertainty_rating=uncertainty_rating,
+                    finalised_at=a.finalised_at,
+                    updated_at=a.updated_at,
+                )
+            )
+        entries.sort(key=lambda e: e.updated_at, reverse=True)
+        return entries
 
     def list_assessments_for_committee(self, principal: Principal) -> list[Assessment]:
         """Every in-progress assessment across owners — so a committee member/admin can find the
