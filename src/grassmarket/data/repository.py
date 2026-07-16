@@ -123,6 +123,7 @@ from bcap_contracts.pipeline import assert_legal_transition
 from bcap_contracts.predictions import (
     BenchmarkRow,
     BenchmarkSector,
+    CBenchmarkRow,
     Prediction,
     PredictionOutcome,
 )
@@ -141,6 +142,7 @@ from grassmarket.data.models import (
     BenchmarkRowORM,
     CalibrationRatingORM,
     CalibrationSessionORM,
+    CBenchmarkRowORM,
     CertificationEventORM,
     CertificationRecordORM,
     CommissionLineORM,
@@ -1517,6 +1519,100 @@ class Repository:
             methodology_version=row.methodology_version,
             coefficient_version=row.coefficient_version,
             sector=BenchmarkSector(row.sector) if row.sector else None,
+            ingested_at=row.ingested_at,
+        )
+
+    # ------------------------------------------------------ C benchmark set (ADR-0023 / GRS-0084)
+    def propose_c_benchmark_row(
+        self,
+        principal: Principal,
+        *,
+        peer_name: str,
+        profile_key: str,
+        c_index: float,
+        module_scores: dict[str, float],
+        methodology_version: str,
+        coefficient_version: str,
+        source_ref: str | None,
+        now: datetime,
+    ) -> CBenchmarkRow:
+        """Propose a C benchmark row for a named public-app peer (ADR-0023). The row is created
+        UNAPPROVED (ADR-0009 / CLAUDE.md #8: AI/consultant proposes, a human approves) — it is not
+        live for comparison until :meth:`approve_c_benchmark_row` records a sign-off. Any consultant
+        may propose; the peer set is a shared org-wide reference (peers are public apps, not client
+        data)."""
+        row = CBenchmarkRowORM(
+            peer_name=peer_name,
+            profile_key=profile_key,
+            c_index=c_index,
+            module_scores=dict(module_scores),
+            methodology_version=methodology_version,
+            coefficient_version=coefficient_version,
+            source_ref=source_ref,
+            approved=False,
+            approved_by=None,
+            approved_at=None,
+            ingested_at=now,
+        )
+        self._session.add(row)
+        self._session.flush()
+        return self._to_c_benchmark_row(row)
+
+    def approve_c_benchmark_row(
+        self, principal: Principal, row_id: UUID, *, now: datetime
+    ) -> CBenchmarkRow:
+        """Record the ADR-0009 human approval that makes a proposed row live. Idempotent-safe:
+        re-approving an approved row keeps the ORIGINAL approver/timestamp (the recorded first
+        sign-off is the auditable fact, never silently overwritten)."""
+        row = self._session.get(CBenchmarkRowORM, row_id)
+        if row is None:
+            raise NotFoundError(f"C benchmark row {row_id} not found.")
+        if not row.approved:
+            row.approved = True
+            row.approved_by = principal.consultant_id
+            row.approved_at = now
+            self._session.flush()
+        return self._to_c_benchmark_row(row)
+
+    def list_c_benchmark_rows(
+        self,
+        *,
+        approved_only: bool = True,
+        profile_key: str | None = None,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> list[CBenchmarkRow]:
+        """The C benchmark peer set — a shared org-wide reference (not owner-scoped). By default
+        only APPROVED rows (the live comparison set, ADR-0009); pass ``approved_only=False`` to
+        include pending proposals (e.g. an approval queue). Optionally filtered to one operating-
+        model profile so a subject only compares against same-profile peers."""
+        stmt = select(CBenchmarkRowORM)
+        if approved_only:
+            stmt = stmt.where(CBenchmarkRowORM.approved.is_(True))
+        if profile_key is not None:
+            stmt = stmt.where(CBenchmarkRowORM.profile_key == profile_key)
+        stmt = (
+            stmt.order_by(CBenchmarkRowORM.c_index.desc())
+            .limit(_clamp_limit(limit))
+            .offset(max(0, offset))
+        )
+        rows = self._session.execute(stmt).scalars().all()
+        return [self._to_c_benchmark_row(r) for r in rows]
+
+    @staticmethod
+    def _to_c_benchmark_row(row: CBenchmarkRowORM) -> CBenchmarkRow:
+        return CBenchmarkRow(
+            id=row.id,
+            peer_name=row.peer_name,
+            profile_key=row.profile_key,
+            c_index=row.c_index,
+            module_scores=dict(row.module_scores or {}),
+            methodology_version=row.methodology_version,
+            coefficient_version=row.coefficient_version,
+            source_ref=row.source_ref,
+            approved=row.approved,
+            approved_by=row.approved_by,
+            approved_at=row.approved_at,
             ingested_at=row.ingested_at,
         )
 

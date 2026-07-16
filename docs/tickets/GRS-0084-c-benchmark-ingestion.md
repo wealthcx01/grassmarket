@@ -1,5 +1,47 @@
 # GRS-0084 — C benchmark ingestion (7 scored reviews)
 
+**Status:** Shipped
+**Loop:** Loop 7 — C-index (Customer Proposition)
+**Depends on:** GRS-0080/0082, ADR-0023, ADR-0009, ATLAS-Methodology-v1.3
+**Branch:** `grs-0084-c-benchmark-ingestion`
+
+## What shipped
+
+The C benchmark **ingestion machinery** — a NAMED public-app peer set, approval-gated — so a subject's
+C index ships with peer context. Two honest boundaries held:
+
+- **No client data committed.** The seven scored reviews are the founder's IP (read reference-only,
+  never committed). This ticket ships the *machinery*; the operator feeds each review's C ratings in
+  and the real scores never live in the repo. Tests use synthetic ratings.
+- **AI proposes, humans approve (ADR-0009 / CLAUDE.md #8).** Ingestion only *proposes* a row; a
+  consultant records the approval that makes it live.
+
+Files:
+- **`CBenchmarkRow`** (`predictions.py`) — a named peer's C score: `peer_name` (public app),
+  `profile_key`, `c_index`, per-C-module `module_scores`, versions, `source_ref` (a non-committed
+  provenance pointer), and `approved`/`approved_by`/`approved_at`. Contract invariant: `approved` ⟺
+  both approval stamps present (ADR-0009).
+- **`CBenchmarkRowORM`** + migration `0022_c_benchmark_rows` (JSON `module_scores`, FK approver,
+  profile index).
+- **Repository** — `propose_c_benchmark_row` (creates UNAPPROVED), `approve_c_benchmark_row`
+  (records the sign-off; keeps the original approver on re-approve), `list_c_benchmark_rows`
+  (`approved_only` default True; optional `profile_key` filter; a shared org-wide reference, not
+  owner-scoped — peers are public).
+- **`atlas/c_benchmark.py`** — `c_benchmark_proposal` scores a peer's C ratings via `score_customer`
+  (fail-loud: unknown/missing C key aborts, never a silent drop); `c_peer_comparison` positions a
+  subject (percentile = share of peers beaten; None on an empty set); `C_BENCHMARK_PEER_ROSTER` (the
+  7 public peers). The 9 unscored apps are documented as the next content batch, not built here.
+
+## Acceptance / verification
+
+`tests/test_c_benchmark.py` — ingestion scores a peer + validates keys fail-loud; incomplete C
+coverage refuses; the roster lists 7; a proposed row is not live until approved and the approval is
+recorded; approving a missing row fails loud; the contract refuses an unstamped `approved=True`; the
+peer set is a shared org-wide reference; peer comparison positions a subject. Golden master unchanged;
+schema parity green; pyright + ruff clean.
+
+## Original plan
+
 **Status:** Planned
 **Loop:** Loop 7 — C-index (Customer Proposition)
 **Depends on:** ADR-0023 (Accepted), ATLAS-Methodology-v1.3
