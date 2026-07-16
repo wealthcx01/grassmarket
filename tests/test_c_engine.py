@@ -172,3 +172,37 @@ def test_missing_c_subcomponent_input_is_refused(registry: Registry) -> None:
     incomplete: AssessmentInputs = bpl.model_copy(update={"c_subcomponents": ratings})
     with pytest.raises(ValueError, match="c_subcomponent"):
         score(incomplete, coeffs, registry)
+
+
+# --- Stage 2 / v1.4: fold C into V (ADR-0023, GRS-0086) ---------------------------------
+
+
+def test_theta_c_without_scoring_c_is_refused(registry: Registry) -> None:
+    # θ_C weights C into V; a set that weights C but does not compute it would fold a defaulted
+    # θ_C·0 — refused at construction (never a silent default).
+    base = draft_v1_coefficient_set(registry)  # scores_c False, theta_c None
+    with pytest.raises(ValueError, match="does not score C|θ_C"):
+        CoefficientSet(**{**base.model_dump(), "theta_c": 0.15})
+
+
+def test_four_index_theta_sum_must_equal_one(registry: Registry) -> None:
+    base = draft_v1_coefficient_set(registry, score_c=True)
+    # θ_B+θ_P+θ_L+θ_C = 0.30+0.30+0.40+0.15 = 1.15 ≠ 1 → refused.
+    with pytest.raises(ValueError, match="Σθ"):
+        CoefficientSet(**{**base.model_dump(), "theta_c": 0.15})
+
+
+def test_c_is_not_folded_into_v_without_theta_c(registry: Registry) -> None:
+    # A scores_c set with θ_C absent is Stage 1: C is reported, NOT summed. V stays three-index —
+    # the load-bearing guarantee that C never silently enters V without an elicited θ_C.
+    coeffs = draft_v1_coefficient_set(registry, score_c=True)  # theta_c None
+    _, with_c = _inputs_with_c(registry)
+    result = score(with_c, coeffs, registry)
+    v_three_index = round(
+        coeffs.theta_b * result.composite.b_index
+        + coeffs.theta_p * result.composite.p_index
+        + coeffs.theta_l * result.composite.l_index,
+        6,
+    )
+    assert result.composite.v_index == v_three_index  # C reported (c_index set) but not in V
+    assert result.composite.c_index is not None
