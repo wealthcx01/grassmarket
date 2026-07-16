@@ -1,8 +1,29 @@
 # GRS-0094 — Primer: the 7 Powers (Helmer)
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** GRS-0069 (`lib/powerGuidance.ts` per-power content)
+**Branch:** `grs-0094-primer-seven-powers`
+
+## What shipped
+
+A new **"The seven Powers, one by one"** section in the primer (`app/guide/page.tsx`) that names and
+explains each of Helmer's seven Powers:
+
+- A card per power — Scale Economies, Network Economies, Counter-Positioning, Switching Costs, Branding,
+  Cornered Resource, Process Power — each showing its **Benefit**, **Barrier**, and an illustrative
+  brokerage **Example**, plus a **lifecycle-stage** badge (Origination / Take-off / Stability).
+- The **benefit/barrier/example text is reused from `lib/powerGuidance.ts`** (GRS-0069) — imported, not
+  re-authored — so the primer and the wizard's 7-Powers step stay consistent. Names + lifecycle stages
+  match the registry (`powers.yaml`).
+- A lead paragraph explains **lifecycle-stage fit** (which powers are even *available* at a platform's
+  age) and a closing note reinforces the **weaker-side rule** (the score is the weaker of benefit and
+  barrier — a benefit with a crossable barrier is a head start, not a power).
+
+## Acceptance / verification
+
+All seven powers are named and explained with benefit vs. barrier, the weaker-side rule, and
+lifecycle-stage fit, reusing `powerGuidance.ts`. Frontend type-check · lint · vitest green.
 
 ## Why
 
