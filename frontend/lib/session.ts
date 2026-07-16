@@ -34,12 +34,23 @@ function decodePayload(token: string): Record<string, unknown> | null {
   }
 }
 
-/** The current session from the stored token, or null when signed out / token malformed. */
+/** True when the token's `exp` (seconds) is in the past. A malformed/absent exp is treated as
+ *  expired — a token we cannot vouch for is not a live session (GRS-0120). */
+function isExpired(claims: Record<string, unknown>): boolean {
+  const exp = claims.exp;
+  if (typeof exp !== "number") return true;
+  return exp * 1000 <= Date.now();
+}
+
+/** The current session from the stored token, or null when signed out / token malformed / EXPIRED.
+ *  Treating an expired token as signed-out stops the chrome from showing signed-in while every API
+ *  call 401s (GRS-0120) — the confusing symptom advisers reported. */
 export function getSession(): Session | null {
   const token = getToken();
   if (!token) return null;
   const claims = decodePayload(token);
   if (!claims) return null;
+  if (isExpired(claims)) return null;
 
   const role = claims.role as Role | undefined;
   const level = claims.assessor_level as AssessorLevel | undefined;

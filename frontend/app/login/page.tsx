@@ -3,12 +3,7 @@
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
-import { API_BASE_URL, ApiError, api } from "@/lib/api";
-
-// Placeholder token storage key. Loop 6 replaces this with real session management
-// (httpOnly cookie / refresh flow matching the Holy Corner claim shape). Storing an
-// access token in localStorage is a skeleton stand-in only.
-const TOKEN_KEY = "bas.access_token";
+import { API_BASE_URL, ApiError, api, setTokens } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -29,9 +24,9 @@ export default function LoginPage() {
     let cancelled = false;
     (async () => {
       try {
-        const { access_token } = await api.exchangeSession(code);
+        const { access_token, refresh_token } = await api.exchangeSession(code);
         if (cancelled) return;
-        window.localStorage.setItem(TOKEN_KEY, access_token);
+        setTokens(access_token, refresh_token);
         router.push("/");
       } catch (err: unknown) {
         if (cancelled) return;
@@ -48,10 +43,8 @@ export default function LoginPage() {
     setError(null);
     setSubmitting(true);
     try {
-      const { access_token } = await api.login({ email, password });
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(TOKEN_KEY, access_token);
-      }
+      const { access_token, refresh_token } = await api.login({ email, password });
+      setTokens(access_token, refresh_token);
       router.push("/");
     } catch (err: unknown) {
       const message =

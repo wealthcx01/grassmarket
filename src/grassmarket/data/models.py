@@ -102,6 +102,26 @@ class LoginHandoffCodeORM(Base):
     )
 
 
+class RefreshTokenORM(Base):
+    """A long-lived, single-use, rotated refresh token (GRS-0120). Mints a fresh access token (and a
+    new refresh token) so an active advisor is not signed out at the 30-min TTL. Only the HASH
+    is stored (like invite/handoff codes); `consumed_at` enforces single use — a used token is dead,
+    and rotation issues its successor. `revoked_at` supports a future explicit logout/all-sessions
+    revoke without weakening the single-use invariant."""
+
+    __tablename__ = "refresh_tokens"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
+    consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    consumed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
 class ProspectORM(Base):
     __tablename__ = "prospects"
 
