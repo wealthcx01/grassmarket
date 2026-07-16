@@ -38,86 +38,78 @@ export default function RootLayout({
       className={`${sourceSerif.variable} ${inter.variable} ${ibmPlexMono.variable}`}
     >
       <body>
+        {/* BC site chrome: paper header + hairline rule (not a colour bar), the Bruntsfield
+            wordmark lockup with the "ADVISORY" sub-label in accent green. Matches the
+            bruntsfield.capital header so the login redirect reads as one continuous site. */}
         <header
           style={{
             position: "sticky",
             top: 0,
             zIndex: 50,
-            height: "var(--topbar-height)",
+            minHeight: "var(--topbar-height)",
             display: "flex",
             alignItems: "center",
-            gap: "0.75rem",
+            gap: "1rem",
             padding: "0 1.5rem",
-            background: "var(--color-accent)",
-            color: "var(--color-accent-contrast)",
-            boxShadow: "0 1px 0 rgba(0,0,0,0.15), 0 6px 20px rgba(26,59,38,0.12)",
+            background: "var(--color-paper)",
+            color: "var(--color-ink)",
+            borderBottom: "1px solid var(--color-border)",
           }}
         >
           <Link
             href="/"
+            aria-label="Bruntsfield Advisory — home"
             style={{
               display: "inline-flex",
-              alignItems: "center",
-              gap: "0.6rem",
+              flexDirection: "column",
+              justifyContent: "center",
+              lineHeight: 1,
               color: "inherit",
               textDecoration: "none",
             }}
           >
             <span
-              aria-hidden
               style={{
-                width: "1.4rem",
-                height: "1.4rem",
-                borderRadius: "5px",
-                background: "var(--color-accent-contrast)",
-                color: "var(--color-accent)",
                 fontFamily: "var(--font-serif)",
-                fontWeight: 700,
-                fontSize: "0.95rem",
-                display: "grid",
-                placeItems: "center",
-                lineHeight: 1,
+                fontWeight: 500,
+                fontSize: "1.35rem",
+                letterSpacing: "-0.012em",
+                color: "var(--color-ink)",
               }}
             >
-              B
+              Bruntsfield
             </span>
             <span
               style={{
-                fontFamily: "var(--font-serif)",
-                fontWeight: 600,
-                fontSize: "1rem",
-                letterSpacing: "0.01em",
+                fontFamily: "var(--font-sans)",
+                fontWeight: 500,
+                fontSize: "0.62rem",
+                letterSpacing: "0.42em",
+                textTransform: "uppercase",
+                color: "var(--color-accent)",
+                marginTop: "3px",
               }}
             >
-              Bruntsfield Advisor Studio
+              Advisory
             </span>
           </Link>
+
+          <span className="eyebrow" style={{ marginLeft: "auto" }}>
+            <span className="eyebrow-id">02</span> — Advisory
+          </span>
           <Link
             href="/help"
             style={{
-              marginLeft: "auto",
-              color: "inherit",
+              color: "var(--color-ink-soft)",
               textDecoration: "none",
               fontSize: "0.85rem",
-              opacity: 0.92,
-              padding: "0.3rem 0.7rem",
-              border: "1px solid rgba(255,255,255,0.28)",
-              borderRadius: "999px",
+              padding: "0.3rem 0.75rem",
+              border: "1px solid var(--color-border-strong)",
+              borderRadius: "var(--radius-pill)",
             }}
           >
             Guide
           </Link>
-          <span
-            className="mono"
-            style={{
-              fontSize: "0.68rem",
-              opacity: 0.72,
-              textTransform: "uppercase",
-              letterSpacing: "0.1em",
-            }}
-          >
-            Grassmarket
-          </span>
         </header>
         <main
           style={{
