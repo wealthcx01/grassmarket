@@ -1,0 +1,1415 @@
+# C rubric anchors (ADR-0023 / GRS-0081) — a full §4 anchor set for every Customer-
+# Proposition subcomponent across the 10 Phase-E modules, at all four maturity levels.
+#
+# STATUS: draft-pending-ratification. Authored as DRAFT (statement from the subcomponent
+# theme via the standard §4 maturity ladder) — NOT ratified. The founder ratifies the
+# language against the seven completed Brokerage-App-Reviews checklists (OneDrive,
+# reference-only, never committed). Every (subcomponent, level) pair is present, so the
+# fail-loud loader stays green; no B/P/L anchor is touched.
+status: draft-pending-ratification
+
+anchors:
+  - subcomponent_key: CUST_ONBOARDING_SPEED_TIME_TO_TRADE
+    level: Basic
+    status: draft
+    statement: "Speed / time-to-first-trade is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is speed / time-to-first-trade a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_ONBOARDING_SPEED_TIME_TO_TRADE
+    level: Developing
+    status: draft
+    statement: "Speed / time-to-first-trade is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is speed / time-to-first-trade a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_ONBOARDING_SPEED_TIME_TO_TRADE
+    level: Advanced
+    status: draft
+    statement: "Speed / time-to-first-trade is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is speed / time-to-first-trade a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_ONBOARDING_SPEED_TIME_TO_TRADE
+    level: Frontier
+    status: draft
+    statement: "Speed / time-to-first-trade is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is speed / time-to-first-trade a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_ONBOARDING_KYC_FRICTION
+    level: Basic
+    status: draft
+    statement: "KYC & verification friction is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is kyc & verification friction a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_ONBOARDING_KYC_FRICTION
+    level: Developing
+    status: draft
+    statement: "KYC & verification friction is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is kyc & verification friction a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_ONBOARDING_KYC_FRICTION
+    level: Advanced
+    status: draft
+    statement: "KYC & verification friction is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is kyc & verification friction a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_ONBOARDING_KYC_FRICTION
+    level: Frontier
+    status: draft
+    statement: "KYC & verification friction is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is kyc & verification friction a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_ONBOARDING_FUNDING_EASE
+    level: Basic
+    status: draft
+    statement: "Funding & first-deposit ease is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is funding & first-deposit ease a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_ONBOARDING_FUNDING_EASE
+    level: Developing
+    status: draft
+    statement: "Funding & first-deposit ease is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is funding & first-deposit ease a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_ONBOARDING_FUNDING_EASE
+    level: Advanced
+    status: draft
+    statement: "Funding & first-deposit ease is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is funding & first-deposit ease a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_ONBOARDING_FUNDING_EASE
+    level: Frontier
+    status: draft
+    statement: "Funding & first-deposit ease is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is funding & first-deposit ease a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_ONBOARDING_GUIDANCE_CLARITY
+    level: Basic
+    status: draft
+    statement: "Guidance & clarity is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is guidance & clarity a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_ONBOARDING_GUIDANCE_CLARITY
+    level: Developing
+    status: draft
+    statement: "Guidance & clarity is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is guidance & clarity a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_ONBOARDING_GUIDANCE_CLARITY
+    level: Advanced
+    status: draft
+    statement: "Guidance & clarity is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is guidance & clarity a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_ONBOARDING_GUIDANCE_CLARITY
+    level: Frontier
+    status: draft
+    statement: "Guidance & clarity is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is guidance & clarity a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_UI_NAVIGATION_LAYOUT_LOGIC
+    level: Basic
+    status: draft
+    statement: "Layout logic & IA is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is layout logic & ia a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_UI_NAVIGATION_LAYOUT_LOGIC
+    level: Developing
+    status: draft
+    statement: "Layout logic & IA is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is layout logic & ia a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_UI_NAVIGATION_LAYOUT_LOGIC
+    level: Advanced
+    status: draft
+    statement: "Layout logic & IA is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is layout logic & ia a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_UI_NAVIGATION_LAYOUT_LOGIC
+    level: Frontier
+    status: draft
+    statement: "Layout logic & IA is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is layout logic & ia a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_UI_NAVIGATION_VISUAL_DESIGN
+    level: Basic
+    status: draft
+    statement: "Visual design & polish is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is visual design & polish a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_UI_NAVIGATION_VISUAL_DESIGN
+    level: Developing
+    status: draft
+    statement: "Visual design & polish is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is visual design & polish a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_UI_NAVIGATION_VISUAL_DESIGN
+    level: Advanced
+    status: draft
+    statement: "Visual design & polish is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is visual design & polish a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_UI_NAVIGATION_VISUAL_DESIGN
+    level: Frontier
+    status: draft
+    statement: "Visual design & polish is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is visual design & polish a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_UI_NAVIGATION_CUSTOMISATION
+    level: Basic
+    status: draft
+    statement: "Customisation & layouts is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is customisation & layouts a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_UI_NAVIGATION_CUSTOMISATION
+    level: Developing
+    status: draft
+    statement: "Customisation & layouts is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is customisation & layouts a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_UI_NAVIGATION_CUSTOMISATION
+    level: Advanced
+    status: draft
+    statement: "Customisation & layouts is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is customisation & layouts a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_UI_NAVIGATION_CUSTOMISATION
+    level: Frontier
+    status: draft
+    statement: "Customisation & layouts is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is customisation & layouts a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_UI_NAVIGATION_PORTFOLIO_VIEW
+    level: Basic
+    status: draft
+    statement: "Portfolio & positions view is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is portfolio & positions view a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_UI_NAVIGATION_PORTFOLIO_VIEW
+    level: Developing
+    status: draft
+    statement: "Portfolio & positions view is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is portfolio & positions view a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_UI_NAVIGATION_PORTFOLIO_VIEW
+    level: Advanced
+    status: draft
+    statement: "Portfolio & positions view is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is portfolio & positions view a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_UI_NAVIGATION_PORTFOLIO_VIEW
+    level: Frontier
+    status: draft
+    statement: "Portfolio & positions view is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is portfolio & positions view a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_TRADING_EXPERIENCE_ORDER_TYPES
+    level: Basic
+    status: draft
+    statement: "Order-type coverage is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is order-type coverage a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_TRADING_EXPERIENCE_ORDER_TYPES
+    level: Developing
+    status: draft
+    statement: "Order-type coverage is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is order-type coverage a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_TRADING_EXPERIENCE_ORDER_TYPES
+    level: Advanced
+    status: draft
+    statement: "Order-type coverage is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is order-type coverage a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_TRADING_EXPERIENCE_ORDER_TYPES
+    level: Frontier
+    status: draft
+    statement: "Order-type coverage is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is order-type coverage a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_TRADING_EXPERIENCE_EXECUTION_FLOW
+    level: Basic
+    status: draft
+    statement: "Execution flow & feedback is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is execution flow & feedback a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_TRADING_EXPERIENCE_EXECUTION_FLOW
+    level: Developing
+    status: draft
+    statement: "Execution flow & feedback is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is execution flow & feedback a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_TRADING_EXPERIENCE_EXECUTION_FLOW
+    level: Advanced
+    status: draft
+    statement: "Execution flow & feedback is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is execution flow & feedback a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_TRADING_EXPERIENCE_EXECUTION_FLOW
+    level: Frontier
+    status: draft
+    statement: "Execution flow & feedback is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is execution flow & feedback a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_TRADING_EXPERIENCE_FEE_TRANSPARENCY_AT_TRADE
+    level: Basic
+    status: draft
+    statement: "Fee transparency at trade is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is fee transparency at trade a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_TRADING_EXPERIENCE_FEE_TRANSPARENCY_AT_TRADE
+    level: Developing
+    status: draft
+    statement: "Fee transparency at trade is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is fee transparency at trade a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_TRADING_EXPERIENCE_FEE_TRANSPARENCY_AT_TRADE
+    level: Advanced
+    status: draft
+    statement: "Fee transparency at trade is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is fee transparency at trade a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_TRADING_EXPERIENCE_FEE_TRANSPARENCY_AT_TRADE
+    level: Frontier
+    status: draft
+    statement: "Fee transparency at trade is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is fee transparency at trade a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_TRADING_EXPERIENCE_REALTIME_FEEDBACK
+    level: Basic
+    status: draft
+    statement: "Real-time confirmation is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is real-time confirmation a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_TRADING_EXPERIENCE_REALTIME_FEEDBACK
+    level: Developing
+    status: draft
+    statement: "Real-time confirmation is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is real-time confirmation a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_TRADING_EXPERIENCE_REALTIME_FEEDBACK
+    level: Advanced
+    status: draft
+    statement: "Real-time confirmation is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is real-time confirmation a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_TRADING_EXPERIENCE_REALTIME_FEEDBACK
+    level: Frontier
+    status: draft
+    statement: "Real-time confirmation is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is real-time confirmation a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_PRODUCT_RANGE_ASSET_CLASSES
+    level: Basic
+    status: draft
+    statement: "Asset-class breadth is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is asset-class breadth a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_PRODUCT_RANGE_ASSET_CLASSES
+    level: Developing
+    status: draft
+    statement: "Asset-class breadth is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is asset-class breadth a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_PRODUCT_RANGE_ASSET_CLASSES
+    level: Advanced
+    status: draft
+    statement: "Asset-class breadth is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is asset-class breadth a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_PRODUCT_RANGE_ASSET_CLASSES
+    level: Frontier
+    status: draft
+    statement: "Asset-class breadth is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is asset-class breadth a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_PRODUCT_RANGE_FRACTIONAL
+    level: Basic
+    status: draft
+    statement: "Fractional & small-lot is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is fractional & small-lot a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_PRODUCT_RANGE_FRACTIONAL
+    level: Developing
+    status: draft
+    statement: "Fractional & small-lot is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is fractional & small-lot a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_PRODUCT_RANGE_FRACTIONAL
+    level: Advanced
+    status: draft
+    statement: "Fractional & small-lot is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is fractional & small-lot a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_PRODUCT_RANGE_FRACTIONAL
+    level: Frontier
+    status: draft
+    statement: "Fractional & small-lot is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is fractional & small-lot a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_PRODUCT_RANGE_GLOBAL_ACCESS
+    level: Basic
+    status: draft
+    statement: "Global vs local access is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is global vs local access a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_PRODUCT_RANGE_GLOBAL_ACCESS
+    level: Developing
+    status: draft
+    statement: "Global vs local access is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is global vs local access a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_PRODUCT_RANGE_GLOBAL_ACCESS
+    level: Advanced
+    status: draft
+    statement: "Global vs local access is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is global vs local access a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_PRODUCT_RANGE_GLOBAL_ACCESS
+    level: Frontier
+    status: draft
+    statement: "Global vs local access is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is global vs local access a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_PRODUCT_RANGE_WRAPPERS
+    level: Basic
+    status: draft
+    statement: "Tax wrappers (ISA/SIPP/…) is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is tax wrappers (isa/sipp/…) a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_PRODUCT_RANGE_WRAPPERS
+    level: Developing
+    status: draft
+    statement: "Tax wrappers (ISA/SIPP/…) is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is tax wrappers (isa/sipp/…) a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_PRODUCT_RANGE_WRAPPERS
+    level: Advanced
+    status: draft
+    statement: "Tax wrappers (ISA/SIPP/…) is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is tax wrappers (isa/sipp/…) a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_PRODUCT_RANGE_WRAPPERS
+    level: Frontier
+    status: draft
+    statement: "Tax wrappers (ISA/SIPP/…) is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is tax wrappers (isa/sipp/…) a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_RESEARCH_EDUCATION_MARKET_DATA_DEPTH
+    level: Basic
+    status: draft
+    statement: "Market-data depth is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is market-data depth a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_RESEARCH_EDUCATION_MARKET_DATA_DEPTH
+    level: Developing
+    status: draft
+    statement: "Market-data depth is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is market-data depth a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_RESEARCH_EDUCATION_MARKET_DATA_DEPTH
+    level: Advanced
+    status: draft
+    statement: "Market-data depth is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is market-data depth a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_RESEARCH_EDUCATION_MARKET_DATA_DEPTH
+    level: Frontier
+    status: draft
+    statement: "Market-data depth is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is market-data depth a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_RESEARCH_EDUCATION_SCREENERS_TOOLS
+    level: Basic
+    status: draft
+    statement: "Screeners & interactive tools is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is screeners & interactive tools a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_RESEARCH_EDUCATION_SCREENERS_TOOLS
+    level: Developing
+    status: draft
+    statement: "Screeners & interactive tools is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is screeners & interactive tools a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_RESEARCH_EDUCATION_SCREENERS_TOOLS
+    level: Advanced
+    status: draft
+    statement: "Screeners & interactive tools is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is screeners & interactive tools a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_RESEARCH_EDUCATION_SCREENERS_TOOLS
+    level: Frontier
+    status: draft
+    statement: "Screeners & interactive tools is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is screeners & interactive tools a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_RESEARCH_EDUCATION_EDUCATION_QUALITY
+    level: Basic
+    status: draft
+    statement: "Education quality is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is education quality a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_RESEARCH_EDUCATION_EDUCATION_QUALITY
+    level: Developing
+    status: draft
+    statement: "Education quality is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is education quality a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_RESEARCH_EDUCATION_EDUCATION_QUALITY
+    level: Advanced
+    status: draft
+    statement: "Education quality is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is education quality a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_RESEARCH_EDUCATION_EDUCATION_QUALITY
+    level: Frontier
+    status: draft
+    statement: "Education quality is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is education quality a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_RESEARCH_EDUCATION_NEWS_CONTENT
+    level: Basic
+    status: draft
+    statement: "News & content is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is news & content a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_RESEARCH_EDUCATION_NEWS_CONTENT
+    level: Developing
+    status: draft
+    statement: "News & content is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is news & content a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_RESEARCH_EDUCATION_NEWS_CONTENT
+    level: Advanced
+    status: draft
+    statement: "News & content is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is news & content a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_RESEARCH_EDUCATION_NEWS_CONTENT
+    level: Frontier
+    status: draft
+    statement: "News & content is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is news & content a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_AI_PERSONALISATION_RECOMMENDATIONS
+    level: Basic
+    status: draft
+    statement: "AI recommendations is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is ai recommendations a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_AI_PERSONALISATION_RECOMMENDATIONS
+    level: Developing
+    status: draft
+    statement: "AI recommendations is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is ai recommendations a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_AI_PERSONALISATION_RECOMMENDATIONS
+    level: Advanced
+    status: draft
+    statement: "AI recommendations is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is ai recommendations a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_AI_PERSONALISATION_RECOMMENDATIONS
+    level: Frontier
+    status: draft
+    statement: "AI recommendations is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is ai recommendations a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_AI_PERSONALISATION_CHATBOTS
+    level: Basic
+    status: draft
+    statement: "Conversational / chatbot is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is conversational / chatbot a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_AI_PERSONALISATION_CHATBOTS
+    level: Developing
+    status: draft
+    statement: "Conversational / chatbot is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is conversational / chatbot a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_AI_PERSONALISATION_CHATBOTS
+    level: Advanced
+    status: draft
+    statement: "Conversational / chatbot is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is conversational / chatbot a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_AI_PERSONALISATION_CHATBOTS
+    level: Frontier
+    status: draft
+    statement: "Conversational / chatbot is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is conversational / chatbot a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_AI_PERSONALISATION_PERSONALISED_CONTENT
+    level: Basic
+    status: draft
+    statement: "Personalised content is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is personalised content a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_AI_PERSONALISATION_PERSONALISED_CONTENT
+    level: Developing
+    status: draft
+    statement: "Personalised content is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is personalised content a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_AI_PERSONALISATION_PERSONALISED_CONTENT
+    level: Advanced
+    status: draft
+    statement: "Personalised content is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is personalised content a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_AI_PERSONALISATION_PERSONALISED_CONTENT
+    level: Frontier
+    status: draft
+    statement: "Personalised content is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is personalised content a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_AI_PERSONALISATION_SMART_ALERTS
+    level: Basic
+    status: draft
+    statement: "Smart alerts is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is smart alerts a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_AI_PERSONALISATION_SMART_ALERTS
+    level: Developing
+    status: draft
+    statement: "Smart alerts is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is smart alerts a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_AI_PERSONALISATION_SMART_ALERTS
+    level: Advanced
+    status: draft
+    statement: "Smart alerts is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is smart alerts a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_AI_PERSONALISATION_SMART_ALERTS
+    level: Frontier
+    status: draft
+    statement: "Smart alerts is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is smart alerts a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SECURITY_REGULATION_INVESTOR_PROTECTION
+    level: Basic
+    status: draft
+    statement: "Investor protection (FSCS/SIPC) is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is investor protection (fscs/sipc) a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SECURITY_REGULATION_INVESTOR_PROTECTION
+    level: Developing
+    status: draft
+    statement: "Investor protection (FSCS/SIPC) is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is investor protection (fscs/sipc) a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SECURITY_REGULATION_INVESTOR_PROTECTION
+    level: Advanced
+    status: draft
+    statement: "Investor protection (FSCS/SIPC) is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is investor protection (fscs/sipc) a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SECURITY_REGULATION_INVESTOR_PROTECTION
+    level: Frontier
+    status: draft
+    statement: "Investor protection (FSCS/SIPC) is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is investor protection (fscs/sipc) a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SECURITY_REGULATION_AUTHENTICATION
+    level: Basic
+    status: draft
+    statement: "Authentication & 2FA is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is authentication & 2fa a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SECURITY_REGULATION_AUTHENTICATION
+    level: Developing
+    status: draft
+    statement: "Authentication & 2FA is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is authentication & 2fa a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SECURITY_REGULATION_AUTHENTICATION
+    level: Advanced
+    status: draft
+    statement: "Authentication & 2FA is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is authentication & 2fa a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SECURITY_REGULATION_AUTHENTICATION
+    level: Frontier
+    status: draft
+    statement: "Authentication & 2FA is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is authentication & 2fa a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SECURITY_REGULATION_COMPLIANCE_DISCLOSURE
+    level: Basic
+    status: draft
+    statement: "Compliance & disclosure is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is compliance & disclosure a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SECURITY_REGULATION_COMPLIANCE_DISCLOSURE
+    level: Developing
+    status: draft
+    statement: "Compliance & disclosure is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is compliance & disclosure a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SECURITY_REGULATION_COMPLIANCE_DISCLOSURE
+    level: Advanced
+    status: draft
+    statement: "Compliance & disclosure is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is compliance & disclosure a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SECURITY_REGULATION_COMPLIANCE_DISCLOSURE
+    level: Frontier
+    status: draft
+    statement: "Compliance & disclosure is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is compliance & disclosure a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SECURITY_REGULATION_ACCOUNT_PROTECTION
+    level: Basic
+    status: draft
+    statement: "Account protection is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is account protection a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SECURITY_REGULATION_ACCOUNT_PROTECTION
+    level: Developing
+    status: draft
+    statement: "Account protection is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is account protection a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SECURITY_REGULATION_ACCOUNT_PROTECTION
+    level: Advanced
+    status: draft
+    statement: "Account protection is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is account protection a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SECURITY_REGULATION_ACCOUNT_PROTECTION
+    level: Frontier
+    status: draft
+    statement: "Account protection is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is account protection a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SUPPORT_COMMUNITY_SUPPORT_AVAILABILITY
+    level: Basic
+    status: draft
+    statement: "Support availability is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is support availability a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SUPPORT_COMMUNITY_SUPPORT_AVAILABILITY
+    level: Developing
+    status: draft
+    statement: "Support availability is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is support availability a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SUPPORT_COMMUNITY_SUPPORT_AVAILABILITY
+    level: Advanced
+    status: draft
+    statement: "Support availability is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is support availability a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SUPPORT_COMMUNITY_SUPPORT_AVAILABILITY
+    level: Frontier
+    status: draft
+    statement: "Support availability is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is support availability a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SUPPORT_COMMUNITY_SUPPORT_QUALITY
+    level: Basic
+    status: draft
+    statement: "Support quality is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is support quality a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SUPPORT_COMMUNITY_SUPPORT_QUALITY
+    level: Developing
+    status: draft
+    statement: "Support quality is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is support quality a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SUPPORT_COMMUNITY_SUPPORT_QUALITY
+    level: Advanced
+    status: draft
+    statement: "Support quality is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is support quality a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SUPPORT_COMMUNITY_SUPPORT_QUALITY
+    level: Frontier
+    status: draft
+    statement: "Support quality is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is support quality a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SUPPORT_COMMUNITY_SELF_SERVICE_HELP
+    level: Basic
+    status: draft
+    statement: "Self-service help is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is self-service help a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SUPPORT_COMMUNITY_SELF_SERVICE_HELP
+    level: Developing
+    status: draft
+    statement: "Self-service help is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is self-service help a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SUPPORT_COMMUNITY_SELF_SERVICE_HELP
+    level: Advanced
+    status: draft
+    statement: "Self-service help is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is self-service help a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_SUPPORT_COMMUNITY_SELF_SERVICE_HELP
+    level: Frontier
+    status: draft
+    statement: "Self-service help is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is self-service help a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_FEES_PRICING_COMMISSIONS_SPREADS
+    level: Basic
+    status: draft
+    statement: "Commissions & spreads is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is commissions & spreads a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_FEES_PRICING_COMMISSIONS_SPREADS
+    level: Developing
+    status: draft
+    statement: "Commissions & spreads is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is commissions & spreads a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_FEES_PRICING_COMMISSIONS_SPREADS
+    level: Advanced
+    status: draft
+    statement: "Commissions & spreads is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is commissions & spreads a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_FEES_PRICING_COMMISSIONS_SPREADS
+    level: Frontier
+    status: draft
+    statement: "Commissions & spreads is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is commissions & spreads a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_FEES_PRICING_FX_FEES
+    level: Basic
+    status: draft
+    statement: "FX fees is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is fx fees a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_FEES_PRICING_FX_FEES
+    level: Developing
+    status: draft
+    statement: "FX fees is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is fx fees a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_FEES_PRICING_FX_FEES
+    level: Advanced
+    status: draft
+    statement: "FX fees is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is fx fees a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_FEES_PRICING_FX_FEES
+    level: Frontier
+    status: draft
+    statement: "FX fees is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is fx fees a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_FEES_PRICING_SUBSCRIPTIONS
+    level: Basic
+    status: draft
+    statement: "Subscriptions & tiers is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is subscriptions & tiers a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_FEES_PRICING_SUBSCRIPTIONS
+    level: Developing
+    status: draft
+    statement: "Subscriptions & tiers is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is subscriptions & tiers a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_FEES_PRICING_SUBSCRIPTIONS
+    level: Advanced
+    status: draft
+    statement: "Subscriptions & tiers is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is subscriptions & tiers a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_FEES_PRICING_SUBSCRIPTIONS
+    level: Frontier
+    status: draft
+    statement: "Subscriptions & tiers is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is subscriptions & tiers a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_FEES_PRICING_INACTIVITY_OTHER
+    level: Basic
+    status: draft
+    statement: "Inactivity & other fees is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is inactivity & other fees a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_FEES_PRICING_INACTIVITY_OTHER
+    level: Developing
+    status: draft
+    statement: "Inactivity & other fees is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is inactivity & other fees a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_FEES_PRICING_INACTIVITY_OTHER
+    level: Advanced
+    status: draft
+    statement: "Inactivity & other fees is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is inactivity & other fees a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_FEES_PRICING_INACTIVITY_OTHER
+    level: Frontier
+    status: draft
+    statement: "Inactivity & other fees is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is inactivity & other fees a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_INNOVATION_DIFFERENTIATORS_SOCIAL_TRADING
+    level: Basic
+    status: draft
+    statement: "Social / copy trading is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is social / copy trading a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_INNOVATION_DIFFERENTIATORS_SOCIAL_TRADING
+    level: Developing
+    status: draft
+    statement: "Social / copy trading is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is social / copy trading a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_INNOVATION_DIFFERENTIATORS_SOCIAL_TRADING
+    level: Advanced
+    status: draft
+    statement: "Social / copy trading is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is social / copy trading a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_INNOVATION_DIFFERENTIATORS_SOCIAL_TRADING
+    level: Frontier
+    status: draft
+    statement: "Social / copy trading is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is social / copy trading a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_INNOVATION_DIFFERENTIATORS_GAMIFICATION
+    level: Basic
+    status: draft
+    statement: "Gamification & rewards is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is gamification & rewards a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_INNOVATION_DIFFERENTIATORS_GAMIFICATION
+    level: Developing
+    status: draft
+    statement: "Gamification & rewards is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is gamification & rewards a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_INNOVATION_DIFFERENTIATORS_GAMIFICATION
+    level: Advanced
+    status: draft
+    statement: "Gamification & rewards is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is gamification & rewards a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_INNOVATION_DIFFERENTIATORS_GAMIFICATION
+    level: Frontier
+    status: draft
+    statement: "Gamification & rewards is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is gamification & rewards a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_INNOVATION_DIFFERENTIATORS_REFERRALS
+    level: Basic
+    status: draft
+    statement: "Referrals & incentives is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is referrals & incentives a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_INNOVATION_DIFFERENTIATORS_REFERRALS
+    level: Developing
+    status: draft
+    statement: "Referrals & incentives is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is referrals & incentives a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_INNOVATION_DIFFERENTIATORS_REFERRALS
+    level: Advanced
+    status: draft
+    statement: "Referrals & incentives is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is referrals & incentives a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_INNOVATION_DIFFERENTIATORS_REFERRALS
+    level: Frontier
+    status: draft
+    statement: "Referrals & incentives is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is referrals & incentives a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_INNOVATION_DIFFERENTIATORS_DIRECT_CUSTODY
+    level: Basic
+    status: draft
+    statement: "Direct custody & DRS is absent, manual, or inconsistent — a customer cannot rely on it, and it is not a systematic part of the proposition."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is direct custody & drs a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_INNOVATION_DIFFERENTIATORS_DIRECT_CUSTODY
+    level: Developing
+    status: draft
+    statement: "Direct custody & DRS is present at a basic, standard level — it clears the market baseline but is not a strength or a differentiator."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is direct custody & drs a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_INNOVATION_DIFFERENTIATORS_DIRECT_CUSTODY
+    level: Advanced
+    status: draft
+    statement: "Direct custody & DRS is strong, systematic, and consistent — clearly above the market baseline and a dependable part of the experience."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is direct custody & drs a reason a customer would choose — or leave — this platform?"
+  - subcomponent_key: CUST_INNOVATION_DIFFERENTIATORS_DIRECT_CUSTODY
+    level: Frontier
+    status: draft
+    statement: "Direct custody & DRS is best-in-class and differentiated — a genuine competitive advantage a customer would notice and choose the platform for."
+    required_evidence:
+      - Product walkthrough / screen capture
+      - Customer-facing documentation, pricing, or help pages
+    differentiator_questions:
+      - "Is direct custody & drs a reason a customer would choose — or leave — this platform?"

@@ -9,7 +9,13 @@ from __future__ import annotations
 
 import pytest
 from bcap_contracts.common import MaturityLevel
-from bcap_contracts.registry import ModuleDef, Registry, SubcomponentDef, UnknownKeyError
+from bcap_contracts.registry import (
+    ModuleDef,
+    Registry,
+    SubcomponentDef,
+    UnknownKeyError,
+    load_registry,
+)
 from bcap_contracts.rubric import (
     AnchorStatus,
     DuplicateAnchorError,
@@ -45,7 +51,9 @@ def _todo(sub: str, level: MaturityLevel) -> RubricAnchor:
 
 def test_seeded_library_loads_all_204_anchors() -> None:
     lib = load_rubric_library()
-    assert len(lib.anchors) == 51 * 4 == 204
+    bpl_keys = load_registry().all_subcomponent_keys()
+    bpl = [a for a in lib.anchors if a.subcomponent_key in bpl_keys]
+    assert len(bpl) == 51 * 4 == 204  # the B/P/L set — C anchors (GRS-0081) are counted separately
     assert lib.status == "draft-pending-ratification"
     # Every anchor's level is a valid MaturityLevel; keys are registry-legal (the loader validated).
     assert all(a.level in _LEVELS for a in lib.anchors)
@@ -53,9 +61,10 @@ def test_seeded_library_loads_all_204_anchors() -> None:
 
 def test_seeded_library_has_the_authored_oems_example() -> None:
     lib = load_rubric_library()
-    # The library is fully authored: all 51 subcomponents × 4 levels = 204 anchors — the §4 worked
-    # example (OEMS_EXEC_ALGOS), the 14 CRITICAL (★) subcomponents (first pass), and the remaining
-    # 36 non-critical subcomponents (second pass, GRS-0008).
+    # The B/P/L library is fully authored: all 51 subcomponents × 4 levels = 204 authored anchors —
+    # the §4 worked example (OEMS_EXEC_ALGOS), the 14 CRITICAL (★) subcomponents (first pass), and
+    # the remaining 36 non-critical subcomponents (second pass, GRS-0008). C anchors are DRAFT, not
+    # authored, so authored_count is exactly the B/P/L 204.
     assert lib.authored_count() == 204
     levels = lib.for_subcomponent("OEMS_EXEC_ALGOS")
     assert [a.level for a in levels] == list(_LEVELS)  # returned in rank order
