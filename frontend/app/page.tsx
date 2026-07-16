@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FirstRunWalkthrough } from "@/components/FirstRunWalkthrough";
+import { WelcomeBanner } from "@/components/WelcomeBanner";
 
 // PRD §1 / §4–7 — the advisor's main sections. Every section has a live page.
 const SECTIONS: ReadonlyArray<{ title: string; href: string; blurb: string; kicker: string }> = [
@@ -39,25 +40,9 @@ export default function DashboardPage() {
   return (
     <div className="stack" style={{ gap: "2.75rem" }}>
       <FirstRunWalkthrough />
-      {/* Hero */}
-      <section
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-          gap: "1.5rem",
-          flexWrap: "wrap",
-        }}
-      >
-        <div style={{ maxWidth: "40rem" }}>
-          <p className="eyebrow">Advisor dashboard</p>
-          <h1 style={{ margin: "0.4rem 0 0.5rem" }}>Bruntsfield Advisor Studio</h1>
-          <p style={{ margin: 0, color: "var(--color-ink-muted)", fontSize: "1.05rem", lineHeight: 1.55 }}>
-            The advisor platform of the Bruntsfield Advisory Network — pipeline management, Platform Power
-            assessments, client deliverables, and the Workbench. Jump to a section below, or start
-            with the primer if Platform Power is new to you.
-          </p>
-        </div>
+      {/* Welcome + context (GRS-0089) */}
+      <section>
+        <WelcomeBanner />
       </section>
 
       {/* New-advisor primer strip */}
