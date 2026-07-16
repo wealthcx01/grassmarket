@@ -83,10 +83,14 @@ test.describe("GRS-0019 slice 2 — AI narrative review", () => {
     const row = page.getByRole("row").filter({ hasText: "Platform Power Report" }).last();
     await row.getByRole("button", { name: "Review AI" }).click();
     const draft = page.getByRole("button", { name: "Draft AI narratives" });
+    const box = page.getByRole("textbox", { name: /Edit Interpretation/ }).first();
+    // Wait for the panel to FINISH loading before deciding whether to draft: until listNarratives
+    // resolves the panel shows "Loading…" and neither control exists, so a bare `isVisible()` check
+    // races the fetch and skips the click on a slow (cold) runner. Wait for it to settle first.
+    await expect(draft.or(box)).toBeVisible();
     if (await draft.isVisible().catch(() => false)) await draft.click();
 
     // Edit the AI draft and approve (the seeded advisor is Consultant-tier → may self-approve).
-    const box = page.getByRole("textbox", { name: /Edit Interpretation/ }).first();
     await expect(box).toBeVisible();
     await box.fill("Reviewed interpretation for Meridian Securities.");
     await page.getByRole("button", { name: /Approve/ }).first().click();
@@ -108,10 +112,14 @@ test.describe("GRS-0019 slice 3 — review gate + approval queue", () => {
     const row = page.getByRole("row").filter({ hasText: "Executive Summary" }).last();
     await row.getByRole("button", { name: "Review AI" }).click();
     const draft = page.getByRole("button", { name: "Draft AI narratives" });
+    const awaitingApproval = page.getByText(/awaiting approval/i);
+    // Wait for the panel to finish loading before the conditional draft (see slice 2): a bare
+    // isVisible() check races listNarratives and skips the click on a cold runner.
+    await expect(draft.or(awaitingApproval)).toBeVisible();
     if (await draft.isVisible().catch(() => false)) await draft.click();
 
     // The review gate is visible: the queue banner warns the pack cannot go to a client yet
     // (the banner counts pending sections engagement-wide, so the fresh draft must land first).
-    await expect(page.getByText(/awaiting approval/i)).toBeVisible();
+    await expect(awaitingApproval).toBeVisible();
   });
 });
