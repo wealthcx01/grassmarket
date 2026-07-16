@@ -16,6 +16,9 @@ Fail-loud everywhere (the D1–D7 defence):
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+from typing import Protocol
+
 from bcap_contracts.assessments import CoefficientSet, SubcomponentRating
 from bcap_contracts.common import EvidenceGrade, MaturityLevel, NonScoreState
 from bcap_contracts.registry import MetricDef, Registry
@@ -25,6 +28,7 @@ from grassmarket.atlas.results import (
     AtlasResult,
     BusinessResult,
     CompositeResult,
+    CustomerResult,
     LResult,
     MetricRow,
     ModuleResult,
@@ -60,7 +64,7 @@ def score(
 ) -> AtlasResult:
     """Score one complete assessment end-to-end (two-track, Methodology v1.1 §5)."""
     coefficients.validate_against(registry)
-    _assert_inputs_cover_registry(inputs, registry)
+    _assert_inputs_cover_registry(inputs, registry, score_c=coefficients.scores_c)
     _assert_triad_sources_registered(registry)
 
     subs_by_key = {r.subcomponent_key: r for r in inputs.subcomponents}
@@ -73,6 +77,14 @@ def score(
     powers_result, p_value = _score_powers(registry, coefficients, powers_by_key)
     triad = _score_triad(registry, coefficients, powers_by_key, group_means_raw)
 
+    # C-index (ADR-0023 Stage 1): computed and REPORTED alongside V when the coefficient set scores
+    # C. It is deliberately NOT part of the v_value sum below — that is v1.4 / GRS-0086. A B/P/L
+    # set leaves customer=None and the composite byte-identical to the golden master.
+    customer: CustomerResult | None = None
+    if coefficients.scores_c:
+        c_subs_by_key = {r.subcomponent_key: r for r in inputs.c_subcomponents}
+        customer, _ = _score_c(registry, coefficients, c_subs_by_key)
+
     v_value = (
         coefficients.theta_b * b_value
         + coefficients.theta_p * p_value
@@ -84,6 +96,7 @@ def score(
         p_index=_round(p_value),
         l_index=_round(l_value),
         v_index=v_stored,
+        c_index=customer.value if customer is not None else None,
     )
     return AtlasResult(
         engine_version=engine_version,
@@ -94,6 +107,7 @@ def score(
         business=business,
         powers=powers_result,
         triad=triad,
+        customer=customer,
         composite=composite,
         gate_bands={m.key: m.gate_band for m in module_results},
         v_display_0_100=_round(v_stored * 100),
@@ -108,12 +122,40 @@ def _score_modules(
     coefficients: CoefficientSet,
     subs_by_key: dict[str, SubcomponentRating],
 ) -> tuple[list[ModuleResult], dict[str, float | None]]:
+    """B/P/L module scoring — the L dimension. A thin wrapper over the dimension-agnostic
+    :func:`_score_module_set` so the C dimension (ADR-0023) reuses the identical q_m + gate logic
+    over its own modules/coefficients without forking any of the renormalisation rules."""
+    return _score_module_set(
+        registry.modules, coefficients.alpha_module, coefficients.lambda_loadings, subs_by_key
+    )
+
+
+class _ScorableSub(Protocol):
+    key: str
+    critical: bool
+
+
+class _ScorableModule(Protocol):
+    key: str
+    name: str
+
+    @property
+    def subcomponents(self) -> Sequence[_ScorableSub]:  # read-only ⇒ covariant in the element type
+        ...
+
+
+def _score_module_set(
+    modules: Sequence[_ScorableModule],
+    alpha_module: dict[str, float],
+    lambda_loadings: dict[str, dict[str, float]],
+    subs_by_key: dict[str, SubcomponentRating],
+) -> tuple[list[ModuleResult], dict[str, float | None]]:
     module_results: list[ModuleResult] = []
     q_by_module: dict[str, float | None] = {}
 
-    for module in registry.modules:
-        alpha = coefficients.alpha_module[module.key]
-        lambdas = coefficients.lambda_loadings[module.key]
+    for module in modules:
+        alpha = alpha_module[module.key]
+        lambdas = lambda_loadings[module.key]
 
         rows: list[SubcomponentRow] = []
         assessed: list[tuple[str, MaturityLevel]] = []  # (key, level), registry order
@@ -252,6 +294,47 @@ def _score_l(
     return (
         LResult(weighted_term=_round(l_weighted), min_term=_round(l_min), value=_round(l_value)),
         l_value,
+    )
+
+
+# --- Customer proposition (C) — ADR-0023, Stage 1 --------------------------------------
+
+
+def _score_c(
+    registry: Registry,
+    coefficients: CoefficientSet,
+    c_subs_by_key: dict[str, SubcomponentRating],
+) -> tuple[CustomerResult, float]:
+    """C = α_C·(Σδ_c·q_m / Σδ_c) + (1−α_C)·min(q over critical-for-C modules) — the SAME shape as
+    :func:`_score_l`, over the separate C registry dimension. A fully-unassessed C module (q_m None)
+    is excluded from both terms (D9), never zero-filled. Caller guarantees ``scores_c``."""
+    assert coefficients.alpha_c is not None  # scores_c ⇒ the four C families are all populated
+    module_results, q_by_module = _score_module_set(
+        registry.c_modules,
+        coefficients.alpha_c_module,
+        coefficients.lambda_c_loadings,
+        c_subs_by_key,
+    )
+    assessed_q = {k: v for k, v in q_by_module.items() if v is not None}
+    if not assessed_q:
+        raise ValueError("Cannot compute C: no C module has any assessed subcomponent.")
+    num = sum(coefficients.delta_c[k] * v for k, v in assessed_q.items())
+    den = sum(coefficients.delta_c[k] for k in assessed_q)
+    c_weighted = num / den
+
+    crit_q = [v for k in coefficients.critical_modules_for_c if (v := q_by_module[k]) is not None]
+    if not crit_q:
+        raise ValueError("Cannot compute C min term: no critical-for-C module is assessed.")
+    c_min = min(crit_q)
+    c_value = coefficients.alpha_c * c_weighted + (1 - coefficients.alpha_c) * c_min
+    return (
+        CustomerResult(
+            weighted_term=_round(c_weighted),
+            min_term=_round(c_min),
+            value=_round(c_value),
+            modules=tuple(module_results),
+        ),
+        c_value,
     )
 
 
@@ -428,9 +511,15 @@ def _score_triad(
 # --- Fail-loud input coverage -----------------------------------------------------------
 
 
-def _assert_inputs_cover_registry(inputs: AssessmentInputs, registry: Registry) -> None:
+def _assert_inputs_cover_registry(
+    inputs: AssessmentInputs, registry: Registry, *, score_c: bool
+) -> None:
     """Inputs must cover the registry EXACTLY — the same discipline ADR-0001 enforces for
-    coefficients. A missing or extra key aborts the score (never a default, never a partial run)."""
+    coefficients. A missing or extra key aborts the score (never a default, never a partial run).
+
+    C subcomponents (ADR-0023) are checked only when the coefficient set scores C: then they must
+    cover the C dimension exactly; otherwise supplying any is a refusal (a C rating with no C
+    coefficients to score it against is a silent no-op we reject up front)."""
     _assert_exact(
         "subcomponent",
         registry.all_subcomponent_keys(),
@@ -438,6 +527,17 @@ def _assert_inputs_cover_registry(inputs: AssessmentInputs, registry: Registry) 
     )
     _assert_exact("metric", registry.metric_keys(), {m.metric_key for m in inputs.metrics})
     _assert_exact("power", registry.power_keys(), {p.power_key for p in inputs.powers})
+    if score_c:
+        _assert_exact(
+            "c_subcomponent",
+            registry.all_c_subcomponent_keys(),
+            {r.subcomponent_key for r in inputs.c_subcomponents},
+        )
+    elif inputs.c_subcomponents:
+        raise ValueError(
+            "c_subcomponents were supplied but the coefficient set does not score C (ADR-0023): "
+            "a C rating with no C coefficients cannot be scored around."
+        )
 
 
 def _assert_exact(dimension: str, legal: frozenset[str], supplied: set[str]) -> None:

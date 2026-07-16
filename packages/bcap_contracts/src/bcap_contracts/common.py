@@ -77,6 +77,12 @@ class NonScoreState(StrEnum):
 
     NOT_APPLICABLE = "Not Applicable"  # out of scope; removed from denominator, weights renorm
     NOT_ASSESSED = "Not Assessed"  # in scope but not evidenced; widens uncertainty / blocks gate
+    # C-index Level-1 widget-observation states (ADR-0023). A widget can be *present yet not a clean
+    # pass*: gated behind a paywall, or shipped-but-broken. These are first-class non-score states
+    # for the 93-widget grid (GRS-0083) — they never appear on a B/P/L subcomponent rating, so the
+    # deterministic and Monte Carlo B/P/L paths never see them.
+    PRESENT_PAYWALLED = "Present (Paywalled)"  # feature exists but is behind a paywall
+    PRESENT_DEFECTIVE = "Present (Defective)"  # feature exists but is broken / non-functional
 
 
 class EvidenceGrade(StrEnum):

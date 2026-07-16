@@ -71,6 +71,29 @@
   "additionalProperties": false,
   "description": "A versioned, provenance-carrying set of every coefficient the engine needs.\n\nConstruction enforces the invariants that DON'T need the registry (Σθ=1, α∈[0,1], provenance\npresent). :meth:`validate_against` enforces the ones that DO (every weight family is exactly\nthe registry's key set for its dimension) and refuses empty dimensions. Neither failure is\never swallowed.",
   "properties": {
+    "alpha_c": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Alpha C"
+    },
+    "alpha_c_module": {
+      "additionalProperties": {
+        "maximum": 1.0,
+        "minimum": 0.0,
+        "type": "number"
+      },
+      "title": "Alpha C Module",
+      "type": "object"
+    },
     "alpha_l": {
       "maximum": 1.0,
       "minimum": 0.0,
@@ -91,6 +114,14 @@
       "title": "Client Usable",
       "type": "boolean"
     },
+    "critical_modules_for_c": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Critical Modules For C",
+      "type": "array"
+    },
     "critical_modules_for_l": {
       "default": [],
       "items": {
@@ -107,11 +138,30 @@
       "title": "Delta",
       "type": "object"
     },
+    "delta_c": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "description": "C-module weights δ_m for the C blend.",
+      "title": "Delta C",
+      "type": "object"
+    },
     "group_weights": {
       "additionalProperties": {
         "type": "number"
       },
       "title": "Group Weights",
+      "type": "object"
+    },
+    "lambda_c_loadings": {
+      "additionalProperties": {
+        "additionalProperties": {
+          "type": "number"
+        },
+        "type": "object"
+      },
+      "description": "Per-C-module subcomponent loadings λ_{m,c}.",
+      "title": "Lambda C Loadings",
       "type": "object"
     },
     "lambda_loadings": {
