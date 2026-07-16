@@ -15,6 +15,7 @@ from bcap_contracts.arena import ArenaScenario, ArenaSession
 from bcap_contracts.assessments import (
     Assessment,
     AssessmentDocument,
+    BrokeragePortfolioEntry,
     CoefficientSet,
     LiveScore,
     ModuleRatingDraft,
@@ -76,6 +77,7 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "ScoringRun": ScoringRun,
     "AssessmentDocument": AssessmentDocument,
     "Assessment": Assessment,
+    "BrokeragePortfolioEntry": BrokeragePortfolioEntry,
     "ModuleRatingDraft": ModuleRatingDraft,
     "LiveScore": LiveScore,
     "ScenarioComparison": ScenarioComparison,

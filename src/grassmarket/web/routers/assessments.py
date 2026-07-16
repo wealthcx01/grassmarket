@@ -15,6 +15,7 @@ from uuid import UUID
 from bcap_contracts.assessments import (
     Assessment,
     AssessmentDocument,
+    BrokeragePortfolioEntry,
     LiveScore,
     ModuleRatingDraft,
     SubcomponentRating,
@@ -101,6 +102,17 @@ def list_assessments(
     repo: Repository = Depends(get_repository),
 ) -> list[Assessment]:
     return repo.list_assessments(principal)
+
+
+# Declared BEFORE `/{assessment_id}` so "portfolio" isn't parsed as an assessment UUID.
+@router.get("/portfolio", response_model=list[BrokeragePortfolioEntry])
+def brokerage_portfolio(
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> list[BrokeragePortfolioEntry]:
+    """The advisor's "Your Brokerages" home — one summary row per assessment (segment, last score,
+    status, last updated), newest-touched first. Self-scoped."""
+    return repo.list_brokerage_portfolio(principal)
 
 
 class RatingRequestSummary(BaseModel):

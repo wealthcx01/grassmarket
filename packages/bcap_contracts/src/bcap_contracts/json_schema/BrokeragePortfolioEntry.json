@@ -1,0 +1,104 @@
+{
+  "$defs": {
+    "AssessmentState": {
+      "description": "The assessment lifecycle. Finalisation locks inputs (CLAUDE.md non-negotiable #6).",
+      "enum": [
+        "draft",
+        "in_progress",
+        "finalised"
+      ],
+      "title": "AssessmentState",
+      "type": "string"
+    },
+    "UncertaintyRating": {
+      "description": "Assessment Uncertainty Rating (Methodology §7), Morningstar pattern.",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Very High"
+      ],
+      "title": "UncertaintyRating",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One row of the advisor's \"Your Brokerages\" portfolio home (GRS-0071): a scoped, at-a-glance\nsummary of an assessment — its segment (from the business profile), status, and last finalised\nPlatform Value with the honest uncertainty rating. `v_index` is the P50 in [0,1]; it is None\nuntil the assessment is finalised (a draft has no immutable score). Self-scoped, like every read\n(a consultant sees only their own book).",
+  "properties": {
+    "assessment_id": {
+      "format": "uuid",
+      "title": "Assessment Id",
+      "type": "string"
+    },
+    "finalised_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Finalised At"
+    },
+    "segment": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Segment"
+    },
+    "state": {
+      "$ref": "#/$defs/AssessmentState"
+    },
+    "subject": {
+      "title": "Subject",
+      "type": "string"
+    },
+    "uncertainty_rating": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/UncertaintyRating"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    },
+    "v_index": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "V Index"
+    }
+  },
+  "required": [
+    "assessment_id",
+    "subject",
+    "state",
+    "updated_at"
+  ],
+  "title": "BrokeragePortfolioEntry",
+  "type": "object"
+}

@@ -417,6 +417,25 @@ class Assessment(OwnedResource):
     uncertainty_version: str | None = None
 
 
+class BrokeragePortfolioEntry(BaseModel):
+    """One row of the advisor's "Your Brokerages" portfolio home (GRS-0071): a scoped, at-a-glance
+    summary of an assessment — its segment (from the business profile), status, and last finalised
+    Platform Value with the honest uncertainty rating. `v_index` is the P50 in [0,1]; it is None
+    until the assessment is finalised (a draft has no immutable score). Self-scoped, like every read
+    (a consultant sees only their own book)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    assessment_id: UUID
+    subject: str
+    segment: str | None = None
+    state: AssessmentState
+    v_index: Score | None = None
+    uncertainty_rating: UncertaintyRating | None = None
+    finalised_at: datetime | None = None
+    updated_at: datetime
+
+
 # --- Dual-rating governance (Methodology §9) --------------------------------------------
 
 

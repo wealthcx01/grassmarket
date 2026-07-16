@@ -12,10 +12,10 @@ const SECTIONS: ReadonlyArray<{ title: string; href: string; blurb: string; kick
     blurb: "Prospects, workshops, and kanban stages with time-in-stage flags and a weighted forecast.",
   },
   {
-    title: "Assessments",
+    title: "Your Brokerages",
     href: "/assessments",
-    kicker: "The ATLAS wizard",
-    blurb: "The 7-step wizard — business metrics, the 7 Powers, and the infrastructure deep dive, scored live with uncertainty bands.",
+    kicker: "Portfolio · the ATLAS wizard",
+    blurb: "Your portfolio of assessments — segment, last score and status at a glance — and the 7-step wizard: business metrics, the 7 Powers, and the infrastructure deep dive, scored live with uncertainty bands.",
   },
   {
     title: "Deliverables",
