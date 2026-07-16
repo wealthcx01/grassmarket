@@ -1,6 +1,26 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
+import { POWER_GUIDANCE } from "@/lib/powerGuidance";
+
+// The seven Powers (GRS-0094): name + Helmer lifecycle stage from the registry, benefit/barrier/example
+// reused from powerGuidance.ts (GRS-0069) so the primer and the wizard stay consistent — not re-authored.
+const LIFECYCLE_LABEL: Record<string, string> = {
+  origination: "Origination",
+  takeoff: "Take-off",
+  stability: "Stability",
+};
+
+const POWERS: ReadonlyArray<{ key: string; name: string; lifecycle: string }> = [
+  { key: "SCALE_ECONOMIES", name: "Scale Economies", lifecycle: "takeoff" },
+  { key: "NETWORK_ECONOMIES", name: "Network Economies", lifecycle: "takeoff" },
+  { key: "COUNTER_POSITIONING", name: "Counter-Positioning", lifecycle: "origination" },
+  { key: "SWITCHING_COSTS", name: "Switching Costs", lifecycle: "takeoff" },
+  { key: "BRANDING", name: "Branding", lifecycle: "stability" },
+  { key: "CORNERED_RESOURCE", name: "Cornered Resource", lifecycle: "origination" },
+  { key: "PROCESS_POWER", name: "Process Power", lifecycle: "stability" },
+];
+
 export const metadata: Metadata = {
   title: "How Platform Power works — Advisor Studio",
   description: "A ten-minute primer on the Platform Power framework for new advisors.",
@@ -313,6 +333,51 @@ export default function GuidePage() {
         <p className="callout callout-warn">
           Every power is always scored — &ldquo;not applicable&rdquo; doesn&rsquo;t exist for powers. A power that&rsquo;s
           irrelevant to this business is simply weak, and that&rsquo;s information.
+        </p>
+      </section>
+
+      {/* The seven Powers, one by one (GRS-0094) */}
+      <section>
+        <SectionTitle kicker="Helmer's seven">The seven Powers, one by one</SectionTitle>
+        <p style={{ margin: "0 0 1rem", color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
+          Each has a distinct <strong>benefit</strong> (the advantage the leader enjoys) and{" "}
+          <strong>barrier</strong> (why a rival can&rsquo;t copy it), and each tends to arise at a
+          particular stage of a business&rsquo;s life — <strong>Origination</strong> (the model is being
+          formed), <strong>Take-off</strong> (rapid growth), or <strong>Stability</strong> (maturity). Knowing
+          the stage-fit tells you which powers are even <em>available</em> to a platform at its age.
+        </p>
+        <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: "0.75rem" }}>
+          {POWERS.map((p) => {
+            const g = POWER_GUIDANCE[p.key];
+            if (!g) return null; // every registry power has guidance (asserted by a test); type guard
+            return (
+              <li key={p.key} className="card" style={{ padding: "1rem 1.15rem" }}>
+                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "0.75rem", flexWrap: "wrap" }}>
+                  <span style={{ fontFamily: "var(--font-serif)", fontWeight: 600, fontSize: "1.05rem" }}>{p.name}</span>
+                  <span className="tag" style={{ fontSize: "0.68rem" }}>{LIFECYCLE_LABEL[p.lifecycle]}</span>
+                </div>
+                <dl style={{ margin: "0.5rem 0 0", display: "grid", gap: "0.35rem", fontSize: "0.88rem", lineHeight: 1.5 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "5rem 1fr", gap: "0.5rem" }}>
+                    <dt style={{ color: "var(--color-accent)", fontWeight: 600 }}>Benefit</dt>
+                    <dd style={{ margin: 0, color: "var(--color-ink-muted)" }}>{g.benefitHint}</dd>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "5rem 1fr", gap: "0.5rem" }}>
+                    <dt style={{ color: "var(--color-accent)", fontWeight: 600 }}>Barrier</dt>
+                    <dd style={{ margin: 0, color: "var(--color-ink-muted)" }}>{g.barrierHint}</dd>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "5rem 1fr", gap: "0.5rem" }}>
+                    <dt style={{ color: "var(--color-ink-soft)" }}>Example</dt>
+                    <dd style={{ margin: 0, color: "var(--color-ink-soft)", fontStyle: "italic" }}>{g.example}</dd>
+                  </div>
+                </dl>
+              </li>
+            );
+          })}
+        </ul>
+        <p style={{ marginTop: "0.9rem", fontSize: "0.9rem", color: "var(--color-ink-muted)", lineHeight: 1.55 }}>
+          Remember the rule from above: for each of these, the score is the <strong>weaker</strong> of
+          benefit and barrier. A textbook benefit with a barrier a rival can cross in a quarter is not a
+          power — it&rsquo;s a head start.
         </p>
       </section>
 
