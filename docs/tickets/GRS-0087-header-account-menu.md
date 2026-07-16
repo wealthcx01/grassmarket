@@ -1,8 +1,31 @@
 # GRS-0087 — Header account/session menu
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** —
+**Branch:** `grs-0087-header-account-menu`
+
+## What shipped
+
+A proper account menu in the global header, and the footer session stub retired.
+
+- **`components/AccountMenu.tsx`** (new) — an avatar-initial + email trigger to the right of the header
+  nav, opening a dropdown: **Profile**, **Settings**, a link to **bruntsfield.capital ↗**, and **Log
+  out**. Identity comes from the existing `lib/session` accessor (no re-fetch, no duplicated token
+  logic); when signed out it renders a **Sign in** link instead. Client-side mount guard avoids a
+  hydration flash; click-outside + Escape close it.
+- **`app/layout.tsx`** — mounts `AccountMenu` on the far right of the sticky header (all pages).
+- **`app/profile/page.tsx`** + **`app/settings/page.tsx`** (new) — minimal, honest destinations so the
+  menu has no dead links. Profile confirms your identity from the session (email / role / assessor
+  level); Settings is a "coming soon" placeholder. Richer editing is a later Part-2 ticket.
+- **Retired the footer stub** — deleted `components/DashboardSessionFooter.tsx` (+ its test) and its
+  render in `app/page.tsx`; session controls (log out / sign in) now live in ONE place, the header.
+
+## Acceptance / verification
+
+`components/AccountMenu.test.tsx` — signed-out shows a Sign in link; signed-in shows the identity + a
+menu with Profile / Settings / bruntsfield.capital / Log out; Log out clears the session (the old
+footer's behaviour). Frontend type-check · lint · vitest green.
 
 ## Why
 

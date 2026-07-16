@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Source_Serif_4, Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import { AccountMenu } from "@/components/AccountMenu";
 
 // Three faces from the Bruntsfield design system, exposed as CSS variables that
 // globals.css consumes (--font-serif / --font-sans / --font-mono).
@@ -110,6 +111,7 @@ export default function RootLayout({
           >
             Guide
           </Link>
+          <AccountMenu />
         </header>
         <main
           style={{
