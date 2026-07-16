@@ -107,5 +107,7 @@ This is the headline finding and the reason onboarding should wait.
 | `ESTATE-RECONCILIATION.md` | Business-estate sweep → the §3 threads here |
 | `reviews/ATLAS-Delivery-Review-2026-07-15.md` | Delivered-vs-ratified + UI/UX audit |
 | `NEXT-STEPS-2026-07.md` | **This doc — the binder** |
+| `planning/PART1-oauth-earnings-profiles-cindex.md` | Part 1 execution plan — GRS-0073–0086 (on `main`) |
+| `planning/PART2-uiux-review.md` | Part 2 execution plan — section-by-section UI/UX review → GRS-0087–0134 + ADR-0027–0030 |
 | `BACKLOG.md` | Ticket index (needs refresh) |
 | `Advisor-Guide-to-ATLAS.md` / `ATLAS-Methodology-Guide.md` | Advisor-facing guide + formal foundations |
