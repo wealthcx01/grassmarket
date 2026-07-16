@@ -1,9 +1,11 @@
 """The rubric anchor library — the assessor guidance content (Methodology §4).
 
-One anchor per subcomponent × maturity level: 51 × 4 = **204** anchors. Each anchor follows the §4
-template — a behavioural (BARS-style) statement, 2–4 required-evidence artifacts, 1–2 differentiator
-questions, and misgrading notes. This module is the contract-typed **storage + loader**; the content
-itself is John's to author and ratify (it ships `draft-pending-ratification`).
+One anchor per subcomponent × maturity level: the 51 B/P/L subcomponents × 4 = **204** authored
+anchors, plus (ADR-0023 / GRS-0081) the 39 Customer-Proposition (C) subcomponents × 4 = **156**
+DRAFT anchors, from `rubric_anchors_c.yaml`. Each anchor follows the §4 template — a behavioural
+(BARS-style) statement, 2–4 required-evidence artifacts, 1–2 differentiator questions, and
+misgrading notes. This module is the contract-typed **storage + loader**; the content itself is
+John's to author and ratify (it ships `draft-pending-ratification`).
 
 Fail-loud the ADR-0001 way. Every (subcomponent, level) pair is **either present or EXPLICITLY
 marked TODO** — a silently missing anchor is a load-time refusal, never an empty string masquerading
@@ -99,9 +101,9 @@ class RubricAnchor(BaseModel):
 
 
 class RubricLibrary(BaseModel):
-    """The whole 204-anchor library. Construction checks each anchor is well-formed;
-    :meth:`validate_against` checks completeness against the registry (all 204 present, keys legal,
-    no duplicates) — the ADR-0001 load-time gate."""
+    """The whole anchor library (204 B/P/L + 156 C = 360). Construction checks each anchor is
+    well-formed; :meth:`validate_against` checks completeness against the registry (every B/P/L and
+    C subcomponent × level present, keys legal, no duplicates) — the ADR-0001 load-time gate."""
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
@@ -126,7 +128,9 @@ class RubricLibrary(BaseModel):
         return sum(1 for a in self.anchors if a.status is AnchorStatus.AUTHORED)
 
     def validate_against(self, registry: Registry) -> None:
-        legal = registry.all_subcomponent_keys()
+        # C subcomponents (ADR-0023) share the anchor requirement: every assessed subcomponent —
+        # B/P/L or C — needs a full anchor set at all four maturity levels (GRS-0081).
+        legal = registry.all_subcomponent_keys() | registry.all_c_subcomponent_keys()
         present: set[tuple[str, str]] = set()
         for a in self.anchors:
             if a.subcomponent_key not in legal:
@@ -162,33 +166,36 @@ def load_rubric_library() -> RubricLibrary:
     and an optional ``todo`` list of individual {subcomponent, level} pairs. The loader expands
     those into real TODO anchors, then validates completeness against the registry — fail-loud."""
     raw = _load_yaml("rubric_anchors.yaml") or {}
+    c_raw = _load_yaml("rubric_anchors_c.yaml") or {}  # C anchors (ADR-0023 / GRS-0081)
     registry = load_registry()
 
-    anchors: list[RubricAnchor] = [
-        RubricAnchor(
-            subcomponent_key=a["subcomponent_key"],
-            level=MaturityLevel(a["level"]),
-            status=AnchorStatus(a["status"]),
-            statement=a.get("statement", ""),
-            required_evidence=tuple(a.get("required_evidence", ())),
-            differentiator_questions=tuple(a.get("differentiator_questions", ())),
-            misgrading_notes=a.get("misgrading_notes"),
-        )
-        for a in raw.get("anchors", [])
-    ]
-    for sub_key in raw.get("todo_all_levels", []):
+    anchors: list[RubricAnchor] = []
+    for source in (raw, c_raw):
         anchors.extend(
-            RubricAnchor(subcomponent_key=sub_key, level=lvl, status=AnchorStatus.TODO)
-            for lvl in MaturityLevel
-        )
-    for pair in raw.get("todo", []):
-        anchors.append(
             RubricAnchor(
-                subcomponent_key=pair["subcomponent_key"],
-                level=MaturityLevel(pair["level"]),
-                status=AnchorStatus.TODO,
+                subcomponent_key=a["subcomponent_key"],
+                level=MaturityLevel(a["level"]),
+                status=AnchorStatus(a["status"]),
+                statement=a.get("statement", ""),
+                required_evidence=tuple(a.get("required_evidence", ())),
+                differentiator_questions=tuple(a.get("differentiator_questions", ())),
+                misgrading_notes=a.get("misgrading_notes"),
             )
+            for a in source.get("anchors", [])
         )
+        for sub_key in source.get("todo_all_levels", []):
+            anchors.extend(
+                RubricAnchor(subcomponent_key=sub_key, level=lvl, status=AnchorStatus.TODO)
+                for lvl in MaturityLevel
+            )
+        for pair in source.get("todo", []):
+            anchors.append(
+                RubricAnchor(
+                    subcomponent_key=pair["subcomponent_key"],
+                    level=MaturityLevel(pair["level"]),
+                    status=AnchorStatus.TODO,
+                )
+            )
 
     library = RubricLibrary(status=_require_status(raw), anchors=tuple(anchors))
     library.validate_against(registry)
