@@ -87,12 +87,28 @@ export interface RegistryProfile {
   name: string;
 }
 
+/** One Level-1 widget observation for the C-index grid (ADR-0023 / GRS-0083). A widget is either
+ *  present (scored 1–5 on ease/usability/depth) or not — a non-present widget may carry
+ *  `Present (Paywalled)` / `Present (Defective)`. Rarity is read from the registry, never stored. */
+export interface WidgetObservation {
+  widget_key: string;
+  present: boolean;
+  state?: NonScoreState | null; // only PRESENT_PAYWALLED / PRESENT_DEFECTIVE, only when !present
+  ease?: number | null; // 1–5, only when present
+  usability?: number | null;
+  depth?: number | null;
+  notes?: string | null;
+}
+
 export interface AssessmentDocument {
   subject: string;
   profile?: BusinessProfile | null;
   subcomponents: SubcomponentRating[];
   metrics: MetricEntry[];
   powers: PowerEntry[];
+  // C-index capture (ADR-0023 / GRS-0083); default-empty so older documents load unchanged.
+  c_subcomponents: SubcomponentRating[];
+  widgets: WidgetObservation[];
   notes?: string | null;
 }
 
@@ -139,6 +155,9 @@ export interface LiveScore {
   b?: IndexBand | null;
   p?: IndexBand | null;
   l_index?: IndexBand | null;
+  // C-index (ADR-0023 Stage 1): a deterministic value reported alongside V, not a band; null until
+  // C is scoreable. Never summed into V (that is v1.4 / GRS-0086).
+  c?: number | null;
   module_qm: Record<string, IndexBand>;
   triad_economic?: StrengthRating | null;
   triad_perceived?: StrengthRating | null;
@@ -200,12 +219,45 @@ export interface RegistryPower {
   description: string;
 }
 
+export type WidgetRarity = "Common" | "Uncommon" | "Rare";
+
+/** A Customer-Proposition (C) subcomponent (ADR-0023) — same shape as an L subcomponent. */
+export interface RegistryCSubcomponent {
+  key: string;
+  name: string;
+  module_key: string;
+  description?: string | null;
+  critical: boolean;
+}
+
+/** One of the 10 Phase-E Customer-Proposition modules (ADR-0023). */
+export interface RegistryCModule {
+  key: string;
+  name: string;
+  description: string;
+  subcomponents: RegistryCSubcomponent[];
+}
+
+/** One Level-1 customer-proposition widget (ADR-0023 / GRS-0080), differentiated by rarity. */
+export interface RegistryWidget {
+  key: string;
+  name: string;
+  category: string;
+  rarity: WidgetRarity;
+  module_key: string;
+}
+
 export interface Registry {
   powers: RegistryPower[];
   modules: RegistryModule[];
   metrics: RegistryMetric[];
   subcomponent_status: string;
   metric_status: string;
+  // Customer-Proposition (C) section (ADR-0023) — a parallel dimension to B/P/L.
+  c_modules: RegistryCModule[];
+  c_widgets: RegistryWidget[];
+  c_status: string;
+  c_widget_profile: string;
 }
 
 export interface ScenarioResult {

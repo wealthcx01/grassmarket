@@ -1,5 +1,55 @@
 # GRS-0083 — C wizard step + widget-capture grid
 
+**Status:** Shipped
+**Loop:** Loop 7 — C-index (Customer Proposition)
+**Depends on:** GRS-0080/0081/0082, ADR-0023, ATLAS-Methodology-v1.3
+**Branch:** `grs-0083-c-wizard-and-widget-grid`
+
+## What shipped
+
+A `Customer Proposition` wizard step (10 C modules + subcomponents + the 93-widget Level-1 grid), its
+document collection, edit helpers, and a C read-out beside V on the Summary.
+
+**Contract (`bcap_contracts/assessments.py`)**
+- `WidgetObservation` — `present` + optional 1–5 `ease`/`usability`/`depth`; a non-present widget may
+  carry `PRESENT_PAYWALLED` / `PRESENT_DEFECTIVE`, validated fail-loud (present ⇒ no state; not
+  present ⇒ no scores, and only the two PRESENT_* states). Rarity is read from the registry, not
+  stored.
+- `AssessmentDocument.c_subcomponents` + `.widgets` (both default-empty → old documents load
+  unchanged). `LiveScore.c` — a **deterministic** reported value (not a Monte Carlo band).
+
+**Engine / service**
+- `score_customer` (engine) scores ONLY the C dimension — independent of B/P/L, so C reports before
+  powers/metrics are entered. `active_c_coefficient_set` is the C activation seam (draft, not
+  client-usable; None for a registry with no C).
+- `complete_c_subcomponents` completes untouched C subs to Not Assessed (D9, never zero-filled).
+  `c_scoreable` / `c_index_of` gate C on a rated critical-for-C module; `live_score` surfaces `c`
+  independently of V-scoreability.
+- **Bug fixed:** `Registry.for_profile` dropped the C dimension — every profile view now carries
+  `c_modules`/`c_widgets`/`c_status`/`c_widget_profile`, so the wizard/live C are not silently empty.
+
+**Frontend**
+- `types.ts` — `WidgetObservation`, C registry types (`RegistryCModule`/`RegistryWidget`/`WidgetRarity`),
+  `AssessmentDocument.c_subcomponents`/`widgets`, `LiveScore.c`.
+- `doc.ts` — `findCSub`/`setCSub` (C ratings reuse `subAssessed`/`subState`) + `findWidget`/`setWidget`
+  /`widgetPresent`/`widgetAbsent`.
+- `steps.tsx` — `CustomerPropositionStep` (cloned from Infrastructure Deep Dive) with the widget grid
+  grouped by the 15 categories, rarity chips, Present/Absent/Paywalled/Defective + ease/usability/depth
+  selects, and the `Guidance` toggle (the guidance endpoint serves C anchors from GRS-0081). Added to
+  `WIZARD_STEPS`. The grid is hidden for a non-retail profile (`c_widget_profile`). Summary shows C ×100
+  beside V.
+
+## Acceptance / verification
+
+`tests/test_c_capture.py` — widget validation (present/absent/paywalled/defective, 1–5 bounds);
+document round-trips C + widgets (save → reload identical); legacy documents load; untouched C
+completes to Not Assessed; C not scoreable until a critical-for-C module is rated, then reported;
+`live_score.c` surfaces while V is still blocked. `tests/test_profiles.py` — the profile view carries
+C. Golden master unchanged (Stage-1 reporting only). Front-end type-check · lint · vitest green;
+schema parity green; pyright + ruff clean.
+
+## Original plan
+
 **Status:** Planned
 **Loop:** Loop 7 — C-index (Customer Proposition)
 **Depends on:** ADR-0023 (Accepted), ATLAS-Methodology-v1.3

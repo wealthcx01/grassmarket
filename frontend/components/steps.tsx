@@ -21,6 +21,7 @@ import type {
   LiveScore,
   MaturityLevel,
   MetricConfidence,
+  NonScoreState,
   Registry,
   RegistryProfile,
   ScenarioComparison,
@@ -562,6 +563,223 @@ export function InfrastructureDeepDiveStep({ registry, document: d, update, read
   );
 }
 
+// --- 5b. Customer Proposition (C) — ADR-0023 --------------------------------------------
+
+// A widget's headline presence choice. "" = untouched. Paywalled/Defective are non-present states.
+type WidgetChoice = "" | "Yes" | "No" | "Paywalled" | "Defective";
+const WIDGET_SCORE_FIELDS: { key: "ease" | "usability" | "depth"; label: string }[] = [
+  { key: "ease", label: "Ease" },
+  { key: "usability", label: "Usability" },
+  { key: "depth", label: "Depth" },
+];
+const RARITY_TITLE: Record<string, string> = {
+  Common: "Common — table stakes; a gap here is a bottleneck",
+  Uncommon: "Uncommon — above baseline",
+  Rare: "Rare — a differentiator when done well",
+};
+
+function widgetChoiceOf(w: { present: boolean; state?: NonScoreState | null } | undefined): WidgetChoice {
+  if (!w) return "";
+  if (w.present) return "Yes";
+  if (w.state === "Present (Paywalled)") return "Paywalled";
+  if (w.state === "Present (Defective)") return "Defective";
+  return "No";
+}
+
+/** A 1–5 score select (ease / usability / depth) for a present widget. */
+function ScoreSelect({
+  value,
+  label,
+  disabled,
+  onChange,
+}: {
+  value: number | null | undefined;
+  label: string;
+  disabled: boolean;
+  onChange: (v: number | null) => void;
+}) {
+  return (
+    <select
+      disabled={disabled}
+      value={value ?? ""}
+      onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)}
+      style={selectStyle}
+      title={label}
+      aria-label={label}
+    >
+      <option value="">{label}…</option>
+      {[1, 2, 3, 4, 5].map((n) => (
+        <option key={n} value={n}>
+          {label[0]}
+          {n}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+export function CustomerPropositionStep({ registry, document: d, update, readOnly }: StepProps) {
+  const [openGuidance, setOpenGuidance] = useState<string | null>(null);
+  const profileKey = d.profile?.operating_model ?? "retail";
+  const showGrid = registry.c_widgets.length > 0 && profileKey === registry.c_widget_profile;
+  const categories = Array.from(new Set(registry.c_widgets.map((w) => w.category)));
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+      <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem", margin: 0 }}>
+        The Customer Proposition (C) index (ADR-0023) — the ten Phase-E modules, plus the Level-1
+        widget checklist. C is reported <em>alongside</em> V; it does not change V yet.
+      </p>
+
+      {registry.c_modules.map((m) => (
+        <div key={m.key}>
+          <h3 style={{ fontSize: "1rem", margin: "0 0 0.4rem" }}>{m.name}</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+            {m.subcomponents.map((s) => {
+              const r = doc.findCSub(d, s.key);
+              const choice: SubChoice = r?.level ?? (r?.state as SubChoice) ?? "";
+              return (
+                <Card key={s.key}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap", alignItems: "center" }}>
+                    <div>
+                      <strong style={{ fontSize: "0.85rem" }}>
+                        {s.critical ? "★ " : ""}
+                        {s.name}
+                      </strong>
+                      {s.description ? (
+                        <p style={{ margin: "0.1rem 0 0", fontSize: "0.75rem", color: "var(--color-ink-muted)" }}>{s.description}</p>
+                      ) : null}
+                    </div>
+                    <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
+                      <select
+                        disabled={readOnly}
+                        value={choice}
+                        onChange={(e) => {
+                          const v = e.target.value as SubChoice;
+                          update((x) => {
+                            if (v === "") return doc.setCSub(x, s.key, null);
+                            if (v === "Not Applicable" || v === "Not Assessed")
+                              return doc.setCSub(x, s.key, doc.subState(m.key, s.key, v));
+                            return doc.setCSub(x, s.key, doc.subAssessed(m.key, s.key, v, r?.evidence_grade ?? "E2"));
+                          });
+                        }}
+                        style={selectStyle}
+                      >
+                        <option value="">— unrated —</option>
+                        {MATURITY_LEVELS.map((l) => (
+                          <option key={l} value={l}>
+                            {l}
+                          </option>
+                        ))}
+                        <option value="Not Applicable">Not Applicable</option>
+                        <option value="Not Assessed">Not Assessed</option>
+                      </select>
+                      {r?.level != null ? (
+                        <GradeSelect
+                          value={r.evidence_grade}
+                          disabled={readOnly}
+                          onChange={(g) => update((x) => doc.setCSub(x, s.key, doc.subAssessed(m.key, s.key, r.level as MaturityLevel, g ?? "E1")))}
+                        />
+                      ) : null}
+                      <button type="button" className={smallBtn} style={smallBtnStyle} onClick={() => setOpenGuidance(openGuidance === s.key ? null : s.key)}>
+                        {openGuidance === s.key ? "Hide guidance" : "Guidance"}
+                      </button>
+                    </div>
+                  </div>
+                  {openGuidance === s.key ? (
+                    <div style={{ marginTop: "0.6rem" }}>
+                      <GuidancePanel subcomponentKey={s.key} />
+                    </div>
+                  ) : null}
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+
+      <div>
+        <h3 style={{ fontSize: "1rem", margin: "0 0 0.4rem" }}>Level-1 widget checklist</h3>
+        {!showGrid ? (
+          <p style={{ color: "var(--color-ink-muted)", fontSize: "0.82rem", margin: 0 }}>
+            The widget checklist is scoped to the <strong>{registry.c_widget_profile}</strong>{" "}
+            operating model; it is not shown for the <strong>{profileKey}</strong> profile.
+          </p>
+        ) : (
+          categories.map((category) => (
+            <div key={category} style={{ marginBottom: "0.75rem" }}>
+              <h4 style={{ fontSize: "0.82rem", margin: "0.5rem 0 0.3rem", color: "var(--color-ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                {category}
+              </h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+                {registry.c_widgets
+                  .filter((w) => w.category === category)
+                  .map((w) => {
+                    const obs = doc.findWidget(d, w.key);
+                    const choice = widgetChoiceOf(obs);
+                    return (
+                      <Card key={w.key}>
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", flexWrap: "wrap", alignItems: "center" }}>
+                          <div style={{ display: "flex", gap: "0.5rem", alignItems: "baseline" }}>
+                            <strong style={{ fontSize: "0.82rem" }}>{w.name}</strong>
+                            <span className="mono" title={RARITY_TITLE[w.rarity]} style={{ fontSize: "0.68rem", color: "var(--color-ink-muted)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-sm)", padding: "0 0.3rem" }}>
+                              {w.rarity}
+                            </span>
+                          </div>
+                          <div style={{ display: "flex", gap: "0.4rem", alignItems: "center", flexWrap: "wrap" }}>
+                            <select
+                              disabled={readOnly}
+                              value={choice}
+                              aria-label={`${w.name} presence`}
+                              onChange={(e) => {
+                                const v = e.target.value as WidgetChoice;
+                                update((x) => {
+                                  if (v === "") return doc.setWidget(x, w.key, null);
+                                  if (v === "Yes")
+                                    return doc.setWidget(x, w.key, doc.widgetPresent(w.key, obs ?? undefined));
+                                  if (v === "No") return doc.setWidget(x, w.key, doc.widgetAbsent(w.key, null));
+                                  const state: NonScoreState = v === "Paywalled" ? "Present (Paywalled)" : "Present (Defective)";
+                                  return doc.setWidget(x, w.key, doc.widgetAbsent(w.key, state));
+                                });
+                              }}
+                              style={selectStyle}
+                            >
+                              <option value="">— untouched —</option>
+                              <option value="Yes">Present</option>
+                              <option value="No">Absent</option>
+                              <option value="Paywalled">Paywalled</option>
+                              <option value="Defective">Defective</option>
+                            </select>
+                            {choice === "Yes"
+                              ? WIDGET_SCORE_FIELDS.map((f) => (
+                                  <ScoreSelect
+                                    key={f.key}
+                                    label={f.label}
+                                    value={obs?.[f.key]}
+                                    disabled={readOnly}
+                                    onChange={(n) =>
+                                      update((x) => {
+                                        const cur = doc.findWidget(x, w.key);
+                                        return doc.setWidget(x, w.key, doc.widgetPresent(w.key, { ...cur, [f.key]: n }));
+                                      })
+                                    }
+                                  />
+                                ))
+                              : null}
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
 // --- 6. Summary & Interpretation --------------------------------------------------------
 
 export function SummaryStep(props: StepProps) {
@@ -576,6 +794,21 @@ export function SummaryStep(props: StepProps) {
         onRefresh={props.refreshLive}
         moduleLabels={moduleLabels}
       />
+      {live?.c != null ? (
+        <Card>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "1rem" }}>
+            <div>
+              <strong style={{ fontSize: "0.9rem" }}>Customer Proposition (C)</strong>
+              <p style={{ margin: "0.2rem 0 0", fontSize: "0.75rem", color: "var(--color-ink-muted)" }}>
+                Reported alongside V (ADR-0023) — a point estimate, not yet part of the composite.
+              </p>
+            </div>
+            <span className="mono" style={{ fontSize: "1.15rem" }} title="C-index × 100">
+              {(live.c * 100).toFixed(1)}
+            </span>
+          </div>
+        </Card>
+      ) : null}
       {live?.scoreable ? (
         <Card>
           <h3 style={{ margin: "0 0 0.4rem", fontSize: "1rem" }}>Platform Power triad (ordinal)</h3>
@@ -738,6 +971,7 @@ export const WIZARD_STEPS: { title: string; component: (p: StepProps) => React.R
   { title: "Strategic Powers", component: StrategicPowersStep },
   { title: "Module Overview", component: ModuleOverviewStep },
   { title: "Infrastructure Deep Dive", component: InfrastructureDeepDiveStep },
+  { title: "Customer Proposition", component: CustomerPropositionStep },
   { title: "Summary & Interpretation", component: SummaryStep },
   { title: "Scenarios", component: ScenariosStep },
 ];

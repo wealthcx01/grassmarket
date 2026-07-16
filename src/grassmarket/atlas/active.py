@@ -71,6 +71,19 @@ def active_coefficient_set(registry: Registry) -> CoefficientSet:
     return draft_v1_coefficient_set(registry)
 
 
+def active_c_coefficient_set(registry: Registry) -> CoefficientSet | None:
+    """The C-index coefficient set the platform reports C with today (ADR-0023 Stage 1).
+
+    DRAFT, ``client_usable=False`` — C is reported ALONGSIDE V, never summed into it and never
+    priced (that is v1.4 / GRS-0086). Returns None for a registry with no C dimension. This is the
+    same single-point activation seam as :func:`active_coefficient_set`: when the θ_C panel ratifies
+    the C weights, this returns the elicited C set instead — one reviewed change, no env toggle.
+    """
+    if not registry.c_modules:
+        return None
+    return draft_v1_coefficient_set(registry, score_c=True)
+
+
 def active_uncertainty_model() -> UncertaintyModel:
     """Return the §7 uncertainty model the platform draws ranges from right now.
 

@@ -300,6 +300,26 @@ def _score_l(
 # --- Customer proposition (C) — ADR-0023, Stage 1 --------------------------------------
 
 
+def score_customer(
+    c_subcomponents: Sequence[SubcomponentRating],
+    coefficients: CoefficientSet,
+    registry: Registry,
+) -> CustomerResult:
+    """Score ONLY the C dimension (ADR-0023 Stage 1), independent of B/P/L — so C can be reported
+    before powers/metrics are entered. Requires a C-scoring coefficient set and exact C coverage;
+    both are fail-loud (ADR-0001). C never enters V here (that is v1.4 / GRS-0086)."""
+    if not coefficients.scores_c:
+        raise ValueError("score_customer requires a coefficient set that scores C (ADR-0023).")
+    coefficients.validate_against(registry)
+    _assert_exact(
+        "c_subcomponent",
+        registry.all_c_subcomponent_keys(),
+        {r.subcomponent_key for r in c_subcomponents},
+    )
+    customer, _ = _score_c(registry, coefficients, {r.subcomponent_key: r for r in c_subcomponents})
+    return customer
+
+
 def _score_c(
     registry: Registry,
     coefficients: CoefficientSet,
