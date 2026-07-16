@@ -16,6 +16,8 @@ from uuid import UUID
 from bcap_contracts.commissions import (
     CommissionConfig,
     CommissionKind,
+    CommissionStream,
+    DeliveryType,
     SourcingAttribution,
 )
 from bcap_contracts.common import ConsultantTier
@@ -69,11 +71,20 @@ def commission_content_hash(
     rate_ref: str | None,
     base_value: Money | None,
     source_attribution_id: UUID | None,
+    stream: CommissionStream | None = None,
+    product_id: str | None = None,
+    delivery_type: DeliveryType | None = None,
+    contract_year: int | None = None,
+    window_end: date | None = None,
 ) -> str:
     """SHA-256 over the canonical commission-line FINANCIAL fields — the immutability seal
     (scoring-run pattern). `payment_status` is deliberately EXCLUDED — it is the one mutable field
     (the pending → invoiced → paid lifecycle), so the seal protects the figures that must never
-    change (amount, base value, rate, tier, attribution) while the status advances freely."""
+    change (amount, base value, rate, tier, attribution, and the v7 stream provenance) while the
+    status advances freely. `client_paid_on` is EXCLUDED too (ADR-0026): it is a lifecycle
+    precondition on advancing to `paid`, not a figure — like `payment_status`, it moves after record
+    time. The four v7 provenance fields (product_id / delivery_type / contract_year / window_end)
+    ARE sealed."""
     canonical = "|".join(
         [
             str(owner_consultant_id),
@@ -90,6 +101,11 @@ def commission_content_hash(
             base_value.currency.value if base_value else "-",
             base_value.assumption_register_ref if base_value else "-",
             str(source_attribution_id) if source_attribution_id else "-",
+            stream.value if stream else "-",
+            product_id or "-",
+            delivery_type.value if delivery_type else "-",
+            str(contract_year) if contract_year is not None else "-",
+            window_end.isoformat() if window_end else "-",
         ]
     )
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()

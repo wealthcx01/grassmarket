@@ -59,6 +59,8 @@ from bcap_contracts.certification import (
 from bcap_contracts.commissions import (
     CommissionKind,
     CommissionLine,
+    CommissionStream,
+    DeliveryType,
     EarningsSummary,
     PaymentStatus,
     SourcingAttribution,
@@ -733,6 +735,12 @@ class Repository:
         rate_ref: str | None,
         base_value: Money | None,
         source_attribution_id: UUID | None,
+        stream: CommissionStream | None = None,
+        product_id: str | None = None,
+        delivery_type: DeliveryType | None = None,
+        contract_year: int | None = None,
+        window_end: date | None = None,
+        client_paid_on: date | None = None,
     ) -> CommissionLine:
         content_hash = commission_content_hash(
             owner_consultant_id=owner_consultant_id,
@@ -745,6 +753,11 @@ class Repository:
             rate_ref=rate_ref,
             base_value=base_value,
             source_attribution_id=source_attribution_id,
+            stream=stream,
+            product_id=product_id,
+            delivery_type=delivery_type,
+            contract_year=contract_year,
+            window_end=window_end,
         )
         row = CommissionLineORM(
             owner_consultant_id=owner_consultant_id,
@@ -762,6 +775,12 @@ class Repository:
             base_value_currency=base_value.currency.value if base_value else None,
             base_value_ref=base_value.assumption_register_ref if base_value else None,
             source_attribution_id=source_attribution_id,
+            stream=stream.value if stream else None,
+            product_id=product_id,
+            delivery_type=delivery_type.value if delivery_type else None,
+            contract_year=contract_year,
+            window_end=window_end,
+            client_paid_on=client_paid_on,
             content_hash=content_hash,
         )
         self._session.add(row)
@@ -940,6 +959,12 @@ class Repository:
             rate_ref=row.rate_ref,
             base_value=base_value,
             source_attribution_id=row.source_attribution_id,
+            stream=CommissionStream(row.stream) if row.stream else None,
+            product_id=row.product_id,
+            delivery_type=DeliveryType(row.delivery_type) if row.delivery_type else None,
+            contract_year=row.contract_year,
+            window_end=row.window_end,
+            client_paid_on=row.client_paid_on,
             content_hash=row.content_hash,
             created_at=row.created_at,
             updated_at=row.updated_at,

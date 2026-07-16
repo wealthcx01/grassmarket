@@ -352,6 +352,14 @@ class CommissionLineORM(Base):
     source_attribution_id: Mapped[UUID | None] = mapped_column(
         Uuid, unique=True, index=True, nullable=True
     )
+    # v7 two-stream provenance (ADR-0026); null on legacy/recovery lines (non-retroactive). The
+    # sealed four are stream/product/delivery/year/window; client_paid_on is the pay-when-paid date.
+    stream: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    product_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    delivery_type: Mapped[str | None] = mapped_column(String(24), nullable=True)
+    contract_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    window_end: Mapped[date | None] = mapped_column(Date, nullable=True)
+    client_paid_on: Mapped[date | None] = mapped_column(Date, nullable=True)
     content_hash: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
     updated_at: Mapped[datetime] = mapped_column(
