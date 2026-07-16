@@ -464,6 +464,14 @@ class LiveScore(BaseModel):
     subcomponents_assessed: int = 0
     subcomponents_total: int = 0
     coverage: Score | None = None
+    # Weights the score was built from — surfaced for the diagnostic visuals (GRS-0070): the θ
+    # value-weights drive the B→P→L→V waterfall, the module weights δ_m (κ_m) annotate the module
+    # table. Present only when scoreable; this is transparency of the active coefficients, never a
+    # client price (the client-facing gate is on deliverables, not the live panel).
+    theta_b: Score | None = None
+    theta_p: Score | None = None
+    theta_l: Score | None = None
+    module_weights: dict[str, float] = Field(default_factory=dict)
     engine_version: str
     methodology_version: str
     coefficient_version: str

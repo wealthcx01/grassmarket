@@ -112,6 +112,11 @@ export interface LiveScore {
   subcomponents_assessed: number;
   subcomponents_total: number;
   coverage?: number | null;
+  // Weights the score was built from (GRS-0070 diagnostics); present only when scoreable.
+  theta_b?: number | null;
+  theta_p?: number | null;
+  theta_l?: number | null;
+  module_weights: Record<string, number>;
   engine_version: string;
   methodology_version: string;
   coefficient_version: string;

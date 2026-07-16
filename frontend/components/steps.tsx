@@ -9,6 +9,7 @@
 import { useState } from "react";
 
 import { CommitteeReviewPanel } from "@/components/CommitteeReviewPanel";
+import { DiagnosticsPanel } from "@/components/Diagnostics";
 import { DualRatingPanel } from "@/components/DualRatingPanel";
 import { GuidancePanel } from "@/components/GuidancePanel";
 import { LiveScorePanel } from "@/components/LiveScorePanel";
@@ -471,6 +472,9 @@ export function SummaryStep(props: StepProps) {
         </Card>
       ) : null}
 
+      {/* Diagnostic visuals (GRS-0070): radar, value waterfall, weighted module table. */}
+      <DiagnosticsPanel live={live} moduleLabels={moduleLabels} />
+
       {/* Governance (resolves the finalise blockers in-product): §9 dual rating + §8 committee. */}
       {readOnly ? null : (
         <DualRatingPanel
@@ -580,14 +584,33 @@ export function ScenariosStep({ registry, document: d, assessmentId }: StepProps
       ) : null}
       {result?.scoreable ? (
         <Card>
-          <h3 style={{ margin: "0 0 0.4rem", fontSize: "1rem" }}>Upgrade Priority Index</h3>
-          <ol style={{ margin: 0, paddingLeft: "1.2rem" }}>
-            {result.priority_index.map((u) => (
-              <li key={u.name} style={{ fontSize: "0.85rem", marginBottom: "0.2rem" }}>
-                {u.name} — <strong className="mono">ΔV {(u.delta_v * 100).toFixed(2)}</strong>
-              </li>
-            ))}
-          </ol>
+          <h3 style={{ margin: "0 0 0.1rem", fontSize: "1rem" }}>Upgrade Priority Index</h3>
+          <p style={{ margin: "0 0 0.6rem", fontSize: "0.75rem", color: "var(--color-ink-muted)" }}>
+            Ranked by ΔV (score points ×100). Longest bar = the highest-leverage single upgrade.
+          </p>
+          {(() => {
+            const maxDelta = Math.max(...result.priority_index.map((u) => Math.abs(u.delta_v)), 1e-9);
+            return (
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+                {result.priority_index.map((u) => {
+                  const pts = u.delta_v * 100;
+                  const widthPct = Math.max((Math.abs(u.delta_v) / maxDelta) * 100, 1.5);
+                  return (
+                    <div key={u.name} style={{ display: "grid", gridTemplateColumns: "1.4rem 1fr auto", gap: "0.5rem", alignItems: "center" }}>
+                      <span className="mono" style={{ fontSize: "0.72rem", color: "var(--color-ink-faint)" }}>#{u.rank}</span>
+                      <div title={u.name}>
+                        <div style={{ fontSize: "0.78rem", marginBottom: "0.15rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.name}</div>
+                        <div style={{ height: "0.55rem", background: "var(--color-paper-sunken)", borderRadius: "var(--radius-pill)", overflow: "hidden" }}>
+                          <div style={{ width: `${widthPct}%`, height: "100%", background: "var(--color-accent)", borderRadius: "var(--radius-pill)" }} />
+                        </div>
+                      </div>
+                      <strong className="mono" style={{ fontSize: "0.8rem" }}>ΔV {pts.toFixed(2)}</strong>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </Card>
       ) : null}
     </div>
