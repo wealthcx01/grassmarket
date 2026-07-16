@@ -2,26 +2,42 @@ import Link from "next/link";
 import { FirstRunWalkthrough } from "@/components/FirstRunWalkthrough";
 import { WelcomeBanner } from "@/components/WelcomeBanner";
 
-// PRD §1 / §4–7 — the advisor's main sections. Every section has a live page.
-const SECTIONS: ReadonlyArray<{ title: string; href: string; blurb: string; kicker: string }> = [
+// The advisor's sections, grouped by an intentional IA (GRS-0091): the client-delivery FLOW first
+// (prospect → assess → deliver, in that order), then the grow-and-get-paid group. `step` numbers the
+// delivery flow because it genuinely is a sequence; the secondary group carries no step.
+type Section = {
+  title: string;
+  href: string;
+  blurb: string;
+  kicker: string;
+  step?: number;
+};
+
+const CLIENT_WORK: ReadonlyArray<Section> = [
   {
+    step: 1,
     title: "Pipeline",
     href: "/pipeline",
     kicker: "Prospects & workshops",
     blurb: "Prospects, workshops, and kanban stages with time-in-stage flags and a weighted forecast.",
   },
   {
+    step: 2,
     title: "Your Brokerages",
     href: "/assessments",
     kicker: "Portfolio · the Platform Power wizard",
-    blurb: "Your portfolio of assessments — segment, last score and status at a glance — and the 7-step wizard: business metrics, the 7 Powers, and the infrastructure deep dive, scored live with uncertainty bands.",
+    blurb: "Your portfolio of assessments — segment, last score and status at a glance — and the wizard: business metrics, the 7 Powers, and the infrastructure deep dive, scored live with uncertainty bands.",
   },
   {
+    step: 3,
     title: "Deliverables",
     href: "/engagements",
     kicker: "Per engagement",
     blurb: "Diagnostic packs, heatmaps, and the modernisation roadmap — generated from a finalised assessment.",
   },
+];
+
+const GROW: ReadonlyArray<Section> = [
   {
     title: "Workbench",
     href: "/workbench",
@@ -35,6 +51,53 @@ const SECTIONS: ReadonlyArray<{ title: string; href: string; blurb: string; kick
     blurb: "Commission breakdown, workshop recovery fees, YTD and projections — with a downloadable statement.",
   },
 ];
+
+function SectionCard({ section }: { section: Section }) {
+  return (
+    <Link href={section.href} className="card-link" style={{ padding: "1.25rem 1.35rem", height: "100%" }}>
+      <span
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "0.5rem",
+        }}
+      >
+        <p className="eyebrow" style={{ fontSize: "0.62rem", margin: 0 }}>
+          {section.kicker}
+        </p>
+        {section.step ? (
+          <span
+            aria-hidden
+            className="mono"
+            style={{ fontSize: "0.7rem", color: "var(--color-ink-faint)" }}
+          >
+            {String(section.step).padStart(2, "0")}
+          </span>
+        ) : null}
+      </span>
+      <span
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "0.5rem",
+          margin: "0.35rem 0 0",
+        }}
+      >
+        <span style={{ fontFamily: "var(--font-serif)", fontWeight: 600, fontSize: "1.2rem" }}>
+          {section.title}
+        </span>
+        <span aria-hidden className="mono" style={{ color: "var(--color-ink-faint)" }}>
+          →
+        </span>
+      </span>
+      <p style={{ margin: "0.5rem 0 0", fontSize: "0.88rem", color: "var(--color-ink-muted)", lineHeight: 1.5 }}>
+        {section.blurb}
+      </p>
+    </Link>
+  );
+}
 
 export default function DashboardPage() {
   return (
@@ -89,9 +152,14 @@ export default function DashboardPage() {
         </span>
       </Link>
 
-      {/* Sections */}
+      {/* Your client work — the delivery flow, prioritised (GRS-0091) */}
       <section>
-        <h2 style={{ fontSize: "1.1rem", marginBottom: "1rem" }}>Sections</h2>
+        <div style={{ marginBottom: "1rem" }}>
+          <h2 style={{ fontSize: "1.1rem", margin: 0 }}>Your client work</h2>
+          <p style={{ margin: "0.25rem 0 0", color: "var(--color-ink-muted)", fontSize: "0.9rem" }}>
+            Prospect, assess, deliver — the flow from a lead to a finished Platform Power Report.
+          </p>
+        </div>
         <ul
           style={{
             listStyle: "none",
@@ -99,40 +167,37 @@ export default function DashboardPage() {
             padding: 0,
             display: "grid",
             gap: "1rem",
-            gridTemplateColumns: "repeat(auto-fill, minmax(17rem, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(16rem, 1fr))",
           }}
         >
-          {SECTIONS.map((s) => (
+          {CLIENT_WORK.map((s) => (
             <li key={s.title}>
-              <Link href={s.href} className="card-link" style={{ padding: "1.25rem 1.35rem", height: "100%" }}>
-                <p className="eyebrow" style={{ fontSize: "0.62rem" }}>
-                  {s.kicker}
-                </p>
-                <span
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: "0.5rem",
-                    margin: "0.35rem 0 0",
-                  }}
-                >
-                  <span style={{ fontFamily: "var(--font-serif)", fontWeight: 600, fontSize: "1.2rem" }}>
-                    {s.title}
-                  </span>
-                  <span aria-hidden className="mono" style={{ color: "var(--color-ink-faint)" }}>
-                    →
-                  </span>
-                </span>
-                <p style={{ margin: "0.5rem 0 0", fontSize: "0.88rem", color: "var(--color-ink-muted)", lineHeight: 1.5 }}>
-                  {s.blurb}
-                </p>
-              </Link>
+              <SectionCard section={s} />
             </li>
           ))}
         </ul>
       </section>
 
+      {/* Grow & get paid — secondary group */}
+      <section>
+        <h2 style={{ fontSize: "1.1rem", margin: "0 0 1rem" }}>Grow &amp; get paid</h2>
+        <ul
+          style={{
+            listStyle: "none",
+            margin: 0,
+            padding: 0,
+            display: "grid",
+            gap: "1rem",
+            gridTemplateColumns: "repeat(auto-fit, minmax(18rem, 1fr))",
+          }}
+        >
+          {GROW.map((s) => (
+            <li key={s.title}>
+              <SectionCard section={s} />
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }

@@ -1,8 +1,35 @@
 # GRS-0091 — Home IA / layout & the "Sections" grid
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** —
+**Branch:** `grs-0091-home-ia-layout`
+
+## What shipped
+
+Replaced the flat, undifferentiated "Sections" tile grid with a **deliberate information architecture**
+that prioritises the advisor's client-delivery work.
+
+- **Two grouped clusters** instead of one grid:
+  1. **"Your client work"** — the delivery **flow** in workflow order: **Pipeline → Your Brokerages
+     (assess) → Deliverables**. Subtitled "Prospect, assess, deliver — the flow from a lead to a
+     finished Platform Power Report." These three are numbered `01/02/03` because they genuinely are a
+     sequence (the numbering encodes real order, not decoration).
+  2. **"Grow & get paid"** — the secondary group: **Workbench**, **My Earnings**. No step numbers.
+- **`SectionCard`** extracted so both groups share one card, with the step index shown only on the
+  sequenced group.
+- Coheres with the GRS-0089 welcome/context block above it (which points into this flow) and the
+  GRS-0087 header account menu.
+
+The section *set* was reconsidered and justified: the five live sections are retained but re-grouped by
+whether they are **client delivery** or **advisor growth/earnings**, and the delivery group is ordered
+by the actual prospect→assess→deliver sequence rather than carried over as an arbitrary tile order.
+
+## Acceptance / verification
+
+The home page presents a considered IA (two labelled groups, a sequenced primary flow, a secondary
+group) rather than an undifferentiated grid; the ordering is justified by the delivery workflow; it
+coheres with the welcome block + header menu. Frontend type-check · lint · vitest green.
 
 ## Why
 
