@@ -24,9 +24,11 @@ export interface Waterfall {
   total: number; // Σ contributions (== V.p50 up to rounding)
 }
 
+// Terse labels for the compact SVG waterfall axis (GRS-0097 keeps P as "Power"; the fuller L caption
+// "the technology Layer" lives in the live-score panel band labels + the primer, where there is room).
 const LENS_LABEL: Record<WaterfallStep["key"], string> = {
   B: "Business (B)",
-  P: "Strategic Power (P)",
+  P: "Power (P)",
   L: "Infrastructure (L)",
 };
 

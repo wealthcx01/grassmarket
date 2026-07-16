@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 
 const LENSES: ReadonlyArray<{ letter: string; name: string; question: string }> = [
   { letter: "B", name: "Business", question: "What does this platform achieve economically? Hard numbers — AUA, revenue, margins, growth, acquisition costs." },
-  { letter: "P", name: "Strategic Power", question: "What stops a competitor taking it away? Helmer's 7 Powers, each scored on benefit AND barrier." },
-  { letter: "L", name: "Infrastructure", question: "Is the plumbing an asset or a constraint? 9 modules, 51 subcomponents, front end to liquidity." },
+  { letter: "P", name: "Power", question: "What stops a competitor taking it away? Helmer's 7 Powers, each scored on benefit AND barrier." },
+  { letter: "L", name: "Infrastructure · the technology Layer", question: "Is the plumbing an asset or a constraint? 9 modules, 51 subcomponents, front end to liquidity." },
   { letter: "V", name: "Platform Value", question: "The composite headline. But the number clients remember is usually the bottleneck — the weakest link." },
 ];
 
