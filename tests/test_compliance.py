@@ -10,7 +10,7 @@ from datetime import UTC, datetime
 
 import pytest
 from bcap_contracts.audit import AuditEventType
-from bcap_contracts.commissions import SourcingAttribution
+from bcap_contracts.commissions import DeliveryType, SourcingAttribution
 from bcap_contracts.money import Currency, Money
 from cryptography.fernet import Fernet
 
@@ -84,14 +84,16 @@ def test_login_is_audited(client, alice: SeededConsultant, admin: SeededConsulta
 def test_recording_a_commission_is_audited(
     repo: Repository, admin: SeededConsultant, alice: SeededConsultant
 ) -> None:
-    repo.record_engagement_commission(
+    repo.record_consultancy_commission(
         admin.principal,
         advisor_id=alice.stored.id,
         engagement_id=alice.stored.id,  # any uuid — informational
         base_value=Money(
             amount_minor=4_000_000, currency=Currency.GBP, assumption_register_ref="c"
         ),
-        attribution=SourcingAttribution.SELF_SOURCED,
+        sourcing=SourcingAttribution.SELF_SOURCED,
+        delivery_type=DeliveryType.BRUNTSFIELD_LED,
+        contract_year=1,
         earned_on=_NOW.date(),
     )
     assert any(

@@ -13,7 +13,9 @@ from io import BytesIO
 from uuid import UUID
 
 from bcap_contracts.commissions import (
+    CommissionConfigError,
     CommissionLine,
+    DeliveryType,
     EarningsSummary,
     PaymentStatus,
     SourcingAttribution,
@@ -38,14 +40,30 @@ router = APIRouter(prefix="/earnings", tags=["earnings"])
 _DOCX_MEDIA = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
 
-class RecordCommissionRequest(BaseModel):
+class _RecordCommissionBase(BaseModel):
     advisor_id: UUID
     engagement_id: UUID
-    base_value_minor: int = Field(ge=0, description="Engagement contract value in minor units.")
+    base_value_minor: int = Field(ge=0, description="Cash received in minor units.")
     currency: Currency = Currency.GBP
-    base_value_ref: str = Field(min_length=1, description="Where the contract value comes from.")
-    attribution: SourcingAttribution
+    base_value_ref: str = Field(
+        min_length=1, description="Where the cash-received figure comes from."
+    )
+    contract_year: int = Field(ge=1, description="1-based period: Year 1 = the first 12 months.")
     earned_on: date
+    client_paid_on: date | None = None  # pay-when-paid anchor (may be set later)
+
+
+class RecordProductCommissionRequest(_RecordCommissionBase):
+    """Stream A — product commission (ADR-0026)."""
+
+    product_id: str = Field(min_length=1)
+
+
+class RecordConsultancyCommissionRequest(_RecordCommissionBase):
+    """Stream B — consultancy commission (ADR-0026)."""
+
+    sourcing: SourcingAttribution
+    delivery_type: DeliveryType
 
 
 class ClaimRecoveryFeeRequest(BaseModel):
@@ -54,6 +72,10 @@ class ClaimRecoveryFeeRequest(BaseModel):
 
 class AdvancePaymentRequest(BaseModel):
     to_status: PaymentStatus
+
+
+class RecordClientPaidRequest(BaseModel):
+    client_paid_on: date
 
 
 def _forbidden(exc: Exception) -> HTTPException:
@@ -113,31 +135,70 @@ def download_statement(
 # --- admin / finance actions -------------------------------------------------------------
 
 
-@router.post("/commissions", response_model=CommissionLine, status_code=status.HTTP_201_CREATED)
-def record_commission(
-    payload: RecordCommissionRequest,
-    principal: Principal = Depends(get_current_principal),
-    repo: Repository = Depends(get_repository),
-) -> CommissionLine:
-    base_value = Money(
+def _base_value(payload: _RecordCommissionBase) -> Money:
+    return Money(
         amount_minor=payload.base_value_minor,
         currency=payload.currency,
         assumption_register_ref=payload.base_value_ref,
     )
+
+
+@router.post(
+    "/commissions/product", response_model=CommissionLine, status_code=status.HTTP_201_CREATED
+)
+def record_product_commission(
+    payload: RecordProductCommissionRequest,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> CommissionLine:
+    """Record a Stream-A product commission (ADR-0026) — ADMIN only."""
     try:
-        return repo.record_engagement_commission(
+        return repo.record_product_commission(
             principal,
             advisor_id=payload.advisor_id,
             engagement_id=payload.engagement_id,
-            base_value=base_value,
-            attribution=payload.attribution,
+            base_value=_base_value(payload),
+            product_id=payload.product_id,
+            contract_year=payload.contract_year,
             earned_on=payload.earned_on,
+            client_paid_on=payload.client_paid_on,
         )
     except ScopeViolationError as exc:
         raise _forbidden(exc) from exc
     except NotFoundError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
-    except ValueError as exc:  # e.g. a base value in a currency the schedule doesn't price
+    except (ValueError, CommissionConfigError) as exc:  # unknown product, cross-currency, etc.
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
+        ) from exc
+
+
+@router.post(
+    "/commissions/consultancy", response_model=CommissionLine, status_code=status.HTTP_201_CREATED
+)
+def record_consultancy_commission(
+    payload: RecordConsultancyCommissionRequest,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> CommissionLine:
+    """Record a Stream-B consultancy commission (ADR-0026) — ADMIN only."""
+    try:
+        return repo.record_consultancy_commission(
+            principal,
+            advisor_id=payload.advisor_id,
+            engagement_id=payload.engagement_id,
+            base_value=_base_value(payload),
+            sourcing=payload.sourcing,
+            delivery_type=payload.delivery_type,
+            contract_year=payload.contract_year,
+            earned_on=payload.earned_on,
+            client_paid_on=payload.client_paid_on,
+        )
+    except ScopeViolationError as exc:
+        raise _forbidden(exc) from exc
+    except NotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except (ValueError, CommissionConfigError) as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
         ) from exc
@@ -177,3 +238,20 @@ def advance_payment(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
     except ConflictError as exc:
         raise _conflict(exc) from exc
+
+
+@router.post("/commissions/{line_id}/client-paid", response_model=CommissionLine)
+def record_client_paid(
+    line_id: UUID,
+    payload: RecordClientPaidRequest,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> CommissionLine:
+    """Record the client-cash-received date on a commission (ADR-0026 pay-when-paid) — ADMIN only.
+    Required before the line may advance to `paid`."""
+    try:
+        return repo.record_client_paid(principal, line_id, client_paid_on=payload.client_paid_on)
+    except ScopeViolationError as exc:
+        raise _forbidden(exc) from exc
+    except NotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc

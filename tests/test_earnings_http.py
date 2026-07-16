@@ -14,16 +14,24 @@ from grassmarket.data.models import RecoveryFeeAttributionORM
 from tests.conftest import SeededConsultant, auth_header
 
 
-def _record_payload(advisor_id: str, *, minor: int = 4_000_000) -> dict:
-    return {
+def _record_payload(
+    advisor_id: str, *, minor: int = 4_000_000, client_paid_on: str | None = None
+) -> dict:
+    # Stream-B consultancy: firm × bruntsfield-led, Year 1 = 1500 bps (15%). £40,000 → £6,000.
+    payload = {
         "advisor_id": advisor_id,
         "engagement_id": str(uuid4()),
         "base_value_minor": minor,
         "currency": "GBP",
         "base_value_ref": "contract:acme-2026",
-        "attribution": "self_sourced",
+        "sourcing": "firm_sourced",
+        "delivery_type": "bruntsfield_led",
+        "contract_year": 1,
         "earned_on": "2026-03-01",
     }
+    if client_paid_on:
+        payload["client_paid_on"] = client_paid_on
+    return payload
 
 
 def test_admin_records_a_commission_that_the_advisor_can_see(
@@ -31,7 +39,7 @@ def test_admin_records_a_commission_that_the_advisor_can_see(
 ) -> None:
     # Alice is a venture_associate; self-sourced = 1500 bps (15%). £40,000 → £6,000.
     resp = client.post(
-        "/earnings/commissions",
+        "/earnings/commissions/consultancy",
         json=_record_payload(str(alice.stored.id)),
         headers=auth_header(admin),
     )
@@ -54,7 +62,7 @@ def test_admin_records_a_commission_that_the_advisor_can_see(
 def test_recording_a_commission_is_admin_only(client, alice: SeededConsultant) -> None:
     # An advisor cannot record their own commission (objective money fact, never self-attested).
     resp = client.post(
-        "/earnings/commissions",
+        "/earnings/commissions/consultancy",
         json=_record_payload(str(alice.stored.id)),
         headers=auth_header(alice),
     )
@@ -64,9 +72,10 @@ def test_recording_a_commission_is_admin_only(client, alice: SeededConsultant) -
 def test_payment_status_advances_forward_only(
     client, admin: SeededConsultant, alice: SeededConsultant
 ) -> None:
+    # Record with client_paid_on set so the pay-when-paid gate permits reaching `paid`.
     line_id = client.post(
-        "/earnings/commissions",
-        json=_record_payload(str(alice.stored.id)),
+        "/earnings/commissions/consultancy",
+        json=_record_payload(str(alice.stored.id), client_paid_on="2026-03-15"),
         headers=auth_header(admin),
     ).json()["id"]
 
@@ -97,11 +106,56 @@ def test_payment_status_advances_forward_only(
     assert forbidden.status_code == 403
 
 
+def test_pay_when_paid_gates_reaching_paid(
+    client, admin: SeededConsultant, alice: SeededConsultant
+) -> None:
+    # Recorded WITHOUT client_paid_on → cannot reach `paid` (ADR-0026 pay-when-paid).
+    line_id = client.post(
+        "/earnings/commissions/consultancy",
+        json=_record_payload(str(alice.stored.id)),
+        headers=auth_header(admin),
+    ).json()["id"]
+    client.post(
+        f"/earnings/commissions/{line_id}/payment",
+        json={"to_status": "invoiced"},
+        headers=auth_header(admin),
+    )
+    blocked = client.post(
+        f"/earnings/commissions/{line_id}/payment",
+        json={"to_status": "paid"},
+        headers=auth_header(admin),
+    )
+    assert blocked.status_code == 409  # client cash not yet recorded
+
+    # Recording the client-paid date is admin-only; an advisor cannot self-attest it.
+    assert (
+        client.post(
+            f"/earnings/commissions/{line_id}/client-paid",
+            json={"client_paid_on": "2026-04-01"},
+            headers=auth_header(alice),
+        ).status_code
+        == 403
+    )
+    client.post(
+        f"/earnings/commissions/{line_id}/client-paid",
+        json={"client_paid_on": "2026-04-01"},
+        headers=auth_header(admin),
+    )
+    # Now it may advance to paid.
+    ok = client.post(
+        f"/earnings/commissions/{line_id}/payment",
+        json={"to_status": "paid"},
+        headers=auth_header(admin),
+    )
+    assert ok.status_code == 200
+    assert ok.json()["payment_status"] == "paid"
+
+
 def test_a_skip_transition_is_refused(
     client, admin: SeededConsultant, alice: SeededConsultant
 ) -> None:
     line_id = client.post(
-        "/earnings/commissions",
+        "/earnings/commissions/consultancy",
         json=_record_payload(str(alice.stored.id)),
         headers=auth_header(admin),
     ).json()["id"]
@@ -118,7 +172,7 @@ def test_commissions_are_self_scoped(
     client, admin: SeededConsultant, alice: SeededConsultant, bob: SeededConsultant
 ) -> None:
     client.post(
-        "/earnings/commissions",
+        "/earnings/commissions/consultancy",
         json=_record_payload(str(alice.stored.id)),
         headers=auth_header(admin),
     )
@@ -134,7 +188,7 @@ def test_an_advisor_downloads_their_statement(
     client, admin: SeededConsultant, alice: SeededConsultant
 ) -> None:
     client.post(
-        "/earnings/commissions",
+        "/earnings/commissions/consultancy",
         json=_record_payload(str(alice.stored.id)),
         headers=auth_header(admin),
     )
@@ -212,7 +266,7 @@ def test_the_seal_survives_a_payment_advance(
     client, admin: SeededConsultant, alice: SeededConsultant
 ) -> None:
     line = client.post(
-        "/earnings/commissions",
+        "/earnings/commissions/consultancy",
         json=_record_payload(str(alice.stored.id)),
         headers=auth_header(admin),
     ).json()
@@ -231,7 +285,7 @@ def test_earnings_endpoints_require_authentication(client, alice: SeededConsulta
     assert client.get("/earnings/summary").status_code == 401
     assert client.get("/earnings/statement").status_code == 401
     # The admin/finance mutations also require auth.
-    assert client.post("/earnings/commissions", json={}).status_code == 401
+    assert client.post("/earnings/commissions/consultancy", json={}).status_code == 401
     assert (
         client.post(
             f"/earnings/commissions/{uuid4()}/payment", json={"to_status": "paid"}

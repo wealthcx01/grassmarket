@@ -15,6 +15,7 @@ Fail-loud throughout: a missing row raises `NotFoundError`; a cross-owner access
 
 from __future__ import annotations
 
+import calendar
 import hashlib
 import json
 from collections.abc import Sequence
@@ -166,7 +167,8 @@ from grassmarket.data.models import (
 )
 from grassmarket.earnings.commission import (
     commission_content_hash,
-    compute_engagement_commission,
+    compute_consultancy_commission,
+    compute_product_commission,
 )
 from grassmarket.pathb.cipher import TranscriptCipher
 from grassmarket.pathb.extraction import Extractor
@@ -205,6 +207,16 @@ def content_hash_for(
         [engine_version, methodology_version, coefficient_version, inputs.model_dump_json()]
     )
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _add_months(start: date, months: int) -> date:
+    """`start` advanced by whole `months`, clamping the day to the target month's length. Used to
+    stamp a Stream-A product commission's window cut-off (ADR-0026)."""
+    total = start.month - 1 + months
+    year = start.year + total // 12
+    month = total % 12 + 1
+    day = min(start.day, calendar.monthrange(year, month)[1])
+    return date(year, month, day)
 
 
 def _strip_governance_fields(document: AssessmentDocument) -> AssessmentDocument:
@@ -791,45 +803,98 @@ class Repository:
             raise ConflictError("This recovery fee has already been claimed.") from exc
         return self._to_commission_line(row)
 
-    def record_engagement_commission(
+    def record_product_commission(
         self,
         principal: Principal,
         *,
         advisor_id: UUID,
         engagement_id: UUID,
         base_value: Money,
-        attribution: SourcingAttribution,
+        product_id: str,
+        contract_year: int,
         earned_on: date,
+        client_paid_on: date | None = None,
     ) -> CommissionLine:
-        """Record an engagement commission for an advisor — ADMIN only. The rate is the config rate
-        for the advisor's tier × attribution AT RECORD TIME, stamped via rate_ref so a later config
-        change is never retroactive. Immutable + content-hash-sealed."""
+        """Record a **Stream-A product** commission (ADR-0026) — ADMIN only. Prices Yr1/Yr2 by
+        `contract_year` (£0 past the window), stamps the product provenance + `rate_ref` so a later
+        config change is never retroactive, and records the window cut-off. Content-hash-sealed."""
         if not principal.is_admin:
             raise ScopeViolationError("Only an admin may record a commission.")
-        advisor = self._require_consultant(advisor_id)
+        self._require_consultant(advisor_id)
         config = load_commission_config()
-        tier = ConsultantTier(advisor.tier)
-        amount = compute_engagement_commission(base_value, tier, attribution, config)
+        amount = compute_product_commission(base_value, product_id, contract_year, config)
+        window_end = _add_months(earned_on, config.require_product(product_id).window_months)
         line = self._new_commission_line(
             owner_consultant_id=advisor_id,
             engagement_id=engagement_id,
             kind=CommissionKind.ENGAGEMENT,
             amount=amount,
             earned_on=earned_on,
-            tier=tier,
-            attribution=attribution,
-            rate_ref=config.rate_ref(tier, attribution),
+            tier=None,
+            attribution=None,
+            rate_ref=config.product_rate_ref(product_id, contract_year),
             base_value=base_value,
             source_attribution_id=None,
+            stream=CommissionStream.PRODUCT,
+            product_id=product_id,
+            contract_year=contract_year,
+            window_end=window_end,
+            client_paid_on=client_paid_on,
         )
+        self._audit_commission(principal, line.id)
+        return line
+
+    def record_consultancy_commission(
+        self,
+        principal: Principal,
+        *,
+        advisor_id: UUID,
+        engagement_id: UUID,
+        base_value: Money,
+        sourcing: SourcingAttribution,
+        delivery_type: DeliveryType,
+        contract_year: int,
+        earned_on: date,
+        client_paid_on: date | None = None,
+    ) -> CommissionLine:
+        """Record a **Stream-B consultancy** commission (ADR-0026) — ADMIN only. Prices the
+        `delivery_type × sourcing` cell (Yr1 vs thereafter) by `contract_year`, stamps sourcing +
+        delivery provenance + `rate_ref` (non-retroactive). Content-hash-sealed."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may record a commission.")
+        self._require_consultant(advisor_id)
+        config = load_commission_config()
+        amount = compute_consultancy_commission(
+            base_value, sourcing, delivery_type, contract_year, config
+        )
+        period = "yr1" if contract_year == 1 else "thereafter"
+        line = self._new_commission_line(
+            owner_consultant_id=advisor_id,
+            engagement_id=engagement_id,
+            kind=CommissionKind.ENGAGEMENT,
+            amount=amount,
+            earned_on=earned_on,
+            tier=None,
+            attribution=sourcing,
+            rate_ref=config.consultancy_rate_ref(delivery_type, sourcing, period),
+            base_value=base_value,
+            source_attribution_id=None,
+            stream=CommissionStream.CONSULTANCY,
+            delivery_type=delivery_type,
+            contract_year=contract_year,
+            client_paid_on=client_paid_on,
+        )
+        self._audit_commission(principal, line.id)
+        return line
+
+    def _audit_commission(self, principal: Principal, line_id: UUID) -> None:
         self.record_audit(
             actor_consultant_id=principal.consultant_id,
             event_type=AuditEventType.COMMISSION_RECORDED,
             resource_type="commission_line",
-            resource_id=line.id,
+            resource_id=line_id,
             now=datetime.now(UTC),
         )
-        return line
 
     def claim_recovery_fee(
         self, principal: Principal, *, attribution_id: UUID, earned_on: date
@@ -876,7 +941,31 @@ class Repository:
                 f"Illegal payment transition {current.value} → {to_status.value}: status advances "
                 f"one step forward only (pending → invoiced → paid)."
             )
+        # Pay-when-paid (ADR-0026): a line cannot reach `paid` until the client cash it derives from
+        # has been received and retained — `client_paid_on` must be set first.
+        if to_status is PaymentStatus.PAID and row.client_paid_on is None:
+            raise ConflictError(
+                "Pay-when-paid: cannot mark this commission paid until the client cash it derives "
+                "from is recorded (client_paid_on is unset)."
+            )
         row.payment_status = to_status.value
+        self._session.add(row)
+        self._session.flush()
+        return self._to_commission_line(row)
+
+    def record_client_paid(
+        self, principal: Principal, line_id: UUID, *, client_paid_on: date
+    ) -> CommissionLine:
+        """Record the date the client cash a commission derives from was received — ADMIN only
+        (ADR-0026 pay-when-paid). `client_paid_on` is OUTSIDE the content-hash seal (a lifecycle
+        precondition, like payment_status), so this does not violate immutability; the sealed
+        financial figures are untouched. It is the gate that then permits advancing to `paid`."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may record client payment.")
+        row = self._session.get(CommissionLineORM, line_id)
+        if row is None:
+            raise NotFoundError(f"Commission line {line_id} not found.")
+        row.client_paid_on = client_paid_on
         self._session.add(row)
         self._session.flush()
         return self._to_commission_line(row)
