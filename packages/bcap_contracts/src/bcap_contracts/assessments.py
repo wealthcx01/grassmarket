@@ -79,6 +79,13 @@ class CoefficientSet(BaseModel):
     theta_b: Score
     theta_p: Score
     theta_l: Score
+    # The fourth headline weight θ_C — the Customer-Proposition term of the composite V (ADR-0023
+    # Stage 2, Methodology v1.4). PRESENT ⇒ the four-index V (B/P/L/C) with Σθ over all FOUR = 1;
+    # ABSENT (None) ⇒ the three-index V (Stage 1, §5.1 unchanged), so the ratified golden master and
+    # the `1.1` deterministic stamp survive. A four-index V with θ_C absent is IMPOSSIBLE by
+    # construction — the engine never defaults θ_C to 0 (ADR-0023 §4, fail-loud). A set carrying
+    # θ_C MUST also score C (validated below): you cannot weight a C you do not compute.
+    theta_c: Score | None = None
 
     # Blend parameters α ∈ [0,1] (Methodology §5.1). The prototype's α = 2.0 (D3) fails here.
     alpha_l: UnitInterval
@@ -155,11 +162,30 @@ class CoefficientSet(BaseModel):
 
     @model_validator(mode="after")
     def _enforce_theta_sum(self) -> CoefficientSet:
-        total = self.theta_b + self.theta_p + self.theta_l
+        # Three-index (Stage 1) when θ_C is absent; four-index (Stage 2/v1.4) when present. Σθ
+        # equal 1 over exactly the terms in play — never a three-term set with a bolted-on fourth.
+        if self.theta_c is None:
+            total = self.theta_b + self.theta_p + self.theta_l
+            terms = "θ_B+θ_P+θ_L"
+        else:
+            total = self.theta_b + self.theta_p + self.theta_l + self.theta_c
+            terms = "θ_B+θ_P+θ_L+θ_C"
         if not math.isclose(total, 1.0, abs_tol=_THETA_TOLERANCE):
             raise ValueError(
-                f"Σθ must equal 1 (got θ_B+θ_P+θ_L = {total!r}). Three conflicting θ sets summing "
-                f"to anything cannot recur (ADR-0001 §3)."
+                f"Σθ must equal 1 (got {terms} = {total!r}). Conflicting θ sets summing to "
+                f"anything cannot recur (ADR-0001 §3)."
+            )
+        return self
+
+    @model_validator(mode="after")
+    def _theta_c_requires_scoring_c(self) -> CoefficientSet:
+        """θ_C weights C INTO V (four-index, v1.4) — so a set that carries θ_C must also compute C
+        (`scores_c`). Weighting a C the engine never produces forces a silent θ_C·0 — exactly the
+        default this staged design forbids (ADR-0023 §4, ADR-0001)."""
+        if self.theta_c is not None and not self.scores_c:
+            raise ValueError(
+                "θ_C is set (four-index V, v1.4) but the set does not score C: a headline C weight "
+                "with no C coefficients would fold a fabricated zero into V (ADR-0023 §4)."
             )
         return self
 

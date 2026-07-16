@@ -77,19 +77,26 @@ def score(
     powers_result, p_value = _score_powers(registry, coefficients, powers_by_key)
     triad = _score_triad(registry, coefficients, powers_by_key, group_means_raw)
 
-    # C-index (ADR-0023 Stage 1): computed and REPORTED alongside V when the coefficient set scores
-    # C. It is deliberately NOT part of the v_value sum below — that is v1.4 / GRS-0086. A B/P/L
-    # set leaves customer=None and the composite byte-identical to the golden master.
+    # C-index (ADR-0023): computed when the coefficient set scores C. In Stage 1 (θ_C absent) it is
+    # REPORTED alongside V and NOT in the composite — the golden master stays byte-identical. In
+    # Stage 2 / v1.4 (θ_C present) it becomes the fourth term of V below.
     customer: CustomerResult | None = None
+    c_value: float | None = None
     if coefficients.scores_c:
         c_subs_by_key = {r.subcomponent_key: r for r in inputs.c_subcomponents}
-        customer, _ = _score_c(registry, coefficients, c_subs_by_key)
+        customer, c_value = _score_c(registry, coefficients, c_subs_by_key)
 
     v_value = (
         coefficients.theta_b * b_value
         + coefficients.theta_p * p_value
         + (coefficients.theta_l * l_value)
     )
+    if coefficients.theta_c is not None:
+        # Four-index V (ADR-0023 Stage 2, Methodology v1.4): V = θ_B·B + θ_P·P + θ_L·L + θ_C·C. The
+        # contract guarantees a set with θ_C also scores C, so c_value is present — the engine never
+        # folds a defaulted θ_C·0 (fail-loud, ADR-0023 §4). θ_C absent ⇒ this term never exists.
+        assert c_value is not None  # scores_c ⇐ theta_c is not None (CoefficientSet invariant)
+        v_value += coefficients.theta_c * c_value
     v_stored = _round(v_value)
     composite = CompositeResult(
         b_index=_round(b_value),

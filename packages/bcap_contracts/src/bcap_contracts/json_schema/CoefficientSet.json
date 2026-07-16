@@ -200,6 +200,20 @@
       "title": "Theta B",
       "type": "number"
     },
+    "theta_c": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Theta C"
+    },
     "theta_l": {
       "maximum": 1.0,
       "minimum": 0.0,
