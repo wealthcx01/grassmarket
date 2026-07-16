@@ -1,6 +1,7 @@
 # GRS-0095 — Primer: evidence grades E1–E4, de-jargoned
 
-**Status:** Planned
+**Status:** Shipped
+**Branch:** `grs-0095-primer-evidence-grades`
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** —
 
@@ -31,3 +32,20 @@ ticket de-jargons the evidence grades in the primer.
 
 - Capturing evidence/rationale per rating in the wizard (that is the §3 evidence-rigor work).
 - Any change to how grades are computed or stored.
+
+## What shipped
+
+Rebuilt the primer's evidence-grades section (`app/guide/page.tsx`) so each grade is de-jargoned with
+a plain source label + what actually qualifies, and the escalation is obvious:
+
+- Each grade now carries a **source** (E1 Client-said · E2 Interview · E3 Artifact · E4 Observed), a
+  plain-English **meaning**, and a **"What counts"** line with concrete examples of what qualifies.
+- A lead sentence spells out the weakest→strongest escalation (**client-said → interview → artifact →
+  observed**), rendered as an ordered list; a closing note explains *why* a higher grade is stronger —
+  it is closer to the thing itself (a claim can be wrong, a document stale, but something you watched
+  work is hard to argue with) — and ties the grade to the output ranges (E1 wide, E4 tight).
+
+## Acceptance / verification
+
+Each grade E1–E4 is defined in plain English with what qualifies; the escalation is explicit; no bare
+codes. Frontend type-check · lint · vitest green.
