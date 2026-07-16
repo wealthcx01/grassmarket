@@ -75,11 +75,33 @@ const LEVELS: ReadonlyArray<{ level: string; test: string }> = [
   { level: "Frontier", test: "It's a competitive weapon, not just adequate. Not every firm needs it — and it should never be the universal target." },
 ];
 
-const GRADES: ReadonlyArray<{ grade: string; meaning: string }> = [
-  { grade: "E1", meaning: "The client told you, and that's all you have." },
-  { grade: "E2", meaning: "You probed it in a structured interview with the owner." },
-  { grade: "E3", meaning: "You saw the artifact — document, dashboard, config, metric." },
-  { grade: "E4", meaning: "You watched it work / inspected it yourself." },
+// Evidence grades (GRS-0095): plain-English meaning + what actually qualifies + the source, so the
+// weakest→strongest escalation (client-said → interview → artifact → observed) is obvious.
+const GRADES: ReadonlyArray<{ grade: string; source: string; meaning: string; qualifies: string }> = [
+  {
+    grade: "E1",
+    source: "Client-said",
+    meaning: "The client told you, and that's all you have — an unverified claim.",
+    qualifies: "A statement in a meeting or a form: “our uptime is 99.9%”, with nothing behind it yet.",
+  },
+  {
+    grade: "E2",
+    source: "Interview",
+    meaning: "You probed it in a structured interview with the person who owns it.",
+    qualifies: "You asked how, since when, who runs it, what breaks — and the answers held together.",
+  },
+  {
+    grade: "E3",
+    source: "Artifact",
+    meaning: "You saw the thing itself — a document, dashboard, config, runbook, or metric.",
+    qualifies: "A screenshot of the monitor, the incident log, the architecture diagram, the actual number.",
+  },
+  {
+    grade: "E4",
+    source: "Observed",
+    meaning: "You watched it work or inspected it yourself — the strongest evidence.",
+    qualifies: "You saw a deploy run, watched failover, or drove the system and confirmed it behaves as claimed.",
+  },
 ];
 
 const MISTAKES: readonly string[] = [
@@ -304,20 +326,37 @@ export default function GuidePage() {
         </p>
       </section>
 
-      {/* Evidence grades */}
+      {/* Evidence grades (GRS-0095) */}
       <section>
         <SectionTitle kicker="How sure are you?">Evidence grades drive the ranges</SectionTitle>
-        <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: "0.5rem", gridTemplateColumns: "repeat(auto-fit, minmax(13rem, 1fr))" }}>
+        <p style={{ margin: "0 0 1rem", color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
+          Every rating carries a grade for <em>how you know</em>. The four climb from weakest to
+          strongest — <strong>client-said → interview → artifact → observed</strong> — and each step up
+          is a step from &ldquo;someone claimed it&rdquo; toward &ldquo;I saw it with my own eyes&rdquo;.
+        </p>
+        <ol style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: "0.6rem" }}>
           {GRADES.map((g) => (
-            <li key={g.grade} className="card" style={{ padding: "0.8rem 0.95rem" }}>
-              <span className="tag" style={{ background: "var(--color-accent-tint)", color: "var(--color-accent)", borderColor: "var(--color-accent-tint-border)" }}>{g.grade}</span>
-              <p style={{ margin: "0.5rem 0 0", fontSize: "0.86rem", color: "var(--color-ink-muted)", lineHeight: 1.45 }}>{g.meaning}</p>
+            <li key={g.grade} className="card" style={{ padding: "0.9rem 1.1rem", display: "flex", gap: "1rem", alignItems: "flex-start" }}>
+              <span className="tag" style={{ flex: "none", background: "var(--color-accent-tint)", color: "var(--color-accent)", borderColor: "var(--color-accent-tint-border)" }}>{g.grade}</span>
+              <div>
+                <div style={{ fontFamily: "var(--font-serif)", fontWeight: 600, fontSize: "0.98rem" }}>
+                  {g.source}
+                </div>
+                <p style={{ margin: "0.15rem 0 0", fontSize: "0.88rem", color: "var(--color-ink-muted)", lineHeight: 1.5 }}>
+                  {g.meaning}
+                </p>
+                <p style={{ margin: "0.35rem 0 0", fontSize: "0.82rem", color: "var(--color-ink-soft)", lineHeight: 1.5 }}>
+                  <strong>What counts:</strong> {g.qualifies}
+                </p>
+              </div>
             </li>
           ))}
-        </ul>
-        <p style={{ marginTop: "0.9rem", fontSize: "0.9rem", color: "var(--color-ink-muted)" }}>
-          This isn&rsquo;t bureaucracy — it drives the output. E1 ratings make the ranges wide; E4 makes them tight.
-          The difference between a £25k assessment and a £75k one is largely the evidence grade you achieve.
+        </ol>
+        <p style={{ marginTop: "0.9rem", fontSize: "0.9rem", color: "var(--color-ink-muted)", lineHeight: 1.55 }}>
+          This isn&rsquo;t bureaucracy — it drives the output. E1 ratings make the ranges wide; E4 makes them
+          tight. A higher grade is stronger because it is <em>closer to the thing itself</em>: a claim can
+          be wrong, a document can be stale, but something you watched work is hard to argue with. The
+          difference between a £25k assessment and a £75k one is largely the evidence grade you achieve.
         </p>
       </section>
 
