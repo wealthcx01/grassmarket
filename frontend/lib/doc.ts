@@ -99,6 +99,8 @@ export function powerEntry(
   barrier: StrengthRating,
   benefitGrade: EvidenceGrade | null,
   barrierGrade: EvidenceGrade | null,
+  benefitEvidence?: string | null,
+  barrierEvidence?: string | null,
 ): PowerEntry {
   return {
     power_key: key,
@@ -106,5 +108,9 @@ export function powerEntry(
     barrier,
     benefit_grade: benefitGrade,
     barrier_grade: barrierGrade,
+    // Only carry evidence keys when present, so existing callers serialise identically (an empty
+    // string collapses to null — the engine treats absent and blank evidence the same).
+    benefit_evidence: benefitEvidence ? benefitEvidence : null,
+    barrier_evidence: barrierEvidence ? barrierEvidence : null,
   };
 }
