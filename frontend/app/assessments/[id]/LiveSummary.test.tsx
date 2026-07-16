@@ -26,6 +26,7 @@ function liveScore(over: Partial<LiveScore> = {}): LiveScore {
     subcomponents_assessed: 3,
     subcomponents_total: 51,
     coverage: null,
+    module_weights: {},
     engine_version: "test",
     methodology_version: "test",
     coefficient_version: "test",

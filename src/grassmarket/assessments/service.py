@@ -264,6 +264,11 @@ def live_score(
         subcomponents_assessed=assessed,
         subcomponents_total=total,
         coverage=coverage,
+        # The active coefficients this score was built from (GRS-0070 diagnostics).
+        theta_b=coefficients.theta_b,
+        theta_p=coefficients.theta_p,
+        theta_l=coefficients.theta_l,
+        module_weights=dict(coefficients.delta),
         engine_version=engine_version,
         methodology_version=methodology_version,
         coefficient_version=coefficient_version,

@@ -125,6 +125,13 @@
       "title": "Module Qm",
       "type": "object"
     },
+    "module_weights": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Module Weights",
+      "type": "object"
+    },
     "overall_uncertainty": {
       "anyOf": [
         {
@@ -160,6 +167,48 @@
       "default": 0,
       "title": "Subcomponents Total",
       "type": "integer"
+    },
+    "theta_b": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Theta B"
+    },
+    "theta_l": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Theta L"
+    },
+    "theta_p": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Theta P"
     },
     "triad_defence": {
       "anyOf": [
