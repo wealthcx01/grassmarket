@@ -26,7 +26,8 @@ from bcap_contracts.money import Currency, Money
 
 from grassmarket.earnings.commission import (
     commission_content_hash,
-    compute_engagement_commission,
+    compute_consultancy_commission,
+    compute_product_commission,
 )
 from grassmarket.pipeline.fees import is_within_attribution_window
 
@@ -38,60 +39,77 @@ def _gbp(minor: int, ref: str = "contract:test") -> Money:
 # --- Commission golden master (hand-computed against commissions.yaml) --------------------
 
 
+# Stream A — product commission (hand-computed vs commissions.yaml, £100,000 = 10_000_000 minor)
 @pytest.mark.parametrize(
-    ("value_minor", "tier", "attribution", "expected_minor"),
+    ("product_id", "contract_year", "expected_minor"),
     [
-        # £50,000 × consultant self-sourced (2500 bps = 25%) = £12,500
-        (5_000_000, ConsultantTier.CONSULTANT, SourcingAttribution.SELF_SOURCED, 1_250_000),
-        # £30,000 × advisor co-sourced (1500 bps = 15%) = £4,500
-        (3_000_000, ConsultantTier.ADVISOR, SourcingAttribution.CO_SOURCED, 450_000),
-        # £100,000 × venture-associate Bruntsfield-sourced (750 bps = 7.5%) = £7,500
-        (
-            10_000_000,
-            ConsultantTier.VENTURE_ASSOCIATE,
-            SourcingAttribution.BRUNTSFIELD_SOURCED,
-            750_000,
-        ),
+        ("connecttrade", 1, 1_500_000),  # yr1 15%
+        ("connecttrade", 2, 1_000_000),  # yr2 10%
+        ("connecttrade", 3, 0),  # Yr3+ / past window → £0
+        ("openbb", 1, 1_500_000),
+        ("brandfetch_distribution", 1, 750_000),  # 7.5%
+        ("brandfetch_distribution", 2, 500_000),  # 5%
+        ("brandfetch_redistribution", 1, 375_000),  # 3.75%
+        ("brandfetch_redistribution", 2, 375_000),  # 3.75% (flat)
     ],
 )
-def test_commission_golden(value_minor, tier, attribution, expected_minor) -> None:
+def test_product_commission_golden(product_id, contract_year, expected_minor) -> None:
     config = load_commission_config()
-    got = compute_engagement_commission(_gbp(value_minor), tier, attribution, config)
+    got = compute_product_commission(_gbp(10_000_000), product_id, contract_year, config)
     assert got.amount_minor == expected_minor
-    assert got.currency is Currency.GBP
-    # The £ is never bare — it cites the config rate reference it derives from.
-    assert got.assumption_register_ref == config.rate_ref(tier, attribution)
+    assert got.assumption_register_ref == config.product_rate_ref(product_id, contract_year)
+
+
+def test_product_commission_unknown_product_refuses() -> None:
+    with pytest.raises(CommissionConfigError, match="No Stream-A product"):
+        compute_product_commission(_gbp(100), "nope", 1, load_commission_config())
+
+
+# Stream B — consultancy commission: all four cells × both periods.
+@pytest.mark.parametrize(
+    ("sourcing", "delivery", "year", "expected_minor"),
+    [
+        (SourcingAttribution.SELF_SOURCED, DeliveryType.BRUNTSFIELD_LED, 1, 3_000_000),  # 30%
+        (SourcingAttribution.SELF_SOURCED, DeliveryType.BRUNTSFIELD_LED, 2, 2_500_000),  # 25%
+        (SourcingAttribution.FIRM_SOURCED, DeliveryType.BRUNTSFIELD_LED, 1, 1_500_000),  # 15%
+        (SourcingAttribution.FIRM_SOURCED, DeliveryType.BRUNTSFIELD_LED, 2, 1_000_000),  # 10%
+        (SourcingAttribution.SELF_SOURCED, DeliveryType.CONSULTANT_LED, 1, 6_500_000),  # 65%
+        (SourcingAttribution.SELF_SOURCED, DeliveryType.CONSULTANT_LED, 2, 5_500_000),  # 55%
+        (SourcingAttribution.FIRM_SOURCED, DeliveryType.CONSULTANT_LED, 1, 4_500_000),  # 45%
+        (SourcingAttribution.FIRM_SOURCED, DeliveryType.CONSULTANT_LED, 2, 3_500_000),  # 35%
+    ],
+)
+def test_consultancy_commission_golden(sourcing, delivery, year, expected_minor) -> None:
+    config = load_commission_config()
+    got = compute_consultancy_commission(_gbp(10_000_000), sourcing, delivery, year, config)
+    assert got.amount_minor == expected_minor
 
 
 def test_commission_rounding_is_deterministic_half_to_even() -> None:
     config = load_commission_config()
-    # consultant self-sourced = 2500 bps (25%). 10 minor × 0.25 = 2.5 → 2 (round-half-to-even).
-    got = compute_engagement_commission(
-        _gbp(10), ConsultantTier.CONSULTANT, SourcingAttribution.SELF_SOURCED, config
+    # brandfetch_redistribution = 375 bps. 40 minor × 0.0375 = 1.5 → 2 (round-half-to-even, odd→up).
+    assert (
+        compute_product_commission(_gbp(40), "brandfetch_redistribution", 1, config).amount_minor
+        == 2
     )
-    assert got.amount_minor == 2
-    # 6 minor × 0.25 = 1.5 → 2 (nearest even).
-    got2 = compute_engagement_commission(
-        _gbp(6), ConsultantTier.CONSULTANT, SourcingAttribution.SELF_SOURCED, config
+    # 120 minor × 0.0375 = 4.5 → 4 (nearest even, even stays).
+    assert (
+        compute_product_commission(_gbp(120), "brandfetch_redistribution", 1, config).amount_minor
+        == 4
     )
-    assert got2.amount_minor == 2
 
 
 def test_commission_refuses_cross_currency() -> None:
     config = load_commission_config()  # GBP
     usd = Money(amount_minor=1000, currency=Currency.USD, assumption_register_ref="x")
     with pytest.raises(ValueError, match="no silent FX"):
-        compute_engagement_commission(
-            usd, ConsultantTier.ADVISOR, SourcingAttribution.SELF_SOURCED, config
-        )
+        compute_product_commission(usd, "connecttrade", 1, config)
 
 
 def test_commission_refuses_negative_value() -> None:
     config = load_commission_config()
     with pytest.raises(ValueError, match="negative"):
-        compute_engagement_commission(
-            _gbp(-1), ConsultantTier.ADVISOR, SourcingAttribution.SELF_SOURCED, config
-        )
+        compute_product_commission(_gbp(-1), "connecttrade", 1, config)
 
 
 # --- Config completeness fails loud ------------------------------------------------------

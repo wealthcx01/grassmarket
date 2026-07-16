@@ -24,38 +24,66 @@ from bcap_contracts.common import ConsultantTier
 from bcap_contracts.money import Money
 
 
-def compute_engagement_commission(
-    base_value: Money,
-    tier: ConsultantTier,
-    attribution: SourcingAttribution,
-    config: CommissionConfig,
-) -> Money:
-    """The commission on an engagement of `base_value`, at the (tier, attribution) rate from config.
+def _apply_bps(base_value: Money, bps: int, config: CommissionConfig, rate_ref: str) -> Money:
+    """Apply a basis-point rate to a base value, exactly (reuses the GRS-0028 money discipline).
 
-    ``amount = base_value × rate_bps / 10_000`` in integer minor units, rounded to the nearest minor
-    unit with **half-to-even** (banker's rounding). The division is done in **pure integer
-    arithmetic** — money is never denominated by a float (money.py invariant), so the figure is
-    exact at every magnitude, not just realistic ones. The result carries the config `rate_ref` as
-    its assumption reference, so the £ is never bare. The base value's currency must match the
-    config currency — a mismatch is refused, never silently converted (no FX; ADR-0002)."""
+    ``amount = base_value × bps / 10_000`` in integer minor units, rounded to the nearest minor
+    unit with **half-to-even** (banker's rounding). The division is **pure integer arithmetic** —
+    money is never denominated by a float (money.py invariant), so the figure is exact at every
+    magnitude. The result carries `rate_ref` so the £ is never bare. The base value's currency must
+    match the config currency — a mismatch is refused, never converted (no FX; ADR-0002)."""
     if base_value.currency is not config.currency:
         raise ValueError(
-            f"Refusing to price a {base_value.currency.value} engagement under a "
+            f"Refusing to price a {base_value.currency.value} amount under a "
             f"{config.currency.value} commission schedule: no silent FX."
         )
     if base_value.amount_minor < 0:
         raise ValueError("A contract value cannot be negative.")
-    bps = config.rate_bps_for(tier, attribution)
-    # Exact integer round-half-to-even: quotient, then bump on a strict-over-half remainder, or on
-    # an exact half only when the quotient is odd. No float ever touches the money figure.
+    # Exact integer round-half-to-even: quotient, bump on a strict-over-half remainder, or on an
+    # exact half only when the quotient is odd. No float ever touches the money figure.
     quotient, remainder = divmod(base_value.amount_minor * bps, 10_000)
     if 2 * remainder > 10_000 or (2 * remainder == 10_000 and quotient % 2 == 1):
         quotient += 1
-    amount_minor = quotient
-    return Money(
-        amount_minor=amount_minor,
-        currency=config.currency,
-        assumption_register_ref=config.rate_ref(tier, attribution),
+    return Money(amount_minor=quotient, currency=config.currency, assumption_register_ref=rate_ref)
+
+
+def compute_product_commission(
+    base_value: Money, product_id: str, contract_year: int, config: CommissionConfig
+) -> Money:
+    """Stream A — product commission (ADR-0026). Year 1 uses the product's `yr1_bps`, Year 2 its
+    `yr2_bps`; **Year 3+ (past the window) prices to exactly £0** — the model carries only two rate
+    tiers, so nothing earns beyond Year 2. The caller supplies the year (the helper does not
+    infer dates); an unknown product refuses loud (ADR-0001)."""
+    if contract_year < 1:
+        raise ValueError("contract_year is 1-based (Year 1 = the first 12 months).")
+    product = config.require_product(product_id)  # fail loud on unknown product
+    if contract_year == 1:
+        bps = product.yr1_bps
+    elif contract_year == 2:
+        bps = product.yr2_bps
+    else:
+        bps = 0  # past the window: no Year-3+ rate exists → £0
+    return _apply_bps(base_value, bps, config, config.product_rate_ref(product_id, contract_year))
+
+
+def compute_consultancy_commission(
+    base_value: Money,
+    sourcing: SourcingAttribution,
+    delivery_type: DeliveryType,
+    contract_year: int,
+    config: CommissionConfig,
+) -> Money:
+    """Stream B — consultancy commission (ADR-0026). The `delivery_type × sourcing` cell's `yr1_bps`
+    applies in the first 12-month period (Year 1), `thereafter_bps` after — uncapped, ongoing
+    share-of-outcome. The caller supplies the period as a 1-based contract year; an unknown cell
+    refuses loud (ADR-0001)."""
+    if contract_year < 1:
+        raise ValueError("contract_year is 1-based (Year 1 = the first 12 months).")
+    rate = config.require_consultancy_rate(delivery_type, sourcing)  # fail loud on unknown cell
+    bps = rate.yr1_bps if contract_year == 1 else rate.thereafter_bps
+    period = "yr1" if contract_year == 1 else "thereafter"
+    return _apply_bps(
+        base_value, bps, config, config.consultancy_rate_ref(delivery_type, sourcing, period)
     )
 
 

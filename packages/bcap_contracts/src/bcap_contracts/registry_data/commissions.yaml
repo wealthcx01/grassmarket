@@ -39,20 +39,3 @@ consultancy:
   consultant_led: # bespoke, client-/consultant-determined scope
     self_sourced: { yr1_bps: 6500, thereafter_bps: 5500 } # 65% / 55%
     firm_sourced: { yr1_bps: 4500, thereafter_bps: 3500 } # 45% / 35%
-
-# --- LEGACY (deprecated; GRS-0076 removes) — the pre-v7 flat tier × attribution matrix, retained
-# only so the old engagement-commission compute path stays green until it is reworked into the two
-# streams above. NOT the v7 model.
-rates_bps:
-  venture_associate:
-    self_sourced: 1500
-    co_sourced: 1000
-    bruntsfield_sourced: 750
-  advisor:
-    self_sourced: 2000
-    co_sourced: 1500
-    bruntsfield_sourced: 1000
-  consultant:
-    self_sourced: 2500
-    co_sourced: 1750
-    bruntsfield_sourced: 1250

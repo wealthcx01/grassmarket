@@ -17,10 +17,6 @@ Sourcing reconciliation (ADR-0026): v7's axes are **self / firm** (firm = the Br
 inbound). The pre-v7 ``bruntsfield_sourced`` / ``co_sourced`` values are **retained** as legacy enum
 members so historical v1 lines still validate, and both fold into ``firm_sourced`` for v7 pricing —
 they are not v7 matrix keys.
-
-The legacy flat ``rates_bps`` (tier × attribution) is **deprecated** — kept only so the pre-v7
-engagement-commission compute path stays green until GRS-0076 reworks it into the two streams and
-removes it.
 """
 
 from __future__ import annotations
@@ -74,13 +70,6 @@ class DeliveryType(StrEnum):
 V7_SOURCING: tuple[SourcingAttribution, ...] = (
     SourcingAttribution.SELF_SOURCED,
     SourcingAttribution.FIRM_SOURCED,
-)
-# Legacy flat-matrix axes (pre-v7 completeness); pinned so adding FIRM_SOURCED does not
-# retroactively require it in a legacy config.
-_LEGACY_SOURCING: tuple[SourcingAttribution, ...] = (
-    SourcingAttribution.SELF_SOURCED,
-    SourcingAttribution.BRUNTSFIELD_SOURCED,
-    SourcingAttribution.CO_SOURCED,
 )
 
 
@@ -143,9 +132,6 @@ class CommissionConfig(BaseModel):
     consultancy: dict[DeliveryType, dict[SourcingAttribution, ConsultancyRate]] = Field(
         description="Stream-B consultancy rates, keyed delivery_type × sourcing."
     )
-    # LEGACY (deprecated, GRS-0076 removes): the pre-v7 flat tier × attribution matrix, kept only so
-    # the old engagement-commission compute path stays green. Optional; validated only when present.
-    rates_bps: dict[ConsultantTier, dict[SourcingAttribution, int]] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def _require_completeness(self) -> CommissionConfig:
@@ -171,25 +157,6 @@ class CommissionConfig(BaseModel):
                 raise CommissionConfigError(
                     f"commissions.yaml Stream B: {delivery.value} has non-v7 sourcing: {shown}."
                 )
-        # Legacy flat matrix: validated only if present (deprecated).
-        if self.rates_bps:
-            for tier in ConsultantTier:
-                by_attr = self.rates_bps.get(tier)
-                if by_attr is None:
-                    raise CommissionConfigError(
-                        f"commissions.yaml legacy rates_bps has no rates for tier {tier.value}."
-                    )
-                missing = set(_LEGACY_SOURCING) - set(by_attr)
-                if missing:
-                    shown = ", ".join(a.value for a in sorted(missing))
-                    raise CommissionConfigError(
-                        f"commissions.yaml legacy rates_bps: tier {tier.value} missing: {shown}."
-                    )
-                for attr, bps in by_attr.items():
-                    if bps < 0:
-                        raise CommissionConfigError(
-                            f"Legacy rate for {tier.value}/{attr.value} is negative ({bps} bps)."
-                        )
         return self
 
     # ------------------------------------------------------------------ Stream A accessors
@@ -228,20 +195,6 @@ class CommissionConfig(BaseModel):
     ) -> str:
         """The assumption-register reference a Stream-B commission derives from."""
         return f"{self.version}:consultancy:{delivery_type.value}:{sourcing.value}:{period}"
-
-    # ------------------------------------------------------------------ legacy (deprecated)
-    def rate_ref(self, tier: ConsultantTier, attribution: SourcingAttribution) -> str:
-        """LEGACY (GRS-0076 removes): assumption-register ref for the flat tier/attribution rate."""
-        return f"{self.version}:{tier.value}:{attribution.value}"
-
-    def rate_bps_for(self, tier: ConsultantTier, attribution: SourcingAttribution) -> int:
-        """LEGACY (GRS-0076 removes): the flat basis-point rate for a (tier, attribution)."""
-        try:
-            return self.rates_bps[tier][attribution]
-        except KeyError as exc:
-            raise CommissionConfigError(
-                f"No legacy commission rate configured for {tier.value}/{attribution.value}."
-            ) from exc
 
 
 def _load_yaml(filename: str) -> Any:
