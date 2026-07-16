@@ -208,6 +208,24 @@ class MetricDef(BaseModel):
         return self
 
 
+class ProfileDef(BaseModel):
+    """An operating-model profile (ADR-0025): a validated VIEW over the registry superset. It
+    selects which module keys apply to this operating model, optionally adds profile-specific
+    subcomponents, and may override a subcomponent's `critical` flag (an exchange need not treat
+    `OEMS_*` as critical). The registry stays the superset; retail brokerage is the default profile
+    and its view is byte-identical to the full registry."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    key: str
+    name: str
+    module_keys: tuple[str, ...]  # selected from the superset, in the superset's order at view time
+    # Profile-specific subcomponents added into a selected module (globally-unique keys).
+    subcomponent_additions: tuple[SubcomponentDef, ...] = ()
+    # Override a subcomponent's global `critical` flag for this profile only (key -> critical).
+    critical_overrides: dict[str, bool] = {}
+
+
 class Registry(BaseModel):
     """The whole legal key-space in one immutable object.
 
@@ -285,6 +303,58 @@ class Registry(BaseModel):
         if missing:
             raise MissingKeyError(dimension, missing)
 
+    # --- Operating-model profile view (ADR-0025) ---
+    def for_profile(self, profile: ProfileDef) -> Registry:
+        """Return a new Registry that is this superset filtered to `profile`'s operating model:
+        only the selected modules (in the superset's order), with any profile subcomponent
+        additions and `critical` overrides applied. Powers and metrics (the B/P dimensions) are
+        shared across profiles and pass through unchanged. Fail loud on an unknown selected module,
+        an addition to an unselected module, or an override of a subcomponent not in the view.
+
+        The retail profile selects every module with no additions/overrides, so its view is
+        structurally identical to the full registry — the golden master is byte-identical."""
+        unknown_modules = set(profile.module_keys) - set(self.module_keys())
+        if unknown_modules:
+            raise UnknownKeyError("profile module", sorted(unknown_modules)[0], self.module_keys())
+        additions_by_module: dict[str, list[SubcomponentDef]] = {}
+        for add in profile.subcomponent_additions:
+            additions_by_module.setdefault(add.module_key, []).append(add)
+        stray = set(additions_by_module) - set(profile.module_keys)
+        if stray:
+            raise RegistryError(
+                f"Profile {profile.key!r} adds subcomponents to unselected module(s): "
+                f"{sorted(stray)}."
+            )
+        selected = set(profile.module_keys)
+        new_modules: list[ModuleDef] = []
+        view_sub_keys: set[str] = set()
+        for module in self.modules:  # superset order preserved → retail view is byte-identical
+            if module.key not in selected:
+                continue
+            subs = list(module.subcomponents) + additions_by_module.get(module.key, [])
+            resolved = tuple(
+                s.model_copy(update={"critical": profile.critical_overrides[s.key]})
+                if s.key in profile.critical_overrides
+                else s
+                for s in subs
+            )
+            view_sub_keys.update(s.key for s in resolved)
+            new_modules.append(module.model_copy(update={"subcomponents": resolved}))
+        bad_overrides = set(profile.critical_overrides) - view_sub_keys
+        if bad_overrides:
+            raise UnknownKeyError(
+                f"profile[{profile.key}] critical override", sorted(bad_overrides)[0], view_sub_keys
+            )
+        view = Registry(
+            powers=self.powers,
+            modules=tuple(new_modules),
+            metrics=self.metrics,
+            subcomponent_status=self.subcomponent_status,
+            metric_status=self.metric_status,
+        )
+        _assert_unique_keys(view)  # additions must not clash with the superset (fail loud)
+        return view
+
 
 # --- Canonical loader -------------------------------------------------------------------
 
@@ -323,6 +393,44 @@ def load_registry() -> Registry:
     modules_raw = _load_yaml("modules.yaml") or {}
     metrics_raw = _load_yaml("metrics.yaml") or {}
     return _build_registry(powers_raw, modules_raw, metrics_raw)
+
+
+# The default operating-model profile: retail brokerage (the v1 taxonomy, byte-identical).
+RETAIL_PROFILE_KEY = "retail"
+
+
+@functools.lru_cache(maxsize=1)
+def load_profiles() -> dict[str, ProfileDef]:
+    """Load the operating-model profiles from ``registry_data/profiles.yaml`` (ADR-0025), once,
+    cached. `status` and each profile's `name`/`modules` are REQUIRED (fail loud, bracket access);
+    additions/overrides are genuinely optional. Profiles are validated against the registry lazily
+    at :meth:`Registry.for_profile`, so this stays a pure config load."""
+    raw = _load_yaml("profiles.yaml") or {}
+    _require(raw, "status", "profiles.yaml")
+    profiles_raw = _require(raw, "profiles", "profiles.yaml")
+    profiles: dict[str, ProfileDef] = {}
+    for key, body in profiles_raw.items():
+        ctx = f"profiles.yaml[{key}]"
+        profiles[key] = ProfileDef(
+            key=key,
+            name=_require(body, "name", ctx),
+            module_keys=tuple(_require(body, "modules", ctx)),
+            subcomponent_additions=tuple(
+                SubcomponentDef(**s) for s in body.get("subcomponent_additions", [])
+            ),
+            critical_overrides=dict(body.get("critical_overrides", {})),
+        )
+    if RETAIL_PROFILE_KEY not in profiles:
+        raise RegistryError("profiles.yaml must declare the default 'retail' profile.")
+    return profiles
+
+
+def load_profile(key: str) -> ProfileDef:
+    """A single operating-model profile, or fail loud on an unknown key (ADR-0001)."""
+    profiles = load_profiles()
+    if key not in profiles:
+        raise UnknownKeyError("profile", key, frozenset(profiles))
+    return profiles[key]
 
 
 def _build_registry(
