@@ -331,9 +331,16 @@ export interface RecoveryFeeAttribution {
   updated_at: string;
 }
 
-// --- Earnings / commissions (GRS-0028 backend `CommissionLine` / `EarningsSummary` contracts) ---
+// --- Earnings / commissions (Commission Schedule v7, ADR-0026; `CommissionLine` contract) ---
 export type CommissionKind = "engagement" | "workshop_recovery_fee" | "retainer";
-export type SourcingAttribution = "self_sourced" | "bruntsfield_sourced" | "co_sourced";
+// v7 axes are self / firm; bruntsfield_sourced / co_sourced are legacy (pre-v7) values.
+export type SourcingAttribution =
+  | "self_sourced"
+  | "firm_sourced"
+  | "bruntsfield_sourced"
+  | "co_sourced";
+export type DeliveryType = "bruntsfield_led" | "consultant_led";
+export type CommissionStream = "product" | "consultancy";
 export type PaymentStatus = "pending" | "invoiced" | "paid";
 
 export interface CommissionLine {
@@ -349,6 +356,13 @@ export interface CommissionLine {
   rate_ref?: string | null;
   base_value?: Money | null;
   source_attribution_id?: string | null;
+  // v7 two-stream provenance (null on legacy / recovery lines).
+  stream?: CommissionStream | null;
+  product_id?: string | null;
+  delivery_type?: DeliveryType | null;
+  contract_year?: number | null;
+  window_end?: string | null;
+  client_paid_on?: string | null;
   content_hash: string;
   created_at: string;
   updated_at: string;

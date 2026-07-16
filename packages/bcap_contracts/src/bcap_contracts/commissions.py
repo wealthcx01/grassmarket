@@ -1,11 +1,26 @@
-"""Earnings / commission lines + the commission-rate schedule (PRD §7).
+"""Earnings / commission lines + the commission-rate schedule (PRD §7; v7 per ADR-0026).
 
-Rates are **configuration, never code** (per tier and sourcing attribution), loaded fail-loud from
-``registry_data/commissions.yaml``: every tier × attribution must have a rate or the config refuses
-to load — no defaults (ADR-0001 completeness). A commission is a percentage (basis points) of an
-engagement's contract value; the £ is always `Money`, carrying the config reference that justifies
-it (ADR-0002). A recorded commission cites the rate_ref it used, so a later rate change is **never
-retroactive** — it reproduces exactly (the scoring-run immutability pattern, non-negotiable #6).
+Rates are **configuration, never code**, loaded fail-loud from ``registry_data/commissions.yaml``:
+a gap in either stream refuses to load — no defaults (ADR-0001 completeness). Commission Schedule
+**v7** is a **two-stream** model:
+
+- **Stream A — product commission:** per product ``{yr1_bps, yr2_bps, window_months}`` on cash
+  received under a qualifying deal; past the window the rate is zero.
+- **Stream B — consultancy commission:** a ``delivery_type × sourcing`` matrix of
+  ``{yr1_bps, thereafter_bps}``, uncapped ongoing share-of-outcome.
+
+The £ is always `Money`, carrying the config reference that justifies it (ADR-0002); a recorded line
+cites the ``rate_ref`` it used, so a later rate change is **never retroactive** (the scoring-run
+immutability pattern, non-negotiable #6).
+
+Sourcing reconciliation (ADR-0026): v7's axes are **self / firm** (firm = the Bruntsfield funnel /
+inbound). The pre-v7 ``bruntsfield_sourced`` / ``co_sourced`` values are **retained** as legacy enum
+members so historical v1 lines still validate, and both fold into ``firm_sourced`` for v7 pricing —
+they are not v7 matrix keys.
+
+The legacy flat ``rates_bps`` (tier × attribution) is **deprecated** — kept only so the pre-v7
+engagement-commission compute path stays green until GRS-0076 reworks it into the two streams and
+removes it.
 """
 
 from __future__ import annotations
@@ -31,12 +46,42 @@ class CommissionKind(StrEnum):
     RETAINER = "retainer"
 
 
+class CommissionStream(StrEnum):
+    """The two v7 commission streams (ADR-0026)."""
+
+    PRODUCT = "product"  # Stream A
+    CONSULTANCY = "consultancy"  # Stream B
+
+
 class SourcingAttribution(StrEnum):
-    """Who sourced the deal — the second axis (with tier) of the commission rate (PRD §7)."""
+    """Who sourced the deal. v7 axes are SELF / FIRM; the two legacy values are retained for
+    historical lines and fold into FIRM for v7 pricing (ADR-0026)."""
 
     SELF_SOURCED = "self_sourced"
-    BRUNTSFIELD_SOURCED = "bruntsfield_sourced"
-    CO_SOURCED = "co_sourced"
+    FIRM_SOURCED = "firm_sourced"  # v7: the Bruntsfield funnel / inbound
+    BRUNTSFIELD_SOURCED = "bruntsfield_sourced"  # legacy (pre-v7)
+    CO_SOURCED = "co_sourced"  # legacy (pre-v7)
+
+
+class DeliveryType(StrEnum):
+    """The consultancy delivery model (ADR-0026), mirroring SourcingAttribution's shape."""
+
+    BRUNTSFIELD_LED = "bruntsfield_led"  # Power Platform Assessment / methodology work
+    CONSULTANT_LED = "consultant_led"  # bespoke, client-/consultant-determined scope
+
+
+# v7 matrix axes: the consultancy matrix keys on these two sourcing values only.
+V7_SOURCING: tuple[SourcingAttribution, ...] = (
+    SourcingAttribution.SELF_SOURCED,
+    SourcingAttribution.FIRM_SOURCED,
+)
+# Legacy flat-matrix axes (pre-v7 completeness); pinned so adding FIRM_SOURCED does not
+# retroactively require it in a legacy config.
+_LEGACY_SOURCING: tuple[SourcingAttribution, ...] = (
+    SourcingAttribution.SELF_SOURCED,
+    SourcingAttribution.BRUNTSFIELD_SOURCED,
+    SourcingAttribution.CO_SOURCED,
+)
 
 
 class PaymentStatus(StrEnum):
@@ -51,51 +96,151 @@ class CommissionConfigError(Exception):
     """The commission configuration is incomplete or malformed. Load-time refusal (fail loud)."""
 
 
+class ProductRate(BaseModel):
+    """Stream-A per-product rate: Year-1 / Year-2 bps + window (months) past which it is £0."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    name: str = Field(min_length=1)
+    yr1_bps: int = Field(ge=0)
+    yr2_bps: int = Field(ge=0)
+    window_months: int = Field(gt=0)
+
+
+class ConsultancyRate(BaseModel):
+    """Stream-B matrix cell: first-12-month bps and the thereafter (ongoing) bps."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    yr1_bps: int = Field(ge=0)
+    thereafter_bps: int = Field(ge=0)
+
+
+class ProductRef(BaseModel):
+    """A reference to a Stream-A product in the catalogue — validated against the config's products
+    map (fail loud on an unknown product_id, ADR-0001)."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    product_id: str = Field(min_length=1)
+    name: str = Field(min_length=1)
+
+
 class CommissionConfig(BaseModel):
-    """The commission-rate schedule: a basis-point rate per (tier, attribution). Every combination
-    must be present (ADR-0001 completeness); a missing one is a refusal, never a default."""
+    """The v7 two-stream commission schedule. Every product must carry all three rate fields and
+    every ``delivery_type × sourcing`` cell must be present — a gap is a load-time refusal, no
+    defaults (ADR-0001)."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     version: str = Field(min_length=1)
     currency: Currency
-    rates_bps: dict[ConsultantTier, dict[SourcingAttribution, int]] = Field(
-        description="Basis-point rate (100 bps = 1%) per consultant tier per sourcing attribution."
+    # Stream A — product catalogue.
+    products: dict[str, ProductRate] = Field(
+        description="Stream-A product commission rates, keyed by product_id."
     )
+    # Stream B — consultancy matrix: delivery_type → sourcing → rate.
+    consultancy: dict[DeliveryType, dict[SourcingAttribution, ConsultancyRate]] = Field(
+        description="Stream-B consultancy rates, keyed delivery_type × sourcing."
+    )
+    # LEGACY (deprecated, GRS-0076 removes): the pre-v7 flat tier × attribution matrix, kept only so
+    # the old engagement-commission compute path stays green. Optional; validated only when present.
+    rates_bps: dict[ConsultantTier, dict[SourcingAttribution, int]] = Field(default_factory=dict)
 
     @model_validator(mode="after")
-    def _require_every_combination(self) -> CommissionConfig:
-        for tier in ConsultantTier:
-            by_attr = self.rates_bps.get(tier)
-            if by_attr is None:
+    def _require_completeness(self) -> CommissionConfig:
+        # Stream A: at least one product; Field constraints already enforce non-negative/window.
+        if not self.products:
+            raise CommissionConfigError("commissions.yaml Stream A has no products.")
+        # Stream B: every delivery_type × v7-sourcing cell present.
+        for delivery in DeliveryType:
+            by_sourcing = self.consultancy.get(delivery)
+            if by_sourcing is None:
                 raise CommissionConfigError(
-                    f"commissions.yaml is incomplete — no rates for tier {tier.value} "
-                    f"(every tier × attribution must be configured; no defaults — ADR-0001)."
+                    f"commissions.yaml Stream B is missing delivery type {delivery.value}."
                 )
-            missing = set(SourcingAttribution) - set(by_attr)
+            missing = set(V7_SOURCING) - set(by_sourcing)
             if missing:
-                shown = ", ".join(a.value for a in sorted(missing))
+                shown = ", ".join(s.value for s in sorted(missing))
                 raise CommissionConfigError(
-                    f"commissions.yaml: tier {tier.value} is missing attribution(s): {shown}."
+                    f"commissions.yaml Stream B: {delivery.value} is missing sourcing: {shown}."
                 )
-            for attr, bps in by_attr.items():
-                if bps < 0:
+            stray = set(by_sourcing) - set(V7_SOURCING)
+            if stray:
+                shown = ", ".join(s.value for s in sorted(stray))
+                raise CommissionConfigError(
+                    f"commissions.yaml Stream B: {delivery.value} has non-v7 sourcing: {shown}."
+                )
+        # Legacy flat matrix: validated only if present (deprecated).
+        if self.rates_bps:
+            for tier in ConsultantTier:
+                by_attr = self.rates_bps.get(tier)
+                if by_attr is None:
                     raise CommissionConfigError(
-                        f"Rate for {tier.value}/{attr.value} is negative ({bps} bps)."
+                        f"commissions.yaml legacy rates_bps has no rates for tier {tier.value}."
                     )
+                missing = set(_LEGACY_SOURCING) - set(by_attr)
+                if missing:
+                    shown = ", ".join(a.value for a in sorted(missing))
+                    raise CommissionConfigError(
+                        f"commissions.yaml legacy rates_bps: tier {tier.value} missing: {shown}."
+                    )
+                for attr, bps in by_attr.items():
+                    if bps < 0:
+                        raise CommissionConfigError(
+                            f"Legacy rate for {tier.value}/{attr.value} is negative ({bps} bps)."
+                        )
         return self
 
+    # ------------------------------------------------------------------ Stream A accessors
+    def require_product(self, product_id: str) -> ProductRate:
+        """The product rate for `product_id`, or fail loud on an unknown product (ADR-0001)."""
+        try:
+            return self.products[product_id]
+        except KeyError as exc:
+            raise CommissionConfigError(
+                f"No Stream-A product configured for product_id {product_id!r}."
+            ) from exc
+
+    def product_ref(self, product_id: str) -> ProductRef:
+        """Resolve a `ProductRef` for a product, validated against the catalogue."""
+        rate = self.require_product(product_id)
+        return ProductRef(product_id=product_id, name=rate.name)
+
+    def product_rate_ref(self, product_id: str, contract_year: int) -> str:
+        """The assumption-register reference a Stream-A commission derives from."""
+        return f"{self.version}:product:{product_id}:yr{contract_year}"
+
+    # ------------------------------------------------------------------ Stream B accessors
+    def require_consultancy_rate(
+        self, delivery_type: DeliveryType, sourcing: SourcingAttribution
+    ) -> ConsultancyRate:
+        """The consultancy rate for a (delivery_type, sourcing) cell. Fail loud on unknown."""
+        try:
+            return self.consultancy[delivery_type][sourcing]
+        except KeyError as exc:
+            raise CommissionConfigError(
+                f"No Stream-B rate configured for {delivery_type.value}/{sourcing.value}."
+            ) from exc
+
+    def consultancy_rate_ref(
+        self, delivery_type: DeliveryType, sourcing: SourcingAttribution, period: str
+    ) -> str:
+        """The assumption-register reference a Stream-B commission derives from."""
+        return f"{self.version}:consultancy:{delivery_type.value}:{sourcing.value}:{period}"
+
+    # ------------------------------------------------------------------ legacy (deprecated)
     def rate_ref(self, tier: ConsultantTier, attribution: SourcingAttribution) -> str:
-        """The assumption-register reference a commission at this tier/attribution derives from."""
+        """LEGACY (GRS-0076 removes): assumption-register ref for the flat tier/attribution rate."""
         return f"{self.version}:{tier.value}:{attribution.value}"
 
     def rate_bps_for(self, tier: ConsultantTier, attribution: SourcingAttribution) -> int:
-        """The basis-point rate for a (tier, attribution). Fail loud on an unconfigured pair."""
+        """LEGACY (GRS-0076 removes): the flat basis-point rate for a (tier, attribution)."""
         try:
             return self.rates_bps[tier][attribution]
-        except KeyError as exc:  # pragma: no cover - guarded by the completeness validator
+        except KeyError as exc:
             raise CommissionConfigError(
-                f"No commission rate configured for {tier.value}/{attribution.value}."
+                f"No legacy commission rate configured for {tier.value}/{attribution.value}."
             ) from exc
 
 
@@ -116,10 +261,10 @@ def load_commission_config() -> CommissionConfig:
 
 
 class CommissionLine(OwnedResource):
-    """One earned commission — immutable once recorded. For an engagement commission the provenance
-    (tier, attribution, rate_ref, base_value) is stamped at record time, so a later rate change is
-    never retroactive; the line reproduces from its own fields. `payment_status` is the one mutable
-    field (its lifecycle), and it moves forward only (pending → invoiced → paid)."""
+    """One earned commission — immutable once recorded. Provenance (tier/attribution/rate_ref/
+    base_value for legacy; product_id/delivery_type/contract_year/window_end for v7) is stamped at
+    record time, so a later rate change is never retroactive; the line reproduces from its own
+    fields. `payment_status` is the one mutable field (its forward-only lifecycle)."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -137,6 +282,19 @@ class CommissionLine(OwnedResource):
     )
     source_attribution_id: UUID | None = Field(
         default=None, description="The recovery-fee attribution this line was claimed from, if any."
+    )
+    # v7 two-stream provenance (ADR-0026); null on legacy/recovery lines (non-retroactive).
+    stream: CommissionStream | None = None
+    product_id: str | None = None
+    delivery_type: DeliveryType | None = None
+    contract_year: int | None = Field(
+        default=None, description="1 = Year 1, 2 = Year 2, 3+ = thereafter / post-window."
+    )
+    window_end: date | None = Field(
+        default=None, description="Stream-A window cut-off; past it the product rate is zero."
+    )
+    client_paid_on: date | None = Field(
+        default=None, description="Pay-when-paid anchor: the date the client cash was received."
     )
     content_hash: str = Field(min_length=1, description="SHA-256 immutability seal over the line.")
 

@@ -9,6 +9,15 @@
       "title": "CommissionKind",
       "type": "string"
     },
+    "CommissionStream": {
+      "description": "The two v7 commission streams (ADR-0026).",
+      "enum": [
+        "product",
+        "consultancy"
+      ],
+      "title": "CommissionStream",
+      "type": "string"
+    },
     "ConsultantTier": {
       "description": "Advisory Network tier (PRD §2).",
       "enum": [
@@ -26,6 +35,15 @@
         "EUR"
       ],
       "title": "Currency",
+      "type": "string"
+    },
+    "DeliveryType": {
+      "description": "The consultancy delivery model (ADR-0026), mirroring SourcingAttribution's shape.",
+      "enum": [
+        "bruntsfield_led",
+        "consultant_led"
+      ],
+      "title": "DeliveryType",
       "type": "string"
     },
     "Money": {
@@ -66,9 +84,10 @@
       "type": "string"
     },
     "SourcingAttribution": {
-      "description": "Who sourced the deal — the second axis (with tier) of the commission rate (PRD §7).",
+      "description": "Who sourced the deal. v7 axes are SELF / FIRM; the two legacy values are retained for\nhistorical lines and fold into FIRM for v7 pricing (ADR-0026).",
       "enum": [
         "self_sourced",
+        "firm_sourced",
         "bruntsfield_sourced",
         "co_sourced"
       ],
@@ -77,7 +96,7 @@
     }
   },
   "additionalProperties": false,
-  "description": "One earned commission — immutable once recorded. For an engagement commission the provenance\n(tier, attribution, rate_ref, base_value) is stamped at record time, so a later rate change is\nnever retroactive; the line reproduces from its own fields. `payment_status` is the one mutable\nfield (its lifecycle), and it moves forward only (pending → invoiced → paid).",
+  "description": "One earned commission — immutable once recorded. Provenance (tier/attribution/rate_ref/\nbase_value for legacy; product_id/delivery_type/contract_year/window_end for v7) is stamped at\nrecord time, so a later rate change is never retroactive; the line reproduces from its own\nfields. `payment_status` is the one mutable field (its forward-only lifecycle).",
   "properties": {
     "amount": {
       "$ref": "#/$defs/Money",
@@ -106,16 +125,54 @@
       "default": null,
       "description": "The contract value the rate was applied to."
     },
+    "client_paid_on": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Pay-when-paid anchor: the date the client cash was received.",
+      "title": "Client Paid On"
+    },
     "content_hash": {
       "description": "SHA-256 immutability seal over the line.",
       "minLength": 1,
       "title": "Content Hash",
       "type": "string"
     },
+    "contract_year": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "1 = Year 1, 2 = Year 2, 3+ = thereafter / post-window.",
+      "title": "Contract Year"
+    },
     "created_at": {
       "format": "date-time",
       "title": "Created At",
       "type": "string"
+    },
+    "delivery_type": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DeliveryType"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "earned_on": {
       "anyOf": [
@@ -161,6 +218,18 @@
       "$ref": "#/$defs/PaymentStatus",
       "default": "pending"
     },
+    "product_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Product Id"
+    },
     "rate_ref": {
       "anyOf": [
         {
@@ -187,6 +256,17 @@
       "description": "The recovery-fee attribution this line was claimed from, if any.",
       "title": "Source Attribution Id"
     },
+    "stream": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CommissionStream"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
     "tier": {
       "anyOf": [
         {
@@ -202,6 +282,20 @@
       "format": "date-time",
       "title": "Updated At",
       "type": "string"
+    },
+    "window_end": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Stream-A window cut-off; past it the product rate is zero.",
+      "title": "Window End"
     }
   },
   "required": [

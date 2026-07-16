@@ -1,26 +1,58 @@
-# Commission-rate configuration (GRS-0028, PRD §7) — rates/percentages are CONFIGURATION, never code.
+# Commission Schedule v7 (ADR-0026) — rates are CONFIGURATION, never code. Two-stream model.
 #
-# A commission is a percentage of an engagement's contract value, set by the consultant's tier and
-# who sourced the deal (self / Bruntsfield / co-sourced). Rates are in BASIS POINTS (100 bps = 1%)
-# so the percentage is exact. Every tier × attribution MUST have a rate (ADR-0001 completeness; a
-# missing combination is a load-time refusal, never a default).
-#
-# DRAFT v1 values — the exact commercial rates are an OPEN commercial decision (PRD §7, founder
-# track). These placeholders are internally consistent (self-sourced > co-sourced > Bruntsfield-
-# sourced; higher tier earns more) but NOT final.
-version: commissions-v1-draft
+# Rates are in BASIS POINTS (100 bps = 1%). Every product must carry {yr1, yr2, window} and every
+# Stream-B delivery_type × sourcing cell must be present — a gap is a load-time refusal (ADR-0001),
+# never a default. Rates are amendable by written notice; the version + rate_ref freeze guarantees
+# non-retroactivity. Normative source: Bruntsfield_Consultant_CommissionSchedule_TEMPLATE_v7.docx
+# (referenced, never committed).
+version: commissions-v7
 currency: GBP
 
+# --- Stream A — product commission (per product: Year-1 / Year-2 rate + window months) ---
+products:
+  connecttrade:
+    name: ConnectTrade
+    yr1_bps: 1500 # 15%
+    yr2_bps: 1000 # 10%
+    window_months: 24
+  openbb:
+    name: OpenBB
+    yr1_bps: 1500 # 15%
+    yr2_bps: 1000 # 10%
+    window_months: 24
+  brandfetch_distribution:
+    name: Brandfetch (distribution)
+    yr1_bps: 750 # 7.5%
+    yr2_bps: 500 # 5%
+    window_months: 24
+  brandfetch_redistribution:
+    name: Brandfetch (redistribution)
+    yr1_bps: 375 # 3.75%
+    yr2_bps: 375 # 3.75%
+    window_months: 36
+
+# --- Stream B — consultancy commission (delivery_type × sourcing → first-12mo / thereafter) ---
+consultancy:
+  bruntsfield_led: # Power Platform Assessment / methodology work
+    self_sourced: { yr1_bps: 3000, thereafter_bps: 2500 } # 30% / 25%
+    firm_sourced: { yr1_bps: 1500, thereafter_bps: 1000 } # 15% / 10%
+  consultant_led: # bespoke, client-/consultant-determined scope
+    self_sourced: { yr1_bps: 6500, thereafter_bps: 5500 } # 65% / 55%
+    firm_sourced: { yr1_bps: 4500, thereafter_bps: 3500 } # 45% / 35%
+
+# --- LEGACY (deprecated; GRS-0076 removes) — the pre-v7 flat tier × attribution matrix, retained
+# only so the old engagement-commission compute path stays green until it is reworked into the two
+# streams above. NOT the v7 model.
 rates_bps:
   venture_associate:
-    self_sourced: 1500 # 15%
-    co_sourced: 1000 # 10%
-    bruntsfield_sourced: 750 # 7.5%
+    self_sourced: 1500
+    co_sourced: 1000
+    bruntsfield_sourced: 750
   advisor:
-    self_sourced: 2000 # 20%
-    co_sourced: 1500 # 15%
-    bruntsfield_sourced: 1000 # 10%
+    self_sourced: 2000
+    co_sourced: 1500
+    bruntsfield_sourced: 1000
   consultant:
-    self_sourced: 2500 # 25%
-    co_sourced: 1750 # 17.5%
-    bruntsfield_sourced: 1250 # 12.5%
+    self_sourced: 2500
+    co_sourced: 1750
+    bruntsfield_sourced: 1250

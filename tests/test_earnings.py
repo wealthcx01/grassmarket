@@ -14,6 +14,10 @@ from bcap_contracts.commissions import (
     CommissionConfig,
     CommissionConfigError,
     CommissionKind,
+    CommissionStream,
+    ConsultancyRate,
+    DeliveryType,
+    ProductRate,
     SourcingAttribution,
     load_commission_config,
 )
@@ -93,29 +97,63 @@ def test_commission_refuses_negative_value() -> None:
 # --- Config completeness fails loud ------------------------------------------------------
 
 
-def test_config_missing_a_tier_refuses_to_load() -> None:
-    with pytest.raises(CommissionConfigError, match="no rates for tier"):
-        CommissionConfig(
-            version="broken",
-            currency=Currency.GBP,
-            rates_bps={
-                ConsultantTier.ADVISOR: {a: 1000 for a in SourcingAttribution},
-                ConsultantTier.CONSULTANT: {a: 1000 for a in SourcingAttribution},
-                # venture_associate missing entirely
+def _v7_kwargs() -> dict:
+    """A complete, valid v7 config (both streams) — tests mutate a copy to prove fail-loud."""
+    return dict(
+        version="test-v7",
+        currency=Currency.GBP,
+        products={
+            "connecttrade": ProductRate(
+                name="ConnectTrade", yr1_bps=1500, yr2_bps=1000, window_months=24
+            )
+        },
+        consultancy={
+            DeliveryType.BRUNTSFIELD_LED: {
+                SourcingAttribution.SELF_SOURCED: ConsultancyRate(
+                    yr1_bps=3000, thereafter_bps=2500
+                ),
+                SourcingAttribution.FIRM_SOURCED: ConsultancyRate(
+                    yr1_bps=1500, thereafter_bps=1000
+                ),
             },
-        )
+            DeliveryType.CONSULTANT_LED: {
+                SourcingAttribution.SELF_SOURCED: ConsultancyRate(
+                    yr1_bps=6500, thereafter_bps=5500
+                ),
+                SourcingAttribution.FIRM_SOURCED: ConsultancyRate(
+                    yr1_bps=4500, thereafter_bps=3500
+                ),
+            },
+        },
+    )
 
 
-def test_config_missing_an_attribution_refuses_to_load() -> None:
-    with pytest.raises(CommissionConfigError, match="missing attribution"):
-        CommissionConfig(
-            version="broken",
-            currency=Currency.GBP,
-            rates_bps={
-                tier: {SourcingAttribution.SELF_SOURCED: 1000}  # only one of three attributions
-                for tier in ConsultantTier
-            },
-        )
+def test_v7_config_with_no_products_refuses() -> None:
+    kwargs = _v7_kwargs()
+    kwargs["products"] = {}
+    with pytest.raises(CommissionConfigError, match="no products"):
+        CommissionConfig(**kwargs)
+
+
+def test_v7_config_missing_a_stream_b_cell_refuses() -> None:
+    kwargs = _v7_kwargs()
+    # Drop the firm_sourced cell from consultant_led → completeness must refuse.
+    kwargs["consultancy"] = {
+        **kwargs["consultancy"],
+        DeliveryType.CONSULTANT_LED: {
+            SourcingAttribution.SELF_SOURCED: ConsultancyRate(yr1_bps=6500, thereafter_bps=5500),
+        },
+    }
+    with pytest.raises(CommissionConfigError, match="missing sourcing"):
+        CommissionConfig(**kwargs)
+
+
+def test_v7_product_lookup_refuses_unknown() -> None:
+    config = CommissionConfig(**_v7_kwargs())
+    with pytest.raises(CommissionConfigError, match="No Stream-A product"):
+        config.require_product("nonexistent")
+    # A known product resolves a validated ProductRef.
+    assert config.product_ref("connecttrade").name == "ConnectTrade"
 
 
 # --- Immutability seal -------------------------------------------------------------------
@@ -145,6 +183,16 @@ def test_seal_excludes_payment_status_but_pins_the_amount() -> None:
     # …but any change to the FINANCIAL figures changes the seal.
     assert _hash() != _hash(amount=_gbp(1001, "commissions-v1:consultant:self_sourced"))
     assert _hash() != _hash(base_value=_gbp(4001))
+
+
+def test_seal_pins_the_v7_provenance_fields() -> None:
+    # Each of the four sealed v7 fields changes the hash; a legacy (all-None) line is stable.
+    assert _hash() == _hash(stream=None, product_id=None)  # defaults are the legacy shape
+    assert _hash() != _hash(stream=CommissionStream.PRODUCT)
+    assert _hash() != _hash(product_id="connecttrade")
+    assert _hash() != _hash(delivery_type=DeliveryType.BRUNTSFIELD_LED)
+    assert _hash() != _hash(contract_year=2)
+    assert _hash() != _hash(window_end=date(2028, 7, 14))
 
 
 # --- Recovery-fee attribution window edges (GRS-0012 fn, pinned here per the ticket) ------
