@@ -1,8 +1,36 @@
 # GRS-0092 — Primer depth, rationale & provenance
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** —
+**Branch:** `grs-0092-primer-depth-provenance`
+
+## What shipped
+
+Three new sections at the top of the primer (`app/guide/page.tsx`) that give it the missing depth —
+why the framework exists, where it comes from, and how it runs end to end — before the existing
+"shape of it" content:
+
+- **"Why Platform Power exists"** — the one question under every engagement (can this platform create
+  value and hold it?), why answering it means looking at economics + strategy + technology at once, and
+  what the framework buys: judgement made **consistent · comparable · defensible** (survives a board's
+  / an acquirer's technical due diligence).
+- **"Where the framework comes from"** (provenance) — **P** is Hamilton Helmer's *7 Powers* used
+  verbatim (benefit protected by a barrier); **L** is the infrastructure deep-dive lineage (9 modules /
+  51 subcomponents, front end to liquidity); **B** is the hard economic register. The synthesis —
+  strategy + technology + economics under one graded, uncertainty-aware method — is the whole idea.
+- **"How it works, end to end"** — a numbered 6-step pipeline (gather + grade evidence → rate against
+  rubric anchors → engine computes B/P/L with the bottleneck cap → Monte Carlo P10/P50/P90 → rule-based
+  gates for the headline words → the value bridge prices the gaps) ending at the Platform Power Report.
+
+Tone recalibrated to detailed-yet-plain for senior operators; the ATLAS → Platform Power naming
+(GRS-0090) is carried throughout.
+
+## Acceptance / verification
+
+The primer now opens with rationale, provenance (Helmer lineage + infrastructure deep-dive + business
+economics), and an end-to-end walkthrough, in plain-English-for-operators tone, naming the framework
+"Platform Power". Frontend type-check · lint · vitest green.
 
 ## Why
 
