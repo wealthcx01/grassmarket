@@ -18,11 +18,13 @@ from dataclasses import dataclass
 from datetime import date
 from io import BytesIO
 
-from bcap_contracts.assessments import CoefficientSet
+from bcap_contracts.assessments import CoefficientSet, WidgetObservation
 from bcap_contracts.committee import CommitteeDecision, CommitteeDecisionStatus, CommitteeItemType
 from bcap_contracts.common import WeightMethod
 from bcap_contracts.deliverables import DeliverableMode
 from bcap_contracts.narratives import AINarrative, NarrativeStatus
+from bcap_contracts.predictions import CBenchmarkRow
+from bcap_contracts.registry import WidgetDef
 from docx import Document
 from docx.document import Document as DocxDocument
 from docx.shared import Pt, RGBColor
@@ -47,6 +49,13 @@ class DeliverableContext:
     # Rating Committee calls on this run's high-stakes items (GRS-0021, §8). The approved triad
     # rationale is the text a client sees; every decision + dissent renders into the appendix.
     committee_decisions: tuple[CommitteeDecision, ...] = ()
+    # Customer-Proposition (C) inputs (ADR-0023 / GRS-0085), all optional — the C sections render
+    # ONLY when `result.customer` is present, and omit cleanly (no blanks/zeros) when it is not.
+    # `c_peers` are the APPROVED benchmark rows (GRS-0084); `widgets` are the subject's captured
+    # Level-1 grid; `c_widget_defs` supply each widget's rarity/category from the registry.
+    c_peers: tuple[CBenchmarkRow, ...] = ()
+    widgets: tuple[WidgetObservation, ...] = ()
+    c_widget_defs: tuple[WidgetDef, ...] = ()
 
 
 _TRIAD_ORDER = (
@@ -73,6 +82,8 @@ def build_platform_power_report(
     doc.add_paragraph(f"Generated {context.generated_on.isoformat()}.")
 
     _platform_power_section(doc, context)
+    _customer_proposition_section(doc, context)  # ADR-0023 / GRS-0085 — omits cleanly when no C
+    _differentiation_rarity_section(doc, context)
     _methods_appendix(doc, context)
     append_narrative_appendix(doc, narratives, mode)
 
@@ -145,6 +156,106 @@ def _platform_power_section(doc: DocxDocument, context: DeliverableContext) -> N
             )
 
 
+def _customer_proposition_section(doc: DocxDocument, context: DeliverableContext) -> None:
+    """The proposition heatmap (ADR-0023 / GRS-0085): the 10 C modules, the subject's band + q_m,
+    and the peer-benchmark average per module. Renders ONLY when the run carries a C result; a run
+    with no C is omitted cleanly — never a blank table or a zero-filled row (Stage 1: C is reported
+    alongside V, not part of the headline V)."""
+    customer = context.result.customer
+    if customer is None:
+        return
+
+    doc.add_heading("Customer Proposition (C)", level=1)
+    doc.add_paragraph(
+        f"The Customer-Proposition index C is {to_display(customer.value):.1f} (0–100). C is "
+        "reported ALONGSIDE Platform Value V (ADR-0023); it is not part of the headline V in this "
+        "release. The heatmap below reads the ten proposition modules against the peer set."
+    )
+
+    # Peer average per C module (only over peers that scored it) — first-class absence, so a
+    # module no peer scored simply shows "—", never a fabricated 0.
+    peer_means: dict[str, float] = {}
+    for module in customer.modules:
+        peer_values = [
+            p.module_scores[module.key] for p in context.c_peers if module.key in p.module_scores
+        ]
+        if peer_values:
+            peer_means[module.key] = sum(peer_values) / len(peer_values)
+
+    table = doc.add_table(rows=1, cols=4)
+    table.style = "Light Grid Accent 1"
+    hdr = table.rows[0].cells
+    hdr[0].text, hdr[1].text, hdr[2].text, hdr[3].text = ("Module", "Rating", "Score", "Peer avg")
+    for module in customer.modules:
+        row = table.add_row().cells
+        row[0].text = module.name
+        row[1].text = module.gate_band
+        row[2].text = f"{to_display(module.q_m):.1f}" if module.q_m is not None else "Not Assessed"
+        row[3].text = (
+            f"{to_display(peer_means[module.key]):.1f}" if module.key in peer_means else "—"
+        )
+
+    if context.c_peers:
+        subject_c = customer.value
+        ahead = sum(1 for p in context.c_peers if p.c_index < subject_c)
+        doc.add_paragraph(
+            f"Against {len(context.c_peers)} benchmarked peer(s), the subject's proposition ranks "
+            f"ahead of {ahead}."
+        )
+
+
+def _differentiation_rarity_section(doc: DocxDocument, context: DeliverableContext) -> None:
+    """The differentiation-vs-rarity map (ADR-0023 / GRS-0085): widgets read by RARITY against
+    presence. A Rare widget the subject HAS is a differentiation asset; a Common one it LACKS is a
+    table-stakes gap. Renders only when both a C result and captured widgets exist."""
+    if context.result.customer is None or not context.widgets or not context.c_widget_defs:
+        return
+
+    rarity_by_key = {w.key: w.rarity for w in context.c_widget_defs}
+    name_by_key = {w.key: w.name for w in context.c_widget_defs}
+    present = {o.widget_key for o in context.widgets if o.present}
+    # A captured-but-not-present widget is a gap unless explicitly paywalled/defective, which we
+    # surface separately (present-yet-not-a-clean-pass).
+    flagged = {
+        o.widget_key: o.state for o in context.widgets if not o.present and o.state is not None
+    }
+    absent = {o.widget_key for o in context.widgets if not o.present}
+
+    differentiators = sorted(
+        k for k in present if rarity_by_key.get(k) == "Rare" and k in name_by_key
+    )
+    table_stakes_gaps = sorted(
+        k for k in absent if rarity_by_key.get(k) == "Common" and k in name_by_key
+    )
+
+    doc.add_heading("Differentiation vs. rarity", level=1)
+    doc.add_paragraph(
+        "The Level-1 widget checklist read against rarity. A RARE widget the subject offers is a "
+        "differentiation asset; a COMMON widget it lacks is a table-stakes gap. Uncommon ones and "
+        "present-but-paywalled/defective features are noted for context."
+    )
+
+    doc.add_heading("Differentiation assets (Rare, present)", level=2)
+    if differentiators:
+        for k in differentiators:
+            doc.add_paragraph(name_by_key[k], style="List Bullet")
+    else:
+        doc.add_paragraph("No Rare widget is offered — no rarity-driven differentiation captured.")
+
+    doc.add_heading("Table-stakes gaps (Common, absent)", level=2)
+    if table_stakes_gaps:
+        for k in table_stakes_gaps:
+            doc.add_paragraph(name_by_key[k], style="List Bullet")
+    else:
+        doc.add_paragraph("No Common widget is missing — table-stakes coverage is complete.")
+
+    paywalled_or_defective = sorted(k for k in flagged if k in name_by_key)
+    if paywalled_or_defective:
+        doc.add_heading("Present but gated / defective", level=2)
+        for k in paywalled_or_defective:
+            doc.add_paragraph(f"{name_by_key[k]} — {flagged[k].value}", style="List Bullet")
+
+
 def _methods_appendix(doc: DocxDocument, context: DeliverableContext) -> None:
     doc.add_heading("Methods Appendix", level=1)
     result = context.result
@@ -203,6 +314,19 @@ def _methods_appendix(doc: DocxDocument, context: DeliverableContext) -> None:
         f"Headline platform value V = {to_display(result.composite.v_index):.1f} "
         f"(display scale 0–100)."
     )
+
+    if result.customer is not None:
+        # C provenance note (ADR-0023 / GRS-0085): make the staged, reported-not-summed status
+        # explicit, and that peer benchmarks are approval-gated (ADR-0009), so no reader mistakes C
+        # for part of V or the peer set for auto-ingested data.
+        doc.add_heading("Customer Proposition (C) — provenance", level=2)
+        doc.add_paragraph(
+            f"C = {to_display(result.customer.value):.1f} is computed on the same rubric family as "
+            "the infrastructure index over the separate Phase-E module set (ADR-0023). In this "
+            "release C is REPORTED ALONGSIDE V and is NOT part of the headline V. The C "
+            "coefficients are draft (a θ_C elicitation panel is post-launch). Peer benchmarks are "
+            "approval-gated (ADR-0009): only consultant-approved peer rows appear here."
+        )
 
     _committee_appendix(doc, context)
 
