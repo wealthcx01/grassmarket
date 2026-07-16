@@ -1,8 +1,27 @@
 # GRS-0089 — Home welcome + context
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** —
+**Branch:** `grs-0089-home-welcome-context`
+
+## What shipped
+
+- **`components/WelcomeBanner.tsx`** (new) — a personalised welcome on the home page: a time-of-day
+  greeting with the advisor's first name (best-effort from the session email local-part — reuses
+  `lib/session`, no re-fetch), a one-line statement of what the platform does, and an **orientation**
+  line: start a **first assessment** vs. resume your **portfolio** / **pipeline**. Mount-guarded so
+  the first client paint matches the server (no personalised/anonymous flash).
+- **`app/page.tsx`** — replaced the flat "Advisor dashboard" eyebrow + one-liner hero with
+  `<WelcomeBanner />`. It **complements** the existing one-time first-run walkthrough (GRS-0065) and
+  the primer strip below it (the welcome is a persistent greeting + orientation, not a second
+  onboarding tour — no duplication).
+
+## Acceptance / verification
+
+`components/WelcomeBanner.test.tsx` — personalises the greeting from the session email; orients with
+first-assessment / portfolio / pipeline links; still renders the studio title when signed out.
+Frontend type-check · lint · vitest green.
 
 ## Why
 
