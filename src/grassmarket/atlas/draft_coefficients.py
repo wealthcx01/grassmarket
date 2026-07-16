@@ -22,6 +22,10 @@ from bcap_contracts.registry import Registry
 
 # The draft's critical-for-L modules (brokerage core) — a ratified draft judgement (GRS-0003).
 _CRITICAL_MODULES_FOR_L = ("APP_SERVER", "BACKOFFICE", "OEMS")
+# The exchange profile's critical-for-L modules (ADR-0025/GRS-0078): the platform, the matching
+# engine (OEMS in the exchange view), and clearing/settlement (LIQ_CONNECT). DRAFT — the exchange
+# panel refines these; provenance stays draft-pending-elicitation.
+_EXCHANGE_CRITICAL_MODULES_FOR_L = ("APP_SERVER", "OEMS", "LIQ_CONNECT")
 
 _STRENGTH_ENCODING = {"None": 0.0, "Emerging": 0.4, "Established": 0.7, "Wide": 1.0}
 
@@ -49,16 +53,24 @@ _PROVENANCE_FAMILIES = (
 )
 
 
-def draft_v1_coefficient_set(registry: Registry) -> CoefficientSet:
-    """Build the uniform v1 draft coefficient set that covers ``registry`` exactly (ADR-0001).
+def draft_v1_coefficient_set(
+    registry: Registry,
+    *,
+    version: str = "v1-draft-pending-elicitation",
+    critical_modules_for_l: tuple[str, ...] = _CRITICAL_MODULES_FOR_L,
+) -> CoefficientSet:
+    """Build the uniform draft coefficient set that covers ``registry`` exactly (ADR-0001).
 
     Fully-qualified subcomponent keys come straight from the registry (GRS-0002a), so λ can never
     drift from the real key set. Raises via ``CoefficientSet`` construction / ``validate_against``
-    if the registry is somehow not coverable — it never silently produces a partial set.
+    if the registry is somehow not coverable — it never silently produces a partial set. The
+    ``critical_modules_for_l`` and ``version`` are parameterised so an operating-model profile
+    (ADR-0025) can supply its own critical-for-L set over its registry VIEW; the retail defaults
+    reproduce the golden master byte-identically.
     """
     groups = sorted({m.group for m in registry.metrics if m.group is not None})
     cs = CoefficientSet(
-        version="v1-draft-pending-elicitation",
+        version=version,
         methodology_version="1.1",
         theta_b=0.30,
         theta_p=0.30,
@@ -69,7 +81,7 @@ def draft_v1_coefficient_set(registry: Registry) -> CoefficientSet:
             k: {s: 1.0 for s in registry.subcomponent_keys(k)} for k in registry.module_keys()
         },
         delta={k: 1.0 for k in registry.module_keys()},
-        critical_modules_for_l=_CRITICAL_MODULES_FOR_L,
+        critical_modules_for_l=critical_modules_for_l,
         w_power={k: 1.0 for k in registry.power_keys()},
         w_metric={k: 1.0 for k in registry.metric_keys()},
         group_weights={g: 1.0 for g in groups},
@@ -79,3 +91,14 @@ def draft_v1_coefficient_set(registry: Registry) -> CoefficientSet:
     )
     cs.validate_against(registry)  # fail loud now, not at score time
     return cs
+
+
+def draft_exchange_coefficient_set(registry: Registry) -> CoefficientSet:
+    """The DRAFT exchange-profile coefficient set (ADR-0025 / GRS-0078). Covers the exchange
+    VIEW exactly, with the exchange critical-for-L modules. `client_usable=False` — the exchange
+    weight-elicitation panel replaces this (same activation seam as retail)."""
+    return draft_v1_coefficient_set(
+        registry,
+        version="exchange-v1-draft-pending-elicitation",
+        critical_modules_for_l=_EXCHANGE_CRITICAL_MODULES_FOR_L,
+    )
