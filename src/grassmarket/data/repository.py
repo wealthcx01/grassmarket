@@ -57,6 +57,7 @@ from bcap_contracts.certification import (
     CertificationEvent,
     CertificationEventKind,
     CertificationRecord,
+    CourseCertification,
 )
 from bcap_contracts.commissions import (
     CommissionKind,
@@ -199,6 +200,12 @@ from grassmarket.workbench.bench import (
 )
 from grassmarket.workbench.calibration import compute_calibration_result
 from grassmarket.workbench.certification import next_level, promotion_blockers
+from grassmarket.workbench.course_certs import (
+    CourseCertSubject,
+    course_cert_status,
+    course_cert_subjects,
+    signoff_blockers,
+)
 from grassmarket.workbench.courses import (
     approve_lesson_in_tree,
     is_course_complete,
@@ -3130,6 +3137,7 @@ class Repository:
         from_level: AssessorLevel | None = None,
         to_level: AssessorLevel | None = None,
         reason: str | None = None,
+        cert_subject: str | None = None,
     ) -> None:
         self._session.add(
             CertificationEventORM(
@@ -3139,6 +3147,7 @@ class Repository:
                 from_level=from_level.value if from_level else None,
                 to_level=to_level.value if to_level else None,
                 reason=reason,
+                cert_subject=cert_subject,
                 recorded_by_consultant_id=recorded_by,
                 occurred_at=occurred_at,
             )
@@ -3342,11 +3351,121 @@ class Repository:
             from_level=AssessorLevel(row.from_level) if row.from_level else None,
             to_level=AssessorLevel(row.to_level) if row.to_level else None,
             reason=row.reason,
+            cert_subject=row.cert_subject,
             recorded_by_consultant_id=row.recorded_by_consultant_id,
             occurred_at=row.occurred_at,
             created_at=row.created_at,
             updated_at=row.updated_at,
         )
+
+    # ------------------------------------------------- course/product certifications (GRS-0127)
+    # A Sales Egoist cert + one per product, on top of the assessor ladder. They REUSE the
+    # certification-events audit (cert_subject != None) — no parallel store — and need the backing
+    # course complete AND a senior sign-off that is not the learner (the senior↔junior pairing).
+    def _learner_completed_course(self, advisor_id: UUID, slug: str) -> bool:
+        """True iff the advisor has completed every approved lesson of the latest published course
+        with this slug. An unpublished/absent course ⟹ not complete (you can't finish what isn't
+        there)."""
+        course = self._session.execute(
+            select(CourseORM).where(CourseORM.slug == slug)
+        ).scalar_one_or_none()
+        if course is None:
+            return False
+        latest = self._latest_published_row(course.id)
+        if latest is None:
+            return False
+        tree = CourseTree.model_validate_json(latest.tree_json)
+        completed = {
+            r.lesson_id
+            for r in self._session.execute(
+                select(LessonCompletionORM).where(
+                    LessonCompletionORM.owner_consultant_id == advisor_id,
+                    LessonCompletionORM.course_id == course.id,
+                )
+            ).scalars()
+        }
+        return is_course_complete(tree, frozenset(completed))
+
+    def _course_cert_signoff_event(
+        self, advisor_id: UUID, subject_key: str
+    ) -> CertificationEventORM | None:
+        """The advisor's sign-off event for a cert subject, if any (the certifying evidence)."""
+        return self._session.execute(
+            select(CertificationEventORM)
+            .where(
+                CertificationEventORM.owner_consultant_id == advisor_id,
+                CertificationEventORM.cert_subject == subject_key,
+                CertificationEventORM.kind == CertificationEventKind.SIGNOFF_RECORDED.value,
+            )
+            .order_by(CertificationEventORM.occurred_at)
+        ).scalar_one_or_none()
+
+    def _course_certification(
+        self, advisor_id: UUID, subject: CourseCertSubject
+    ) -> CourseCertification:
+        signoff = self._course_cert_signoff_event(advisor_id, subject.key)
+        complete = self._learner_completed_course(advisor_id, subject.backing_slug)
+        return CourseCertification(
+            owner_consultant_id=advisor_id,
+            subject=subject.key,
+            title=subject.title,
+            status=course_cert_status(course_complete=complete, has_signoff=signoff is not None),
+            course_complete=complete,
+            signed_off_by_consultant_id=(
+                signoff.recorded_by_consultant_id if signoff is not None else None
+            ),
+            certified_at=signoff.occurred_at if signoff is not None else None,
+        )
+
+    def _cert_subjects(self) -> list[CourseCertSubject]:
+        return course_cert_subjects(load_commission_config().products)
+
+    def list_course_certifications(
+        self, principal: Principal, advisor_id: UUID
+    ) -> list[CourseCertification]:
+        """An advisor's full course/product cert set (self, or any for an admin)."""
+        if not (principal.is_admin or advisor_id == principal.consultant_id):
+            raise ScopeViolationError("You may view only your own certifications.")
+        if self._session.get(ConsultantORM, advisor_id) is None:
+            raise NotFoundError(f"Consultant {advisor_id} not found.")
+        return [self._course_certification(advisor_id, s) for s in self._cert_subjects()]
+
+    def signoff_course_certification(
+        self, principal: Principal, advisor_id: UUID, subject_key: str, *, now: datetime
+    ) -> CourseCertification:
+        """A senior signs off a junior's course/product cert (GRS-0127) — the pairing.
+        Refuses (ConflictError) unless the learner completed the course AND the signer is a
+        separate, senior operator (Certified Lead or admin). A second sign-off is refused."""
+        subject = next((s for s in self._cert_subjects() if s.key == subject_key), None)
+        if subject is None:
+            raise NotFoundError(f"Unknown certification subject '{subject_key}'.")
+        if self._session.get(ConsultantORM, advisor_id) is None:
+            raise NotFoundError(f"Consultant {advisor_id} not found.")
+
+        signer_is_senior = (
+            principal.is_admin
+            or self._consultant_level(principal.consultant_id) is AssessorLevel.CERTIFIED_LEAD
+        )
+        blockers = signoff_blockers(
+            course_complete=self._learner_completed_course(advisor_id, subject.backing_slug),
+            signer_is_senior=signer_is_senior,
+            signer_is_learner=principal.consultant_id == advisor_id,
+        )
+        if blockers:
+            raise ConflictError("Cannot sign off this certification: " + "; ".join(blockers))
+        if self._course_cert_signoff_event(advisor_id, subject.key) is not None:
+            raise ConflictError(f"'{subject.title}' is already certified for this advisor.")
+
+        self._append_cert_event(
+            advisor_id,
+            CertificationEventKind.SIGNOFF_RECORDED,
+            principal.consultant_id,
+            now,
+            detail=f"course cert: {subject.title}",
+            cert_subject=subject.key,
+        )
+        self._session.flush()
+        return self._course_certification(advisor_id, subject)
 
     # ------------------------------------------------- Power Drills (SCOPED, SM-2, GRS-0024)
     # Each advisor owns their own spaced-repetition cards; answering one reschedules it by SM-2. The

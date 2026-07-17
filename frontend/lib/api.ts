@@ -23,6 +23,7 @@ import type {
   CalibrationSession,
   CertificationEvent,
   CertificationRecord,
+  CourseCertification,
   CommissionLine,
   CommitteeDecision,
   CommitteeDecisionRequest,
@@ -719,6 +720,15 @@ export const api = {
 
   certificationEvents(advisorId: string, signal?: AbortSignal): Promise<CertificationEvent[]> {
     return request<CertificationEvent[]>(`/certification/${advisorId}/events`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  // Course / product certifications (GRS-0127) — the caller's own set.
+  courseCertifications(signal?: AbortSignal): Promise<CourseCertification[]> {
+    return request<CourseCertification[]>("/workbench/certifications/course", {
       method: "GET",
       headers: authHeaders(),
       signal,

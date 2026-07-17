@@ -11,6 +11,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from uuid import UUID
 
+from bcap_contracts.certification import CourseCertification
 from bcap_contracts.learning import (
     CertificationCredit,
     ContentCompletion,
@@ -410,5 +411,43 @@ def complete_lesson(
         return repo.complete_lesson(principal, slug, lesson_id, now=datetime.now(UTC))
     except NotFoundError as exc:
         raise _not_found("Lesson") from exc
+    except ConflictError as exc:
+        raise _conflict(exc) from exc
+
+
+# --- Course / product certifications (GRS-0127) -----------------------------------------
+# The Sales Egoist cert + one per product, on top of the assessor ladder. They reuse the
+# certification-events audit (no parallel store). A cert is earned by completing the course AND a
+# senior sign-off that is not the learner (the senior↔junior pairing) — never self-report.
+
+
+class CourseSignoffRequest(BaseModel):
+    learner_consultant_id: UUID
+    subject: str = Field(min_length=1)
+
+
+@router.get("/certifications/course", response_model=list[CourseCertification])
+def list_my_course_certifications(
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> list[CourseCertification]:
+    """The caller's full course/product certification set (status folded from the events)."""
+    return repo.list_course_certifications(principal, principal.consultant_id)
+
+
+@router.post("/certifications/course/signoff", response_model=CourseCertification)
+def signoff_course_certification(
+    payload: CourseSignoffRequest,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> CourseCertification:
+    """A senior signs off a junior's course/product cert (the pairing). Refuses (409) unless the
+    learner completed the course AND the signer is a different, senior operator."""
+    try:
+        return repo.signoff_course_certification(
+            principal, payload.learner_consultant_id, payload.subject, now=datetime.now(UTC)
+        )
+    except NotFoundError as exc:
+        raise _not_found("Certification subject or learner") from exc
     except ConflictError as exc:
         raise _conflict(exc) from exc

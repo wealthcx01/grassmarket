@@ -40,7 +40,11 @@ from bcap_contracts.calibration import (
     CalibrationResult,
     CalibrationSession,
 )
-from bcap_contracts.certification import CertificationEvent, CertificationRecord
+from bcap_contracts.certification import (
+    CertificationEvent,
+    CertificationRecord,
+    CourseCertification,
+)
 from bcap_contracts.commissions import (
     CommissionLine,
     EarningsSummary,
@@ -118,6 +122,7 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "CalibrationResult": CalibrationResult,
     "CertificationRecord": CertificationRecord,
     "CertificationEvent": CertificationEvent,
+    "CourseCertification": CourseCertification,
     "CertificationProgress": CertificationProgress,
     "DrillResult": DrillResult,
     "DrillCard": DrillCard,

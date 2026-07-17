@@ -1,0 +1,76 @@
+{
+  "$defs": {
+    "CourseCertificationStatus": {
+      "description": "A course/product certification's state for one advisor (GRS-0127), folded from the events +\ncourse completion.",
+      "enum": [
+        "not_started",
+        "in_progress",
+        "certified"
+      ],
+      "title": "CourseCertificationStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One advisor's standing on a course/product certification (GRS-0127) — a read view folded from\n`CertificationEvent`s (`cert_subject == subject`) plus whether they have completed the backing\ncourse. Certification requires the course done AND a senior sign-off (not self) — the\nsenior↔junior pairing, never self-report. A computed view, so no id/timestamps of its own.",
+  "properties": {
+    "certified_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Certified At"
+    },
+    "course_complete": {
+      "title": "Course Complete",
+      "type": "boolean"
+    },
+    "owner_consultant_id": {
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "signed_off_by_consultant_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Signed Off By Consultant Id"
+    },
+    "status": {
+      "$ref": "#/$defs/CourseCertificationStatus"
+    },
+    "subject": {
+      "description": "The cert key, e.g. 'sales_egoist'.",
+      "minLength": 1,
+      "title": "Subject",
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    }
+  },
+  "required": [
+    "owner_consultant_id",
+    "subject",
+    "title",
+    "status",
+    "course_complete"
+  ],
+  "title": "CourseCertification",
+  "type": "object"
+}
