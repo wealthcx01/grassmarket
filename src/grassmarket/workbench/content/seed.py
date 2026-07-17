@@ -15,8 +15,14 @@ from grassmarket.workbench.content.sales_egoist import (
     SALES_EGOIST_SLUG,
     sales_egoist_course,
 )
+from grassmarket.workbench.content.sales_ops_playbook import (
+    SALES_OPS_SLUG,
+    sales_ops_playbook_course,
+)
 
 
 def seed_academy_content(repo: Repository, admin: Principal, *, now: datetime) -> None:
-    """Publish (or re-publish) the seeded courses. Currently the Sales Egoist core module."""
+    """Publish (or re-publish) the seeded courses: the Sales Egoist core module (GRS-0122) and the
+    Sales Operations Playbook (GRS-0129)."""
     repo.upsert_published_course(admin, SALES_EGOIST_SLUG, sales_egoist_course(), now=now)
+    repo.upsert_published_course(admin, SALES_OPS_SLUG, sales_ops_playbook_course(), now=now)

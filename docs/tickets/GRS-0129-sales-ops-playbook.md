@@ -1,8 +1,21 @@
 # GRS-0129 — Sales operational process playbook
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 **Depends on:** ADR-0028 (Bruntsfield Academy / Workbench), GRS-0121 (content CMS)
+
+## Delivered
+
+A **Sales Operations Playbook** course authored through the GRS-0121 CMS
+(`workbench/content/sales_ops_playbook.py`), seeded idempotently alongside Sales Egoist. Four
+lessons walk the advisor's standing operational motion **keyed to the real `PipelineStage` values**
+(prospect → workshop_scheduled → workshop_delivered → qualified → scoped → contracted → active →
+delivered), so the process the CRM (§4) enables and the process the Academy teaches line up. Grounded
+in the **v7 two-stream commission schedule** — product Stream A / consultancy Stream B (delivery_type
+× sourcing, self- vs firm-sourced) + workshop recovery fees — referenced, never re-typed as figures
+(the live numbers stay on the product courses, GRS-0123). Pure content on the existing CourseTree —
+no contract/schema/frontend change; the course surfaces automatically in the catalog + the hub.
+Golden master untouched.
 
 ## Why
 
