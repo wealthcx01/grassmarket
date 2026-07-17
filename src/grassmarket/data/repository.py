@@ -3620,14 +3620,40 @@ class Repository:
         )
 
     def list_published_courses(self, principal: Principal) -> list[CourseVersion]:
-        """The latest published version of every course — the learner-facing catalog (org-wide)."""
+        """The latest published version of every course — the learner-facing catalog (org-wide). The
+        mandatory-first course (GRS-0122) sorts to the front so a new advisor's path opens on it;
+        the rest keep creation order."""
         courses = self._session.execute(select(CourseORM).order_by(CourseORM.created_at)).scalars()
         out: list[CourseVersion] = []
         for course in courses:
             latest = self._latest_published_row(course.id)
             if latest is not None:
                 out.append(self._to_course_version(latest))
+        # Stable sort: mandatory-first first, otherwise preserve creation order.
+        out.sort(key=lambda v: 0 if v.tree.mandatory_first else 1)
         return out
+
+    def upsert_published_course(
+        self, principal: Principal, slug: str, tree: CourseTree, *, now: datetime
+    ) -> CourseVersion:
+        """Idempotently seed a course (admin): create it if the slug is new, else replace its draft,
+        then publish. Re-running produces a fresh retained version with identical content — the seed
+        is safe to apply on every boot (GRS-0122)."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may seed a course.")
+        existing = self._session.execute(
+            select(CourseORM).where(CourseORM.slug == slug)
+        ).scalar_one_or_none()
+        if existing is None:
+            self.create_course(
+                principal,
+                slug=slug,
+                title=tree.title,
+                summary=tree.summary,
+                certification_credit=tree.certification_credit,
+            )
+        self.save_course_draft(principal, slug, tree)
+        return self.publish_course(principal, slug, now=now)
 
     def get_published_course(self, principal: Principal, slug: str) -> CourseVersion:
         """The latest published version of one course (org-wide). 404 if never published."""

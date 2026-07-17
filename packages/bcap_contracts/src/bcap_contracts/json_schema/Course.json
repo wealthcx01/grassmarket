@@ -53,6 +53,12 @@
           "$ref": "#/$defs/CertificationCredit",
           "default": "none"
         },
+        "mandatory_first": {
+          "default": false,
+          "description": "A new advisor's learning path opens on this course (GRS-0122). At most one course should carry the flag; the catalog surfaces it first.",
+          "title": "Mandatory First",
+          "type": "boolean"
+        },
         "modules": {
           "default": [],
           "items": {
@@ -137,6 +143,19 @@
           "format": "uuid",
           "title": "Id",
           "type": "string"
+        },
+        "measurement": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "How the advisor measures they have applied this lesson (GRS-0122).",
+          "title": "Measurement"
         },
         "order": {
           "minimum": 0,

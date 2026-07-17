@@ -1,8 +1,23 @@
 # GRS-0122 — Sales Egoist = the "Sales 101" core module
 
-**Status:** Planned
+**Status:** Shipped (v1 seed — founder deepens from the decks over the top)
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 **Depends on:** ADR-0028 (Bruntsfield Academy / Workbench), GRS-0121 (content CMS)
+
+## Delivered
+
+The 8-lesson Sales Egoist doctrine, authored **through the GRS-0121 CMS** as structured content (not
+decks): `workbench/content/sales_egoist.py` builds the `CourseTree` (Zero-Sum Pipeline → Total
+Account Awareness; the Relationship / Challenger / Demo weapons; qualify-with-assessment; awareness→
+close). Each lesson has a spaced-repetition **drill** topic and a concrete **measurement** (new
+`Lesson.measurement` field), and each ties the sales motion to the Platform Power assessment across
+**retail brokerage / wealth / exchange**. The module is flagged **mandatory-first** (new
+`CourseTree.mandatory_first`), so `list_published_courses` sorts it to the front of the learner
+catalog. `workbench/content/seed.py` + `repo.upsert_published_course` seed it idempotently (stable
+uuid5 lesson ids), wired into `scripts/seed_dev.py`. Editor exposes the mandatory-first toggle; the
+catalog shows a "start here" badge. Grounded in the public Challenger Sales method + the codebase's
+own operating models — **not** a copy of any proprietary deck; because it is versioned, the founder
+deepening it from the uploaded decks is simply a new published version, never a code change.
 
 ## Why
 

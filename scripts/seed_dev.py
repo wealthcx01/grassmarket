@@ -124,6 +124,24 @@ def _ensure_consultant(
         session.close()
 
 
+def _seed_academy(session_factory, admin: StoredConsultant) -> None:
+    """Publish the Academy's seeded courses (Sales Egoist core, GRS-0122) as the admin."""
+    from datetime import UTC, datetime
+
+    from grassmarket.data.repository import Principal
+    from grassmarket.workbench.content.seed import seed_academy_content
+
+    session = session_factory()
+    try:
+        repo = Repository(session)
+        seed_academy_content(
+            repo, Principal(consultant_id=admin.id, role=admin.role), now=datetime.now(UTC)
+        )
+        session.commit()
+    finally:
+        session.close()
+
+
 def _headers(settings, stored) -> dict:
     token = create_access_token(
         settings,
@@ -157,6 +175,15 @@ def main() -> None:
     reviewer = _ensure_consultant(
         session_factory, email=REVIEWER_EMAIL, full_name="Demo Reviewer", password=None
     )
+    # An admin seeds the Academy catalog content (authoring is admin-gated, ADR-0028).
+    admin = _ensure_consultant(
+        session_factory,
+        email="admin@bruntsfieldcapital.com",
+        full_name="Demo Admin",
+        password=None,
+        role=Role.ADMIN,
+    )
+    _seed_academy(session_factory, admin)
     headers = _headers(settings, stored)
     reviewer_headers = _headers(settings, reviewer)
 

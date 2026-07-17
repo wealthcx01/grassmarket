@@ -163,6 +163,17 @@ export default function CourseEditorPage() {
             <option value="coursework">Coursework</option>
           </select>
         </label>
+        <label
+          style={{ ...labelStyle, flexDirection: "row", alignItems: "center", gap: "0.5rem" }}
+          title="A new advisor's learning path opens on this course."
+        >
+          <input
+            type="checkbox"
+            checked={tree.mandatory_first}
+            onChange={(e) => patchTree({ mandatory_first: e.target.checked })}
+          />
+          Mandatory first — new advisors start here
+        </label>
       </section>
 
       {/* Modules + lessons */}
@@ -262,6 +273,7 @@ function ModuleEditor({
       author: lessonAuthor,
       video_ref: null,
       drill_topics: [],
+      measurement: null,
       // A human lesson is inherently approved; an AI lesson starts unapproved and is gated.
       approved: lessonAuthor === "human",
       approved_by_consultant_id: null,
