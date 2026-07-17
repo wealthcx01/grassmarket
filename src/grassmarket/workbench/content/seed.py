@@ -10,7 +10,15 @@ from __future__ import annotations
 
 from datetime import datetime
 
+from bcap_contracts.commissions import load_commission_config
+
 from grassmarket.data.repository import Principal, Repository
+from grassmarket.earnings.product_carrot import product_commission_carrot
+from grassmarket.workbench.content.openbb_course import (
+    OPENBB_PRODUCT_ID,
+    OPENBB_SLUG,
+    openbb_course,
+)
 from grassmarket.workbench.content.practice_scenarios import academy_practice_scenarios
 from grassmarket.workbench.content.sales_egoist import (
     SALES_EGOIST_SLUG,
@@ -24,10 +32,16 @@ from grassmarket.workbench.content.sales_ops_playbook import (
 
 def seed_academy_content(repo: Repository, admin: Principal, *, now: datetime) -> None:
     """Publish (or re-publish) the seeded Academy content: the Sales Egoist core module (GRS-0122),
-    the Sales Operations Playbook (GRS-0129), and the Academy-grounded Practice Arena scenarios
-    (GRS-0130). Idempotent — courses upsert by slug; scenarios are created only when absent."""
+    the Sales Operations Playbook (GRS-0129), the OpenBB product course (GRS-0126), and the
+    Academy-grounded Practice Arena scenarios (GRS-0130). Idempotent — courses upsert by slug;
+    scenarios are created only when absent."""
     repo.upsert_published_course(admin, SALES_EGOIST_SLUG, sales_egoist_course(), now=now)
     repo.upsert_published_course(admin, SALES_OPS_SLUG, sales_ops_playbook_course(), now=now)
+
+    # The OpenBB product course reuses the GRS-0123 template, so its commission section resolves
+    # live from the Earnings v7 schedule (fails loud if 'openbb' is ever removed from the config).
+    carrot = product_commission_carrot(OPENBB_PRODUCT_ID, load_commission_config())
+    repo.upsert_published_course(admin, OPENBB_SLUG, openbb_course(carrot), now=now)
 
     # Practice-arena scenarios have no natural key; seed idempotently by title (create if absent).
     existing_titles = {s.title for s in repo.list_arena_scenarios(admin)}
