@@ -119,6 +119,11 @@ export default function CoursesPage() {
                   <span>
                     <strong style={{ fontSize: "0.9rem" }}>{c.draft.title}</strong>{" "}
                     <span className="mono" style={{ fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>/{c.slug}</span>
+                    {c.draft.mandatory_first ? (
+                      <span className="mono" style={{ marginLeft: "0.5rem", fontSize: "0.62rem", color: "var(--color-accent)", border: "1px solid var(--color-accent)", borderRadius: "999px", padding: "0 0.35rem" }}>
+                        start here
+                      </span>
+                    ) : null}
                   </span>
                   <span className="mono" style={{ fontSize: "0.72rem", color: c.latest_version > 0 ? "var(--color-accent)" : "var(--color-ink-faint)" }}>
                     {c.latest_version > 0 ? `v${c.latest_version} published` : "unpublished"}

@@ -173,6 +173,10 @@ class Lesson(BaseModel):
     drill_topics: tuple[str, ...] = Field(
         default=(), description="Existing DrillCard topics this lesson reinforces (e.g. 'power:…')."
     )
+    measurement: str | None = Field(
+        default=None,
+        description="How the advisor measures they have applied this lesson (GRS-0122).",
+    )
     approved: bool = True
     approved_by_consultant_id: UUID | None = None
     approved_at: datetime | None = None
@@ -212,6 +216,11 @@ class CourseTree(BaseModel):
     title: str = Field(min_length=1)
     summary: str = Field(min_length=1)
     certification_credit: CertificationCredit = CertificationCredit.NONE
+    mandatory_first: bool = Field(
+        default=False,
+        description="A new advisor's learning path opens on this course (GRS-0122). At most one "
+        "course should carry the flag; the catalog surfaces it first.",
+    )
     modules: tuple[CourseModule, ...] = ()
 
 

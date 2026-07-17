@@ -654,6 +654,7 @@ export interface Lesson {
   author: LessonAuthor;
   video_ref?: string | null;
   drill_topics: string[];
+  measurement?: string | null;
   approved: boolean;
   approved_by_consultant_id?: string | null;
   approved_at?: string | null;
@@ -670,6 +671,7 @@ export interface CourseTree {
   title: string;
   summary: string;
   certification_credit: CertificationCredit;
+  mandatory_first: boolean;
   modules: CourseModule[];
 }
 
