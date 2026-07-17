@@ -11,7 +11,7 @@ from __future__ import annotations
 from uuid import UUID
 
 from bcap_contracts.entities import PipelineStage, Prospect
-from bcap_contracts.pipeline import IllegalStageTransition
+from bcap_contracts.pipeline import IllegalStageTransition, StageHistoryEntry
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
@@ -70,6 +70,22 @@ def get_prospect(
 ) -> Prospect:
     try:
         return repo.get_prospect(principal, prospect_id)
+    except (NotFoundError, ScopeViolationError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Prospect not found."
+        ) from exc
+
+
+@router.get("/{prospect_id}/history", response_model=list[StageHistoryEntry])
+def prospect_stage_history(
+    prospect_id: UUID,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> list[StageHistoryEntry]:
+    """The prospect's stage timeline, oldest first (GRS-0111). Owner-scoped — an unowned or unknown
+    prospect is 404, never a leak that it exists."""
+    try:
+        return list(repo.list_stage_history(principal, prospect_id))
     except (NotFoundError, ScopeViolationError) as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Prospect not found."

@@ -2,7 +2,7 @@
   "$defs": {
     "PipelineBoardEntry": {
       "additionalProperties": false,
-      "description": "A prospect annotated with its time-in-stage and staleness flag.",
+      "description": "A prospect annotated with its time-in-stage, staleness flag, and win-probability.",
       "properties": {
         "days_in_stage": {
           "minimum": 0,
@@ -20,13 +20,17 @@
           "minimum": 0,
           "title": "Stale After Days",
           "type": "integer"
+        },
+        "win_probability": {
+          "$ref": "#/$defs/WinProbability"
         }
       },
       "required": [
         "prospect",
         "days_in_stage",
         "stale_after_days",
-        "stale"
+        "stale",
+        "win_probability"
       ],
       "title": "PipelineBoardEntry",
       "type": "object"
@@ -146,6 +150,46 @@
         "stage_entered_at"
       ],
       "title": "Prospect",
+      "type": "object"
+    },
+    "WinProbability": {
+      "additionalProperties": false,
+      "description": "A prospect's explainable win-probability (GRS-0111). ``score`` is a percentage 0–100 (a\nprobability, never currency — ADR-0002); ``label`` is the config-banded headline word;\n``reasons`` explain what moved the estimate; ``missing_info`` names the data gaps a consultant\ncould fill to sharpen it. Deterministic given the prospect + config.",
+      "properties": {
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "missing_info": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Missing Info",
+          "type": "array"
+        },
+        "reasons": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Reasons",
+          "type": "array"
+        },
+        "score": {
+          "description": "Win probability as a whole-number percentage.",
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Score",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "score",
+        "label",
+        "reasons",
+        "missing_info"
+      ],
+      "title": "WinProbability",
       "type": "object"
     }
   },

@@ -149,6 +149,28 @@ class ProspectORM(Base):
     )
 
 
+class ProspectStageHistoryORM(Base):
+    """Append-only audit of a prospect's stage transitions (GRS-0111). One row is written at the
+    ``update_prospect_stage`` choke-point on every validated move, plus one creation row
+    (``from_stage`` NULL) when the prospect is created. Rows are inserted, never updated; ordering
+    is by ``occurred_at`` then ``created_at``."""
+
+    __tablename__ = "prospect_stage_history"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    # THE scoping column — every read/list is filtered by this in the repository layer.
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    prospect_id: Mapped[UUID] = mapped_column(
+        ForeignKey("prospects.id"), index=True, nullable=False
+    )
+    from_stage: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    to_stage: Mapped[str] = mapped_column(String(32), nullable=False)
+    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
 class WorkshopORM(Base):
     """A workshop owned by a consultant and linked to a prospect (GRS-0012, PRD §4). Scheduled,
     then delivered; the delivered date is the anchor for recovery-fee attribution."""

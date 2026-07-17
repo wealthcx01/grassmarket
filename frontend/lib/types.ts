@@ -340,16 +340,31 @@ export interface Prospect {
   updated_at: string;
 }
 
+export interface WinProbability {
+  score: number; // 0–100 percentage (a probability, never currency)
+  label: string; // config-banded headline word (Cold / Warming / Likely / Strong)
+  reasons: string[];
+  missing_info: string[];
+}
+
 export interface PipelineBoardEntry {
   prospect: Prospect;
   days_in_stage: number;
   stale_after_days: number;
   stale: boolean;
+  win_probability: WinProbability;
 }
 
 export interface PipelineBoard {
   generated_at: string;
   entries: PipelineBoardEntry[];
+}
+
+export interface StageHistoryEntry {
+  prospect_id: string;
+  from_stage: PipelineStage | null;
+  to_stage: PipelineStage;
+  occurred_at: string;
 }
 
 export interface StageForecast {

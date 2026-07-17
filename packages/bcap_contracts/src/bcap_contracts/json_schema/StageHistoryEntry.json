@@ -1,0 +1,56 @@
+{
+  "$defs": {
+    "PipelineStage": {
+      "description": "Kanban stages (PRD §4). Ordered; time-in-stage flags key off the transitions.",
+      "enum": [
+        "prospect",
+        "workshop_scheduled",
+        "workshop_delivered",
+        "qualified",
+        "scoped",
+        "contracted",
+        "active",
+        "delivered",
+        "closed",
+        "nurture"
+      ],
+      "title": "PipelineStage",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One recorded stage transition for a prospect (GRS-0111) — the audit timeline behind the\nboard. Written at the ``update_prospect_stage`` choke-point; ``from_stage`` is None only for the\ncreation row (the prospect's first stage). Read-only, owner-scoped.",
+  "properties": {
+    "from_stage": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PipelineStage"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "occurred_at": {
+      "format": "date-time",
+      "title": "Occurred At",
+      "type": "string"
+    },
+    "prospect_id": {
+      "format": "uuid",
+      "title": "Prospect Id",
+      "type": "string"
+    },
+    "to_stage": {
+      "$ref": "#/$defs/PipelineStage"
+    }
+  },
+  "required": [
+    "prospect_id",
+    "from_stage",
+    "to_stage",
+    "occurred_at"
+  ],
+  "title": "StageHistoryEntry",
+  "type": "object"
+}

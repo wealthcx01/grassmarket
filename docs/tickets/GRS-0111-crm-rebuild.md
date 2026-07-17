@@ -1,8 +1,26 @@
 # GRS-0111 — Rebuild the pipeline as an EliteVault-grade CRM
 
-**Status:** Planned
+**Status:** Partially shipped (backend foundation) — see "Delivered" below
 **Loop:** Part 2 — Pipeline / GTM engine (one program)
 **Depends on:** ADR-0027 (Pipeline / GTM engine)
+
+## Delivered (this PR — the "rebuild in Python" foundation)
+
+The low-risk, fully-tested backend half of the flagship landed first, self-contained:
+- **Win-probability scorer** (`src/grassmarket/pipeline/win_probability.py`) — deterministic and
+  explainable, returning exactly `{score, label, reasons, missing_info}`, with **all weights + bands
+  in `pipeline_config.yaml`** (config-not-code). It is a probability, never currency (ADR-0002).
+  Surfaced as a pill on every board card (score + reasons/gaps in the tooltip).
+- **Stage-history timeline** — `ProspectStageHistoryORM` + migration 0025; a row is written at the
+  single `update_prospect_stage` choke-point (plus a creation row), owner-scoped; new
+  `GET /prospects/{id}/history` endpoint; rendered as a timeline on the prospect detail page.
+
+**Deferred (needs the `@dnd-kit` frontend dependency + attended review — not cleanly buildable in an
+unattended autonomous pass):** the DnD kanban port, the slide-over `DealDetailPanel`, the KPI /
+filter / search row, unifying the timeline with `CommsLogEntry` in one panel, and elevating
+`company_name` / `primary_contact_*` into first-class **Company + Contact** entities. These carry a
+new-dependency/CI risk (bun install of `@dnd-kit` unverified offline) and a substantial UI rebuild,
+so they were held rather than shipped half-broken. Golden master untouched throughout.
 
 ## Why
 

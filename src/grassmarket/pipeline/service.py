@@ -23,6 +23,8 @@ from bcap_contracts.pipeline import (
     StageForecast,
 )
 
+from grassmarket.pipeline.win_probability import score_win_probability
+
 
 def _as_utc(value: datetime) -> datetime:
     """Coerce to timezone-aware UTC. Timestamps are always persisted in UTC, but SQLite drops the
@@ -39,11 +41,13 @@ def days_in_stage(prospect: Prospect, now: datetime) -> int:
 def _board_entry(prospect: Prospect, config: PipelineConfig, now: datetime) -> PipelineBoardEntry:
     params = config.params(prospect.stage)
     dis = days_in_stage(prospect, now)
+    stale = dis >= params.stale_after_days
     return PipelineBoardEntry(
         prospect=prospect,
         days_in_stage=dis,
         stale_after_days=params.stale_after_days,
-        stale=dis >= params.stale_after_days,
+        stale=stale,
+        win_probability=score_win_probability(prospect, stale=stale, config=config),
     )
 
 

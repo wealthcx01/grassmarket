@@ -14,7 +14,43 @@ import {
   type PipelineBoard,
   type PipelineBoardEntry,
   type PipelineStage,
+  type WinProbability,
 } from "@/lib/types";
+
+// The headline band → colour. A probability, never currency (ADR-0002); semantic (not the accent).
+const WIN_BAND_COLOR: Record<string, string> = {
+  Strong: "var(--color-accent)",
+  Likely: "var(--color-accent)",
+  Warming: "var(--color-warn)",
+  Cold: "var(--color-ink-muted)",
+};
+
+export function WinProbabilityPill({ wp }: { wp: WinProbability }) {
+  const color = WIN_BAND_COLOR[wp.label] ?? "var(--color-ink-muted)";
+  const gaps = wp.missing_info.length;
+  return (
+    <span
+      className="mono"
+      title={
+        `Win probability ${wp.score}% · ${wp.label}\n` +
+        wp.reasons.join("\n") +
+        (gaps ? `\n\nWould sharpen the estimate:\n${wp.missing_info.join("\n")}` : "")
+      }
+      style={{
+        flex: "0 0 auto",
+        fontSize: "0.62rem",
+        fontWeight: 600,
+        color,
+        border: `1px solid ${color}`,
+        borderRadius: "999px",
+        padding: "0 0.35rem",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {wp.score}%{gaps ? " ·" : ""}
+    </span>
+  );
+}
 
 export function KanbanBoard({
   board,
@@ -112,7 +148,7 @@ function ProspectCard({
   entry: PipelineBoardEntry;
   onMove: (id: string, stage: PipelineStage) => Promise<unknown>;
 }) {
-  const { prospect, days_in_stage, stale } = entry;
+  const { prospect, days_in_stage, stale, win_probability } = entry;
   return (
     <article
       style={{
@@ -122,12 +158,15 @@ function ProspectCard({
         padding: "0.5rem 0.6rem",
       }}
     >
-      <Link
-        href={`/prospects/${prospect.id}`}
-        style={{ fontSize: "0.85rem", fontWeight: 600, textDecoration: "none", color: "inherit" }}
-      >
-        {prospect.company_name}
-      </Link>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.4rem" }}>
+        <Link
+          href={`/prospects/${prospect.id}`}
+          style={{ fontSize: "0.85rem", fontWeight: 600, textDecoration: "none", color: "inherit" }}
+        >
+          {prospect.company_name}
+        </Link>
+        <WinProbabilityPill wp={win_probability} />
+      </div>
       <div
         style={{
           display: "flex",
