@@ -59,7 +59,7 @@ from bcap_contracts.learning import (
 from bcap_contracts.meetings import MeetingTranscript
 from bcap_contracts.money import Money
 from bcap_contracts.narratives import AINarrative
-from bcap_contracts.pipeline import PipelineBoard, PipelineForecast
+from bcap_contracts.pipeline import PipelineBoard, PipelineForecast, StageHistoryEntry
 from bcap_contracts.predictions import BenchmarkRow, CBenchmarkRow, Prediction
 from bcap_contracts.provenance import WeightProvenanceRecord
 from bcap_contracts.registry import Registry
@@ -87,6 +87,7 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "Prospect": Prospect,
     "PipelineForecast": PipelineForecast,
     "PipelineBoard": PipelineBoard,
+    "StageHistoryEntry": StageHistoryEntry,
     "Engagement": Engagement,
     "CommsLogEntry": CommsLogEntry,
     "Workshop": Workshop,

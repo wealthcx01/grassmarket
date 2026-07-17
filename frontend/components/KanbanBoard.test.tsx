@@ -29,7 +29,13 @@ describe("KanbanBoard empty states (GRS-0055)", () => {
   });
 
   it("renders the prospect card in a populated stage and no placeholder there", () => {
-    const entry = { prospect: prospect(), days_in_stage: 3, stale_after_days: 30, stale: false };
+    const entry = {
+      prospect: prospect(),
+      days_in_stage: 3,
+      stale_after_days: 30,
+      stale: false,
+      win_probability: { score: 10, label: "Cold", reasons: [], missing_info: [] },
+    };
     render(<KanbanBoard board={board([entry])} onMove={async () => {}} />);
     expect(screen.getByText("Meridian Securities")).toBeTruthy();
     // One fewer empty column than the total number of stages.

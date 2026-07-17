@@ -17,25 +17,57 @@ from bcap_contracts.pipeline import (
     PipelineConfig,
     PipelineConfigError,
     PipelineStageParams,
+    WinProbabilityBand,
+    WinProbabilityConfig,
+    WinProbabilitySignals,
     assert_legal_transition,
     is_legal_transition,
     load_pipeline_config,
 )
 
-from grassmarket.data.repository import Repository
+from grassmarket.data.repository import NotFoundError, Repository, ScopeViolationError
 from grassmarket.pipeline import build_board, build_forecast, days_in_stage
 from tests.conftest import SeededConsultant, auth_header
 
 _NOW = datetime(2026, 7, 9, 12, 0, tzinfo=UTC)
 
+# A minimal-but-valid win-probability config for inline PipelineConfig construction (the loaded
+# one is what production uses; this just satisfies the required field in unit tests).
+_WIN_PROB = WinProbabilityConfig(
+    version="test",
+    signals=WinProbabilitySignals(
+        has_primary_contact=0.05,
+        has_contact_email=0.05,
+        has_sector=0.03,
+        has_notes=0.02,
+        stale_penalty=-0.10,
+    ),
+    bands=(
+        WinProbabilityBand(min_probability=0.5, label="High"),
+        WinProbabilityBand(min_probability=0.0, label="Low"),
+    ),
+)
 
-def _prospect(stage: PipelineStage, *, entered: datetime) -> Prospect:
+
+def _prospect(
+    stage: PipelineStage,
+    *,
+    entered: datetime,
+    sector: str | None = None,
+    primary_contact_name: str | None = None,
+    primary_contact_email: str | None = None,
+    notes: str | None = None,
+) -> Prospect:
     return Prospect(
         id=uuid.uuid4(),
         owner_consultant_id=uuid.uuid4(),
         company_name="Acme",
         stage=stage,
         stage_entered_at=entered,
+        sector=sector,
+        primary_contact_name=primary_contact_name,
+        primary_contact_email=primary_contact_email,
+        notes=notes,
         created_at=_NOW,
         updated_at=_NOW,
     )
@@ -84,6 +116,7 @@ def test_incomplete_config_refuses() -> None:
                     close_probability=0.1, stale_after_days=10
                 )
             },
+            win_probability=_WIN_PROB,
         )
 
 
@@ -192,6 +225,128 @@ def test_http_cross_owner_stage_update_is_404(
         f"/prospects/{pid}/stage", json={"stage": "workshop_scheduled"}, headers=auth_header(bob)
     )
     assert resp.status_code == 404
+
+
+# ------------------------------------------------------------------ win-probability (GRS-0111)
+def _config() -> PipelineConfig:
+    return load_pipeline_config()
+
+
+def test_win_probability_config_loads() -> None:
+    wp = _config().win_probability
+    assert wp.signals.stale_penalty < 0  # a stale prospect is penalised
+    assert min(b.min_probability for b in wp.bands) == 0.0  # a 0-anchored floor (fail-loud)
+    assert wp.band_for(0.0) == "Cold"
+    assert wp.band_for(0.95) == "Strong"
+
+
+def test_win_probability_starts_from_stage_base() -> None:
+    from grassmarket.pipeline.win_probability import score_win_probability
+
+    config = _config()
+    bare = _prospect(PipelineStage.PROSPECT, entered=_NOW)  # no contact/sector/notes
+    wp = score_win_probability(bare, stale=False, config=config)
+    # 10% base, nothing to add → 10.
+    assert wp.score == 10
+    assert wp.label == "Cold"
+    # Everything is missing, so it is all surfaced as fillable gaps.
+    assert len(wp.missing_info) == 4
+
+
+def test_win_probability_completeness_raises_score() -> None:
+    from grassmarket.pipeline.win_probability import score_win_probability
+
+    config = _config()
+    full = _prospect(
+        PipelineStage.QUALIFIED,  # 55% base
+        entered=_NOW,
+        sector="Wealth",
+        primary_contact_name="Jo",
+        primary_contact_email="jo@x.com",
+        notes="Keen.",
+    )
+    wp = score_win_probability(full, stale=False, config=config)
+    # 55 + 5 + 5 + 3 + 2 = 70.
+    assert wp.score == 70
+    assert wp.missing_info == ()
+    assert wp.label == "Likely"
+
+
+def test_win_probability_stale_penalty_applies() -> None:
+    from grassmarket.pipeline.win_probability import score_win_probability
+
+    config = _config()
+    p = _prospect(PipelineStage.QUALIFIED, entered=_NOW)  # 55% base, no signals
+    fresh = score_win_probability(p, stale=False, config=config)
+    stale = score_win_probability(p, stale=True, config=config)
+    assert stale.score == fresh.score - 10  # −10pp stale penalty
+    assert any("Stale" in r for r in stale.reasons)
+
+
+def test_win_probability_settled_stages_ignore_signals() -> None:
+    from grassmarket.pipeline.win_probability import score_win_probability
+
+    config = _config()
+    # A closed deal is 0 regardless of how complete the record is; a won (active) deal is 100.
+    closed = _prospect(
+        PipelineStage.CLOSED, entered=_NOW, sector="X", primary_contact_name="Y", notes="Z"
+    )
+    won = _prospect(PipelineStage.ACTIVE, entered=_NOW)
+    assert score_win_probability(closed, stale=True, config=config).score == 0
+    assert score_win_probability(closed, stale=True, config=config).missing_info == ()
+    assert score_win_probability(won, stale=False, config=config).score == 100
+
+
+def test_board_entries_carry_win_probability() -> None:
+    config = _config()
+    board = build_board([_prospect(PipelineStage.PROSPECT, entered=_NOW)], config, _NOW)
+    assert board.entries[0].win_probability.score == 10
+
+
+# ------------------------------------------------------------------ stage history (GRS-0111)
+def test_creation_writes_a_history_row(repo: Repository, alice: SeededConsultant) -> None:
+    prospect = repo.create_prospect(alice.principal, company_name="Acme")
+    history = repo.list_stage_history(alice.principal, prospect.id)
+    assert len(history) == 1
+    assert history[0].from_stage is None  # the creation row
+    assert history[0].to_stage is PipelineStage.PROSPECT
+
+
+def test_transition_appends_history_in_order(repo: Repository, alice: SeededConsultant) -> None:
+    prospect = repo.create_prospect(alice.principal, company_name="Acme")
+    repo.update_prospect_stage(alice.principal, prospect.id, PipelineStage.WORKSHOP_SCHEDULED)
+    repo.update_prospect_stage(alice.principal, prospect.id, PipelineStage.WORKSHOP_DELIVERED)
+    history = repo.list_stage_history(alice.principal, prospect.id)
+    assert [(h.from_stage, h.to_stage) for h in history] == [
+        (None, PipelineStage.PROSPECT),
+        (PipelineStage.PROSPECT, PipelineStage.WORKSHOP_SCHEDULED),
+        (PipelineStage.WORKSHOP_SCHEDULED, PipelineStage.WORKSHOP_DELIVERED),
+    ]
+
+
+def test_stage_history_is_owner_scoped(
+    repo: Repository, alice: SeededConsultant, bob: SeededConsultant
+) -> None:
+    prospect = repo.create_prospect(alice.principal, company_name="Alice Co")
+    with pytest.raises((NotFoundError, ScopeViolationError)):
+        repo.list_stage_history(bob.principal, prospect.id)
+
+
+def test_http_stage_history_is_scoped(
+    client, alice: SeededConsultant, bob: SeededConsultant
+) -> None:
+    created = client.post(
+        "/prospects", json={"company_name": "Alice Co"}, headers=auth_header(alice)
+    )
+    pid = created.json()["id"]
+    client.patch(
+        f"/prospects/{pid}/stage", json={"stage": "workshop_scheduled"}, headers=auth_header(alice)
+    )
+    owner_view = client.get(f"/prospects/{pid}/history", headers=auth_header(alice))
+    assert owner_view.status_code == 200
+    assert len(owner_view.json()) == 2  # creation + one move
+    # Bob can't see it exists.
+    assert client.get(f"/prospects/{pid}/history", headers=auth_header(bob)).status_code == 404
 
 
 def test_pipeline_endpoints_require_auth(client) -> None:

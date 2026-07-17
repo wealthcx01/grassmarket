@@ -12,7 +12,14 @@ import Link from "next/link";
 import { StageMoveControl } from "@/components/StageMoveControl";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ApiError, api, getToken } from "@/lib/api";
-import { STAGE_LABEL, type Engagement, type PipelineStage, type Prospect, type Workshop } from "@/lib/types";
+import {
+  STAGE_LABEL,
+  type Engagement,
+  type PipelineStage,
+  type Prospect,
+  type StageHistoryEntry,
+  type Workshop,
+} from "@/lib/types";
 
 const CONTRACTED_OR_BEYOND: PipelineStage[] = ["contracted", "active", "delivered"];
 
@@ -24,6 +31,7 @@ export default function ProspectDetailPage() {
   const [prospect, setProspect] = useState<Prospect | null>(null);
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [engagements, setEngagements] = useState<Engagement[]>([]);
+  const [history, setHistory] = useState<StageHistoryEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const reload = useCallback(
@@ -32,11 +40,13 @@ export default function ProspectDetailPage() {
         api.getProspect(id, signal),
         api.listWorkshops(signal),
         api.listEngagements(signal),
+        api.prospectHistory(id, signal),
       ])
-        .then(([p, ws, es]) => {
+        .then(([p, ws, es, hist]) => {
           setProspect(p);
           setWorkshops(ws.filter((w) => w.prospect_id === id));
           setEngagements(es.filter((e) => e.prospect_id === id));
+          setHistory(hist);
         })
         .catch((err: unknown) => {
           if (err instanceof ApiError && err.status === 0) return;
@@ -85,7 +95,49 @@ export default function ProspectDetailPage() {
 
       <WorkshopsSection prospectId={id} workshops={workshops} onChanged={reload} />
       <EngagementsSection prospectId={id} engagements={engagements} canEngage={canEngage} />
+      <StageHistorySection history={history} />
     </div>
+  );
+}
+
+function StageHistorySection({ history }: { history: StageHistoryEntry[] }) {
+  // Newest first — the most recent move reads at the top, the creation row anchors the bottom.
+  const rows = [...history].reverse();
+  return (
+    <Section title="Stage history">
+      {rows.length === 0 ? (
+        <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem" }}>No history yet.</p>
+      ) : (
+        <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+          {rows.map((h, i) => (
+            <li
+              key={`${h.occurred_at}-${i}`}
+              style={{ display: "flex", alignItems: "baseline", gap: "0.6rem", fontSize: "0.85rem" }}
+            >
+              <span
+                className="mono"
+                style={{ flex: "0 0 6.5rem", fontSize: "0.72rem", color: "var(--color-ink-muted)" }}
+              >
+                {new Date(h.occurred_at).toLocaleDateString()}
+              </span>
+              <span>
+                {h.from_stage ? (
+                  <>
+                    <span style={{ color: "var(--color-ink-muted)" }}>{STAGE_LABEL[h.from_stage]}</span>
+                    {" → "}
+                    <strong>{STAGE_LABEL[h.to_stage]}</strong>
+                  </>
+                ) : (
+                  <>
+                    Created in <strong>{STAGE_LABEL[h.to_stage]}</strong>
+                  </>
+                )}
+              </span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </Section>
   );
 }
 

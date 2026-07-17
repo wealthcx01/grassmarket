@@ -121,7 +121,7 @@ from bcap_contracts.learning import (
 from bcap_contracts.meetings import MediaKind, MeetingTranscript
 from bcap_contracts.money import Currency, Money
 from bcap_contracts.narratives import AINarrative, NarrativeSection, NarrativeStatus
-from bcap_contracts.pipeline import assert_legal_transition
+from bcap_contracts.pipeline import StageHistoryEntry, assert_legal_transition
 from bcap_contracts.predictions import (
     BenchmarkRow,
     BenchmarkSector,
@@ -165,6 +165,7 @@ from grassmarket.data.models import (
     ModuleRatingDraftORM,
     PredictionORM,
     ProspectORM,
+    ProspectStageHistoryORM,
     RecoveryFeeAttributionORM,
     RefreshTokenORM,
     ScoringRunORM,
@@ -544,6 +545,10 @@ class Repository:
         )
         self._session.add(row)
         self._session.flush()
+        # The creation row of the stage timeline (from_stage NULL). Same choke-point discipline as
+        # update_prospect_stage — every stage a prospect has ever held is recorded here.
+        self._record_stage_history(row, from_stage=None, to_stage=PipelineStage(row.stage))
+        self._session.flush()
         return self._to_prospect(row)
 
     def list_prospects(self, principal: Principal) -> list[Prospect]:
@@ -576,12 +581,61 @@ class Repository:
         if row is None:
             raise NotFoundError(f"Prospect {prospect_id} not found.")
         self._assert_can_access(principal, row.owner_consultant_id)
-        assert_legal_transition(PipelineStage(row.stage), stage)
+        from_stage = PipelineStage(row.stage)
+        assert_legal_transition(from_stage, stage)
+        moved_at = datetime.now(UTC)
         row.stage = stage
-        row.stage_entered_at = datetime.now(UTC)
+        row.stage_entered_at = moved_at
         self._session.add(row)
+        # Record the transition at the same choke-point that mutates the stage — a move can't happen
+        # without leaving a timeline row (audit + the CRM history view, GRS-0111).
+        self._record_stage_history(row, from_stage=from_stage, to_stage=stage, occurred_at=moved_at)
         self._session.flush()
         return self._to_prospect(row)
+
+    def _record_stage_history(
+        self,
+        prospect: ProspectORM,
+        *,
+        from_stage: PipelineStage | None,
+        to_stage: PipelineStage,
+        occurred_at: datetime | None = None,
+    ) -> None:
+        """Append one stage-history row, inheriting the prospect's owner (scoping travels here)."""
+        self._session.add(
+            ProspectStageHistoryORM(
+                owner_consultant_id=prospect.owner_consultant_id,
+                prospect_id=prospect.id,
+                from_stage=from_stage.value if from_stage is not None else None,
+                to_stage=to_stage.value,
+                occurred_at=occurred_at if occurred_at is not None else datetime.now(UTC),
+            )
+        )
+
+    def list_stage_history(
+        self, principal: Principal, prospect_id: UUID
+    ) -> tuple[StageHistoryEntry, ...]:
+        """The prospect's stage timeline, oldest first. Owner-scoped: the prospect must be visible
+        to the principal (a scoping failure raises before any history is returned)."""
+        prospect = self._session.get(ProspectORM, prospect_id)
+        if prospect is None:
+            raise NotFoundError(f"Prospect {prospect_id} not found.")
+        self._assert_can_access(principal, prospect.owner_consultant_id)
+        stmt = (
+            select(ProspectStageHistoryORM)
+            .where(ProspectStageHistoryORM.prospect_id == prospect_id)
+            .order_by(ProspectStageHistoryORM.occurred_at, ProspectStageHistoryORM.created_at)
+        )
+        rows = self._session.execute(stmt).scalars().all()
+        return tuple(
+            StageHistoryEntry(
+                prospect_id=r.prospect_id,
+                from_stage=PipelineStage(r.from_stage) if r.from_stage is not None else None,
+                to_stage=PipelineStage(r.to_stage),
+                occurred_at=r.occurred_at,
+            )
+            for r in rows
+        )
 
     # ------------------------------------------------------------------ workshops (SCOPED)
     def create_workshop(

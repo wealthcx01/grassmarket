@@ -21,3 +21,21 @@ stages:
   delivered:           { close_probability: 1.00, stale_after_days: 30 }
   closed:              { close_probability: 0.00, stale_after_days: 3650 }
   nurture:             { close_probability: 0.05, stale_after_days: 180 }
+
+# Win-probability scorer (GRS-0111) — per-prospect, explainable. Starts from the stage
+# close_probability above and nudges it by data-completeness signals, then bands into a headline
+# word. Weights are probability points (0.05 = +5pp), never currency (ADR-0002). Draft v1 values,
+# pending advisor calibration. The bands MUST include a 0.0-anchored floor (fail-loud).
+win_probability:
+  version: win-prob-v1
+  signals:
+    has_primary_contact: 0.05   # a named contact on file
+    has_contact_email:   0.05   # a reachable email
+    has_sector:          0.03   # sector recorded (qualifies fit)
+    has_notes:           0.02   # qualifying notes captured
+    stale_penalty:      -0.10   # flagged stale in its stage — momentum lost
+  bands:
+    - { min_probability: 0.80, label: Strong }
+    - { min_probability: 0.55, label: Likely }
+    - { min_probability: 0.25, label: Warming }
+    - { min_probability: 0.00, label: Cold }

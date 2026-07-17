@@ -55,6 +55,7 @@ import type {
   RegistryProfile,
   RubricAnchor,
   ScenarioComparison,
+  StageHistoryEntry,
   Workshop,
 } from "@/lib/types";
 
@@ -468,6 +469,15 @@ export const api = {
 
   getProspect(id: string, signal?: AbortSignal): Promise<Prospect> {
     return request<Prospect>(`/prospects/${id}`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  /** The prospect's stage timeline, oldest first (GRS-0111). Owner-scoped server-side. */
+  prospectHistory(id: string, signal?: AbortSignal): Promise<StageHistoryEntry[]> {
+    return request<StageHistoryEntry[]>(`/prospects/${id}/history`, {
       method: "GET",
       headers: authHeaders(),
       signal,

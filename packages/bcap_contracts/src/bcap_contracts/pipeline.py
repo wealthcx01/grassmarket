@@ -20,6 +20,7 @@ import functools
 from datetime import datetime
 from importlib import resources
 from typing import Any
+from uuid import UUID
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -103,6 +104,63 @@ class PipelineStageParams(BaseModel):
     )
 
 
+# --- Win-probability configuration (GRS-0111, config-not-code) --------------------------------
+# The per-prospect win-probability scorer (src/grassmarket/pipeline/win_probability.py) is a
+# deterministic, explainable estimate: it starts from the stage's close_probability and nudges it
+# by data-completeness signals, then bands the result into a headline word. Every weight and band
+# is CONFIGURATION here — not a currency, a probability (ADR-0002: score-points and £ never mix).
+class WinProbabilitySignals(BaseModel):
+    """Additive adjustments (in probability points, e.g. 0.05 = +5pp) applied to the stage base for
+    a prospect that carries / lacks a given piece of qualifying information. ``stale_penalty`` is
+    the (typically negative) adjustment when the prospect is flagged stale in its stage."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    has_primary_contact: float = Field(ge=-1.0, le=1.0)
+    has_contact_email: float = Field(ge=-1.0, le=1.0)
+    has_sector: float = Field(ge=-1.0, le=1.0)
+    has_notes: float = Field(ge=-1.0, le=1.0)
+    stale_penalty: float = Field(ge=-1.0, le=1.0)
+
+
+class WinProbabilityBand(BaseModel):
+    """A headline label applied when the adjusted probability is at least ``min_probability``."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    min_probability: float = Field(ge=0.0, le=1.0)
+    label: str = Field(min_length=1)
+
+
+class WinProbabilityConfig(BaseModel):
+    """Win-probability tuning: the completeness signal weights and the label bands. Fail-loud — the
+    bands must cover the whole [0, 1] range (a lowest band anchored at 0.0), so every score gets a
+    label, never a default."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    version: str = Field(min_length=1)
+    signals: WinProbabilitySignals
+    bands: tuple[WinProbabilityBand, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _bands_cover_range(self) -> WinProbabilityConfig:
+        if min(b.min_probability for b in self.bands) != 0.0:
+            raise PipelineConfigError(
+                "win_probability.bands must include a band anchored at 0.0 so every score is "
+                "labelled (no default — ADR-0001)."
+            )
+        return self
+
+    def band_for(self, probability: float) -> str:
+        """The headline label for a probability — the highest band whose floor it clears."""
+        best = max(
+            (b for b in self.bands if probability >= b.min_probability),
+            key=lambda b: b.min_probability,
+        )
+        return best.label
+
+
 class PipelineConfig(BaseModel):
     """The full pipeline configuration — every stage must be present (ADR-0001 completeness)."""
 
@@ -110,6 +168,7 @@ class PipelineConfig(BaseModel):
 
     version: str = Field(min_length=1)
     stages: dict[PipelineStage, PipelineStageParams]
+    win_probability: WinProbabilityConfig
 
     @model_validator(mode="after")
     def _require_every_stage(self) -> PipelineConfig:
@@ -181,8 +240,22 @@ class PipelineForecast(BaseModel):
     )
 
 
+class WinProbability(BaseModel):
+    """A prospect's explainable win-probability (GRS-0111). ``score`` is a percentage 0–100 (a
+    probability, never currency — ADR-0002); ``label`` is the config-banded headline word;
+    ``reasons`` explain what moved the estimate; ``missing_info`` names the data gaps a consultant
+    could fill to sharpen it. Deterministic given the prospect + config."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    score: int = Field(ge=0, le=100, description="Win probability as a whole-number percentage.")
+    label: str = Field(min_length=1)
+    reasons: tuple[str, ...]
+    missing_info: tuple[str, ...]
+
+
 class PipelineBoardEntry(BaseModel):
-    """A prospect annotated with its time-in-stage and staleness flag."""
+    """A prospect annotated with its time-in-stage, staleness flag, and win-probability."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -190,6 +263,7 @@ class PipelineBoardEntry(BaseModel):
     days_in_stage: int = Field(ge=0)
     stale_after_days: int = Field(ge=0)
     stale: bool
+    win_probability: WinProbability
 
 
 class PipelineBoard(BaseModel):
@@ -199,3 +273,16 @@ class PipelineBoard(BaseModel):
 
     generated_at: datetime
     entries: tuple[PipelineBoardEntry, ...]
+
+
+class StageHistoryEntry(BaseModel):
+    """One recorded stage transition for a prospect (GRS-0111) — the audit timeline behind the
+    board. Written at the ``update_prospect_stage`` choke-point; ``from_stage`` is None only for the
+    creation row (the prospect's first stage). Read-only, owner-scoped."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    prospect_id: UUID
+    from_stage: PipelineStage | None
+    to_stage: PipelineStage
+    occurred_at: datetime
