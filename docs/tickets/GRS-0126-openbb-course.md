@@ -1,8 +1,28 @@
 # GRS-0126 — OpenBB course (dedicated research agent — the biggest)
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 **Depends on:** ADR-0028 (Bruntsfield Academy / Workbench), GRS-0121 (content CMS), GRS-0123 (product-course framework)
+
+## Delivered
+
+A deep, use-case-aligned **OpenBB product course** (`workbench/content/openbb_course.py`, slug
+`product-openbb`), authored through the GRS-0121 CMS on the GRS-0123 template — 5 modules, ~19
+lessons. Built from real research: five parallel research agents over OpenBB's site, docs, blog, and
+founder **Didier Rodrigues Lopes**'s writing, **plus a hands-on run of the open-source Platform**
+(`pip install openbb`; `obb.equity.price.historical('AAPL', provider='yfinance')` returned live data;
+17 providers, the full equity/crypto/economy/fixedincome router surface). Modules: the template spine
+(relevance / white-label / sell-motion / **live commission carrot**); **What OpenBB actually is**
+(the Terminal→Platform→Workspace pivot, Workspace, the Open Data Platform, Copilot+MCP); **Use cases
+you can sell for** (buy-side research, portfolio/risk, branded client reporting, governed AI over the
+firm's own data, quant/consolidation, honest vs-Bloomberg) each tied to an assessment finding + buyer
+segment; **The white-label & build angle** (AGPLv3→commercial license, Workspace branding, the
+custom-backend `widgets.json` deliverable, enterprise/Snowflake, the real dev experience); and
+**Conviction & founder thesis** (Gamestonk origin, the governed-AI bet, objection handling). The
+commission section resolves **live** from the Earnings v7 schedule (not hardcoded). Seeded
+idempotently; completing it counts toward the `product:openbb` certification (GRS-0127). Only public
+product facts — no partner-confidential data; versioned so the founder can deepen it. Backend content
+only — no contract/schema/frontend change. Golden master untouched.
 
 ## Why
 
