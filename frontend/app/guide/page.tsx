@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
+import { GuideNav } from "@/components/GuideNav";
 import { POWER_GUIDANCE } from "@/lib/powerGuidance";
 
 // The seven Powers (GRS-0094): name + Helmer lifecycle stage from the registry, benefit/barrier/example
@@ -126,6 +127,7 @@ function SectionTitle({ kicker, children }: { kicker: string; children: React.Re
 export default function GuidePage() {
   return (
     <article className="stack measure" style={{ gap: "2.5rem", margin: "0 auto" }}>
+      <GuideNav />
       <header>
         <p className="eyebrow">Advisor primer · Platform Power</p>
         <h1 style={{ margin: "0.4rem 0 0.6rem" }}>How Platform Power works</h1>
@@ -137,7 +139,7 @@ export default function GuidePage() {
       </header>
 
       {/* Why it exists (GRS-0092) */}
-      <section>
+      <section id="why">
         <SectionTitle kicker="The problem it solves">Why Platform Power exists</SectionTitle>
         <p style={{ margin: "0 0 0.75rem", color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
           One question sits under every brokerage or fintech engagement: <strong>can this platform
@@ -157,7 +159,7 @@ export default function GuidePage() {
       </section>
 
       {/* Where it comes from (GRS-0092) */}
-      <section>
+      <section id="provenance">
         <SectionTitle kicker="Provenance">Where the framework comes from</SectionTitle>
         <p style={{ margin: "0 0 0.75rem", color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
           The strategy lens is not invented here. <strong>P (Power)</strong> is Hamilton Helmer&rsquo;s{" "}
@@ -177,7 +179,7 @@ export default function GuidePage() {
       </section>
 
       {/* How it works, end to end (GRS-0092) */}
-      <section>
+      <section id="how-it-works">
         <SectionTitle kicker="The pipeline">How it works, end to end</SectionTitle>
         <ol style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: "0.75rem", counterReset: "step" }}>
           {PIPELINE.map((p, i) => (
@@ -210,7 +212,7 @@ export default function GuidePage() {
       </section>
 
       {/* Three lenses + headline */}
-      <section>
+      <section id="lenses">
         <SectionTitle kicker="The shape of it">Three lenses, one headline</SectionTitle>
         <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: "0.75rem" }}>
           {LENSES.map((l) => (
@@ -248,7 +250,7 @@ export default function GuidePage() {
       </section>
 
       {/* The lenses in depth — letter↔word mapping (GRS-0093) */}
-      <section>
+      <section id="letters">
         <SectionTitle kicker="Reading the lenses">What the letters mean</SectionTitle>
         <p style={{ margin: "0 0 1rem", color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
           A <strong>&ldquo;platform&rdquo;</strong> here is the whole operating system of a brokerage or
@@ -300,7 +302,7 @@ export default function GuidePage() {
       </section>
 
       {/* Four levels */}
-      <section>
+      <section id="maturity">
         <SectionTitle kicker="Rating infrastructure">The four maturity levels</SectionTitle>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.92rem" }}>
@@ -327,7 +329,7 @@ export default function GuidePage() {
       </section>
 
       {/* Evidence grades (GRS-0095) */}
-      <section>
+      <section id="evidence-grades">
         <SectionTitle kicker="How sure are you?">Evidence grades drive the ranges</SectionTitle>
         <p style={{ margin: "0 0 1rem", color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
           Every rating carries a grade for <em>how you know</em>. The four climb from weakest to
@@ -361,7 +363,7 @@ export default function GuidePage() {
       </section>
 
       {/* Powers: benefit and barrier */}
-      <section>
+      <section id="scoring-powers">
         <SectionTitle kicker="Scoring the 7 Powers">Benefit and barrier — the weaker side wins</SectionTitle>
         <p style={{ margin: "0 0 0.75rem", color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
           For each power you record a <strong>benefit</strong> (is there a real economic advantage?) and a{" "}
@@ -376,7 +378,7 @@ export default function GuidePage() {
       </section>
 
       {/* The seven Powers, one by one (GRS-0094) */}
-      <section>
+      <section id="seven-powers">
         <SectionTitle kicker="Helmer's seven">The seven Powers, one by one</SectionTitle>
         <p style={{ margin: "0 0 1rem", color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
           Each has a distinct <strong>benefit</strong> (the advantage the leader enjoys) and{" "}
@@ -421,7 +423,7 @@ export default function GuidePage() {
       </section>
 
       {/* Reading the outputs (GRS-0096) */}
-      <section>
+      <section id="reading-outputs">
         <SectionTitle kicker="Reading the outputs">Reading the outputs</SectionTitle>
         <div style={{ display: "grid", gap: "1.1rem" }}>
           <div>
@@ -469,7 +471,7 @@ export default function GuidePage() {
       </section>
 
       {/* What calibration is (GRS-0130) */}
-      <section>
+      <section id="calibration">
         <SectionTitle kicker="Staying aligned">What a calibration session is</SectionTitle>
         <div className="card" style={{ padding: "1.15rem 1.3rem", display: "flex", flexDirection: "column", gap: "0.6rem" }}>
           <p style={{ margin: 0, color: "var(--color-ink-muted)", fontSize: "0.95rem", lineHeight: 1.6 }}>
@@ -490,7 +492,7 @@ export default function GuidePage() {
       </section>
 
       {/* Mistakes */}
-      <section>
+      <section id="mistakes">
         <SectionTitle kicker="Don't do this">Mistakes that get assessments rejected</SectionTitle>
         <ol style={{ margin: 0, paddingLeft: "1.15rem", color: "var(--color-ink-muted)", lineHeight: 1.7, fontSize: "0.95rem" }}>
           {MISTAKES.map((m) => (
