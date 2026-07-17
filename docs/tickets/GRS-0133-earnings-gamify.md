@@ -1,8 +1,20 @@
 # GRS-0133 — Gamify My Earnings + earnings chart
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** ADR-0026 (Earnings v7) / GRS-0075–0076; GRS-0123 (product-course carrot)
+
+## Delivered
+
+An **earnings incentive layer** on `/earnings`. New backend `EarningsTimeline` contract +
+`repo.earnings_timeline` + `GET /earnings/timeline`: it **aggregates the already-computed commission
+lines in the Money domain** (monthly buckets, cumulative, + the two v7 stream totals) — no rate,
+rounding, or lifecycle change, so ADR-0002 holds (the client never derives a new £). Frontend
+`EarningsProgress.tsx`: an inline-SVG **cumulative-earnings chart** (no new deps) with a **Stream A /
+Stream B split bar**, plus light **gamification** — a milestone-ladder progress bar (display-constant
+thresholds, ratio only) and a forward **"sell {product} and earn {yr1_commission}"** nudge sourced
+from the live product carrots (GRS-0123). Every £ shown is a backend-computed `Money`; the client
+only plots and compares. No change to earnings computation. Golden master untouched.
 
 ## Why
 

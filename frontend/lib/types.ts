@@ -391,6 +391,21 @@ export interface Money {
   assumption_register_ref: string;
 }
 
+// Earnings over time + the two v7 stream totals (GRS-0133) — the incentive chart's data.
+export interface EarningsTimelinePoint {
+  period: string; // "YYYY-MM"
+  earned: Money;
+  cumulative: Money;
+}
+
+export interface EarningsTimeline {
+  owner_consultant_id: string;
+  currency: Currency;
+  points: EarningsTimelinePoint[];
+  stream_product: Money;
+  stream_consultancy: Money;
+}
+
 // The live commission "carrot" for a Stream-A product (GRS-0123), from the Earnings v7 schedule.
 export interface ProductCommissionCarrot {
   product_id: string;

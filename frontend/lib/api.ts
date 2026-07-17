@@ -41,6 +41,7 @@ import type {
   DeliverableType,
   DrillCard,
   EarningsSummary,
+  EarningsTimeline,
   Engagement,
   LearningModule,
   ModuleRatingDraft,
@@ -943,6 +944,14 @@ export const api = {
 
   productCommissions(signal?: AbortSignal): Promise<ProductCommissionCarrot[]> {
     return request<ProductCommissionCarrot[]>("/earnings/product-commissions", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  earningsTimeline(signal?: AbortSignal): Promise<EarningsTimeline> {
+    return request<EarningsTimeline>("/earnings/timeline", {
       method: "GET",
       headers: authHeaders(),
       signal,

@@ -13,10 +13,12 @@ import Link from "next/link";
 
 import { MoneyAmount } from "@/components/MoneyAmount";
 import { ApiError, api, getToken } from "@/lib/api";
+import { EarningsProgress } from "@/components/EarningsProgress";
 import type {
   CommissionKind,
   CommissionLine,
   EarningsSummary,
+  EarningsTimeline,
   PaymentStatus,
   ProductCommissionCarrot,
 } from "@/lib/types";
@@ -61,6 +63,7 @@ export default function EarningsPage() {
   const [summary, setSummary] = useState<EarningsSummary | null>(null);
   const [lines, setLines] = useState<CommissionLine[] | null>(null);
   const [carrots, setCarrots] = useState<ProductCommissionCarrot[]>([]);
+  const [timeline, setTimeline] = useState<EarningsTimeline | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
 
@@ -69,11 +72,13 @@ export default function EarningsPage() {
       api.earningsSummary(signal),
       api.listCommissions(signal),
       api.productCommissions(signal),
+      api.earningsTimeline(signal),
     ])
-      .then(([s, l, c]) => {
+      .then(([s, l, c, t]) => {
         setSummary(s);
         setLines(l);
         setCarrots(c);
+        setTimeline(t);
       })
       .catch((err: unknown) => {
         if (err instanceof ApiError && err.status === 0) return;
@@ -189,6 +194,10 @@ export default function EarningsPage() {
             </li>
           ))}
         </ul>
+      ) : null}
+
+      {summary && timeline ? (
+        <EarningsProgress summary={summary} timeline={timeline} carrots={carrots} />
       ) : null}
 
       {carrots.length > 0 ? (

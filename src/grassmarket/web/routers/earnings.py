@@ -17,6 +17,7 @@ from bcap_contracts.commissions import (
     CommissionLine,
     DeliveryType,
     EarningsSummary,
+    EarningsTimeline,
     PaymentStatus,
     ProductCommissionCarrot,
     SourcingAttribution,
@@ -119,6 +120,19 @@ def get_summary(
     try:
         return repo.earnings_summary(principal, now=datetime.now(UTC))
     except ConflictError as exc:  # mixed-currency lines refuse to sum (not reachable today)
+        raise _conflict(exc) from exc
+
+
+@router.get("/timeline", response_model=EarningsTimeline)
+def get_timeline(
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> EarningsTimeline:
+    """The caller's earnings-over-time series + the two v7 stream totals (GRS-0133) — the incentive
+    chart's data, aggregated server-side from the computed commission lines (ADR-0002)."""
+    try:
+        return repo.earnings_timeline(principal, now=datetime.now(UTC))
+    except ConflictError as exc:
         raise _conflict(exc) from exc
 
 
