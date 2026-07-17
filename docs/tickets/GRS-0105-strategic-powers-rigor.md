@@ -1,6 +1,6 @@
 # GRS-0105 — Strategic Powers: rigor + Helmer depth + evidence
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** A (build now)
 **Depends on:** —
@@ -35,3 +35,26 @@ makes ratings evidence-based, and de-jargons the E-grades in place.
 
 - The generic cross-wizard evidence field mechanism — GRS-0107 (this step uses it for powers).
 - Primer-side Helmer explainer — GRS-0094.
+
+## What shipped (Status: Shipped — branch grs-0105-powers-rigor)
+
+Brought the Helmer material into the Strategic Powers step and made ratings evidence-grounded, with
+the E-grades de-jargoned in place:
+
+- **`lib/powerGuidance.ts`** — extended `PowerGuidance` with an **`assessment`** field ("how to assess
+  this power objectively — what evidence establishes the benefit AND the barrier, and what makes it
+  weak") authored for **all 7 powers**, single-sourced (the step imports it, GRS-0069).
+- **`StrategicPowersStep`** — the per-power toggle "See an example" is now **"How to assess this
+  power"**, opening a full panel: **Benefit** hint, **Barrier** hint (+ the weaker-side rule),
+  **How to assess**, and the **Example** — the Helmer framing per power, not just a one-liner. The
+  benefit/barrier strength + grade selects and the per-side rationale fields (GRS-0069) stay, so a
+  rating captures WHY.
+- **De-jargoned E-grades** — the step intro now spells out the ladder in plain English (**E1**
+  client-said · **E2** interview · **E3** artifact · **E4** observed, weakest→strongest) and reiterates
+  that grades drive §7 uncertainty, not the score.
+
+## Acceptance / verification
+
+Each power presents the Helmer benefit/barrier framing + how it is assessed + a grounded rationale
+capture; E-grades read in plain English. Content is single-sourced in `powerGuidance.ts`. Frontend
+type-check · lint · vitest green.

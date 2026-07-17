@@ -371,11 +371,21 @@ export function StrategicPowersStep({ registry, document: d, update, readOnly }:
   const [openExample, setOpenExample] = useState<string | null>(null);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-      <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem" }}>
-        Each power carries a Benefit (the upside the leader enjoys) and a Barrier (why a rival can&rsquo;t
-        copy it); the engine takes the <strong>weaker</strong> side (Helmer). Grade the evidence to model
-        uncertainty — ungraded powers score as a point (labelled honestly).
-      </p>
+      <div style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem", lineHeight: 1.55 }}>
+        <p style={{ margin: 0 }}>
+          Each of Helmer&rsquo;s seven powers carries a <strong>Benefit</strong> (the upside the leader
+          enjoys) and a <strong>Barrier</strong> (why a rival can&rsquo;t copy it); the engine takes the{" "}
+          <strong>weaker</strong> side — a great benefit with no barrier is just a head start. Open
+          &ldquo;How to assess this power&rdquo; on any card for the Helmer framing and what evidence to
+          look for, so the rating is grounded rather than guessed.
+        </p>
+        <p style={{ margin: "0.5rem 0 0" }}>
+          Grade the evidence behind each side (this drives §7 uncertainty, not the score):{" "}
+          <strong>E1</strong> client-said · <strong>E2</strong> interview · <strong>E3</strong> artifact
+          you saw · <strong>E4</strong> observed yourself — weakest to strongest. Ungraded powers score
+          as a labelled point, never a false-tight range.
+        </p>
+      </div>
       {registry.powers.map((p) => {
         const e = doc.findPower(d, p.key);
         const g = POWER_GUIDANCE[p.key];
@@ -440,11 +450,23 @@ export function StrategicPowersStep({ registry, document: d, update, readOnly }:
             {g ? (
               <div style={{ marginTop: "0.5rem" }}>
                 <button type="button" className={smallBtn} style={smallBtnStyle} onClick={() => setOpenExample(showExample ? null : p.key)}>
-                  {showExample ? "Hide example" : "See an example"}
+                  {showExample ? "Hide guidance" : "How to assess this power"}
                 </button>
                 {showExample ? (
-                  <div className="callout callout-info" style={{ marginTop: "0.5rem", fontSize: "0.8rem", lineHeight: 1.5 }}>
-                    {g.example}
+                  <div className="callout callout-info" style={{ marginTop: "0.5rem", fontSize: "0.8rem", lineHeight: 1.5, display: "grid", gap: "0.5rem" }}>
+                    <div>
+                      <strong style={{ color: "var(--color-accent)" }}>Benefit</strong> — {g.benefitHint}
+                    </div>
+                    <div>
+                      <strong style={{ color: "var(--color-accent)" }}>Barrier</strong> — {g.barrierHint}{" "}
+                      The engine takes the <strong>weaker</strong> of the two.
+                    </div>
+                    <div>
+                      <strong>How to assess</strong> — {g.assessment}
+                    </div>
+                    <div style={{ color: "var(--color-ink-soft)", fontStyle: "italic" }}>
+                      Example — {g.example}
+                    </div>
                   </div>
                 ) : null}
               </div>
