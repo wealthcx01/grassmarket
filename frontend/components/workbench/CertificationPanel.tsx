@@ -8,7 +8,24 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { ApiError, api } from "@/lib/api";
-import type { AssessorLevelValue, CertificationEvent, CertificationRecord } from "@/lib/types";
+import type {
+  AssessorLevelValue,
+  CertificationEvent,
+  CertificationRecord,
+  CourseCertification,
+  CourseCertificationStatus,
+} from "@/lib/types";
+
+const COURSE_CERT_LABEL: Record<CourseCertificationStatus, string> = {
+  not_started: "Not started",
+  in_progress: "Course done · awaiting sign-off",
+  certified: "Certified",
+};
+const COURSE_CERT_COLOR: Record<CourseCertificationStatus, string> = {
+  not_started: "var(--color-ink-muted)",
+  in_progress: "var(--color-warn)",
+  certified: "var(--color-accent)",
+};
 
 const LADDER: AssessorLevelValue[] = ["trained", "shadow", "observed_lead", "certified_lead"];
 const LEVEL_LABEL: Record<AssessorLevelValue, string> = {
@@ -21,17 +38,20 @@ const LEVEL_LABEL: Record<AssessorLevelValue, string> = {
 export function CertificationPanel({ advisorId }: { advisorId: string }) {
   const [record, setRecord] = useState<CertificationRecord | null>(null);
   const [events, setEvents] = useState<CertificationEvent[] | null>(null);
+  const [courseCerts, setCourseCerts] = useState<CourseCertification[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(
     async (signal?: AbortSignal) => {
       try {
-        const [rec, evs] = await Promise.all([
+        const [rec, evs, certs] = await Promise.all([
           api.certification(advisorId, signal),
           api.certificationEvents(advisorId, signal),
+          api.courseCertifications(signal),
         ]);
         setRecord(rec);
         setEvents(evs);
+        setCourseCerts(certs);
       } catch (err) {
         if (err instanceof ApiError && err.status === 0) return;
         setError(err instanceof ApiError ? err.message : "Could not load certification.");
@@ -82,6 +102,25 @@ export function CertificationPanel({ advisorId }: { advisorId: string }) {
           })}
         </ol>
       </section>
+
+      {courseCerts.length > 0 ? (
+        <section>
+          <h3 style={{ fontSize: "1rem", margin: "0 0 0.6rem" }}>Course &amp; product certifications</h3>
+          <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "0.4rem", maxWidth: "30rem" }}>
+            {courseCerts.map((c) => (
+              <li
+                key={c.subject}
+                style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.75rem", padding: "0.5rem 0.7rem", border: "1px solid var(--color-border)", borderRadius: "var(--radius)", background: "var(--color-paper-raised)", fontSize: "0.85rem" }}
+              >
+                <span>{c.title}</span>
+                <span className="mono" style={{ fontSize: "0.72rem", color: COURSE_CERT_COLOR[c.status] }}>
+                  {COURSE_CERT_LABEL[c.status]}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section>
         <h3 style={{ fontSize: "1rem", margin: "0 0 0.6rem" }}>Evidence</h3>

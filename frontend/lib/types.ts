@@ -635,7 +635,21 @@ export interface CertificationEvent {
   from_level?: AssessorLevelValue | null;
   to_level?: AssessorLevelValue | null;
   reason?: string | null;
+  cert_subject?: string | null;
   occurred_at: string;
+}
+
+// Course / product certifications (GRS-0127) — alongside the assessor ladder.
+export type CourseCertificationStatus = "not_started" | "in_progress" | "certified";
+
+export interface CourseCertification {
+  owner_consultant_id: string;
+  subject: string;
+  title: string;
+  status: CourseCertificationStatus;
+  course_complete: boolean;
+  signed_off_by_consultant_id?: string | null;
+  certified_at?: string | null;
 }
 
 export type LearningKind = "playbook" | "sales_journey" | "technical_primer" | "exam_quiz";

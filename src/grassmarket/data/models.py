@@ -787,6 +787,9 @@ class CertificationEventORM(Base):
     from_level: Mapped[str | None] = mapped_column(String(32), nullable=True)
     to_level: Mapped[str | None] = mapped_column(String(32), nullable=True)
     reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # None = the assessor ladder; a value (e.g. 'sales_egoist', 'product:openbb') = a course/product
+    # certification (GRS-0127). Keeps this the single audit store for both tracks.
+    cert_subject: Mapped[str | None] = mapped_column(String(64), nullable=True)
     recorded_by_consultant_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
     occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)

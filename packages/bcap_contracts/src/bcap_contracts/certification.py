@@ -16,7 +16,7 @@ from datetime import datetime
 from enum import StrEnum
 from uuid import UUID
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from bcap_contracts.base import OwnedResource
 from bcap_contracts.common import AssessorLevel
@@ -61,7 +61,11 @@ class CertificationRecord(OwnedResource):
 
 class CertificationEvent(OwnedResource):
     """One append-only certification audit record for an advisor (`owner_consultant_id`). Promotions
-    carry from/to levels; an override carries the mandatory reason. Recorded by an admin/signer."""
+    carry from/to levels; an override carries the mandatory reason. Recorded by an admin/signer.
+
+    `cert_subject` keeps this the SINGLE audit store for both tracks (GRS-0127): ``None`` is the
+    assessor ladder; a value (e.g. ``sales_egoist`` or ``product:openbb``) is a course/product
+    certification. No parallel cert store — a course cert is folded from these same events."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -70,6 +74,9 @@ class CertificationEvent(OwnedResource):
     from_level: AssessorLevel | None = None
     to_level: AssessorLevel | None = None
     reason: str | None = Field(default=None, description="Mandatory for an OVERRIDE (§9).")
+    cert_subject: str | None = Field(
+        default=None, description="None = assessor ladder; else a course/product cert key."
+    )
     recorded_by_consultant_id: UUID
     occurred_at: datetime
 
@@ -80,3 +87,29 @@ class CertificationEvent(OwnedResource):
         if self.kind is CertificationEventKind.OVERRIDE and not (self.reason or "").strip():
             raise ValueError("An OVERRIDE certification event requires a non-blank reason (§9).")
         return self
+
+
+class CourseCertificationStatus(StrEnum):
+    """A course/product certification's state for one advisor (GRS-0127), folded from the events +
+    course completion."""
+
+    NOT_STARTED = "not_started"  # course not yet complete
+    IN_PROGRESS = "in_progress"  # course complete, awaiting a senior sign-off (pairing)
+    CERTIFIED = "certified"  # a senior signed off — certified
+
+
+class CourseCertification(BaseModel):
+    """One advisor's standing on a course/product certification (GRS-0127) — a read view folded from
+    `CertificationEvent`s (`cert_subject == subject`) plus whether they have completed the backing
+    course. Certification requires the course done AND a senior sign-off (not self) — the
+    senior↔junior pairing, never self-report. A computed view, so no id/timestamps of its own."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    owner_consultant_id: UUID
+    subject: str = Field(min_length=1, description="The cert key, e.g. 'sales_egoist'.")
+    title: str = Field(min_length=1)
+    status: CourseCertificationStatus
+    course_complete: bool
+    signed_off_by_consultant_id: UUID | None = None
+    certified_at: datetime | None = None
