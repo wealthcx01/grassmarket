@@ -435,6 +435,9 @@ class MetricEntry(BaseModel):
     raw: float | None = None
     state: NonScoreState | None = None
     confidence: MetricConfidence | None = None
+    # Optional evidence/rationale for the figure (GRS-0107) — where it came from, as-of when — so a
+    # metric carries its justification, never a bare number. Additive; not a scoring input.
+    notes: str | None = None
 
     @model_validator(mode="after")
     def _exactly_one_of_raw_or_state(self) -> MetricEntry:

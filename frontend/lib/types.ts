@@ -57,6 +57,8 @@ export interface MetricEntry {
   raw?: number | null;
   state?: NonScoreState | null;
   confidence?: MetricConfidence | null;
+  /** Optional evidence/rationale for the figure (GRS-0107). Additive; not a scoring input. */
+  notes?: string | null;
 }
 
 export interface PowerEntry {

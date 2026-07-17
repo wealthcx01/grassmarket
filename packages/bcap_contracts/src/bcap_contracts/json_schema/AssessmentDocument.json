@@ -130,6 +130,18 @@
           "title": "Metric Key",
           "type": "string"
         },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notes"
+        },
         "raw": {
           "anyOf": [
             {

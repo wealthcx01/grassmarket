@@ -295,6 +295,25 @@ export function BusinessMetricsStep({ registry, document: d, update, readOnly }:
                   Not assessed
                 </label>
               </div>
+              {/* Evidence/rationale for the figure (GRS-0107) — where it came from, as-of when. */}
+              {entry && entry.raw != null ? (
+                <input
+                  type="text"
+                  disabled={readOnly}
+                  value={entry.notes ?? ""}
+                  placeholder="Source / as-of date (e.g. Q2 board pack, audited)"
+                  onChange={(ev) =>
+                    update((x) =>
+                      doc.setMetric(
+                        x,
+                        m.key,
+                        doc.metricObserved(m.key, entry.raw ?? 0, entry.confidence ?? null, ev.target.value || null),
+                      ),
+                    )
+                  }
+                  style={{ ...selectStyle, width: "100%", fontSize: "0.78rem" }}
+                />
+              ) : null}
             </div>
           </Card>
         );
@@ -545,7 +564,7 @@ export function InfrastructureDeepDiveStep({ registry, document: d, update, read
                         <GradeSelect
                           value={r.evidence_grade}
                           disabled={readOnly}
-                          onChange={(g) => update((x) => doc.setSub(x, s.key, doc.subAssessed(m.key, s.key, r.level as MaturityLevel, g ?? "E1")))}
+                          onChange={(g) => update((x) => doc.setSub(x, s.key, doc.subAssessed(m.key, s.key, r.level as MaturityLevel, g ?? "E1", r.notes ?? null)))}
                         />
                       ) : null}
                       <button type="button" className={smallBtn} style={smallBtnStyle} onClick={() => setOpenGuidance(openGuidance === s.key ? null : s.key)}>
@@ -553,6 +572,17 @@ export function InfrastructureDeepDiveStep({ registry, document: d, update, read
                       </button>
                     </div>
                   </div>
+                  {/* Evidence/rationale for the rating (GRS-0107) — what you saw that supports it. */}
+                  {r?.level != null ? (
+                    <input
+                      type="text"
+                      disabled={readOnly}
+                      value={r.notes ?? ""}
+                      placeholder="What evidence supports this rating? (e.g. saw the failover runbook + incident log)"
+                      onChange={(ev) => update((x) => doc.setSub(x, s.key, doc.subAssessed(m.key, s.key, r.level as MaturityLevel, r.evidence_grade ?? "E1", ev.target.value || null)))}
+                      style={{ ...selectStyle, width: "100%", fontSize: "0.78rem", marginTop: "0.5rem" }}
+                    />
+                  ) : null}
                   {openGuidance === s.key ? (
                     <div style={{ marginTop: "0.6rem" }}>
                       <GuidancePanel subcomponentKey={s.key} />
