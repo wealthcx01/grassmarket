@@ -30,6 +30,20 @@
       "title": "Assessment Id",
       "type": "string"
     },
+    "coverage": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Coverage"
+    },
     "finalised_at": {
       "anyOf": [
         {

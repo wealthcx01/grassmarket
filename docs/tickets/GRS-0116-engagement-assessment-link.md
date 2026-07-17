@@ -1,6 +1,6 @@
 # GRS-0116 — Clarify the engagement ↔ assessment link
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** GRS-0039 (LinkAssessmentControl)
 
@@ -39,3 +39,30 @@ tightens the in-copy vocabulary — it is a clarity/UI change, not a data-model 
 - The watermarked end-to-end demo dataset — GRS-0117.
 - Backlink/breadcrumb navigation across the wider flow — GRS-0118.
 - Any change to how assessments are linked or stored (reuse GRS-0039's mechanism as-is).
+
+## What shipped (Status: Shipped — branch grs-0116-engagement-assessment-link)
+
+Made the engagement ↔ assessment link legible in both directions:
+
+**Engagement → assessment** (`app/engagements/[id]/page.tsx`)
+- Each linked assessment now renders a rich card (`LinkedAssessment`) showing its **subject**, a **state**
+  badge (Draft / In progress / Finalised), **Platform Value (V)** with the uncertainty rating when
+  finalised, **coverage %**, and **last-updated**, with a clear "Open →" link through. State comes from
+  the lightweight `brokeragePortfolio()` summary (one call, matched by `assessment_id`) — no per-
+  assessment fetch. `LinkAssessmentControl` (GRS-0039) still owns bind/unbind. Copy tightened to
+  disambiguate engagement vs. assessment vs. deliverable.
+
+**Assessment → engagement** (`components/ConsumingEngagements.tsx`, mounted in `WizardClient`)
+- The reverse view: a "Consumed by engagement(s):" line under the assessment title linking back to each
+  engagement that consumes it, filtered client-side from `listEngagements` (owner-scoped, no new
+  endpoint). Renders nothing when the assessment isn't linked anywhere yet — so neither screen
+  dead-ends into the other.
+
+**Backend** — `BrokeragePortfolioEntry.coverage` (assessed / applicable, Not-Applicable excluded),
+computed in `list_brokerage_portfolio`; schema + TS mirror updated.
+
+## Acceptance / verification
+
+`tests/test_brokerage_portfolio.py::test_portfolio_surfaces_coverage`. The engagement shows each linked
+assessment's identity + live state with a link through; the assessment shows which engagement(s) consume
+it; the two-way loop no longer dead-ends. Backend + frontend gates green; schema parity green.

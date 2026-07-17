@@ -11,9 +11,48 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { ApiError, api, clearToken, getToken } from "@/lib/api";
-import { COMMS_CHANNELS, type CommsChannel, type Engagement } from "@/lib/types";
+import {
+  COMMS_CHANNELS,
+  type BrokeragePortfolioEntry,
+  type CommsChannel,
+  type Engagement,
+} from "@/lib/types";
 import { DeliverablesPanel } from "@/components/DeliverablesPanel";
 import { LinkAssessmentControl } from "@/components/LinkAssessmentControl";
+
+const STATE_LABEL: Record<string, string> = {
+  draft: "Draft",
+  in_progress: "In progress",
+  finalised: "Finalised",
+};
+
+function LinkedAssessment({ id, index, entry }: { id: string; index: number; entry?: BrokeragePortfolioEntry }) {
+  const subject = entry?.subject ?? `Assessment ${index + 1}`;
+  const v = entry?.v_index != null ? Math.round(entry.v_index * 100) : null;
+  const coverage = entry?.coverage != null ? Math.round(entry.coverage * 100) : null;
+  const updated = entry ? new Date(entry.updated_at).toLocaleDateString() : null;
+  return (
+    <Link href={`/assessments/${id}`} className="card-link" style={{ padding: "0.9rem 1.1rem", display: "block" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.75rem", flexWrap: "wrap" }}>
+        <span style={{ fontWeight: 600 }}>{subject}</span>
+        <span aria-hidden className="mono" style={{ color: "var(--color-ink-faint)", fontSize: "0.8rem" }}>Open →</span>
+      </div>
+      <div style={{ display: "flex", gap: "0.5rem 1.1rem", flexWrap: "wrap", marginTop: "0.45rem", fontSize: "0.82rem", color: "var(--color-ink-muted)" }}>
+        {entry ? <span className="tag" style={{ fontSize: "0.66rem" }}>{STATE_LABEL[entry.state] ?? entry.state}</span> : null}
+        {v != null ? (
+          <span>
+            V <strong style={{ color: "var(--color-ink)" }}>{v}</strong>
+            {entry?.uncertainty_rating ? ` · ${entry.uncertainty_rating}` : ""}
+          </span>
+        ) : (
+          <span>Not yet finalised</span>
+        )}
+        {coverage != null ? <span>Coverage <strong style={{ color: "var(--color-ink)" }}>{coverage}%</strong></span> : null}
+        {updated ? <span>Updated {updated}</span> : null}
+      </div>
+    </Link>
+  );
+}
 
 export default function EngagementDetailPage() {
   const router = useRouter();
@@ -21,6 +60,7 @@ export default function EngagementDetailPage() {
   const id = params.id;
 
   const [engagement, setEngagement] = useState<Engagement | null>(null);
+  const [portfolio, setPortfolio] = useState<BrokeragePortfolioEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const reload = useCallback(
@@ -47,6 +87,10 @@ export default function EngagementDetailPage() {
     }
     const ctrl = new AbortController();
     reload(ctrl.signal);
+    // The lightweight portfolio summary gives each linked assessment its live state (V, coverage,
+    // status) without a per-assessment fetch (GRS-0116). A failure here is non-fatal — the links
+    // still work, they just show less state.
+    api.brokeragePortfolio(ctrl.signal).then(setPortfolio).catch(() => {});
     return () => ctrl.abort();
   }, [router, reload]);
 
@@ -67,7 +111,11 @@ export default function EngagementDetailPage() {
       </div>
 
       <section>
-        <h2 style={{ fontSize: "1.1rem", marginBottom: "0.6rem" }}>Assessments</h2>
+        <h2 style={{ fontSize: "1.1rem", marginBottom: "0.3rem" }}>Assessment</h2>
+        <p style={{ margin: "0 0 0.7rem", color: "var(--color-ink-muted)", fontSize: "0.85rem", maxWidth: "34rem" }}>
+          This engagement is delivered <em>from</em> a Platform Power assessment — the scored analysis of
+          the client&rsquo;s platform. The deliverables below are generated from it once it is finalised.
+        </p>
         {engagement.assessment_ids.length === 0 ? (
           <div className="card" style={{ padding: "1.1rem 1.25rem", display: "flex", gap: "1rem", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
             <p style={{ margin: 0, color: "var(--color-ink-muted)", fontSize: "0.9rem", maxWidth: "30rem" }}>
@@ -86,12 +134,11 @@ export default function EngagementDetailPage() {
           <ul className="stack" style={{ listStyle: "none", margin: 0, padding: 0, gap: "0.5rem" }}>
             {engagement.assessment_ids.map((aid, i) => (
               <li key={aid}>
-                <Link href={`/assessments/${aid}`} className="card-link" style={{ padding: "0.8rem 1rem", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.5rem" }}>
-                  <span style={{ fontWeight: 500 }}>Assessment {i + 1}</span>
-                  <span aria-hidden className="mono" style={{ color: "var(--color-ink-faint)" }}>
-                    Open →
-                  </span>
-                </Link>
+                <LinkedAssessment
+                  id={aid}
+                  index={i}
+                  entry={portfolio.find((p) => p.assessment_id === aid)}
+                />
               </li>
             ))}
           </ul>

@@ -76,6 +76,7 @@ from bcap_contracts.common import (
     AssessorLevel,
     ConsultantTier,
     EvidenceGrade,
+    NonScoreState,
     Role,
     UncertaintyRating,
 )
@@ -259,6 +260,16 @@ def _clamp_limit(limit: int | None) -> int:
     if limit is None:
         return DEFAULT_PAGE_LIMIT
     return max(1, min(limit, MAX_PAGE_LIMIT))
+
+
+def _document_coverage(document: object, total_subs: int) -> float | None:
+    """Assessed subcomponents over APPLICABLE ones (Not Applicable excluded) — the portfolio
+    coverage (GRS-0116), matching the live panel's coverage notion. None when nothing applicable."""
+    subs = getattr(document, "subcomponents", ())
+    assessed = sum(1 for r in subs if r.level is not None)
+    not_applicable = sum(1 for r in subs if r.state == NonScoreState.NOT_APPLICABLE)
+    applicable = total_subs - not_applicable
+    return round(assessed / applicable, 4) if applicable > 0 else None
 
 
 def _owned_orm_classes() -> list[type]:
@@ -2244,6 +2255,10 @@ class Repository:
         finalised — its last Platform Value + uncertainty rating from the immutable scoring run.
         Reuses `list_assessments` for scoping, so the owner-only guarantee is inherited, not
         re-implemented."""
+        from bcap_contracts.registry import load_registry
+
+        registry = load_registry()
+        total_subs = len(registry.all_subcomponent_keys())
         entries: list[BrokeragePortfolioEntry] = []
         for a in self.list_assessments(principal):
             v_index = None
@@ -2261,6 +2276,7 @@ class Repository:
                     state=a.state,
                     v_index=v_index,
                     uncertainty_rating=uncertainty_rating,
+                    coverage=_document_coverage(a.document, total_subs),
                     finalised_at=a.finalised_at,
                     updated_at=a.updated_at,
                 )
