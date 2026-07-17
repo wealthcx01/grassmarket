@@ -110,8 +110,9 @@ export function metricObserved(
   key: string,
   raw: number,
   confidence: MetricConfidence | null,
+  notes: string | null = null,
 ): MetricEntry {
-  return { metric_key: key, raw, state: null, confidence };
+  return { metric_key: key, raw, state: null, confidence, notes };
 }
 
 export function metricState(key: string, state: NonScoreState): MetricEntry {
