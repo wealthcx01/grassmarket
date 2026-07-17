@@ -318,9 +318,9 @@ function SaveBadge({ state, readOnly }: { state: SaveState; readOnly: boolean })
  * point, never a false range (§7 / ADR-0008). */
 export function LiveSummary({ live }: { live: LiveScore | null }) {
   return (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", position: "sticky", top: "1rem" }}>
       {live?.scoreable && live.v ? (
-        <div className="card" style={{ padding: "0.9rem 1rem", position: "sticky", top: "1rem" }}>
+        <div className="card" style={{ padding: "0.9rem 1rem" }}>
           {/* Delegate to BandDisplay so an UNMODELLED band (modelled=false) shows an honest labelled
               point, never a falsely confident p10–p90 range (§7 / ADR-0008). */}
           <BandDisplay label="V — PLATFORM VALUE" band={live.v} />
@@ -354,6 +354,24 @@ export function LiveSummary({ live }: { live: LiveScore | null }) {
           )}
         </div>
       )}
+
+      {/* Customer Proposition Index (C) — surfaced alongside V on every step (GRS-0108), so the widget-
+          driven view of how good the platform actually is stays front-of-mind, not buried. Reported
+          alongside V (ADR-0023), not folded into it. Shown as soon as C is scoreable. */}
+      {live?.c != null ? (
+        <div className="card" style={{ padding: "0.9rem 1rem" }}>
+          <p style={{ margin: 0, fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.04em", color: "var(--color-ink-muted)" }}>
+            C — CUSTOMER PROPOSITION
+          </p>
+          <div style={{ display: "flex", alignItems: "baseline", gap: "0.4rem", marginTop: "0.2rem" }}>
+            <strong className="mono" style={{ fontSize: "1.35rem" }}>{(live.c * 100).toFixed(0)}</strong>
+            <span style={{ fontSize: "0.72rem", color: "var(--color-ink-faint)" }}>/ 100</span>
+          </div>
+          <p style={{ margin: "0.25rem 0 0", fontSize: "0.7rem", color: "var(--color-ink-faint)" }}>
+            From the widget checklist + Ease/Usability/Depth. Reported alongside V.
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }

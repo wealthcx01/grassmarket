@@ -1,6 +1,6 @@
 # GRS-0108 — Surface the widget checklist + Customer Proposition Index in the wizard
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** A (build now)
 **Depends on:** ADR-0023 (C-index) / GRS-0080–0085
@@ -32,3 +32,24 @@ the wizard as a first-class, prominent step so advisors treat it as central rath
 
 - The C-index computation and widget model itself — GRS-0080–0085.
 - Screen-recording → AI auto-population of the checklist — GRS-0109 (Phase B).
+
+## What shipped (Status: Shipped — branch grs-0108-surface-c-index)
+
+Elevated the widget checklist + Customer Proposition Index from incidental to front-of-mind (the
+computation is Part-1 / GRS-0080–0085 — this is pure surfacing):
+
+- **C on the live side rail, every step** (`WizardClient` `LiveSummary`) — a prominent "C — CUSTOMER
+  PROPOSITION" card (the score /100) now sits beside V in the sticky rail, visible on every wizard step
+  and as soon as C is scoreable (independent of V-scoreability). Previously C only appeared on the
+  Summary step; now the widget-driven view of platform quality stays in view throughout.
+- **Reframed the Customer Proposition step intro** to lead with what it is for — *"This is where you
+  judge how good the platform actually is for a customer"* — and to name the Ease · Usability · Depth
+  scoring and the rare-done-well / common-missing logic explicitly, so advisors treat it as central.
+
+Reuses the Part-1 C-index computation and widget scoring; no new index.
+
+## Acceptance / verification
+
+The widget checklist + C-index are a prominent, first-class part of the wizard (a live C card on every
+step + a reframed step intro), reusing the existing C computation. Frontend type-check · lint · vitest
+green.
