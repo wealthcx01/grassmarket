@@ -21,6 +21,36 @@ const STATE_LABEL: Record<BrokeragePortfolioEntry["state"], string> = {
   finalised: "Finalised · locked",
 };
 
+function Completeness({ coverage }: { coverage?: number | null }) {
+  if (coverage == null) {
+    return <span style={{ color: "var(--color-ink-faint)" }}>—</span>;
+  }
+  const pct = Math.round(coverage * 100);
+  return (
+    <span
+      style={{ display: "inline-flex", alignItems: "center", gap: "0.45rem", minWidth: "5.5rem" }}
+      title={`${pct}% of applicable subcomponents rated`}
+    >
+      <span
+        aria-hidden
+        style={{
+          flex: 1,
+          height: "0.4rem",
+          borderRadius: "var(--radius-pill)",
+          background: "var(--color-border)",
+          overflow: "hidden",
+          minWidth: "3rem",
+        }}
+      >
+        <span style={{ display: "block", height: "100%", width: `${pct}%`, background: "var(--color-accent)" }} />
+      </span>
+      <span className="mono" style={{ fontSize: "0.75rem", color: "var(--color-ink-muted)" }}>
+        {pct}%
+      </span>
+    </span>
+  );
+}
+
 function LastScore({ entry }: { entry: BrokeragePortfolioEntry }) {
   if (entry.v_index == null) {
     return <span style={{ color: "var(--color-ink-faint)" }}>—</span>;
@@ -187,15 +217,18 @@ export default function BrokeragesPage() {
           <p style={{ color: "var(--color-ink-muted)" }}>Loading…</p>
         ) : items.length === 0 ? (
           <p style={{ color: "var(--color-ink-muted)" }}>
-            No brokerages yet. Create one above to begin.
+            No assessments yet. Create one above to begin.
           </p>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.88rem" }}>
               <thead>
                 <tr style={{ textAlign: "left", color: "var(--color-ink-muted)", fontSize: "0.78rem" }}>
-                  <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }}>Brokerage</th>
+                  <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }}>Subject</th>
                   <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }}>Segment</th>
+                  <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }} title="Share of applicable subcomponents rated">
+                    Completeness
+                  </th>
                   <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }} title="Last finalised Platform Value (0–100)">
                     Last score
                   </th>
@@ -216,6 +249,9 @@ export default function BrokeragesPage() {
                     </td>
                     <td style={{ padding: "0.55rem 0.6rem", color: e.segment ? "inherit" : "var(--color-ink-faint)" }}>
                       {e.segment ?? "—"}
+                    </td>
+                    <td style={{ padding: "0.55rem 0.6rem" }}>
+                      <Completeness coverage={e.coverage} />
                     </td>
                     <td style={{ padding: "0.55rem 0.6rem" }}>
                       <LastScore entry={e} />
