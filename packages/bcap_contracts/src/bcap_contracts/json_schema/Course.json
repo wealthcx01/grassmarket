@@ -1,0 +1,226 @@
+{
+  "$defs": {
+    "CertificationCredit": {
+      "description": "What completing a module grants toward certification evidence (§9). Only COURSEWORK is\nself-service — it is binary and platform-verifiable (\"did the module\"). An EXAM score is\nobjective, so it is never self-attested: the certification exam is PROCTORED and admin-recorded\n(GRS-0023). An exam-quiz here is practice content, not a certification credit (ADR-0014).",
+      "enum": [
+        "none",
+        "coursework"
+      ],
+      "title": "CertificationCredit",
+      "type": "string"
+    },
+    "CourseModule": {
+      "additionalProperties": false,
+      "description": "An ordered group of lessons within a course.",
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "lessons": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Lesson"
+          },
+          "title": "Lessons",
+          "type": "array"
+        },
+        "order": {
+          "minimum": 0,
+          "title": "Order",
+          "type": "integer"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "order"
+      ],
+      "title": "CourseModule",
+      "type": "object"
+    },
+    "CourseTree": {
+      "additionalProperties": false,
+      "description": "The editable body of a course — metadata plus its nested modules/lessons. This is what an\nadmin edits in the CMS; publishing snapshots it into an immutable `CourseVersion`.",
+      "properties": {
+        "certification_credit": {
+          "$ref": "#/$defs/CertificationCredit",
+          "default": "none"
+        },
+        "modules": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CourseModule"
+          },
+          "title": "Modules",
+          "type": "array"
+        },
+        "summary": {
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "summary"
+      ],
+      "title": "CourseTree",
+      "type": "object"
+    },
+    "Lesson": {
+      "additionalProperties": false,
+      "description": "One teaching unit inside a module: a markdown body, an optional video, and links to the\nspaced-repetition drill topics it reinforces. An AI-authored lesson (`author == AI`) is not\n``approved`` until a human signs off — the approver is then recorded (ADR-0009).",
+      "properties": {
+        "approved": {
+          "default": true,
+          "title": "Approved",
+          "type": "boolean"
+        },
+        "approved_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Approved At"
+        },
+        "approved_by_consultant_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Approved By Consultant Id"
+        },
+        "author": {
+          "$ref": "#/$defs/LessonAuthor",
+          "default": "human"
+        },
+        "body": {
+          "description": "Lesson content, markdown.",
+          "minLength": 1,
+          "title": "Body",
+          "type": "string"
+        },
+        "drill_topics": {
+          "default": [],
+          "description": "Existing DrillCard topics this lesson reinforces (e.g. 'power:…').",
+          "items": {
+            "type": "string"
+          },
+          "title": "Drill Topics",
+          "type": "array"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "order": {
+          "minimum": 0,
+          "title": "Order",
+          "type": "integer"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "video_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Video Ref"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "body",
+        "order"
+      ],
+      "title": "Lesson",
+      "type": "object"
+    },
+    "LessonAuthor": {
+      "description": "Who wrote a lesson. AI-authored content is approval-gated before it can be published (#8).",
+      "enum": [
+        "human",
+        "ai"
+      ],
+      "title": "LessonAuthor",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A catalog course: a stable slug, its current editable draft, and how many versions have been\npublished (``latest_version`` is 0 until first publish). Learners see the latest published\nversion; admins author against the draft.",
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "draft": {
+      "$ref": "#/$defs/CourseTree"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "latest_version": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Latest Version",
+      "type": "integer"
+    },
+    "slug": {
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "title": "Slug",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "slug",
+    "draft",
+    "created_at",
+    "updated_at"
+  ],
+  "title": "Course",
+  "type": "object"
+}

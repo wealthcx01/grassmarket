@@ -31,6 +31,10 @@ import type {
   CommsChannel,
   CommsLogEntry,
   ContentCompletion,
+  Course,
+  CourseTree,
+  CourseVersion,
+  CertificationCredit,
   Deliverable,
   DeliverableSlot,
   DeliverableType,
@@ -763,6 +767,64 @@ export const api = {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify({ grade }),
+      signal,
+    });
+  },
+
+  // --- Bruntsfield Academy courses (GRS-0121) ---
+  listCourses(signal?: AbortSignal): Promise<Course[]> {
+    return request<Course[]>("/workbench/courses", { method: "GET", headers: authHeaders(), signal });
+  },
+
+  getCourse(slug: string, signal?: AbortSignal): Promise<Course> {
+    return request<Course>(`/workbench/courses/${slug}`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  createCourse(
+    body: { slug: string; title: string; summary: string; certification_credit: CertificationCredit },
+    signal?: AbortSignal,
+  ): Promise<Course> {
+    return request<Course>("/workbench/courses", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(body),
+      signal,
+    });
+  },
+
+  saveCourseDraft(slug: string, tree: CourseTree, signal?: AbortSignal): Promise<Course> {
+    return request<Course>(`/workbench/courses/${slug}/draft`, {
+      method: "PUT",
+      headers: authHeaders(),
+      body: JSON.stringify(tree),
+      signal,
+    });
+  },
+
+  approveCourseLesson(slug: string, lessonId: string, signal?: AbortSignal): Promise<Course> {
+    return request<Course>(`/workbench/courses/${slug}/lessons/${lessonId}/approve`, {
+      method: "POST",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  publishCourse(slug: string, signal?: AbortSignal): Promise<CourseVersion> {
+    return request<CourseVersion>(`/workbench/courses/${slug}/publish`, {
+      method: "POST",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  listCourseVersions(slug: string, signal?: AbortSignal): Promise<CourseVersion[]> {
+    return request<CourseVersion[]>(`/workbench/courses/${slug}/versions`, {
+      method: "GET",
+      headers: authHeaders(),
       signal,
     });
   },

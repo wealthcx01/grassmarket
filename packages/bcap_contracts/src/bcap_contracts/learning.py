@@ -7,7 +7,7 @@ from datetime import datetime
 from enum import StrEnum
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from bcap_contracts.base import OwnedResource
 
@@ -139,3 +139,116 @@ class GeneratedQuiz(OwnedResource):
     drafter_version: str = Field(min_length=1)
     approved_by_consultant_id: UUID | None = None
     approved_at: datetime | None = None
+
+
+# --- Bruntsfield Academy: the Course → Module → Lesson content model (GRS-0121) ----------
+#
+# The foundation the whole Academy program (Sales Egoist, the product courses, the ops playbook)
+# is authored *into*. A course's editable body is a `CourseTree`; publishing snapshots it into an
+# immutable, append-only `CourseVersion` (versions are retained, and re-publishing needs no deploy).
+# AI-authored lessons are approval-gated (ADR-0009): an AI lesson cannot appear in a published
+# version until a human approves it.
+
+
+class LessonAuthor(StrEnum):
+    """Who wrote a lesson. AI-authored content is approval-gated before it can be published (#8)."""
+
+    HUMAN = "human"
+    AI = "ai"
+
+
+class Lesson(BaseModel):
+    """One teaching unit inside a module: a markdown body, an optional video, and links to the
+    spaced-repetition drill topics it reinforces. An AI-authored lesson (`author == AI`) is not
+    ``approved`` until a human signs off — the approver is then recorded (ADR-0009)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: UUID
+    title: str = Field(min_length=1)
+    body: str = Field(min_length=1, description="Lesson content, markdown.")
+    order: int = Field(ge=0)
+    author: LessonAuthor = LessonAuthor.HUMAN
+    video_ref: str | None = None
+    drill_topics: tuple[str, ...] = Field(
+        default=(), description="Existing DrillCard topics this lesson reinforces (e.g. 'power:…')."
+    )
+    approved: bool = True
+    approved_by_consultant_id: UUID | None = None
+    approved_at: datetime | None = None
+
+    @model_validator(mode="after")
+    def _approval_provenance(self) -> Lesson:
+        # An approved lesson that was AI-authored must record WHO approved it (ADR-0009). A human-
+        # authored lesson is inherently approved (a human wrote it) and needs no approver.
+        if (
+            self.author is LessonAuthor.AI
+            and self.approved
+            and self.approved_by_consultant_id is None
+        ):
+            raise ValueError("An approved AI-authored lesson must record its approver (ADR-0009).")
+        if self.approved_by_consultant_id is not None and not self.approved:
+            raise ValueError("A lesson with an approver must be marked approved.")
+        return self
+
+
+class CourseModule(BaseModel):
+    """An ordered group of lessons within a course."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: UUID
+    title: str = Field(min_length=1)
+    order: int = Field(ge=0)
+    lessons: tuple[Lesson, ...] = ()
+
+
+class CourseTree(BaseModel):
+    """The editable body of a course — metadata plus its nested modules/lessons. This is what an
+    admin edits in the CMS; publishing snapshots it into an immutable `CourseVersion`."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    title: str = Field(min_length=1)
+    summary: str = Field(min_length=1)
+    certification_credit: CertificationCredit = CertificationCredit.NONE
+    modules: tuple[CourseModule, ...] = ()
+
+
+class Course(BaseModel):
+    """A catalog course: a stable slug, its current editable draft, and how many versions have been
+    published (``latest_version`` is 0 until first publish). Learners see the latest published
+    version; admins author against the draft."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: UUID
+    slug: str = Field(min_length=1, pattern=r"^[a-z0-9][a-z0-9-]*$")
+    draft: CourseTree
+    latest_version: int = Field(default=0, ge=0)
+    created_at: datetime
+    updated_at: datetime
+
+
+class CourseVersion(BaseModel):
+    """An immutable, published snapshot of a course tree (append-only; retained forever)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    course_id: UUID
+    slug: str = Field(min_length=1)
+    version: int = Field(ge=1)
+    tree: CourseTree
+    published_by_consultant_id: UUID
+    published_at: datetime
+
+
+class LessonCompletion(OwnedResource):
+    """One advisor's completion of a single lesson (GRS-0121). Completing every approved lesson of a
+    COURSEWORK-credit course grants the coursework credit via the existing certification path."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    course_id: UUID
+    lesson_id: UUID
+    completed_at: datetime

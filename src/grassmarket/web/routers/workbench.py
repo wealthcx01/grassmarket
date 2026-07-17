@@ -14,10 +14,14 @@ from uuid import UUID
 from bcap_contracts.learning import (
     CertificationCredit,
     ContentCompletion,
+    Course,
+    CourseTree,
+    CourseVersion,
     DrillCard,
     GeneratedQuiz,
     LearningKind,
     LearningModule,
+    LessonCompletion,
 )
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
@@ -58,6 +62,13 @@ class CompleteRequest(BaseModel):
 class ProposeQuizRequest(BaseModel):
     title: str = Field(min_length=1)
     topics: list[str] = Field(min_length=1)
+
+
+class CreateCourseRequest(BaseModel):
+    slug: str = Field(min_length=1, pattern=r"^[a-z0-9][a-z0-9-]*$")
+    title: str = Field(min_length=1)
+    summary: str = Field(min_length=1)
+    certification_credit: CertificationCredit = CertificationCredit.NONE
 
 
 def _forbidden(exc: Exception) -> HTTPException:
@@ -244,3 +255,160 @@ def get_quiz(
         return repo.get_quiz(principal, quiz_id)
     except NotFoundError as exc:
         raise _not_found("Quiz") from exc
+
+
+# --- Bruntsfield Academy courses (CMS, GRS-0121) ----------------------------------------
+# Authoring (create/edit/approve/publish) is admin-gated in the repository → a ScopeViolationError
+# maps to 403. Reading the published catalog is org-wide. AI-authored lessons are approval-gated:
+# publishing refuses while any remain unapproved (409).
+
+
+@router.post("/courses", response_model=Course, status_code=status.HTTP_201_CREATED)
+def create_course(
+    payload: CreateCourseRequest,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> Course:
+    try:
+        return repo.create_course(
+            principal,
+            slug=payload.slug,
+            title=payload.title,
+            summary=payload.summary,
+            certification_credit=payload.certification_credit,
+        )
+    except ScopeViolationError as exc:
+        raise _forbidden(exc) from exc
+    except ConflictError as exc:
+        raise _conflict(exc) from exc
+
+
+@router.get("/courses", response_model=list[Course])
+def list_courses(
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> list[Course]:
+    """Every course DRAFT (admin authoring view)."""
+    try:
+        return repo.list_courses(principal)
+    except ScopeViolationError as exc:
+        raise _forbidden(exc) from exc
+
+
+@router.get("/courses/published", response_model=list[CourseVersion])
+def list_published_courses(
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> list[CourseVersion]:
+    """The learner-facing catalog: the latest published version of every course (org-wide)."""
+    return repo.list_published_courses(principal)
+
+
+@router.get("/courses/{slug}", response_model=Course)
+def get_course(
+    slug: str,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> Course:
+    """The editable draft (admin authoring view)."""
+    try:
+        return repo.get_course(principal, slug)
+    except ScopeViolationError as exc:
+        raise _forbidden(exc) from exc
+    except NotFoundError as exc:
+        raise _not_found("Course") from exc
+
+
+@router.put("/courses/{slug}/draft", response_model=Course)
+def save_course_draft(
+    slug: str,
+    tree: CourseTree,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> Course:
+    """Replace the editable draft tree (admin). Does not publish."""
+    try:
+        return repo.save_course_draft(principal, slug, tree)
+    except ScopeViolationError as exc:
+        raise _forbidden(exc) from exc
+    except NotFoundError as exc:
+        raise _not_found("Course") from exc
+
+
+@router.post("/courses/{slug}/lessons/{lesson_id}/approve", response_model=Course)
+def approve_course_lesson(
+    slug: str,
+    lesson_id: UUID,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> Course:
+    """Approve one AI-authored lesson so it can be published (ADR-0009)."""
+    try:
+        return repo.approve_course_lesson(principal, slug, lesson_id, now=datetime.now(UTC))
+    except ScopeViolationError as exc:
+        raise _forbidden(exc) from exc
+    except NotFoundError as exc:
+        raise _not_found("Lesson") from exc
+
+
+@router.post("/courses/{slug}/publish", response_model=CourseVersion)
+def publish_course(
+    slug: str,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> CourseVersion:
+    """Snapshot the draft into a new immutable version. Refuses (409) while any AI lesson is
+    unapproved (ADR-0009)."""
+    try:
+        return repo.publish_course(principal, slug, now=datetime.now(UTC))
+    except ScopeViolationError as exc:
+        raise _forbidden(exc) from exc
+    except NotFoundError as exc:
+        raise _not_found("Course") from exc
+    except ConflictError as exc:
+        raise _conflict(exc) from exc
+
+
+@router.get("/courses/{slug}/published", response_model=CourseVersion)
+def get_published_course(
+    slug: str,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> CourseVersion:
+    """The latest published version of one course (org-wide)."""
+    try:
+        return repo.get_published_course(principal, slug)
+    except NotFoundError as exc:
+        raise _not_found("Published course") from exc
+
+
+@router.get("/courses/{slug}/versions", response_model=list[CourseVersion])
+def list_course_versions(
+    slug: str,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> list[CourseVersion]:
+    """Every retained published version of a course (admin)."""
+    try:
+        return repo.list_course_versions(principal, slug)
+    except ScopeViolationError as exc:
+        raise _forbidden(exc) from exc
+    except NotFoundError as exc:
+        raise _not_found("Course") from exc
+
+
+@router.post("/courses/{slug}/lessons/{lesson_id}/complete", response_model=LessonCompletion)
+def complete_lesson(
+    slug: str,
+    lesson_id: UUID,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> LessonCompletion:
+    """Complete one lesson of the latest published course. Completing every lesson of a
+    coursework-credit course grants the coursework credit via the existing certification path."""
+    try:
+        return repo.complete_lesson(principal, slug, lesson_id, now=datetime.now(UTC))
+    except NotFoundError as exc:
+        raise _not_found("Lesson") from exc
+    except ConflictError as exc:
+        raise _conflict(exc) from exc
