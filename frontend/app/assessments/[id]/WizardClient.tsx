@@ -9,11 +9,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 import { BandDisplay } from "@/components/BandDisplay";
 import { ConsumingEngagements } from "@/components/ConsumingEngagements";
 import { WIZARD_STEPS, type StepProps } from "@/components/steps";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { ApiError, api, clearToken, getToken } from "@/lib/api";
 import type {
   Assessment,
@@ -237,10 +237,11 @@ export function WizardClient({ id }: { id: string }) {
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.5rem" }}>
         <div>
-          <Link href="/assessments" style={{ fontSize: "0.8rem" }}>
-            ← All assessments
-          </Link>
-          <h1 style={{ fontSize: "1.5rem", margin: "0.2rem 0 0" }}>{assessment.subject || "Untitled assessment"}</h1>
+          <Breadcrumb
+            trail={[{ label: "Your Brokerages", href: "/assessments" }]}
+            current={assessment.subject || "Untitled assessment"}
+          />
+          <h1 style={{ fontSize: "1.5rem", margin: "0.35rem 0 0" }}>{assessment.subject || "Untitled assessment"}</h1>
           <ConsumingEngagements assessmentId={id} />
         </div>
         <SaveBadge state={save} readOnly={!!readOnly} />

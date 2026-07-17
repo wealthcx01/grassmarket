@@ -1,6 +1,6 @@
 # GRS-0118 — Fix backlinks / cross-screen navigation
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** —
 
@@ -32,3 +32,23 @@ and link-legibility work.
 
 - The two-way engagement↔assessment information link — GRS-0116.
 - Any global-nav / header changes beyond the shared breadcrumb component.
+
+## What shipped (Status: Shipped — branch grs-0118-fix-backlinks-navigation)
+
+Replaced the ad-hoc per-screen "← X" links with one **shared `Breadcrumb` component**
+(`components/Breadcrumb.tsx`) applied consistently across the detail screens, so each shows its place
+in the flow and always has a reliable way back:
+
+- **Prospect** (`app/prospects/[id]`): `Pipeline / {company}`.
+- **Engagement** (`app/engagements/[id]`): `Pipeline / Prospect / {engagement}`.
+- **Assessment** (`app/assessments/[id]` via `WizardClient`): `Your Brokerages / {subject}` (which,
+  with the GRS-0116 "Consumed by" reverse link, closes the loop the other way too).
+
+`Breadcrumb` takes a `trail` of ancestor links (each clickable) + the non-link `current` page, with
+`aria-label="Breadcrumb"` / `aria-current="page"`. Reusing one component keeps the pattern consistent
+as new screens are added, rather than hand-rolled back buttons.
+
+## Acceptance / verification
+
+The prospect, engagement, and assessment screens each show a consistent breadcrumb with a reliable
+back-link; no detail screen dead-ends. Frontend type-check · lint · vitest green.
