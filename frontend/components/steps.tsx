@@ -610,9 +610,13 @@ export function CustomerPropositionStep({ registry, document: d, update, readOnl
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-      <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem", margin: 0 }}>
-        The Customer Proposition (C) index (ADR-0023) — the ten Phase-E modules, plus the Level-1
-        widget checklist. C is reported <em>alongside</em> V; it does not change V yet.
+      <p style={{ color: "var(--color-ink-muted)", fontSize: "0.9rem", margin: 0, lineHeight: 1.55 }}>
+        <strong style={{ color: "var(--color-ink)" }}>This is where you judge how good the platform
+        actually is for a customer.</strong> The Customer Proposition Index (C) reads the ten Phase-E
+        modules and the <strong>Level-1 widget checklist</strong> — is each feature present, and how
+        good is it on <strong>Ease · Usability · Depth</strong>? A rare feature done well is a
+        differentiator; a common one missing is a gap. C is scored live (see the rail) and reported
+        alongside V (ADR-0023); it does not change V yet.
       </p>
 
       {registry.c_modules.map((m) => (
