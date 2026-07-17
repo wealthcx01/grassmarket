@@ -10,6 +10,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { StageMoveControl } from "@/components/StageMoveControl";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { ApiError, api, getToken } from "@/lib/api";
 import { STAGE_LABEL, type Engagement, type PipelineStage, type Prospect, type Workshop } from "@/lib/types";
 
@@ -71,10 +72,8 @@ export default function ProspectDetailPage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", maxWidth: "48rem" }}>
       <div>
-        <Link href="/pipeline" style={{ fontSize: "0.8rem" }}>
-          ← Pipeline
-        </Link>
-        <h1 style={{ fontSize: "1.6rem", margin: "0.2rem 0 0.3rem" }}>{prospect.company_name}</h1>
+        <Breadcrumb trail={[{ label: "Pipeline", href: "/pipeline" }]} current={prospect.company_name} />
+        <h1 style={{ fontSize: "1.6rem", margin: "0.4rem 0 0.3rem" }}>{prospect.company_name}</h1>
         <p style={{ margin: 0, color: "var(--color-ink-muted)", fontSize: "0.85rem" }}>
           Stage <strong>{STAGE_LABEL[prospect.stage]}</strong> · entered{" "}
           {new Date(prospect.stage_entered_at).toLocaleDateString()}

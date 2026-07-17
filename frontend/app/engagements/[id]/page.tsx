@@ -19,6 +19,7 @@ import {
 } from "@/lib/types";
 import { DeliverablesPanel } from "@/components/DeliverablesPanel";
 import { LinkAssessmentControl } from "@/components/LinkAssessmentControl";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 const STATE_LABEL: Record<string, string> = {
   draft: "Draft",
@@ -100,9 +101,13 @@ export default function EngagementDetailPage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem", maxWidth: "48rem" }}>
       <div>
-        <Link href={`/prospects/${engagement.prospect_id}`} style={{ fontSize: "0.82rem" }}>
-          ← Prospect
-        </Link>
+        <Breadcrumb
+          trail={[
+            { label: "Pipeline", href: "/pipeline" },
+            { label: "Prospect", href: `/prospects/${engagement.prospect_id}` },
+          ]}
+          current={engagement.title}
+        />
         <p className="eyebrow" style={{ marginTop: "0.5rem" }}>
           Engagement
         </p>
