@@ -29,6 +29,20 @@
   "additionalProperties": false,
   "description": "One append-only certification audit record for an advisor (`owner_consultant_id`). Promotions\ncarry from/to levels; an override carries the mandatory reason. Recorded by an admin/signer.\n\n`cert_subject` keeps this the SINGLE audit store for both tracks (GRS-0127): ``None`` is the\nassessor ladder; a value (e.g. ``sales_egoist`` or ``product:openbb``) is a course/product\ncertification. No parallel cert store — a course cert is folded from these same events.",
   "properties": {
+    "assessment_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The assessment this evidence was auto-derived from (GRS-0131), if any. Ties shadow / observed-lead credit to real participation and makes the derivation idempotent.",
+      "title": "Assessment Id"
+    },
     "cert_subject": {
       "anyOf": [
         {

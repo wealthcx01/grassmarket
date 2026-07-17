@@ -790,6 +790,9 @@ class CertificationEventORM(Base):
     # None = the assessor ladder; a value (e.g. 'sales_egoist', 'product:openbb') = a course/product
     # certification (GRS-0127). Keeps this the single audit store for both tracks.
     cert_subject: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    # The assessment this evidence was auto-derived from (GRS-0131), if any — ties shadow /
+    # observed-lead credit to real participation and makes the derivation idempotent per assessment.
+    assessment_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
     recorded_by_consultant_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
     occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)

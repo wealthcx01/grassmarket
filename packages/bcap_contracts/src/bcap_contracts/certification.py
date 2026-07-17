@@ -77,6 +77,11 @@ class CertificationEvent(OwnedResource):
     cert_subject: str | None = Field(
         default=None, description="None = assessor ladder; else a course/product cert key."
     )
+    assessment_id: UUID | None = Field(
+        default=None,
+        description="The assessment this evidence was auto-derived from (GRS-0131), if any. Ties "
+        "shadow / observed-lead credit to real participation and makes the derivation idempotent.",
+    )
     recorded_by_consultant_id: UUID
     occurred_at: datetime
 
