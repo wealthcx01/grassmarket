@@ -239,7 +239,7 @@ export function WizardClient({ id }: { id: string }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.5rem" }}>
         <div>
           <Breadcrumb
-            trail={[{ label: "Your Brokerages", href: "/assessments" }]}
+            trail={[{ label: "Your Portfolio", href: "/assessments" }]}
             current={assessment.subject || "Untitled assessment"}
           />
           <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap", margin: "0.35rem 0 0" }}>

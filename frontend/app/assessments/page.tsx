@@ -12,7 +12,8 @@ import Link from "next/link";
 
 import { toDisplay } from "@/lib/band";
 import { ApiError, api, getToken } from "@/lib/api";
-import type { BrokeragePortfolioEntry } from "@/lib/types";
+import * as doc from "@/lib/doc";
+import type { BrokeragePortfolioEntry, RegistryProfile } from "@/lib/types";
 
 const STATE_LABEL: Record<BrokeragePortfolioEntry["state"], string> = {
   draft: "Draft",
@@ -42,12 +43,22 @@ export default function BrokeragesPage() {
   const [error, setError] = useState<string | null>(null);
   const [subject, setSubject] = useState("");
   const [sandbox, setSandbox] = useState(false);
+  const [profiles, setProfiles] = useState<RegistryProfile[]>([]);
+  const [profileKey, setProfileKey] = useState("retail");
   const [creating, setCreating] = useState(false);
 
   // Prefill the subject when arriving from an engagement's "Start an assessment" CTA (?subject=…).
   useEffect(() => {
     const s = new URLSearchParams(window.location.search).get("subject");
     if (s) setSubject(s);
+  }, []);
+
+  // The operating-model profiles the subject can be assessed under (GRS-0079/0098) — the profile is
+  // the same field the wizard's Overview step edits, just chosen at creation.
+  useEffect(() => {
+    const ctrl = new AbortController();
+    api.registryProfiles(ctrl.signal).then(setProfiles).catch(() => {});
+    return () => ctrl.abort();
   }, []);
 
   useEffect(() => {
@@ -62,7 +73,7 @@ export default function BrokeragesPage() {
       .catch((err: unknown) => {
         if (err instanceof ApiError && err.status === 0) return;
         if (err instanceof ApiError && err.status === 401) return router.replace("/login");
-        setError(err instanceof ApiError ? err.message : "Could not load your brokerages.");
+        setError(err instanceof ApiError ? err.message : "Could not load your portfolio.");
       });
     return () => ctrl.abort();
   }, [router]);
@@ -74,6 +85,14 @@ export default function BrokeragesPage() {
     setError(null);
     try {
       const created = await api.createAssessment(subject.trim(), sandbox ? "sandbox" : "production");
+      // Set the operating-model profile at creation (feeds the same mechanism as the wizard's Overview
+      // selector, GRS-0079). Retail is the default; only save a non-default so retail stays byte-clean.
+      if (profileKey && profileKey !== "retail") {
+        await api.saveAssessment(
+          created.id,
+          doc.setProfile(created.document, { operating_model: profileKey }),
+        );
+      }
       router.push(`/assessments/${created.id}`);
     } catch (err: unknown) {
       setError(err instanceof ApiError ? err.message : "Could not create the assessment.");
@@ -87,7 +106,7 @@ export default function BrokeragesPage() {
         <p className="eyebrow" style={{ margin: 0 }}>
           Platform Power · Path A (manual)
         </p>
-        <h1 style={{ fontSize: "2rem", margin: "0.3rem 0 0.4rem" }}>Your Brokerages</h1>
+        <h1 style={{ fontSize: "2rem", margin: "0.3rem 0 0.4rem" }}>Your Portfolio</h1>
         <p style={{ margin: 0, color: "var(--color-ink-muted)", maxWidth: "40rem" }}>
           Your portfolio of assessments. Start a new one or resume a draft — a partial assessment is
           valid and autosaves. A score appears once the assessment is finalised.
@@ -100,7 +119,7 @@ export default function BrokeragesPage() {
       >
         <label style={{ fontSize: "0.85rem", flex: "1 1 20rem" }}>
           <span style={{ display: "block", marginBottom: "0.3rem", fontWeight: 500 }}>
-            New brokerage — subject (business name)
+            New assessment — subject (business name)
           </span>
           <input
             type="text"
@@ -118,6 +137,31 @@ export default function BrokeragesPage() {
               borderRadius: "var(--radius)",
             }}
           />
+        </label>
+        <label style={{ fontSize: "0.85rem", flex: "0 1 14rem" }}>
+          <span style={{ display: "block", marginBottom: "0.3rem", fontWeight: 500 }}>
+            Operating model
+          </span>
+          <select
+            value={profileKey}
+            onChange={(e) => setProfileKey(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "0.55rem 0.7rem",
+              fontFamily: "inherit",
+              fontSize: "0.95rem",
+              color: "var(--color-ink)",
+              background: "var(--color-paper-raised)",
+              border: "1px solid var(--color-border)",
+              borderRadius: "var(--radius)",
+            }}
+          >
+            {(profiles.length ? profiles : [{ key: "retail", name: "Retail" }]).map((p) => (
+              <option key={p.key} value={p.key}>
+                {p.name}
+              </option>
+            ))}
+          </select>
         </label>
         <button type="submit" className="btn btn-primary" disabled={creating || !subject.trim()}>
           {creating ? "Creating…" : "Create & open"}

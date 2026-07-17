@@ -122,7 +122,7 @@ export function OverviewStep({ document: d, update, readOnly, profiles }: StepPr
           style={fieldStyle}
           title="Which operating model this business runs — reshapes the modules assessed and the weights."
         >
-          {(profiles.length ? profiles : [{ key: "retail", name: "Retail brokerage" }]).map((p) => (
+          {(profiles.length ? profiles : [{ key: "retail", name: "Retail" }]).map((p) => (
             <option key={p.key} value={p.key}>
               {p.name}
             </option>
@@ -437,7 +437,7 @@ export function StrategicPowersStep({ registry, document: d, update, readOnly }:
             {g ? (
               <div style={{ marginTop: "0.5rem" }}>
                 <button type="button" className={smallBtn} style={smallBtnStyle} onClick={() => setOpenExample(showExample ? null : p.key)}>
-                  {showExample ? "Hide example" : "In a brokerage…"}
+                  {showExample ? "Hide example" : "See an example"}
                 </button>
                 {showExample ? (
                   <div className="callout callout-info" style={{ marginTop: "0.5rem", fontSize: "0.8rem", lineHeight: 1.5 }}>

@@ -23,7 +23,7 @@ const CLIENT_WORK: ReadonlyArray<Section> = [
   },
   {
     step: 2,
-    title: "Your Brokerages",
+    title: "Your Portfolio",
     href: "/assessments",
     kicker: "Portfolio · the Platform Power wizard",
     blurb: "Your portfolio of assessments — segment, last score and status at a glance — and the wizard: business metrics, the 7 Powers, and the infrastructure deep dive, scored live with uncertainty bands.",
