@@ -236,6 +236,9 @@ export function BusinessMetricsStep({ registry, document: d, update, readOnly }:
                 <span className="mono" style={{ fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
                   {m.unit} · {m.group ?? "—"}
                 </span>
+                <p style={{ margin: "0.25rem 0 0", fontSize: "0.8rem", color: "var(--color-ink-muted)", lineHeight: 1.45 }}>
+                  {m.description}
+                </p>
               </div>
               <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
                 <input

@@ -213,6 +213,8 @@ export interface RegistryModule {
 export interface RegistryMetric {
   key: string;
   name: string;
+  /** Plain-English "what it is and why it matters", operating-model aware (GRS-0103). */
+  description: string;
   unit: string;
   direction: string;
   group?: string | null;

@@ -1,6 +1,6 @@
 # GRS-0103 — Business Metrics: depth + per-metric context
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** A (build now)
 **Depends on:** —
@@ -36,3 +36,23 @@ assessed rather than filling a generic form.
 
 - Changing which metrics exist or how they score.
 - Cross-cutting evidence capture on ratings — GRS-0107.
+
+## What shipped (Status: Shipped — branch grs-0103-business-metrics-depth)
+
+Every metric on the Business Metrics step now carries a plain-English, operating-model-aware
+description, single-sourced from the registry and fail-loud:
+
+- `MetricDef.description` (required, `min_length=1`) — the registry loader refuses a metric with no
+  description (ADR-0001), so the step can never render a bare number without context.
+- Authored a description for all 10 metrics in `metrics.yaml` — "what it is and why it matters",
+  noting where a metric's importance shifts across operating models (e.g. AUA is the headline for a
+  wealth manager but trade volume matters more for an execution-only broker; ARPU is low-and-wide for
+  a neobroker, high-and-narrow for a private-wealth firm).
+- `BusinessMetricsStep` renders `m.description` under each metric; `RegistryMetric.description` mirrored
+  in TS. Golden master untouched (a metric's description is not a scoring input).
+
+## Acceptance / verification
+
+Every metric renders an operating-model-appropriate description sourced from the registry; a metric
+missing its description fails loud at load (`test_registry` construction guards). Backend + frontend
+gates green; schema parity green; golden master unchanged.

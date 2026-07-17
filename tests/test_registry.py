@@ -135,6 +135,7 @@ def _metric_raw(**overrides: object) -> dict:
     base = {
         "key": "K",
         "name": "K",
+        "description": "A test metric.",
         "unit": "count",
         "direction": "higher_is_better",
         "status": "settled",
@@ -291,6 +292,7 @@ def _tiny_registry(extra_module: bool = False) -> Registry:
             MetricDef(
                 key="K1",
                 name="Metric 1",
+                description="A test metric.",
                 unit="count",
                 direction="higher_is_better",
                 normalisation=NormalisationSpec(

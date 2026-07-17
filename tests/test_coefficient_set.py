@@ -310,6 +310,7 @@ def _full_tiny_registry(two_modules: bool = False) -> Registry:
             MetricDef(
                 key="K1",
                 name="Metric 1",
+                description="A test metric.",
                 unit="count",
                 direction="higher_is_better",
                 normalisation=NormalisationSpec(

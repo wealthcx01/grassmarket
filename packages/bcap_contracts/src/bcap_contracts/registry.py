@@ -173,6 +173,10 @@ class MetricDef(BaseModel):
 
     key: str
     name: str
+    # A plain-English "what it is and why it matters" for the wizard (GRS-0103). Single-sourced here
+    # so the metrics step never renders a bare number without context; required (min length) so a
+    # metric with no description is a load-time refusal, not an empty caption (ADR-0001).
+    description: str = Field(min_length=1)
     # The declared unit is captured explicitly, never inferred (Methodology §5.3).
     unit: str
     direction: MetricDirection  # closed set: higher_is_better | lower_is_better
@@ -583,6 +587,7 @@ def _parse_metric(raw: dict[str, Any]) -> MetricDef:
     return MetricDef(
         key=raw["key"],
         name=raw["name"],
+        description=_require(raw, "description", f"metric {key!r}"),
         unit=raw["unit"],
         direction=raw["direction"],
         group=raw.get("group"),  # optional: None until the metric is grouped (ADR-0006)
