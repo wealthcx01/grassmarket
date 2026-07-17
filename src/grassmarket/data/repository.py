@@ -111,10 +111,14 @@ from bcap_contracts.fees import (
 from bcap_contracts.learning import (
     CertificationCredit,
     ContentCompletion,
+    Course,
+    CourseTree,
+    CourseVersion,
     DrillCard,
     GeneratedQuiz,
     LearningKind,
     LearningModule,
+    LessonCompletion,
     QuizQuestion,
     QuizStatus,
 )
@@ -152,6 +156,8 @@ from grassmarket.data.models import (
     CommsLogEntryORM,
     ConsultantORM,
     ContentCompletionORM,
+    CourseORM,
+    CourseVersionORM,
     DeliverableORM,
     DrillCardORM,
     EngagementORM,
@@ -160,6 +166,7 @@ from grassmarket.data.models import (
     GeneratedQuizORM,
     InvitationORM,
     LearningModuleORM,
+    LessonCompletionORM,
     LoginHandoffCodeORM,
     MeetingTranscriptORM,
     ModuleRatingDraftORM,
@@ -192,6 +199,11 @@ from grassmarket.workbench.bench import (
 )
 from grassmarket.workbench.calibration import compute_calibration_result
 from grassmarket.workbench.certification import next_level, promotion_blockers
+from grassmarket.workbench.courses import (
+    approve_lesson_in_tree,
+    is_course_complete,
+    unapproved_ai_lessons,
+)
 from grassmarket.workbench.drills import PASSING_GRADE, DrillState, next_due, review
 
 # Stages at which a prospect is "contracted or beyond" — the only prospects an engagement may link.
@@ -3488,6 +3500,233 @@ class Repository:
             detail="via learning module",
         )
         self._session.flush()
+
+    # ------------------------------------------------- Academy courses (CMS, GRS-0121)
+    # Shared catalog content: authoring is ADMIN-gated (like the weekly quiz), reads are org-wide.
+    # The editable draft is a CourseTree stored as JSON; publishing appends an immutable version.
+    def create_course(
+        self,
+        principal: Principal,
+        *,
+        slug: str,
+        title: str,
+        summary: str,
+        certification_credit: CertificationCredit = CertificationCredit.NONE,
+    ) -> Course:
+        """Create an empty course (admin). The slug is unique; the draft starts with no modules."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may author courses.")
+        draft = CourseTree(title=title, summary=summary, certification_credit=certification_credit)
+        row = CourseORM(
+            owner_consultant_id=principal.consultant_id,
+            slug=slug,
+            draft_json=draft.model_dump_json(),
+        )
+        self._session.add(row)
+        try:
+            self._session.flush()
+        except IntegrityError as exc:
+            self._session.rollback()
+            raise ConflictError(f"A course with slug '{slug}' already exists.") from exc
+        return self._to_course(row)
+
+    def _get_course_row(self, slug: str) -> CourseORM:
+        row = self._session.execute(
+            select(CourseORM).where(CourseORM.slug == slug)
+        ).scalar_one_or_none()
+        if row is None:
+            raise NotFoundError(f"Course '{slug}' not found.")
+        return row
+
+    def get_course(self, principal: Principal, slug: str) -> Course:
+        """The editable draft (admin) — the authoring view. Learners use the published endpoints."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may view a course draft.")
+        return self._to_course(self._get_course_row(slug))
+
+    def list_courses(self, principal: Principal) -> list[Course]:
+        """Every course draft (admin), published or not."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may list course drafts.")
+        rows = self._session.execute(select(CourseORM).order_by(CourseORM.created_at)).scalars()
+        return [self._to_course(r) for r in rows]
+
+    def save_course_draft(self, principal: Principal, slug: str, tree: CourseTree) -> Course:
+        """Replace the editable draft tree (admin). Does not publish — publishing is explicit."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may edit a course.")
+        row = self._get_course_row(slug)
+        row.draft_json = tree.model_dump_json()
+        self._session.add(row)
+        self._session.flush()
+        return self._to_course(row)
+
+    def approve_course_lesson(
+        self, principal: Principal, slug: str, lesson_id: UUID, *, now: datetime
+    ) -> Course:
+        """Approve one AI-authored lesson in the draft (admin) so it can be published (ADR-0009)."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may approve a lesson.")
+        row = self._get_course_row(slug)
+        tree = CourseTree.model_validate_json(row.draft_json)
+        try:
+            approved = approve_lesson_in_tree(
+                tree, lesson_id, approver_id=principal.consultant_id, now=now
+            )
+        except KeyError as exc:
+            raise NotFoundError(f"Lesson {lesson_id} not in course '{slug}'.") from exc
+        row.draft_json = approved.model_dump_json()
+        self._session.add(row)
+        self._session.flush()
+        return self._to_course(row)
+
+    def publish_course(self, principal: Principal, slug: str, *, now: datetime) -> CourseVersion:
+        """Snapshot the current draft into a new immutable version (admin). Refuses if any
+        AI-authored lesson is still unapproved — AI content never reaches a learner ungated
+        (ADR-0009)."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may publish a course.")
+        row = self._get_course_row(slug)
+        tree = CourseTree.model_validate_json(row.draft_json)
+        blockers = unapproved_ai_lessons(tree)
+        if blockers:
+            raise ConflictError(
+                "Cannot publish — these AI-authored lessons need approval first (ADR-0009): "
+                + ", ".join(blockers)
+            )
+        version = row.latest_version + 1
+        snapshot = CourseVersionORM(
+            course_id=row.id,
+            slug=row.slug,
+            version=version,
+            tree_json=row.draft_json,
+            published_by_consultant_id=principal.consultant_id,
+            published_at=now,
+        )
+        row.latest_version = version
+        self._session.add_all([snapshot, row])
+        self._session.flush()
+        return self._to_course_version(snapshot)
+
+    def _latest_published_row(self, course_id: UUID) -> CourseVersionORM | None:
+        return (
+            self._session.execute(
+                select(CourseVersionORM)
+                .where(CourseVersionORM.course_id == course_id)
+                .order_by(CourseVersionORM.version.desc())
+            )
+            .scalars()
+            .first()
+        )
+
+    def list_published_courses(self, principal: Principal) -> list[CourseVersion]:
+        """The latest published version of every course — the learner-facing catalog (org-wide)."""
+        courses = self._session.execute(select(CourseORM).order_by(CourseORM.created_at)).scalars()
+        out: list[CourseVersion] = []
+        for course in courses:
+            latest = self._latest_published_row(course.id)
+            if latest is not None:
+                out.append(self._to_course_version(latest))
+        return out
+
+    def get_published_course(self, principal: Principal, slug: str) -> CourseVersion:
+        """The latest published version of one course (org-wide). 404 if never published."""
+        row = self._get_course_row(slug)
+        latest = self._latest_published_row(row.id)
+        if latest is None:
+            raise NotFoundError(f"Course '{slug}' has no published version.")
+        return self._to_course_version(latest)
+
+    def list_course_versions(self, principal: Principal, slug: str) -> list[CourseVersion]:
+        """Every published version of a course, oldest first (admin) — the retained history."""
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may list course versions.")
+        row = self._get_course_row(slug)
+        versions = self._session.execute(
+            select(CourseVersionORM)
+            .where(CourseVersionORM.course_id == row.id)
+            .order_by(CourseVersionORM.version)
+        ).scalars()
+        return [self._to_course_version(v) for v in versions]
+
+    def complete_lesson(
+        self, principal: Principal, slug: str, lesson_id: UUID, *, now: datetime
+    ) -> LessonCompletion:
+        """The caller completes one lesson of the latest published course. When they have completed
+        every approved lesson of a COURSEWORK-credit course, the coursework credit is applied via
+        the SAME certification path a learning module uses (no regression). One completion per
+        (advisor, lesson)."""
+        published = self.get_published_course(principal, slug)  # 404 if never published
+        course = self._get_course_row(slug)
+        approved_ids = {lesson.id for module in published.tree.modules for lesson in module.lessons}
+        # (approved_lesson_ids over the published tree — every lesson in a published version is
+        # approved, since publish gated on it.)
+        if lesson_id not in approved_ids:
+            raise NotFoundError(f"Lesson {lesson_id} is not in the published course '{slug}'.")
+
+        completion = LessonCompletionORM(
+            owner_consultant_id=principal.consultant_id,
+            course_id=course.id,
+            lesson_id=lesson_id,
+            completed_at=now,
+        )
+        self._session.add(completion)
+        try:
+            self._session.flush()
+        except IntegrityError as exc:
+            self._session.rollback()
+            raise ConflictError("You have already completed this lesson.") from exc
+
+        completed = {
+            r.lesson_id
+            for r in self._session.execute(
+                select(LessonCompletionORM).where(
+                    LessonCompletionORM.owner_consultant_id == principal.consultant_id,
+                    LessonCompletionORM.course_id == course.id,
+                )
+            ).scalars()
+        }
+        if (
+            published.tree.certification_credit is CertificationCredit.COURSEWORK
+            and is_course_complete(published.tree, frozenset(completed))
+        ):
+            self._apply_coursework_credit(principal.consultant_id, now)
+        return self._to_lesson_completion(completion)
+
+    @staticmethod
+    def _to_course(row: CourseORM) -> Course:
+        return Course(
+            id=row.id,
+            slug=row.slug,
+            draft=CourseTree.model_validate_json(row.draft_json),
+            latest_version=row.latest_version,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    @staticmethod
+    def _to_course_version(row: CourseVersionORM) -> CourseVersion:
+        return CourseVersion(
+            course_id=row.course_id,
+            slug=row.slug,
+            version=row.version,
+            tree=CourseTree.model_validate_json(row.tree_json),
+            published_by_consultant_id=row.published_by_consultant_id,
+            published_at=row.published_at,
+        )
+
+    @staticmethod
+    def _to_lesson_completion(row: LessonCompletionORM) -> LessonCompletion:
+        return LessonCompletion(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            course_id=row.course_id,
+            lesson_id=row.lesson_id,
+            completed_at=row.completed_at,
+            # Append-only — a completion is never mutated, so updated == created.
+            created_at=row.created_at,
+            updated_at=row.created_at,
+        )
 
     # ------------------------------------------------- the weekly quiz (AI-drafted, gated, #8)
     def propose_quiz(

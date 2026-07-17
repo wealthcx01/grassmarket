@@ -691,6 +691,65 @@ class GeneratedQuizORM(Base):
     )
 
 
+class CourseORM(Base):
+    """A Bruntsfield Academy course (GRS-0121). The editable draft tree is stored as JSON so the
+    catalog is replaceable without a deploy; ``latest_version`` counts published snapshots (0 =
+    never published). Shared catalog content — authoring is admin-gated in the repository, not
+    owner-scoped. Owned by its author for provenance only."""
+
+    __tablename__ = "courses"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    slug: Mapped[str] = mapped_column(String(80), unique=True, index=True, nullable=False)
+    draft_json: Mapped[str] = mapped_column(Text, nullable=False)
+    latest_version: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
+class CourseVersionORM(Base):
+    """An immutable published snapshot of a course tree (GRS-0121) — append-only, retained forever.
+    One row per (course, version)."""
+
+    __tablename__ = "course_versions"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    course_id: Mapped[UUID] = mapped_column(ForeignKey("courses.id"), index=True, nullable=False)
+    slug: Mapped[str] = mapped_column(String(80), index=True, nullable=False)
+    version: Mapped[int] = mapped_column(Integer, nullable=False)
+    tree_json: Mapped[str] = mapped_column(Text, nullable=False)
+    published_by_consultant_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    published_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+    __table_args__ = (UniqueConstraint("course_id", "version", name="uq_course_version"),)
+
+
+class LessonCompletionORM(Base):
+    """One advisor's completion of a single lesson (GRS-0121) — feeds coursework credit. Unique per
+    (advisor, lesson). Scoped by ``owner_consultant_id`` (the advisor)."""
+
+    __tablename__ = "lesson_completions"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    course_id: Mapped[UUID] = mapped_column(ForeignKey("courses.id"), index=True, nullable=False)
+    lesson_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    completed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+    __table_args__ = (
+        UniqueConstraint("owner_consultant_id", "lesson_id", name="uq_lesson_completion"),
+    )
+
+
 class CertificationRecordORM(Base):
     """The accumulated certification-ladder evidence for one advisor (GRS-0023, §9). One row per
     consultant (``owner_consultant_id`` unique). The advisor's LEVEL lives on ConsultantORM (and the

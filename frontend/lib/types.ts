@@ -643,6 +643,61 @@ export interface ContentCompletion {
   completed_at: string;
 }
 
+// --- Bruntsfield Academy courses (GRS-0121) ---
+export type LessonAuthor = "human" | "ai";
+
+export interface Lesson {
+  id: string;
+  title: string;
+  body: string;
+  order: number;
+  author: LessonAuthor;
+  video_ref?: string | null;
+  drill_topics: string[];
+  approved: boolean;
+  approved_by_consultant_id?: string | null;
+  approved_at?: string | null;
+}
+
+export interface CourseModule {
+  id: string;
+  title: string;
+  order: number;
+  lessons: Lesson[];
+}
+
+export interface CourseTree {
+  title: string;
+  summary: string;
+  certification_credit: CertificationCredit;
+  modules: CourseModule[];
+}
+
+export interface Course {
+  id: string;
+  slug: string;
+  draft: CourseTree;
+  latest_version: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CourseVersion {
+  course_id: string;
+  slug: string;
+  version: number;
+  tree: CourseTree;
+  published_by_consultant_id: string;
+  published_at: string;
+}
+
+export interface LessonCompletion {
+  id: string;
+  course_id: string;
+  lesson_id: string;
+  completed_at: string;
+}
+
 export interface DrillCard {
   id: string;
   topic: string;

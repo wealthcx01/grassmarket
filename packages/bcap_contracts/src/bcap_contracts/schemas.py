@@ -51,10 +51,13 @@ from bcap_contracts.fees import RecoveryFeeAttribution
 from bcap_contracts.learning import (
     CertificationProgress,
     ContentCompletion,
+    Course,
+    CourseVersion,
     DrillCard,
     DrillResult,
     GeneratedQuiz,
     LearningModule,
+    LessonCompletion,
 )
 from bcap_contracts.meetings import MeetingTranscript
 from bcap_contracts.money import Money
@@ -116,6 +119,9 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "LearningModule": LearningModule,
     "ContentCompletion": ContentCompletion,
     "GeneratedQuiz": GeneratedQuiz,
+    "Course": Course,
+    "CourseVersion": CourseVersion,
+    "LessonCompletion": LessonCompletion,
     "ArenaScenario": ArenaScenario,
     "ArenaSession": ArenaSession,
     "BenchQueue": BenchQueue,

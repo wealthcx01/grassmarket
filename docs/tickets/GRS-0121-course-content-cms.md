@@ -1,8 +1,21 @@
 # GRS-0121 — Course/content model + back-end catalog CMS (foundation)
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 **Depends on:** ADR-0028 (Bruntsfield Academy / Workbench)
+
+## Delivered
+
+A versioned **Course → Module → Lesson** content model in `bcap_contracts/learning.py`
+(`Course`/`CourseTree`/`CourseModule`/`Lesson`/`CourseVersion`/`LessonCompletion` + `LessonAuthor`),
+backed by `CourseORM` (editable draft tree as JSON — replaceable without a deploy), append-only
+`CourseVersionORM` snapshots (**versions retained**), and `LessonCompletionORM` (migration 0026).
+Admin-gated CMS in `workbench/courses.py` + `web/routers/workbench.py`: create / edit-draft /
+approve-lesson / **publish** (refuses 409 while any AI-authored lesson is unapproved, ADR-0009) /
+list-versions / complete-lesson. Completing every approved lesson of a **coursework** course credits
+coursework via the *existing* `_apply_coursework_credit` path (no regression). Admin authoring UI at
+`/workbench/courses` (list + create) and `/workbench/courses/[slug]` (tree editor, AI-lesson approve,
+publish, version history). Reads are org-wide; authoring is admin-only. Golden master untouched.
 
 ## Why
 
