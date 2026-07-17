@@ -112,11 +112,15 @@ export interface AssessmentDocument {
   notes?: string | null;
 }
 
+/** Record provenance (ADR-0029): production (full gate) vs demo/sandbox (self-approvable, watermarked). */
+export type RecordProvenance = "production" | "demo" | "sandbox";
+
 export interface Assessment {
   id: string;
   owner_consultant_id: string;
   subject: string;
   state: AssessmentState;
+  provenance: RecordProvenance;
   document: AssessmentDocument;
   finalised_at?: string | null;
   scoring_run_id?: string | null;

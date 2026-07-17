@@ -41,6 +41,7 @@ export default function BrokeragesPage() {
   const [items, setItems] = useState<BrokeragePortfolioEntry[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [subject, setSubject] = useState("");
+  const [sandbox, setSandbox] = useState(false);
   const [creating, setCreating] = useState(false);
 
   // Prefill the subject when arriving from an engagement's "Start an assessment" CTA (?subject=…).
@@ -72,7 +73,7 @@ export default function BrokeragesPage() {
     setCreating(true);
     setError(null);
     try {
-      const created = await api.createAssessment(subject.trim());
+      const created = await api.createAssessment(subject.trim(), sandbox ? "sandbox" : "production");
       router.push(`/assessments/${created.id}`);
     } catch (err: unknown) {
       setError(err instanceof ApiError ? err.message : "Could not create the assessment.");
@@ -121,6 +122,13 @@ export default function BrokeragesPage() {
         <button type="submit" className="btn btn-primary" disabled={creating || !subject.trim()}>
           {creating ? "Creating…" : "Create & open"}
         </button>
+        <label
+          title="A sandbox assessment can be finalised solo (no co-rater or committee) so you can see the real deliverable drafts. It is watermarked and never client-facing."
+          style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", fontSize: "0.82rem", color: "var(--color-ink-muted)", paddingBottom: "0.55rem" }}
+        >
+          <input type="checkbox" checked={sandbox} onChange={(e) => setSandbox(e.target.checked)} />
+          Sandbox (self-approve, non-production)
+        </label>
       </form>
 
       {error ? (

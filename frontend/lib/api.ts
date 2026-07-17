@@ -259,11 +259,15 @@ export const api = {
     });
   },
 
-  createAssessment(subject: string, signal?: AbortSignal): Promise<Assessment> {
+  createAssessment(
+    subject: string,
+    provenance: "production" | "sandbox" = "production",
+    signal?: AbortSignal,
+  ): Promise<Assessment> {
     return request<Assessment>("/assessments", {
       method: "POST",
       headers: authHeaders(),
-      body: JSON.stringify({ subject }),
+      body: JSON.stringify({ subject, provenance }),
       signal,
     });
   },

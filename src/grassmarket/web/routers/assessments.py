@@ -19,6 +19,7 @@ from bcap_contracts.assessments import (
     CoefficientSet,
     LiveScore,
     ModuleRatingDraft,
+    RecordProvenance,
     SubcomponentRating,
 )
 from bcap_contracts.common import AssessorLevel
@@ -60,6 +61,9 @@ _LIVE_SEED = 20260706
 
 class CreateAssessmentRequest(BaseModel):
     subject: str = ""
+    # ADR-0029: a sandbox record self-approves (solo finalise, watermarked, non-promotable). Default
+    # production — the full dual-rating + committee gate. Demo records are seeded server-side.
+    provenance: RecordProvenance = RecordProvenance.PRODUCTION
 
 
 class NamedScenario(BaseModel):
@@ -110,7 +114,14 @@ def create_assessment(
     principal: Principal = Depends(get_current_principal),
     repo: Repository = Depends(get_repository),
 ) -> Assessment:
-    return repo.create_assessment(principal, subject=payload.subject)
+    # A client may create a production or a sandbox record; demo records are seeded server-side,
+    # never accepted from a client request (ADR-0029).
+    provenance = (
+        RecordProvenance.SANDBOX
+        if payload.provenance is RecordProvenance.SANDBOX
+        else RecordProvenance.PRODUCTION
+    )
+    return repo.create_assessment(principal, subject=payload.subject, provenance=provenance)
 
 
 @router.get("", response_model=list[Assessment])
@@ -259,8 +270,15 @@ def finalise_assessment(
             status_code=status.HTTP_409_CONFLICT,
             detail="Cannot finalise — not yet scoreable: " + " ".join(blockers),
         )
+    # Governance gate (dual-rating + committee + certification). A NON-PRODUCTION (demo/sandbox)
+    # record self-approves: the owning tester may finalise their own record and run the REAL
+    # deliverable generation WITHOUT a second rater or committee (ADR-0029). The record is
+    # permanently watermarked, never ratified, never client-facing — the production gate below is
+    # entirely unchanged for production records, so the AI-approval non-negotiable is intact.
+    gated = assessment.provenance is RecordProvenance.PRODUCTION
+
     # Dual-rating governance (Methodology §9): solo ratings are drafts, never deliverables.
-    governance = consensus_blockers(assessment.document)
+    governance = consensus_blockers(assessment.document) if gated else []
     if governance:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -272,9 +290,13 @@ def finalise_assessment(
     )
     # Rating Committee sign-off on high-stakes ratings (Methodology §8): power Established+, triad
     # above None, module Frontier. Any awaiting sign-off blocks finalisation.
-    committee = committee_blockers(
-        required_committee_items(art.result),
-        repo.list_committee_decisions(principal, assessment_id),
+    committee = (
+        committee_blockers(
+            required_committee_items(art.result),
+            repo.list_committee_decisions(principal, assessment_id),
+        )
+        if gated
+        else []
     )
     if committee:
         raise HTTPException(
@@ -283,7 +305,7 @@ def finalise_assessment(
         )
     # Certification (Methodology §9): a Frontier module or Wide power requires a Certified Lead to
     # lead the assessment. An admin may override with a recorded reason (fail-loud, audited).
-    cert_reasons = requires_certified_lead(art.result)
+    cert_reasons = requires_certified_lead(art.result) if gated else []
     if cert_reasons:
         owner = repo.get_consultant_by_id(assessment.owner_consultant_id)
         certified = owner is not None and owner.assessor_level is AssessorLevel.CERTIFIED_LEAD

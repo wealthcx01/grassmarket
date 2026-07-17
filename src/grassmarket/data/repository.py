@@ -38,6 +38,7 @@ from bcap_contracts.assessments import (
     AssessmentState,
     BrokeragePortfolioEntry,
     ModuleRatingDraft,
+    RecordProvenance,
     ScoringRun,
     SubcomponentRating,
 )
@@ -1451,6 +1452,20 @@ class Repository:
             raise ConflictError("Only a finalised scoring run may enter the benchmark population.")
         if run.v_index is None:
             raise ConflictError("Scoring run has no V index to benchmark.")
+        # Non-production (demo/sandbox) records are segregated — they never enter the benchmark
+        # population (ADR-0029). A sandbox tester's throwaway score is not a peer data point. We
+        # exclude only when the record is CONFIRMED non-production; an unfindable assessment is not
+        # a sandbox record we are protecting against, so it does not block (never a silent scoring
+        # fallback — this is a benchmark-eligibility check).
+        try:
+            provenance = self.get_assessment(principal, run.assessment_id).provenance
+        except NotFoundError:
+            provenance = RecordProvenance.PRODUCTION
+        if provenance is not RecordProvenance.PRODUCTION:
+            raise ConflictError(
+                f"A {provenance.value} record is non-production and cannot enter the benchmark "
+                f"population (ADR-0029)."
+            )
         row = BenchmarkRowORM(
             v_index=run.v_index,
             v_p10=run.v_p10,
@@ -2223,12 +2238,21 @@ class Repository:
         return row
 
     # ------------------------------------------------------------------ assessments (SCOPED)
-    def create_assessment(self, principal: Principal, *, subject: str = "") -> Assessment:
-        """Create an empty draft assessment owned by the principal (owner never caller-supplied)."""
+    def create_assessment(
+        self,
+        principal: Principal,
+        *,
+        subject: str = "",
+        provenance: RecordProvenance = RecordProvenance.PRODUCTION,
+    ) -> Assessment:
+        """Create an empty draft assessment owned by the principal (owner never caller-supplied).
+        `provenance` is set here and is IMMUTABLE thereafter (ADR-0029) — a sandbox/demo record is
+        never promotable to production."""
         row = AssessmentORM(
             owner_consultant_id=principal.consultant_id,
             subject=subject,
             state=AssessmentState.DRAFT.value,
+            provenance=provenance.value,
             document_json=AssessmentDocument(subject=subject).model_dump_json(),
         )
         self._session.add(row)
@@ -2376,6 +2400,7 @@ class Repository:
             subject=row.subject,
             state=AssessmentState(row.state),
             document=AssessmentDocument.model_validate_json(row.document_json),
+            provenance=RecordProvenance(row.provenance),
             finalised_at=row.finalised_at,
             scoring_run_id=row.scoring_run_id,
             engine_version=row.engine_version,
