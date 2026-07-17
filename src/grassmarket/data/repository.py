@@ -2463,7 +2463,7 @@ class Repository:
     def _has_derived_cert_event(
         self, advisor_id: UUID, assessment_id: UUID, kind: CertificationEventKind
     ) -> bool:
-        """Whether this exact derived credit already exists — so re-finalising never double-counts."""
+        """Whether this exact derived credit already exists — so re-finalising never double-adds."""
         return (
             self._session.execute(
                 select(CertificationEventORM.id).where(
@@ -2476,9 +2476,9 @@ class Repository:
         )
 
     def _auto_credit_participation(self, assessment: AssessmentORM, occurred_at: datetime) -> None:
-        """Derive certification evidence from real participation in a finalised assessment (GRS-0131):
-        every non-lead rater earns a *shadow* credit, the lead earns an *observed-lead* credit — each
-        once per assessment (idempotent via `assessment_id`). Only PRODUCTION assessments count; a
+        """Derive certification evidence from real participation in a finalised assessment
+        (GRS-0131): every non-lead rater earns a *shadow* credit, the lead earns an *observed-lead*
+        credit — each once per assessment (idempotent via `assessment_id`). Only PRODUCTION count; a
         sandbox/demo run is training, never real evidence (ADR-0029)."""
         if RecordProvenance(assessment.provenance) is not RecordProvenance.PRODUCTION:
             return

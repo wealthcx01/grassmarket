@@ -75,8 +75,8 @@ def requires_certified_lead(result: AtlasResult) -> list[str]:
     a module whose gate is Frontier, or a power rated Wide. Empty ⟹ no floor applies.
 
     Relationship to the committee trigger (`atlas/committee.py:required_committee_items`, GRS-0131):
-    the two gates are deliberately nested, not in conflict. Committee review fires on the BROADER set
-    — any power Established+ (rank ≥ 2), any triad dimension above None, any module Frontier — while
+    the two gates are deliberately nested, not in conflict. Committee review fires on the BROADER
+    set — any power Established+ (rank ≥ 2), any triad above None, any module Frontier — while
     the Certified-Lead floor is the STRICTER subset: module Frontier (⊆ committee's module branch)
     and power Wide (rank 3 ≥ Established, so ⊆ committee's power branch). Therefore anything that
     needs a Certified Lead also needs committee review, but committee also catches lesser-stakes

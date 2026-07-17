@@ -115,10 +115,10 @@ def test_requires_certified_lead_flags_wide_powers_and_frontier_modules() -> Non
 
 
 def test_certified_lead_floor_is_a_subset_of_the_committee_trigger() -> None:
-    # GRS-0131 reconciliation: the two high-stakes gates are nested, never in conflict. Anything that
-    # needs a Certified Lead (module Frontier / power Wide) also triggers committee review; committee
-    # additionally catches lesser-stakes ratings (Established powers, non-None triads) that the
-    # lead-floor lets pass. Pin: CL-floor non-empty ⟹ committee non-empty, on both CL triggers.
+    # GRS-0131 reconciliation: the two high-stakes gates are nested, never in conflict. Anything
+    # that needs a Certified Lead (module Frontier / power Wide) also triggers committee review;
+    # committee additionally catches lesser-stakes ratings (Established powers, non-None triads)
+    # that the lead-floor lets pass. Pin: CL-floor non-empty ⟹ committee non-empty, on both.
     from grassmarket.atlas.committee import required_committee_items
 
     one_sub = (
