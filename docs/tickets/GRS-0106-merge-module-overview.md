@@ -1,6 +1,6 @@
 # GRS-0106 — Merge Module Overview into the Infrastructure Deep Dive
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** A (build now)
 **Depends on:** —
@@ -31,3 +31,24 @@ simplification (one of the review's non-overlap asks), removing a step from the 
 
 - Changing subcomponent scoring or the Guidance content itself.
 - Widget checklist / C-index surfacing — GRS-0108.
+
+## What shipped (Status: Shipped — branch grs-0106-merge-module-overview)
+
+Merged the standalone **Module Overview** step into the **Infrastructure Deep Dive** so the advisor
+works one coherent infrastructure step (`components/steps.tsx`):
+
+- Dropped `ModuleOverviewStep` and its entry from `WIZARD_STEPS` — one fewer step in the flow.
+- Folded the overview's value into the deep dive: each module heading now shows its **`N/M rated`
+  progress count**, and a lead paragraph explains the **★ critical** marker (it gates the module
+  rating) and that each row's **Guidance** opens the §4 rubric anchor inline — so the per-subcomponent
+  Guidance is preserved and integrated, not stranded on a separate screen.
+- Updated the `/help` step list to drop "Module Overview".
+
+Step navigation/numbering follows the array, so the removed step leaves no dead links; the wizard is
+7 coherent steps (Overview · Business Metrics · Powers · Infrastructure Deep Dive · Customer
+Proposition · Summary · Scenarios).
+
+## Acceptance / verification
+
+`WIZARD_STEPS` has one fewer step and no standalone Module Overview page; the per-subcomponent Guidance
+is preserved inside the deep dive; step navigation is correct. Frontend type-check · lint · vitest green.
