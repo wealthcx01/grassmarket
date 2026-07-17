@@ -1,8 +1,18 @@
 # GRS-0134 — Guide / primer navigation shell
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** GRS-0092–0097 (primer depth); do this LAST, after the content tickets land
+
+## Delivered
+
+A navigation shell for the now-long primer: `frontend/components/GuideNav.tsx` (a client island over
+the server-rendered guide) renders a **table of contents** that jumps to any of the 12 sections and
+**tracks the one in view** (IntersectionObserver scrollspy, current section highlighted). Responsive:
+a **sticky rail** in the left margin on wide viewports (≥1200px), a **burger button + drawer overlay**
+on narrow ones (respects `prefers-reduced-motion` on jump). Each guide `<section>` gained a stable
+anchor `id`; `GUIDE_SECTIONS` keeps the TOC in sync. No change to the primer content
+(GRS-0092–0097). Frontend-only — no backend/contract/schema change.
 
 ## Why
 
