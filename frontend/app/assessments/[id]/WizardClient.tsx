@@ -329,9 +329,29 @@ export function LiveSummary({ live }: { live: LiveScore | null }) {
           </p>
         </div>
       ) : (
-        <div style={{ border: "1px dashed var(--color-border)", borderRadius: "var(--radius)", padding: "0.75rem", fontSize: "0.8rem", color: "var(--color-ink-muted)" }}>
-          Live V appears once the assessment is scoreable. Open the Summary step for details and to
-          finalise.
+        <div className="card" style={{ padding: "0.85rem 1rem", position: "sticky", top: "1rem" }}>
+          <p style={{ margin: 0, fontWeight: 600, fontSize: "0.82rem" }}>Live score</p>
+          {live && live.blocking.length > 0 ? (
+            <>
+              <p style={{ margin: "0.3rem 0 0.4rem", fontSize: "0.78rem", color: "var(--color-ink-muted)" }}>
+                A Platform Value score appears once you&rsquo;ve done these:
+              </p>
+              <ul style={{ margin: 0, paddingLeft: "1.05rem", fontSize: "0.78rem", color: "var(--color-ink-muted)", lineHeight: 1.5 }}>
+                {live.blocking.map((b) => (
+                  <li key={b} style={{ marginBottom: "0.2rem" }}>
+                    {b}
+                  </li>
+                ))}
+              </ul>
+              <p style={{ margin: "0.45rem 0 0", fontSize: "0.72rem", color: "var(--color-ink-faint)" }}>
+                {live.subcomponents_assessed}/{live.subcomponents_total} subcomponents rated so far.
+              </p>
+            </>
+          ) : (
+            <p style={{ margin: "0.3rem 0 0", fontSize: "0.78rem", color: "var(--color-ink-muted)" }}>
+              Start rating the steps — the live score updates as you go.
+            </p>
+          )}
         </div>
       )}
     </div>
