@@ -268,3 +268,29 @@ class EarningsSummary(BaseModel):
         description="Earned-but-unpaid (pending + invoiced) — the near-term projection."
     )
     line_count: int = Field(ge=0)
+
+
+class ProductCommissionCarrot(BaseModel):
+    """The live "how much you earn" figure for a Stream-A product (GRS-0123) — the commission carrot
+    on a product course. Resolved from the Earnings v7 schedule (never re-typed): the Year-1 and
+    Year-2 rates come straight from the product's `ProductRate`, and the worked example is
+    `compute_product_commission` applied to an illustrative deal. Stamped with `schedule_version` so
+    the figure is never bare, exactly like `Money.assumption_register_ref` (ADR-0002)."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    product_id: str = Field(min_length=1)
+    name: str = Field(min_length=1)
+    yr1_bps: int = Field(ge=0)
+    yr2_bps: int = Field(ge=0)
+    window_months: int = Field(gt=0)
+    example_deal: Money = Field(description="The illustrative deal the worked example prices.")
+    yr1_commission: Money = Field(
+        description="Year-1 commission on the example deal (live compute)."
+    )
+    yr2_commission: Money = Field(
+        description="Year-2 commission on the example deal (live compute)."
+    )
+    schedule_version: str = Field(
+        min_length=1, description="The commission-config version stamped."
+    )

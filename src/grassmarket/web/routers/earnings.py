@@ -18,7 +18,9 @@ from bcap_contracts.commissions import (
     DeliveryType,
     EarningsSummary,
     PaymentStatus,
+    ProductCommissionCarrot,
     SourcingAttribution,
+    load_commission_config,
 )
 from bcap_contracts.money import Currency, Money
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -95,6 +97,18 @@ def list_commissions(
     repo: Repository = Depends(get_repository),
 ) -> list[CommissionLine]:
     return repo.list_commission_lines(principal)
+
+
+@router.get("/product-commissions", response_model=list[ProductCommissionCarrot])
+def list_product_commissions(
+    principal: Principal = Depends(get_current_principal),
+) -> list[ProductCommissionCarrot]:
+    """The live commission carrot for every Stream-A product (GRS-0123) — the '£ you earn' figure a
+    product course shows, read straight from the Earnings v7 schedule so it can never drift. Every
+    signed-in advisor may see the schedule; it is not personal data."""
+    from grassmarket.earnings.product_carrot import all_product_carrots
+
+    return all_product_carrots(load_commission_config())
 
 
 @router.get("/summary", response_model=EarningsSummary)

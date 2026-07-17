@@ -391,6 +391,19 @@ export interface Money {
   assumption_register_ref: string;
 }
 
+// The live commission "carrot" for a Stream-A product (GRS-0123), from the Earnings v7 schedule.
+export interface ProductCommissionCarrot {
+  product_id: string;
+  name: string;
+  yr1_bps: number;
+  yr2_bps: number;
+  window_months: number;
+  example_deal: Money;
+  yr1_commission: Money;
+  yr2_commission: Money;
+  schedule_version: string;
+}
+
 export type WorkshopState = "scheduled" | "delivered";
 
 export interface Workshop {

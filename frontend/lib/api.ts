@@ -52,6 +52,7 @@ import type {
   PipelineBoard,
   PipelineForecast,
   PipelineStage,
+  ProductCommissionCarrot,
   Prospect,
   RatingEntry,
   RecoveryFeeAttribution,
@@ -924,6 +925,14 @@ export const api = {
 
   listCommissions(signal?: AbortSignal): Promise<CommissionLine[]> {
     return request<CommissionLine[]>("/earnings/commissions", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  productCommissions(signal?: AbortSignal): Promise<ProductCommissionCarrot[]> {
+    return request<ProductCommissionCarrot[]>("/earnings/product-commissions", {
       method: "GET",
       headers: authHeaders(),
       signal,

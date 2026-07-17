@@ -1,8 +1,22 @@
 # GRS-0123 — Product-course framework + the commission "carrot"
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 **Depends on:** ADR-0028 (Bruntsfield Academy / Workbench), GRS-0121 (content CMS), ADR-0026 (Earnings v7)
+
+## Delivered
+
+A reusable **product-course template** on the GRS-0121 content model
+(`workbench/content/product_course.py`): a `ProductCourseSpec` (product_id, relevance, white-label,
+sell-motion) → a four-section `CourseTree` in fixed order — **Why it's relevant / What white-labelling
+is / The sell motion / How much you earn**. The commission section is **generated from a live
+`ProductCommissionCarrot`**, never a re-typed number. The carrot
+(`earnings/product_carrot.py` → new `ProductCommissionCarrot` contract) resolves the Year-1/Year-2
+rates + a worked £ example straight from the Earnings v7 schedule via `compute_product_commission`
+(ADR-0026), stamped with the schedule version so it can't drift. New live endpoint
+`GET /earnings/product-commissions`; the earnings page shows the live carrot cards. Fails loud on an
+unknown product; template rejects a spec/carrot product mismatch. GRS-0124/0125/0126 instantiate it
+per product with no bespoke structure. Golden master untouched (Money, not Score — ADR-0002).
 
 ## Why
 

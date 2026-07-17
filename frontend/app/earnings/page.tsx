@@ -13,7 +13,13 @@ import Link from "next/link";
 
 import { MoneyAmount } from "@/components/MoneyAmount";
 import { ApiError, api, getToken } from "@/lib/api";
-import type { CommissionKind, CommissionLine, EarningsSummary, PaymentStatus } from "@/lib/types";
+import type {
+  CommissionKind,
+  CommissionLine,
+  EarningsSummary,
+  PaymentStatus,
+  ProductCommissionCarrot,
+} from "@/lib/types";
 
 const KIND_LABELS: Record<CommissionKind, string> = {
   engagement: "Engagement",
@@ -54,14 +60,20 @@ export default function EarningsPage() {
   const router = useRouter();
   const [summary, setSummary] = useState<EarningsSummary | null>(null);
   const [lines, setLines] = useState<CommissionLine[] | null>(null);
+  const [carrots, setCarrots] = useState<ProductCommissionCarrot[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
 
   const reload = useCallback((signal?: AbortSignal) => {
-    return Promise.all([api.earningsSummary(signal), api.listCommissions(signal)])
-      .then(([s, l]) => {
+    return Promise.all([
+      api.earningsSummary(signal),
+      api.listCommissions(signal),
+      api.productCommissions(signal),
+    ])
+      .then(([s, l, c]) => {
         setSummary(s);
         setLines(l);
+        setCarrots(c);
       })
       .catch((err: unknown) => {
         if (err instanceof ApiError && err.status === 0) return;
@@ -177,6 +189,41 @@ export default function EarningsPage() {
             </li>
           ))}
         </ul>
+      ) : null}
+
+      {carrots.length > 0 ? (
+        <section>
+          <h2 style={{ fontSize: "1rem", margin: "0 0 0.6rem" }}>Product commissions</h2>
+          <p style={{ margin: "0 0 0.75rem", color: "var(--color-ink-muted)", fontSize: "0.82rem", maxWidth: "42rem" }}>
+            What you earn for selling each represented product — read live from the Earnings schedule
+            (never a typed-in number). The £ figures price an illustrative first-year deal.
+          </p>
+          <ul
+            style={{
+              listStyle: "none",
+              margin: 0,
+              padding: 0,
+              display: "grid",
+              gap: "0.75rem",
+              gridTemplateColumns: "repeat(auto-fill, minmax(14rem, 1fr))",
+            }}
+          >
+            {carrots.map((c) => (
+              <li
+                key={c.product_id}
+                style={{ padding: "0.9rem 1rem", background: "var(--color-paper-raised)", border: "1px solid var(--color-border)", borderRadius: "var(--radius)" }}
+              >
+                <p style={{ margin: 0, fontWeight: 600, fontSize: "0.92rem" }}>{c.name}</p>
+                <p className="mono" style={{ margin: "0.35rem 0 0", fontSize: "0.78rem", color: "var(--color-accent)" }}>
+                  {c.yr1_bps / 100}% yr1 · {c.yr2_bps / 100}% yr2
+                </p>
+                <p style={{ margin: "0.35rem 0 0", fontSize: "0.8rem", color: "var(--color-ink-muted)" }}>
+                  e.g. <MoneyAmount money={c.yr1_commission} /> then <MoneyAmount money={c.yr2_commission} />
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
       ) : null}
 
       {lines === null ? (
