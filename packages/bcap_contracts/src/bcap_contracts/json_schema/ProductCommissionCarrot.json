@@ -1,0 +1,100 @@
+{
+  "$defs": {
+    "Currency": {
+      "enum": [
+        "GBP",
+        "USD",
+        "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "description": "A currency amount that cannot exist without an explicit currency and a reference to the\nassumption register that justifies it (Methodology §10, ADR-0002 compliance test).\n\nA lever NPV or remediation cost is only meaningful under stated assumptions; a `Money`\nwithout an ``assumption_register_ref`` is not constructible.",
+      "properties": {
+        "amount_minor": {
+          "description": "Amount in integer minor units (e.g. pence).",
+          "title": "Amount Minor",
+          "type": "integer"
+        },
+        "assumption_register_ref": {
+          "description": "Reference to the assumption-register entry that justifies this figure. Mandatory: currency claims are never made without stated assumptions (Methodology §10).",
+          "minLength": 1,
+          "title": "Assumption Register Ref",
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        }
+      },
+      "required": [
+        "amount_minor",
+        "currency",
+        "assumption_register_ref"
+      ],
+      "title": "Money",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The live \"how much you earn\" figure for a Stream-A product (GRS-0123) — the commission carrot\non a product course. Resolved from the Earnings v7 schedule (never re-typed): the Year-1 and\nYear-2 rates come straight from the product's `ProductRate`, and the worked example is\n`compute_product_commission` applied to an illustrative deal. Stamped with `schedule_version` so\nthe figure is never bare, exactly like `Money.assumption_register_ref` (ADR-0002).",
+  "properties": {
+    "example_deal": {
+      "$ref": "#/$defs/Money",
+      "description": "The illustrative deal the worked example prices."
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "product_id": {
+      "minLength": 1,
+      "title": "Product Id",
+      "type": "string"
+    },
+    "schedule_version": {
+      "description": "The commission-config version stamped.",
+      "minLength": 1,
+      "title": "Schedule Version",
+      "type": "string"
+    },
+    "window_months": {
+      "exclusiveMinimum": 0,
+      "title": "Window Months",
+      "type": "integer"
+    },
+    "yr1_bps": {
+      "minimum": 0,
+      "title": "Yr1 Bps",
+      "type": "integer"
+    },
+    "yr1_commission": {
+      "$ref": "#/$defs/Money",
+      "description": "Year-1 commission on the example deal (live compute)."
+    },
+    "yr2_bps": {
+      "minimum": 0,
+      "title": "Yr2 Bps",
+      "type": "integer"
+    },
+    "yr2_commission": {
+      "$ref": "#/$defs/Money",
+      "description": "Year-2 commission on the example deal (live compute)."
+    }
+  },
+  "required": [
+    "product_id",
+    "name",
+    "yr1_bps",
+    "yr2_bps",
+    "window_months",
+    "example_deal",
+    "yr1_commission",
+    "yr2_commission",
+    "schedule_version"
+  ],
+  "title": "ProductCommissionCarrot",
+  "type": "object"
+}

@@ -19,6 +19,7 @@ vi.mock("@/lib/api", async (importActual) => {
       ...actual.api,
       earningsSummary: vi.fn(),
       listCommissions: vi.fn(),
+      productCommissions: vi.fn(),
       downloadEarningsStatement: vi.fn(),
     },
   };
@@ -27,6 +28,7 @@ vi.mock("@/lib/api", async (importActual) => {
 const mocked = api as unknown as {
   earningsSummary: ReturnType<typeof vi.fn>;
   listCommissions: ReturnType<typeof vi.fn>;
+  productCommissions: ReturnType<typeof vi.fn>;
   downloadEarningsStatement: ReturnType<typeof vi.fn>;
 };
 
@@ -70,7 +72,12 @@ function line(over: Partial<CommissionLine> = {}): CommissionLine {
 }
 
 describe("EarningsPage (GRS-0035)", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // The page loads the live product-commission carrots alongside the summary; default to none so
+    // each test opts in only to what it asserts.
+    mocked.productCommissions.mockResolvedValue([]);
+  });
 
   it("renders the summary totals and a commission line", async () => {
     mocked.earningsSummary.mockResolvedValue(summary());
