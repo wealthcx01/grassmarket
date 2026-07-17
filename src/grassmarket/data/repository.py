@@ -2455,8 +2455,73 @@ class Repository:
             resource_id=assessment_id,
             now=finalised_at,
         )
+        # GRS-0131: real participation auto-counts toward the ladder — no honour-system admin POST.
+        self._auto_credit_participation(row, finalised_at)
         self._session.flush()
         return self._to_assessment(row)
+
+    def _has_derived_cert_event(
+        self, advisor_id: UUID, assessment_id: UUID, kind: CertificationEventKind
+    ) -> bool:
+        """Whether this exact derived credit already exists — so re-finalising never double-adds."""
+        return (
+            self._session.execute(
+                select(CertificationEventORM.id).where(
+                    CertificationEventORM.owner_consultant_id == advisor_id,
+                    CertificationEventORM.assessment_id == assessment_id,
+                    CertificationEventORM.kind == kind.value,
+                )
+            ).first()
+            is not None
+        )
+
+    def _auto_credit_participation(self, assessment: AssessmentORM, occurred_at: datetime) -> None:
+        """Derive certification evidence from real participation in a finalised assessment
+        (GRS-0131): every non-lead rater earns a *shadow* credit, the lead earns an *observed-lead*
+        credit — each once per assessment (idempotent via `assessment_id`). Only PRODUCTION count; a
+        sandbox/demo run is training, never real evidence (ADR-0029)."""
+        if RecordProvenance(assessment.provenance) is not RecordProvenance.PRODUCTION:
+            return
+        aid = assessment.id
+        lead_id = assessment.owner_consultant_id
+
+        rater_ids = {
+            r
+            for (r,) in self._session.execute(
+                select(ModuleRatingDraftORM.owner_consultant_id)
+                .where(ModuleRatingDraftORM.assessment_id == aid)
+                .distinct()
+            ).all()
+        }
+        # Shadow credit for every co-rater who was not the lead (leading is observed-lead, below).
+        for rater_id in sorted(rater_ids - {lead_id}, key=str):
+            if self._has_derived_cert_event(rater_id, aid, CertificationEventKind.SHADOW_LOGGED):
+                continue
+            record = self._get_or_create_cert_record(rater_id)
+            record.shadow_count += 1
+            self._append_cert_event(
+                rater_id,
+                CertificationEventKind.SHADOW_LOGGED,
+                lead_id,
+                occurred_at,
+                detail=f"auto: co-rated finalised assessment (count={record.shadow_count})",
+                assessment_id=aid,
+            )
+
+        # Observed-lead credit for the lead — they led a finalised assessment, once.
+        if not self._has_derived_cert_event(
+            lead_id, aid, CertificationEventKind.OBSERVED_LEAD_LOGGED
+        ):
+            record = self._get_or_create_cert_record(lead_id)
+            record.observed_lead_logged = True
+            self._append_cert_event(
+                lead_id,
+                CertificationEventKind.OBSERVED_LEAD_LOGGED,
+                lead_id,
+                occurred_at,
+                detail="auto: led a finalised assessment",
+                assessment_id=aid,
+            )
 
     def _require_assessment(self, principal: Principal, assessment_id: UUID) -> AssessmentORM:
         row = self._session.get(AssessmentORM, assessment_id)
@@ -3138,6 +3203,7 @@ class Repository:
         to_level: AssessorLevel | None = None,
         reason: str | None = None,
         cert_subject: str | None = None,
+        assessment_id: UUID | None = None,
     ) -> None:
         self._session.add(
             CertificationEventORM(
@@ -3148,6 +3214,7 @@ class Repository:
                 to_level=to_level.value if to_level else None,
                 reason=reason,
                 cert_subject=cert_subject,
+                assessment_id=assessment_id,
                 recorded_by_consultant_id=recorded_by,
                 occurred_at=occurred_at,
             )
@@ -3352,6 +3419,7 @@ class Repository:
             to_level=AssessorLevel(row.to_level) if row.to_level else None,
             reason=row.reason,
             cert_subject=row.cert_subject,
+            assessment_id=row.assessment_id,
             recorded_by_consultant_id=row.recorded_by_consultant_id,
             occurred_at=row.occurred_at,
             created_at=row.created_at,

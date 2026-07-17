@@ -72,7 +72,15 @@ def promotion_blockers(record: CertificationRecord, target: AssessorLevel) -> li
 
 def requires_certified_lead(result: AtlasResult) -> list[str]:
     """The ratings in a scored assessment that require a Certified Lead to lead it (Methodology §9):
-    a module whose gate is Frontier, or a power rated Wide. Empty ⟹ no floor applies."""
+    a module whose gate is Frontier, or a power rated Wide. Empty ⟹ no floor applies.
+
+    Relationship to the committee trigger (`atlas/committee.py:required_committee_items`, GRS-0131):
+    the two gates are deliberately nested, not in conflict. Committee review fires on the BROADER
+    set — any power Established+ (rank ≥ 2), any triad above None, any module Frontier — while
+    the Certified-Lead floor is the STRICTER subset: module Frontier (⊆ committee's module branch)
+    and power Wide (rank 3 ≥ Established, so ⊆ committee's power branch). Therefore anything that
+    needs a Certified Lead also needs committee review, but committee also catches lesser-stakes
+    ratings the lead-floor lets pass. `test_certification` pins this subset invariant."""
     reasons: list[str] = []
     reasons.extend(
         f"module {m.key} is rated Frontier" for m in result.modules if m.gate_band == "Frontier"

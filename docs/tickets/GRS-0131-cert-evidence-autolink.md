@@ -1,8 +1,23 @@
 # GRS-0131 — Auto-link certification evidence to real assessment participation (the actual gap)
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 **Depends on:** ADR-0028 (Bruntsfield Academy / Workbench)
+
+## Delivered
+
+Real participation in a **finalised** assessment now auto-counts toward the ladder — no honour-system
+admin POST for the derived counts. At `finalise_assessment`, `_auto_credit_participation` gives every
+non-lead co-rater (from the assessment's `ModuleRatingDraft` rows) a **shadow** credit and the lead
+an **observed-lead** credit, each **once per assessment** (idempotent via a new nullable
+`CertificationEvent.assessment_id` + `certification_events.assessment_id`, migration 0028), and only
+for **PRODUCTION** assessments (a sandbox/demo run is training, ADR-0029). The manual
+`/certification/{id}/shadow|observed-lead|signoff` endpoints remain for genuine off-path overrides.
+
+**Threshold reconciliation:** documented in `requires_certified_lead` — the Certified-Lead floor
+(module Frontier / power Wide) is a strict **subset** of the committee trigger (power Established+ /
+triad>None / module Frontier), since Wide ≥ Established; anything needing a Certified Lead also needs
+committee, but committee catches more. Pinned by `test_certification`. Golden master untouched.
 
 ## Why
 

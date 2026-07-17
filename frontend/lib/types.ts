@@ -643,6 +643,7 @@ export interface CertificationEvent {
   to_level?: AssessorLevelValue | null;
   reason?: string | null;
   cert_subject?: string | null;
+  assessment_id?: string | null;
   occurred_at: string;
 }
 

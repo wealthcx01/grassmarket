@@ -114,6 +114,55 @@ def test_requires_certified_lead_flags_wide_powers_and_frontier_modules() -> Non
     assert requires_certified_lead(_result_of(ordinary)) == []
 
 
+def test_certified_lead_floor_is_a_subset_of_the_committee_trigger() -> None:
+    # GRS-0131 reconciliation: the two high-stakes gates are nested, never in conflict. Anything
+    # that needs a Certified Lead (module Frontier / power Wide) also triggers committee review;
+    # committee additionally catches lesser-stakes ratings (Established powers, non-None triads)
+    # that the lead-floor lets pass. Pin: CL-floor non-empty ⟹ committee non-empty, on both.
+    from grassmarket.atlas.committee import required_committee_items
+
+    one_sub = (
+        SubcomponentRating(
+            module_key="APP_SERVER",
+            subcomponent_key="APP_SERVER_SECURITY_COMPLIANCE",
+            level=MaturityLevel.ADVANCED,
+            evidence_grade=_E3,
+        ),
+    )
+    wide_result = _result_of(
+        AssessmentDocument(
+            subject="wide",
+            subcomponents=one_sub,
+            metrics=_METRICS,
+            powers=_powers(StrengthRating.WIDE),
+        )
+    )
+    # A Wide power hits the CL floor AND committee (Wide ≥ Established).
+    assert requires_certified_lead(wide_result)
+    assert required_committee_items(wide_result)
+
+    module = _REGISTRY.require_module("APP_SERVER")
+    frontier_result = _result_of(
+        AssessmentDocument(
+            subject="frontier",
+            subcomponents=tuple(
+                SubcomponentRating(
+                    module_key="APP_SERVER",
+                    subcomponent_key=s.key,
+                    level=MaturityLevel.FRONTIER,
+                    evidence_grade=_E3,
+                )
+                for s in module.subcomponents
+            ),
+            metrics=_METRICS,
+            powers=_powers(StrengthRating.EMERGING),
+        )
+    )
+    # A Frontier module hits the CL floor AND committee (both have a Frontier-module branch).
+    assert any("Frontier" in r for r in requires_certified_lead(frontier_result))
+    assert required_committee_items(frontier_result)
+
+
 def _cert(client, admin, advisor_id: str) -> dict:
     return client.get(f"/certification/{advisor_id}", headers=auth_header(admin)).json()
 
