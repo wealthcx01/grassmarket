@@ -1,6 +1,6 @@
 # GRS-0099 — Portfolio home: detail + completeness
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** A (build now)
 **Depends on:** —
@@ -37,3 +37,20 @@ space.
 
 - The completeness *computation* itself (engine coverage already exists) — surfacing only.
 - Renaming / broadening the page — GRS-0098.
+
+## What shipped (Status: Shipped — branch grs-0099-portfolio-completeness)
+
+Added the missing "how complete is this assessment" signal to the portfolio home, and enriched the
+row detail (`app/assessments/page.tsx`):
+
+- A per-row **Completeness** column — a compact progress bar + `%` from `BrokeragePortfolioEntry.coverage`
+  (surfaced in GRS-0116; assessed / applicable subcomponents, computed in the engine — the UI recomputes
+  nothing). An advisor can now tell barely-started from ready-to-finalise at a glance.
+- The row already carries subject, segment, last score (V + uncertainty when finalised), status, and
+  last-updated; the Completeness column slots between Segment and Last score. Neutralised the last
+  "brokerage" copy ("Subject" header, "No assessments yet").
+
+## Acceptance / verification
+
+Each portfolio row shows a completeness/coverage % (with a bar), sourced from the engine's coverage
+output (no UI re-derivation), alongside the richer detail. Frontend type-check · lint · vitest green.
