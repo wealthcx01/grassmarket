@@ -337,6 +337,16 @@
       "title": "PowerEntry",
       "type": "object"
     },
+    "RecordProvenance": {
+      "description": "Where a record sits relative to production (ADR-0029). Set at creation, IMMUTABLE, and\ncarried on the assessment so non-production records are segregated at the data layer.\n\nA non-production (`demo`/`sandbox`) record may finalise and run the REAL deliverable generation\nWITHOUT the dual-rating + committee gate — so a solo tester/salesperson can walk the flow — but\nis permanently watermarked, never counted as ratified, never enters the benchmark/prediction\npopulations, and can never be promoted to production. The AI-approval non-negotiable (#8)\nis intact: these outputs are non-client-facing by construction, not a bypass of approval for\nreal work.",
+      "enum": [
+        "production",
+        "demo",
+        "sandbox"
+      ],
+      "title": "RecordProvenance",
+      "type": "string"
+    },
     "StrengthRating": {
       "description": "Power strength and triad rating — ordinal with falsifiable duration semantics (§8).\n\nReported as a rating, NEVER as a decimal. Establishing this as an enum (not a float) is the\nADR-0002 guarantee that no decimal leaks into a triad figure.",
       "enum": [
@@ -612,6 +622,10 @@
       "format": "uuid",
       "title": "Owner Consultant Id",
       "type": "string"
+    },
+    "provenance": {
+      "$ref": "#/$defs/RecordProvenance",
+      "default": "production"
     },
     "scoring_run_id": {
       "anyOf": [

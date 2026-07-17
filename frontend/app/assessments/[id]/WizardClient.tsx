@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 
 import { BandDisplay } from "@/components/BandDisplay";
 import { ConsumingEngagements } from "@/components/ConsumingEngagements";
+import { ProvenanceBadge } from "@/components/ProvenanceBadge";
 import { WIZARD_STEPS, type StepProps } from "@/components/steps";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ApiError, api, clearToken, getToken } from "@/lib/api";
@@ -241,7 +242,10 @@ export function WizardClient({ id }: { id: string }) {
             trail={[{ label: "Your Brokerages", href: "/assessments" }]}
             current={assessment.subject || "Untitled assessment"}
           />
-          <h1 style={{ fontSize: "1.5rem", margin: "0.35rem 0 0" }}>{assessment.subject || "Untitled assessment"}</h1>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap", margin: "0.35rem 0 0" }}>
+            <h1 style={{ fontSize: "1.5rem", margin: 0 }}>{assessment.subject || "Untitled assessment"}</h1>
+            <ProvenanceBadge provenance={assessment.provenance} />
+          </div>
           <ConsumingEngagements assessmentId={id} />
         </div>
         <SaveBadge state={save} readOnly={!!readOnly} />

@@ -900,6 +900,8 @@ class AssessmentORM(Base):
     )
     subject: Mapped[str] = mapped_column(String(200), default="", nullable=False)
     state: Mapped[str] = mapped_column(String(16), default="draft", nullable=False)
+    # Record provenance (ADR-0029): production (default) vs demo/sandbox. Immutable after creation.
+    provenance: Mapped[str] = mapped_column(String(16), default="production", nullable=False)
     document_json: Mapped[str] = mapped_column(Text, nullable=False)
 
     finalised_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

@@ -1,6 +1,6 @@
 # GRS-0119 — Beta/sandbox self-approve mode
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** ADR-0029 (demo/illustrative records)
 
@@ -44,3 +44,37 @@ GRS-0117.
 - The watermarked Revolut demo dataset — GRS-0117 (ships first).
 - Any relaxation of the real governance gate for production/client records.
 - Admin/oversight views of sandbox usage (deferred to Holy Corner per §6).
+
+## What shipped (Status: Shipped — branch grs-0119-sandbox-self-approve)
+
+The ADR-0029 **record provenance** flag + the sandbox self-approve path, so a solo tester can finalise
+their OWN assessment and see the real deliverable drafts **without weakening the production gate**.
+
+**Contract / storage**
+- `RecordProvenance` enum (`production` default · `demo` · `sandbox`) + `Assessment.provenance`, set at
+  creation and IMMUTABLE. `AssessmentORM.provenance` column + migration `0024_assessment_provenance`
+  (existing rows backfill to production).
+
+**Governance (the load-bearing part)**
+- `finalise` router: a NON-production record self-approves — the dual-rating (`consensus_blockers`),
+  committee (`committee_blockers`), and certified-lead gates are **skipped only when
+  `provenance != production`**. Scoreability + the real scoring/deliverable generation are unchanged, so
+  the outputs are genuine AI drafts. **The production path is byte-for-byte unchanged** — the AI-approval
+  non-negotiable (CLAUDE.md #8) is intact; sandbox is a labelled non-production mode, not a bypass for
+  real work.
+- Segregation: `ingest_benchmark` refuses a confirmed non-production run — a sandbox score never enters
+  the peer population. Non-promotable by construction (no API sets provenance after creation; the create
+  route only ever grants `sandbox` or `production`, never `demo`).
+
+**Frontend**
+- `RecordProvenance` type + `Assessment.provenance`; `createAssessment(subject, provenance)`.
+- A **"Sandbox (self-approve, non-production)"** checkbox on the create form.
+- `ProvenanceBadge` watermark ("SANDBOX — non-production, not client-facing") shown in the assessment
+  header for any non-production record.
+
+## Acceptance / verification
+
+`tests/test_sandbox_provenance.py` (5): sandbox finalises solo (no co-rater/committee); production still
+requires the full gate on the same document; a client cannot mint a demo record; provenance is immutable
+across updates; a sandbox run is excluded from the benchmark. Golden master untouched (provenance/gating,
+not scoring). Backend + frontend gates green; schema parity green.

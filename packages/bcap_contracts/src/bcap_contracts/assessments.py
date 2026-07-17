@@ -566,6 +566,22 @@ class AssessmentState(StrEnum):
     FINALISED = "finalised"  # inputs locked; an immutable scoring run exists
 
 
+class RecordProvenance(StrEnum):
+    """Where a record sits relative to production (ADR-0029). Set at creation, IMMUTABLE, and
+    carried on the assessment so non-production records are segregated at the data layer.
+
+    A non-production (`demo`/`sandbox`) record may finalise and run the REAL deliverable generation
+    WITHOUT the dual-rating + committee gate — so a solo tester/salesperson can walk the flow — but
+    is permanently watermarked, never counted as ratified, never enters the benchmark/prediction
+    populations, and can never be promoted to production. The AI-approval non-negotiable (#8)
+    is intact: these outputs are non-client-facing by construction, not a bypass of approval for
+    real work."""
+
+    PRODUCTION = "production"  # the default; the full dual-rating + committee gate applies
+    DEMO = "demo"  # a seeded, watermarked worked example (GRS-0117)
+    SANDBOX = "sandbox"  # a solo tester's own throwaway record, self-approvable (GRS-0119)
+
+
 class Assessment(OwnedResource):
     """A scoped, lifecycle-managed assessment wrapping the intermediate document. When finalised it
     is version-stamped and linked to its immutable scoring run (GRS-0006)."""
@@ -573,6 +589,9 @@ class Assessment(OwnedResource):
     subject: str = ""
     state: AssessmentState = AssessmentState.DRAFT
     document: AssessmentDocument
+    # Record provenance (ADR-0029): production (default, full gate) vs demo/sandbox
+    # (self-approvable, watermarked, non-promotable). Set at creation, immutable thereafter.
+    provenance: RecordProvenance = RecordProvenance.PRODUCTION
     finalised_at: datetime | None = None
     scoring_run_id: UUID | None = None
     # Version stamps recorded at finalisation (null while editable).
