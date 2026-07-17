@@ -294,3 +294,29 @@ class ProductCommissionCarrot(BaseModel):
     schedule_version: str = Field(
         min_length=1, description="The commission-config version stamped."
     )
+
+
+class EarningsTimelinePoint(BaseModel):
+    """One period on the earnings-over-time series (GRS-0133) — what was earned in the period and
+    the running cumulative through it. All figures are summed server-side in the Money domain
+    (ADR-0002); the client only plots them."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    period: str = Field(min_length=1, description="Calendar month, 'YYYY-MM'.")
+    earned: Money = Field(description="Commission earned in this period.")
+    cumulative: Money = Field(description="Cumulative commission earned through this period.")
+
+
+class EarningsTimeline(BaseModel):
+    """The caller's earnings over time + the two-stream split (GRS-0133) — the incentive/visual
+    layer over the Earnings v7 computed lines. Aggregates existing computed figures; changes no
+    rate, rounding, or lifecycle. Self-scoped."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    owner_consultant_id: UUID
+    currency: Currency
+    points: tuple[EarningsTimelinePoint, ...] = ()
+    stream_product: Money = Field(description="Total Stream-A (product) commission earned.")
+    stream_consultancy: Money = Field(description="Total Stream-B (consultancy) commission earned.")

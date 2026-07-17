@@ -48,6 +48,7 @@ from bcap_contracts.certification import (
 from bcap_contracts.commissions import (
     CommissionLine,
     EarningsSummary,
+    EarningsTimeline,
     ProductCommissionCarrot,
 )
 from bcap_contracts.committee import CommitteeDecision, CommitteeItem, CommitteeQueueEntry
@@ -107,6 +108,7 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "AINarrative": AINarrative,
     "CommissionLine": CommissionLine,
     "EarningsSummary": EarningsSummary,
+    "EarningsTimeline": EarningsTimeline,
     "ProductCommissionCarrot": ProductCommissionCarrot,
     "MeetingTranscript": MeetingTranscript,
     "Extraction": Extraction,

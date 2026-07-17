@@ -65,6 +65,8 @@ from bcap_contracts.commissions import (
     CommissionStream,
     DeliveryType,
     EarningsSummary,
+    EarningsTimeline,
+    EarningsTimelinePoint,
     PaymentStatus,
     SourcingAttribution,
     load_commission_config,
@@ -1104,6 +1106,52 @@ class Repository:
             paid=money(totals[PaymentStatus.PAID], "earnings-summary:paid"),
             projected_unpaid=money(pending + invoiced, "earnings-summary:projected-unpaid"),
             line_count=len(lines),
+        )
+
+    def earnings_timeline(self, principal: Principal, *, now: datetime) -> EarningsTimeline:
+        """The caller's earnings over time + the two v7 stream totals (GRS-0133). Aggregates the
+        already-computed commission lines in the Money domain — no rate, rounding, or lifecycle
+        change. Self only, single currency (a cross-currency line refuses to sum)."""
+        lines = self.list_commission_lines(principal)
+        currency = load_commission_config().currency
+        by_period: dict[str, int] = {}
+        stream_totals = {CommissionStream.PRODUCT: 0, CommissionStream.CONSULTANCY: 0}
+        for line in lines:
+            if line.amount.currency is not currency:
+                raise ConflictError(
+                    f"Commission line {line.id} is in {line.amount.currency.value}, not the "
+                    f"{currency.value} earnings currency — refusing to sum across currencies."
+                )
+            earned = line.earned_on if line.earned_on else line.created_at.date()
+            period = f"{earned.year:04d}-{earned.month:02d}"
+            by_period[period] = by_period.get(period, 0) + line.amount.amount_minor
+            if line.stream is not None:
+                stream_totals[line.stream] += line.amount.amount_minor
+
+        def money(minor: int, ref: str) -> Money:
+            return Money(amount_minor=minor, currency=currency, assumption_register_ref=ref)
+
+        points: list[EarningsTimelinePoint] = []
+        cumulative = 0
+        for period in sorted(by_period):
+            cumulative += by_period[period]
+            points.append(
+                EarningsTimelinePoint(
+                    period=period,
+                    earned=money(by_period[period], f"earnings-timeline:{period}:earned"),
+                    cumulative=money(cumulative, f"earnings-timeline:{period}:cumulative"),
+                )
+            )
+        return EarningsTimeline(
+            owner_consultant_id=principal.consultant_id,
+            currency=currency,
+            points=tuple(points),
+            stream_product=money(
+                stream_totals[CommissionStream.PRODUCT], "earnings-timeline:stream-product"
+            ),
+            stream_consultancy=money(
+                stream_totals[CommissionStream.CONSULTANCY], "earnings-timeline:stream-consultancy"
+            ),
         )
 
     @staticmethod

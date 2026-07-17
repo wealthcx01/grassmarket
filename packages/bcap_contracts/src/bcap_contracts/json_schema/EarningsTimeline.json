@@ -1,0 +1,103 @@
+{
+  "$defs": {
+    "Currency": {
+      "enum": [
+        "GBP",
+        "USD",
+        "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+    },
+    "EarningsTimelinePoint": {
+      "additionalProperties": false,
+      "description": "One period on the earnings-over-time series (GRS-0133) — what was earned in the period and\nthe running cumulative through it. All figures are summed server-side in the Money domain\n(ADR-0002); the client only plots them.",
+      "properties": {
+        "cumulative": {
+          "$ref": "#/$defs/Money",
+          "description": "Cumulative commission earned through this period."
+        },
+        "earned": {
+          "$ref": "#/$defs/Money",
+          "description": "Commission earned in this period."
+        },
+        "period": {
+          "description": "Calendar month, 'YYYY-MM'.",
+          "minLength": 1,
+          "title": "Period",
+          "type": "string"
+        }
+      },
+      "required": [
+        "period",
+        "earned",
+        "cumulative"
+      ],
+      "title": "EarningsTimelinePoint",
+      "type": "object"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "description": "A currency amount that cannot exist without an explicit currency and a reference to the\nassumption register that justifies it (Methodology §10, ADR-0002 compliance test).\n\nA lever NPV or remediation cost is only meaningful under stated assumptions; a `Money`\nwithout an ``assumption_register_ref`` is not constructible.",
+      "properties": {
+        "amount_minor": {
+          "description": "Amount in integer minor units (e.g. pence).",
+          "title": "Amount Minor",
+          "type": "integer"
+        },
+        "assumption_register_ref": {
+          "description": "Reference to the assumption-register entry that justifies this figure. Mandatory: currency claims are never made without stated assumptions (Methodology §10).",
+          "minLength": 1,
+          "title": "Assumption Register Ref",
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        }
+      },
+      "required": [
+        "amount_minor",
+        "currency",
+        "assumption_register_ref"
+      ],
+      "title": "Money",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The caller's earnings over time + the two-stream split (GRS-0133) — the incentive/visual\nlayer over the Earnings v7 computed lines. Aggregates existing computed figures; changes no\nrate, rounding, or lifecycle. Self-scoped.",
+  "properties": {
+    "currency": {
+      "$ref": "#/$defs/Currency"
+    },
+    "owner_consultant_id": {
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "points": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/EarningsTimelinePoint"
+      },
+      "title": "Points",
+      "type": "array"
+    },
+    "stream_consultancy": {
+      "$ref": "#/$defs/Money",
+      "description": "Total Stream-B (consultancy) commission earned."
+    },
+    "stream_product": {
+      "$ref": "#/$defs/Money",
+      "description": "Total Stream-A (product) commission earned."
+    }
+  },
+  "required": [
+    "owner_consultant_id",
+    "currency",
+    "stream_product",
+    "stream_consultancy"
+  ],
+  "title": "EarningsTimeline",
+  "type": "object"
+}
