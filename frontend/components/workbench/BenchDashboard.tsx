@@ -12,7 +12,10 @@ import { ApiError, api } from "@/lib/api";
 import type { BenchQueue, PerformanceSummary } from "@/lib/types";
 
 const KIND_LABEL: Record<string, string> = {
+  rating_request: "Rating request",
+  committee: "Committee review",
   certification: "Certification",
+  academy: "Academy",
   drill: "Power drill",
   arena: "Practice arena",
   research: "Opportunity Radar",

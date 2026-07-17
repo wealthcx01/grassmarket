@@ -290,3 +290,50 @@ def test_conversion_rate_is_zero_with_no_prospects() -> None:
     assert summary.pipeline_conversion_rate == 0.0
     assert summary.arena_best_completeness is None
     assert summary.arena_trend == ()
+
+
+# --- GRS-0128: governance + Academy folded into the one hub -------------------------------
+def test_hub_folds_rating_committee_and_academy_in_priority_order() -> None:
+    aid = uuid4()
+    queue = assemble_queue(
+        cert_record=_record(AssessorLevel.TRAINED),
+        next_coursework=_coursework_module(),
+        due_drills=[_drill("t", due=_NOW)],
+        arena_scenario=_scenario(),
+        research_prospect=_prospect(PipelineStage.PROSPECT),
+        pending_rating_count=2,
+        pending_rating_subject="Meridian Securities",
+        pending_rating_ref=aid,
+        committee_review_count=1,
+        committee_ref=uuid4(),
+        academy_course_title="Sales Egoist",
+    )
+    # Governance first (others are blocked on it), then certification, then Academy, then the rest.
+    assert [i.kind for i in queue] == [
+        BenchItemKind.RATING_REQUEST,
+        BenchItemKind.COMMITTEE,
+        BenchItemKind.CERTIFICATION,
+        BenchItemKind.ACADEMY,
+        BenchItemKind.DRILL,
+        BenchItemKind.ARENA,
+        BenchItemKind.RESEARCH,
+    ]
+    assert [i.priority for i in queue] == list(range(1, 8))
+    assert queue[0].ref_id == aid
+    assert "Meridian Securities" in queue[0].detail
+    assert queue[3].title == "Continue the Academy: Sales Egoist"
+
+
+def test_hub_items_absent_when_nothing_pending() -> None:
+    # The defaults add nothing — a plain advisor's queue is unchanged from before GRS-0128.
+    queue = assemble_queue(
+        cert_record=_record(AssessorLevel.CERTIFIED_LEAD, coursework=True, exam=0.9),
+        next_coursework=None,
+        due_drills=[],
+        arena_scenario=None,
+        research_prospect=None,
+    )
+    kinds = {i.kind for i in queue}
+    assert BenchItemKind.RATING_REQUEST not in kinds
+    assert BenchItemKind.COMMITTEE not in kinds
+    assert BenchItemKind.ACADEMY not in kinds

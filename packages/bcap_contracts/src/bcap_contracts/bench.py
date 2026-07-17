@@ -22,9 +22,14 @@ from bcap_contracts.common import AssessorLevel, Score
 
 
 class BenchItemKind(StrEnum):
-    """What a queue item points the advisor at — the four bench sources in priority order."""
+    """What a queue item points the advisor at — the bench sources, in priority order. GRS-0128
+    folds the governance + Academy surfaces into the same hub (rating requests + committee reviews
+    sit above certification because others are waiting on them; Academy sits with the ladder)."""
 
+    RATING_REQUEST = "rating_request"
+    COMMITTEE = "committee"
     CERTIFICATION = "certification"
+    ACADEMY = "academy"
     DRILL = "drill"
     ARENA = "arena"
     RESEARCH = "research"

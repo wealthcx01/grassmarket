@@ -92,3 +92,21 @@ def test_admin_bench_views_are_self_scoped_not_org_wide(
 def test_bench_endpoints_require_authentication(client, alice: SeededConsultant) -> None:
     assert client.get("/bench/queue").status_code == 401
     assert client.get(f"/bench/performance/{alice.stored.id}").status_code == 401
+
+
+def test_the_hub_surfaces_an_incomplete_academy_course(
+    client, repo, admin: SeededConsultant, alice: SeededConsultant
+) -> None:
+    # GRS-0128: once a course is published, an advisor who hasn't finished it sees an ACADEMY item.
+    from datetime import UTC, datetime
+
+    from grassmarket.workbench.content.seed import seed_academy_content
+
+    seed_academy_content(repo, admin.principal, now=datetime(2026, 7, 17, tzinfo=UTC))
+    repo._session.commit()  # make the published course visible to the app's request session
+
+    body = client.get("/bench/queue", headers=auth_header(alice)).json()
+    academy = [i for i in body["items"] if i["kind"] == "academy"]
+    assert len(academy) == 1
+    assert academy[0]["title"] == "Continue the Academy: Sales Egoist"
+    assert academy[0]["action_hint"] == "learn"

@@ -576,7 +576,14 @@ export interface Engagement {
 
 export type AssessorLevelValue = "trained" | "shadow" | "observed_lead" | "certified_lead";
 
-export type BenchItemKind = "certification" | "drill" | "arena" | "research";
+export type BenchItemKind =
+  | "rating_request"
+  | "committee"
+  | "certification"
+  | "academy"
+  | "drill"
+  | "arena"
+  | "research";
 
 export interface BenchQueueItem {
   kind: BenchItemKind;
