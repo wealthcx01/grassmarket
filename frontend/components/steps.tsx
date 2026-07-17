@@ -822,6 +822,47 @@ export function CustomerPropositionStep({ registry, document: d, update, readOnl
 
 // --- 6. Summary & Interpretation --------------------------------------------------------
 
+/** The interpretation (GRS-0110): read the RANGE not the point, name the bottleneck, remind that
+ *  words rate / numbers rank, and point at the value bridge — computed from the live diagnostics the
+ *  engine already produces, never recomputed. */
+function Interpretation({ live, moduleLabels }: { live: LiveScore; moduleLabels: Record<string, string> }) {
+  if (!live.scoreable || !live.v) return null;
+  const pct = (x: number) => Math.round(x * 100);
+  const modules = Object.entries(live.module_qm);
+  const bottleneck = modules.length
+    ? modules.reduce((min, cur) => (cur[1].p50 < min[1].p50 ? cur : min))
+    : null;
+  return (
+    <Card>
+      <h3 style={{ margin: "0 0 0.6rem", fontSize: "1rem" }}>What this means</h3>
+      <ul style={{ margin: 0, paddingLeft: "1.15rem", fontSize: "0.86rem", lineHeight: 1.6, color: "var(--color-ink-muted)" }}>
+        <li>
+          <strong>Read the range, not the point.</strong> Platform Value sits at{" "}
+          <strong style={{ color: "var(--color-ink)" }}>{pct(live.v.p50)}</strong>, but the honest
+          answer is the <strong style={{ color: "var(--color-ink)" }}>{pct(live.v.p10)}–{pct(live.v.p90)}</strong>{" "}
+          range (overall uncertainty {live.overall_uncertainty}). Quote the range; the point alone loses a technical audience.
+        </li>
+        {bottleneck ? (
+          <li>
+            <strong>The bottleneck.</strong>{" "}
+            <strong style={{ color: "var(--color-ink)" }}>{moduleLabels[bottleneck[0]] ?? bottleneck[0]}</strong>{" "}
+            is the current weakest link at <strong style={{ color: "var(--color-ink)" }}>{pct(bottleneck[1].p50)}</strong> —
+            it caps the whole. The fastest lift comes from fixing the weakest critical part, not the already-strong ones.
+          </li>
+        ) : null}
+        <li>
+          <strong>Words rate; numbers rank.</strong> The module bands (Basic → Frontier) are what you
+          defend in the boardroom; the continuous scores decide <em>what to fix first</em>. Use the word to communicate, the number to prioritise.
+        </li>
+        <li>
+          <strong>The value bridge.</strong> The finalised deliverable prices the gaps in three layers
+          kept apart — cost (£) to upgrade, the cash-flow levers it moves (NPV), and strategic value (words). It never divides a score gap into pounds.
+        </li>
+      </ul>
+    </Card>
+  );
+}
+
 export function SummaryStep(props: StepProps) {
   const { live, readOnly, onFinalise, finalising } = props;
   const moduleLabels = Object.fromEntries(props.registry.modules.map((m) => [m.key, m.name]));
@@ -834,6 +875,7 @@ export function SummaryStep(props: StepProps) {
         onRefresh={props.refreshLive}
         moduleLabels={moduleLabels}
       />
+      {live ? <Interpretation live={live} moduleLabels={moduleLabels} /> : null}
       {live?.c != null ? (
         <Card>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "1rem" }}>
@@ -976,6 +1018,17 @@ export function ScenariosStep({ registry, document: d, assessmentId }: StepProps
           <p style={{ margin: "0 0 0.6rem", fontSize: "0.75rem", color: "var(--color-ink-muted)" }}>
             Ranked by ΔV (score points ×100). Longest bar = the highest-leverage single upgrade.
           </p>
+          {result.baseline_v != null && result.priority_index.length > 0 ? (
+            <p style={{ margin: "0 0 0.7rem", fontSize: "0.82rem" }}>
+              Baseline V <strong className="mono">{(result.baseline_v * 100).toFixed(1)}</strong> → the
+              top upgrade ({result.priority_index[0]!.name}) lifts it to{" "}
+              <strong className="mono">
+                {((result.baseline_v + result.priority_index[0]!.delta_v) * 100).toFixed(1)}
+              </strong>
+              . ΔV is score-domain only — it says <em>what to fix first</em>, not what it&rsquo;s worth
+              (the deliverable&rsquo;s value bridge prices that).
+            </p>
+          ) : null}
           {(() => {
             const maxDelta = Math.max(...result.priority_index.map((u) => Math.abs(u.delta_v)), 1e-9);
             return (
