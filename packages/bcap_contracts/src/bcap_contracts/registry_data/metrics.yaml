@@ -18,6 +18,9 @@ status: draft-pending-ratification
 metrics:
   - key: AUA
     name: Assets Under Administration
+    description: >-
+      Total client assets the platform administers — its headline scale. Central for a wealth
+      manager or custodian; for an execution-only broker, trade volume matters more.
     unit: GBP
     direction: higher_is_better
     group: scale
@@ -33,6 +36,10 @@ metrics:
 
   - key: ACTIVE_CLIENTS
     name: Active Clients
+    description: >-
+      Clients who actually transact, not just registrations — the real demand base. A retail
+      broker lives on active-trader count; an advice-led wealth manager values fewer, larger
+      relationships.
     unit: count
     direction: higher_is_better
     group: scale
@@ -48,6 +55,9 @@ metrics:
 
   - key: NET_REVENUE
     name: Net Revenue (TTM)
+    description: >-
+      Trailing-twelve-month revenue after rebates and introducer fees — the top line the business
+      actually keeps.
     unit: GBP
     direction: higher_is_better
     group: scale
@@ -63,6 +73,9 @@ metrics:
 
   - key: REVENUE_PER_CLIENT
     name: Revenue per Active Client (ARPU)
+    description: >-
+      Average revenue per active client — how much each relationship is worth. Low-and-wide for a
+      neobroker; high-and-narrow for a private-wealth firm.
     unit: GBP_per_year
     direction: higher_is_better
     group: unit_economics
@@ -78,6 +91,9 @@ metrics:
 
   - key: GROSS_MARGIN
     name: Gross Margin
+    description: >-
+      Revenue left after the direct cost of serving it (clearing, market data, execution) — unit
+      profitability before overheads.
     unit: percent
     direction: higher_is_better
     group: unit_economics
@@ -93,6 +109,9 @@ metrics:
 
   - key: COST_TO_SERVE
     name: Cost to Serve per Client
+    description: >-
+      The direct cost to serve one client — the denominator of efficiency. Automation-heavy models
+      drive this down; advice-led models accept it higher for higher ARPU.
     unit: GBP_per_year
     direction: lower_is_better
     group: unit_economics
@@ -108,6 +127,9 @@ metrics:
 
   - key: TAKE_RATE_LEVEL
     name: Take Rate (level)
+    description: >-
+      The share of client flow or assets captured as revenue — pricing power. A few basis points
+      for an exchange; far higher for a bundled wealth proposition.
     unit: bps
     direction: higher_is_better
     group: unit_economics
@@ -127,6 +149,9 @@ metrics:
 
   - key: NET_REVENUE_RETENTION
     name: Net Revenue Retention
+    description: >-
+      Revenue kept and grown from the existing book over a year, net of churn and contraction —
+      the compounding engine. Above 100% means the base grows without new logos.
     unit: percent
     direction: higher_is_better
     group: momentum
@@ -142,6 +167,9 @@ metrics:
 
   - key: CLIENT_GROWTH_RATE
     name: YoY Active-Client Growth
+    description: >-
+      Year-on-year growth in active clients — top-of-funnel momentum. The headline for a scaling
+      neobroker; a mature private bank optimises depth over count.
     unit: percent
     direction: higher_is_better
     group: momentum
@@ -157,6 +185,9 @@ metrics:
 
   - key: CAC_PAYBACK_MONTHS
     name: CAC Payback Period
+    description: >-
+      Months of gross margin to recover the cost of acquiring a client — how quickly growth pays
+      for itself. Lower is better; long paybacks make aggressive acquisition fragile.
     unit: months
     direction: lower_is_better
     group: momentum

@@ -102,6 +102,11 @@
     "MetricDef": {
       "additionalProperties": false,
       "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
         "direction": {
           "enum": [
             "higher_is_better",
@@ -151,6 +156,7 @@
       "required": [
         "key",
         "name",
+        "description",
         "unit",
         "direction",
         "normalisation"
