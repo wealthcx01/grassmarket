@@ -54,7 +54,7 @@ const SECTIONS: ReadonlyArray<Section> = [
     lead: "The seven-step wizard scores a company across the 7 Powers, Platform Value, and the 9 infrastructure modules. It autosaves every edit, so a partial assessment is always safe to leave and resume.",
     href: { label: "Open assessments", to: "/assessments" },
     steps: [
-      { do: "Start an assessment for the subject company, then work the steps left to right: Business Metrics, Powers, Module Overview, the Infrastructure Deep Dive.", then: "Your work saves automatically — the badge moves from “Saving…” to “All changes saved”." },
+      { do: "Start an assessment for the subject company, then work the steps left to right: Business Metrics, Powers, the Infrastructure Deep Dive.", then: "Your work saves automatically — the badge moves from “Saving…” to “All changes saved”." },
       { do: "Rate what you know. For each subcomponent pick a maturity level and record how sure you are with an evidence grade (E1 hearsay → E4 you saw it work).", then: "The grade widens or tightens the uncertainty on the score — honest by design." },
       { do: "Leave anything you haven't looked at as Not Assessed. Never guess.", then: "Not Assessed is a first-class state; it lowers coverage and widens the range, but it never counts as zero." },
       { do: "When it's ready, finalise. Finalising locks the inputs and produces an immutable, versioned scoring run." },

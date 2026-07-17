@@ -453,39 +453,7 @@ export function StrategicPowersStep({ registry, document: d, update, readOnly }:
   );
 }
 
-// --- 4. Module Overview (quick pass) ----------------------------------------------------
-
-export function ModuleOverviewStep({ registry, document: d }: StepProps) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-      <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem" }}>
-        A quick pass over the nine modules before the deep dive. Coverage counts assessed
-        subcomponents; a ★ marks a critical subcomponent (it gates the module rating).
-      </p>
-      {registry.modules.map((m) => {
-        const rated = m.subcomponents.filter((s) => {
-          const r = doc.findSub(d, s.key);
-          return r?.level != null;
-        }).length;
-        return (
-          <Card key={m.key}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-              <strong style={{ fontSize: "0.9rem" }}>{m.name}</strong>
-              <span className="mono" style={{ fontSize: "0.78rem", color: "var(--color-ink-muted)" }}>
-                {rated}/{m.subcomponents.length} rated
-              </span>
-            </div>
-            <p style={{ margin: "0.3rem 0 0", fontSize: "0.78rem", color: "var(--color-ink-muted)" }}>
-              {m.subcomponents.map((s) => (s.critical ? `★ ${s.name}` : s.name)).join(" · ")}
-            </p>
-          </Card>
-        );
-      })}
-    </div>
-  );
-}
-
-// --- 5. Infrastructure Deep Dive --------------------------------------------------------
+// --- 4. Infrastructure Deep Dive (Module Overview folded in, GRS-0106) ------------------
 
 type SubChoice = "" | MaturityLevel | "Not Applicable" | "Not Assessed";
 
@@ -493,9 +461,21 @@ export function InfrastructureDeepDiveStep({ registry, document: d, update, read
   const [openGuidance, setOpenGuidance] = useState<string | null>(null);
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      {registry.modules.map((m) => (
+      <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem", margin: 0 }}>
+        Work each of the nine modules, front end to liquidity. A ★ marks a critical subcomponent — it
+        gates the module rating (a module can&rsquo;t outrun its critical bottleneck). Each row&rsquo;s
+        Guidance opens the §4 rubric anchor inline. The count by each module is your progress so far.
+      </p>
+      {registry.modules.map((m) => {
+        const rated = m.subcomponents.filter((s) => doc.findSub(d, s.key)?.level != null).length;
+        return (
         <div key={m.key}>
-          <h3 style={{ fontSize: "1rem", margin: "0 0 0.4rem" }}>{m.name}</h3>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.75rem", margin: "0 0 0.4rem" }}>
+            <h3 style={{ fontSize: "1rem", margin: 0 }}>{m.name}</h3>
+            <span className="mono" style={{ fontSize: "0.75rem", color: "var(--color-ink-muted)" }}>
+              {rated}/{m.subcomponents.length} rated
+            </span>
+          </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
             {m.subcomponents.map((s) => {
               const r = doc.findSub(d, s.key);
@@ -558,7 +538,8 @@ export function InfrastructureDeepDiveStep({ registry, document: d, update, read
             })}
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -969,7 +950,6 @@ export const WIZARD_STEPS: { title: string; component: (p: StepProps) => React.R
   { title: "Overview", component: OverviewStep },
   { title: "Business Metrics", component: BusinessMetricsStep },
   { title: "Powers", component: StrategicPowersStep },
-  { title: "Module Overview", component: ModuleOverviewStep },
   { title: "Infrastructure Deep Dive", component: InfrastructureDeepDiveStep },
   { title: "Customer Proposition", component: CustomerPropositionStep },
   { title: "Summary & Interpretation", component: SummaryStep },
