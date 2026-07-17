@@ -1,8 +1,21 @@
 # GRS-0130 — Feed practice arena + calibration from the courses
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 **Depends on:** ADR-0028 (Bruntsfield Academy / Workbench)
+
+## Delivered
+
+Academy-grounded **Practice Arena scenarios** (`workbench/content/practice_scenarios.py`): each
+rehearses a Sales Egoist weapon (Challenger teach on scale-economies; the Demo weapon on switching
+costs) against a real 7-Powers probe with authored benefit/barrier cues — not generic filler. Seeded
+idempotently through `seed_academy_content` (created only when absent, since scenarios have no natural
+key). The **guide gains a "What a calibration session is" section** — blind shared vignettes drawn
+from the courses, revealed together and converged on the rubric, recorded as a governance control —
+explicitly contrasted with the self-only, AI-labelled Practice Arena feedback. Practice-arena
+feedback is **unchanged**: still `feedback_is_ai_drafted` on a self-owned `ArenaSession` with no
+approval fields (the deliberate #8 exception preserved, asserted by test). No contract/schema change;
+golden master untouched.
 
 ## Why
 

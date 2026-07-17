@@ -468,6 +468,27 @@ export default function GuidePage() {
         </div>
       </section>
 
+      {/* What calibration is (GRS-0130) */}
+      <section>
+        <SectionTitle kicker="Staying aligned">What a calibration session is</SectionTitle>
+        <div className="card" style={{ padding: "1.15rem 1.3rem", display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+          <p style={{ margin: 0, color: "var(--color-ink-muted)", fontSize: "0.95rem", lineHeight: 1.6 }}>
+            A <strong>calibration session</strong> is how assessors stay aligned so the same evidence
+            earns the same rating no matter who scores it. A facilitator poses a set of shared
+            vignettes — short, real assessment situations, drawn from the Academy courses (the Sales
+            Egoist doctrine and the product content) rather than generic filler — and every
+            participant rates them <em>blind</em>, without seeing the others&apos; answers.
+          </p>
+          <p style={{ margin: 0, color: "var(--color-ink-muted)", fontSize: "0.95rem", lineHeight: 1.6 }}>
+            When the session closes, the ratings are revealed together and the spread is measured:
+            where assessors diverged, the group discusses why and converges on the rubric&apos;s
+            intent. Calibration is a <strong>governance</strong> control — its result is recorded —
+            which is what makes it different from the Practice Arena, where the AI-drafted feedback
+            is a self-only training aid, clearly labelled and never a recorded approval.
+          </p>
+        </div>
+      </section>
+
       {/* Mistakes */}
       <section>
         <SectionTitle kicker="Don't do this">Mistakes that get assessments rejected</SectionTitle>
