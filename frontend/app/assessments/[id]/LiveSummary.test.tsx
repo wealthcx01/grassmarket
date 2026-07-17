@@ -48,8 +48,24 @@ describe("LiveSummary (GRS-0044 band honesty)", () => {
     expect(screen.queryByTestId("band-point")).toBeNull();
   });
 
-  it("shows the not-yet-scoreable prompt when there is no V", () => {
-    render(<LiveSummary live={liveScore({ scoreable: false, v: null })} />);
-    expect(screen.getByText(/Live V appears once/i)).toBeDefined();
+  it("names concretely what's missing when not yet scoreable (GRS-0104)", () => {
+    render(
+      <LiveSummary
+        live={liveScore({
+          scoreable: false,
+          v: null,
+          blocking: ["Enter at least one business metric.", "Rate all 7 Strategic Powers."],
+        })}
+      />,
+    );
+    // The opaque "Live V appears once…" jargon is gone; the concrete blockers are shown instead.
+    expect(screen.queryByText(/Live V appears once/i)).toBeNull();
+    expect(screen.getByText(/Enter at least one business metric/i)).toBeDefined();
+    expect(screen.getByText(/Rate all 7 Strategic Powers/i)).toBeDefined();
+  });
+
+  it("shows a gentle start prompt before any blockers are known", () => {
+    render(<LiveSummary live={liveScore({ scoreable: false, v: null, blocking: [] })} />);
+    expect(screen.getByText(/Start rating the steps/i)).toBeDefined();
   });
 });
