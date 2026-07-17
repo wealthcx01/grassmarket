@@ -597,6 +597,10 @@ class BrokeragePortfolioEntry(BaseModel):
     state: AssessmentState
     v_index: Score | None = None
     uncertainty_rating: UncertaintyRating | None = None
+    # Assessed subcomponents over APPLICABLE ones (Not Applicable excluded) — the coverage notion
+    # live panel shows, so a linked assessment's progress reads at a glance (GRS-0116). None when
+    # nothing is applicable yet.
+    coverage: Score | None = None
     finalised_at: datetime | None = None
     updated_at: datetime
 

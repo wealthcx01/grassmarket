@@ -3,7 +3,9 @@ each assessment's segment from its business profile, and carry no score until fi
 
 from __future__ import annotations
 
-from bcap_contracts.assessments import AssessmentDocument, BusinessProfile
+from bcap_contracts.assessments import AssessmentDocument, BusinessProfile, SubcomponentRating
+from bcap_contracts.common import EvidenceGrade, MaturityLevel, NonScoreState
+from bcap_contracts.registry import load_registry
 from fastapi.testclient import TestClient
 
 from grassmarket.data.repository import Repository
@@ -41,6 +43,47 @@ def test_portfolio_has_no_score_until_finalised(repo: Repository, alice: SeededC
     assert entry.state == "draft"
     assert entry.v_index is None
     assert entry.uncertainty_rating is None
+
+
+def test_portfolio_surfaces_coverage(repo: Repository, alice: SeededConsultant) -> None:
+    # Coverage = assessed / applicable (Not Applicable excluded), so a linked assessment's progress
+    # reads at a glance (GRS-0116). Rate one subcomponent and mark one Not Applicable.
+    registry = load_registry()
+    total = len(registry.all_subcomponent_keys())
+    module = registry.modules[0]
+    a = repo.create_assessment(alice.principal, subject="Partly Assessed Co")
+    repo.update_assessment(
+        alice.principal,
+        a.id,
+        document=AssessmentDocument(
+            subcomponents=(
+                SubcomponentRating(
+                    module_key=module.key,
+                    subcomponent_key=module.subcomponents[0].key,
+                    level=MaturityLevel.ADVANCED,
+                    evidence_grade=EvidenceGrade.E3_ARTIFACT,
+                ),
+                SubcomponentRating(
+                    module_key=module.key,
+                    subcomponent_key=module.subcomponents[1].key,
+                    state=NonScoreState.NOT_APPLICABLE,
+                ),
+            )
+        ),
+    )
+    entry = next(
+        e for e in repo.list_brokerage_portfolio(alice.principal) if e.assessment_id == a.id
+    )
+    # 1 assessed of (total − 1 Not Applicable) applicable.
+    assert entry.coverage == round(1 / (total - 1), 4)
+
+    # A brand-new assessment with nothing rated has 0 coverage (0 assessed / all applicable) —
+    # never None unless nothing is applicable.
+    fresh = repo.create_assessment(alice.principal, subject="Fresh Co")
+    fresh_entry = next(
+        e for e in repo.list_brokerage_portfolio(alice.principal) if e.assessment_id == fresh.id
+    )
+    assert fresh_entry.coverage == 0.0
 
 
 def test_portfolio_is_newest_touched_first(repo: Repository, alice: SeededConsultant) -> None:

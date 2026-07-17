@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { BandDisplay } from "@/components/BandDisplay";
+import { ConsumingEngagements } from "@/components/ConsumingEngagements";
 import { WIZARD_STEPS, type StepProps } from "@/components/steps";
 import { ApiError, api, clearToken, getToken } from "@/lib/api";
 import type {
@@ -240,6 +241,7 @@ export function WizardClient({ id }: { id: string }) {
             ← All assessments
           </Link>
           <h1 style={{ fontSize: "1.5rem", margin: "0.2rem 0 0" }}>{assessment.subject || "Untitled assessment"}</h1>
+          <ConsumingEngagements assessmentId={id} />
         </div>
         <SaveBadge state={save} readOnly={!!readOnly} />
       </div>
