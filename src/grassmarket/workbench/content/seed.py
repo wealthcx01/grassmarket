@@ -14,6 +14,12 @@ from bcap_contracts.commissions import load_commission_config
 
 from grassmarket.data.repository import Principal, Repository
 from grassmarket.earnings.product_carrot import product_commission_carrot
+from grassmarket.workbench.content.brandfetch_course import (
+    BRANDFETCH_PRODUCT_ID,
+    BRANDFETCH_REDIST_ID,
+    BRANDFETCH_SLUG,
+    brandfetch_course,
+)
 from grassmarket.workbench.content.openbb_course import (
     OPENBB_PRODUCT_ID,
     OPENBB_SLUG,
@@ -38,10 +44,25 @@ def seed_academy_content(repo: Repository, admin: Principal, *, now: datetime) -
     repo.upsert_published_course(admin, SALES_EGOIST_SLUG, sales_egoist_course(), now=now)
     repo.upsert_published_course(admin, SALES_OPS_SLUG, sales_ops_playbook_course(), now=now)
 
-    # The OpenBB product course reuses the GRS-0123 template, so its commission section resolves
-    # live from the Earnings v7 schedule (fails loud if 'openbb' is ever removed from the config).
-    carrot = product_commission_carrot(OPENBB_PRODUCT_ID, load_commission_config())
-    repo.upsert_published_course(admin, OPENBB_SLUG, openbb_course(carrot), now=now)
+    # The product courses reuse the GRS-0123 template, so their commission resolves live from the
+    # Earnings v7 schedule (fails loud if a product is ever removed from the config).
+    config = load_commission_config()
+    repo.upsert_published_course(
+        admin,
+        OPENBB_SLUG,
+        openbb_course(product_commission_carrot(OPENBB_PRODUCT_ID, config)),
+        now=now,
+    )
+    # Brandfetch has two tiers; the course shows both live (distribution is the template spine).
+    repo.upsert_published_course(
+        admin,
+        BRANDFETCH_SLUG,
+        brandfetch_course(
+            product_commission_carrot(BRANDFETCH_PRODUCT_ID, config),
+            product_commission_carrot(BRANDFETCH_REDIST_ID, config),
+        ),
+        now=now,
+    )
 
     # Practice-arena scenarios have no natural key; seed idempotently by title (create if absent).
     existing_titles = {s.title for s in repo.list_arena_scenarios(admin)}

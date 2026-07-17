@@ -33,13 +33,22 @@ def product_subject_key(product_id: str) -> str:
     return f"{_PRODUCT_PREFIX}{product_id}"
 
 
+def _product_backing_slug(product_id: str) -> str:
+    """The course slug that backs a product cert. Course slugs forbid underscores
+    (`^[a-z0-9][a-z0-9-]*$`), so a product_id like `brandfetch_distribution` is hyphenated —
+    otherwise its cert could never be earned (no valid course slug could match)."""
+    return f"product-{product_id.replace('_', '-')}"
+
+
 def course_cert_subjects(product_ids: Iterable[str]) -> list[CourseCertSubject]:
     """The full certifiable set: Sales Egoist first, then one per catalogue product (stable order).
-    Backing slugs match the seeded course slugs (`sales-egoist`, `product-<id>`)."""
+    Backing slugs match the seeded course slugs (`sales-egoist`, `product-<id>`, hyphenated)."""
     subjects = [CourseCertSubject(SALES_EGOIST_SUBJECT, "Sales Egoist", "sales-egoist")]
     for pid in sorted(product_ids):
         subjects.append(
-            CourseCertSubject(product_subject_key(pid), f"{pid} product", f"product-{pid}")
+            CourseCertSubject(
+                product_subject_key(pid), f"{pid} product", _product_backing_slug(pid)
+            )
         )
     return subjects
 

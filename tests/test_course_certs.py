@@ -35,6 +35,15 @@ def test_subjects_are_sales_egoist_plus_one_per_product() -> None:
     assert "product:openbb" in keys and "product:connecttrade" in keys
 
 
+def test_underscore_product_ids_get_a_valid_hyphenated_backing_slug() -> None:
+    # Course slugs forbid underscores; a product_id like 'brandfetch_distribution' must map to a
+    # hyphenated backing slug or its cert could never be earned (GRS-0125 fix).
+    subjects = {s.key: s for s in course_cert_subjects(["brandfetch_distribution"])}
+    subj = subjects["product:brandfetch_distribution"]
+    assert subj.backing_slug == "product-brandfetch-distribution"
+    assert "_" not in subj.backing_slug
+
+
 def test_status_folds_completion_and_signoff() -> None:
     assert (
         course_cert_status(course_complete=False, has_signoff=False)
