@@ -1,8 +1,20 @@
 # GRS-0128 — Bench/Workbench as the single "what I should / must / have done" hub
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 **Depends on:** ADR-0028 (Bruntsfield Academy / Workbench)
+
+## Delivered
+
+The bench queue now folds the **governance + Academy** surfaces into the one hub, extending
+`assemble_queue` (no parallel aggregator): three new `BenchItemKind`s — **RATING_REQUEST** (from
+`list_my_rating_assignments` — an assigned co-rating blocking an assessment), **COMMITTEE** (from
+`list_assessments_for_committee`, for committee members), and **ACADEMY** (the next incomplete
+published course, mandatory-first first, from GRS-0121/0122). Priority order: rating + committee
+first (others are waiting on them), then certification, Academy, drills, arena, research (the tail).
+The defaults add nothing, so a plain advisor's queue is unchanged. `BenchDashboard.tsx` renders the
+new kinds; **`app/layout.tsx` gains a global-nav `/workbench` link** (the hub was reachable only from
+the dashboard card + `/help` before). Golden master untouched.
 
 ## Why
 

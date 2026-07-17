@@ -1,9 +1,12 @@
 {
   "$defs": {
     "BenchItemKind": {
-      "description": "What a queue item points the advisor at — the four bench sources in priority order.",
+      "description": "What a queue item points the advisor at — the bench sources, in priority order. GRS-0128\nfolds the governance + Academy surfaces into the same hub (rating requests + committee reviews\nsit above certification because others are waiting on them; Academy sits with the ladder).",
       "enum": [
+        "rating_request",
+        "committee",
         "certification",
+        "academy",
         "drill",
         "arena",
         "research"

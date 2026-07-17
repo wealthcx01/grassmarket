@@ -13,6 +13,7 @@ scenario, then an Opportunity Radar research task (always present as the standin
 from __future__ import annotations
 
 from collections.abc import Sequence
+from uuid import UUID
 
 from bcap_contracts.arena import ArenaScenario, ArenaSession, ArenaStatus
 from bcap_contracts.bench import (
@@ -105,14 +106,58 @@ def assemble_queue(
     due_drills: Sequence[DrillCard],
     arena_scenario: ArenaScenario | None,
     research_prospect: Prospect | None,
+    pending_rating_count: int = 0,
+    pending_rating_subject: str | None = None,
+    pending_rating_ref: UUID | None = None,
+    committee_review_count: int = 0,
+    committee_ref: UUID | None = None,
+    academy_course_title: str | None = None,
 ) -> tuple[BenchQueueItem, ...]:
-    """The advisor's prioritised bench queue (highest priority first). Only applicable items appear,
-    in the fixed priority order; the Opportunity Radar research task is always the tail item."""
+    """The advisor's prioritised bench queue (highest priority first) — the one hub (GRS-0128). Only
+    applicable items appear, in the fixed priority order: rating requests and committee reviews
+    first (others are waiting on them), then the certification step, the next Academy course, due
+    drills, a practice-arena scenario, and finally the Opportunity Radar research task."""
     specs: list[tuple[BenchItemKind, str, str, str, object]] = []
+
+    # Governance work others are blocked on comes first.
+    if pending_rating_count > 0:
+        n = pending_rating_count
+        subject = f" (next: {pending_rating_subject})" if pending_rating_subject else ""
+        specs.append(
+            (
+                BenchItemKind.RATING_REQUEST,
+                f"{n} assessment{'s' if n != 1 else ''} awaiting your rating",
+                f"A co-rating you've been assigned is blocking an assessment{subject}.",
+                "rate",
+                pending_rating_ref,
+            )
+        )
+    if committee_review_count > 0:
+        n = committee_review_count
+        specs.append(
+            (
+                BenchItemKind.COMMITTEE,
+                f"{n} assessment{'s' if n != 1 else ''} awaiting committee review",
+                "A high-stakes assessment needs your committee sign-off before it can finalise.",
+                "review",
+                committee_ref,
+            )
+        )
 
     cert = _certification_spec(cert_record, next_coursework)
     if cert is not None:
         specs.append((BenchItemKind.CERTIFICATION, *cert))
+
+    if academy_course_title is not None:
+        specs.append(
+            (
+                BenchItemKind.ACADEMY,
+                f"Continue the Academy: {academy_course_title}",
+                "A course on your learning path is not yet complete — finish it to certify.",
+                "learn",
+                None,
+            )
+        )
 
     if due_drills:
         soonest = min(due_drills, key=lambda c: c.due_at)

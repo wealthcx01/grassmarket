@@ -99,6 +99,19 @@ export default function RootLayout({
             <span className="eyebrow-id">02</span> — Advisory
           </span>
           <Link
+            href="/workbench"
+            style={{
+              color: "var(--color-ink-soft)",
+              textDecoration: "none",
+              fontSize: "0.85rem",
+              padding: "0.3rem 0.75rem",
+              border: "1px solid var(--color-border-strong)",
+              borderRadius: "var(--radius-pill)",
+            }}
+          >
+            Workbench
+          </Link>
+          <Link
             href="/help"
             style={{
               color: "var(--color-ink-soft)",

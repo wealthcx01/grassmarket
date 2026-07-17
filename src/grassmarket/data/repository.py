@@ -3752,6 +3752,14 @@ class Repository:
         out.sort(key=lambda v: 0 if v.tree.mandatory_first else 1)
         return out
 
+    def _next_academy_course_title(self, principal: Principal) -> str | None:
+        """The title of the next published course the advisor has not completed — mandatory-first
+        first (they sort to the front). None when the catalogue is empty or all done (GRS-0128)."""
+        for published in self.list_published_courses(principal):
+            if not self._learner_completed_course(principal.consultant_id, published.slug):
+                return published.tree.title
+        return None
+
     def upsert_published_course(
         self, principal: Principal, slug: str, tree: CourseTree, *, now: datetime
     ) -> CourseVersion:
@@ -4204,12 +4212,27 @@ class Repository:
         )
         research_prospect = pick_research_prospect(self._own_prospects(principal.consultant_id))
 
+        # GRS-0128: fold the governance + Academy surfaces into the one hub, reusing existing reads.
+        rating_assignments = self.list_my_rating_assignments(principal)
+        committee_reviews = (
+            self.list_assessments_for_committee(principal) if principal.is_committee else []
+        )
+        academy_title = self._next_academy_course_title(principal)
+
         items = assemble_queue(
             cert_record=cert_record,
             next_coursework=next_coursework,
             due_drills=due_drills,
             arena_scenario=arena_scenario,
             research_prospect=research_prospect,
+            pending_rating_count=len(rating_assignments),
+            pending_rating_subject=rating_assignments[0][1] if rating_assignments else None,
+            pending_rating_ref=(
+                rating_assignments[0][0].assessment_id if rating_assignments else None
+            ),
+            committee_review_count=len(committee_reviews),
+            committee_ref=committee_reviews[0].id if committee_reviews else None,
+            academy_course_title=academy_title,
         )
         return BenchQueue(
             owner_consultant_id=principal.consultant_id, generated_at=now, items=items
