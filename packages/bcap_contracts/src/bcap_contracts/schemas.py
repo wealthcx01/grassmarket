@@ -77,6 +77,7 @@ from bcap_contracts.provenance import WeightProvenanceRecord
 from bcap_contracts.registry import Registry
 from bcap_contracts.rubric import RubricAnchor
 from bcap_contracts.value import ScenarioComparison
+from bcap_contracts.wizard import WizardSuggestion, WizardSuggestions
 
 # The exported surface. Adding a resource means adding it here and regenerating — deliberate
 # friction so the contract surface is always explicit and mirrored.
@@ -135,6 +136,8 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "Course": Course,
     "CourseVersion": CourseVersion,
     "LessonCompletion": LessonCompletion,
+    "WizardSuggestion": WizardSuggestion,
+    "WizardSuggestions": WizardSuggestions,
     "ArenaScenario": ArenaScenario,
     "ArenaSession": ArenaSession,
     "BenchQueue": BenchQueue,

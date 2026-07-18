@@ -1,6 +1,6 @@
 # GRS-0101 — AI-assisted input in the wizard
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** B (flagged follow-up — its own ADR/ticket set later)
 **Depends on:** —

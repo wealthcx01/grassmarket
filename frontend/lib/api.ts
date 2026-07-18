@@ -49,6 +49,7 @@ import type {
   ModuleRatingDraft,
   NarrativeSection,
   LiveScore,
+  WizardSuggestions,
   RaterCandidate,
   RatingRequestSummary,
   SubcomponentRating,
@@ -317,6 +318,15 @@ export const api = {
 
   liveScore(id: string, signal?: AbortSignal): Promise<LiveScore> {
     return request<LiveScore>(`/assessments/${id}/live-score`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  // AI-assisted wizard input suggestions (GRS-0101, ADR-0032).
+  wizardSuggestions(id: string, signal?: AbortSignal): Promise<WizardSuggestions> {
+    return request<WizardSuggestions>(`/assessments/${id}/suggestions`, {
       method: "GET",
       headers: authHeaders(),
       signal,

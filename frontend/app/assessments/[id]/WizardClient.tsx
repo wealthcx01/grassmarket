@@ -15,13 +15,16 @@ import { ConsumingEngagements } from "@/components/ConsumingEngagements";
 import { ProvenanceBadge } from "@/components/ProvenanceBadge";
 import { WIZARD_STEPS, type StepProps } from "@/components/steps";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { WizardSuggestionsPanel } from "@/components/WizardSuggestionsPanel";
 import { ApiError, api, clearToken, getToken } from "@/lib/api";
+import { setSub, subAssessed } from "@/lib/doc";
 import type {
   Assessment,
   AssessmentDocument,
   LiveScore,
   Registry,
   RegistryProfile,
+  WizardSuggestion,
 } from "@/lib/types";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
@@ -40,6 +43,11 @@ export function WizardClient({ id }: { id: string }) {
   const [liveLoading, setLiveLoading] = useState(false);
   const [liveError, setLiveError] = useState<string | null>(null);
   const [finalising, setFinalising] = useState(false);
+
+  // AI-assisted input (GRS-0101): deterministic proposals + the ids the advisor has dismissed.
+  const [suggestions, setSuggestions] = useState<WizardSuggestion[]>([]);
+  const [suggesterVersion, setSuggesterVersion] = useState("");
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mounted = useRef(true);
@@ -148,6 +156,19 @@ export function WizardClient({ id }: { id: string }) {
       });
   }, [id, handleAuth]);
 
+  // AI suggestions over the persisted document — refreshed on load and after each autosave, so a
+  // coverage nudge disappears as coverage grows. A failure is silent (assistance is non-essential).
+  const refreshSuggestions = useCallback(() => {
+    api
+      .wizardSuggestions(id)
+      .then((r) => {
+        if (!mounted.current) return;
+        setSuggestions(r.suggestions);
+        setSuggesterVersion(r.suggester_version);
+      })
+      .catch(() => {});
+  }, [id]);
+
   const persist = useCallback(
     (next: AssessmentDocument) => {
       saveCtrl.current?.abort();
@@ -161,6 +182,7 @@ export function WizardClient({ id }: { id: string }) {
           setAssessment(a);
           setSave("saved");
           refreshLive();
+          refreshSuggestions();
         })
         .catch((err: unknown) => {
           if (err instanceof ApiError && err.status === 0) return; // aborted / superseded
@@ -176,7 +198,7 @@ export function WizardClient({ id }: { id: string }) {
           if (mounted.current) setSave("error");
         });
     },
-    [id, refreshLive, handleAuth],
+    [id, refreshLive, refreshSuggestions, handleAuth],
   );
 
   const update = useCallback(
@@ -193,9 +215,34 @@ export function WizardClient({ id }: { id: string }) {
     [persist, readOnly],
   );
 
-  // Fetch a live score once loaded.
+  // Accept a PREFILL: apply the proposed level as an ordinary edit (the advisor can change it after),
+  // then hide the suggestion. This is the visible approve step — nothing applied without it.
+  const acceptSuggestion = useCallback(
+    (s: WizardSuggestion) => {
+      if (s.kind === "prefill" && s.module_key && s.subcomponent_key && s.proposed_level) {
+        update((d) =>
+          setSub(
+            d,
+            s.subcomponent_key!,
+            subAssessed(s.module_key!, s.subcomponent_key!, s.proposed_level!, "E1"),
+          ),
+        );
+      }
+      setDismissed((prev) => new Set(prev).add(s.id));
+    },
+    [update],
+  );
+
+  const dismissSuggestion = useCallback((sid: string) => {
+    setDismissed((prev) => new Set(prev).add(sid));
+  }, []);
+
+  // Fetch a live score + AI suggestions once loaded.
   useEffect(() => {
-    if (document) refreshLive();
+    if (document) {
+      refreshLive();
+      refreshSuggestions();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [document !== null]);
 
@@ -271,7 +318,17 @@ export function WizardClient({ id }: { id: string }) {
             </button>
           </div>
         </div>
-        <LiveSummary live={live} />
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <LiveSummary live={live} />
+          {!readOnly ? (
+            <WizardSuggestionsPanel
+              suggestions={suggestions.filter((s) => !dismissed.has(s.id))}
+              version={suggesterVersion}
+              onAccept={acceptSuggestion}
+              onDismiss={dismissSuggestion}
+            />
+          ) : null}
+        </div>
       </div>
     </div>
   );
