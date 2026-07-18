@@ -99,7 +99,7 @@ from bcap_contracts.engagements import (
     Workshop,
     WorkshopState,
 )
-from bcap_contracts.entities import PipelineStage, Prospect
+from bcap_contracts.entities import Contact, PipelineStage, Prospect
 from bcap_contracts.extraction import (
     Extraction,
     ExtractionConfidence,
@@ -158,6 +158,7 @@ from grassmarket.data.models import (
     CommitteeDecisionORM,
     CommsLogEntryORM,
     ConsultantORM,
+    ContactORM,
     ContentCompletionORM,
     CourseORM,
     CourseVersionORM,
@@ -549,6 +550,7 @@ class Repository:
         company_name: str,
         stage: PipelineStage = PipelineStage.PROSPECT,
         sector: str | None = None,
+        website: str | None = None,
         primary_contact_name: str | None = None,
         primary_contact_email: str | None = None,
         notes: str | None = None,
@@ -560,6 +562,7 @@ class Repository:
             company_name=company_name,
             stage=stage,
             sector=sector,
+            website=website,
             primary_contact_name=primary_contact_name,
             primary_contact_email=primary_contact_email,
             notes=notes,
@@ -656,6 +659,177 @@ class Repository:
                 occurred_at=r.occurred_at,
             )
             for r in rows
+        )
+
+    def update_prospect(
+        self,
+        principal: Principal,
+        prospect_id: UUID,
+        *,
+        company_name: str | None = None,
+        sector: str | None = None,
+        website: str | None = None,
+        primary_contact_name: str | None = None,
+        primary_contact_email: str | None = None,
+        notes: str | None = None,
+    ) -> Prospect:
+        """Patch a prospect's editable fields (GRS-0111) — owner-scoped. Only the fields passed (not
+        None) are changed; stage moves stay on the dedicated choke-point `update_prospect_stage`.
+        An empty-string `company_name` is refused (it is required)."""
+        row = self._session.get(ProspectORM, prospect_id)
+        if row is None:
+            raise NotFoundError(f"Prospect {prospect_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        if company_name is not None:
+            if not company_name.strip():
+                raise ConflictError("A prospect's company name cannot be empty.")
+            row.company_name = company_name
+        if sector is not None:
+            row.sector = sector or None
+        if website is not None:
+            row.website = website or None
+        if primary_contact_name is not None:
+            row.primary_contact_name = primary_contact_name or None
+        if primary_contact_email is not None:
+            row.primary_contact_email = primary_contact_email or None
+        if notes is not None:
+            row.notes = notes or None
+        self._session.add(row)
+        self._session.flush()
+        return self._to_prospect(row)
+
+    # ------------------------------------------------------------------ contacts (SCOPED, GRS-0111)
+    def create_contact(
+        self,
+        principal: Principal,
+        prospect_id: UUID,
+        *,
+        name: str,
+        email: str | None = None,
+        phone: str | None = None,
+        title: str | None = None,
+        is_primary: bool = False,
+    ) -> Contact:
+        """Add a contact to a prospect the caller owns. Making it primary demotes any other primary
+        and mirrors the name/email onto the prospect (the win-probability scorer reads those)."""
+        prospect = self._session.get(ProspectORM, prospect_id)
+        if prospect is None:
+            raise NotFoundError(f"Prospect {prospect_id} not found.")
+        self._assert_can_access(principal, prospect.owner_consultant_id)
+        row = ContactORM(
+            owner_consultant_id=prospect.owner_consultant_id,
+            prospect_id=prospect_id,
+            name=name,
+            email=email or None,
+            phone=phone or None,
+            title=title or None,
+            is_primary=is_primary,
+        )
+        self._session.add(row)
+        self._session.flush()
+        if is_primary:
+            self._make_contact_primary(prospect, row)
+        self._session.flush()
+        return self._to_contact(row)
+
+    def list_contacts(self, principal: Principal, prospect_id: UUID) -> list[Contact]:
+        """Every contact on a prospect the caller owns — primary first, then by creation."""
+        prospect = self._session.get(ProspectORM, prospect_id)
+        if prospect is None:
+            raise NotFoundError(f"Prospect {prospect_id} not found.")
+        self._assert_can_access(principal, prospect.owner_consultant_id)
+        stmt = (
+            select(ContactORM)
+            .where(ContactORM.prospect_id == prospect_id)
+            .order_by(ContactORM.is_primary.desc(), ContactORM.created_at)
+        )
+        return [self._to_contact(r) for r in self._session.execute(stmt).scalars()]
+
+    def update_contact(
+        self,
+        principal: Principal,
+        contact_id: UUID,
+        *,
+        name: str | None = None,
+        email: str | None = None,
+        phone: str | None = None,
+        title: str | None = None,
+        is_primary: bool | None = None,
+    ) -> Contact:
+        """Patch a contact the caller owns. Setting `is_primary` True demotes the others + mirrors
+        the prospect's primary_contact_* fields."""
+        row = self._session.get(ContactORM, contact_id)
+        if row is None:
+            raise NotFoundError(f"Contact {contact_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        if name is not None:
+            if not name.strip():
+                raise ConflictError("A contact's name cannot be empty.")
+            row.name = name
+        if email is not None:
+            row.email = email or None
+        if phone is not None:
+            row.phone = phone or None
+        if title is not None:
+            row.title = title or None
+        self._session.add(row)
+        if is_primary:
+            prospect = self._require_consultant_owned_prospect(row.prospect_id)
+            self._make_contact_primary(prospect, row)
+        self._session.flush()
+        return self._to_contact(row)
+
+    def delete_contact(self, principal: Principal, contact_id: UUID) -> None:
+        """Remove a contact the caller owns. If it was primary, the prospect's mirrored primary_*
+        fields are cleared (the caller can promote another contact)."""
+        row = self._session.get(ContactORM, contact_id)
+        if row is None:
+            raise NotFoundError(f"Contact {contact_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        if row.is_primary:
+            prospect = self._session.get(ProspectORM, row.prospect_id)
+            if prospect is not None:
+                prospect.primary_contact_name = None
+                prospect.primary_contact_email = None
+                self._session.add(prospect)
+        self._session.delete(row)
+        self._session.flush()
+
+    def _require_consultant_owned_prospect(self, prospect_id: UUID) -> ProspectORM:
+        prospect = self._session.get(ProspectORM, prospect_id)
+        if prospect is None:  # pragma: no cover - a contact always has a prospect
+            raise NotFoundError(f"Prospect {prospect_id} not found.")
+        return prospect
+
+    def _make_contact_primary(self, prospect: ProspectORM, contact: ContactORM) -> None:
+        """Enforce a single primary contact + mirror it onto the prospect (win-prob reads those)."""
+        others = self._session.execute(
+            select(ContactORM).where(
+                ContactORM.prospect_id == prospect.id, ContactORM.id != contact.id
+            )
+        ).scalars()
+        for other in others:
+            if other.is_primary:
+                other.is_primary = False
+                self._session.add(other)
+        contact.is_primary = True
+        prospect.primary_contact_name = contact.name
+        prospect.primary_contact_email = contact.email
+        self._session.add_all([contact, prospect])
+
+    @staticmethod
+    def _to_contact(row: ContactORM) -> Contact:
+        return Contact(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            prospect_id=row.prospect_id,
+            name=row.name,
+            email=row.email,
+            phone=row.phone,
+            title=row.title,
+            is_primary=row.is_primary,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
         )
 
     # ------------------------------------------------------------------ workshops (SCOPED)
@@ -4510,6 +4684,7 @@ class Repository:
             stage=PipelineStage(row.stage),
             stage_entered_at=row.stage_entered_at,
             sector=row.sector,
+            website=row.website,
             primary_contact_name=row.primary_contact_name,
             primary_contact_email=row.primary_contact_email,
             notes=row.notes,

@@ -31,6 +31,7 @@ import type {
   CommitteeReviewSummary,
   CommsChannel,
   CommsLogEntry,
+  Contact,
   ContentCompletion,
   Course,
   CourseTree,
@@ -465,11 +466,33 @@ export const api = {
     });
   },
 
-  createProspect(company_name: string, signal?: AbortSignal): Promise<Prospect> {
+  createProspect(
+    body: { company_name: string; sector?: string | null; website?: string | null },
+    signal?: AbortSignal,
+  ): Promise<Prospect> {
     return request<Prospect>("/prospects", {
       method: "POST",
       headers: authHeaders(),
-      body: JSON.stringify({ company_name }),
+      body: JSON.stringify(body),
+      signal,
+    });
+  },
+
+  /** Patch a prospect's editable fields (GRS-0111). Only the fields sent are changed. */
+  updateProspect(
+    id: string,
+    patch: Partial<
+      Pick<
+        Prospect,
+        "company_name" | "sector" | "website" | "primary_contact_name" | "primary_contact_email" | "notes"
+      >
+    >,
+    signal?: AbortSignal,
+  ): Promise<Prospect> {
+    return request<Prospect>(`/prospects/${id}`, {
+      method: "PATCH",
+      headers: authHeaders(),
+      body: JSON.stringify(patch),
       signal,
     });
   },
@@ -477,6 +500,50 @@ export const api = {
   getProspect(id: string, signal?: AbortSignal): Promise<Prospect> {
     return request<Prospect>(`/prospects/${id}`, {
       method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  // --- Contacts (first-class, GRS-0111) ---
+  listContacts(prospectId: string, signal?: AbortSignal): Promise<Contact[]> {
+    return request<Contact[]>(`/prospects/${prospectId}/contacts`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  createContact(
+    prospectId: string,
+    body: { name: string; email?: string | null; phone?: string | null; title?: string | null; is_primary?: boolean },
+    signal?: AbortSignal,
+  ): Promise<Contact> {
+    return request<Contact>(`/prospects/${prospectId}/contacts`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(body),
+      signal,
+    });
+  },
+
+  updateContact(
+    prospectId: string,
+    contactId: string,
+    patch: Partial<Pick<Contact, "name" | "email" | "phone" | "title" | "is_primary">>,
+    signal?: AbortSignal,
+  ): Promise<Contact> {
+    return request<Contact>(`/prospects/${prospectId}/contacts/${contactId}`, {
+      method: "PATCH",
+      headers: authHeaders(),
+      body: JSON.stringify(patch),
+      signal,
+    });
+  },
+
+  deleteContact(prospectId: string, contactId: string, signal?: AbortSignal): Promise<void> {
+    return request<void>(`/prospects/${prospectId}/contacts/${contactId}`, {
+      method: "DELETE",
       headers: authHeaders(),
       signal,
     });

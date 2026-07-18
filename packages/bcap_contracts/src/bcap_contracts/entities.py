@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
+from uuid import UUID
 
 from pydantic import ConfigDict, Field
 
@@ -41,6 +42,23 @@ class Prospect(OwnedResource):
         "flags. Set on creation and updated on every (validated) stage transition."
     )
     sector: str | None = None
+    website: str | None = None
     primary_contact_name: str | None = None
     primary_contact_email: str | None = None
     notes: str | None = None
+
+
+class Contact(OwnedResource):
+    """A person at a prospect's company (GRS-0111) — a first-class, owner-scoped entity so a deal
+    can carry its whole buying unit (many contacts per prospect), not just one inline name/email.
+    One contact may be flagged `is_primary`; the prospect's `primary_contact_*` fields mirror it for
+    the win-probability scorer and back-compat."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    prospect_id: UUID
+    name: str = Field(min_length=1)
+    email: str | None = None
+    phone: str | None = None
+    title: str | None = Field(default=None, description="Role / job title, e.g. 'Head of Trading'.")
+    is_primary: bool = False
