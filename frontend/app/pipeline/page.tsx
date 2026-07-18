@@ -171,7 +171,7 @@ export default function PipelinePage() {
         <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
           <Kpi label="Prospects" value={String(forecast.total_prospects)} />
           <Kpi label="Open" value={String(forecast.open_prospects)} hint="not terminal" />
-          <Kpi label="Weighted forecast" value={forecast.weighted_expected_deals.toFixed(1)} hint="expected won deals" />
+          <Kpi label="Expected wins" value={forecast.weighted_expected_deals.toFixed(1)} hint="open pipeline, Σ win-probabilities" />
           <Kpi label="Stale" value={String(staleCount)} hint="past time-in-stage" />
         </div>
       ) : null}

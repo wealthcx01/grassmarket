@@ -135,24 +135,32 @@ def test_days_in_stage_and_stale_flag() -> None:
 
 
 # ------------------------------------------------------------------ forecast (currency-free)
-def test_forecast_is_probability_weighted() -> None:
+def test_forecast_headline_equals_sum_of_win_probability_pills() -> None:
+    # GRS-0137: the headline "expected wins" must equal the sum of the win-probability pills the
+    # advisor sees on the cards (never a contradicting number), and already-won / lost work must not
+    # inflate it — so the KPI reflects genuine open pipeline.
     config = load_pipeline_config()
     prospects = [
         _prospect(PipelineStage.PROSPECT, entered=_NOW),
         _prospect(PipelineStage.PROSPECT, entered=_NOW),
         _prospect(PipelineStage.CONTRACTED, entered=_NOW),
-        _prospect(PipelineStage.CLOSED, entered=_NOW),
+        _prospect(PipelineStage.DELIVERED, entered=_NOW),  # already won (base 1.0) → excluded
+        _prospect(PipelineStage.CLOSED, entered=_NOW),  # lost (base 0.0) → excluded
     ]
+    board = build_board(prospects, config, _NOW)
     forecast = build_forecast(prospects, config, _NOW)
 
-    p = config.params(PipelineStage.PROSPECT).close_probability
-    c = config.params(PipelineStage.CONTRACTED).close_probability
-    assert forecast.total_prospects == 4
-    assert forecast.open_prospects == 3  # Closed is terminal
-    assert forecast.weighted_expected_deals == pytest.approx(2 * p + c)  # Closed contributes 0
-    by_stage = {s.stage: s for s in forecast.stages}
-    assert by_stage[PipelineStage.PROSPECT].count == 2
-    assert len(forecast.stages) == len(PipelineStage)  # every stage represented
+    settled = {0.0, 1.0}
+    expected = sum(
+        e.win_probability.score / 100.0
+        for e in board.entries
+        if config.params(e.prospect.stage).close_probability not in settled
+    )
+    assert forecast.weighted_expected_deals == pytest.approx(expected)
+    # The three non-settled deals contribute; Delivered (won) and Closed (lost) do not.
+    assert expected > 0
+    assert forecast.total_prospects == 5
+    assert len(forecast.stages) == len(PipelineStage)  # per-stage funnel view unchanged
 
 
 # -------------------------------------------------------------- repository (persistence + reset)

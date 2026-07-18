@@ -62,22 +62,38 @@ def build_board(
 def build_forecast(
     prospects: Sequence[Prospect], config: PipelineConfig, now: datetime
 ) -> PipelineForecast:
-    """A probability-weighted deal-*volume* forecast (currency-free). One row per stage (all ten,
-    in canonical order) plus the book-level expected won-deal count."""
+    """A probability-weighted deal-*volume* forecast (currency-free). Per-stage funnel rows (count ×
+    stage close-probability) plus the headline `weighted_expected_deals` — the expected count of NEW
+    wins from the open book.
+
+    The headline is the sum of each in-flight prospect's OWN win probability — the exact number the
+    advisor sees on its card — so the KPI and the cards can never disagree (GRS-0137). A SETTLED
+    deal is excluded: an already-won one (base 1.0, in delivery) is a win not an *expected* win, and
+    a lost one (base 0.0) contributes nothing. So the KPI counts open pipeline, not closed work."""
     counts: dict[PipelineStage, int] = {stage: 0 for stage in PipelineStage}
     for p in prospects:
         counts[p.stage] += 1
 
+    # Per-stage funnel view (unchanged): the book by stage, at each stage's base close rate.
     stages: list[StageForecast] = []
-    weighted_total = 0.0
     for stage in PipelineStage:
         count = counts[stage]
         prob = config.params(stage).close_probability
-        weighted = count * prob
-        weighted_total += weighted
         stages.append(
-            StageForecast(stage=stage, count=count, close_probability=prob, weighted_deals=weighted)
+            StageForecast(
+                stage=stage, count=count, close_probability=prob, weighted_deals=count * prob
+            )
         )
+
+    # Headline = Σ per-prospect win probability over NON-SETTLED prospects (base in (0,1)) — equal
+    # to the sum of the win-probability pills, and free of already-won / lost work.
+    expected_new_wins = 0.0
+    for p in prospects:
+        params = config.params(p.stage)
+        if params.close_probability in (0.0, 1.0):
+            continue  # settled — an already-won or lost deal is not an "expected new win"
+        stale = days_in_stage(p, now) >= params.stale_after_days
+        expected_new_wins += score_win_probability(p, stale=stale, config=config).score / 100.0
 
     total = len(prospects)
     open_count = sum(1 for p in prospects if p.stage not in TERMINAL_STAGES)
@@ -86,5 +102,5 @@ def build_forecast(
         total_prospects=total,
         open_prospects=open_count,
         stages=tuple(stages),
-        weighted_expected_deals=weighted_total,
+        weighted_expected_deals=expected_new_wins,
     )

@@ -236,7 +236,9 @@ class PipelineForecast(BaseModel):
     stages: tuple[StageForecast, ...]
     weighted_expected_deals: float = Field(
         ge=0.0,
-        description="Σ close_probability over all prospects — expected won deals in the book.",
+        description="Σ per-prospect win probability over NON-SETTLED prospects (GRS-0137) — the "
+        "expected count of NEW wins from the open book, equal to the sum of the win-probability "
+        "pills. Already-won (in-delivery) and lost deals are excluded.",
     )
 
 
