@@ -25,6 +25,7 @@ from bcap_contracts.assessments import (
 from bcap_contracts.common import AssessorLevel
 from bcap_contracts.registry import Registry, UnknownKeyError, load_registry
 from bcap_contracts.value import ScenarioComparison
+from bcap_contracts.wizard import WizardSuggestions
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
@@ -36,6 +37,7 @@ from grassmarket.assessments import (
     module_rating_errors,
     scoreability_blockers,
 )
+from grassmarket.assessments.suggester import SUGGESTER_VERSION, suggest_for
 from grassmarket.atlas.active import (
     active_uncertainty_model,
     profile_key_of,
@@ -222,6 +224,31 @@ def get_live_score(
         registry,
         active_uncertainty_model(),
         random.Random(_LIVE_SEED),
+    )
+
+
+@router.get("/{assessment_id}/suggestions", response_model=WizardSuggestions)
+def get_wizard_suggestions(
+    assessment_id: UUID,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> WizardSuggestions:
+    """AI-assisted input suggestions (GRS-0101 / ADR-0032): deterministic proposals derived from the
+    current document. A finalised (locked) assessment returns none — there is nothing to assist.
+    Owner-scoped; every proposal is applied only by the advisor's explicit accept/edit in the UI."""
+    try:
+        assessment = repo.get_assessment(principal, assessment_id)
+    except (NotFoundError, ScopeViolationError) as exc:
+        raise _not_found(exc) from exc
+    if assessment.state.value == "finalised":
+        return WizardSuggestions(
+            assessment_id=assessment_id, suggester_version=SUGGESTER_VERSION, suggestions=()
+        )
+    registry, _ = _profile_context(assessment.document)
+    return WizardSuggestions(
+        assessment_id=assessment_id,
+        suggester_version=SUGGESTER_VERSION,
+        suggestions=tuple(suggest_for(assessment.document, registry)),
     )
 
 

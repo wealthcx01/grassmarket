@@ -1,0 +1,138 @@
+{
+  "$defs": {
+    "MaturityLevel": {
+      "description": "The four maturity levels (Methodology §3.1).\n\nThe numeric ``index`` is for computation only; clients see the label. These four indices\nare the ONLY legal subcomponent indices — any other value is a contract violation, not a\ndatum to clamp or round (ADR-0001 §1).",
+      "enum": [
+        "Basic",
+        "Developing",
+        "Advanced",
+        "Frontier"
+      ],
+      "title": "MaturityLevel",
+      "type": "string"
+    },
+    "WizardSuggestion": {
+      "additionalProperties": false,
+      "description": "One AI-proposed suggestion on a wizard input step. `id` is a stable key (so the UI can\ndismiss or de-dupe it). A PREFILL carries `proposed_level` for the (module_key,\nsubcomponent_key) it targets; a GUIDANCE carries only the pointer + rationale.",
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/WizardSuggestionKind"
+        },
+        "module_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Module Key"
+        },
+        "power_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Power Key"
+        },
+        "proposed_level": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MaturityLevel"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "step": {
+          "description": "Wizard step key, e.g. 'powers' or 'infrastructure'.",
+          "minLength": 1,
+          "title": "Step",
+          "type": "string"
+        },
+        "subcomponent_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subcomponent Key"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "step",
+        "title",
+        "rationale"
+      ],
+      "title": "WizardSuggestion",
+      "type": "object"
+    },
+    "WizardSuggestionKind": {
+      "description": "GUIDANCE points at a field to reconsider (no value); PREFILL proposes a concrete starting\nvalue the advisor accepts or edits.",
+      "enum": [
+        "guidance",
+        "prefill"
+      ],
+      "title": "WizardSuggestionKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The suggestion set for one assessment, stamped with the suggester version that produced it\n(so a suggestion is always attributable — the audit seam ADR-0009 established for AI output).",
+  "properties": {
+    "assessment_id": {
+      "format": "uuid",
+      "title": "Assessment Id",
+      "type": "string"
+    },
+    "suggester_version": {
+      "minLength": 1,
+      "title": "Suggester Version",
+      "type": "string"
+    },
+    "suggestions": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/WizardSuggestion"
+      },
+      "title": "Suggestions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "assessment_id",
+    "suggester_version"
+  ],
+  "title": "WizardSuggestions",
+  "type": "object"
+}

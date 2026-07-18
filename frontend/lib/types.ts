@@ -135,6 +135,28 @@ export interface Assessment {
 }
 
 /** One row of the "Your Brokerages" portfolio (GRS-0071). v_index is the last finalised V (P50). */
+// --- AI-assisted wizard input (GRS-0101, ADR-0032) ---
+/** GUIDANCE points at a field to reconsider (no value); PREFILL proposes a starting value to accept/edit. */
+export type WizardSuggestionKind = "guidance" | "prefill";
+
+export interface WizardSuggestion {
+  id: string;
+  kind: WizardSuggestionKind;
+  step: string;
+  title: string;
+  rationale: string;
+  module_key?: string | null;
+  subcomponent_key?: string | null;
+  power_key?: string | null;
+  proposed_level?: MaturityLevel | null;
+}
+
+export interface WizardSuggestions {
+  assessment_id: string;
+  suggester_version: string;
+  suggestions: WizardSuggestion[];
+}
+
 export interface BrokeragePortfolioEntry {
   assessment_id: string;
   subject: string;
