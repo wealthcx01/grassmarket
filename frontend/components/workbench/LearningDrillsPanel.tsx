@@ -7,23 +7,43 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 
 import { ApiError, api } from "@/lib/api";
-import type { DrillCard, LearningModule } from "@/lib/types";
+import type { CourseVersion, DrillCard, LearningModule } from "@/lib/types";
 
 const GRADES = [0, 1, 2, 3, 4, 5];
 
+function lessonCount(v: CourseVersion): number {
+  return v.tree.modules.reduce((n, m) => n + m.lessons.length, 0);
+}
+
 export function LearningDrillsPanel() {
   const [modules, setModules] = useState<LearningModule[] | null>(null);
+  const [courses, setCourses] = useState<CourseVersion[] | null>(null);
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [due, setDue] = useState<DrillCard[] | null>(null);
   const [notice, setNotice] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
 
   const load = useCallback(async (signal?: AbortSignal) => {
     try {
-      const [mods, dueCards] = await Promise.all([api.learningModules(signal), api.dueDrillCards(signal)]);
+      const [mods, dueCards, published] = await Promise.all([
+        api.learningModules(signal),
+        api.dueDrillCards(signal),
+        api.listPublishedCourses(signal),
+      ]);
       setModules(mods);
       setDue(dueCards);
+      // Mandatory-first course leads the Academy strip.
+      setCourses(
+        [...published].sort((a, b) =>
+          a.tree.mandatory_first !== b.tree.mandatory_first
+            ? a.tree.mandatory_first
+              ? -1
+              : 1
+            : a.tree.title.localeCompare(b.tree.title),
+        ),
+      );
     } catch (err) {
       if (err instanceof ApiError && err.status === 0) return;
       setNotice({ kind: "error", text: err instanceof ApiError ? err.message : "Could not load." });
@@ -63,6 +83,40 @@ export function LearningDrillsPanel() {
           {notice.text}
         </p>
       )}
+
+      <section>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.6rem", marginBottom: "0.6rem" }}>
+          <h3 style={{ fontSize: "1rem", margin: 0 }}>Bruntsfield Academy</h3>
+          <Link href="/workbench/academy" style={{ fontSize: "0.78rem" }}>All courses →</Link>
+        </div>
+        {courses === null ? (
+          <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem" }}>Loading…</p>
+        ) : courses.length === 0 ? (
+          <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem" }}>No courses published yet.</p>
+        ) : (
+          <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+            {courses.map((v) => (
+              <li key={v.slug}>
+                <Link
+                  href={`/workbench/academy/${v.slug}`}
+                  style={{ display: "flex", justifyContent: "space-between", gap: "0.8rem", alignItems: "center", border: "1px solid var(--color-border)", borderRadius: "var(--radius)", padding: "0.7rem 0.9rem", textDecoration: "none", color: "inherit" }}
+                >
+                  <div>
+                    <strong style={{ fontSize: "0.88rem" }}>{v.tree.title}</strong>
+                    {v.tree.mandatory_first ? (
+                      <span className="mono" style={{ marginLeft: "0.5rem", fontSize: "0.6rem", fontWeight: 600, color: "var(--color-accent)", border: "1px solid var(--color-accent)", borderRadius: "999px", padding: "0.05rem 0.35rem" }}>Start here</span>
+                    ) : null}
+                    <div style={{ fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
+                      {lessonCount(v)} lessons{v.tree.certification_credit === "coursework" ? " · counts toward certification" : ""}
+                    </div>
+                  </div>
+                  <span aria-hidden style={{ color: "var(--color-ink-muted)" }}>→</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <section>
         <h3 style={{ fontSize: "1rem", margin: "0 0 0.6rem" }}>Power drills due</h3>

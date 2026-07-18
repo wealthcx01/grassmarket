@@ -7,9 +7,15 @@
  */
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 
 import { ApiError, api } from "@/lib/api";
 import type { BenchQueue, PerformanceSummary } from "@/lib/types";
+
+// Where an action kind takes the advisor when it has a concrete destination.
+const KIND_HREF: Record<string, string> = {
+  academy: "/workbench/academy",
+};
 
 const KIND_LABEL: Record<string, string> = {
   rating_request: "Rating request",
@@ -95,6 +101,11 @@ export function BenchDashboard({ advisorId }: { advisorId: string }) {
                   <p style={{ margin: "0.25rem 0 0", fontSize: "0.82rem", color: "var(--color-ink-muted)" }}>
                     {item.detail}
                   </p>
+                  {KIND_HREF[item.kind] ? (
+                    <p style={{ margin: "0.4rem 0 0", fontSize: "0.8rem" }}>
+                      <Link href={KIND_HREF[item.kind]!}>Open the Academy →</Link>
+                    </p>
+                  ) : null}
                 </div>
               </li>
             ))}

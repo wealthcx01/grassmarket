@@ -415,6 +415,20 @@ def complete_lesson(
         raise _conflict(exc) from exc
 
 
+@router.get("/courses/{slug}/completions", response_model=list[LessonCompletion])
+def list_lesson_completions(
+    slug: str,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> list[LessonCompletion]:
+    """The caller's own completed lessons for one published course — drives the learner reader's
+    progress (org-wide course, own progress). 404 if the course was never published."""
+    try:
+        return repo.list_lesson_completions(principal, slug)
+    except NotFoundError as exc:
+        raise _not_found("Published course") from exc
+
+
 # --- Course / product certifications (GRS-0127) -----------------------------------------
 # The Sales Egoist cert + one per product, on top of the assessor ladder. They reuse the
 # certification-events audit (no parallel store). A cert is earned by completing the course AND a
