@@ -54,7 +54,7 @@ from bcap_contracts.commissions import (
 from bcap_contracts.committee import CommitteeDecision, CommitteeItem, CommitteeQueueEntry
 from bcap_contracts.deliverables import Deliverable
 from bcap_contracts.engagements import CommsLogEntry, Engagement, Workshop
-from bcap_contracts.entities import Contact, Prospect
+from bcap_contracts.entities import CompanyEntity, Contact, Prospect
 from bcap_contracts.extraction import Extraction, FieldProvenance
 from bcap_contracts.fees import RecoveryFeeAttribution
 from bcap_contracts.learning import (
@@ -99,6 +99,7 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "Registry": Registry,
     "Prospect": Prospect,
     "Contact": Contact,
+    "CompanyEntity": CompanyEntity,
     "PipelineForecast": PipelineForecast,
     "PipelineBoard": PipelineBoard,
     "StageHistoryEntry": StageHistoryEntry,

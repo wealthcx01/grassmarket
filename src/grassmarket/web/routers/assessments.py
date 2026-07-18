@@ -51,6 +51,7 @@ from grassmarket.data.repository import (
     Repository,
     ScopeViolationError,
 )
+from grassmarket.entities import active_entity_registry
 from grassmarket.web.dependencies import get_current_principal, get_repository
 from grassmarket.workbench.certification import requires_certified_lead
 
@@ -66,6 +67,8 @@ class CreateAssessmentRequest(BaseModel):
     # ADR-0029: a sandbox record self-approves (solo finalise, watermarked, non-promotable). Default
     # production — the full dual-rating + committee gate. Demo records are seeded server-side.
     provenance: RecordProvenance = RecordProvenance.PRODUCTION
+    # GRS-0100/ADR-0033: the canonical company the subject resolved to; null for a manual subject.
+    entity_id: str | None = None
 
 
 class NamedScenario(BaseModel):
@@ -123,7 +126,27 @@ def create_assessment(
         if payload.provenance is RecordProvenance.SANDBOX
         else RecordProvenance.PRODUCTION
     )
-    return repo.create_assessment(principal, subject=payload.subject, provenance=provenance)
+    # A supplied entity_id must be a real registry entity — a fabricated link can never be stored
+    # (GRS-0100/ADR-0033, fail loud #3). Null is the explicit manual/unlinked fallback.
+    if payload.entity_id is not None and active_entity_registry().get(payload.entity_id) is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unknown company entity '{payload.entity_id}'.",
+        )
+    return repo.create_assessment(
+        principal, subject=payload.subject, provenance=provenance, entity_id=payload.entity_id
+    )
+
+
+@router.get("/for-entity/{entity_id}", response_model=list[Assessment])
+def list_assessments_for_entity(
+    entity_id: str,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> list[Assessment]:
+    """The caller's own assessments of one canonical company (GRS-0100 dedup legibility) — so the
+    advisor sees "you already have N assessments of this company" before starting another."""
+    return repo.list_assessments_for_entity(principal, entity_id)
 
 
 @router.get("", response_model=list[Assessment])

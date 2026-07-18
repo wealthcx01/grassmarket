@@ -15,6 +15,7 @@ import { ApiError, api, getToken } from "@/lib/api";
 import * as doc from "@/lib/doc";
 import type { BrokeragePortfolioEntry, RegistryProfile } from "@/lib/types";
 import { ProvenanceBadge } from "@/components/ProvenanceBadge";
+import { EntitySubjectField } from "@/components/EntitySubjectField";
 
 const STATE_LABEL: Record<BrokeragePortfolioEntry["state"], string> = {
   draft: "Draft",
@@ -73,6 +74,7 @@ export default function BrokeragesPage() {
   const [items, setItems] = useState<BrokeragePortfolioEntry[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [subject, setSubject] = useState("");
+  const [entityId, setEntityId] = useState<string | null>(null);
   const [sandbox, setSandbox] = useState(false);
   const [profiles, setProfiles] = useState<RegistryProfile[]>([]);
   const [profileKey, setProfileKey] = useState("retail");
@@ -115,7 +117,11 @@ export default function BrokeragesPage() {
     setCreating(true);
     setError(null);
     try {
-      const created = await api.createAssessment(subject.trim(), sandbox ? "sandbox" : "production");
+      const created = await api.createAssessment(
+        subject.trim(),
+        sandbox ? "sandbox" : "production",
+        entityId,
+      );
       // Set the operating-model profile at creation (feeds the same mechanism as the wizard's Overview
       // selector, GRS-0079). Retail is the default; only save a non-default so retail stays byte-clean.
       if (profileKey && profileKey !== "retail") {
@@ -150,22 +156,14 @@ export default function BrokeragesPage() {
       >
         <label style={{ fontSize: "0.85rem", flex: "1 1 20rem" }}>
           <span style={{ display: "block", marginBottom: "0.3rem", fontWeight: 500 }}>
-            New assessment — subject (business name)
+            New assessment — subject company
           </span>
-          <input
-            type="text"
+          <EntitySubjectField
             value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            placeholder="e.g. Meridian Capital Partners"
-            style={{
-              width: "100%",
-              padding: "0.55rem 0.7rem",
-              fontFamily: "inherit",
-              fontSize: "0.95rem",
-              color: "var(--color-ink)",
-              background: "var(--color-paper-raised)",
-              border: "1px solid var(--color-border)",
-              borderRadius: "var(--radius)",
+            entityId={entityId}
+            onChange={(s, id) => {
+              setSubject(s);
+              setEntityId(id);
             }}
           />
         </label>
