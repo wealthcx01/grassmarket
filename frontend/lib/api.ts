@@ -36,6 +36,7 @@ import type {
   Course,
   CourseTree,
   CourseVersion,
+  LessonCompletion,
   CertificationCredit,
   Deliverable,
   DeliverableSlot,
@@ -903,6 +904,39 @@ export const api = {
   listCourseVersions(slug: string, signal?: AbortSignal): Promise<CourseVersion[]> {
     return request<CourseVersion[]>(`/workbench/courses/${slug}/versions`, {
       method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  // --- Bruntsfield Academy: learner reads (GRS-0135) — org-wide catalog + own progress ---
+  listPublishedCourses(signal?: AbortSignal): Promise<CourseVersion[]> {
+    return request<CourseVersion[]>("/workbench/courses/published", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  getPublishedCourse(slug: string, signal?: AbortSignal): Promise<CourseVersion> {
+    return request<CourseVersion>(`/workbench/courses/${slug}/published`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  listLessonCompletions(slug: string, signal?: AbortSignal): Promise<LessonCompletion[]> {
+    return request<LessonCompletion[]>(`/workbench/courses/${slug}/completions`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  completeLesson(slug: string, lessonId: string, signal?: AbortSignal): Promise<LessonCompletion> {
+    return request<LessonCompletion>(`/workbench/courses/${slug}/lessons/${lessonId}/complete`, {
+      method: "POST",
       headers: authHeaders(),
       signal,
     });

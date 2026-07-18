@@ -4136,6 +4136,22 @@ class Repository:
             self._apply_coursework_credit(principal.consultant_id, now)
         return self._to_lesson_completion(completion)
 
+    def list_lesson_completions(self, principal: Principal, slug: str) -> list[LessonCompletion]:
+        """The caller's OWN lesson completions for a published course, so the learner reader shows
+        progress and never re-POSTs a done lesson. Owner-scoped (a consultant sees only their own
+        progress); the course is org-wide readable. 404 if the course was never published."""
+        self.get_published_course(principal, slug)  # 404 if never published
+        course = self._get_course_row(slug)
+        rows = self._session.execute(
+            select(LessonCompletionORM)
+            .where(
+                LessonCompletionORM.owner_consultant_id == principal.consultant_id,
+                LessonCompletionORM.course_id == course.id,
+            )
+            .order_by(LessonCompletionORM.completed_at)
+        ).scalars()
+        return [self._to_lesson_completion(r) for r in rows]
+
     @staticmethod
     def _to_course(row: CourseORM) -> Course:
         return Course(
