@@ -81,7 +81,7 @@ function LessonCard({
       ) : null}
       {lesson.drill_topics.length ? (
         <div style={{ marginTop: "0.5rem", display: "flex", gap: "0.3rem", flexWrap: "wrap", alignItems: "center" }}>
-          <span style={{ fontSize: "0.68rem", color: "var(--color-ink-faint)" }}>Reinforced by drills:</span>
+          <span style={{ fontSize: "0.68rem", color: "var(--color-ink-faint)" }}>Practice topics:</span>
           {lesson.drill_topics.map((t) => (
             <span key={t} className="tag" style={{ fontSize: "0.6rem" }}>{t}</span>
           ))}
@@ -232,10 +232,38 @@ export default function AcademyReaderPage() {
           })}
 
           {doneCount === total && total > 0 ? (
-            <p role="status" style={{ color: "var(--color-accent)", fontWeight: 600, fontSize: "0.9rem" }}>
-              ✓ You’ve completed every lesson in this course.
-              {course.tree.certification_credit === "coursework" ? " The coursework credit is recorded." : ""}
-            </p>
+            <section
+              role="status"
+              style={{
+                border: "1px solid var(--color-accent)",
+                borderRadius: "var(--radius)",
+                padding: "0.9rem 1rem",
+                background: "var(--color-paper-raised)",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.4rem",
+              }}
+            >
+              <p style={{ margin: 0, color: "var(--color-accent)", fontWeight: 600, fontSize: "0.9rem" }}>
+                ✓ You’ve read every lesson in this course.
+              </p>
+              <p style={{ margin: 0, fontSize: "0.82rem", color: "var(--color-ink-muted)" }}>
+                Reading is step one — the skill sticks when you use it. Next:
+              </p>
+              <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.85rem", display: "flex", flexDirection: "column", gap: "0.2rem" }}>
+                <li>
+                  <Link href="/workbench">Rehearse it live in the Practice Arena →</Link>
+                </li>
+                <li>
+                  <Link href="/workbench/academy">Pick your next course →</Link>
+                </li>
+              </ul>
+              {course.tree.certification_credit === "coursework" ? (
+                <p style={{ margin: 0, fontSize: "0.72rem", color: "var(--color-ink-faint)" }}>
+                  This course’s coursework credit is recorded toward your certification.
+                </p>
+              ) : null}
+            </section>
           ) : null}
         </>
       ) : !error ? (
