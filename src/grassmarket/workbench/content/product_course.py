@@ -65,15 +65,21 @@ def _commission_body(carrot: ProductCommissionCarrot) -> str:
     )
 
 
-def build_product_course(spec: ProductCourseSpec, carrot: ProductCommissionCarrot) -> CourseTree:
+def build_product_course(
+    spec: ProductCourseSpec,
+    carrot: ProductCommissionCarrot,
+    checks: dict[str, tuple[str, str]] | None = None,
+) -> CourseTree:
     """Assemble a product course from its spec + the live commission carrot. The `carrot.product_id`
     must match the spec (the caller resolves the carrot for this product) — the four sections come
-    out in a fixed order every time, so the template is reusable across products."""
+    out in a fixed order every time, so the template is reusable across products. `checks` maps a
+    lesson key → (comprehension question, model answer) for the active-recall gate (GRS-0140)."""
     if carrot.product_id != spec.product_id:
         raise ValueError(
             f"carrot is for {carrot.product_id!r}, not this course's product {spec.product_id!r}."
         )
 
+    checks = checks or {}
     sections = (
         ("relevance", "Why it's relevant", spec.relevance),
         ("white-label", "What white-labelling is", spec.white_label),
@@ -89,6 +95,8 @@ def build_product_course(spec: ProductCourseSpec, carrot: ProductCommissionCarro
             author=LessonAuthor.HUMAN,
             drill_topics=(f"product:{spec.product_id}:{key}",),
             measurement=None,
+            check_question=checks.get(key, (None, None))[0],
+            check_answer=checks.get(key, (None, None))[1],
         )
         for order, (key, title, body) in enumerate(sections)
     )

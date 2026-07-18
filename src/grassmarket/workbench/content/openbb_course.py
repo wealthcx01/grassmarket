@@ -290,7 +290,154 @@ _CONVICTION: tuple[tuple[str, str, str, str, str], ...] = (
 )
 
 
-def _lessons(specs: tuple[tuple[str, str, str, str, str], ...], start: int) -> tuple[Lesson, ...]:
+# Comprehension checks (GRS-0140): (question, answer) per lesson key. Authored so completing a
+# lesson is retrieval practice grounded in the real content, not a click. The four template lessons
+# are keyed in _TEMPLATE_CHECKS.
+_DEEP_CHECKS: dict[str, tuple[str, str]] = {
+    "pivot": (
+        "Name OpenBB's three product stages and its current commercial product.",
+        "The viral Terminal (sunset) → the open-source Open Data Platform (the data layer) → "
+        "OpenBB Workspace, the current commercial AI-research product. Don't lead with 'Bloomberg "
+        "killer'.",
+    ),
+    "workspace": (
+        "What is a Workspace 'widget', and why does 'data never leaves your environment' matter?",
+        "A widget is a self-contained data component analysts assemble into dashboards/apps with no"
+        "front-end team. Running on the firm's own infrastructure keeps proprietary data in-house —"
+        "the central pitch to compliance-sensitive buyers.",
+    ),
+    "platform": (
+        "State the 'connect once, consume everywhere' thesis and the five consuming surfaces.",
+        "Integrate a data source once via the Open Data Platform and it's available across Python, "
+        "the Workspace UI, Excel, MCP servers (AI agents), and a REST API — standardised output "
+        "means"
+        "swapping a vendor is a one-word provider= change.",
+    ),
+    "copilot-mcp": (
+        "What is the 'govern the AI agents already loose in the firm' pitch?",
+        "Agents will run inside a firm whether it plans for them or not, landing ungoverned. "
+        "OpenBB Copilot/MCP puts them on the firm's own data with permissions, lineage, citations "
+        "and "
+        "credential vaulting — govern the agents you already have.",
+    ),
+    "buy-side-research": (
+        "Which buyer segment is buy-side research consolidation for, and which assessment gap does "
+        "it answer?",
+        "Hedge funds / asset managers / equity-research teams. It's the fix for a research/tooling "
+        "infrastructure gap a retail-brokerage or wealth firm's Platform Power read surfaces.",
+    ),
+    "portfolio-risk": (
+        "Map portfolio-analytics/risk monitoring to the bottleneck it answers, and its buyer.",
+        "Asset managers, multi-strategy and risk teams; it fixes an operations/risk-infrastructure "
+        "bottleneck (custodian/vendor/internal data scattered, every view waiting on the data "
+        "team).",
+    ),
+    "client-reporting": (
+        "How does branded client reporting tie to an assessment finding?",
+        "Auto-refreshing white-labelled reports/portals answer a brand or switching-cost finding — "
+        "a"
+        "wealth firm's stickiness and brand shown through always-current client-facing artefacts.",
+    ),
+    "governed-ai": (
+        "How do you lead a governed-AI pitch instead of a feature bake-off?",
+        "Lead with 'govern the agents already in your firm on your own data, with lineage and "
+        "citations' — an enterprise-governance story, not a feature-by-feature comparison.",
+    ),
+    "quant-consolidation": (
+        "What is the 'connect once, own your infrastructure' consolidation story?",
+        "Replace a stack of point vendors with one governed layer the firm owns — integrate sources"
+        "once, standardise output, and swap any vendor with a provider= change; no lock-in.",
+    ),
+    "vs-bloomberg": (
+        "State, unprompted, what OpenBB does and does NOT replace.",
+        "It does NOT replace Bloomberg's messaging network or fixed-income depth (~30–40% of the "
+        "surface). Sell the open + governed-AI-over-your-own-data story; saying this plainly is "
+        "itself a selling advantage.",
+    ),
+    "licensing": (
+        "When does a client build need OpenBB's commercial license, and why?",
+        "The open-source Platform is AGPLv3, so offering it as a service or embedding it in a "
+        "client-facing/white-labelled product counts as distribution — triggering source-disclosure"
+        "unless the firm buys the commercial license.",
+    ),
+    "white-label": (
+        "List the white-label branding levers and why they avoid the AGPL trap.",
+        "Brand the Workspace UI, ship apps.json apps, embed custom/HTML widgets, plug in a custom "
+        "backend. These live in the proprietary Workspace, not a fork of the AGPL Platform — so no "
+        "source-disclosure obligation.",
+    ),
+    "custom-backend": (
+        "Describe the custom-backend pattern at a whiteboard.",
+        "Stand up a backend that serves the firm's own data as JSON and register it via a "
+        "widgets.json manifest; Workspace renders it as native widgets — the firm's proprietary "
+        "data,"
+        "no data leaving the environment.",
+    ),
+    "enterprise": (
+        "Name the deployment models and the four RBAC layers, and flag what to verify on SOC 2.",
+        "Cloud / self-hosted / on-prem; RBAC over users, groups, data sources and widgets. Confirm "
+        "the current SOC 2 scope with OpenBB rather than asserting it — verify, don't overclaim.",
+    ),
+    "dev-experience": (
+        "Why does running a live OpenBB query yourself matter to the sell?",
+        "Show, don't tell: a personally-run query (e.g. obb.equity.price.historical(...)) lets you "
+        "walk a buyer through the real flow with credibility no slide has — the Demo weapon.",
+    ),
+    "origin": (
+        "Tell the OpenBB origin story in ~60 seconds.",
+        "Started as the viral open-source 'Gamestonk Terminal' (~4,000+ stars) — a free 'Bloomberg "
+        "alternative' — founded by Didier Rodrigues Lopes; 'OpenBB' nods to BB = Bloomberg. It then"
+        "pivoted to the Platform and Workspace.",
+    ),
+    "thesis": (
+        "Cite three conviction points, each from a real source.",
+        "Radical openness (the AGPL Platform + ~100 providers), governed AI over the firm's own "
+        "data"
+        "(Copilot/MCP), and traction (the Gamestonk origin + enterprise adoption) — grounded in "
+        "OpenBB's site/docs and the founder's writing.",
+    ),
+    "objections": (
+        "Give a grounded, honest answer to 'isn't this just a worse Bloomberg?'",
+        "It's not trying to be Bloomberg — no messaging network or fixed-income depth. It wins on "
+        "open, vendor-agnostic consolidation and governed AI over your own data; for that job it's "
+        "stronger, and honesty about the rest builds trust.",
+    ),
+}
+
+_TEMPLATE_CHECKS: dict[str, tuple[str, str]] = {
+    "relevance": (
+        "Across retail brokerage, wealth, and exchange, what gap does OpenBB fix?",
+        "A research/data-infrastructure/AI-governance gap: research tooling for a broker, branded "
+        "client reporting + governed AI for a wealth manager, vendor-agnostic consolidation for an "
+        "exchange/data team — recommended against the Platform Power read, or sold on its own.",
+    ),
+    "white-label": (
+        "Where does OpenBB white-labelling happen, and where must it NOT?",
+        "In the proprietary Workspace (brand the UI, ship apps.json apps, custom widgets, custom "
+        "backend) — NOT by forking the AGPLv3 Platform, which would trigger source disclosure "
+        "without the commercial license.",
+    ),
+    "sell-motion": (
+        "What do you lead with — and explicitly not — when selling OpenBB?",
+        "Lead with governed AI over the firm's own data and vendor-agnostic consolidation; NOT "
+        "'Bloomberg killer'. Qualify on a real data/AI-governance gap, demo on the client's own "
+        "data, price on seat-reduction + IP-ownership + AI-governance.",
+    ),
+    "commission": (
+        "How is the commission you earn on OpenBB determined, and over what window?",
+        "By the Earnings v7 schedule's Year-1 / Year-2 rates for the attribution window from sale —"
+        "read live from the schedule, never a typed-in figure, so the carrot always matches the "
+        "real"
+        "rate. Sold as an assessment-gap fix or a commission product in its own right.",
+    ),
+}
+
+
+def _lessons(
+    specs: tuple[tuple[str, str, str, str, str], ...],
+    start: int,
+    checks: dict[str, tuple[str, str]] = _DEEP_CHECKS,
+) -> tuple[Lesson, ...]:
     return tuple(
         Lesson(
             id=_id("lesson", key),
@@ -300,6 +447,8 @@ def _lessons(specs: tuple[tuple[str, str, str, str, str], ...], start: int) -> t
             author=LessonAuthor.HUMAN,
             drill_topics=(drill,),
             measurement=measurement,
+            check_question=checks.get(key, (None, None))[0],
+            check_answer=checks.get(key, (None, None))[1],
         )
         for i, (key, title, body, drill, measurement) in enumerate(specs)
     )
@@ -336,7 +485,7 @@ def openbb_course(carrot: ProductCommissionCarrot) -> CourseTree:
         ),
     )
     base = build_product_course(
-        spec, carrot
+        spec, carrot, _TEMPLATE_CHECKS
     )  # 1 module (4 canonical sections incl. live commission)
     deep = (
         CourseModule(

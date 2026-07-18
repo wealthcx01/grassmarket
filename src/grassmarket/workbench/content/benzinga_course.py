@@ -244,7 +244,113 @@ _CONVICTION: tuple[tuple[str, str, str, str, str], ...] = (
 )
 
 
-def _lessons(specs: tuple[tuple[str, str, str, str, str], ...]) -> tuple[Lesson, ...]:
+# Comprehension checks (GRS-0140): (question, answer) per lesson key, for the active-recall gate.
+_DEEP_CHECKS: dict[str, tuple[str, str]] = {
+    "two-arms": (
+        "Distinguish Benzinga's two arms — and which one you actually sell.",
+        "The consumer arm (Benzinga Pro, the subscription terminal) versus the data-licensing arm "
+        "(the news / signals / calendar APIs). You sell the licensed data products, not Pro.",
+    ),
+    "news-feeds": (
+        "What is WIIM, and how do you pitch it?",
+        "'Why Is It Moving' — snackable, plain-English explanations of price moves. Pitch it "
+        "as the feed that powers alerts and notifications: the instant 'why' behind every "
+        "ticker move.",
+    ),
+    "signals-ratings": (
+        "Name a few signal datasets, and how do you honestly frame options flow?",
+        "Analyst ratings, options-flow, and unusual-activity signals. Frame options-flow as "
+        "engagement/signal content, NOT validated alpha — honesty about that is the sell, "
+        "not a hole.",
+    ),
+    "calendars-delivery": (
+        "What's in the calendar suite, and how is the data delivered?",
+        "Earnings, economics, dividends, IPOs, splits, guidance calendars — delivered over REST, "
+        "WebSocket (streaming), and webhooks, so a firm integrates the shape it needs.",
+    ),
+    "power-brokerage": (
+        "How do you pitch Benzinga to a brokerage?",
+        "As the news / ratings / signals layer on the brokerage's ticker pages — turning a bare "
+        "quote screen into an engaging, always-fresh research surface.",
+    ),
+    "advisor-platforms": (
+        "Describe the advisor-portal use case and the integration shape.",
+        "Embed Benzinga's feed into an advisor/client portal for timely, branded market context; "
+        "cite the Apex integration as the reference embed pattern.",
+    ),
+    "signals-quant": (
+        "How do you pitch the signals feed to an algo buyer without overclaiming?",
+        "Sell it as clean, structured signal/engagement data to enrich models — never as "
+        "predictive alpha. The honest framing is what an algo buyer trusts.",
+    ),
+    "fintech-engagement": (
+        "Which assessment gap does an always-fresh Benzinga feed answer?",
+        "A retention/engagement bottleneck — fresh, relevant market content keeps users returning, "
+        "the fix you recommend when the Platform Power read surfaces weak engagement.",
+    ),
+    "redistribution": (
+        "Is redistributing Benzinga's data an exception or the model?",
+        "It's the core model — Benzinga licenses data expressly for a firm to redistribute to its "
+        "own users; that's the product, not a special case.",
+    ),
+    "licence-attribution": (
+        "What must you scope per deal, and why?",
+        "The specific redistribution and attribution rights in the signed contract — proactively, "
+        "per deal — so the client's usage stays inside what was licensed.",
+    ),
+    "positioning": (
+        "State, unprompted, where Benzinga wins and where it is not the answer.",
+        "It wins on fast retail-facing news, ratings and engagement signals; it is NOT deep "
+        "institutional fundamentals or a Bloomberg-grade terminal — saying so builds trust.",
+    ),
+    "origin": (
+        "Tell the Benzinga origin/mission story briefly.",
+        "Founded by Jason Raznick in Detroit around 2009–2010 to 'level the playing field' — give "
+        "retail investors the fast market information institutions had.",
+    ),
+    "conviction": (
+        "Cite three conviction points, attributing company-reported ones honestly.",
+        "Breadth of real-time coverage, the redistribution-first licensing model, and adoption "
+        "by brokerages/fintechs — flagging which figures are company-reported rather than "
+        "independent.",
+    ),
+    "objections": (
+        "Give an honest answer to 'isn't this just retail news noise?'",
+        "It's structured, redistributable, attributable market data — news, ratings, signals "
+        "and calendars via API — built to embed and engage, not a noise feed; and it's honest "
+        "about not being institutional fundamentals.",
+    ),
+}
+
+_TEMPLATE_CHECKS: dict[str, tuple[str, str]] = {
+    "relevance": (
+        "Across retail brokerage, wealth, and exchange, what gap does Benzinga fill?",
+        "A market-content / engagement gap — news, ratings and signals to enrich ticker pages, "
+        "advisor portals and apps — recommended against the Platform Power read, or sold on "
+        "its own.",
+    ),
+    "white-label": (
+        "How is Benzinga white-labelled?",
+        "By embedding its licensed feeds under the firm's own brand in the firm's surfaces "
+        "(portals, apps, ticker pages) — the redistribution rights are scoped in the contract.",
+    ),
+    "sell-motion": (
+        "What do you lead with when selling Benzinga?",
+        "A real engagement/market-content gap: run the assessment, show how a fresh news/ratings/"
+        "signals layer lifts engagement, and scope the redistribution/attribution per deal.",
+    ),
+    "commission": (
+        "How is your Benzinga commission determined, and over what window?",
+        "By the Earnings v7 schedule's Year-1 / Year-2 advisor rates for the attribution window "
+        "from sale — read live from the schedule, never a typed-in figure.",
+    ),
+}
+
+
+def _lessons(
+    specs: tuple[tuple[str, str, str, str, str], ...],
+    checks: dict[str, tuple[str, str]] = _DEEP_CHECKS,
+) -> tuple[Lesson, ...]:
     return tuple(
         Lesson(
             id=_id("lesson", key),
@@ -254,6 +360,8 @@ def _lessons(specs: tuple[tuple[str, str, str, str, str], ...]) -> tuple[Lesson,
             author=LessonAuthor.HUMAN,
             drill_topics=(drill,),
             measurement=measurement,
+            check_question=checks.get(key, (None, None))[0],
+            check_answer=checks.get(key, (None, None))[1],
         )
         for i, (key, title, body, drill, measurement) in enumerate(specs)
     )
@@ -290,7 +398,9 @@ def benzinga_course(carrot: ProductCommissionCarrot) -> CourseTree:
             "Enterprise pricing is a scoped quote via licensing@benzinga.com."
         ),
     )
-    base = build_product_course(spec, carrot)  # spine incl. the live advisor commission (15%)
+    base = build_product_course(
+        spec, carrot, _TEMPLATE_CHECKS
+    )  # spine incl. the live advisor commission (15%)
     deep = (
         CourseModule(
             id=_id("module", "what-it-is"),

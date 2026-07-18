@@ -237,7 +237,113 @@ _CONVICTION: tuple[tuple[str, str, str, str, str], ...] = (
 )
 
 
-def _lessons(specs: tuple[tuple[str, str, str, str, str], ...]) -> tuple[Lesson, ...]:
+# Comprehension checks (GRS-0140): (question, answer) per lesson key, for the active-recall gate.
+_DEEP_CHECKS: dict[str, tuple[str, str]] = {
+    "platform": (
+        "Explain Brandfetch's directory-plus-API model, and why first-party verification matters.",
+        "A crowd-plus-verified directory of brand assets (logos, colours, fonts, "
+        "firmographics) exposed via APIs. First-party verification (a brand claims and "
+        "curates its own record) is what makes the data trustworthy enough to display.",
+    ),
+    "brand-api": (
+        "Name the four Brand API lookup keys.",
+        "Domain, stock ticker, ISIN, and crypto address — you resolve a brand's assets "
+        "from any of the identifiers a financial app already holds.",
+    ),
+    "logo-search": (
+        "How do you demo Logo Link, and what's the land-and-expand motion?",
+        "Drop a Logo Link URL straight into an <img> tag — instant logos, no integration. "
+        "That free/simple entry lands the account, then expands into the paid Brand API.",
+    ),
+    "transaction-api": (
+        "What does the Transaction API do, and who buys it?",
+        "It resolves a raw bank/card descriptor to a clean merchant (name + logo). Buyers "
+        "are neobanks, PFM and spend-analytics apps that want recognisable transaction "
+        "feeds.",
+    ),
+    "onboarding-kyb": (
+        "Which assessment gap does the onboarding brand-picker answer?",
+        "A conversion gap — a logo-rich picker makes onboarding/KYB feel fast and "
+        "trustworthy, lifting completion where the Platform Power read flags drop-off.",
+    ),
+    "portfolio-dashboards": (
+        "How do you pitch logo lookup for a holdings dashboard, and who's the proof point?",
+        "Resolve ticker/ISIN → brand logo so a portfolio/holdings dashboard shows "
+        "recognisable brands, not tickers; cite Morningstar as a reference user.",
+    ),
+    "transaction-feeds": (
+        "Map the Transaction API to a data-quality gap.",
+        "It fixes messy, cryptic spend feeds — enriching descriptors into named, "
+        "logo'd merchants — the fix for a transaction data-quality bottleneck.",
+    ),
+    "enrichment-research": (
+        "What's the batch-enrichment pitch?",
+        "Enrich a whole book at scale — logos plus firmographics — so a research or CRM "
+        "dataset carries clean, current brand data without manual lookup.",
+    ),
+    "two-tier": (
+        "Explain distribution vs redistribution, and which commission tier each is.",
+        "Distribution = the client uses the data in its own product; redistribution = the "
+        "client passes it on to third parties. They are separate commission tiers, and "
+        "distribution pays more.",
+    ),
+    "trademark": (
+        "Who owns trademark / fair-use compliance, and what must you disclose?",
+        "The buyer does, not Brandfetch — proactively disclose that displaying third-party "
+        "logos is the client's trademark/fair-use responsibility.",
+    ),
+    "pricing-motion": (
+        "Walk the land-and-expand pricing path.",
+        "Free Logo Link → the paid Brand API (usage-tiered) → an Enterprise agreement — "
+        "start free/self-serve, expand to committed volume with real price anchors.",
+    ),
+    "origin": (
+        "Tell the Brandfetch origin story accurately.",
+        "Founded in 2020, based in Switzerland, backed by the Adobe Fund for Design — do "
+        "NOT claim a specific VC raise (terms weren't public).",
+    ),
+    "conviction": (
+        "Cite two reference customers and the core thesis.",
+        "Financial-firm users such as Morningstar; the thesis is a registry flywheel — more "
+        "verified brands make the directory more valuable, which attracts more brands.",
+    ),
+    "objections": (
+        "Give an honest answer to 'why not just scrape logos ourselves?'",
+        "Scraped logos are stale, inconsistent and a trademark risk. Brandfetch is "
+        "first-party-verified, current, and API-delivered across ticker/ISIN/domain — the "
+        "maintenance and compliance you'd otherwise own.",
+    ),
+}
+
+_TEMPLATE_CHECKS: dict[str, tuple[str, str]] = {
+    "relevance": (
+        "Across retail brokerage, wealth, and exchange, what gap does Brandfetch fill?",
+        "A brand-data / UX gap — recognisable logos and firmographics for onboarding, "
+        "holdings dashboards and transaction feeds — recommended against the Platform "
+        "Power read, or sold on its own.",
+    ),
+    "white-label": (
+        "How is Brandfetch used under the firm's own brand?",
+        "Its logos and brand data are embedded inside the firm's own product surfaces; the "
+        "distribution vs redistribution rights are scoped in the contract.",
+    ),
+    "sell-motion": (
+        "What's the Brandfetch sell motion?",
+        "Land free with Logo Link, prove the UX lift against an onboarding/engagement gap "
+        "the assessment surfaces, then expand into the paid Brand API and Enterprise.",
+    ),
+    "commission": (
+        "How is your Brandfetch commission determined, and over what window?",
+        "By the Earnings v7 schedule's rates (distribution and redistribution tiers) for "
+        "the attribution window from sale — read live, never a typed-in figure.",
+    ),
+}
+
+
+def _lessons(
+    specs: tuple[tuple[str, str, str, str, str], ...],
+    checks: dict[str, tuple[str, str]] = _DEEP_CHECKS,
+) -> tuple[Lesson, ...]:
     return tuple(
         Lesson(
             id=_id("lesson", key),
@@ -247,6 +353,8 @@ def _lessons(specs: tuple[tuple[str, str, str, str, str], ...]) -> tuple[Lesson,
             author=LessonAuthor.HUMAN,
             drill_topics=(drill,),
             measurement=measurement,
+            check_question=checks.get(key, (None, None))[0],
+            check_answer=checks.get(key, (None, None))[1],
         )
         for i, (key, title, body, drill, measurement) in enumerate(specs)
     )
@@ -312,7 +420,9 @@ def brandfetch_course(
             "commission tier."
         ),
     )
-    base = build_product_course(spec, dist_carrot)  # spine incl. the live distribution commission
+    base = build_product_course(
+        spec, dist_carrot, _TEMPLATE_CHECKS
+    )  # spine incl. the live distribution commission
     commercial_lessons = _lessons(_COMMERCIAL) + (
         _two_tier_commission_lesson(dist_carrot, redist_carrot),
     )
