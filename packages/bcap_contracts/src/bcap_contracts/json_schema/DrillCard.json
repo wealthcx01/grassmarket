@@ -2,6 +2,12 @@
   "additionalProperties": false,
   "description": "One advisor's spaced-repetition state for a drill TOPIC (a power / triad / module / anchor).\nThe SM-2 fields (`repetitions`, `easiness`, `interval_days`) update on every review; `due_at` is\nwhen it next surfaces; `streak` is consecutive passes.",
   "properties": {
+    "answer": {
+      "default": "",
+      "description": "The model answer (back of the card).",
+      "title": "Answer",
+      "type": "string"
+    },
     "created_at": {
       "format": "date-time",
       "title": "Created At",
@@ -46,6 +52,12 @@
       "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
       "format": "uuid",
       "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "prompt": {
+      "default": "",
+      "description": "The recall question (front of the card).",
+      "title": "Prompt",
       "type": "string"
     },
     "repetitions": {

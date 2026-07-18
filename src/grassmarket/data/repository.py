@@ -121,6 +121,7 @@ from bcap_contracts.learning import (
     GeneratedQuiz,
     LearningKind,
     LearningModule,
+    Lesson,
     LessonCompletion,
     QuizQuestion,
     QuizStatus,
@@ -2558,9 +2559,7 @@ class Repository:
         self._session.flush()
         return self._to_assessment(row)
 
-    def list_assessments_for_entity(
-        self, principal: Principal, entity_id: str
-    ) -> list[Assessment]:
+    def list_assessments_for_entity(self, principal: Principal, entity_id: str) -> list[Assessment]:
         """The caller's OWN assessments of one canonical company (GRS-0100 dedup). Owner-scoped —
         the count is a consultant's own book, never a cross-owner leak (#9)."""
         rows = (
@@ -3786,11 +3785,22 @@ class Repository:
     # Each advisor owns their own spaced-repetition cards; answering one reschedules it by SM-2. The
     # clock is injected (never `datetime.now()` inside), so the schedule is deterministic in tests.
 
-    def create_drill_card(self, principal: Principal, *, topic: str, now: datetime) -> DrillCard:
-        """Add a drill card for the caller over a topic — due immediately. One card per topic."""
+    def create_drill_card(
+        self,
+        principal: Principal,
+        *,
+        topic: str,
+        now: datetime,
+        prompt: str = "",
+        answer: str = "",
+    ) -> DrillCard:
+        """Add a drill card for the caller over a topic — due immediately. One card per topic.
+        `prompt`/`answer` carry the retrieval content (GRS-0139); empty for a bare topic card."""
         row = DrillCardORM(
             owner_consultant_id=principal.consultant_id,
             topic=topic,
+            prompt=prompt,
+            answer=answer,
             due_at=now,
         )
         self._session.add(row)
@@ -3800,6 +3810,17 @@ class Repository:
             self._session.rollback()
             raise ConflictError(f"You already have a drill card for {topic!r}.") from exc
         return self._to_drill_card(row)
+
+    def _has_drill_card(self, advisor_id: UUID, topic: str) -> bool:
+        return (
+            self._session.execute(
+                select(DrillCardORM.id).where(
+                    DrillCardORM.owner_consultant_id == advisor_id,
+                    DrillCardORM.topic == topic,
+                )
+            ).first()
+            is not None
+        )
 
     def list_drill_cards(self, principal: Principal) -> list[DrillCard]:
         rows = (
@@ -4145,6 +4166,21 @@ class Repository:
             self._session.rollback()
             raise ConflictError("You have already completed this lesson.") from exc
 
+        # Wire the spaced-repetition loop (GRS-0139): completing a lesson auto-enrolls a real drill
+        # card — with a recall question + model answer — for each topic it teaches, so learning is
+        # reinforced, not read-and-forget. Idempotent: skip a topic the advisor already drills.
+        lesson = next(
+            (les for m in published.tree.modules for les in m.lessons if les.id == lesson_id),
+            None,
+        )
+        if lesson is not None:
+            prompt, answer = self._lesson_drill_content(lesson)
+            for topic in lesson.drill_topics:
+                if not self._has_drill_card(principal.consultant_id, topic):
+                    self.create_drill_card(
+                        principal, topic=topic, now=now, prompt=prompt, answer=answer
+                    )
+
         completed = {
             r.lesson_id
             for r in self._session.execute(
@@ -4275,11 +4311,27 @@ class Repository:
         return self._to_generated_quiz(row)
 
     @staticmethod
+    def _lesson_drill_content(lesson: Lesson) -> tuple[str, str]:
+        """The recall question + model answer a completed lesson seeds its drills with (GRS-0139).
+        Prefer the authored comprehension check; otherwise derive a recall prompt from the lesson's
+        `measurement` (its 'how you know you applied it' criterion), which is the answer key too."""
+        if lesson.check_question:
+            return lesson.check_question, (lesson.check_answer or lesson.measurement or "")
+        if lesson.measurement:
+            return (
+                f"Recall — {lesson.title}: how do you know you've applied it?",
+                lesson.measurement,
+            )
+        return f"Recall the key idea of '{lesson.title}'.", ""
+
+    @staticmethod
     def _to_drill_card(row: DrillCardORM) -> DrillCard:
         return DrillCard(
             id=row.id,
             owner_consultant_id=row.owner_consultant_id,
             topic=row.topic,
+            prompt=row.prompt,
+            answer=row.answer,
             repetitions=row.repetitions,
             easiness=row.easiness,
             interval_days=row.interval_days,

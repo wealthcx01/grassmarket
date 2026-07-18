@@ -130,6 +130,32 @@
           "title": "Body",
           "type": "string"
         },
+        "check_answer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The model answer revealed after the advisor attempts the check (GRS-0139). None → the reader falls back to `measurement` as the answer key.",
+          "title": "Check Answer"
+        },
+        "check_question": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "A retrieval-practice question the advisor answers to complete the lesson (GRS-0139). None → the reader derives a recall prompt from `measurement`.",
+          "title": "Check Question"
+        },
         "drill_topics": {
           "default": [],
           "description": "Existing DrillCard topics this lesson reinforces (e.g. 'power:…').",

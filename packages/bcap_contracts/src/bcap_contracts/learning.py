@@ -53,6 +53,10 @@ class DrillCard(OwnedResource):
     model_config = ConfigDict(extra="forbid")
 
     topic: str = Field(min_length=1, description="e.g. 'power:SCALE_ECONOMIES' or 'module:OEMS'.")
+    # Real retrieval content (GRS-0139) — the question the advisor tries to recall, and the model
+    # answer they reveal before self-grading. Empty on a legacy topic-only card.
+    prompt: str = Field(default="", description="The recall question (front of the card).")
+    answer: str = Field(default="", description="The model answer (back of the card).")
     repetitions: int = Field(default=0, ge=0)
     easiness: float = Field(default=2.5, ge=1.3)
     interval_days: int = Field(default=0, ge=0)
@@ -176,6 +180,16 @@ class Lesson(BaseModel):
     measurement: str | None = Field(
         default=None,
         description="How the advisor measures they have applied this lesson (GRS-0122).",
+    )
+    check_question: str | None = Field(
+        default=None,
+        description="A retrieval-practice question the advisor answers to complete the lesson "
+        "(GRS-0139). None → the reader derives a recall prompt from `measurement`.",
+    )
+    check_answer: str | None = Field(
+        default=None,
+        description="The model answer revealed after the advisor attempts the check (GRS-0139). "
+        "None → the reader falls back to `measurement` as the answer key.",
     )
     approved: bool = True
     approved_by_consultant_id: UUID | None = None

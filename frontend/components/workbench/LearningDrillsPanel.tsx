@@ -14,6 +14,49 @@ import type { CourseVersion, DrillCard, LearningModule } from "@/lib/types";
 
 const GRADES = [0, 1, 2, 3, 4, 5];
 
+// One spaced-repetition drill (GRS-0139): a real flashcard — try to recall the answer to the
+// question, reveal the model answer, then self-grade. Falls back to the topic for legacy cards.
+function DrillItem({ card, onGrade }: { card: DrillCard; onGrade: (grade: number) => void }) {
+  const [revealed, setRevealed] = useState(false);
+  const question = card.prompt || `Recall the key idea of ${card.topic}.`;
+  return (
+    <li style={{ border: "1px solid var(--color-border)", borderRadius: "var(--radius)", padding: "0.7rem 0.9rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: "0.6rem", alignItems: "baseline" }}>
+        <span style={{ fontSize: "0.85rem", fontWeight: 600 }}>{question}</span>
+        <span className="mono" style={{ fontSize: "0.66rem", color: "var(--color-ink-muted)", whiteSpace: "nowrap" }}>streak {card.streak}</span>
+      </div>
+      <div className="mono" style={{ fontSize: "0.6rem", color: "var(--color-ink-faint)", marginTop: "0.15rem" }}>{card.topic}</div>
+      {revealed ? (
+        <>
+          {card.answer ? (
+            <p style={{ margin: "0.5rem 0 0", fontSize: "0.8rem", color: "var(--color-ink-muted)", borderLeft: "2px solid var(--color-accent)", paddingLeft: "0.6rem" }}>
+              <strong style={{ color: "var(--color-ink)" }}>Answer:</strong> {card.answer}
+            </p>
+          ) : null}
+          <div style={{ display: "flex", gap: "0.3rem", marginTop: "0.5rem", flexWrap: "wrap", alignItems: "center" }}>
+            <span style={{ fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>How well did you recall it?</span>
+            {GRADES.map((g) => (
+              <button
+                key={g}
+                type="button"
+                aria-label={`Grade ${g} for ${card.topic}`}
+                onClick={() => onGrade(g)}
+                style={{ width: "1.9rem", height: "1.9rem", border: "1px solid var(--color-border)", borderRadius: "var(--radius)", background: "var(--color-paper-raised)", cursor: "pointer", fontSize: "0.8rem" }}
+              >
+                {g}
+              </button>
+            ))}
+          </div>
+        </>
+      ) : (
+        <button type="button" className="btn" onClick={() => setRevealed(true)} style={{ marginTop: "0.5rem", fontSize: "0.74rem" }}>
+          Reveal answer
+        </button>
+      )}
+    </li>
+  );
+}
+
 function lessonCount(v: CourseVersion): number {
   return v.tree.modules.reduce((n, m) => n + m.lessons.length, 0);
 }
@@ -127,26 +170,7 @@ export function LearningDrillsPanel() {
         ) : (
           <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             {due.map((card) => (
-              <li key={card.id} style={{ border: "1px solid var(--color-border)", borderRadius: "var(--radius)", padding: "0.7rem 0.9rem" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: "0.6rem", alignItems: "baseline" }}>
-                  <span className="mono" style={{ fontSize: "0.8rem" }}>{card.topic}</span>
-                  <span style={{ fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>streak {card.streak}</span>
-                </div>
-                <div style={{ display: "flex", gap: "0.3rem", marginTop: "0.5rem", flexWrap: "wrap" }}>
-                  <span style={{ fontSize: "0.72rem", color: "var(--color-ink-muted)", alignSelf: "center" }}>Recall:</span>
-                  {GRADES.map((g) => (
-                    <button
-                      key={g}
-                      type="button"
-                      aria-label={`Grade ${g} for ${card.topic}`}
-                      onClick={() => void answer(card, g)}
-                      style={{ width: "1.9rem", height: "1.9rem", border: "1px solid var(--color-border)", borderRadius: "var(--radius)", background: "var(--color-paper-raised)", cursor: "pointer", fontSize: "0.8rem" }}
-                    >
-                      {g}
-                    </button>
-                  ))}
-                </div>
-              </li>
+              <DrillItem key={card.id} card={card} onGrade={(g) => void answer(card, g)} />
             ))}
           </ul>
         )}

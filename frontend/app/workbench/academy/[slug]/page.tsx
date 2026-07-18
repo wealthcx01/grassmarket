@@ -53,6 +53,16 @@ function LessonCard({
   busy: boolean;
   onComplete: () => void;
 }) {
+  // Active-recall gate (GRS-0139): you complete a lesson by trying to recall its point, then
+  // revealing the model answer — retrieval practice, not a click-through.
+  const [attempt, setAttempt] = useState("");
+  const [revealed, setRevealed] = useState(false);
+  const question =
+    lesson.check_question ??
+    (lesson.measurement
+      ? "Before you complete this — in your own words, how will you know you’ve applied it?"
+      : "Recall the key idea of this lesson in your own words.");
+  const modelAnswer = lesson.check_answer ?? lesson.measurement ?? "";
   return (
     <article
       style={{
@@ -87,11 +97,70 @@ function LessonCard({
           ))}
         </div>
       ) : null}
-      <div style={{ marginTop: "0.7rem" }}>
-        <button type="button" className="btn" disabled={done || busy} onClick={onComplete} style={{ fontSize: "0.78rem" }}>
-          {done ? "Completed" : busy ? "Saving…" : "Mark complete"}
-        </button>
-      </div>
+      {done ? (
+        <div style={{ marginTop: "0.7rem" }}>
+          <button type="button" className="btn" disabled style={{ fontSize: "0.78rem" }}>
+            Completed
+          </button>
+        </div>
+      ) : (
+        <div
+          style={{
+            marginTop: "0.8rem",
+            paddingTop: "0.7rem",
+            borderTop: "1px dashed var(--color-border)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.5rem",
+          }}
+        >
+          <p style={{ margin: 0, fontSize: "0.8rem", fontWeight: 600 }}>
+            <span className="mono" style={{ fontSize: "0.6rem", color: "var(--color-accent)", marginRight: "0.4rem" }}>CHECK YOURSELF</span>
+            {question}
+          </p>
+          <textarea
+            value={attempt}
+            onChange={(e) => setAttempt(e.target.value)}
+            placeholder="Answer from memory before revealing — that’s what makes it stick."
+            aria-label={`Recall answer for ${lesson.title}`}
+            rows={2}
+            disabled={revealed}
+            style={{
+              width: "100%",
+              padding: "0.45rem 0.55rem",
+              fontFamily: "inherit",
+              fontSize: "0.82rem",
+              border: "1px solid var(--color-border)",
+              borderRadius: "var(--radius)",
+              background: "var(--color-paper)",
+              resize: "vertical",
+            }}
+          />
+          {revealed && modelAnswer ? (
+            <p style={{ margin: 0, fontSize: "0.82rem", color: "var(--color-ink-muted)", borderLeft: "2px solid var(--color-accent)", paddingLeft: "0.6rem" }}>
+              <strong style={{ color: "var(--color-ink)" }}>Model answer:</strong> {modelAnswer}
+            </p>
+          ) : null}
+          <div>
+            {revealed ? (
+              <button type="button" className="btn btn-primary" disabled={busy} onClick={onComplete} style={{ fontSize: "0.78rem" }}>
+                {busy ? "Saving…" : "Mark complete →"}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="btn"
+                disabled={attempt.trim().length < 3}
+                onClick={() => setRevealed(true)}
+                style={{ fontSize: "0.78rem" }}
+                title={attempt.trim().length < 3 ? "Write your recall attempt first" : undefined}
+              >
+                Reveal model answer
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </article>
   );
 }
