@@ -121,9 +121,67 @@ _LESSONS: tuple[tuple[str, str, str, str], ...] = (
 )
 
 
+# (check_question, check_answer) per lesson, in _LESSONS order — the retrieval-practice pair the
+# advisor answers to complete the lesson, and which seeds its spaced-repetition drill (GRS-0139).
+_CHECKS: tuple[tuple[str, str], ...] = (
+    (
+        "Why is a passive advisory conversation a loss rather than neutral — and what "
+        "does the Sales Egoist own on every live account?",
+        "The pipeline is zero-sum: any step you don't advance, a competitor advances "
+        "instead. So the Sales Egoist owns the next step of every live account, and the "
+        "Platform Power assessment is that advancing move.",
+    ),
+    (
+        "What three things must you be able to name for each account, and why sell to "
+        "the account rather than the contact?",
+        "The whole buying unit, the incumbent, and the P&L line your solution moves. "
+        "Selling to one contact misses the buying unit and the economics the assessment "
+        "scores across every module.",
+    ),
+    (
+        "How do you earn the right to challenge a client, and what makes the assessment "
+        "your credibility instrument?",
+        "By doing the unglamorous account work first and bringing evidence, not opinion — "
+        "a scored finding a client trusts over a claim. Relationship earns the right to "
+        "challenge.",
+    ),
+    (
+        "What is the Challenger's 'teach', and how does the assessment power it?",
+        "Teach the client a non-obvious insight about their own business — a bottleneck "
+        "they've under-priced — that the Platform Power assessment surfaces. Lead with the "
+        "insight; let the score carry the argument.",
+    ),
+    (
+        "Teaching lands only under two conditions — what are they?",
+        "It must be tailored to the buyer's operating model and incentives, and you must "
+        "take control of the process by naming and scheduling the next step, not asking "
+        "for one.",
+    ),
+    (
+        "In the Sales Egoist method, what IS the demo — and why show rather than tell?",
+        "The assessment is the demo: run a scoped Platform Power read and let the client "
+        "watch their own moat get measured. A live artefact shows rigour no slide can — "
+        "the method sells.",
+    ),
+    (
+        "How do the assessment findings qualify — and disqualify — a deal?",
+        "A genuine, addressable bottleneck means a deal; an already-strong surface means "
+        "nurture, not push. Qualify on the specific gap, and disqualify honestly when the "
+        "moat is already sound.",
+    ),
+    (
+        "How does Total Account Awareness convert a finding into a close?",
+        "Turn the finding into a scoped engagement, counter-positioning the cost of "
+        "leaving the bottleneck unaddressed (priced via the value bridge, never mixed with "
+        "the score), and close on the named finding with a dated first deliverable.",
+    ),
+)
+
+
 def sales_egoist_course() -> CourseTree:
     """Build the Sales Egoist course tree — 8 human-authored lessons, mandatory-first, no cert
-    credit by itself (the certification sits on top in GRS-0127)."""
+    credit by itself (the certification sits on top in GRS-0127). Each lesson carries a
+    retrieval-practice check (GRS-0139) that gates completion and seeds its drill."""
     lessons = tuple(
         Lesson(
             id=_id("lesson", str(order)),
@@ -133,6 +191,8 @@ def sales_egoist_course() -> CourseTree:
             author=LessonAuthor.HUMAN,
             drill_topics=(drill,),
             measurement=measurement,
+            check_question=_CHECKS[order][0],
+            check_answer=_CHECKS[order][1],
         )
         for order, (title, body, drill, measurement) in enumerate(_LESSONS)
     )

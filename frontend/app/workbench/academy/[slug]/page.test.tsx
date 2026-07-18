@@ -93,12 +93,18 @@ describe("Academy reader (GRS-0135)", () => {
     expect(document.body.textContent).not.toContain("**");
   });
 
-  it("marks a lesson complete through the API and reflects it", async () => {
+  it("gates completion behind active recall, then completes through the API (GRS-0139)", async () => {
     render(<AcademyReaderPage />);
-    const button = await screen.findByRole("button", { name: "Mark complete" });
-    fireEvent.click(button);
+    // You cannot complete without first attempting recall — there is no bare "Mark complete".
+    const reveal = await screen.findByRole("button", { name: "Reveal model answer" });
+    expect((reveal as HTMLButtonElement).disabled).toBe(true);
+    // Attempt recall → reveal the model answer → then complete.
+    fireEvent.change(screen.getByLabelText(/Recall answer for/), {
+      target: { value: "the pipeline is zero-sum" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Reveal model answer" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Mark complete →" }));
     await waitFor(() => expect(mocked.completeLesson).toHaveBeenCalledWith("sales-egoist", "l1"));
-    // The button flips to a disabled "Completed" once the completion is recorded.
     expect(await screen.findByRole("button", { name: "Completed" })).toBeTruthy();
   });
 });

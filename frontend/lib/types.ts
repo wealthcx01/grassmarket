@@ -753,6 +753,8 @@ export interface Lesson {
   video_ref?: string | null;
   drill_topics: string[];
   measurement?: string | null;
+  check_question?: string | null;
+  check_answer?: string | null;
   approved: boolean;
   approved_by_consultant_id?: string | null;
   approved_at?: string | null;
@@ -801,6 +803,8 @@ export interface LessonCompletion {
 export interface DrillCard {
   id: string;
   topic: string;
+  prompt: string;
+  answer: string;
   repetitions: number;
   easiness: number;
   interval_days: number;

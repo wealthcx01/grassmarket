@@ -631,6 +631,9 @@ class DrillCardORM(Base):
         ForeignKey("consultants.id"), index=True, nullable=False
     )
     topic: Mapped[str] = mapped_column(String(128), nullable=False)
+    # Retrieval content (GRS-0139) — the recall question + model answer. Empty on legacy cards.
+    prompt: Mapped[str] = mapped_column(Text, default="", nullable=False, server_default="")
+    answer: Mapped[str] = mapped_column(Text, default="", nullable=False, server_default="")
     repetitions: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     easiness: Mapped[float] = mapped_column(Float, default=2.5, nullable=False)
     interval_days: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
