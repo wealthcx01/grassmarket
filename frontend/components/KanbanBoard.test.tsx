@@ -24,7 +24,7 @@ function board(entries: PipelineBoard["entries"]): PipelineBoard {
 
 describe("KanbanBoard empty states (GRS-0055)", () => {
   it("shows a 'No prospects' placeholder in every empty stage", () => {
-    render(<KanbanBoard board={board([])} onMove={async () => {}} />);
+    render(<KanbanBoard board={board([])} onOpen={() => {}} onMove={async () => {}} />);
     expect(screen.getAllByText("No prospects").length).toBe(PIPELINE_STAGES.length);
   });
 
@@ -36,7 +36,7 @@ describe("KanbanBoard empty states (GRS-0055)", () => {
       stale: false,
       win_probability: { score: 10, label: "Cold", reasons: [], missing_info: [] },
     };
-    render(<KanbanBoard board={board([entry])} onMove={async () => {}} />);
+    render(<KanbanBoard board={board([entry])} onOpen={() => {}} onMove={async () => {}} />);
     expect(screen.getByText("Meridian Securities")).toBeTruthy();
     // One fewer empty column than the total number of stages.
     expect(screen.getAllByText("No prospects").length).toBe(PIPELINE_STAGES.length - 1);

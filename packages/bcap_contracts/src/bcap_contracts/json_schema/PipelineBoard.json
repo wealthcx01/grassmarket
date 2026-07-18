@@ -139,6 +139,18 @@
           "format": "date-time",
           "title": "Updated At",
           "type": "string"
+        },
+        "website": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Website"
         }
       },
       "required": [

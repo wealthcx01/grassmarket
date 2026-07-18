@@ -140,9 +140,35 @@ class ProspectORM(Base):
         DateTime(timezone=True), default=_now, nullable=False
     )
     sector: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    website: Mapped[str | None] = mapped_column(String(255), nullable=True)
     primary_contact_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
     primary_contact_email: Mapped[str | None] = mapped_column(String(320), nullable=True)
     notes: Mapped[str | None] = mapped_column(String(2000), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
+class ContactORM(Base):
+    """A person at a prospect's company (GRS-0111) — owner-scoped, many per prospect. One may be
+    ``is_primary``; the prospect's inline primary_contact_* fields mirror the primary for the
+    win-probability scorer."""
+
+    __tablename__ = "contacts"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    prospect_id: Mapped[UUID] = mapped_column(
+        ForeignKey("prospects.id"), index=True, nullable=False
+    )
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    email: Mapped[str | None] = mapped_column(String(320), nullable=True)
+    phone: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    title: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    is_primary: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_now, onupdate=_now

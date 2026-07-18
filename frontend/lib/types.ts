@@ -333,9 +333,24 @@ export interface Prospect {
   stage: PipelineStage;
   stage_entered_at: string;
   sector?: string | null;
+  website?: string | null;
   primary_contact_name?: string | null;
   primary_contact_email?: string | null;
   notes?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// A first-class contact on a prospect (GRS-0111) — many per prospect, one may be primary.
+export interface Contact {
+  id: string;
+  owner_consultant_id: string;
+  prospect_id: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  title?: string | null;
+  is_primary: boolean;
   created_at: string;
   updated_at: string;
 }
