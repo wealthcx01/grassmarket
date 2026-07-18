@@ -36,14 +36,17 @@ describe("WizardSuggestionsPanel (GRS-0101)", () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it("accepts a prefill and labels everything AI-proposed", () => {
+  it("accepts a prefill and is honestly labelled (not 'AI'), gated on an explicit action", () => {
     const onAccept = vi.fn();
     const onDismiss = vi.fn();
     render(
       <WizardSuggestionsPanel suggestions={[prefill]} version="heuristic-v1" onAccept={onAccept} onDismiss={onDismiss} />,
     );
-    // The gate is visible: nothing is applied until the advisor accepts.
-    expect(screen.getByText(/nothing is applied until you accept/i)).toBeTruthy();
+    // Honest labelling (GRS-0136): "Suggestions", not "AI".
+    expect(screen.getByRole("heading", { name: "Suggestions" })).toBeTruthy();
+    expect(document.body.textContent).not.toMatch(/\bAI\b/);
+    // The gate is visible: nothing is applied unless the advisor acts.
+    expect(screen.getByText(/never applied unless you act/i)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Accept" }));
     expect(onAccept).toHaveBeenCalledWith(prefill);
     expect(onDismiss).not.toHaveBeenCalled();

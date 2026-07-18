@@ -11,11 +11,10 @@ flows through the §9 dual-rating and §8 committee gates before any client-faci
 
 from __future__ import annotations
 
-from collections import Counter
 from typing import Protocol
 
 from bcap_contracts.assessments import AssessmentDocument
-from bcap_contracts.common import MaturityLevel, StrengthRating
+from bcap_contracts.common import StrengthRating
 from bcap_contracts.registry import Registry
 from bcap_contracts.wizard import WizardSuggestion, WizardSuggestionKind
 
@@ -28,7 +27,7 @@ _STRONG_BENEFIT = frozenset({StrengthRating.ESTABLISHED, StrengthRating.WIDE})
 
 # Keep the panel calm: cap each kind so suggestions read as help, not noise.
 _MAX_CONSISTENCY = 3
-_MAX_PREFILL = 3
+_MAX_UNRATED = 3
 
 
 class WizardSuggester(Protocol):
@@ -50,7 +49,7 @@ class HeuristicWizardSuggester:
         out: list[WizardSuggestion] = []
         out.extend(self._coverage(document, registry))
         out.extend(self._power_consistency(document, registry))
-        out.extend(self._carry_forward_prefill(document, registry))
+        out.extend(self._unrated_nudge(document, registry))
         return out
 
     # --- guidance: what stands between the advisor and a live score --------------------
@@ -94,44 +93,46 @@ class HeuristicWizardSuggester:
                 break
         return out
 
-    # --- prefill: carry the module's modal level into an unrated subcomponent ----------
-    def _carry_forward_prefill(
+    # --- guidance: finish a partly-rated module — WITHOUT anchoring a level ------------
+    def _unrated_nudge(
         self, document: AssessmentDocument, registry: Registry
     ) -> list[WizardSuggestion]:
-        rated_levels: dict[str, list[MaturityLevel]] = {}
+        """When a module is partly rated, nudge the advisor to finish it — but propose NO value.
+        Pre-planting the module's modal level would anchor an unrated subcomponent toward the herd,
+        and ATLAS is bottleneck-sensitive (the weakest subcomponent drives the module score), so an
+        anchor would inflate the score and mask the binding constraint the methodology exists to
+        surface. Guidance only: rate each on its own evidence (GRS-0136, ADR-0032 amendment)."""
         present: dict[str, set[str]] = {}
+        rated: dict[str, int] = {}
         for s in document.subcomponents:
             present.setdefault(s.module_key, set()).add(s.subcomponent_key)
             if s.level is not None:  # a rated (not N/A, not blank) subcomponent
-                rated_levels.setdefault(s.module_key, []).append(s.level)
+                rated[s.module_key] = rated.get(s.module_key, 0) + 1
 
         out: list[WizardSuggestion] = []
         for module in registry.modules:
-            levels = rated_levels.get(module.key, [])
-            if len(levels) < 2:  # need a real pattern to carry forward
+            if rated.get(module.key, 0) < 2:  # only once a real rating pattern exists
                 continue
-            modal = Counter(levels).most_common(1)[0][0]
             here = present.get(module.key, set())
             unrated = [sc for sc in module.subcomponents if sc.key not in here]
             if not unrated:
                 continue
-            target = unrated[0]
+            n = len(unrated)
             out.append(
                 WizardSuggestion(
-                    id=f"prefill:{module.key}:{target.key}",
-                    kind=WizardSuggestionKind.PREFILL,
+                    id=f"unrated:{module.key}",
+                    kind=WizardSuggestionKind.GUIDANCE,
                     step="infrastructure",
                     module_key=module.key,
-                    subcomponent_key=target.key,
-                    proposed_level=modal,
-                    title=f"Start {target.name} at {modal.value}?",
+                    title=f"{n} subcomponent{'s' if n != 1 else ''} still unrated in {module.name}",
                     rationale=(
-                        f"Other subcomponents in {module.name} are mostly {modal.value}. This is a "
-                        "starting point — confirm or edit it."
+                        "Assess each on its own evidence — don't copy the module's pattern. The "
+                        "weakest subcomponent drives the module score, so a real weak point is the "
+                        "signal that matters most."
                     ),
                 )
             )
-            if len(out) >= _MAX_PREFILL:
+            if len(out) >= _MAX_UNRATED:
                 break
         return out
 

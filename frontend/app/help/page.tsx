@@ -144,8 +144,8 @@ const PRINCIPLES: ReadonlyArray<{ title: string; body: string }> = [
     body: "Continuous scores rank what to fix first; rule-based gates produce the headline word; the value bridge prices in pounds. Score-points and currency never share an equation.",
   },
   {
-    title: "AI proposes, you approve",
-    body: "Meeting extraction, deliverable drafts, and practice feedback are AI-drafted and human-gated. Nothing AI-generated reaches a client without your sign-off.",
+    title: "Drafts propose, you approve",
+    body: "Deliverable drafts and practice feedback are auto-drafted and human-gated — nothing reaches a client without your sign-off. (Meeting-transcript extraction is on the roadmap; it isn't wired to a live model yet, so don't expect it to read your notes today.)",
   },
   {
     title: "Fail loud, never fake it",

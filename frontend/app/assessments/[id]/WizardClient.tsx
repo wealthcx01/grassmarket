@@ -44,7 +44,7 @@ export function WizardClient({ id }: { id: string }) {
   const [liveError, setLiveError] = useState<string | null>(null);
   const [finalising, setFinalising] = useState(false);
 
-  // AI-assisted input (GRS-0101): deterministic proposals + the ids the advisor has dismissed.
+  // Wizard input assistant (GRS-0101/0136): deterministic rule-based suggestions + the ids the advisor has dismissed.
   const [suggestions, setSuggestions] = useState<WizardSuggestion[]>([]);
   const [suggesterVersion, setSuggesterVersion] = useState("");
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
@@ -156,7 +156,7 @@ export function WizardClient({ id }: { id: string }) {
       });
   }, [id, handleAuth]);
 
-  // AI suggestions over the persisted document — refreshed on load and after each autosave, so a
+  // Suggestions over the persisted document — refreshed on load and after each autosave, so a
   // coverage nudge disappears as coverage grows. A failure is silent (assistance is non-essential).
   const refreshSuggestions = useCallback(() => {
     api
@@ -237,7 +237,7 @@ export function WizardClient({ id }: { id: string }) {
     setDismissed((prev) => new Set(prev).add(sid));
   }, []);
 
-  // Fetch a live score + AI suggestions once loaded.
+  // Fetch a live score + suggestions once loaded.
   useEffect(() => {
     if (document) {
       refreshLive();

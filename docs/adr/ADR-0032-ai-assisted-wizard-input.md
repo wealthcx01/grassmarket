@@ -102,3 +102,19 @@ approval store, no change to the scoring engine.** Directly mirrors ADR-0009's s
 - **Proposing full ratings across the board (aggressive prefill).** Rejected for v1 on anti-anchoring
   grounds (#2) — a deterministic engine has no basis to assert a maturity judgment; that belongs to the
   LLM adapter under founder-tuned limits.
+
+## Amendment (2026-07-18, GRS-0136) — the carry-forward PREFILL is withdrawn
+
+An outside-in critical review flagged that the v1 carry-forward PREFILL (propose the module's *modal*
+rated level for an unrated subcomponent) is not a neutral convenience: ATLAS is bottleneck-sensitive —
+the weakest subcomponent drives the module score — so anchoring an unrated subcomponent to the mode
+pulls it toward the herd, inflating the module score and **masking the binding constraint** the
+methodology exists to surface. The one-click Accept made copying the path of least resistance, and a
+routine subcomponent has no independent downstream check.
+
+Decision: the suggester **no longer emits a level-bearing PREFILL**. The carry-forward case becomes a
+GUIDANCE nudge — "N subcomponents still unrated in {module}; rate each on its own evidence, the weakest
+drives the score" — with no pre-planted value and no Accept affordance. The `PREFILL` kind stays in the
+contract for a future *genuinely non-anchoring* prefill. The panel is also relabelled "Suggestions"
+(not "AI"): it is a deterministic rule-based helper, and honest labelling is the same discipline the
+win-probability surface already follows.
