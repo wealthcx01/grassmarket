@@ -140,6 +140,7 @@ export interface BrokeragePortfolioEntry {
   subject: string;
   segment?: string | null;
   state: AssessmentState;
+  provenance: RecordProvenance;
   v_index?: number | null;
   uncertainty_rating?: UncertaintyRating | null;
   // Assessed / applicable subcomponents (GRS-0116) — the live-panel coverage notion; null when none.

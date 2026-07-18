@@ -1,6 +1,6 @@
 # GRS-0117 — Watermarked end-to-end DEMO dataset (Revolut)
 
-**Status:** Planned
+**Status:** Shipped
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** ADR-0029 (demo/illustrative records)
 
