@@ -14,7 +14,7 @@ import Link from "next/link";
 import { StageMoveControl } from "@/components/StageMoveControl";
 import { WinProbabilityPill } from "@/components/KanbanBoard";
 import { api } from "@/lib/api";
-import { STAGE_LABEL, type Contact, type PipelineBoardEntry, type PipelineStage, type Prospect } from "@/lib/types";
+import { STAGE_LABEL, type Contact, type PipelineBoardEntry, type PipelineStage, type Prospect, type WinProbability } from "@/lib/types";
 
 function EditableField({
   label,
@@ -196,6 +196,56 @@ const contactInput: React.CSSProperties = {
   borderRadius: "var(--radius)",
 };
 
+// The win-probability made legible (GRS-0137): the number, WHY it is what it is, and — when the
+// estimate is unsettled — exactly what would sharpen it. Previously this lived only in a hover
+// tooltip on the pill (invisible on touch); a shown number deserves its shown reasons.
+function WinProbabilityExplainer({ wp }: { wp: WinProbability }) {
+  return (
+    <section
+      style={{
+        border: "1px solid var(--color-border)",
+        borderRadius: "var(--radius)",
+        padding: "0.7rem 0.85rem",
+        background: "var(--color-paper-raised)",
+        display: "flex",
+        flexDirection: "column",
+        gap: "0.45rem",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "0.5rem" }}>
+        <h3 style={{ margin: 0, fontSize: "0.9rem" }}>Win probability</h3>
+        <span className="mono" style={{ fontSize: "0.62rem", color: "var(--color-ink-faint)" }}>
+          rule-based estimate
+        </span>
+      </div>
+      <div style={{ display: "flex", alignItems: "baseline", gap: "0.5rem" }}>
+        <span style={{ fontSize: "1.5rem", fontWeight: 700 }}>{wp.score}%</span>
+        <span style={{ fontSize: "0.8rem", color: "var(--color-ink-muted)" }}>{wp.label}</span>
+      </div>
+      {wp.reasons.length ? (
+        <div>
+          <p style={{ margin: "0 0 0.2rem", fontSize: "0.7rem", color: "var(--color-ink-faint)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Why</p>
+          <ul style={{ margin: 0, paddingLeft: "1rem", fontSize: "0.78rem", color: "var(--color-ink-muted)", display: "flex", flexDirection: "column", gap: "0.1rem" }}>
+            {wp.reasons.map((r, i) => (
+              <li key={i}>{r}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      {wp.missing_info.length ? (
+        <div>
+          <p style={{ margin: "0 0 0.2rem", fontSize: "0.7rem", color: "var(--color-ink-faint)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Would sharpen the estimate</p>
+          <ul style={{ margin: 0, paddingLeft: "1rem", fontSize: "0.78rem", color: "var(--color-ink-muted)", display: "flex", flexDirection: "column", gap: "0.1rem" }}>
+            {wp.missing_info.map((m, i) => (
+              <li key={i}>{m}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
 export function DealDetailPanel({
   entry,
   onClose,
@@ -279,6 +329,8 @@ export function DealDetailPanel({
             ✕
           </button>
         </header>
+
+        <WinProbabilityExplainer wp={entry.win_probability} />
 
         <div style={{ maxWidth: "14rem" }}>
           <StageMoveControl prospectId={prospectId} currentStage={prospect.stage} onMove={onMove} />
