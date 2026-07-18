@@ -1,8 +1,10 @@
 /**
- * AI-assisted wizard input (GRS-0101, ADR-0032). Shows deterministic AI PROPOSALS while the advisor
- * fills the assessment — a coverage nudge, a consistency check, or a conservative prefill. Nothing is
- * committed here: a GUIDANCE item is just help; a PREFILL is applied ONLY when the advisor clicks
- * Accept (they can edit it after), so no AI-proposed value counts without a visible approve step.
+ * Wizard input assistant (GRS-0101/0136, ADR-0032). Shows DETERMINISTIC, rule-based suggestions while
+ * the advisor fills the assessment — a coverage nudge and a consistency check. It is honestly labelled
+ * "Suggestions", not "AI": it computes nothing the scoring engine computes and proposes no maturity
+ * levels (a pre-planted level would anchor a bottleneck-sensitive score — GRS-0136). Nothing is
+ * committed here; a suggestion is just help. (The panel still supports a PREFILL kind for a future
+ * genuinely-safe prefill; a PREFILL applies only on an explicit Accept, editable after.)
  */
 
 "use client";
@@ -23,7 +25,7 @@ export function WizardSuggestionsPanel({
   if (suggestions.length === 0) return null;
   return (
     <section
-      aria-label="AI suggestions"
+      aria-label="Suggestions"
       style={{
         border: "1px solid var(--color-border)",
         borderRadius: "var(--radius)",
@@ -35,13 +37,13 @@ export function WizardSuggestionsPanel({
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.5rem" }}>
-        <h3 style={{ margin: 0, fontSize: "0.92rem" }}>AI suggestions</h3>
-        <span className="mono" style={{ fontSize: "0.58rem", color: "var(--color-ink-faint)" }} title="The suggester version that produced these">
+        <h3 style={{ margin: 0, fontSize: "0.92rem" }}>Suggestions</h3>
+        <span className="mono" style={{ fontSize: "0.58rem", color: "var(--color-ink-faint)" }} title="The rule-based suggester version that produced these">
           {version}
         </span>
       </div>
       <p style={{ margin: 0, fontSize: "0.68rem", color: "var(--color-ink-faint)" }}>
-        AI-proposed — nothing is applied until you accept it.
+        Rule-based checks to sharpen your assessment — not scores, and never applied unless you act.
       </p>
       <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "0.55rem" }}>
         {suggestions.map((s) => (

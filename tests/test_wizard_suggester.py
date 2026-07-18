@@ -66,11 +66,11 @@ def test_power_consistency_nudge_on_strong_benefit_no_barrier() -> None:
     assert nudges[0].proposed_level is None  # guidance carries no value
 
 
-def test_carry_forward_prefill_targets_an_unrated_subcomponent() -> None:
+def test_unrated_nudge_is_guidance_and_never_anchors_a_level() -> None:
+    # A partly-rated module nudges the advisor to finish it — but proposes NO value (anti-anchoring,
+    # GRS-0136): pre-planting a level would bias the bottleneck-sensitive score.
     registry = load_registry()
     module = next(m for m in registry.modules if m.key == "APP_SERVER")
-    rated = module.subcomponents[:2]  # rate the first two Advanced
-    unrated_keys = {sc.key for sc in module.subcomponents[2:]}
     subs = tuple(
         SubcomponentRating(
             module_key="APP_SERVER",
@@ -78,20 +78,20 @@ def test_carry_forward_prefill_targets_an_unrated_subcomponent() -> None:
             level=MaturityLevel.ADVANCED,
             evidence_grade=_E3,
         )
-        for sc in rated
+        for sc in module.subcomponents[:2]  # rate the first two
     )
     doc = AssessmentDocument(subject="X", subcomponents=subs, powers=_all_powers())
     out = suggest_for(doc, registry)
-    prefills = [s for s in out if s.kind is WizardSuggestionKind.PREFILL]
-    assert len(prefills) >= 1
-    p = prefills[0]
-    assert p.module_key == "APP_SERVER"
-    assert p.subcomponent_key in unrated_keys  # never a field the advisor already rated
-    assert p.proposed_level is MaturityLevel.ADVANCED  # the module's modal rated level
+    # No suggestion ever pre-plants a maturity level.
+    assert all(s.proposed_level is None for s in out)
+    assert all(s.kind is not WizardSuggestionKind.PREFILL for s in out)
+    nudge = [s for s in out if s.id == "unrated:APP_SERVER"]
+    assert len(nudge) == 1 and nudge[0].kind is WizardSuggestionKind.GUIDANCE
+    assert nudge[0].module_key == "APP_SERVER"
 
 
-def test_no_prefill_without_a_pattern() -> None:
-    # A single rated subcomponent is not a pattern — no carry-forward.
+def test_no_unrated_nudge_without_a_pattern() -> None:
+    # A single rated subcomponent is not a pattern — no nudge yet.
     registry = load_registry()
     subs = (
         SubcomponentRating(
@@ -103,7 +103,7 @@ def test_no_prefill_without_a_pattern() -> None:
     )
     doc = AssessmentDocument(subject="X", subcomponents=subs, powers=_all_powers())
     out = HeuristicWizardSuggester().suggest(doc, registry)
-    assert [s for s in out if s.kind is WizardSuggestionKind.PREFILL] == []
+    assert [s for s in out if s.id.startswith("unrated:")] == []
 
 
 def test_http_suggestions_scoped_and_empty_when_finalised(
