@@ -12,8 +12,15 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 
 import { ApiError, api } from "@/lib/api";
-import type { AINarrative, Deliverable, DeliverableMode, DeliverableType } from "@/lib/types";
+import type {
+  AINarrative,
+  Deliverable,
+  DeliverableMode,
+  DeliverableType,
+  RecordProvenance,
+} from "@/lib/types";
 import { NarrativeReview } from "@/components/NarrativeReview";
+import { ProvenanceBadge } from "@/components/ProvenanceBadge";
 
 interface NarrativeSummary {
   total: number;
@@ -64,7 +71,13 @@ function formatWhen(iso: string | null): string {
   return Number.isNaN(d.getTime()) ? "—" : d.toISOString().slice(0, 16).replace("T", " ");
 }
 
-export function DeliverablesPanel({ engagementId }: { engagementId: string }) {
+export function DeliverablesPanel({
+  engagementId,
+  provenance,
+}: {
+  engagementId: string;
+  provenance?: RecordProvenance;
+}) {
   const [items, setItems] = useState<Deliverable[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [type, setType] = useState<DeliverableType>("platform_power_report");
@@ -162,8 +175,11 @@ export function DeliverablesPanel({ engagementId }: { engagementId: string }) {
         background: "var(--color-paper-raised)",
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <h2 style={{ fontSize: "1.05rem", margin: 0 }}>Deliverables</h2>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.6rem", flexWrap: "wrap" }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
+          <h2 style={{ fontSize: "1.05rem", margin: 0 }}>Deliverables</h2>
+          {provenance ? <ProvenanceBadge provenance={provenance} /> : null}
+        </span>
         <span className="mono" style={{ fontSize: "0.68rem", color: "var(--color-ink-muted)" }}>
           generated from the finalised assessment
         </span>

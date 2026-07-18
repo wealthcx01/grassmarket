@@ -14,6 +14,7 @@ import { toDisplay } from "@/lib/band";
 import { ApiError, api, getToken } from "@/lib/api";
 import * as doc from "@/lib/doc";
 import type { BrokeragePortfolioEntry, RegistryProfile } from "@/lib/types";
+import { ProvenanceBadge } from "@/components/ProvenanceBadge";
 
 const STATE_LABEL: Record<BrokeragePortfolioEntry["state"], string> = {
   draft: "Draft",
@@ -240,12 +241,15 @@ export default function BrokeragesPage() {
                 {items.map((e) => (
                   <tr key={e.assessment_id} style={{ borderTop: "1px solid var(--color-border)" }}>
                     <td style={{ padding: "0.55rem 0.6rem" }}>
-                      <Link
-                        href={`/assessments/${e.assessment_id}`}
-                        style={{ fontFamily: "var(--font-serif)", fontWeight: 600, color: "inherit", textDecoration: "none" }}
-                      >
-                        {e.subject || "Untitled"}
-                      </Link>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                        <Link
+                          href={`/assessments/${e.assessment_id}`}
+                          style={{ fontFamily: "var(--font-serif)", fontWeight: 600, color: "inherit", textDecoration: "none" }}
+                        >
+                          {e.subject || "Untitled"}
+                        </Link>
+                        <ProvenanceBadge provenance={e.provenance} />
+                      </span>
                     </td>
                     <td style={{ padding: "0.55rem 0.6rem", color: e.segment ? "inherit" : "var(--color-ink-faint)" }}>
                       {e.segment ?? "—"}

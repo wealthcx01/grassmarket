@@ -617,6 +617,9 @@ class BrokeragePortfolioEntry(BaseModel):
     subject: str
     segment: str | None = None
     state: AssessmentState
+    # ADR-0029: a demo/sandbox record is flagged here so its watermark shows everywhere the summary
+    # appears (portfolio home, engagement view) — production is the unremarkable default (GRS-0117).
+    provenance: RecordProvenance = RecordProvenance.PRODUCTION
     v_index: Score | None = None
     uncertainty_rating: UncertaintyRating | None = None
     # Assessed subcomponents over APPLICABLE ones (Not Applicable excluded) — the coverage notion

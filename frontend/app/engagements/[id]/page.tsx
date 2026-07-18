@@ -20,6 +20,7 @@ import {
 import { DeliverablesPanel } from "@/components/DeliverablesPanel";
 import { LinkAssessmentControl } from "@/components/LinkAssessmentControl";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { ProvenanceBadge } from "@/components/ProvenanceBadge";
 
 const STATE_LABEL: Record<string, string> = {
   draft: "Draft",
@@ -35,7 +36,10 @@ function LinkedAssessment({ id, index, entry }: { id: string; index: number; ent
   return (
     <Link href={`/assessments/${id}`} className="card-link" style={{ padding: "0.9rem 1.1rem", display: "block" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.75rem", flexWrap: "wrap" }}>
-        <span style={{ fontWeight: 600 }}>{subject}</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", fontWeight: 600 }}>
+          {subject}
+          {entry ? <ProvenanceBadge provenance={entry.provenance} /> : null}
+        </span>
         <span aria-hidden className="mono" style={{ color: "var(--color-ink-faint)", fontSize: "0.8rem" }}>Open →</span>
       </div>
       <div style={{ display: "flex", gap: "0.5rem 1.1rem", flexWrap: "wrap", marginTop: "0.45rem", fontSize: "0.82rem", color: "var(--color-ink-muted)" }}>
@@ -151,7 +155,12 @@ export default function EngagementDetailPage() {
         <LinkAssessmentControl engagement={engagement} onLinked={reload} />
       </section>
 
-      <DeliverablesPanel engagementId={id} />
+      <DeliverablesPanel
+        engagementId={id}
+        provenance={
+          portfolio.find((p) => p.assessment_id === engagement.assessment_ids[0])?.provenance
+        }
+      />
 
       <CommsLog engagement={engagement} onAdded={reload} />
     </div>

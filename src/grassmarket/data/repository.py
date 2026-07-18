@@ -2593,6 +2593,7 @@ class Repository:
                     subject=a.subject or "Untitled assessment",
                     segment=segment,
                     state=a.state,
+                    provenance=a.provenance,
                     v_index=v_index,
                     uncertainty_rating=uncertainty_rating,
                     coverage=_document_coverage(a.document, total_subs),
