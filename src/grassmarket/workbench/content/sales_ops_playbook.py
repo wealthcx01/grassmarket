@@ -45,7 +45,19 @@ _LESSONS: tuple[tuple[str, str, str, str], ...] = (
         f"'{_stages(PipelineStage.PROSPECT, PipelineStage.WORKSHOP_SCHEDULED)}' move: create the "
         "prospect, capture the contact and sector, and book the Platform Power workshop off a "
         "growth pain — the workshop is the advancing action, not a courtesy call. Sourcing the "
-        "prospect yourself is what earns the self-sourced commission rate later, so log it now.",
+        "prospect yourself is what earns the self-sourced commission rate later, so log it now."
+        "\n\n"
+        "**In practice.** You meet a wealth-firm COO at a conference who mentions, in passing, "
+        "that onboarding takes too long. The passive move is 'I'll add you to the CRM and send a "
+        "follow-up.' The ops move is to open the account there and then and book off the pain you "
+        "just heard: 'That onboarding friction is exactly what a Platform Power workshop scores — "
+        "it's 90 minutes, on your own numbers. I've got Thursday the 12th; shall I hold it?' You "
+        "leave with a dated workshop and the growth pain captured in the notes, and you log "
+        "yourself as the source — that's what earns the self-sourced rate when the deal converts."
+        "\n\n"
+        "**The move.** Within the first week, every new prospect has a booked workshop (or a dated "
+        "next step) AND a captured growth pain in the notes. A prospect with no pain and no date "
+        "is a business card, not a deal.",
         "ops:open-and-book",
         "Every new prospect has a booked workshop or a dated next step within the first week.",
     ),
@@ -56,7 +68,19 @@ _LESSONS: tuple[tuple[str, str, str, str], ...] = (
         "the demo (see Sales Egoist): the client watches their own moat get scored. Qualify hard "
         "on a genuine, addressable bottleneck — a real gap means advance; a strong surface "
         "means Nurture, not push. If a represented product fixes the gap, that is where product "
-        "commission (Stream A) enters.",
+        "commission (Stream A) enters."
+        "\n\n"
+        "**In practice.** In the workshop you score the COO's switching-cost module live, and the "
+        "assessment surfaces thin linked-account depth — a real, addressable gap. That is a "
+        "qualify: move the CRM to Qualified and log the finding verbatim. Had it scored a strong, "
+        "sticky book instead, you would move it to Nurture and say so honestly, rather than push a "
+        "fix they don't need. And notice the second door: if a product you represent (say a "
+        "brand-data or onboarding tool) is what closes that specific gap, this is the moment "
+        "Stream A product commission enters the deal alongside the consultancy work."
+        "\n\n"
+        "**The move.** Leave every workshop with the CRM at Qualified or Nurture — never left at "
+        "Delivered — and the specific assessment finding recorded against the account. 'It went "
+        "well' is not a qualification; a named bottleneck is.",
         "ops:deliver-and-qualify",
         "Each qualified prospect cites the specific assessment finding that justifies pursuit.",
     ),
@@ -67,7 +91,19 @@ _LESSONS: tuple[tuple[str, str, str, str], ...] = (
         "bridge (cost / lever NPV / strategic ordinal — never mixed with the score), and set a "
         "dated first deliverable. Contracting is the gate that opens consultancy commission "
         "(Stream B): the delivery_type × sourcing cell of the v7 schedule sets your rate, and "
-        "self-sourced always pays more than firm-sourced.",
+        "self-sourced always pays more than firm-sourced."
+        "\n\n"
+        "**In practice.** You turn 'thin linked-account depth' into a scoped six-week engagement "
+        "whose first deliverable is a modernisation roadmap, dated to the 30th. You price it "
+        "against the value bridge — the NPV of the retention lift the fix unlocks — and you keep "
+        "that in a different sentence from the score: the assessment says *how weak* the moat is; "
+        "the value bridge says *what fixing it is worth*, in pounds. When it moves to Contracted, "
+        "Stream B opens, and the v7 schedule's delivery_type × sourcing cell sets your rate — the "
+        "self-sourced prospect you opened in lesson one now pays more than a firm-sourced one."
+        "\n\n"
+        "**The move.** Never contract without a scoped, *dated* first deliverable on the CRM, and "
+        "never quote a price by dividing a score into pounds — the value bridge prices the lever, "
+        "the score rates the moat, and the two never share an equation.",
         "ops:scope-and-contract",
         "Each contracted engagement has a scoped, dated first deliverable on the CRM.",
     ),
@@ -78,7 +114,19 @@ _LESSONS: tuple[tuple[str, str, str, str], ...] = (
         "the account has one activity timeline. If a workshop was delivered but the deal did not "
         "contract inside the attribution window, the **workshop recovery fee** applies — the v7 "
         "schedule lets you recover the workshop effort rather than write it off. A Closed or "
-        "Nurtured deal is not a failure of process; it is a recorded outcome you re-engage later.",
+        "Nurtured deal is not a failure of process; it is a recorded outcome you re-engage later."
+        "\n\n"
+        "**In practice.** The retention engagement runs Active → Delivered, and every touch — the "
+        "roadmap review, the check-in call, the sign-off — goes on the one account timeline, so "
+        "anyone can see the deal's true state. Now the harder case: a different prospect took the "
+        "workshop but never contracted, and the attribution window has closed. The amateur writes "
+        "it off as a loss. The Sales Egoist resolves the **recovery fee** — the v7 schedule lets "
+        "you recover the workshop effort — and moves the deal to Nurture with a dated re-engage "
+        "reminder, because a scored moat that wasn't ready today is a warm lead in two quarters."
+        "\n\n"
+        "**The move.** Keep one current activity timeline per account, and never let a delivered "
+        "workshop lapse silently: every delivered or lapsed engagement has its recovery-fee "
+        "position explicitly resolved, and every parked deal carries a dated reason to come back.",
         "ops:deliver-and-recover",
         "Every delivered or lapsed engagement has its recovery-fee position resolved, not ignored.",
     ),
