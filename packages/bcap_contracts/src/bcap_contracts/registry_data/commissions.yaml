@@ -30,6 +30,14 @@ products:
     yr1_bps: 375 # 3.75%
     yr2_bps: 375 # 3.75%
     window_months: 36
+  benzinga:
+    name: Benzinga
+    # Benzinga pays Bruntsfield 30% of revenue for up to 36 months; the advisor's share is 15%
+    # (Bruntsfield retains the other 15%) — in line with the other products. This schedule is the
+    # ADVISOR's commission, so it carries the 15% advisor share, flat over the window.
+    yr1_bps: 1500 # 15% advisor share
+    yr2_bps: 1500 # 15% advisor share, flat over the attribution window
+    window_months: 36 # up to 36 months from the initial sale to each customer
 
 # --- Stream B — consultancy commission (delivery_type × sourcing → first-12mo / thereafter) ---
 consultancy:

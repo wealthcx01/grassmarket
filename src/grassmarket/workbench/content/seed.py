@@ -14,6 +14,11 @@ from bcap_contracts.commissions import load_commission_config
 
 from grassmarket.data.repository import Principal, Repository
 from grassmarket.earnings.product_carrot import product_commission_carrot
+from grassmarket.workbench.content.benzinga_course import (
+    BENZINGA_PRODUCT_ID,
+    BENZINGA_SLUG,
+    benzinga_course,
+)
 from grassmarket.workbench.content.brandfetch_course import (
     BRANDFETCH_PRODUCT_ID,
     BRANDFETCH_REDIST_ID,
@@ -61,6 +66,12 @@ def seed_academy_content(repo: Repository, admin: Principal, *, now: datetime) -
             product_commission_carrot(BRANDFETCH_PRODUCT_ID, config),
             product_commission_carrot(BRANDFETCH_REDIST_ID, config),
         ),
+        now=now,
+    )
+    repo.upsert_published_course(
+        admin,
+        BENZINGA_SLUG,
+        benzinga_course(product_commission_carrot(BENZINGA_PRODUCT_ID, config)),
         now=now,
     )
 
