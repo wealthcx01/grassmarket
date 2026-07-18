@@ -1,0 +1,56 @@
+{
+  "additionalProperties": false,
+  "description": "A canonical company an assessment subject can resolve to (GRS-0100, ADR-0033). Reference\ndata, not owner-scoped: `entity_id` is the durable key an assessment points at, `name` is the\ncanonical display name, and `aliases` are the variants that should collapse to one entity\n(\"Revolut\" / \"Revolut Ltd\"). Served by the injectable EntityRegistry (a seeded stub today, a\nreal registry later behind the same port).",
+  "properties": {
+    "aliases": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Aliases",
+      "type": "array"
+    },
+    "domain": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Domain"
+    },
+    "entity_id": {
+      "description": "Stable canonical id, e.g. a registry slug.",
+      "minLength": 1,
+      "title": "Entity Id",
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "segment": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Coarse sector hint, e.g. 'Neobank' or 'Broker'.",
+      "title": "Segment"
+    }
+  },
+  "required": [
+    "entity_id",
+    "name"
+  ],
+  "title": "CompanyEntity",
+  "type": "object"
+}

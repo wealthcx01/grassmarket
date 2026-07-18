@@ -590,6 +590,10 @@ class Assessment(OwnedResource):
     is version-stamped and linked to its immutable scoring run (GRS-0006)."""
 
     subject: str = ""
+    # The canonical company this subject resolves to (GRS-0100, ADR-0033) — null when the advisor
+    # entered a subject the registry does not cover (the explicit manual fallback). Two assessments
+    # of the same company share this id.
+    entity_id: str | None = None
     state: AssessmentState = AssessmentState.DRAFT
     document: AssessmentDocument
     # Record provenance (ADR-0029): production (default, full gate) vs demo/sandbox

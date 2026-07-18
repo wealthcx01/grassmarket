@@ -1012,6 +1012,8 @@ class AssessmentORM(Base):
         ForeignKey("consultants.id"), index=True, nullable=False
     )
     subject: Mapped[str] = mapped_column(String(200), default="", nullable=False)
+    # Canonical company this subject resolves to (GRS-0100, ADR-0033); null = manual/unlinked.
+    entity_id: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
     state: Mapped[str] = mapped_column(String(16), default="draft", nullable=False)
     # Record provenance (ADR-0029): production (default) vs demo/sandbox. Immutable after creation.
     provenance: Mapped[str] = mapped_column(String(16), default="production", nullable=False)

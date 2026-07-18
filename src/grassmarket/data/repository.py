@@ -2539,13 +2539,17 @@ class Repository:
         *,
         subject: str = "",
         provenance: RecordProvenance = RecordProvenance.PRODUCTION,
+        entity_id: str | None = None,
     ) -> Assessment:
         """Create an empty draft assessment owned by the principal (owner never caller-supplied).
         `provenance` is set here and is IMMUTABLE thereafter (ADR-0029) — a sandbox/demo record is
-        never promotable to production."""
+        never promotable to production. `entity_id` is the canonical company the subject resolved to
+        (GRS-0100), or null for a manual/unlinked subject; the caller validates it against the
+        registry before passing it (the repository stores what it's given)."""
         row = AssessmentORM(
             owner_consultant_id=principal.consultant_id,
             subject=subject,
+            entity_id=entity_id,
             state=AssessmentState.DRAFT.value,
             provenance=provenance.value,
             document_json=AssessmentDocument(subject=subject).model_dump_json(),
@@ -2553,6 +2557,25 @@ class Repository:
         self._session.add(row)
         self._session.flush()
         return self._to_assessment(row)
+
+    def list_assessments_for_entity(
+        self, principal: Principal, entity_id: str
+    ) -> list[Assessment]:
+        """The caller's OWN assessments of one canonical company (GRS-0100 dedup). Owner-scoped —
+        the count is a consultant's own book, never a cross-owner leak (#9)."""
+        rows = (
+            self._session.execute(
+                select(AssessmentORM)
+                .where(
+                    AssessmentORM.owner_consultant_id == principal.consultant_id,
+                    AssessmentORM.entity_id == entity_id,
+                )
+                .order_by(AssessmentORM.created_at)
+            )
+            .scalars()
+            .all()
+        )
+        return [self._to_assessment(r) for r in rows]
 
     def get_assessment(self, principal: Principal, assessment_id: UUID) -> Assessment:
         return self._to_assessment(self._require_assessment(principal, assessment_id))
@@ -2759,6 +2782,7 @@ class Repository:
             id=row.id,
             owner_consultant_id=row.owner_consultant_id,
             subject=row.subject,
+            entity_id=row.entity_id,
             state=AssessmentState(row.state),
             document=AssessmentDocument.model_validate_json(row.document_json),
             provenance=RecordProvenance(row.provenance),

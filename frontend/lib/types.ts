@@ -117,10 +117,20 @@ export interface AssessmentDocument {
 /** Record provenance (ADR-0029): production (full gate) vs demo/sandbox (self-approvable, watermarked). */
 export type RecordProvenance = "production" | "demo" | "sandbox";
 
+/** A canonical company an assessment subject can resolve to (GRS-0100, ADR-0033). */
+export interface CompanyEntity {
+  entity_id: string;
+  name: string;
+  aliases: string[];
+  domain?: string | null;
+  segment?: string | null;
+}
+
 export interface Assessment {
   id: string;
   owner_consultant_id: string;
   subject: string;
+  entity_id?: string | null;
   state: AssessmentState;
   provenance: RecordProvenance;
   document: AssessmentDocument;

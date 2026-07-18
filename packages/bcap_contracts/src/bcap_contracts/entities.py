@@ -6,7 +6,7 @@ from datetime import datetime
 from enum import StrEnum
 from uuid import UUID
 
-from pydantic import ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from bcap_contracts.base import OwnedResource
 
@@ -62,3 +62,21 @@ class Contact(OwnedResource):
     phone: str | None = None
     title: str | None = Field(default=None, description="Role / job title, e.g. 'Head of Trading'.")
     is_primary: bool = False
+
+
+class CompanyEntity(BaseModel):
+    """A canonical company an assessment subject can resolve to (GRS-0100, ADR-0033). Reference
+    data, not owner-scoped: `entity_id` is the durable key an assessment points at, `name` is the
+    canonical display name, and `aliases` are the variants that should collapse to one entity
+    ("Revolut" / "Revolut Ltd"). Served by the injectable EntityRegistry (a seeded stub today, a
+    real registry later behind the same port)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    entity_id: str = Field(min_length=1, description="Stable canonical id, e.g. a registry slug.")
+    name: str = Field(min_length=1)
+    aliases: tuple[str, ...] = ()
+    domain: str | None = None
+    segment: str | None = Field(
+        default=None, description="Coarse sector hint, e.g. 'Neobank' or 'Broker'."
+    )

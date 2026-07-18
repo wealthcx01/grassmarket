@@ -31,6 +31,7 @@ import type {
   CommitteeReviewSummary,
   CommsChannel,
   CommsLogEntry,
+  CompanyEntity,
   Contact,
   ContentCompletion,
   Course,
@@ -273,12 +274,30 @@ export const api = {
   createAssessment(
     subject: string,
     provenance: "production" | "sandbox" = "production",
+    entityId?: string | null,
     signal?: AbortSignal,
   ): Promise<Assessment> {
     return request<Assessment>("/assessments", {
       method: "POST",
       headers: authHeaders(),
-      body: JSON.stringify({ subject, provenance }),
+      body: JSON.stringify({ subject, provenance, entity_id: entityId ?? null }),
+      signal,
+    });
+  },
+
+  // Company entity lookup (GRS-0100, ADR-0033) — proposes candidates; the advisor picks one.
+  searchEntities(q: string, signal?: AbortSignal): Promise<CompanyEntity[]> {
+    return request<CompanyEntity[]>(`/entities/search?q=${encodeURIComponent(q)}`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  assessmentsForEntity(entityId: string, signal?: AbortSignal): Promise<Assessment[]> {
+    return request<Assessment[]>(`/assessments/for-entity/${encodeURIComponent(entityId)}`, {
+      method: "GET",
+      headers: authHeaders(),
       signal,
     });
   },
