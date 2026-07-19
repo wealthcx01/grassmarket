@@ -74,6 +74,20 @@ def scoreability_blockers(document: AssessmentDocument, registry: Registry) -> l
     ):
         blockers.append("Enter at least one business metric.")
 
+    # Fail-loud input-domain check (GRS-0144, ADR-0035): a raw outside its metric's declared domain
+    # (e.g. a negative AUA) or a non-finite value REFUSES to score — surfaced as a blocker the
+    # advisor can fix, never clamped into the anchor curve and never a 500.
+    metrics_by_key = {m.key: m for m in registry.metrics}
+    for entry in document.metrics:
+        if entry.raw is None:
+            continue
+        metric = metrics_by_key.get(entry.metric_key)
+        if metric is None:
+            continue  # unknown-key handling is the engine's registry validation, not here
+        violation = metric.domain_violation(entry.raw)
+        if violation:
+            blockers.append(violation)
+
     core_subs = {
         s.key for k in _CRITICAL_MODULES_FOR_L for s in registry.require_module(k).subcomponents
     }

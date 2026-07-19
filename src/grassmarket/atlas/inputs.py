@@ -8,6 +8,8 @@ exactly one of level/state, a benefit AND a barrier per power (Helmer, §8), etc
 
 from __future__ import annotations
 
+import math
+
 from bcap_contracts.assessments import SubcomponentRating
 from bcap_contracts.common import EvidenceGrade, MetricConfidence, NonScoreState, StrengthRating
 from pydantic import BaseModel, ConfigDict, model_validator
@@ -34,6 +36,12 @@ class MetricObservation(BaseModel):
             raise ValueError(
                 f"Metric {self.metric_key!r} carries exactly one of `raw` (observed) or `state` "
                 f"(Not Applicable / Not Assessed) — never both, never neither."
+            )
+        # A non-finite raw (NaN/inf) can never be a real observation — refuse it at the boundary
+        # (GRS-0144), so it can never reach the interpolation or the Monte-Carlo perturbation.
+        if self.raw is not None and not math.isfinite(self.raw):
+            raise ValueError(
+                f"Metric {self.metric_key!r} raw must be a finite number, got {self.raw}."
             )
         return self
 

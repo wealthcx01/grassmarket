@@ -73,6 +73,52 @@ def test_metric_register_is_populated_draft() -> None:
     assert norms == sorted(norms, reverse=True)
 
 
+def test_metric_domain_bounds_reject_impossible_values() -> None:
+    # GRS-0144 / ADR-0035: a non-negative magnitude carries min_raw=0 and refuses a negative or
+    # non-finite raw, but a valid (even extreme) positive value is fine — it clamps in the engine.
+    r = load_registry()
+    aua = r.require_metric("AUA")
+    assert aua.min_raw == 0
+    assert aua.domain_violation(-999_999) is not None
+    assert aua.domain_violation(float("nan")) is not None
+    assert aua.domain_violation(float("inf")) is not None
+    assert aua.domain_violation(1_800_000_000) is None  # a real value scores
+    assert aua.domain_violation(1) is None  # below lowest anchor but valid → clamps, not refused
+
+
+def test_signed_metrics_allow_negative_values() -> None:
+    # A margin or a growth rate can legitimately be negative (loss-making / shrinking) — those
+    # metrics leave min_raw None so a negative is a valid input, not a refusal.
+    r = load_registry()
+    for key in ("GROSS_MARGIN", "CLIENT_GROWTH_RATE"):
+        metric = r.require_metric(key)
+        assert metric.min_raw is None
+        assert metric.domain_violation(-5) is None
+        assert metric.domain_violation(float("nan")) is not None  # non-finite still refused
+
+
+def test_scoreability_refuses_an_out_of_domain_metric() -> None:
+    # A negative AUA (impossible) surfaces as a fail-loud scoreability blocker naming the metric —
+    # never clamped into the anchor curve, never a 500 (GRS-0144).
+    from bcap_contracts.assessments import AssessmentDocument, MetricEntry
+
+    from grassmarket.assessments.service import scoreability_blockers
+
+    r = load_registry()
+    doc = AssessmentDocument(metrics=(MetricEntry(metric_key="AUA", raw=-999_999),))
+    blockers = scoreability_blockers(doc, r)
+    assert any("Assets Under Administration" in b and "can't be below" in b for b in blockers)
+
+
+def test_metricentry_rejects_non_finite_raw() -> None:
+    from bcap_contracts.assessments import MetricEntry
+
+    with pytest.raises(ValidationError):
+        MetricEntry(metric_key="AUA", raw=float("nan"))
+    with pytest.raises(ValidationError):
+        MetricEntry(metric_key="AUA", raw=float("inf"))
+
+
 def test_require_unknown_power_raises() -> None:
     r = load_registry()
     with pytest.raises(UnknownKeyError):

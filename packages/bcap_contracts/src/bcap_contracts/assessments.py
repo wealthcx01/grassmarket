@@ -443,6 +443,13 @@ class MetricEntry(BaseModel):
     def _exactly_one_of_raw_or_state(self) -> MetricEntry:
         if (self.raw is None) == (self.state is None):
             raise ValueError(f"Metric {self.metric_key!r} carries exactly one of `raw` or `state`.")
+        # A non-finite raw (NaN/inf) can never be a real figure — refuse it at the boundary so it
+        # never persists in a document or reaches scoring (GRS-0144). Sign/range bounds are checked
+        # against the metric's registry definition at score time (they need the MetricDef).
+        if self.raw is not None and not math.isfinite(self.raw):
+            raise ValueError(
+                f"Metric {self.metric_key!r} raw must be a finite number, got {self.raw}."
+            )
         return self
 
 
