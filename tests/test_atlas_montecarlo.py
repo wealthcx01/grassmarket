@@ -1,9 +1,10 @@
-"""Uncertainty-engine tests (GRS-0005, Methodology v1.1 §7).
+"""Uncertainty-engine tests (GRS-0005; Methodology v1.5 §7, ADR-0034).
 
 Each test fixes the seed and asserts a behavioural guarantee that fails if Monte Carlo is wrong:
 bands are ordered and reproducible; P50 sits on the deterministic point; evidence grade drives the
-width (all-E4 tighter than all-E1); the tornado ranks a known high-leverage input on top; a
-Not-Assessed input widens the band versus the same input assessed. The RNG is always injected and
+width (all-E4 tighter than all-E1); the tornado ranks a known high-leverage input on top. Not
+Assessed is EXCLUDED, never imputed (v1.5 §7 / D9): it cannot inflate the band, a fully-unassessed
+module gets no q_m band, and raising coverage never fabricates width. The RNG is always injected and
 seeded — never module-global — which is what keeps the golden-master determinism intact.
 """
 
@@ -21,6 +22,7 @@ from bcap_contracts.common import (
     MetricConfidence,
     NonScoreState,
     StrengthRating,
+    UncertaintyRating,
 )
 from bcap_contracts.registry import Registry, load_registry
 from bcap_contracts.uncertainty import UncertaintyModel
@@ -266,16 +268,63 @@ def test_tornado_ranks_the_known_high_leverage_input_first(registry, coeffs, mod
     assert res.tornado[0].swing > res.tornado[1].swing
 
 
-# --- Not Assessed widens the band vs the same input assessed ----------------------------
+# --- Not Assessed is EXCLUDED, never imputed (D9 / ADR-0034, Methodology v1.5 §7) --------
 
 
-def test_not_assessed_widens_the_band_vs_assessed(registry, coeffs, model) -> None:
+def test_not_assessed_is_excluded_not_imputed(registry, coeffs, model) -> None:
+    # Under v1.5 §7 a Not Assessed subcomponent is excluded from every draw (not imputed a uniform
+    # level). So it can no longer INFLATE the band: excluding a sub is tighter than assessing it
+    # even at the WIDEST evidence grade (E1) — the exact opposite of the old imputation behaviour.
     lever = "OEMS_ASSET_COVERAGE"
-    assessed = _uniform_inputs(registry, overrides={lever: (_ADV, _E4)})
+    assessed_e1 = _uniform_inputs(registry, overrides={lever: (_ADV, _E1)})
     not_assessed = _uniform_inputs(registry, overrides={lever: NonScoreState.NOT_ASSESSED})
-    r_assessed = run_monte_carlo(assessed, coeffs, registry, model, random.Random(11), draws=1500)
+    r_e1 = run_monte_carlo(assessed_e1, coeffs, registry, model, random.Random(11), draws=1500)
     r_na = run_monte_carlo(not_assessed, coeffs, registry, model, random.Random(11), draws=1500)
-    assert _width(r_na.v_band) > _width(r_assessed.v_band)
+    assert _width(r_na.v_band) <= _width(r_e1.v_band)
+
+
+def test_zero_coverage_module_absent_from_module_qm(registry, coeffs, model) -> None:
+    # A module whose every subcomponent is Not Assessed contributes q_m=None in every draw, so it
+    # gets NO band in module_qm (never a phantom bottleneck) — while a fully-assessed module does.
+    # Ignorance about the unmeasured is still surfaced: its module_uncertainty is VERY_HIGH.
+    target = registry.modules[0]
+    other = registry.modules[1]
+    overrides = {s.key: NonScoreState.NOT_ASSESSED for s in target.subcomponents}
+    inputs = _uniform_inputs(registry, level=_ADV, evidence=_E4, overrides=overrides)
+    res = run_monte_carlo(inputs, coeffs, registry, model, random.Random(5), draws=200)
+    assert target.key not in res.module_qm  # no fabricated band for a module nobody assessed
+    assert other.key in res.module_qm  # an assessed module still has one
+    assert res.module_uncertainty[target.key] == UncertaintyRating.VERY_HIGH  # ignorance surfaced
+
+
+def test_module_band_width_does_not_widen_as_coverage_rises(registry, coeffs, model) -> None:
+    # Adding an assessed subcomponent (raising coverage) never fabricates width: the module band
+    # over more assessed inputs is no wider than over fewer. Guards against any coverage-driven
+    # imputation sneaking back in.
+    mod = registry.modules[0]
+    keys = [s.key for s in mod.subcomponents]
+    assert len(keys) >= 2
+    # Low coverage: only the first subcomponent assessed; the rest Not Assessed (excluded).
+    low = {k: NonScoreState.NOT_ASSESSED for k in keys[1:]}
+    # Higher coverage: the first two assessed, same levels/grades.
+    high = {k: NonScoreState.NOT_ASSESSED for k in keys[2:]}
+    r_low = run_monte_carlo(
+        _uniform_inputs(registry, overrides=low),
+        coeffs,
+        registry,
+        model,
+        random.Random(9),
+        draws=1500,
+    )
+    r_high = run_monte_carlo(
+        _uniform_inputs(registry, overrides=high),
+        coeffs,
+        registry,
+        model,
+        random.Random(9),
+        draws=1500,
+    )
+    assert _width(r_high.module_qm[mod.key]) <= _width(r_low.module_qm[mod.key]) + 1e-9
 
 
 # --- Weight stability -------------------------------------------------------------------
