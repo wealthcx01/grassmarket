@@ -41,6 +41,10 @@ export default function PipelinePage() {
   const [board, setBoard] = useState<PipelineBoard | null>(null);
   const [forecast, setForecast] = useState<PipelineForecast | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Distinct from `error` (create failures): the board load can fail on its own, and when it does the
+  // screen must offer a way back — not sit on "Loading…" forever (GRS-0142).
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState<string | null>(null);
   const [company, setCompany] = useState("");
   const [creating, setCreating] = useState(false);
@@ -54,15 +58,28 @@ export default function PipelinePage() {
         .then(([b, f]) => {
           setBoard(b);
           setForecast(f);
+          setLoadError(null);
         })
         .catch((err: unknown) => {
-          if (err instanceof ApiError && err.status === 0) return;
+          // An aborted request (unmount / superseded reload) is not a failure — stay silent. A genuine
+          // network failure (backend down/slow, also status 0) MUST surface with a retry, or the board
+          // is stuck on "Loading…" with no error and no recovery (the stress-test finding).
+          if (signal?.aborted) return;
           if (err instanceof ApiError && err.status === 401) {
             clearToken();
             router.replace("/login");
             return;
           }
-          setError(err instanceof ApiError ? err.message : "Could not load the pipeline.");
+          setLoadError(
+            err instanceof ApiError && err.status === 0
+              ? "Couldn't reach the server. Check your connection and try again."
+              : err instanceof ApiError
+                ? err.message
+                : "Could not load the pipeline.",
+          );
+        })
+        .finally(() => {
+          if (!signal?.aborted) setLoading(false);
         });
     },
     [router],
@@ -77,6 +94,13 @@ export default function PipelinePage() {
     reload(ctrl.signal);
     return () => ctrl.abort();
   }, [router, reload]);
+
+  // Manual retry after a board-load failure — a fresh fetch, not tied to the mount's aborted signal.
+  const retry = useCallback(() => {
+    setLoading(true);
+    setLoadError(null);
+    reload();
+  }, [reload]);
 
   // Optimistic move: land the card immediately, then confirm with the backend. On a 409 (illegal
   // move) the reload restores the true state and we surface the reason.
@@ -205,8 +229,29 @@ export default function PipelinePage() {
 
       {filtered ? (
         <KanbanBoard board={filtered} onOpen={setOpenId} onMove={onMove} />
+      ) : loadError ? (
+        <div
+          role="alert"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-start",
+            gap: "0.7rem",
+            padding: "1.4rem",
+            background: "var(--color-paper-raised)",
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius)",
+          }}
+        >
+          <p style={{ margin: 0, color: "var(--color-error)", fontSize: "0.9rem" }}>{loadError}</p>
+          <button type="button" className="btn" onClick={retry}>
+            Retry
+          </button>
+        </div>
+      ) : loading ? (
+        <p style={{ color: "var(--color-ink-muted)" }}>Loading your pipeline…</p>
       ) : (
-        <p>Loading…</p>
+        <p style={{ color: "var(--color-ink-muted)" }}>No prospects yet — add one above to get started.</p>
       )}
 
       {openEntry ? (
