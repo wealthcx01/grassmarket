@@ -11,7 +11,11 @@ from pathlib import Path
 
 import pytest
 from bcap_contracts.registry import (
+    AnchorPoint,
+    MetricDef,
+    NormalisationSpec,
     ProfileDef,
+    RegistryError,
     SubcomponentDef,
     UnknownKeyError,
     load_profile,
@@ -37,6 +41,77 @@ def test_retail_view_is_structurally_identical_to_the_superset() -> None:
     assert view.all_subcomponent_keys() == r.all_subcomponent_keys()
     assert _criticals(view) == _criticals(r)
     assert view.power_keys() == r.power_keys() and view.metric_keys() == r.metric_keys()
+
+
+# --- GRS-0147 / ADR-0035: per-profile B-index metric selection --------------------------
+
+
+def _metric(key: str) -> MetricDef:
+    """A minimal well-formed profile metric addition for the mechanism tests."""
+    return MetricDef(
+        key=key,
+        name=key.replace("_", " ").title(),
+        description="A profile-specific metric for the mechanism test.",
+        unit="percent",
+        direction="higher_is_better",
+        group="momentum",
+        min_raw=0,
+        normalisation=NormalisationSpec(
+            anchors=(AnchorPoint(raw=0, normalised=0.1), AnchorPoint(raw=10, normalised=0.9))
+        ),
+    )
+
+
+def test_profile_metric_selection_and_additions() -> None:
+    r = load_registry()
+    # Select two superset metrics and add one profile-specific metric. The view's B metrics are
+    # exactly those three, superset-selected keys first (in superset order), then the addition.
+    profile = ProfileDef(
+        key="probe",
+        name="Probe",
+        module_keys=tuple(r.module_keys()),
+        metric_keys=("AUA", "GROSS_MARGIN"),
+        metric_additions=(_metric("PROBE_NNM_RATE"),),
+    )
+    view = r.for_profile(profile)
+    assert view.metric_keys() == frozenset({"AUA", "GROSS_MARGIN", "PROBE_NNM_RATE"})
+    # Superset order is preserved among the selected keys.
+    keys = [m.key for m in view.metrics]
+    assert keys[:2] == ["AUA", "GROSS_MARGIN"] and keys[-1] == "PROBE_NNM_RATE"
+
+
+def test_profile_can_drop_all_superset_metrics() -> None:
+    # metric_keys=() selects NONE of the superset — the view's B is entirely its own additions (the
+    # wealth case: no retail AUA/ARPU). The superset itself is untouched (golden master safe).
+    r = load_registry()
+    profile = ProfileDef(
+        key="probe",
+        name="Probe",
+        module_keys=tuple(r.module_keys()),
+        metric_keys=(),
+        metric_additions=(_metric("PROBE_A"), _metric("PROBE_B")),
+    )
+    view = r.for_profile(profile)
+    assert view.metric_keys() == frozenset({"PROBE_A", "PROBE_B"})
+    assert r.metric_keys() == load_registry().metric_keys()  # superset unchanged
+
+
+def test_profile_metric_selection_is_fail_loud() -> None:
+    r = load_registry()
+    unknown = ProfileDef(
+        key="probe", name="Probe", module_keys=tuple(r.module_keys()), metric_keys=("NOPE",)
+    )
+    with pytest.raises(UnknownKeyError):
+        r.for_profile(unknown)
+    # An addition may not shadow a superset metric key.
+    shadow = ProfileDef(
+        key="probe",
+        name="Probe",
+        module_keys=tuple(r.module_keys()),
+        metric_additions=(_metric("AUA"),),
+    )
+    with pytest.raises(RegistryError):
+        r.for_profile(shadow)
 
 
 def test_a_profile_view_carries_the_c_dimension() -> None:
