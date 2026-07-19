@@ -88,15 +88,16 @@ def scoreability_blockers(document: AssessmentDocument, registry: Registry) -> l
         if violation:
             blockers.append(violation)
 
-    core_subs = {
-        s.key for k in _CRITICAL_MODULES_FOR_L for s in registry.require_module(k).subcomponents
-    }
+    # Name the core modules from the ACTIVE registry VIEW, not a hardcoded retail string — a wealth
+    # or exchange profile renames these modules, so a wealth advisor must not be told to rate
+    # "App Server, Back Office, or OEMS" (GRS-0147e).
+    core_modules = [registry.require_module(k) for k in _CRITICAL_MODULES_FOR_L]
+    core_subs = {s.key for m in core_modules for s in m.subcomponents}
     if not any(
         r.level is not None and r.subcomponent_key in core_subs for r in document.subcomponents
     ):
-        blockers.append(
-            "Rate at least one subcomponent in a core module (App Server, Back Office, or OEMS)."
-        )
+        names = ", ".join(m.name for m in core_modules)
+        blockers.append(f"Rate at least one subcomponent in a core module ({names}).")
     return blockers
 
 
