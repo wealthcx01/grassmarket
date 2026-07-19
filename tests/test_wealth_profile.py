@@ -24,12 +24,12 @@ from grassmarket.atlas.engine import score
 from tests.test_atlas_engine_properties import build_inputs
 
 _WEALTH_SUB_ADDITIONS = {
-    "CMS_SUITABILITY_ADVICE",
-    "CMS_MANDATE_MIX",
-    "BACKOFFICE_CUSTODY_CASS",
-    "BACKOFFICE_INVESTMENT_GOVERNANCE",
-    "APP_SERVER_PLATFORM_AUM_ECONOMICS",
-    "FRONTEND_FINANCIAL_PLANNING",
+    "WEALTH_SUITABILITY",
+    "WEALTH_CUSTODY_CASS",
+    "WEALTH_MODEL_PORTFOLIOS",
+    "WEALTH_PLANNING_TOOLS",
+    "WEALTH_PLATFORM_RESILIENCE",
+    "WEALTH_ADVICE_WORKFLOW",
 }
 _WEALTH_METRICS = {
     "WEALTH_AUM",
@@ -72,9 +72,27 @@ def test_wealth_b_index_is_wealth_native_not_retail() -> None:
 def test_wealth_criticals_reflect_suitability_and_custody() -> None:
     view = _wealth_view()
     crit = {s.key: s.critical for m in view.modules for s in m.subcomponents}
-    assert crit["CMS_SUITABILITY_ADVICE"] is True  # COBS 9A advice process
-    assert crit["BACKOFFICE_CUSTODY_CASS"] is True  # client-money protection
-    assert crit["OEMS_PRE_TRADE_RISK"] is False  # broker gate is not the wealth critical
+    assert crit["WEALTH_SUITABILITY"] is True  # COBS 9A advice process
+    assert crit["WEALTH_CUSTODY_CASS"] is True  # client-money protection
+    assert crit["WEALTH_PLATFORM_RESILIENCE"] is True  # operational resilience
+
+
+def test_wealth_infrastructure_is_wealth_native_not_retail() -> None:
+    # GRS-0147d: the Infrastructure Deep Dive drops every retail subcomponent from the selected
+    # modules and renames the modules for a wealth manager — no OEMS/watchlists/time-to-first-trade.
+    r = load_registry()
+    view = _wealth_view()
+    retail_subs = {s.key for m in r.modules for s in m.subcomponents}
+    assert not (view.all_subcomponent_keys() & retail_subs)  # zero retail leak
+    names = {m.name for m in view.modules}
+    assert "Custody, Settlement & CASS" in names
+    assert "Portfolio Management & Dealing" in names
+    assert "Client Management & Suitability" in names
+    # The superset OEMS module still carries its retail subcomponents (golden master safe).
+    oems = r.require_module("OEMS")
+    assert len(oems.subcomponents) > 0 and not any(
+        s.key.startswith("WEALTH_") for s in oems.subcomponents
+    )
 
 
 def test_wealth_coefficient_set_covers_the_wealth_view_exactly() -> None:

@@ -85,37 +85,141 @@ profiles:
       - CMS
       - BACKOFFICE
       - OEMS
+    # GRS-0147d: the infrastructure taxonomy is wealth-native. We keep the module KEYS (so scoring +
+    # scoreability that address modules by key still resolve) but DROP every retail subcomponent from
+    # each selected module and RENAME the module for a wealth manager — a wealth firm runs custody,
+    # portfolio management, suitability and adviser tooling, not OEMS/watchlists/time-to-first-trade.
+    subcomponent_selection:
+      FRONTEND: []
+      APP_SERVER: []
+      MARKET_DATA: []
+      ORCHESTRATION: []
+      CMS: []
+      BACKOFFICE: []
+      OEMS: []
+    module_name_overrides:
+      FRONTEND: Client Portal & Planning
+      APP_SERVER: Platform & AUM Economics
+      MARKET_DATA: Investment Data & Research
+      ORCHESTRATION: Advice Workflow & Investment Governance
+      CMS: Client Management & Suitability
+      BACKOFFICE: Custody, Settlement & CASS
+      OEMS: Portfolio Management & Dealing
     subcomponent_additions:
-      - key: CMS_SUITABILITY_ADVICE
-        name: Suitability & advice process
-        module_key: CMS
-        description: Client objectives, risk profiling, suitability assessment & reports, periodic review (FCA COBS 9A).
+      # --- Client Portal & Planning (FRONTEND) ---
+      - key: WEALTH_PORTAL_EXPERIENCE
+        name: Client portal experience
+        module_key: FRONTEND
+        description: Valuations, documents, secure messaging and mobile access for clients.
+      - key: WEALTH_DIGITAL_ONBOARDING
+        name: Digital onboarding & account opening
+        module_key: FRONTEND
+        description: KYC/AML, source-of-wealth capture and e-signature onboarding for new clients.
+      - key: WEALTH_PLANNING_TOOLS
+        name: Financial-planning tools
+        module_key: FRONTEND
+        description: Cashflow modelling, goal tracking and IHT/tax visualisation for clients and advisers.
+      - key: WEALTH_ACCESSIBILITY
+        name: Accessibility & vulnerable-client support
+        module_key: FRONTEND
+        description: Accessible journeys and support for vulnerable clients (Consumer Duty).
+      # --- Platform & AUM Economics (APP_SERVER) ---
+      - key: WEALTH_PLATFORM_RESILIENCE
+        name: Platform resilience & availability
+        module_key: APP_SERVER
+        description: Uptime, disaster recovery and operational resilience of the wealth platform.
         critical: true
-      - key: CMS_MANDATE_MIX
+      - key: WEALTH_FEE_ADMIN
+        name: Fee administration & billing accuracy
+        module_key: APP_SERVER
+        description: Tiered fee calculation, rebates, and billing reconciliation across mandates.
+      - key: WEALTH_INTEGRATION
+        name: Integration & APIs
+        module_key: APP_SERVER
+        description: Custodian, platform, planning-tool and data connectivity across the estate.
+      - key: WEALTH_COST_TO_SERVE
+        name: Cost-to-serve & straight-through processing
+        module_key: APP_SERVER
+        description: Operational efficiency and STP rates that drive platform economics.
+      # --- Investment Data & Research (MARKET_DATA) ---
+      - key: WEALTH_PRICING_DATA
+        name: Pricing & valuation data quality
+        module_key: MARKET_DATA
+        description: Instrument coverage, corporate-action accuracy and timeliness of valuation data.
+      - key: WEALTH_RESEARCH_INPUTS
+        name: Research & model inputs
+        module_key: MARKET_DATA
+        description: Fund/security research and data feeding model-portfolio construction.
+      - key: WEALTH_BENCHMARK_DATA
+        name: Benchmark & performance-attribution data
+        module_key: MARKET_DATA
+        description: Benchmark reference data and performance-attribution inputs for reporting.
+      # --- Advice Workflow & Investment Governance (ORCHESTRATION) ---
+      - key: WEALTH_ADVICE_WORKFLOW
+        name: Advice workflow orchestration
+        module_key: ORCHESTRATION
+        description: Fact-find → suitability → recommendation → periodic-review workflow across advisers.
+      - key: WEALTH_INVESTMENT_GOVERNANCE
+        name: Investment governance & PROD
+        module_key: ORCHESTRATION
+        description: CIO / investment-committee oversight and PROD target-market controls.
+      - key: WEALTH_CHANGE_CONTROL
+        name: Change control & model propagation
+        module_key: ORCHESTRATION
+        description: Controlled propagation of model-portfolio changes across client mandates.
+      # --- Client Management & Suitability (CMS) ---
+      - key: WEALTH_SUITABILITY
+        name: Suitability & advice process (COBS 9A)
+        module_key: CMS
+        description: Objectives, risk profiling, suitability assessment & reports, and periodic review.
+        critical: true
+      - key: WEALTH_RISK_PROFILING
+        name: Risk profiling & capacity for loss
+        module_key: CMS
+        description: Attitude-to-risk and capacity-for-loss assessment feeding mandate selection.
+      - key: WEALTH_MANDATE_MIX
         name: Mandate mix & controls
         module_key: CMS
-        description: Discretionary / advisory / execution-only mandate mix and the controls appropriate to each.
-      - key: BACKOFFICE_CUSTODY_CASS
+        description: Discretionary / advisory / execution mandate mix and per-mandate controls.
+      - key: WEALTH_ONGOING_SERVICE
+        name: Ongoing-service evidencing
+        module_key: CMS
+        description: Periodic-review scheduling and evidencing of ongoing service (Consumer Duty).
+      # --- Custody, Settlement & CASS (BACKOFFICE) ---
+      - key: WEALTH_CUSTODY_CASS
         name: Custody & client-asset (CASS) controls
         module_key: BACKOFFICE
-        description: Client-asset custody, segregation, reconciliation, and CASS reporting (client-money protection).
+        description: Segregation, reconciliation and CASS reporting — client-money and asset protection.
         critical: true
-      - key: BACKOFFICE_INVESTMENT_GOVERNANCE
-        name: Investment governance & CIO oversight
+      - key: WEALTH_SETTLEMENT
+        name: Settlement & reconciliation
         module_key: BACKOFFICE
-        description: CIO / investment-committee oversight and PROD product-governance target-market alignment.
-      - key: APP_SERVER_PLATFORM_AUM_ECONOMICS
-        name: Platform & AUM economics
-        module_key: APP_SERVER
-        description: Fee administration, billing accuracy, and platform/AUM cost-to-serve economics.
-      - key: FRONTEND_FINANCIAL_PLANNING
-        name: Financial planning tools
-        module_key: FRONTEND
-        description: Cashflow modelling, IHT/tax planning, and goal tracking for clients and advisers.
-    critical_overrides:
-      # A wealth firm's critical controls are suitability (COBS 9A) and client-asset custody (CASS,
-      # added above) — not the broker pre-trade risk gate. DRAFT pending the wealth panel.
-      OEMS_PRE_TRADE_RISK: false
+        description: Trade, cash and stock settlement and daily reconciliation.
+      - key: WEALTH_CORP_ACTIONS
+        name: Corporate actions & income
+        module_key: BACKOFFICE
+        description: Corporate-action processing and income/dividend handling across custody.
+      - key: WEALTH_CLIENT_MONEY
+        name: Client-money handling
+        module_key: BACKOFFICE
+        description: Client-money receipt, segregation and disbursement controls.
+      # --- Portfolio Management & Dealing (OEMS) ---
+      - key: WEALTH_MODEL_PORTFOLIOS
+        name: Model portfolios / MPS
+        module_key: OEMS
+        description: Construction and maintenance of model portfolios / managed portfolio services.
+      - key: WEALTH_REBALANCING
+        name: Rebalancing & drift management
+        module_key: OEMS
+        description: Rebalancing and drift management across client accounts and mandates.
+      - key: WEALTH_ORDER_EXECUTION
+        name: Order generation & best execution
+        module_key: OEMS
+        description: Order aggregation, allocation and best execution (MiFID II) for managed money.
+      - key: WEALTH_DISCRETIONARY_CONTROLS
+        name: Discretionary controls & restrictions
+        module_key: OEMS
+        description: Discretionary-mandate controls and enforcement of client investment restrictions.
     # The B index is wealth-native (GRS-0147 Phase 2): no retail superset metrics, its own set.
     metrics: []
     metric_additions:
