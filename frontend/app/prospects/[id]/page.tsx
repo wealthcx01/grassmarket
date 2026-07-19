@@ -50,7 +50,10 @@ export default function ProspectDetailPage() {
         })
         .catch((err: unknown) => {
           if (err instanceof ApiError && err.status === 0) return;
-          if (err instanceof ApiError && err.status === 404) return router.replace("/pipeline");
+          // 404 (no such prospect) or 422 (malformed id in the URL) both mean "not a real record" —
+          // bounce back to the pipeline rather than leak a raw "Request failed (422)" (GRS-0143).
+          if (err instanceof ApiError && (err.status === 404 || err.status === 422))
+            return router.replace("/pipeline");
           setError(err instanceof ApiError ? err.message : "Could not load the prospect.");
         }),
     [id, router],
