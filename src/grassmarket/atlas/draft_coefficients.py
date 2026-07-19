@@ -26,6 +26,10 @@ _CRITICAL_MODULES_FOR_L = ("APP_SERVER", "BACKOFFICE", "OEMS")
 # engine (OEMS in the exchange view), and clearing/settlement (LIQ_CONNECT). DRAFT — the exchange
 # panel refines these; provenance stays draft-pending-elicitation.
 _EXCHANGE_CRITICAL_MODULES_FOR_L = ("APP_SERVER", "OEMS", "LIQ_CONNECT")
+# The wealth profile's critical-for-L modules (ADR-0035/GRS-0147): the platform, client management
+# (which carries suitability, COBS 9A), and the back office (which carries client-asset custody /
+# CASS). DRAFT — the wealth panel refines these; provenance stays draft-pending-elicitation.
+_WEALTH_CRITICAL_MODULES_FOR_L = ("APP_SERVER", "CMS", "BACKOFFICE")
 
 # The draft's critical-for-C modules (ADR-0023): the customer-facing core — first-trade onboarding,
 # the trading experience, and security/regulation (trust). A ratified DRAFT judgement; the θ_C panel
@@ -164,4 +168,16 @@ def draft_exchange_coefficient_set(registry: Registry) -> CoefficientSet:
         registry,
         version="exchange-v1-draft-pending-elicitation",
         critical_modules_for_l=_EXCHANGE_CRITICAL_MODULES_FOR_L,
+    )
+
+
+def draft_wealth_coefficient_set(registry: Registry) -> CoefficientSet:
+    """The DRAFT wealth-profile coefficient set (ADR-0035 / GRS-0147). Covers the wealth VIEW
+    exactly — its wealth-native B metrics (AUM, net-new-money, margin, retention…) and wealth
+    critical-for-L modules (platform, client management/suitability, back office/custody). It is
+    the wealth weight-elicitation panel replaces this (same activation seam as retail/exchange)."""
+    return draft_v1_coefficient_set(
+        registry,
+        version="wealth-v1-draft-pending-elicitation",
+        critical_modules_for_l=_WEALTH_CRITICAL_MODULES_FOR_L,
     )

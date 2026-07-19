@@ -34,10 +34,12 @@ from bcap_contracts.uncertainty import UncertaintyModel
 from grassmarket.atlas.draft_coefficients import (
     draft_exchange_coefficient_set,
     draft_v1_coefficient_set,
+    draft_wealth_coefficient_set,
 )
 from grassmarket.atlas.montecarlo import draft_v1_uncertainty_model
 
 _EXCHANGE_PROFILE_KEY = "exchange"
+_WEALTH_PROFILE_KEY = "wealth"
 
 
 def profile_key_of(document: AssessmentDocument) -> str:
@@ -54,11 +56,14 @@ def profile_scoring_context(
     """Resolve the (registry VIEW, coefficient set) an assessment scores against for an operating-
     model profile (ADR-0025). The retail default view is byte-identical to the full registry, so the
     golden master and every existing retail assessment are unchanged. Retail routes through
-    :func:`active_coefficient_set` (the client-usability activation seam); the exchange profile uses
-    its own draft set with exchange criticals. An unknown profile key fails loud (ADR-0001)."""
+    :func:`active_coefficient_set` (the client-usability activation seam); the exchange and wealth
+    profiles use their own draft sets with profile-specific criticals + metrics. An unknown profile
+    key fails loud (ADR-0001)."""
     view = load_registry().for_profile(load_profile(profile_key))
     if profile_key == _EXCHANGE_PROFILE_KEY:
         return view, draft_exchange_coefficient_set(view)
+    if profile_key == _WEALTH_PROFILE_KEY:
+        return view, draft_wealth_coefficient_set(view)
     return view, active_coefficient_set(view)
 
 
