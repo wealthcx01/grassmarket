@@ -26,9 +26,9 @@ test.describe("GRS-0111 — CRM pipeline", () => {
     await login(page);
     await page.goto("/pipeline");
 
-    // KPI strip renders.
+    // KPI strip renders. ("Expected wins" since GRS-0137 relabelled the old "Weighted forecast" KPI.)
     await expect(page.getByText("Prospects", { exact: true })).toBeVisible();
-    await expect(page.getByText("Weighted forecast")).toBeVisible();
+    await expect(page.getByText("Expected wins")).toBeVisible();
 
     // Add a prospect — it lands in the board.
     const name = `E2E Broking ${Date.now()}`;
