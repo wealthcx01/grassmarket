@@ -37,13 +37,26 @@ def _exchange_view():
 
 
 def test_exchange_view_selects_market_infra_and_not_the_retail_cms() -> None:
+    r = load_registry()
     view = _exchange_view()
     module_keys = {m.key for m in view.modules}
     assert "CMS" not in module_keys  # retail client-management system is not an exchange concern
     sub_keys = view.all_subcomponent_keys()
     assert _EXCHANGE_ADDITIONS <= sub_keys  # the market-infra subcomponents are present
-    # No retail-only CMS subcomponent leaks into the exchange run.
-    assert not any(k.startswith("CMS_") for k in sub_keys)
+    # GRS-0147g: the infra taxonomy is exchange-native — ZERO retail subcomponents leak in, and the
+    # modules are renamed for a venue operator.
+    retail_subs = {s.key for mm in r.modules for s in mm.subcomponents}
+    assert not (sub_keys & retail_subs)
+    names = {m.name for m in view.modules}
+    assert "Matching Engine" in names and "Clearing & Settlement" in names
+
+
+def test_exchange_b_index_is_exchange_native_not_retail() -> None:
+    view = _exchange_view()
+    metric_keys = view.metric_keys()
+    assert "EXCH_ADV" in metric_keys and "EXCH_DATA_REVENUE" in metric_keys
+    assert "AUA" not in metric_keys and "TAKE_RATE_LEVEL" not in metric_keys
+    assert "AUA" in load_registry().metric_keys()  # superset unchanged
 
 
 def test_exchange_criticals_reflect_market_infrastructure() -> None:
@@ -51,8 +64,9 @@ def test_exchange_criticals_reflect_market_infrastructure() -> None:
     crit = {s.key: s.critical for m in view.modules for s in m.subcomponents}
     assert crit["OEMS_MATCHING_ENGINE"] is True  # the heart of an exchange
     assert crit["BACKOFFICE_MARKET_SURVEILLANCE"] is True  # regulatory imperative
-    # A broker's pre-trade risk gate is overridden non-critical for the exchange.
-    assert crit["OEMS_PRE_TRADE_RISK"] is False
+    assert crit["EXCH_PLATFORM_UPTIME"] is True  # operational resilience
+    # The broker pre-trade risk gate is dropped entirely from the exchange view.
+    assert "OEMS_PRE_TRADE_RISK" not in crit
 
 
 def test_exchange_coefficient_set_covers_the_exchange_view_exactly() -> None:
