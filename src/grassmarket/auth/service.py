@@ -157,6 +157,29 @@ class AuthService:
         )
         return self._issue_tokens(stored, now=now)
 
+    def change_password(
+        self, *, consultant_id: UUID, current_password: str, new_password: str
+    ) -> None:
+        """Self-service password change (GRS-0148d). Verifies the current password, then stores the
+        new hash and records an audit event. Fail-loud: a wrong current password, an inactive
+        account, or an OAuth-only account (no password to change) is `InvalidCredentialsError`."""
+        stored = self._repo.get_consultant_by_id(consultant_id)
+        if stored is None or stored.hashed_password is None:
+            # No password to verify — an OAuth-only account can't change a password it never had.
+            raise InvalidCredentialsError("This account has no password to change.")
+        if not stored.is_active:
+            raise InvalidCredentialsError("Account is inactive.")
+        if not verify_password(current_password, stored.hashed_password):
+            raise InvalidCredentialsError("Current password is incorrect.")
+        self._repo.set_consultant_password(consultant_id, hash_password(new_password))
+        self._repo.record_audit(
+            actor_consultant_id=consultant_id,
+            event_type=AuditEventType.AUTH_PASSWORD_CHANGED,
+            resource_type="consultant",
+            resource_id=consultant_id,
+            now=datetime.now(UTC),
+        )
+
     def _issue_tokens(self, stored: StoredConsultant, *, now: datetime) -> IssuedTokens:
         """Mint the access token + a fresh single-use refresh token (its hash persisted, GRS-0120).
         The single mint point for BOTH tokens on every login/refresh path."""

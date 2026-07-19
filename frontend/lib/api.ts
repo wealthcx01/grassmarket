@@ -242,6 +242,17 @@ export const api = {
     });
   },
 
+  // Self-service password change (GRS-0148d). 204 on success; 401 if the current password is wrong
+  // or the account is OAuth-only; 422 if the new password is under the 12-char floor.
+  changePassword(currentPassword: string, newPassword: string, signal?: AbortSignal): Promise<void> {
+    return request<void>("/auth/change-password", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+      signal,
+    });
+  },
+
   // Exchange a single-use Google login hand-off code for the GM JWT (GRS-0074).
   exchangeSession(code: string, signal?: AbortSignal): Promise<LoginResponse> {
     return request<LoginResponse>("/auth/session/exchange", {

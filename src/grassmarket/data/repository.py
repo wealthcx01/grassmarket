@@ -483,6 +483,16 @@ class Repository:
         row = self._session.get(ConsultantORM, consultant_id)
         return self._to_stored_consultant(row) if row is not None else None
 
+    def set_consultant_password(self, consultant_id: UUID, hashed_password: str) -> None:
+        """Replace a consultant's password hash (GRS-0148d). Persistence-only — the caller (the auth
+        service) verifies the current password and hashes the new one. Fail loud if absent."""
+        row = self._session.get(ConsultantORM, consultant_id)
+        if row is None:
+            raise NotFoundError(f"No consultant {consultant_id}.")
+        row.hashed_password = hashed_password
+        self._session.add(row)
+        self._session.flush()
+
     def create_consultant(
         self,
         *,

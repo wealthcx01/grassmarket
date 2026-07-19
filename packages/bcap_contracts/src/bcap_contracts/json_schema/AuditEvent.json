@@ -4,6 +4,7 @@
       "description": "The security-relevant action classes the audit log records (PRD §2).",
       "enum": [
         "auth_login",
+        "auth_password_changed",
         "assessment_finalised",
         "deliverable_generated",
         "deliverable_downloaded",

@@ -49,6 +49,56 @@ def test_invitation_signup_then_login_and_me(session_factory, settings, alice, c
     assert "hashed_password" not in me.json()  # the hash never leaves the storage layer
 
 
+def test_change_password_rotates_the_credential(client, alice: SeededConsultant) -> None:
+    # GRS-0148d: a signed-in advisor changes their own password; the old one stops working and the
+    # new one logs in.
+    resp = client.post(
+        "/auth/change-password",
+        headers=auth_header(alice),
+        json={
+            "current_password": "correct-horse-battery-staple",
+            "new_password": "a-brand-new-strong-passphrase",
+        },
+    )
+    assert resp.status_code == 204
+    old = client.post(
+        "/auth/login",
+        json={"email": alice.stored.email, "password": "correct-horse-battery-staple"},
+    )
+    assert old.status_code == 401
+    new = client.post(
+        "/auth/login",
+        json={"email": alice.stored.email, "password": "a-brand-new-strong-passphrase"},
+    )
+    assert new.status_code == 200
+
+
+def test_change_password_wrong_current_is_401(client, alice: SeededConsultant) -> None:
+    resp = client.post(
+        "/auth/change-password",
+        headers=auth_header(alice),
+        json={"current_password": "not-my-password", "new_password": "a-brand-new-strong-pass"},
+    )
+    assert resp.status_code == 401
+
+
+def test_change_password_weak_new_is_422(client, alice: SeededConsultant) -> None:
+    resp = client.post(
+        "/auth/change-password",
+        headers=auth_header(alice),
+        json={"current_password": "correct-horse-battery-staple", "new_password": "short"},
+    )
+    assert resp.status_code == 422  # the 12-char floor is contract-enforced
+
+
+def test_change_password_requires_auth(client) -> None:
+    resp = client.post(
+        "/auth/change-password",
+        json={"current_password": "x", "new_password": "a-brand-new-strong-pass"},
+    )
+    assert resp.status_code == 401
+
+
 def test_login_wrong_password_is_401(client, alice: SeededConsultant) -> None:
     resp = client.post(
         "/auth/login", json={"email": alice.stored.email, "password": "wrong-password"}
