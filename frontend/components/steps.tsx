@@ -832,6 +832,11 @@ function Interpretation({ live, moduleLabels }: { live: LiveScore; moduleLabels:
   const bottleneck = modules.length
     ? modules.reduce((min, cur) => (cur[1].p50 < min[1].p50 ? cur : min))
     : null;
+  // At low coverage the "weakest module" is unreliable: an unassessed module carries a modelled
+  // ~neutral band and can rank weakest simply because it hasn't been looked at (GRS-0145). Below half
+  // coverage we caveat the bottleneck rather than issue a confident "go fix this" that could point at
+  // the one module nobody assessed.
+  const lowCoverage = live.coverage != null && live.coverage < 0.5;
   return (
     <Card>
       <h3 style={{ margin: "0 0 0.6rem", fontSize: "1rem" }}>What this means</h3>
@@ -846,8 +851,20 @@ function Interpretation({ live, moduleLabels }: { live: LiveScore; moduleLabels:
           <li>
             <strong>The bottleneck.</strong>{" "}
             <strong style={{ color: "var(--color-ink)" }}>{moduleLabels[bottleneck[0]] ?? bottleneck[0]}</strong>{" "}
-            is the current weakest link at <strong style={{ color: "var(--color-ink)" }}>{pct(bottleneck[1].p50)}</strong> —
-            it caps the whole. The fastest lift comes from fixing the weakest critical part, not the already-strong ones.
+            is the current weakest link at <strong style={{ color: "var(--color-ink)" }}>{pct(bottleneck[1].p50)}</strong>
+            {lowCoverage ? (
+              <>
+                {" "}— but at only{" "}
+                <strong style={{ color: "var(--color-ink)" }}>{pct(live.coverage as number)}%</strong> coverage this is
+                provisional: a module can rank weakest simply because it hasn&rsquo;t been assessed yet. Assess more before
+                acting on it.
+              </>
+            ) : (
+              <>
+                {" "}— it caps the whole. The fastest lift comes from fixing the weakest critical part, not the
+                already-strong ones.
+              </>
+            )}
           </li>
         ) : null}
         <li>

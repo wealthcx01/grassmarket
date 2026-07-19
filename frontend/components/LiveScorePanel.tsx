@@ -86,10 +86,14 @@ function Bottleneck({ score, moduleLabels }: { score: LiveScore; moduleLabels?: 
   const weakest = mods[0];
   if (!weakest) return null;
   const [key, , value] = weakest;
+  // Below half coverage the weakest module is unreliable — an unassessed module carries a modelled
+  // neutral band and can rank weakest just because it hasn't been looked at, so label the callout
+  // provisional rather than a confident constraint (GRS-0145).
+  const lowCoverage = score.coverage != null && score.coverage < 0.5;
   return (
     <div className="callout callout-warn" style={{ padding: "0.6rem 0.75rem" }}>
       <span className="mono" style={{ fontSize: "0.6rem", letterSpacing: "0.08em", textTransform: "uppercase", opacity: 0.8 }}>
-        Likely constraint
+        {lowCoverage ? "Likely constraint · provisional" : "Likely constraint"}
       </span>
       <div style={{ marginTop: "0.15rem", fontSize: "0.9rem", color: "var(--color-ink)" }}>
         <strong>{label(key, moduleLabels)}</strong>{" "}
@@ -97,6 +101,12 @@ function Bottleneck({ score, moduleLabels }: { score: LiveScore; moduleLabels?: 
           q<sub>m</sub> {value.toFixed(1)}
         </span>
       </div>
+      {lowCoverage ? (
+        <div style={{ marginTop: "0.3rem", fontSize: "0.7rem", color: "var(--color-ink-muted)" }}>
+          Only {Math.round((score.coverage as number) * 100)}% assessed — a module can rank weakest just because it
+          isn&rsquo;t assessed yet. Assess more before acting on this.
+        </div>
+      ) : null}
     </div>
   );
 }
