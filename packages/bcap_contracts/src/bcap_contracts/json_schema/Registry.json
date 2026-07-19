@@ -136,6 +136,30 @@
           "title": "Key",
           "type": "string"
         },
+        "max_raw": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Raw"
+        },
+        "min_raw": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min Raw"
+        },
         "name": {
           "title": "Name",
           "type": "string"

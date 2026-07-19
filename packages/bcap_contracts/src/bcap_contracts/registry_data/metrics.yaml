@@ -23,6 +23,7 @@ metrics:
       manager or custodian; for an execution-only broker, trade volume matters more.
     unit: GBP
     direction: higher_is_better
+    min_raw: 0  # a magnitude/count/rate that cannot be negative (GRS-0144)
     group: scale
     status: draft-pending-ratification
     normalisation:
@@ -42,6 +43,7 @@ metrics:
       relationships.
     unit: count
     direction: higher_is_better
+    min_raw: 0  # a magnitude/count/rate that cannot be negative (GRS-0144)
     group: scale
     status: draft-pending-ratification
     normalisation:
@@ -60,6 +62,7 @@ metrics:
       actually keeps.
     unit: GBP
     direction: higher_is_better
+    min_raw: 0  # a magnitude/count/rate that cannot be negative (GRS-0144)
     group: scale
     status: draft-pending-ratification
     normalisation:
@@ -78,6 +81,7 @@ metrics:
       neobroker; high-and-narrow for a private-wealth firm.
     unit: GBP_per_year
     direction: higher_is_better
+    min_raw: 0  # a magnitude/count/rate that cannot be negative (GRS-0144)
     group: unit_economics
     status: draft-pending-ratification
     normalisation:
@@ -114,6 +118,7 @@ metrics:
       drive this down; advice-led models accept it higher for higher ARPU.
     unit: GBP_per_year
     direction: lower_is_better
+    min_raw: 0  # a magnitude/count/rate that cannot be negative (GRS-0144)
     group: unit_economics
     status: draft-pending-ratification
     normalisation:
@@ -132,6 +137,7 @@ metrics:
       for an exchange; far higher for a bundled wealth proposition.
     unit: bps
     direction: higher_is_better
+    min_raw: 0  # a magnitude/count/rate that cannot be negative (GRS-0144)
     group: unit_economics
     status: draft-pending-ratification
     normalisation:
@@ -154,6 +160,7 @@ metrics:
       the compounding engine. Above 100% means the base grows without new logos.
     unit: percent
     direction: higher_is_better
+    min_raw: 0  # a magnitude/count/rate that cannot be negative (GRS-0144)
     group: momentum
     status: draft-pending-ratification
     normalisation:
@@ -190,6 +197,7 @@ metrics:
       for itself. Lower is better; long paybacks make aggressive acquisition fragile.
     unit: months
     direction: lower_is_better
+    min_raw: 0  # a magnitude/count/rate that cannot be negative (GRS-0144)
     group: momentum
     status: draft-pending-ratification
     normalisation:

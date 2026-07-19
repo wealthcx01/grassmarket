@@ -15,6 +15,7 @@ because it cannot produce a number at all.
 from __future__ import annotations
 
 import functools
+import math
 from collections.abc import Set as AbstractSet
 from importlib import resources
 from typing import Any, Literal
@@ -187,7 +188,34 @@ class MetricDef(BaseModel):
     # Required, not defaulted: a metric with no normalisation cannot be scored, so an omitted
     # normalisation is a load-time refusal (ADR-0001), not an empty placeholder that scores wrong.
     normalisation: NormalisationSpec
+    # Input-domain bounds (GRS-0144, ADR-0035): a raw outside [min_raw, max_raw] is a nonsensical
+    # value (e.g. a negative AUA) and is REFUSED, never clamped into the anchor curve. `None` = no
+    # bound on that side, so a legitimately-signed metric (a margin or a growth rate that can go
+    # negative) leaves `min_raw` None. A value inside the domain but past the anchors still clamps
+    # (a valid-but-extreme firm) — the bound only rejects values that cannot exist for this metric.
+    min_raw: float | None = None
+    max_raw: float | None = None
     status: str = "settled"  # e.g. "draft-pending-ratification" for the Loop 1 draft register
+
+    @model_validator(mode="after")
+    def _bounds_are_sane(self) -> MetricDef:
+        if self.min_raw is not None and self.max_raw is not None and self.min_raw > self.max_raw:
+            raise RegistryError(
+                f"Metric {self.key!r} has min_raw {self.min_raw} > max_raw {self.max_raw}."
+            )
+        return self
+
+    def domain_violation(self, raw: float) -> str | None:
+        """A fail-loud message if `raw` is outside this metric's declared domain, else None. Refuses
+        a non-finite value (NaN/inf) and anything past an explicit bound — the engine must never
+        score a value this returns non-None for (ADR-0001: refuse, never default/clamp around)."""
+        if not math.isfinite(raw):
+            return f"{self.name} must be a finite number (got {raw})."
+        if self.min_raw is not None and raw < self.min_raw:
+            return f"{self.name} can't be below {self.min_raw:g} {self.unit} (got {raw:g})."
+        if self.max_raw is not None and raw > self.max_raw:
+            return f"{self.name} can't be above {self.max_raw:g} {self.unit} (got {raw:g})."
+        return None
 
     @model_validator(mode="after")
     def _normalisation_agrees_with_direction(self) -> MetricDef:
@@ -592,6 +620,9 @@ def _parse_metric(raw: dict[str, Any]) -> MetricDef:
         direction=raw["direction"],
         group=raw.get("group"),  # optional: None until the metric is grouped (ADR-0006)
         normalisation=normalisation,
+        # Input-domain bounds (GRS-0144): optional; absent ⇒ unbounded on that side (signed metric).
+        min_raw=raw.get("min_raw"),
+        max_raw=raw.get("max_raw"),
         status=_require(raw, "status", f"metric {key!r}"),
     )
 
