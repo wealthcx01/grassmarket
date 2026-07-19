@@ -220,6 +220,17 @@ def test_guidance_unknown_subcomponent_is_404(client, alice: SeededConsultant) -
     assert client.get("/guidance/subcomponents/NOPE", headers=auth_header(alice)).status_code == 404
 
 
+def test_guidance_real_but_unauthored_subcomponent_is_graceful(
+    client, alice: SeededConsultant
+) -> None:
+    # A real profile subcomponent whose rubric ladder isn't authored yet (the draft wealth infra
+    # set, GRS-0147d/f) must NOT surface a raw "No such subcomponent" 404 in the wizard — it returns
+    # 200 with an empty list so the panel shows "guidance not yet authored".
+    resp = client.get("/guidance/subcomponents/WEALTH_PRICING_DATA", headers=auth_header(alice))
+    assert resp.status_code == 200
+    assert resp.json() == []
+
+
 # --- Scenario evaluation (ΔV → Upgrade Priority Index) -----------------------------------
 
 
