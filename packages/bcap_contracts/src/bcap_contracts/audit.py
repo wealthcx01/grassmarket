@@ -23,6 +23,7 @@ class AuditEventType(StrEnum):
     """The security-relevant action classes the audit log records (PRD §2)."""
 
     AUTH_LOGIN = "auth_login"
+    AUTH_PASSWORD_CHANGED = "auth_password_changed"
     ASSESSMENT_FINALISED = "assessment_finalised"
     DELIVERABLE_GENERATED = "deliverable_generated"
     DELIVERABLE_DOWNLOADED = "deliverable_downloaded"

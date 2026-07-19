@@ -6,6 +6,7 @@ import secrets
 
 from bcap_contracts.auth import (
     AcceptInvitationRequest,
+    ChangePasswordRequest,
     Consultant,
     LoginRequest,
     RefreshRequest,
@@ -127,6 +128,24 @@ def me(
     if stored is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Consultant not found.")
     return stored.to_contract()
+
+
+@router.post("/change-password", status_code=status.HTTP_204_NO_CONTENT)
+def change_password(
+    payload: ChangePasswordRequest,
+    principal: Principal = Depends(get_current_principal),
+    auth: AuthService = Depends(get_auth_service),
+) -> None:
+    """Self-scoped password change (GRS-0148d) — a signed-in advisor changes only their own
+    password. A wrong current password / OAuth-only account surfaces as 401, mirroring login."""
+    try:
+        auth.change_password(
+            consultant_id=principal.consultant_id,
+            current_password=payload.current_password,
+            new_password=payload.new_password,
+        )
+    except InvalidCredentialsError as exc:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc)) from exc
 
 
 # --- Google OAuth (ADR-0024, GRS-0073) --------------------------------------------------------

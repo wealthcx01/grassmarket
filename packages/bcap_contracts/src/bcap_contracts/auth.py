@@ -92,3 +92,15 @@ class AcceptInvitationRequest(BaseModel):
     token: str = Field(min_length=1)
     full_name: str = Field(min_length=1)
     password: str = Field(min_length=12, description="Minimum 12 characters (fail-loud on weak).")
+
+
+class ChangePasswordRequest(BaseModel):
+    """Self-service password change (GRS-0148d). The caller proves knowledge of the current
+    password; the new one carries the same 12-char floor as signup."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    current_password: str = Field(min_length=1)
+    new_password: str = Field(
+        min_length=12, description="Minimum 12 characters (fail-loud on weak)."
+    )
