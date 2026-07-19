@@ -65,9 +65,10 @@ def scoreability_blockers(document: AssessmentDocument, registry: Registry) -> l
     doc_powers = {p.power_key for p in document.powers}
     missing_powers = registry.power_keys() - doc_powers
     if missing_powers:
-        blockers.append(
-            f"Rate all 7 Strategic Powers (missing: {', '.join(sorted(missing_powers))})."
-        )
+        # Name the powers, not their raw keys — "Branding, Cornered Resource", never "BRANDING,
+        # CORNERED_RESOURCE" (GRS-0148c: keys leaked into the wizard's blocking/Suggestions panels).
+        missing_names = sorted(registry.require_power(k).name for k in missing_powers)
+        blockers.append(f"Rate all 7 Strategic Powers (missing: {', '.join(missing_names)}).")
 
     if not any(
         m.raw is not None for m in document.metrics if m.metric_key in registry.metric_keys()
