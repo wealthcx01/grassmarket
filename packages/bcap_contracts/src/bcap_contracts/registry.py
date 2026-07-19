@@ -268,6 +268,17 @@ class ProfileDef(BaseModel):
     #    profile can never change the retail metric set.
     metric_keys: tuple[str, ...] | None = None
     metric_additions: tuple[MetricDef, ...] = ()
+    # Per-profile L-infrastructure content (GRS-0147d, ADR-0035). The 9-module taxonomy is
+    # brokerage-shaped; a wealth manager's infra is custody, portfolio management, suitability, and
+    # adviser tooling — not OEMS/watchlists/time-to-first-trade. To make the Infra Deep Dive read
+    # segment-native WITHOUT changing the superset (golden master) or the module KEYS (so
+    # scoring/scoreability that address modules by key still resolve), a profile can, per module:
+    #  - `subcomponent_selection[module] = (...)` keep ONLY these superset subcomponents (an empty
+    #    tuple drops all retail subs, leaving just this profile's `subcomponent_additions`);
+    #  - `module_name_overrides[module] = "..."` rename the module for this operating model.
+    # Both default empty ⇒ retail/exchange views are unchanged and the golden master is unaffected.
+    subcomponent_selection: dict[str, tuple[str, ...]] = {}
+    module_name_overrides: dict[str, str] = {}
 
 
 WidgetRarity = Literal["Common", "Uncommon", "Rare"]
@@ -443,13 +454,36 @@ class Registry(BaseModel):
                 f"Profile {profile.key!r} adds subcomponents to unselected module(s): "
                 f"{sorted(stray)}."
             )
+        # Per-module subcomponent selection / rename (GRS-0147d) may only target selected modules.
+        stray_sel = set(profile.subcomponent_selection) - set(profile.module_keys)
+        stray_name = set(profile.module_name_overrides) - set(profile.module_keys)
+        if stray_sel or stray_name:
+            raise RegistryError(
+                f"Profile {profile.key!r} selects/renames subcomponents on unselected module(s): "
+                f"{sorted(stray_sel | stray_name)}."
+            )
         selected = set(profile.module_keys)
         new_modules: list[ModuleDef] = []
         view_sub_keys: set[str] = set()
         for module in self.modules:  # superset order preserved → retail view is byte-identical
             if module.key not in selected:
                 continue
-            subs = list(module.subcomponents) + additions_by_module.get(module.key, [])
+            # Keep either all the module's superset subcomponents, or — if this profile narrows the
+            # module — only the selected ones (empty selection drops all retail subs), then append
+            # this profile's additions. Fail loud on a selection naming a sub not in the module.
+            if module.key in profile.subcomponent_selection:
+                keep = set(profile.subcomponent_selection[module.key])
+                unknown_sel = keep - {s.key for s in module.subcomponents}
+                if unknown_sel:
+                    raise UnknownKeyError(
+                        f"profile[{profile.key}] subcomponent selection on {module.key}",
+                        sorted(unknown_sel)[0],
+                        frozenset(s.key for s in module.subcomponents),
+                    )
+                base_subs = [s for s in module.subcomponents if s.key in keep]
+            else:
+                base_subs = list(module.subcomponents)
+            subs = base_subs + additions_by_module.get(module.key, [])
             resolved = tuple(
                 s.model_copy(update={"critical": profile.critical_overrides[s.key]})
                 if s.key in profile.critical_overrides
@@ -457,7 +491,10 @@ class Registry(BaseModel):
                 for s in subs
             )
             view_sub_keys.update(s.key for s in resolved)
-            new_modules.append(module.model_copy(update={"subcomponents": resolved}))
+            update: dict[str, object] = {"subcomponents": resolved}
+            if module.key in profile.module_name_overrides:
+                update["name"] = profile.module_name_overrides[module.key]
+            new_modules.append(module.model_copy(update=update))
         bad_overrides = set(profile.critical_overrides) - view_sub_keys
         if bad_overrides:
             raise UnknownKeyError(
@@ -571,6 +608,12 @@ def load_profiles() -> dict[str, ProfileDef]:
             # parsed exactly like superset metrics so a profile metric is a first-class MetricDef.
             metric_keys=tuple(body["metrics"]) if "metrics" in body else None,
             metric_additions=tuple(_parse_metric(m) for m in body.get("metric_additions", [])),
+            # Per-module subcomponent selection + rename (GRS-0147d): make the infra taxonomy
+            # segment-native without touching the superset or the module keys.
+            subcomponent_selection={
+                k: tuple(v) for k, v in body.get("subcomponent_selection", {}).items()
+            },
+            module_name_overrides=dict(body.get("module_name_overrides", {})),
         )
     if RETAIL_PROFILE_KEY not in profiles:
         raise RegistryError("profiles.yaml must declare the default 'retail' profile.")
