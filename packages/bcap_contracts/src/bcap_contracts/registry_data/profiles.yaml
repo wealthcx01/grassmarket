@@ -42,33 +42,286 @@ profiles:
       - OEMS
       - EMS_GATEWAY
       - LIQ_CONNECT
+    # GRS-0147g: the infrastructure taxonomy is exchange-native — drop every retail subcomponent from
+    # each selected module and rename the module for a market-infrastructure operator (matching
+    # engine, market-data dissemination, clearing/settlement, surveillance), NOT retail OEMS/watchlists.
+    subcomponent_selection:
+      FRONTEND: []
+      APP_SERVER: []
+      MARKET_DATA: []
+      ORCHESTRATION: []
+      BACKOFFICE: []
+      OEMS: []
+      EMS_GATEWAY: []
+      LIQ_CONNECT: []
+    module_name_overrides:
+      FRONTEND: Member Front-End & APIs
+      APP_SERVER: Core Trading Platform
+      MARKET_DATA: Market-Data Dissemination
+      ORCHESTRATION: Trading Operations & Controls
+      BACKOFFICE: Post-Trade & Surveillance
+      OEMS: Matching Engine
+      EMS_GATEWAY: Member Connectivity
+      LIQ_CONNECT: Clearing & Settlement
     subcomponent_additions:
-      - key: OEMS_MATCHING_ENGINE
-        name: Matching engine
-        module_key: OEMS
-        description: Order matching / auction engine — throughput, determinism, fairness, resilience.
+      # --- Member Front-End & APIs (FRONTEND) ---
+      - key: EXCH_FE_MEMBER_UI
+        name: Member trading front-end
+        module_key: FRONTEND
+        description: Member-facing trading and monitoring UI — order entry, dashboards, drop-copy views.
+      - key: EXCH_FE_API_COVERAGE
+        name: Trading API coverage
+        module_key: FRONTEND
+        description: Breadth and quality of trading/reference APIs offered to members and vendors.
+      - key: EXCH_FE_DROP_COPY
+        name: Drop-copy & post-trade feeds
+        module_key: FRONTEND
+        description: Real-time drop-copy and post-trade confirmation feeds to member back offices.
+      # --- Core Trading Platform (APP_SERVER) ---
+      - key: EXCH_PLATFORM_UPTIME
+        name: Platform availability & resilience
+        module_key: APP_SERVER
+        description: Uptime (four-to-five-nines), disaster recovery, and operational resilience.
         critical: true
+      - key: EXCH_PLATFORM_CAPACITY
+        name: Throughput & capacity headroom
+        module_key: APP_SERVER
+        description: Peak message/order throughput and capacity headroom under stress.
+      - key: EXCH_PLATFORM_LATENCY
+        name: Latency & determinism
+        module_key: APP_SERVER
+        description: End-to-end latency and deterministic, jitter-bounded processing.
+      # --- Market-Data Dissemination (MARKET_DATA) ---
+      - key: MARKET_DATA_DISTRIBUTION
+        name: Real-time market-data distribution
+        module_key: MARKET_DATA
+        description: Real-time feed dissemination to members and vendors; feed products and quality.
+      - key: EXCH_MD_REFERENCE
+        name: Reference & index data
+        module_key: MARKET_DATA
+        description: Reference, corporate-action and index data feeding pricing and analytics products.
+      - key: EXCH_MD_FAIRNESS
+        name: Data fairness & latency equalisation
+        module_key: MARKET_DATA
+        description: Fair, latency-equalised data access across members (regulatory fairness).
+      # --- Trading Operations & Controls (ORCHESTRATION) ---
+      - key: EXCH_OPS_LIFECYCLE
+        name: Session & lifecycle management
+        module_key: ORCHESTRATION
+        description: Trading-session lifecycle, auctions, halts, and open/close orchestration.
+      - key: EXCH_OPS_MARKET_OPS
+        name: Market operations & incident response
+        module_key: ORCHESTRATION
+        description: Market-operations desk, incident management, and member communications.
+      - key: EXCH_OPS_CHANGE_CONTROL
+        name: Change control & conformance
+        module_key: ORCHESTRATION
+        description: Controlled platform change and member conformance testing.
+      # --- Post-Trade & Surveillance (BACKOFFICE) ---
       - key: BACKOFFICE_MARKET_SURVEILLANCE
         name: Market surveillance
         module_key: BACKOFFICE
         description: Real-time + post-trade surveillance, alerting, and case management (regulatory).
         critical: true
+      - key: EXCH_PT_TRADE_KEEPING
+        name: Trade & position keeping
+        module_key: BACKOFFICE
+        description: Trade capture, position keeping, and reconciliation across the venue.
+      - key: EXCH_PT_REG_REPORTING
+        name: Regulatory & transaction reporting
+        module_key: BACKOFFICE
+        description: Transaction and regulatory reporting (e.g. MiFIR/RTS) accuracy and timeliness.
+      # --- Matching Engine (OEMS) ---
+      - key: OEMS_MATCHING_ENGINE
+        name: Matching / auction engine
+        module_key: OEMS
+        description: Order matching / auction engine — throughput, determinism, fairness, resilience.
+        critical: true
+      - key: EXCH_ME_ORDER_TYPES
+        name: Order types & auction models
+        module_key: OEMS
+        description: Coverage of order types, auction models, and market-model configurability.
+      - key: EXCH_ME_DETERMINISM
+        name: Sequencing & fairness
+        module_key: OEMS
+        description: Deterministic sequencing and fairness guarantees under load.
+      # --- Member Connectivity (EMS_GATEWAY) ---
       - key: EMS_GATEWAY_MEMBER_CONNECTIVITY
         name: Member / participant connectivity
         module_key: EMS_GATEWAY
-        description: Member gateways, session management, protocol coverage (FIX/binary), conformance.
+        description: Member gateways, session management, and connectivity resilience.
+      - key: EXCH_CONN_PROTOCOLS
+        name: Protocol coverage & conformance
+        module_key: EMS_GATEWAY
+        description: Protocol coverage (FIX/binary/native) and member conformance certification.
+      - key: EXCH_CONN_COLOCATION
+        name: Colocation & proximity hosting
+        module_key: EMS_GATEWAY
+        description: Colocation, cross-connects and proximity-hosting services for members.
+      # --- Clearing & Settlement (LIQ_CONNECT) ---
       - key: LIQ_CONNECT_CLEARING_SETTLEMENT_IF
         name: Clearing & settlement interfaces
         module_key: LIQ_CONNECT
         description: CCP / CSD interfaces, trade feeds, novation and settlement instruction flows.
-      - key: MARKET_DATA_DISTRIBUTION
-        name: Market-data distribution
-        module_key: MARKET_DATA
-        description: Real-time + reference data dissemination to members and vendors; feed products.
+      - key: EXCH_CS_RISK_MARGIN
+        name: Clearing risk & margin
+        module_key: LIQ_CONNECT
+        description: CCP risk management, margin, and default-fund/waterfall resilience (Cover-2).
+      - key: EXCH_CS_SETTLEMENT
+        name: Settlement finality
+        module_key: LIQ_CONNECT
+        description: Settlement instruction, novation, and finality across the settlement chain.
     critical_overrides:
       # A broker's pre-trade risk gate is not the exchange's critical control — the matching engine
-      # (added, critical) is. DRAFT judgement pending the exchange panel.
-      OEMS_PRE_TRADE_RISK: false
+      # and platform uptime are. (OEMS_PRE_TRADE_RISK is dropped by the selection above; no override
+      # needed.) DRAFT judgement pending the exchange panel.
+      {}
+    # The B index is exchange-native (GRS-0147g): volume/clearing/listings/data revenue, not retail
+    # AUA/ARPU. No retail superset metrics; its own set.
+    metrics: []
+    metric_additions:
+      - key: EXCH_ADV
+        name: Average daily volume (ADV)
+        description: Average daily contracts (or trades) matched — the headline throughput of a venue.
+        unit: contracts_per_day
+        direction: higher_is_better
+        min_raw: 0
+        group: scale
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          note: Anchors pinned to FY2024 venue scale (CME ADV ~26.5M); pending the exchange panel.
+          anchors:
+            - {raw: 0, normalised: 0.0}
+            - {raw: 1000000, normalised: 0.30}
+            - {raw: 5000000, normalised: 0.55}
+            - {raw: 15000000, normalised: 0.80}
+            - {raw: 26500000, normalised: 1.0}
+      - key: EXCH_OPEN_INTEREST
+        name: Open interest / cleared notional
+        description: Open interest (or cleared notional) — the stock of risk the venue clears.
+        unit: contracts
+        direction: higher_is_better
+        min_raw: 0
+        group: scale
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          anchors:
+            - {raw: 0, normalised: 0.0}
+            - {raw: 5000000, normalised: 0.40}
+            - {raw: 20000000, normalised: 0.70}
+            - {raw: 36000000, normalised: 0.90}
+            - {raw: 45000000, normalised: 1.0}
+      - key: EXCH_IPOS_WON
+        name: IPOs / listings won
+        description: New listings won per year — the primary-market franchise.
+        unit: count_per_year
+        direction: higher_is_better
+        min_raw: 0
+        group: scale
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          anchors:
+            - {raw: 0, normalised: 0.0}
+            - {raw: 30, normalised: 0.35}
+            - {raw: 80, normalised: 0.60}
+            - {raw: 130, normalised: 0.85}
+            - {raw: 171, normalised: 1.0}
+      - key: EXCH_DATA_REVENUE
+        name: Index & market-data revenue
+        description: Recurring index and market-data revenue — the toll-booth that de-risks volume.
+        unit: USD_m_per_year
+        direction: higher_is_better
+        min_raw: 0
+        group: scale
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          anchors:
+            - {raw: 0, normalised: 0.0}
+            - {raw: 200, normalised: 0.35}
+            - {raw: 700, normalised: 0.55}
+            - {raw: 2000, normalised: 0.80}
+            - {raw: 4000, normalised: 1.0}
+      - key: EXCH_TAKE_RATE
+        name: Revenue per contract (take rate)
+        description: Blended revenue per contract — pricing power, read alongside volume.
+        unit: USD_per_contract
+        direction: higher_is_better
+        min_raw: 0
+        group: unit_economics
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          anchors:
+            - {raw: 0.10, normalised: 0.20}
+            - {raw: 0.40, normalised: 0.50}
+            - {raw: 0.70, normalised: 0.75}
+            - {raw: 1.50, normalised: 0.90}
+            - {raw: 3.0, normalised: 1.0}
+      - key: EXCH_EBITDA_MARGIN
+        name: EBITDA / operating margin
+        description: Operating margin — the toll-booth economics. Legitimately negative early-stage.
+        unit: percent
+        direction: higher_is_better
+        group: unit_economics
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          anchors:
+            - {raw: 0, normalised: 0.10}
+            - {raw: 30, normalised: 0.30}
+            - {raw: 50, normalised: 0.55}
+            - {raw: 58, normalised: 0.75}
+            - {raw: 70, normalised: 1.0}
+      - key: EXCH_RECURRING_REV_PCT
+        name: Recurring / subscription revenue share
+        description: Share of revenue that is recurring (data/subscriptions) vs cyclical transactions.
+        unit: percent
+        direction: higher_is_better
+        min_raw: 0
+        group: unit_economics
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          anchors:
+            - {raw: 0, normalised: 0.0}
+            - {raw: 25, normalised: 0.30}
+            - {raw: 50, normalised: 0.60}
+            - {raw: 70, normalised: 0.85}
+            - {raw: 80, normalised: 1.0}
+      - key: EXCH_NET_REVENUE_GROWTH
+        name: Net revenue growth (YoY)
+        description: Year-on-year net revenue growth. Can be negative in a down year.
+        unit: percent
+        direction: higher_is_better
+        group: momentum
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          anchors:
+            - {raw: -10, normalised: 0.0}
+            - {raw: 0, normalised: 0.25}
+            - {raw: 8, normalised: 0.60}
+            - {raw: 15, normalised: 0.85}
+            - {raw: 19, normalised: 1.0}
+      - key: EXCH_VOLUME_GROWTH
+        name: Volume growth (YoY)
+        description: Year-on-year ADV/volume growth — the most cyclical driver. Can be negative.
+        unit: percent
+        direction: higher_is_better
+        group: momentum
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          anchors:
+            - {raw: -15, normalised: 0.0}
+            - {raw: 0, normalised: 0.30}
+            - {raw: 9, normalised: 0.70}
+            - {raw: 20, normalised: 0.90}
+            - {raw: 30, normalised: 1.0}
 
   wealth:
     name: Wealth / investment management
