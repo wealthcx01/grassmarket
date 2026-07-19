@@ -52,7 +52,9 @@ test.describe("GRS-0111 — CRM pipeline", () => {
     await dialog.getByPlaceholder("Email", { exact: true }).fill("jo@e2e.co");
     await dialog.getByRole("button", { name: "Add contact" }).click();
     await expect(dialog.getByText("Jo Lee")).toBeVisible();
-    await expect(dialog.getByText("primary")).toBeVisible();
+    // Exact match: the primary badge is the standalone word "primary" — disambiguates it from the
+    // win-probability explanation's "primary contact" copy that GRS-0137 added to the same panel.
+    await expect(dialog.getByText("primary", { exact: true })).toBeVisible();
 
     // Move the stage from inside the panel (backend-owned; a legal move from Prospect).
     await dialog.getByLabel("Move stage").selectOption("workshop_scheduled");
