@@ -108,7 +108,10 @@ export function WizardClient({ id }: { id: string }) {
       .catch((err: unknown) => {
         if (err instanceof ApiError && err.status === 0) return;
         if (handleAuth(err)) return;
-        if (err instanceof ApiError && err.status === 404) return router.replace("/assessments");
+        // 404 (no such assessment) or 422 (malformed id in the URL) → not a real record; bounce to
+        // the portfolio rather than leak a raw "Request failed (422)" (GRS-0143).
+        if (err instanceof ApiError && (err.status === 404 || err.status === 422))
+          return router.replace("/assessments");
         setLoadError(err instanceof ApiError ? err.message : "Could not load the assessment.");
       });
     return () => ctrl.abort();
