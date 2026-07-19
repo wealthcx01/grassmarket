@@ -33,7 +33,10 @@ export default function WorkshopDetailPage() {
         })
         .catch((err: unknown) => {
           if (err instanceof ApiError && err.status === 0) return;
-          if (err instanceof ApiError && err.status === 404) return router.replace("/pipeline");
+          // 404/422 (missing or malformed id) → not a real record; bounce to the pipeline rather than
+          // leak a raw "Request failed (422)" (GRS-0143b).
+          if (err instanceof ApiError && (err.status === 404 || err.status === 422))
+            return router.replace("/pipeline");
           setError(err instanceof ApiError ? err.message : "Could not load the workshop.");
         }),
     [id, router],

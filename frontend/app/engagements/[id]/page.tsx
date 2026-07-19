@@ -79,7 +79,10 @@ export default function EngagementDetailPage() {
             clearToken();
             return router.replace("/login");
           }
-          if (err instanceof ApiError && err.status === 404) return router.replace("/engagements");
+          // 404 (no such engagement) or 422 (malformed id in the URL) → not a real record; bounce to
+          // the list rather than leak a raw "Request failed (422)" (GRS-0143b, stress-test finding).
+          if (err instanceof ApiError && (err.status === 404 || err.status === 422))
+            return router.replace("/engagements");
           setError(err instanceof ApiError ? err.message : "Could not load the engagement.");
         }),
     [id, router],
