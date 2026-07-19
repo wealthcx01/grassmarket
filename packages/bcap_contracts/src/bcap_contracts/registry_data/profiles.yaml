@@ -69,3 +69,220 @@ profiles:
       # A broker's pre-trade risk gate is not the exchange's critical control — the matching engine
       # (added, critical) is. DRAFT judgement pending the exchange panel.
       OEMS_PRE_TRADE_RISK: false
+
+  wealth:
+    name: Wealth / investment management
+    # A wealth / investment manager runs a client portal, the platform, reporting/data, workflow,
+    # client management, and back-office custody — plus discretionary order management. It is NOT
+    # scored on retail brokerage take-rate: its B is its own metric set (AUM, net-new-money, margin,
+    # retention). The EMS member-gateway and liquidity-connectivity modules (brokerage/exchange
+    # infra) are dropped. DRAFT structure + anchors pending the wealth panel (GRS-0147, ADR-0035).
+    modules:
+      - FRONTEND
+      - APP_SERVER
+      - MARKET_DATA
+      - ORCHESTRATION
+      - CMS
+      - BACKOFFICE
+      - OEMS
+    subcomponent_additions:
+      - key: CMS_SUITABILITY_ADVICE
+        name: Suitability & advice process
+        module_key: CMS
+        description: Client objectives, risk profiling, suitability assessment & reports, periodic review (FCA COBS 9A).
+        critical: true
+      - key: CMS_MANDATE_MIX
+        name: Mandate mix & controls
+        module_key: CMS
+        description: Discretionary / advisory / execution-only mandate mix and the controls appropriate to each.
+      - key: BACKOFFICE_CUSTODY_CASS
+        name: Custody & client-asset (CASS) controls
+        module_key: BACKOFFICE
+        description: Client-asset custody, segregation, reconciliation, and CASS reporting (client-money protection).
+        critical: true
+      - key: BACKOFFICE_INVESTMENT_GOVERNANCE
+        name: Investment governance & CIO oversight
+        module_key: BACKOFFICE
+        description: CIO / investment-committee oversight and PROD product-governance target-market alignment.
+      - key: APP_SERVER_PLATFORM_AUM_ECONOMICS
+        name: Platform & AUM economics
+        module_key: APP_SERVER
+        description: Fee administration, billing accuracy, and platform/AUM cost-to-serve economics.
+      - key: FRONTEND_FINANCIAL_PLANNING
+        name: Financial planning tools
+        module_key: FRONTEND
+        description: Cashflow modelling, IHT/tax planning, and goal tracking for clients and advisers.
+    critical_overrides:
+      # A wealth firm's critical controls are suitability (COBS 9A) and client-asset custody (CASS,
+      # added above) — not the broker pre-trade risk gate. DRAFT pending the wealth panel.
+      OEMS_PRE_TRADE_RISK: false
+    # The B index is wealth-native (GRS-0147 Phase 2): no retail superset metrics, its own set.
+    metrics: []
+    metric_additions:
+      - key: WEALTH_AUM
+        name: Assets Under Management
+        description: >-
+          Total client assets managed — the headline scale of a wealth manager, monetised at a fee
+          margin over long client lifetimes.
+        unit: GBP_bn
+        direction: higher_is_better
+        min_raw: 0
+        group: scale
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          note: Anchors pinned to FY2024 UK wealth peers (SJP ~£190bn); pending the wealth panel.
+          anchors:
+            - {raw: 1, normalised: 0.15}
+            - {raw: 18, normalised: 0.42}
+            - {raw: 50, normalised: 0.62}
+            - {raw: 120, normalised: 0.80}
+            - {raw: 500, normalised: 0.95}
+      - key: WEALTH_ADVISER_HEADCOUNT
+        name: Adviser / RM headcount
+        description: Client-facing advisers or relationship managers — the human capacity that carries AUM.
+        unit: count
+        direction: higher_is_better
+        min_raw: 0
+        group: scale
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          anchors:
+            - {raw: 50, normalised: 0.20}
+            - {raw: 300, normalised: 0.45}
+            - {raw: 800, normalised: 0.65}
+            - {raw: 2000, normalised: 0.78}
+            - {raw: 4800, normalised: 0.90}
+      - key: WEALTH_CLIENT_COUNT
+        name: Client count
+        description: Number of client relationships served — the demand base under management.
+        unit: count
+        direction: higher_is_better
+        min_raw: 0
+        group: scale
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          anchors:
+            - {raw: 5000, normalised: 0.25}
+            - {raw: 50000, normalised: 0.50}
+            - {raw: 250000, normalised: 0.68}
+            - {raw: 1000000, normalised: 0.85}
+            - {raw: 2000000, normalised: 0.92}
+      - key: WEALTH_REVENUE_MARGIN_BPS
+        name: Revenue margin on AUM
+        description: >-
+          Net revenue as basis points of average AUM — the fee yield. Bounded above by a Consumer-Duty
+          fair-value ceiling: an unexplained-high margin is a liability, not pure quality.
+        unit: bps
+        direction: higher_is_better
+        min_raw: 0
+        group: unit_economics
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          anchors:
+            - {raw: 15, normalised: 0.25}
+            - {raw: 25, normalised: 0.40}
+            - {raw: 44, normalised: 0.60}
+            - {raw: 65, normalised: 0.72}
+            - {raw: 90, normalised: 0.82}
+            - {raw: 150, normalised: 0.90}
+      - key: WEALTH_COST_INCOME
+        name: Cost / income ratio
+        description: Operating cost as a share of income — lower is a more efficient, more resilient franchise.
+        unit: percent
+        direction: lower_is_better
+        min_raw: 0
+        group: unit_economics
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          anchors:
+            - {raw: 45, normalised: 0.88}
+            - {raw: 55, normalised: 0.75}
+            - {raw: 64, normalised: 0.58}
+            - {raw: 75, normalised: 0.35}
+            - {raw: 85, normalised: 0.15}
+      - key: WEALTH_AUM_PER_ADVISER
+        name: AUM per adviser
+        description: Average AUM carried per adviser — adviser productivity and operating leverage.
+        unit: GBP_m
+        direction: higher_is_better
+        min_raw: 0
+        group: unit_economics
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          anchors:
+            - {raw: 20, normalised: 0.30}
+            - {raw: 40, normalised: 0.45}
+            - {raw: 80, normalised: 0.62}
+            - {raw: 136, normalised: 0.75}
+            - {raw: 250, normalised: 0.88}
+      - key: WEALTH_RECURRING_REV_PCT
+        name: Recurring revenue share
+        description: Share of revenue that is recurring (ongoing advice / management fees) vs transactional.
+        unit: percent
+        direction: higher_is_better
+        min_raw: 0
+        group: unit_economics
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          anchors:
+            - {raw: 50, normalised: 0.20}
+            - {raw: 70, normalised: 0.45}
+            - {raw: 85, normalised: 0.65}
+            - {raw: 90, normalised: 0.75}
+            - {raw: 98, normalised: 0.92}
+      - key: WEALTH_NET_NEW_MONEY_RATE
+        name: Net new money rate
+        description: >-
+          Organic net inflows as a percent of opening AUM (strips market beta) — the single best
+          growth signal for a wealth manager. Legitimately NEGATIVE in a net-outflow year.
+        unit: percent
+        direction: higher_is_better
+        group: momentum
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          anchors:
+            - {raw: -3, normalised: 0.10}
+            - {raw: 0, normalised: 0.35}
+            - {raw: 3.7, normalised: 0.55}
+            - {raw: 5, normalised: 0.72}
+            - {raw: 7, normalised: 0.85}
+            - {raw: 10, normalised: 0.93}
+      - key: WEALTH_AUM_GROWTH
+        name: AUM growth (total YoY)
+        description: Total AUM growth year on year (flows + market). Can be negative in a down market.
+        unit: percent
+        direction: higher_is_better
+        group: momentum
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          anchors:
+            - {raw: -10, normalised: 0.10}
+            - {raw: 0, normalised: 0.35}
+            - {raw: 5, normalised: 0.55}
+            - {raw: 12, normalised: 0.72}
+            - {raw: 25, normalised: 0.90}
+      - key: WEALTH_RETENTION
+        name: Client / asset retention
+        description: Annual client (or asset) retention rate — the durability of the AUM base.
+        unit: percent
+        direction: higher_is_better
+        min_raw: 0
+        group: momentum
+        status: draft-pending-ratification
+        normalisation:
+          method: piecewise_linear
+          anchors:
+            - {raw: 80, normalised: 0.10}
+            - {raw: 90, normalised: 0.45}
+            - {raw: 94.5, normalised: 0.70}
+            - {raw: 97, normalised: 0.90}
+            - {raw: 99, normalised: 0.96}
