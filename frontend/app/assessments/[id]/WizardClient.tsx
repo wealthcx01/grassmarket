@@ -43,6 +43,7 @@ export function WizardClient({ id }: { id: string }) {
   const [liveLoading, setLiveLoading] = useState(false);
   const [liveError, setLiveError] = useState<string | null>(null);
   const [finalising, setFinalising] = useState(false);
+  const [cloningSandbox, setCloningSandbox] = useState(false);
 
   // Wizard input assistant (GRS-0101/0136): deterministic rule-based suggestions + the ids the advisor has dismissed.
   const [suggestions, setSuggestions] = useState<WizardSuggestion[]>([]);
@@ -265,6 +266,28 @@ export function WizardClient({ id }: { id: string }) {
     }
   }
 
+  // Solo-path escape hatch (GRS-0148): clone this production assessment into a self-approvable
+  // sandbox copy (carrying the full in-progress document, incl. profile) and open it, so a working-
+  // solo advisor can finalise and see the real watermarked deliverable without a co-rater/committee.
+  // Composes two shipped endpoints — no new backend.
+  async function previewInSandbox() {
+    if (!assessment || !document) return;
+    setCloningSandbox(true);
+    try {
+      const copy = await api.createAssessment(
+        assessment.subject,
+        "sandbox",
+        assessment.entity_id ?? null,
+      );
+      await api.saveAssessment(copy.id, document);
+      router.push(`/assessments/${copy.id}`);
+    } catch (err: unknown) {
+      if (handleAuth(err)) return;
+      setLiveError(err instanceof ApiError ? err.message : "Could not create the sandbox preview.");
+      if (mounted.current) setCloningSandbox(false);
+    }
+  }
+
   if (loadError) return <p style={{ color: "var(--color-error)" }}>{loadError}</p>;
   if (!registry || !assessment || !document) return <p>Loading…</p>;
 
@@ -282,6 +305,9 @@ export function WizardClient({ id }: { id: string }) {
     refreshLive,
     onFinalise,
     finalising,
+    provenance: assessment.provenance,
+    onPreviewInSandbox: previewInSandbox,
+    previewingSandbox: cloningSandbox,
   };
 
   return (

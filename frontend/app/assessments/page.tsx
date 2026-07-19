@@ -196,11 +196,11 @@ export default function BrokeragesPage() {
           {creating ? "Creating…" : "Create & open"}
         </button>
         <label
-          title="A sandbox assessment can be finalised solo (no co-rater or committee) so you can see the real deliverable drafts. It is watermarked and never client-facing."
+          title="A sandbox assessment can be finalised solo (no co-rater or committee) so you can see the real deliverable drafts. It is watermarked and never client-facing. You can also spin up a sandbox preview later from the Summary step of any production assessment."
           style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", fontSize: "0.82rem", color: "var(--color-ink-muted)", paddingBottom: "0.55rem" }}
         >
           <input type="checkbox" checked={sandbox} onChange={(e) => setSandbox(e.target.checked)} />
-          Sandbox (self-approve, non-production)
+          Sandbox preview — finalise solo &amp; see the real deliverable (watermarked)
         </label>
       </form>
 
