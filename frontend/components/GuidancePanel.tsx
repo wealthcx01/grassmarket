@@ -30,6 +30,14 @@ export function GuidancePanel({ subcomponentKey }: { subcomponentKey: string }) 
 
   if (error) return <p style={{ color: "var(--color-error)", fontSize: "0.8rem" }}>{error}</p>;
   if (!anchors) return <p style={{ color: "var(--color-ink-muted)", fontSize: "0.8rem" }}>Loading guidance…</p>;
+  // A real subcomponent whose rubric ladder isn't authored yet (e.g. the draft wealth infra set)
+  // returns an empty list — show a friendly note, never a blank panel or a raw error (GRS-0147f).
+  if (anchors.length === 0)
+    return (
+      <p style={{ color: "var(--color-ink-muted)", fontSize: "0.8rem" }}>
+        Guidance not yet authored for this subcomponent (draft profile).
+      </p>
+    );
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
