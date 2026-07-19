@@ -22,6 +22,7 @@ import type {
   MaturityLevel,
   MetricConfidence,
   NonScoreState,
+  RecordProvenance,
   Registry,
   RegistryProfile,
   ScenarioComparison,
@@ -48,6 +49,11 @@ export interface StepProps {
   refreshLive: () => void;
   onFinalise: () => void;
   finalising: boolean;
+  // Solo-path escape hatch (GRS-0148): a production record needs a co-rater + committee to finalise;
+  // a working-solo advisor can clone it to a self-approvable sandbox to see the real deliverable.
+  provenance: RecordProvenance;
+  onPreviewInSandbox: () => void;
+  previewingSandbox: boolean;
 }
 
 // Controls inherit the global form styling (border, radius, focus ring, select chevron);
@@ -949,6 +955,36 @@ export function SummaryStep(props: StepProps) {
             <p style={{ margin: "0.4rem 0 0", fontSize: "0.8rem", color: "var(--color-warn)" }}>
               Complete the blocking items above before finalising.
             </p>
+          ) : null}
+
+          {/* Solo-path escape hatch (GRS-0148): production finalise needs a second rater + committee.
+              A working-solo advisor can clone this to a self-approvable sandbox and see the real,
+              watermarked deliverable now — the capability existed but testers never found it. */}
+          {props.provenance === "production" ? (
+            <div
+              style={{
+                marginTop: "0.9rem",
+                padding: "0.75rem 0.85rem",
+                border: "1px solid var(--color-border)",
+                borderRadius: "var(--radius)",
+                background: "var(--color-paper-raised)",
+              }}
+            >
+              <p style={{ margin: "0 0 0.5rem", fontSize: "0.82rem", color: "var(--color-ink-muted)" }}>
+                <strong style={{ color: "var(--color-ink)" }}>Working solo?</strong> A production score
+                finalises with a second independent rater and committee sign-off. To see a finished,
+                watermarked deliverable draft <em>now</em>, create a Sandbox preview of this assessment —
+                self-approved, and never client-facing.
+              </p>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={props.onPreviewInSandbox}
+                disabled={props.previewingSandbox}
+              >
+                {props.previewingSandbox ? "Creating preview…" : "Preview in sandbox"}
+              </button>
+            </div>
           ) : null}
         </div>
       )}
