@@ -1,4 +1,4 @@
-"""The uncertainty engine — Monte Carlo over the deterministic kernel (Methodology v1.2 §7).
+"""The uncertainty engine — Monte Carlo over the deterministic kernel (Methodology v1.5 §7).
 
 Monte Carlo **wraps** `score()`; it never reimplements scoring. Each draw perturbs the *inputs*
 (subcomponent levels and power strengths by evidence grade; metric raws by source grade) and runs
@@ -11,12 +11,19 @@ guarantee that protects the golden master is preserved. Draws consume the RNG in
 subcomponents in registry order, then metrics and powers in input-tuple order (the app builds both
 canonically via `_complete_inputs`) — so reproducibility holds for a given input ordering.
 
-§7 mechanism (Methodology v1.2, ADR-0008): every input that carries a confidence signal gets a
-distribution — subcomponents and powers by an ordinal evidence grade (adjacent-level categorical),
-metrics by a source/recency grade (relative spread on the raw). An input with NO grade is not
-modelled: it is held at its point value and its index band is LABELLED a point estimate
-(`Band.modelled = False`), never rendered as a tight band. So a zero-width band is never presented
-as confidence — it is presented as "uncertainty not modelled".
+§7 mechanism (Methodology v1.5, ADR-0008 as amended by ADR-0034): every input that carries a
+confidence signal gets a distribution — subcomponents and powers by an ordinal evidence grade
+(adjacent-level categorical), metrics by a source/recency grade (relative spread on the raw). An
+input with NO grade is not modelled: it is held at its point value and its index band is LABELLED a
+point estimate (`Band.modelled = False`), never rendered as a tight band. So a zero-width band is
+never presented as confidence — it is presented as "uncertainty not modelled".
+
+D9 (ADR-0034, v1.5 §7): a **Not Assessed** subcomponent is NOT imputed — it is excluded from every
+draw exactly as the deterministic engine excludes it, so a fully-unassessed module has q_m=None in
+every draw and appears in NO band (`module_qm`). Ignorance about the unmeasured is carried honestly
+by the coverage-driven Assessment Uncertainty Rating (zero coverage → VERY_HIGH) and the tornado (a
+Not Assessed input spans the full scale and tops the leverage ranking) — never by a fabricated
+~neutral band, which would let a module nobody assessed be named the platform bottleneck.
 """
 
 from __future__ import annotations
@@ -144,7 +151,7 @@ def draft_v1_uncertainty_model() -> UncertaintyModel:
     wide (50%). Metric source grades: audited tight (±2% on the raw) → estimated wide (±40%)."""
     return UncertaintyModel(
         version="v1-draft-pending-elicitation",
-        methodology_version="1.2",
+        methodology_version="1.5",
         evidence_spreads={"E1": 0.50, "E2": 0.25, "E3": 0.10, "E4": 0.02},
         metric_spreads={
             "estimated": 0.40,
@@ -182,7 +189,7 @@ def elicited_v1_uncertainty_model() -> UncertaintyModel:
     """
     return UncertaintyModel(
         version="v1-elicited-2026",
-        methodology_version="1.2",
+        methodology_version="1.5",
         evidence_spreads={"E1": 0.50, "E2": 0.25, "E3": 0.10, "E4": 0.02},
         metric_spreads={
             "estimated": 0.40,
@@ -239,8 +246,9 @@ def run_monte_carlo(
                 qm_s[mr.key].append(mr.q_m)
 
     # Honest labelling (ADR-0008): B/P are modelled only if at least one metric/power carried a
-    # confidence grade. Subcomponents always carry evidence grades, so V, L and q_m are always
-    # modelled. An unmodelled band is a point estimate, never a tight band.
+    # confidence grade. Assessed subcomponents carry evidence grades, so V/L and the q_m of any
+    # module with ≥1 assessed subcomponent are modelled. A fully-unassessed module never enters
+    # `qm_s` (its q_m is None every draw, D9/ADR-0034), so it gets no band — never a fabricated one.
     b_modelled = any(m.confidence is not None for m in inputs.metrics if m.state is None)
     p_modelled = any(
         p.benefit_grade is not None or p.barrier_grade is not None for p in inputs.powers
@@ -283,18 +291,15 @@ def _perturb(
                 new_subs.append(rating)  # out of scope in every draw — never sampled
                 continue
             if rating.state == NonScoreState.NOT_ASSESSED:
-                # Missing evidence → maximal ignorance: uniform over all four levels, and INCLUDED
-                # this draw so the unknown widens the band (§7). E1 grade is a placeholder; only the
-                # continuous outputs are read from a draw.
-                level = _uniform_level(rng)
-                new_subs.append(
-                    SubcomponentRating(
-                        module_key=module.key,
-                        subcomponent_key=sub.key,
-                        level=level,
-                        evidence_grade=EvidenceGrade.E1_SELF_REPORTED,
-                    )
-                )
+                # D9 (ADR-0034, Methodology v1.5 §7): a Not Assessed subcomponent is NOT imputed —
+                # it passes through and contributes to no draw, exactly as the deterministic engine
+                # excludes it (engine.py: `if rating.level is not None`). A fully-unassessed module
+                # therefore has q_m=None in every draw and gets NO band in `module_qm` (it cannot be
+                # named a phantom bottleneck). The old code imputed a uniform level and INCLUDED it,
+                # fabricating a ~neutral band for a module nobody assessed — a D9 violation.
+                # Ignorance is carried honestly elsewhere: the coverage-driven Assessment
+                # Uncertainty Rating (0 coverage → VERY_HIGH) and the tornado (NA spans the scale).
+                new_subs.append(rating)  # not sampled — excluded from every draw, like N/A
                 continue
             assert rating.level is not None and rating.evidence_grade is not None
             spread = model.evidence_spreads[rating.evidence_grade.value]
@@ -360,10 +365,6 @@ def _sample_ordinal[T](rng: SupportsRandom, current: T, ordered: tuple[T, ...], 
     else:  # upper only (the weakest end)
         weighted.append((ordered[idx + 1], spread))
     return _weighted_choice(rng, weighted)
-
-
-def _uniform_level(rng: SupportsRandom) -> MaturityLevel:
-    return _LEVELS_BY_RANK[min(3, int(rng.random() * 4))]
 
 
 def _weighted_choice[T](rng: SupportsRandom, weighted: list[tuple[T, float]]) -> T:

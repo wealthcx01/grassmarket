@@ -1,6 +1,7 @@
 # GRS-0146 — Reconcile Monte-Carlo unassessed-imputation with ADR-0001 D9 (needs an ADR)
 
-**Status:** Surfaced for founder / methodology decision — NOT autonomously buildable
+**Status:** Implemented (2026-07-19) — founder greenlit the remediation program. ADR-0034 +
+Methodology v1.5. See "Resolution" at the foot.
 **Loop:** Part 2 — mock-advisor stress test / scoring integrity
 
 ## The finding (verified in source)
@@ -44,3 +45,12 @@ version bump, never silent edits**. This touches the golden-master/uncertainty f
 - A new ADR reconciles D9 with the uncertainty layer; the methodology version bumps; golden master +
   property tests updated intentionally; the live panel no longer presents a zero-coverage module as a
   precise band or a confident bottleneck.
+
+## Resolution (2026-07-19)
+Chose **Option A** (exclude, don't impute). `montecarlo.py` `_perturb` now passes a Not Assessed
+subcomponent through unchanged (like N/A), so a fully-unassessed module has `q_m=None` every draw and
+gets no band in `module_qm` — no phantom band, no phantom bottleneck. Ignorance stays carried by the
+coverage-driven Assessment Uncertainty Rating (VERY_HIGH) and the tornado. UncertaintyModel stamp
+`1.2`→`1.5`; deterministic engine + both golden masters byte-identical. ADR-0034 +
+`docs/ATLAS-Methodology-v1.5.md`. Tests: inverted the old widening test + added two property tests
+(zero-coverage module absent from `module_qm`; band width non-increasing in coverage).
