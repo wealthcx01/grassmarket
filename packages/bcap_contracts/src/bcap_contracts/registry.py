@@ -256,6 +256,18 @@ class ProfileDef(BaseModel):
     subcomponent_additions: tuple[SubcomponentDef, ...] = ()
     # Override a subcomponent's global `critical` flag for this profile only (key -> critical).
     critical_overrides: dict[str, bool] = {}
+    # Per-profile B-index metric selection (GRS-0147, ADR-0035). The B metrics are NOT one-size-
+    # fits-all: an exchange isn't scored on AUA/ARPU, nor a wealth manager on take-rate. Two levers,
+    # mirroring the module mechanism:
+    #  - `metric_keys=None` (default) INHERITS the full superset — retail and exchange unchanged, so
+    #    the golden master (which scores the retail view) is byte-identical.
+    #  - `metric_keys=(...)` selects EXACTLY those superset metrics (an empty tuple = none of them,
+    #    for a profile whose B is entirely its own additions).
+    #  - `metric_additions=(...)` are profile-specific metrics not in the shared superset (e.g. the
+    #    wealth net-new-money rate) — they live on the profile, never in the superset, so adding a
+    #    profile can never change the retail metric set.
+    metric_keys: tuple[str, ...] | None = None
+    metric_additions: tuple[MetricDef, ...] = ()
 
 
 WidgetRarity = Literal["Common", "Uncommon", "Rare"]
@@ -451,10 +463,31 @@ class Registry(BaseModel):
             raise UnknownKeyError(
                 f"profile[{profile.key}] critical override", sorted(bad_overrides)[0], view_sub_keys
             )
+        # Per-profile B metrics (GRS-0147): select from the superset (None ⇒ all, so retail/exchange
+        # are unchanged) then append the profile's own additions. Superset order is preserved so the
+        # retail view stays byte-identical. Fail loud on an unknown selected key or an addition that
+        # shadows a superset metric.
+        if profile.metric_keys is None:
+            base_metrics = self.metrics
+        else:
+            selected_metrics = set(profile.metric_keys)
+            unknown_metrics = selected_metrics - set(self.metric_keys())
+            if unknown_metrics:
+                raise UnknownKeyError(
+                    f"profile[{profile.key}] metric", sorted(unknown_metrics)[0], self.metric_keys()
+                )
+            base_metrics = tuple(m for m in self.metrics if m.key in selected_metrics)
+        addition_clash = {a.key for a in profile.metric_additions} & set(self.metric_keys())
+        if addition_clash:
+            raise RegistryError(
+                f"Profile {profile.key!r} metric addition(s) {sorted(addition_clash)} shadow a "
+                f"superset metric key."
+            )
+        view_metrics = base_metrics + profile.metric_additions
         view = Registry(
             powers=self.powers,
             modules=tuple(new_modules),
-            metrics=self.metrics,
+            metrics=view_metrics,
             subcomponent_status=self.subcomponent_status,
             metric_status=self.metric_status,
             # The C dimension (ADR-0023) is parallel to B/P/L — the profile selects B/P/L modules
@@ -533,6 +566,11 @@ def load_profiles() -> dict[str, ProfileDef]:
                 SubcomponentDef(**s) for s in body.get("subcomponent_additions", [])
             ),
             critical_overrides=dict(body.get("critical_overrides", {})),
+            # Per-profile B metrics (GRS-0147): `metrics` present ⇒ select those superset keys
+            # (empty list = none); absent ⇒ None (inherit the full superset). `metric_additions` are
+            # parsed exactly like superset metrics so a profile metric is a first-class MetricDef.
+            metric_keys=tuple(body["metrics"]) if "metrics" in body else None,
+            metric_additions=tuple(_parse_metric(m) for m in body.get("metric_additions", [])),
         )
     if RETAIL_PROFILE_KEY not in profiles:
         raise RegistryError("profiles.yaml must declare the default 'retail' profile.")
