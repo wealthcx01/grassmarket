@@ -570,9 +570,7 @@ def load_profiles() -> dict[str, ProfileDef]:
             # (empty list = none); absent ⇒ None (inherit the full superset). `metric_additions` are
             # parsed exactly like superset metrics so a profile metric is a first-class MetricDef.
             metric_keys=tuple(body["metrics"]) if "metrics" in body else None,
-            metric_additions=tuple(
-                _parse_metric(m) for m in body.get("metric_additions", [])
-            ),
+            metric_additions=tuple(_parse_metric(m) for m in body.get("metric_additions", [])),
         )
     if RETAIL_PROFILE_KEY not in profiles:
         raise RegistryError("profiles.yaml must declare the default 'retail' profile.")
