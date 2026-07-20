@@ -25,6 +25,10 @@ dependencies = [
     # Auth
     "pyjwt>=2.8",
     "bcrypt>=4.1",
+    # httpx is a RUNTIME dependency: auth/google_oauth.py imports it at module load (the OAuth token
+    # exchange), which is on the app-import path (web/app.py). It was previously dev-only, so the prod
+    # build (`uv sync --no-dev`) crashed on boot with ModuleNotFoundError. Must stay in runtime deps.
+    "httpx>=0.27",
     "python-docx>=1.1",
     "matplotlib>=3.11.0",
     "cryptography>=49.0.0",
@@ -36,7 +40,6 @@ dev = [
     "pytest>=8.0",
     "pyright>=1.1",
     "pre-commit>=3.7",
-    "httpx>=0.27",
     # Golden-master workbook authoring (GRS-0003): live-formula xlsx + JSON export.
     "openpyxl>=3.1.5",
 ]
