@@ -253,6 +253,10 @@ export interface RegistryMetric {
   unit: string;
   direction: string;
   group?: string | null;
+  /** Input-domain bounds (GRS-0144): a raw outside [min_raw, max_raw] is nonsensical. Used for
+   *  inline field validation so an impossible value is caught at entry, not only at score time. */
+  min_raw?: number | null;
+  max_raw?: number | null;
 }
 
 export interface RegistryPower {

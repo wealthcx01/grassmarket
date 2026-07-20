@@ -234,6 +234,17 @@ export function BusinessMetricsStep({ registry, document: d, update, readOnly }:
       {registry.metrics.map((m) => {
         const entry = doc.findMetric(d, m.key);
         const notAssessed = entry?.state === "Not Assessed";
+        // Inline input-domain check (GRS-0154), mirroring the backend `domain_violation` so an
+        // impossible value (e.g. a negative ADV) is caught at ENTRY, not only as a score-time
+        // blocker — the mock-advisor (Elena) entered −500 and it saved silently. Same copy shape.
+        const raw = entry?.raw;
+        let domainError: string | null = null;
+        if (raw != null) {
+          if (m.min_raw != null && raw < m.min_raw)
+            domainError = `${m.name} can't be below ${m.min_raw} ${m.unit} (got ${raw}).`;
+          else if (m.max_raw != null && raw > m.max_raw)
+            domainError = `${m.name} can't be above ${m.max_raw} ${m.unit} (got ${raw}).`;
+        }
         return (
           <Card key={m.key}>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.55rem" }}>
@@ -251,6 +262,9 @@ export function BusinessMetricsStep({ registry, document: d, update, readOnly }:
                   type="number"
                   placeholder="value"
                   disabled={readOnly || notAssessed}
+                  min={m.min_raw ?? undefined}
+                  max={m.max_raw ?? undefined}
+                  aria-invalid={domainError != null}
                   value={entry && entry.raw != null ? entry.raw : ""}
                   onChange={(e) =>
                     update((x) =>
@@ -263,7 +277,11 @@ export function BusinessMetricsStep({ registry, document: d, update, readOnly }:
                           ),
                     )
                   }
-                  style={{ ...selectStyle, width: "9rem" }}
+                  style={{
+                    ...selectStyle,
+                    width: "9rem",
+                    ...(domainError ? { borderColor: "var(--color-error)" } : {}),
+                  }}
                 />
                 <select
                   disabled={readOnly || notAssessed || !entry || entry.raw == null}
@@ -319,6 +337,11 @@ export function BusinessMetricsStep({ registry, document: d, update, readOnly }:
                   }
                   style={{ ...selectStyle, width: "100%", fontSize: "0.78rem" }}
                 />
+              ) : null}
+              {domainError ? (
+                <p role="alert" style={{ margin: 0, fontSize: "0.76rem", color: "var(--color-error)" }}>
+                  {domainError}
+                </p>
               ) : null}
             </div>
           </Card>

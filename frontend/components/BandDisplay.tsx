@@ -29,12 +29,24 @@ export function BandDisplay({ label, band }: { label: string; band?: IndexBand |
           </em>
         </span>
       ) : (
-        <span data-testid="band-range">
+        // The bold figure is the P50 (median); the parenthesised range is P10–P90. Label the
+        // percentiles explicitly (GRS-0153) — a quant reader must not have to guess whether the
+        // bounds are P10/P90, P5/P95 or ±1σ (mock-advisor: Elena/Deutsche Börse).
+        <span
+          data-testid="band-range"
+          title="P50 (median) with the P10–P90 uncertainty range (Methodology §7)"
+        >
           <strong className="mono" style={{ fontSize: "1.25rem" }}>
             {toDisplay(view.mid).toFixed(1)}
           </strong>{" "}
           <span className="mono" style={{ fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
             ({toDisplay(view.low).toFixed(1)}–{toDisplay(view.high).toFixed(1)})
+          </span>{" "}
+          <span
+            className="mono"
+            style={{ fontSize: "0.6rem", color: "var(--color-ink-faint)", letterSpacing: "0.03em" }}
+          >
+            P50 · P10–P90
           </span>
         </span>
       )}
