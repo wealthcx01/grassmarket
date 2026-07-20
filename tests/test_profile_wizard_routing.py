@@ -77,7 +77,9 @@ def test_live_score_uses_the_profiles_coefficient_set(
     # The profile round-trips: document.operating_model → live-score's coefficient_version.
     assert _live_score_version(client, alice, None) == "v1-draft-pending-elicitation"
     assert _live_score_version(client, alice, "retail") == "v1-draft-pending-elicitation"
-    assert _live_score_version(client, alice, "exchange") == "exchange-v1-draft-pending-elicitation"
+    # Wealth/exchange ACTIVATED (ADR-0037/GRS-0156): they score on the client-usable elicited set.
+    assert _live_score_version(client, alice, "exchange") == "exchange-v1-elicited-starter-2026"
+    assert _live_score_version(client, alice, "wealth") == "wealth-v1-elicited-starter-2026"
 
 
 def test_profile_scoring_context_is_the_single_seam() -> None:
@@ -86,4 +88,5 @@ def test_profile_scoring_context_is_the_single_seam() -> None:
     exchange_view, ex_coeffs = profile_scoring_context("exchange")
     assert len(retail_view.modules) == 9
     assert "CMS" not in {m.key for m in exchange_view.modules}
-    assert ex_coeffs.version == "exchange-v1-draft-pending-elicitation"
+    assert ex_coeffs.version == "exchange-v1-elicited-starter-2026"  # ACTIVATED (GRS-0156)
+    assert ex_coeffs.client_usable is True

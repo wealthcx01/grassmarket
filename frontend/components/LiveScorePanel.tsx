@@ -17,6 +17,7 @@ export function LiveScorePanel({
   onRefresh,
   moduleLabels,
   profileKey,
+  clientUsable,
 }: {
   score: LiveScore | null;
   loading: boolean;
@@ -24,6 +25,7 @@ export function LiveScorePanel({
   onRefresh: () => void;
   moduleLabels?: Record<string, string>;
   profileKey?: string;
+  clientUsable?: boolean;
 }) {
   return (
     <aside
@@ -39,7 +41,7 @@ export function LiveScorePanel({
 
       {/* Non-retail profiles score on draft weights (GRS-0152) — the caveat must travel with the
           NUMBER, not live only on the Overview step, so an advisor never quotes a V without it. */}
-      <ProvisionalScoreBanner profileKey={profileKey} />
+      <ProvisionalScoreBanner profileKey={profileKey} clientUsable={clientUsable} />
 
       {error ? (
         <Blocking heading="Score unavailable" blocking={error} tone="error" />
@@ -79,8 +81,17 @@ export function LiveScorePanel({
 /** The draft-profile caveat, rendered wherever a non-retail SCORE is shown (GRS-0152). Retail scores
  *  on the ratified/elicited set, so it renders nothing there. Kept next to the score, not just on the
  *  Overview step, so a finalised non-retail V is never quoted without its provisional flag. */
-export function ProvisionalScoreBanner({ profileKey }: { profileKey?: string }) {
-  if (!profileKey || profileKey === "retail") return null;
+export function ProvisionalScoreBanner({
+  profileKey,
+  clientUsable,
+}: {
+  profileKey?: string;
+  clientUsable?: boolean;
+}) {
+  // Show the caveat only for a non-retail profile that is NOT client-usable. An activated segment
+  // (wealth/exchange, ADR-0037/GRS-0156) is client-usable → no caveat; a future draft profile still
+  // carries it. Retail is the default and never shows it.
+  if (!profileKey || profileKey === "retail" || clientUsable) return null;
   return (
     <div
       className="callout callout-warn"

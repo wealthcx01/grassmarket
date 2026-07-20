@@ -1,23 +1,25 @@
-"""The ACTIVE scoring configuration — the single seam the panel-gated activation flips (GRS-0033).
+"""The ACTIVE scoring configuration — the single seam the founder/panel-gated activation flips.
 
 Every runtime scoring path resolves its configuration here, so "which set is live" is decided in
 exactly one place, not hardcoded at each router. There are TWO client-usability-gated artifacts and
-both must flip together, or a client pack would carry a mismatched provenance (elicited weights,
-draft uncertainty widths — ADR-0022):
+both must flip together per profile, or a client pack would carry a mismatched provenance (elicited
+weights, draft uncertainty widths — ADR-0022):
 
-- :func:`active_coefficient_set` — the §5 deterministic weights.
+- :func:`profile_scoring_context` / :func:`active_coefficient_set` — the §5 deterministic weights.
 - :func:`active_uncertainty_model` — the §7 input-distribution widths (P10/P50/P90, tornado,
   weight-stability).
 
-Both return the DRAFT (``client_usable=False``) artifact today: the engine runs and watermarked
-internal drafts render, but the GRS-0015 gate keeps a client pack from being priced on placeholder
-weights OR draft uncertainty widths.
+**ACTIVATION STATE (founder-directed, 2026-07-20, ADR-0037/ADR-0022):**
+- **wealth & exchange are ACTIVATED** — they score on their research-validated, client-usable
+  ``elicited_{wealth,exchange}_coefficient_set`` (with the ADR-0038 critical-control cap) and the
+  client-usable elicited §7 widths. The GRS-0015 gate now lets a client-facing wealth/exchange
+  deliverable render. The weights are the engineering STARTER values the founder activated; formal
+  panel ratification remains the scheduled review (provenance ``review_due``), not a blocker.
+- **retail stays DRAFT** — ``active_coefficient_set`` still returns the draft set (retail's elicited
+  set exists but is not activated), so retail is not client-usable and the golden master is intact.
 
-Activating the elicited configuration (ADR-0022) is a one-line change to EACH function here — return
-the ``elicited_v1_*`` artifact — gated on the weight-elicitation panel ratifying its values. It is a
-deliberate, recorded flip, never automatic: no import side effect, no env toggle, no clock. Both
-elicited artifacts already construct client-usable with full provenance and pass their golden
-masters; the only thing missing is the panel's sign-off on the numbers. Flip both in one commit.
+Activation is per-profile and both seams flip together for the activated profile. It remains a
+deliberate, recorded change here — no import side effect, no env toggle, no clock.
 """
 
 from __future__ import annotations
@@ -31,15 +33,21 @@ from bcap_contracts.registry import (
 )
 from bcap_contracts.uncertainty import UncertaintyModel
 
-from grassmarket.atlas.draft_coefficients import (
-    draft_exchange_coefficient_set,
-    draft_v1_coefficient_set,
-    draft_wealth_coefficient_set,
+from grassmarket.atlas.draft_coefficients import draft_v1_coefficient_set
+from grassmarket.atlas.elicited_coefficients import (
+    elicited_exchange_coefficient_set,
+    elicited_wealth_coefficient_set,
 )
-from grassmarket.atlas.montecarlo import draft_v1_uncertainty_model
+from grassmarket.atlas.montecarlo import (
+    draft_v1_uncertainty_model,
+    elicited_v1_uncertainty_model,
+)
 
 _EXCHANGE_PROFILE_KEY = "exchange"
 _WEALTH_PROFILE_KEY = "wealth"
+# The operating-model profiles whose weights the founder has activated (ADR-0037). Their coefficient
+# AND uncertainty seams both resolve to the client-usable elicited artifacts.
+_ACTIVATED_PROFILES = frozenset({_EXCHANGE_PROFILE_KEY, _WEALTH_PROFILE_KEY})
 
 
 def profile_key_of(document: AssessmentDocument) -> str:
@@ -61,9 +69,9 @@ def profile_scoring_context(
     key fails loud (ADR-0001)."""
     view = load_registry().for_profile(load_profile(profile_key))
     if profile_key == _EXCHANGE_PROFILE_KEY:
-        return view, draft_exchange_coefficient_set(view)
+        return view, elicited_exchange_coefficient_set(view)  # ACTIVATED (ADR-0037), client-usable
     if profile_key == _WEALTH_PROFILE_KEY:
-        return view, draft_wealth_coefficient_set(view)
+        return view, elicited_wealth_coefficient_set(view)  # ACTIVATED (ADR-0037), client-usable
     return view, active_coefficient_set(view)
 
 
@@ -89,11 +97,16 @@ def active_c_coefficient_set(registry: Registry) -> CoefficientSet | None:
     return draft_v1_coefficient_set(registry, score_c=True)
 
 
-def active_uncertainty_model() -> UncertaintyModel:
-    """Return the §7 uncertainty model the platform draws ranges from right now.
+def active_uncertainty_model(profile_key: str = RETAIL_PROFILE_KEY) -> UncertaintyModel:
+    """Return the §7 uncertainty model the platform draws ranges from right now, for `profile_key`.
 
-    Draft until the panel ratifies the elicited widths (ADR-0022) — flipped in the same reviewed
-    commit as :func:`active_coefficient_set`, so a client pack never mixes elicited weights with
-    draft uncertainty widths. Callers must route every uncertainty/deliverable path through here.
+    Flips together with the coefficient seam per profile (ADR-0022), so a client pack never mixes
+    elicited weights with draft uncertainty widths. An **activated** profile (wealth/exchange) draws
+    the client-usable elicited widths; every other profile (retail) draws the draft widths. The two
+    models carry identical widths today, so this only moves the client-usability gate — no numerical
+    change to any range — but keeping them paired lets the deliverable gate pass a client pack for
+    an activated segment and refuse one for a draft segment. Callers pass the assessment's profile.
     """
+    if profile_key in _ACTIVATED_PROFILES:
+        return elicited_v1_uncertainty_model()
     return draft_v1_uncertainty_model()

@@ -207,12 +207,40 @@ def test_segment_elicited_starter_sets_build_and_validate() -> None:
         assert len(set(cs.w_power.values())) > 1
 
 
-def test_segment_starter_sets_are_not_active() -> None:
-    # The starter sets exist but the engine still scores non-retail on the DRAFT set — activation is
-    # a deliberate flip (ADR-0022). Guards against an accidental client-usable default.
-    from grassmarket.atlas.active import profile_scoring_context
+def test_segment_starter_sets_are_activated() -> None:
+    # ACTIVATED (founder sign-off 2026-07-20, ADR-0037/ADR-0022, GRS-0156): the engine now scores
+    # wealth/exchange on their client-usable ELICITED starter sets, and the uncertainty seam flips
+    # with them. Retail stays draft (not client-usable) — the golden master is unchanged.
+    from grassmarket.atlas.active import active_uncertainty_model, profile_scoring_context
 
     for profile in ("wealth", "exchange"):
         _, active = profile_scoring_context(profile)
-        assert active.client_usable is False
-        assert "elicited" not in active.version
+        assert active.client_usable is True
+        assert "elicited" in active.version
+        assert active_uncertainty_model(profile).client_usable is True  # both seams flip together
+
+    _, retail = profile_scoring_context("retail")
+    assert retail.client_usable is False  # retail not activated
+    assert active_uncertainty_model("retail").client_usable is False
+
+
+def test_activated_segment_passes_the_client_pack_gate_end_to_end() -> None:
+    # The unblock: a client-facing wealth/exchange pack now clears BOTH gates (coefficients +
+    # uncertainty, ADR-0022), where retail still refuses on its draft set.
+    from bcap_contracts.deliverables import DeliverableMode
+
+    from grassmarket.atlas.active import active_uncertainty_model, profile_scoring_context
+    from grassmarket.deliverables.gate import (
+        ClientUsabilityError,
+        assert_uncertainty_client_usable,
+        resolve_mode,
+    )
+
+    for profile in ("wealth", "exchange"):
+        _, coeffs = profile_scoring_context(profile)
+        assert resolve_mode(coeffs, client_facing=True) is DeliverableMode.CLIENT
+        assert_uncertainty_client_usable(active_uncertainty_model(profile), client_facing=True)
+
+    _, retail = profile_scoring_context("retail")
+    with pytest.raises(ClientUsabilityError):
+        resolve_mode(retail, client_facing=True)

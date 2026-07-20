@@ -245,7 +245,7 @@ def get_live_score(
         assessment.document,
         coefficients,
         registry,
-        active_uncertainty_model(),
+        active_uncertainty_model(profile_key_of(assessment.document)),
         random.Random(_LIVE_SEED),
     )
 
@@ -313,7 +313,7 @@ def finalise_assessment(
     # Finalise against the document's operating-model profile (ADR-0025/GRS-0079); the run records
     # WHICH profile scored it via the profile's distinct coefficient_version (immutable, #6).
     registry, coefficients = _profile_context(assessment.document)
-    model = active_uncertainty_model()
+    model = active_uncertainty_model(profile_key_of(assessment.document))
     blockers = scoreability_blockers(assessment.document, registry)
     if blockers:
         raise HTTPException(

@@ -112,7 +112,7 @@ def _render(
         stored_result=result,
         coefficients=coefficients,
         registry=registry,
-        model=active_uncertainty_model(),
+        model=active_uncertainty_model(profile_key),
         subject=subject,
         generated_on=generated_on,
         client_facing=client_facing,
