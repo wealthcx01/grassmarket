@@ -180,3 +180,39 @@ def test_active_uncertainty_model_stays_draft() -> None:
     model = active_uncertainty_model()
     assert model.client_usable is False
     assert model.version == "v1-draft-pending-elicitation"
+
+
+# --- Segment starter sets (GRS-0150, ADR-0037) — built, validated, but NOT active ---------
+def test_segment_elicited_starter_sets_build_and_validate() -> None:
+    from bcap_contracts.registry import load_profile
+
+    from grassmarket.atlas.elicited_coefficients import (
+        elicited_exchange_coefficient_set,
+        elicited_wealth_coefficient_set,
+    )
+
+    r = load_registry()
+    for profile, fn, version in (
+        ("wealth", elicited_wealth_coefficient_set, "wealth-v1-elicited-starter-2026"),
+        ("exchange", elicited_exchange_coefficient_set, "exchange-v1-elicited-starter-2026"),
+    ):
+        view = r.for_profile(load_profile(profile))
+        cs = fn(view)
+        cs.validate_against(view)  # covers the profile view exactly (fail-loud)
+        assert cs.client_usable is True
+        assert cs.version == version
+        assert abs(cs.theta_b + cs.theta_p + cs.theta_l - 1.0) < 1e-9
+        # Research-refined: weights are non-uniform (not the draft placeholders).
+        assert len(set(cs.delta.values())) > 1
+        assert len(set(cs.w_power.values())) > 1
+
+
+def test_segment_starter_sets_are_not_active() -> None:
+    # The starter sets exist but the engine still scores non-retail on the DRAFT set — activation is
+    # a deliberate flip (ADR-0022). Guards against an accidental client-usable default.
+    from grassmarket.atlas.active import profile_scoring_context
+
+    for profile in ("wealth", "exchange"):
+        _, active = profile_scoring_context(profile)
+        assert active.client_usable is False
+        assert "elicited" not in active.version
