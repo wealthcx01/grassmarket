@@ -55,7 +55,7 @@ wheels = [
 
 [[package]]
 name = "bcap-contracts"
-version = "0.0.1"
+version = "0.1.0"
 source = { editable = "packages/bcap_contracts" }
 dependencies = [
     { name = "email-validator" },

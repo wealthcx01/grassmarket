@@ -1,0 +1,62 @@
+{
+  "$defs": {
+    "LaneStatus": {
+      "description": "Health of a workshop lane (a Claude Code lane on the venture's VPS).",
+      "enum": [
+        "active",
+        "idle",
+        "stale",
+        "archived"
+      ],
+      "title": "LaneStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A workshop lane bound to one venture repo (a Claude Code + tmux lane on the venture VPS).",
+  "properties": {
+    "id": {
+      "description": "Lane id, unique within the venture.",
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "repo": {
+      "description": "Repo this lane builds (slug or full name).",
+      "minLength": 1,
+      "title": "Repo",
+      "type": "string"
+    },
+    "standing_order": {
+      "description": "The lane's durable standing order (its brief between sessions).",
+      "minLength": 1,
+      "title": "Standing Order",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/LaneStatus",
+      "default": "idle"
+    },
+    "tmux": {
+      "description": "tmux session/window binding on the VPS.",
+      "minLength": 1,
+      "title": "Tmux",
+      "type": "string"
+    },
+    "venture_id": {
+      "description": "The owning venture's id.",
+      "minLength": 1,
+      "title": "Venture Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "venture_id",
+    "repo",
+    "tmux",
+    "standing_order"
+  ],
+  "title": "Lane",
+  "type": "object"
+}
