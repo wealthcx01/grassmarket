@@ -502,6 +502,7 @@ dependencies = [
     { name = "cryptography" },
     { name = "email-validator" },
     { name = "fastapi" },
+    { name = "httpx" },
     { name = "matplotlib" },
     { name = "psycopg", extra = ["binary"] },
     { name = "pydantic" },
@@ -516,7 +517,6 @@ dependencies = [
 
 [package.optional-dependencies]
 dev = [
-    { name = "httpx" },
     { name = "openpyxl" },
     { name = "pre-commit" },
     { name = "pyright" },
@@ -532,7 +532,7 @@ requires-dist = [
     { name = "cryptography", specifier = ">=49.0.0" },
     { name = "email-validator", specifier = ">=2.1" },
     { name = "fastapi", specifier = ">=0.115" },
-    { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.27" },
+    { name = "httpx", specifier = ">=0.27" },
     { name = "matplotlib", specifier = ">=3.11.0" },
     { name = "openpyxl", marker = "extra == 'dev'", specifier = ">=3.1.5" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.7" },

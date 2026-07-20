@@ -21,6 +21,16 @@ depends_on = None
 
 
 def upgrade() -> None:
+    # Widen alembic_version.version_num before recording this revision. Alembic's default is
+    # varchar(32), but this revision id is 34 chars — on Postgres the version UPDATE at the end of
+    # this migration raises StringDataRightTruncation and the boot migration fails. (SQLite,
+    # used by local/CI, ignores column length, so it only bites prod.) Widen once, Postgres-only, so
+    # this and any future longer revision ids record cleanly; this runs in the same transaction as
+    # the version UPDATE, which then fits.
+    bind = op.get_bind()
+    if bind.dialect.name == "postgresql":
+        op.execute("ALTER TABLE alembic_version ALTER COLUMN version_num TYPE VARCHAR(255)")
+
     op.add_column("prospects", sa.Column("website", sa.String(length=255), nullable=True))
     op.create_table(
         "contacts",

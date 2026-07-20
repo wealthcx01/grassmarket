@@ -11,6 +11,10 @@ builder = "NIXPACKS"
 [deploy]
 startCommand = "uv run uvicorn grassmarket.web.main:app --host 0.0.0.0 --port $PORT"
 healthcheckPath = "/health"
-healthcheckTimeout = 120
+# Alembic migrations run synchronously at app import (create_app → run_migrations), so /health is
+# not served until they finish. A deploy that is several revisions behind runs many migrations on a
+# cold container; 120s was too tight and the deploy failed its health check. 300s gives boot-time
+# migrations headroom without masking a genuinely stuck boot (ON_FAILURE still retries).
+healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 5
