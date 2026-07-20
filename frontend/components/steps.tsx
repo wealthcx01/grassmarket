@@ -704,12 +704,12 @@ export function CustomerPropositionStep({ registry, document: d, update, readOnl
           </h3>
           <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--color-ink-muted)", lineHeight: 1.55 }}>
             The Customer-Proposition Index (C) is a <strong>retail-brokerage</strong> customer-experience
-            model — onboarding and time-to-first-trade, trading experience, product range. A{" "}
-            <strong>{profileKey}</strong> firm&rsquo;s client proposition is a different construct
-            (advice relationship, planning and reporting for wealth; member/participant experience for an
-            exchange), and its taxonomy has not been authored yet. Rather than score you on questions that
-            don&rsquo;t fit, this step is <strong>skipped for this segment</strong> — it does not affect
-            your V. B, P and L (and the infrastructure deep dive) are fully segment-native.
+            model — onboarding and time-to-first-trade, trading experience, product range. This{" "}
+            <strong>{profileKey}</strong> operating model&rsquo;s client proposition is a different
+            construct (advice relationship, planning and reporting for wealth; member/participant
+            experience for an exchange), and its taxonomy has not been authored yet. Rather than score you
+            on questions that don&rsquo;t fit, this step is <strong>skipped for this segment</strong> — it
+            does not affect your V. B, P and L (and the infrastructure deep dive) are fully segment-native.
           </p>
         </div>
       </div>
