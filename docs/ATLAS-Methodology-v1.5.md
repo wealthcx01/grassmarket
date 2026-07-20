@@ -25,6 +25,7 @@ engine already does.
 |---|---|---|
 | **Not Assessed is excluded from Monte-Carlo draws, never imputed.** A Not Assessed subcomponent contributes to no draw; a fully-unassessed module has `q_m = None` in every draw and therefore **no band** in `module_qm` — it can never be named a bottleneck. | §7 | ADR-0034 |
 | **Ignorance about the unmeasured is carried by coverage, not a fabricated band.** The coverage-driven Assessment Uncertainty Rating (zero coverage → VERY_HIGH) and the deterministic tornado (a Not Assessed input spans the full scale and tops the leverage ranking) express what is unknown — the band expresses only the uncertainty of what was *measured*. | §7 | ADR-0034 |
+| **Optional critical-control cap on V.** A CoefficientSet MAY carry a floor κ; when present, `V = min(V_weighted, κ + (1−κ)·min(q_m over critical-for-L modules))`, so a broken critical control cannot be out-weighted by a low θ_L. Excludes fully-unassessed criticals (D9), only ever lowers V, is monotone, and is recorded on the result. **κ absent ⇒ V is byte-identical to §5.1** — the golden master and every un-capped set are unchanged; the cap is used only by the (gated-off) segment starter sets. | §5.1 | ADR-0038 |
 
 ### Version-stamping convention (v1.5)
 
