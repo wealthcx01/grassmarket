@@ -17,13 +17,16 @@ from bcap_contracts.assessments import AssessmentState
 from bcap_contracts.committee import CommitteeDecision
 from bcap_contracts.deliverables import Deliverable, DeliverableMode, DeliverableType
 from bcap_contracts.narratives import AINarrative
-from bcap_contracts.registry import load_registry
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from grassmarket.atlas import AssessmentInputs
-from grassmarket.atlas.active import active_coefficient_set, active_uncertainty_model
+from grassmarket.atlas.active import (
+    active_uncertainty_model,
+    profile_key_of,
+    profile_scoring_context,
+)
 from grassmarket.atlas.results import AtlasResult
 from grassmarket.data.repository import (
     NotFoundError,
@@ -66,8 +69,10 @@ def _not_found(detail: str = "Not found.") -> HTTPException:
 
 def _resolve_run(
     repo: Repository, principal: Principal, engagement
-) -> tuple[StoredScoringRun, str]:
-    """The finalised scoring run + subject (client name) an engagement's report is built from."""
+) -> tuple[StoredScoringRun, str, str]:
+    """The finalised scoring run + subject (client name) + operating-model profile key an
+    engagement's report is built from (the profile drives the registry VIEW the run was scored
+    under — GRS-0148e)."""
     if not engagement.assessment_ids:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -81,27 +86,31 @@ def _resolve_run(
         )
     record = repo.get_scoring_run_record(principal, assessment.scoring_run_id)
     subject = repo.get_prospect(principal, engagement.prospect_id).company_name
-    return record, subject
+    return record, subject, profile_key_of(assessment.document)
 
 
 def _render(
     record: StoredScoringRun,
     subject: str,
     *,
+    profile_key: str,
     deliverable_type: DeliverableType,
     client_facing: bool,
     generated_on: date,
     narratives: Sequence[AINarrative] = (),
     committee_decisions: Sequence[CommitteeDecision] = (),
 ) -> RenderedDeliverable:
-    registry = load_registry()
+    # Build the deliverable against the SAME (registry view, coefficient set) the assessment was
+    # scored under (GRS-0148e). A wealth/exchange run's modules and metrics are profile-specific
+    # (e.g. WEALTH_SUITABILITY), so rendering against the retail superset key-errors → a 500.
+    registry, coefficients = profile_scoring_context(profile_key)
     inputs = AssessmentInputs.model_validate_json(record.inputs_json)
     result = AtlasResult.model_validate_json(record.result_json)
     return render_diagnostic_document(
         deliverable_type=deliverable_type,
         inputs=inputs,
         stored_result=result,
-        coefficients=active_coefficient_set(registry),
+        coefficients=coefficients,
         registry=registry,
         model=active_uncertainty_model(),
         subject=subject,
@@ -128,7 +137,7 @@ def generate_deliverable(
     except (NotFoundError, ScopeViolationError) as exc:
         raise _not_found("Engagement not found.") from exc
 
-    record, subject = _resolve_run(repo, principal, engagement)
+    record, subject, profile_key = _resolve_run(repo, principal, engagement)
     dtype = payload.deliverable_type
     now = datetime.now(UTC)
     try:
@@ -136,6 +145,7 @@ def generate_deliverable(
         rendered = _render(
             record,
             subject,
+            profile_key=profile_key,
             deliverable_type=dtype,
             client_facing=payload.client_facing,
             generated_on=now.date(),
@@ -212,12 +222,14 @@ def download_deliverable(
 
     record = repo.get_scoring_run_record(principal, deliverable.scoring_run_id)
     subject = repo.get_prospect(principal, engagement.prospect_id).company_name
+    profile_key = profile_key_of(repo.get_assessment(principal, record.assessment_id).document)
     generated_on = (deliverable.generated_at or datetime.now(UTC)).date()
     try:
         committee_decisions = repo.list_committee_decisions(principal, record.assessment_id)
         rendered = _render(
             record,
             subject,
+            profile_key=profile_key,
             deliverable_type=deliverable.type,
             client_facing=client_facing,
             generated_on=generated_on,
