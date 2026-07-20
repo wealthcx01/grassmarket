@@ -313,3 +313,35 @@ def test_http_deliverables_scoped(client, alice: SeededConsultant, bob: SeededCo
     assert (
         len(client.get(f"/engagements/{eid}/deliverables", headers=auth_header(alice)).json()) == 1
     )
+
+
+# --- Assessment-level deliverable preview (GRS-0154) — no engagement needed --------------
+
+
+def test_http_preview_finalised_assessment_returns_docx(client, alice: SeededConsultant) -> None:
+    # The solo/sandbox "see the real deliverable" path: a finalised assessment previews its own
+    # watermarked, internal-only deliverable without an engagement (mock-advisor: Priya/Elena).
+    aid = _finalised_assessment_http(client, alice)
+    url = f"/assessments/{aid}/deliverable-preview"
+    resp = client.get(url, headers=auth_header(alice))
+    assert resp.status_code == 200, resp.text
+    assert "wordprocessingml" in resp.headers["content-type"]
+    assert resp.content[:2] == b"PK"  # a real .docx (zip)
+    # A preview is internal-only — the watermark must be present (never a client-facing pack).
+    assert "DRAFT — not client-usable" in _paragraphs(resp.content)
+
+
+def test_http_preview_unfinalised_assessment_refused(client, alice: SeededConsultant) -> None:
+    aid = client.post("/assessments", json={"subject": "S"}, headers=auth_header(alice)).json()[
+        "id"
+    ]
+    resp = client.get(f"/assessments/{aid}/deliverable-preview", headers=auth_header(alice))
+    assert resp.status_code == 409  # finalise first — never render from an unfinalised run
+
+
+def test_http_preview_is_owner_scoped(
+    client, alice: SeededConsultant, bob: SeededConsultant
+) -> None:
+    aid = _finalised_assessment_http(client, alice)
+    resp = client.get(f"/assessments/{aid}/deliverable-preview", headers=auth_header(bob))
+    assert resp.status_code == 404  # another consultant cannot preview alice's assessment

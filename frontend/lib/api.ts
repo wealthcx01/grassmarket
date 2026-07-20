@@ -770,6 +770,34 @@ export const api = {
     return { blob, filename: match?.[1] ?? `${id}.docx` };
   },
 
+  /**
+   * Preview a FINALISED assessment's deliverable as a watermarked .docx — WITHOUT an engagement
+   * (GRS-0154). This is the solo/sandbox "see the real deliverable" path: internal-only (never
+   * client-facing), so it renders even for a draft wealth/exchange profile. A 409 (unfinalised, or a
+   * committee gate) surfaces as an ApiError with the backend's plain-English detail.
+   */
+  async previewAssessmentDeliverable(
+    assessmentId: string,
+    opts?: { deliverableType?: string; signal?: AbortSignal },
+  ): Promise<{ blob: Blob; filename: string }> {
+    const type = opts?.deliverableType ?? "platform_power_report";
+    const url = `${API_BASE_URL}/assessments/${assessmentId}/deliverable-preview?deliverable_type=${type}`;
+    let res: Response;
+    try {
+      res = await fetch(url, { method: "GET", headers: authHeaders(), signal: opts?.signal });
+    } catch (cause) {
+      throw new ApiError(0, `Cannot reach API at ${API_BASE_URL}`, cause);
+    }
+    if (!res.ok) {
+      const body = await parseBody(res);
+      throw new ApiError(res.status, messageFromBody(body, `Preview failed (${res.status})`), body);
+    }
+    const blob = await res.blob();
+    const disposition = res.headers.get("content-disposition") ?? "";
+    const match = /filename="?([^"]+)"?/.exec(disposition);
+    return { blob, filename: match?.[1] ?? `preview-${assessmentId}.docx` };
+  },
+
   // --- AI narratives (GRS-0017; propose is AI, approve is human — the runtime gate) ---
   listNarratives(deliverableId: string, signal?: AbortSignal): Promise<AINarrative[]> {
     return request<AINarrative[]>(`/deliverables/${deliverableId}/narratives`, {
