@@ -28,6 +28,11 @@ profiles:
 
   exchange:
     name: Exchange / market infrastructure
+    # Customer-Proposition (C) is a retail-brokerage customer-experience model (onboarding /
+    # time-to-first-trade, trading experience, product range…). An exchange's "customer" is a member /
+    # participant, a different construct not yet modelled — so select NO retail C modules; the C step
+    # degrades honestly rather than asking an exchange about first-deposit ease (GRS-0152).
+    c_modules: []
     # An exchange runs the trading platform, matching engine, market surveillance, member
     # connectivity, clearing & settlement, and market-data distribution — NOT a retail client CMS
     # (dropped). Modules selected in superset order; the additions below name what an exchange runs
@@ -325,6 +330,11 @@ profiles:
 
   wealth:
     name: Wealth / investment management
+    # Customer-Proposition (C) is a retail-brokerage customer-experience model (onboarding /
+    # time-to-first-trade, order types, fractional shares…). A wealth manager's client proposition is
+    # advice relationship, planning, and reporting — a different construct not yet modelled — so select
+    # NO retail C modules; the C step degrades honestly rather than asking about order types (GRS-0152).
+    c_modules: []
     # A wealth / investment manager runs a client portal, the platform, reporting/data, workflow,
     # client management, and back-office custody — plus discretionary order management. It is NOT
     # scored on retail brokerage take-rate: its B is its own metric set (AUM, net-new-money, margin,

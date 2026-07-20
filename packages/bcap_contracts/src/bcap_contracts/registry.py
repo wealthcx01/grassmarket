@@ -279,6 +279,17 @@ class ProfileDef(BaseModel):
     # Both default empty ⇒ retail/exchange views are unchanged and the golden master is unaffected.
     subcomponent_selection: dict[str, tuple[str, ...]] = {}
     module_name_overrides: dict[str, str] = {}
+    # Per-profile Customer-Proposition (C) module selection (GRS-0152, ADR-0023). The C taxonomy is
+    # a RETAIL-brokerage customer-experience model (onboarding/time-to-first-trade, trading
+    # experience, product range…) for the retail profile only. It is NOT one-size-fits-all: a wealth
+    # manager's or an exchange's customer proposition is a different construct not yet modelled.
+    #  - `c_module_keys=None` (default) INHERITS the full retail C taxonomy — retail unchanged, so
+    #    the golden master (which never iterates C) stays byte-identical and Stage-1 capture works.
+    #  - `c_module_keys=(...)` selects EXACTLY those C modules (empty tuple = none, so a non-retail
+    #    profile shows NO retail customer widgets — the C step degrades honestly rather than asking
+    #    neobroker onboarding questions of a wealth/exchange firm). A per-segment C taxonomy is a
+    #    founder-scoped content build (ADR-0023 reconciliation), never an engineering guess.
+    c_module_keys: tuple[str, ...] | None = None
 
 
 WidgetRarity = Literal["Common", "Uncommon", "Rare"]
@@ -521,16 +532,28 @@ class Registry(BaseModel):
                 f"superset metric key."
             )
         view_metrics = base_metrics + profile.metric_additions
+        # Per-profile C-module selection (GRS-0152). None ⇒ inherit the full retail C taxonomy
+        # (retail byte-identical); a selection picks those C modules in order (empty ⇒ none, so a
+        # non-retail view carries NO retail customer widgets and the C step degrades honestly).
+        if profile.c_module_keys is None:
+            view_c_modules = self.c_modules
+        else:
+            selected_c = set(profile.c_module_keys)
+            unknown_c = selected_c - set(self.c_module_keys())
+            if unknown_c:
+                raise UnknownKeyError(
+                    f"profile[{profile.key}] c_module", sorted(unknown_c)[0], self.c_module_keys()
+                )
+            view_c_modules = tuple(m for m in self.c_modules if m.key in selected_c)
+        # The widget taxonomy stays retail-scoped via `c_widget_profile`; a non-retail view won't
+        # match it (widgets_for_profile → ()), and with no C modules the C step has nothing to show.
         view = Registry(
             powers=self.powers,
             modules=tuple(new_modules),
             metrics=view_metrics,
             subcomponent_status=self.subcomponent_status,
             metric_status=self.metric_status,
-            # The C dimension (ADR-0023) is parallel to B/P/L — the profile selects B/P/L modules
-            # only, so C passes through unchanged. The widget taxonomy stays retail-scoped via
-            # `c_widget_profile`; a non-retail view won't match it (widgets_for_profile → ()).
-            c_modules=self.c_modules,
+            c_modules=view_c_modules,
             c_widgets=self.c_widgets,
             c_status=self.c_status,
             c_widget_profile=self.c_widget_profile,
@@ -614,6 +637,10 @@ def load_profiles() -> dict[str, ProfileDef]:
                 k: tuple(v) for k, v in body.get("subcomponent_selection", {}).items()
             },
             module_name_overrides=dict(body.get("module_name_overrides", {})),
+            # Per-profile C-module selection (GRS-0152): `c_modules` present ⇒ select those C-module
+            # keys (empty list = none, so the C step degrades for a non-retail firm); absent ⇒ None
+            # (inherit the full retail C taxonomy, retail unchanged).
+            c_module_keys=tuple(body["c_modules"]) if "c_modules" in body else None,
         )
     if RETAIL_PROFILE_KEY not in profiles:
         raise RegistryError("profiles.yaml must declare the default 'retail' profile.")
