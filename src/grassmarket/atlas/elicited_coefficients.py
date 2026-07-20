@@ -204,10 +204,13 @@ def _elicited_segment_set(
     group_weights: dict[str, float],
     w_metric: dict[str, float],
     w_power: dict[str, float],
+    critical_control_cap_floor: float,
 ) -> CoefficientSet:
     """Build a client-usable STARTER elicited set covering the profile VIEW exactly (ADR-0037). Same
     shape as ``elicited_v1_coefficient_set``; non-uniform δ/w_metric/w_power/group_weights from the
-    research validation. NOT wired active — activation is a recorded flip (ADR-0022)."""
+    research validation, plus the ADR-0038 critical-control cap κ so a broken critical control can't
+    be out-weighted by the trimmed θ_L. NOT wired active — activation is a recorded flip (ADR-0022).
+    """
     groups = sorted({m.group for m in registry.metrics if m.group is not None})
     cs = CoefficientSet(
         version=version,
@@ -222,6 +225,7 @@ def _elicited_segment_set(
         },
         delta=_weighted(registry.module_keys(), delta),
         critical_modules_for_l=critical_modules_for_l,
+        critical_control_cap_floor=critical_control_cap_floor,
         w_power=_weighted(registry.power_keys(), w_power),
         w_metric=_weighted(registry.metric_keys(), w_metric),
         group_weights={g: float(group_weights.get(g, 1.0)) for g in groups},
@@ -239,6 +243,9 @@ def _elicited_segment_set(
                 WeightMethod.SWING_WEIGHTING, "starter — research-refined"
             ),
             "strength_encoding": _starter_prov(WeightMethod.DELPHI, "convex maturity curve"),
+            "critical_control_cap": _starter_prov(
+                WeightMethod.DELPHI, "starter — operational-maturity guardrail (ADR-0038)"
+            ),
         },
     )
     cs.validate_against(registry)  # fail loud now, not at score time
@@ -257,6 +264,9 @@ def elicited_wealth_coefficient_set(registry: Registry) -> CoefficientSet:
         group_weights=_WEALTH_GROUP_WEIGHTS,
         w_metric=_WEALTH_W_METRIC,
         w_power=_WEALTH_W_POWER,
+        # A broken CASS/custody control caps V at ≈60 (0.5 + 0.5·0.2) — existential, can't be
+        # out-weighted by the trimmed θ_L=0.25 (ADR-0038).
+        critical_control_cap_floor=0.5,
     )
 
 
@@ -272,4 +282,6 @@ def elicited_exchange_coefficient_set(registry: Registry) -> CoefficientSet:
         group_weights=_EXCHANGE_GROUP_WEIGHTS,
         w_metric=_EXCHANGE_W_METRIC,
         w_power=_EXCHANGE_W_POWER,
+        # A broken clearing/settlement control caps V at ≈60 — existential for a venue (ADR-0038).
+        critical_control_cap_floor=0.5,
     )

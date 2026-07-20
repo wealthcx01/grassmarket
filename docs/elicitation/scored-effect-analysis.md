@@ -40,10 +40,35 @@ This is the **"what is ATLAS *for*?"** question made concrete:
   0.30, exchange 0.25/0.35/0.40), or adding a **hard cap** so any Basic critical control gates V
   directly, independent of θ_L.
 
-## Recommendation (founder decides)
-The wired starter uses the **research EV-leaning θ**. Given ATLAS is "Platform *Power*" and advisors use
-it to judge whether a platform is sound (not to price an acquisition), I'd lean **operational-maturity**:
-keep θ_L at ~0.30–0.35 for wealth and ~0.38–0.40 for exchange, *or* add an explicit critical-control cap
-so a broken CASS/clearing control can't be out-weighted. That reconciles the research (moat + economics
-lead *value*) with the product's job (a failed critical control must show). Your call — it's a one-line
-θ change (or a small engine addition for the cap), and neither is activated until you sign off.
+## Resolution — the critical-control cap (ADR-0038, shipped)
+
+Founder decision: **keep the research EV-leaning θ AND add an explicit critical-control cap** (option
+(b)), so the moat/economics-lead-value evidence and the "a failed critical control must show" product
+guarantee coexist. The engine now applies, when a set carries a cap floor κ:
+
+```
+cap = κ + (1 − κ) · min(q_m over critical-for-L modules);   V = min(V_weighted, cap)
+```
+
+Both segment starter sets carry **κ = 0.5** (a broken critical control caps V at ≈60/100). The cap is
+opt-in (κ absent ⇒ V byte-identical; retail golden master untouched), recorded on the result
+(`CriticalControlCapResult`), and monotone. Re-scored effect **with the cap active**:
+
+### Wealth (κ = 0.5)
+| Firm | Draft V | Elicited V (capped) | Δ | cap |
+|---|---|---|---|---|
+| Strong | 97.5 | 96.3 | −1.2 | slack (100) |
+| Strong **except weak on a critical control** | 75.1 | **60.0** | **−15.1** | CAPPED 81.2→60.0 |
+| Weak | ~13 | ~13 | ~0 | below cap |
+
+### Exchange (κ = 0.5)
+| Firm | Draft V | Elicited V (capped) | Δ | cap |
+|---|---|---|---|---|
+| Strong | 100.0 | 100.0 | 0.0 | slack (100) |
+| Strong **except weak on a critical control** | 79.2 | **60.0** | **−19.2** | CAPPED 81.7→60.0 |
+| Weak | ~8 | ~8 | ~0 | below cap |
+
+The anomaly is resolved: a broken CASS/clearing control now ceilings the score (81→60), while strong
+firms and already-weak firms are untouched. κ = 0.5 is the engineering starter; it is elicited and
+ratified with the rest of the segment weights (ADR-0037) — nothing is activated until founder + panel
+sign off, and both sets stay gated off until then.

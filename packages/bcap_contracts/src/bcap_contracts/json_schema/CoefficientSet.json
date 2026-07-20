@@ -114,6 +114,20 @@
       "title": "Client Usable",
       "type": "boolean"
     },
+    "critical_control_cap_floor": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Critical Control Cap Floor"
+    },
     "critical_modules_for_c": {
       "default": [],
       "items": {

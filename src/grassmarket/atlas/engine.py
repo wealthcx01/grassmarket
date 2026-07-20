@@ -28,6 +28,7 @@ from grassmarket.atlas.results import (
     AtlasResult,
     BusinessResult,
     CompositeResult,
+    CriticalControlCapResult,
     CustomerResult,
     LResult,
     MetricRow,
@@ -97,6 +98,15 @@ def score(
         # folds a defaulted θ_C·0 (fail-loud, ADR-0023 §4). θ_C absent ⇒ this term never exists.
         assert c_value is not None  # scores_c ⇐ theta_c is not None (CoefficientSet invariant)
         v_value += coefficients.theta_c * c_value
+
+    # Critical-control cap (ADR-0038). A hard operational-maturity ceiling that descends with the
+    # weakest critical-for-L module, applied AFTER the weighted V so a broken control cannot be
+    # out-weighted by a low θ_L. Absent floor ⇒ no cap and V is byte-identical to before (the retail
+    # golden master path). The cap only ever LOWERS V (min), never raises it.
+    critical_control_cap = _apply_critical_control_cap(coefficients, q_by_module, v_value)
+    if critical_control_cap is not None and critical_control_cap.bound:
+        v_value = critical_control_cap.cap
+
     v_stored = _round(v_value)
     composite = CompositeResult(
         b_index=_round(b_value),
@@ -116,8 +126,37 @@ def score(
         triad=triad,
         customer=customer,
         composite=composite,
+        critical_control_cap=critical_control_cap,
         gate_bands={m.key: m.gate_band for m in module_results},
         v_display_0_100=_round(v_stored * 100),
+    )
+
+
+def _apply_critical_control_cap(
+    coefficients: CoefficientSet,
+    q_by_module: dict[str, float | None],
+    v_uncapped: float,
+) -> CriticalControlCapResult | None:
+    """Compute the ADR-0038 cap: V ≤ κ + (1−κ)·min(q_m over critical-for-L modules). Returns None
+    when the set carries no cap floor (the common path — no behavioural change). A fully-unassessed
+    critical module (q_m None) is excluded (D9), matching the L min-term; at least one critical is
+    assessed (guaranteed by `_score_l`, which raises otherwise)."""
+    floor = coefficients.critical_control_cap_floor
+    if floor is None:
+        return None
+    crit = {k: q for k in coefficients.critical_modules_for_l if (q := q_by_module[k]) is not None}
+    if not crit:  # unreachable — _score_l already raised — but never cap around a missing input
+        raise ValueError("Cannot apply critical-control cap: no critical-for-L module is assessed.")
+    binding_module = min(crit, key=lambda k: crit[k])
+    l_min_critical = crit[binding_module]
+    cap = floor + (1 - floor) * l_min_critical
+    return CriticalControlCapResult(
+        floor=floor,
+        l_min_critical=_round(l_min_critical),
+        cap=_round(cap),
+        v_uncapped=_round(v_uncapped),
+        bound=cap < v_uncapped,
+        binding_module=binding_module,
     )
 
 

@@ -53,6 +53,7 @@ _PROVENANCE_FAMILIES = (
     "lambda_c",
     "delta_c",
     "rarity_weight",  # Level-1 widget rarity weighting (ADR-0023); populated in GRS-0084
+    "critical_control_cap",  # the operational-maturity V cap κ (ADR-0038)
 )
 
 # Closed value sets for the non-registry-keyed coefficient families (ADR-0004, ADR-0006). Kept as
@@ -99,6 +100,17 @@ class CoefficientSet(BaseModel):
         default_factory=dict, description="Module weights δ_m for the L blend."
     )
     critical_modules_for_l: tuple[str, ...] = ()
+
+    # Critical-control cap κ (ADR-0038). OPTIONAL. When set, V is capped at
+    # ``κ + (1−κ)·min(q_m over critical-for-L modules)`` — a hard operational-maturity guardrail so
+    # a broken critical control (a CASS/custody failure for wealth, a clearing failure for a venue)
+    # cannot be out-weighted by a low θ_L, independent of the headline weights. κ is the floor the
+    # cap descends to when a critical control is fully Basic (q_m→0.2 gives cap ≈ κ+0.16). ABSENT
+    # (None) ⇒ no cap and V is untouched — so the retail golden master and every three-index set
+    # stay unaffected (fail-safe: a set caps nothing until someone elicits κ). The cap only ever
+    # LOWERS V, never raises it, and is monotone in every subcomponent (raising a critical sub
+    # raises q_m raises the cap), so the §monotonicity property holds.
+    critical_control_cap_floor: UnitInterval | None = None
 
     # --- C-index coefficients (ADR-0023, Stage 1: report-alongside) ---
     # OPTIONAL and all-or-nothing. A set with `alpha_c is None` does not score C at all: B/P/L is
@@ -161,6 +173,18 @@ class CoefficientSet(BaseModel):
         return self
 
     @model_validator(mode="after")
+    def _cap_requires_critical_modules(self) -> CoefficientSet:
+        """The critical-control cap (ADR-0038) descends with ``min(q_m over critical-for-L
+        modules)``. A cap floor with no critical modules would have nothing to bind on — the engine
+        would raise at score time. Refuse it at construction instead (fail-loud, ADR-0001 §3)."""
+        if self.critical_control_cap_floor is not None and not self.critical_modules_for_l:
+            raise ValueError(
+                "critical_control_cap_floor is set but critical_modules_for_l is empty (ADR-0038): "
+                "the cap has no critical control to descend with."
+            )
+        return self
+
+    @model_validator(mode="after")
     def _enforce_theta_sum(self) -> CoefficientSet:
         # Three-index (Stage 1) when θ_C is absent; four-index (Stage 2/v1.4) when present. Σθ
         # equal 1 over exactly the terms in play — never a three-term set with a bolted-on fourth.
@@ -215,6 +239,8 @@ class CoefficientSet(BaseModel):
             populated.add("lambda_c")
         if self.delta_c:
             populated.add("delta_c")
+        if self.critical_control_cap_floor is not None:
+            populated.add("critical_control_cap")
         missing = populated - set(self.provenance)
         if missing:
             raise ValueError(

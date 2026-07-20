@@ -136,6 +136,23 @@ class CompositeResult(BaseModel):
     c_index: Score | None = None
 
 
+class CriticalControlCapResult(BaseModel):
+    """The critical-control cap (ADR-0038): a hard V ceiling that descends with the weakest
+    critical-for-L module, so a broken control cannot be out-weighted by a low θ_L. Present only on
+    a run whose coefficient set carries `critical_control_cap_floor`; None otherwise (no cap).
+    Always reported — when `bound` is False the cap did not bite, but recording it keeps the
+    guardrail legible rather than a silent adjustment."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    floor: Score  # κ — the ceiling when a critical control is fully broken
+    l_min_critical: Score  # min q_m over the critical-for-L modules
+    cap: Score  # κ + (1−κ)·l_min_critical — the V ceiling this run imposes
+    v_uncapped: Score  # V before the cap (θ_B·B + θ_P·P + θ_L·L [+ θ_C·C])
+    bound: bool  # whether the cap actually lowered V (cap < v_uncapped)
+    binding_module: str  # the critical module at the minimum (the control that set the ceiling)
+
+
 class AtlasResult(BaseModel):
     """The complete scoring output. `v_display_0_100` is the STORED (rounded) V × 100 — the display
     layer only ever scales the stored score (ADR-0001 §4)."""
@@ -154,5 +171,8 @@ class AtlasResult(BaseModel):
     # scores C. Reported alongside V — the composite V sum is unchanged (v1.4/GRS-0086 folds it in).
     customer: CustomerResult | None = None
     composite: CompositeResult
+    # The operational-maturity cap (ADR-0038). None on a set that carries no cap floor — the vast
+    # majority of runs, including the retail golden master. Present ⇒ V may have been ceiling'd.
+    critical_control_cap: CriticalControlCapResult | None = None
     gate_bands: dict[str, str]  # module_key → headline band (the two-track headline)
     v_display_0_100: float
