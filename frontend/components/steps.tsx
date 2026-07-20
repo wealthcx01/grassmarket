@@ -936,6 +936,54 @@ function Interpretation({ live, moduleLabels }: { live: LiveScore; moduleLabels:
   );
 }
 
+/** Preview the finalised assessment's deliverable as a watermarked .docx without an engagement
+ *  (GRS-0154) — the solo/sandbox "see the real deliverable" path. Internal-only, so it works for a
+ *  draft wealth/exchange profile too. A 409 (committee gate) surfaces the backend's plain message. */
+function DeliverablePreviewButton({ assessmentId }: { assessmentId: string }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  async function download() {
+    setBusy(true);
+    setError(null);
+    try {
+      const { blob, filename } = await api.previewAssessmentDeliverable(assessmentId);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err: unknown) {
+      setError(err instanceof ApiError ? err.message : "Couldn't generate the preview.");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <Card>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
+        <div>
+          <strong style={{ fontSize: "0.9rem" }}>Deliverable preview</strong>
+          <p style={{ margin: "0.2rem 0 0", fontSize: "0.76rem", color: "var(--color-ink-muted)", lineHeight: 1.45 }}>
+            The real Platform Power Report for this finalised assessment, watermarked and internal-only
+            (never client-facing). Download the .docx.
+          </p>
+        </div>
+        <button type="button" className="btn btn-secondary" onClick={download} disabled={busy}>
+          {busy ? "Generating…" : "Download preview (.docx)"}
+        </button>
+      </div>
+      {error ? (
+        <p role="alert" style={{ margin: "0.5rem 0 0", fontSize: "0.78rem", color: "var(--color-error)" }}>
+          {error}
+        </p>
+      ) : null}
+    </Card>
+  );
+}
+
 export function SummaryStep(props: StepProps) {
   const { live, readOnly, onFinalise, finalising } = props;
   const moduleLabels = Object.fromEntries(props.registry.modules.map((m) => [m.key, m.name]));
@@ -949,6 +997,9 @@ export function SummaryStep(props: StepProps) {
         moduleLabels={moduleLabels}
         profileKey={props.document?.profile?.operating_model ?? "retail"}
       />
+      {/* A finalised assessment can preview its real deliverable here — no engagement needed
+          (GRS-0154), so the solo/sandbox "see the real deliverable" promise actually pays off. */}
+      {readOnly ? <DeliverablePreviewButton assessmentId={props.assessmentId} /> : null}
       {live ? <Interpretation live={live} moduleLabels={moduleLabels} /> : null}
       {live?.c != null ? (
         <Card>

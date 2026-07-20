@@ -251,3 +251,54 @@ def download_deliverable(
         media_type=_DOCX_MEDIA,
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+
+@router.get("/assessments/{assessment_id}/deliverable-preview")
+def preview_assessment_deliverable(
+    assessment_id: UUID,
+    deliverable_type: DeliverableType = DeliverableType.PLATFORM_POWER_REPORT,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> StreamingResponse:
+    """Render a finalised assessment's deliverable directly, without an engagement (GRS-0154).
+
+    The whole point of the solo/sandbox path is to *see the real deliverable*, but generation was
+    only reachable via a won deal's engagement — so a finalised sandbox assessment had no route to a
+    document (mock-advisor: Priya/Elena/James, HIGH). This previews the INTERNAL, watermarked pack
+    from the assessment's own scoring run: it is **never client-facing** (`client_facing=False`), so
+    it renders even for a draft wealth/exchange profile — the client-pack gate is untouched. Nothing
+    is persisted (a preview, not a stored deliverable). Owner-scoped and fail-loud."""
+    try:
+        assessment = repo.get_assessment(principal, assessment_id)
+    except (NotFoundError, ScopeViolationError) as exc:
+        raise _not_found("Assessment not found.") from exc
+    if assessment.state != AssessmentState.FINALISED or assessment.scoring_run_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Finalise the assessment before previewing its deliverable.",
+        )
+    record = repo.get_scoring_run_record(principal, assessment.scoring_run_id)
+    profile_key = profile_key_of(assessment.document)
+    now = datetime.now(UTC)
+    try:
+        committee_decisions = repo.list_committee_decisions(principal, record.assessment_id)
+        rendered = _render(
+            record,
+            assessment.subject,
+            profile_key=profile_key,
+            deliverable_type=deliverable_type,
+            client_facing=False,  # a preview is internal + watermarked, never client-facing
+            generated_on=now.date(),
+            committee_decisions=committee_decisions,
+        )
+    except (ClientUsabilityError, CommitteePendingError) as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+    except UnsupportedDeliverableTypeError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    filename = f"preview-{deliverable_type.value}-{assessment_id}.docx"
+    return StreamingResponse(
+        BytesIO(rendered.docx_bytes),
+        media_type=_DOCX_MEDIA,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
