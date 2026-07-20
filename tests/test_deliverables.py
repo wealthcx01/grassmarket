@@ -91,6 +91,36 @@ def _client_usable_set() -> CoefficientSet:
     return draft_v1_coefficient_set(_REGISTRY).model_copy(update={"client_usable": True})
 
 
+def test_non_retail_deliverable_renders_against_its_profile_view() -> None:
+    # GRS-0148e regression: a wealth/exchange run's modules & metrics are profile-specific
+    # (WEALTH_SUITABILITY, EXCH_ADV…). The deliverable must be built against that profile's registry
+    # VIEW + coefficient set — building against the retail superset key-errors → a 500.
+    from bcap_contracts.deliverables import DeliverableType
+
+    from grassmarket.atlas import score
+    from grassmarket.atlas.active import profile_scoring_context
+    from grassmarket.deliverables.service import render_diagnostic_document
+    from tests.test_atlas_engine_properties import build_inputs
+
+    for profile in ("wealth", "exchange"):
+        registry, coefficients = profile_scoring_context(profile)
+        inputs = build_inputs(registry)
+        result = score(inputs, coefficients, registry)
+        for dtype in (DeliverableType.PLATFORM_POWER_REPORT, DeliverableType.EXECUTIVE_SUMMARY):
+            rendered = render_diagnostic_document(
+                deliverable_type=dtype,
+                inputs=inputs,
+                stored_result=result,
+                coefficients=coefficients,
+                registry=registry,
+                model=_MODEL,
+                subject="Segment Co",
+                generated_on=date(2026, 7, 20),
+                client_facing=False,
+            )
+            assert len(rendered.docx_bytes) > 1000  # a real .docx, not a crash
+
+
 def _paragraphs(data: bytes) -> str:
     doc = Document(BytesIO(data))
     return "\n".join(p.text for p in doc.paragraphs)
