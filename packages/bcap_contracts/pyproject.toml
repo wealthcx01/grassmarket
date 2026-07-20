@@ -1,7 +1,7 @@
 [project]
 name = "bcap-contracts"
-version = "0.0.1"
-description = "Shared Bruntsfield Capital contracts (Pydantic v2 + JSON Schema) — the future Holy Corner API surface, shared by Grassmarket, Holy Corner and Viewforth."
+version = "0.1.0"
+description = "Shared Bruntsfield Capital contracts (Pydantic v2 + JSON Schema) — the future Holy Corner API surface, shared by Grassmarket, Fountainbridge, Holy Corner and Viewforth."
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "Proprietary" }

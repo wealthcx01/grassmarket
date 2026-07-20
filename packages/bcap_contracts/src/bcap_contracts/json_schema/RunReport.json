@@ -1,0 +1,93 @@
+{
+  "$defs": {
+    "RunOutcome": {
+      "description": "How a lane run ended. ``no-useful-work`` is a first-class outcome — the pre-check that\ndecides not to burn a session is a success, not a failure (Phase 2 scheduler).",
+      "enum": [
+        "progress",
+        "no-useful-work",
+        "error"
+      ],
+      "title": "RunOutcome",
+      "type": "string"
+    },
+    "RunTrigger": {
+      "description": "What woke a lane for a run.",
+      "enum": [
+        "manual",
+        "scheduled"
+      ],
+      "title": "RunTrigger",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The record a lane writes back after a run (Phase 2 scheduler; surfaced in the studio).\n\nKeyed by ``lane_id`` + ``started_at`` — a run has no separate id. ``no-useful-work`` is a\nlegitimate outcome, not a failure, so nothing fails silently (fountainbridge non-negotiable).",
+  "properties": {
+    "ended_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "When the run ended; None while in flight.",
+      "title": "Ended At"
+    },
+    "error_detail": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Failure detail when outcome is 'error'; None otherwise.",
+      "title": "Error Detail"
+    },
+    "lane_id": {
+      "description": "The lane this run belongs to.",
+      "minLength": 1,
+      "title": "Lane Id",
+      "type": "string"
+    },
+    "outcome": {
+      "$ref": "#/$defs/RunOutcome"
+    },
+    "started_at": {
+      "format": "date-time",
+      "title": "Started At",
+      "type": "string"
+    },
+    "summary_md": {
+      "default": "",
+      "description": "Plain-language markdown summary of the run.",
+      "title": "Summary Md",
+      "type": "string"
+    },
+    "tickets_touched": {
+      "description": "Ids of tickets this run touched.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Tickets Touched",
+      "type": "array"
+    },
+    "trigger": {
+      "$ref": "#/$defs/RunTrigger"
+    }
+  },
+  "required": [
+    "lane_id",
+    "started_at",
+    "trigger",
+    "outcome"
+  ],
+  "title": "RunReport",
+  "type": "object"
+}

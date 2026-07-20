@@ -1,0 +1,100 @@
+{
+  "$defs": {
+    "ApprovalKind": {
+      "description": "What produced an approval item. Extensible pending FB-012's external-gate design — new\nkinds are additive, so the attention queue never needs a rewrite (FB-007).",
+      "enum": [
+        "pr",
+        "activegraph_policy"
+      ],
+      "title": "ApprovalKind",
+      "type": "string"
+    },
+    "ApprovalState": {
+      "description": "Where an approval sits. Absence of a decision is ``pending``.",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "title": "ApprovalState",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One item in the attention queue: something awaiting a recorded human decision (FB-007).\n\nv0 is engineering only (``kind=pr`` — every open workshop PR is by definition awaiting a\nhuman). External-action kinds join additively once FB-012's gate design lands.",
+  "properties": {
+    "decided_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "When it was decided; None while pending.",
+      "title": "Decided At"
+    },
+    "decided_by": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Who decided (approver identity); None while pending.",
+      "title": "Decided By"
+    },
+    "id": {
+      "description": "Approval id, unique within the venture.",
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "kind": {
+      "$ref": "#/$defs/ApprovalKind"
+    },
+    "requested_at": {
+      "format": "date-time",
+      "title": "Requested At",
+      "type": "string"
+    },
+    "source_ref": {
+      "description": "Reference to the thing being approved (PR url, event id, …).",
+      "minLength": 1,
+      "title": "Source Ref",
+      "type": "string"
+    },
+    "state": {
+      "$ref": "#/$defs/ApprovalState",
+      "default": "pending"
+    },
+    "summary": {
+      "description": "Plain-language summary of what needs a human.",
+      "minLength": 1,
+      "title": "Summary",
+      "type": "string"
+    },
+    "venture_id": {
+      "description": "The owning venture's id.",
+      "minLength": 1,
+      "title": "Venture Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "venture_id",
+    "kind",
+    "source_ref",
+    "summary",
+    "requested_at"
+  ],
+  "title": "Approval",
+  "type": "object"
+}
