@@ -115,17 +115,17 @@ def test_profile_metric_selection_is_fail_loud() -> None:
 
 
 def test_a_profile_view_carries_the_c_dimension() -> None:
-    # C (ADR-0023) is parallel to B/P/L — the profile view must carry the C modules/widgets, or the
-    # wizard C step and the live C read would be silently empty for every profile-scoped assessment.
+    # C (ADR-0023) is parallel to B/P/L. The RETAIL view carries the full C modules/widgets, or the
+    # wizard C step and the live C read would be silently empty for a retail assessment. Non-retail
+    # profiles intentionally drop the retail C modules (GRS-0152) — covered separately below.
     r = load_registry()
-    for profile_key in ("retail", "exchange"):
-        view = r.for_profile(load_profile(profile_key))
-        assert view.all_c_subcomponent_keys() == r.all_c_subcomponent_keys()
-        assert view.widget_keys() == r.widget_keys()
-    # The retail widget taxonomy stays retail-scoped in every view.
-    exchange_view = r.for_profile(load_profile("exchange"))
-    assert exchange_view.widgets_for_profile("exchange") == ()
-    assert len(r.for_profile(load_profile("retail")).widgets_for_profile("retail")) == 93
+    retail_view = r.for_profile(load_profile("retail"))
+    assert retail_view.all_c_subcomponent_keys() == r.all_c_subcomponent_keys()
+    assert retail_view.widget_keys() == r.widget_keys()
+    # The widget taxonomy field passes through every view, but access stays retail-scoped: retail
+    # sees all 93; a non-retail profile sees none (widgets_for_profile gates by operating model).
+    assert len(retail_view.widgets_for_profile("retail")) == 93
+    assert r.for_profile(load_profile("exchange")).widgets_for_profile("exchange") == ()
 
 
 def test_retail_profile_reproduces_the_golden_master() -> None:
@@ -202,3 +202,45 @@ def test_profile_scoring_context_defaults_to_retail_and_reproduces_golden() -> N
     # An unknown profile fails loud.
     with pytest.raises(UnknownKeyError):
         profile_scoring_context("no_such_profile")
+
+
+# --- Per-profile Customer-Proposition (C) selection (GRS-0152, ADR-0023) ------------------
+
+
+def test_retail_view_keeps_the_full_c_taxonomy() -> None:
+    # Retail inherits every C module (c_module_keys=None) — Stage-1 C capture is unchanged and the
+    # golden master (which never iterates C) is untouched.
+    r = load_registry()
+    view = r.for_profile(load_profile("retail"))
+    assert [m.key for m in view.c_modules] == [m.key for m in r.c_modules]
+    assert view.all_c_subcomponent_keys() == r.all_c_subcomponent_keys()
+    assert len(view.c_modules) > 0
+
+
+def test_non_retail_views_carry_no_retail_c_modules() -> None:
+    # Wealth & exchange select NO retail C modules (profiles.yaml → c_modules: []), so the C step
+    # degrades honestly instead of asking a wealth/exchange firm retail neobroker questions.
+    r = load_registry()
+    for profile in ("wealth", "exchange"):
+        view = r.for_profile(load_profile(profile))
+        assert view.c_modules == ()
+        assert view.all_c_subcomponent_keys() == frozenset()
+        # The widget taxonomy already degrades for non-retail (retail-scoped).
+        assert view.widgets_for_profile(profile) == ()
+
+
+def test_c_module_selection_is_fail_loud_on_an_unknown_key() -> None:
+    r = load_registry()
+    bad = ProfileDef(
+        key="b", name="B", module_keys=("FRONTEND",), c_module_keys=("NOT_A_C_MODULE",)
+    )
+    with pytest.raises(UnknownKeyError):
+        r.for_profile(bad)
+
+
+def test_c_module_none_inherits_all_empty_tuple_selects_none() -> None:
+    r = load_registry()
+    inherit = r.for_profile(ProfileDef(key="i", name="I", module_keys=("FRONTEND",)))
+    assert len(inherit.c_modules) == len(r.c_modules)  # None ⇒ inherit the full taxonomy
+    none = r.for_profile(ProfileDef(key="n", name="N", module_keys=("FRONTEND",), c_module_keys=()))
+    assert none.c_modules == ()  # empty tuple ⇒ select none

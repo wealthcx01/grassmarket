@@ -11,6 +11,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { BandDisplay } from "@/components/BandDisplay";
+import { ProvisionalScoreBanner } from "@/components/LiveScorePanel";
 import { ConsumingEngagements } from "@/components/ConsumingEngagements";
 import { ProvenanceBadge } from "@/components/ProvenanceBadge";
 import { WIZARD_STEPS, type StepProps } from "@/components/steps";
@@ -348,7 +349,7 @@ export function WizardClient({ id }: { id: string }) {
           </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <LiveSummary live={live} />
+          <LiveSummary live={live} profileKey={profileKey} />
           {!readOnly ? (
             <WizardSuggestionsPanel
               suggestions={suggestions.filter((s) => !dismissed.has(s.id))}
@@ -402,9 +403,11 @@ function SaveBadge({ state, readOnly }: { state: SaveState; readOnly: boolean })
 /** A compact always-visible live summary in the side rail (the full panel lives on the Summary step).
  * Exported for test: it must render V through BandDisplay so an unmodelled band stays an honest
  * point, never a false range (§7 / ADR-0008). */
-export function LiveSummary({ live }: { live: LiveScore | null }) {
+export function LiveSummary({ live, profileKey }: { live: LiveScore | null; profileKey?: string }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", position: "sticky", top: "1rem" }}>
+      {/* The draft-profile caveat travels with the rail V (GRS-0152), not just the Overview step. */}
+      {live?.scoreable && live.v ? <ProvisionalScoreBanner profileKey={profileKey} /> : null}
       {live?.scoreable && live.v ? (
         <div className="card" style={{ padding: "0.9rem 1rem" }}>
           {/* Delegate to BandDisplay so an UNMODELLED band (modelled=false) shows an honest labelled

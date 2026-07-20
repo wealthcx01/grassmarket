@@ -16,12 +16,14 @@ export function LiveScorePanel({
   error,
   onRefresh,
   moduleLabels,
+  profileKey,
 }: {
   score: LiveScore | null;
   loading: boolean;
   error: string | null;
   onRefresh: () => void;
   moduleLabels?: Record<string, string>;
+  profileKey?: string;
 }) {
   return (
     <aside
@@ -35,8 +37,12 @@ export function LiveScorePanel({
         </button>
       </div>
 
+      {/* Non-retail profiles score on draft weights (GRS-0152) — the caveat must travel with the
+          NUMBER, not live only on the Overview step, so an advisor never quotes a V without it. */}
+      <ProvisionalScoreBanner profileKey={profileKey} />
+
       {error ? (
-        <Blocking heading="Can't finalise yet" blocking={error} tone="error" />
+        <Blocking heading="Score unavailable" blocking={error} tone="error" />
       ) : !score ? (
         <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem", margin: 0 }}>
           Enter data to see a live score.
@@ -67,6 +73,24 @@ export function LiveScorePanel({
         </div>
       )}
     </aside>
+  );
+}
+
+/** The draft-profile caveat, rendered wherever a non-retail SCORE is shown (GRS-0152). Retail scores
+ *  on the ratified/elicited set, so it renders nothing there. Kept next to the score, not just on the
+ *  Overview step, so a finalised non-retail V is never quoted without its provisional flag. */
+export function ProvisionalScoreBanner({ profileKey }: { profileKey?: string }) {
+  if (!profileKey || profileKey === "retail") return null;
+  return (
+    <div
+      className="callout callout-warn"
+      role="note"
+      style={{ padding: "0.5rem 0.7rem", marginBottom: "0.7rem", fontSize: "0.74rem", lineHeight: 1.45 }}
+    >
+      <strong>Indicative — not client-usable.</strong> The {profileKey} operating model scores on{" "}
+      <strong>draft</strong> weights and criticals (pending elicitation). Use it to prioritise
+      internally; it must not be quoted to a client until the segment weights are ratified.
+    </div>
   );
 }
 

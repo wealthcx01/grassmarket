@@ -512,9 +512,10 @@ export function InfrastructureDeepDiveStep({ registry, document: d, update, read
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem", margin: 0 }}>
-        Work each of the nine modules, front end to liquidity. A ★ marks a critical subcomponent — it
-        gates the module rating (a module can&rsquo;t outrun its critical bottleneck). Each row&rsquo;s
-        Guidance opens the §4 rubric anchor inline. The count by each module is your progress so far.
+        Work each of the {registry.modules.length} modules, front end to liquidity. A ★ marks a critical
+        subcomponent — it gates the module rating (a module can&rsquo;t outrun its critical bottleneck).
+        Each row&rsquo;s Guidance opens the §4 rubric anchor inline. The count by each module is your
+        progress so far.
       </p>
       {registry.modules.map((m) => {
         const rated = m.subcomponents.filter((s) => doc.findSub(d, s.key)?.level != null).length;
@@ -665,16 +666,42 @@ export function CustomerPropositionStep({ registry, document: d, update, readOnl
   const profileKey = d.profile?.operating_model ?? "retail";
   const showGrid = registry.c_widgets.length > 0 && profileKey === registry.c_widget_profile;
   const categories = Array.from(new Set(registry.c_widgets.map((w) => w.category)));
+  // The Customer-Proposition taxonomy is a retail-brokerage customer-experience model (GRS-0152).
+  // A non-retail profile carries no C modules (profiles.yaml → c_modules: []), so instead of asking
+  // a wealth/exchange firm retail neobroker questions, degrade honestly: this dimension is not yet
+  // modelled for the segment. A per-segment C taxonomy is a founder-scoped content build.
+  const cModelled = registry.c_modules.length > 0;
+
+  if (!cModelled) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div className="card" style={{ padding: "1rem 1.15rem", borderLeft: "3px solid var(--color-ink-faint)" }}>
+          <h3 style={{ fontSize: "1rem", margin: "0 0 0.4rem" }}>
+            Customer Proposition — not yet modelled for the {profileKey} operating model
+          </h3>
+          <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--color-ink-muted)", lineHeight: 1.55 }}>
+            The Customer-Proposition Index (C) is a <strong>retail-brokerage</strong> customer-experience
+            model — onboarding and time-to-first-trade, trading experience, product range. A{" "}
+            <strong>{profileKey}</strong> firm&rsquo;s client proposition is a different construct
+            (advice relationship, planning and reporting for wealth; member/participant experience for an
+            exchange), and its taxonomy has not been authored yet. Rather than score you on questions that
+            don&rsquo;t fit, this step is <strong>skipped for this segment</strong> — it does not affect
+            your V. B, P and L (and the infrastructure deep dive) are fully segment-native.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
       <p style={{ color: "var(--color-ink-muted)", fontSize: "0.9rem", margin: 0, lineHeight: 1.55 }}>
         <strong style={{ color: "var(--color-ink)" }}>This is where you judge how good the platform
-        actually is for a customer.</strong> The Customer Proposition Index (C) reads the ten Phase-E
-        modules and the <strong>Level-1 widget checklist</strong> — is each feature present, and how
-        good is it on <strong>Ease · Usability · Depth</strong>? A rare feature done well is a
-        differentiator; a common one missing is a gap. C is scored live (see the rail) and reported
-        alongside V (ADR-0023); it does not change V yet.
+        actually is for a customer.</strong> The Customer Proposition Index (C) reads the{" "}
+        {registry.c_modules.length} Phase-E modules and the <strong>Level-1 widget checklist</strong> —
+        is each feature present, and how good is it on <strong>Ease · Usability · Depth</strong>? A rare
+        feature done well is a differentiator; a common one missing is a gap. C is scored live (see the
+        rail) and reported alongside V (ADR-0023); it does not change V yet.
       </p>
 
       {registry.c_modules.map((m) => (
@@ -897,6 +924,7 @@ export function SummaryStep(props: StepProps) {
         error={props.liveError}
         onRefresh={props.refreshLive}
         moduleLabels={moduleLabels}
+        profileKey={props.document?.profile?.operating_model ?? "retail"}
       />
       {live ? <Interpretation live={live} moduleLabels={moduleLabels} /> : null}
       {live?.c != null ? (
