@@ -23,19 +23,32 @@ router = APIRouter(prefix="/registry", tags=["registry"])
 
 
 class ProfileSummary(BaseModel):
-    """One selectable operating-model profile (ADR-0025) — key + display name for the wizard."""
+    """One selectable operating-model profile (ADR-0025) — key + display name for the wizard, plus
+    whether the profile scores on a CLIENT-USABLE coefficient set (GRS-0156). The wizard shows the
+    "indicative, not client-usable" caveat only for a non-retail profile that is NOT client-usable,
+    so an activated segment (wealth/exchange) drops the caveat while a future draft profile
+    still carries it."""
 
     key: str
     name: str
+    client_usable: bool
 
 
 @router.get("/profiles", response_model=list[ProfileSummary])
 def list_profiles(_principal: Principal = Depends(get_current_principal)) -> list[ProfileSummary]:
     """The operating-model profiles a wizard may select (retail first). Only profiles with real
     content are offered — a profile with no content can't be selected (fail-loud upstream)."""
+    from grassmarket.atlas.active import profile_scoring_context
+
     profiles = load_profiles()
     ordered = [RETAIL_PROFILE_KEY, *(k for k in profiles if k != RETAIL_PROFILE_KEY)]
-    return [ProfileSummary(key=k, name=profiles[k].name) for k in ordered]
+    out: list[ProfileSummary] = []
+    for k in ordered:
+        _, coefficients = profile_scoring_context(k)
+        out.append(
+            ProfileSummary(key=k, name=profiles[k].name, client_usable=coefficients.client_usable)
+        )
+    return out
 
 
 @router.get("", response_model=Registry)

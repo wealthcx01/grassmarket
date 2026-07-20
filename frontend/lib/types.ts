@@ -83,10 +83,13 @@ export interface BusinessProfile {
   licensing?: string | null;
 }
 
-/** One selectable operating-model profile (GRS-0079) from GET /registry/profiles. */
+/** One selectable operating-model profile (GRS-0079) from GET /registry/profiles. `client_usable`
+ *  (GRS-0156) is whether the profile scores on a client-usable coefficient set — the wizard shows the
+ *  "indicative, not client-usable" caveat only for a non-retail profile that is NOT client-usable. */
 export interface RegistryProfile {
   key: string;
   name: string;
+  client_usable: boolean;
 }
 
 /** One Level-1 widget observation for the C-index grid (ADR-0023 / GRS-0083). A widget is either

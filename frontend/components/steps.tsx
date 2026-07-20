@@ -54,6 +54,9 @@ export interface StepProps {
   provenance: RecordProvenance;
   onPreviewInSandbox: () => void;
   previewingSandbox: boolean;
+  // Whether the assessment's operating-model profile scores on a client-usable set (GRS-0156) —
+  // gates the "indicative, not client-usable" caveat on the score views.
+  clientUsable: boolean;
 }
 
 // Controls inherit the global form styling (border, radius, focus ring, select chevron);
@@ -134,10 +137,11 @@ export function OverviewStep({ document: d, update, readOnly, profiles }: StepPr
             </option>
           ))}
         </select>
-        {operatingModel !== "retail" ? (
+        {operatingModel !== "retail" &&
+        !(profiles.find((p) => p.key === operatingModel)?.client_usable ?? false) ? (
           <span style={{ display: "block", marginTop: "0.35rem", fontSize: "0.75rem", color: "var(--color-warn)" }}>
-            Non-retail profiles are <strong>draft</strong> (weights &amp; criticals pending
-            elicitation) — scores are indicative, not client-usable.
+            This profile is <strong>draft</strong> (weights &amp; criticals pending elicitation) —
+            scores are indicative, not client-usable.
           </span>
         ) : null}
       </label>
@@ -996,6 +1000,7 @@ export function SummaryStep(props: StepProps) {
         onRefresh={props.refreshLive}
         moduleLabels={moduleLabels}
         profileKey={props.document?.profile?.operating_model ?? "retail"}
+        clientUsable={props.clientUsable}
       />
       {/* A finalised assessment can preview its real deliverable here — no engagement needed
           (GRS-0154), so the solo/sandbox "see the real deliverable" promise actually pays off. */}

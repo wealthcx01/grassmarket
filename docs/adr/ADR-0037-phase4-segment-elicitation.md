@@ -1,6 +1,6 @@
 # ADR-0037 — Phase-4 weight/critical elicitation for the wealth & exchange profiles
 
-- **Status:** Proposed (2026-07-20). Founder-directed — the ceiling the mock-advisor re-measure identified (4 of 5 personas, HIGH): non-retail assessments self-declare "indicative, not client-usable."
+- **Status:** **ACTIVATED (2026-07-20).** Founder-directed. The mock-advisor re-measure identified the ceiling (4 of 5 personas, HIGH): non-retail assessments self-declared "indicative, not client-usable." On the founder's explicit sign-off, the research-validated STARTER elicited sets (GRS-0150, with the ADR-0038 critical-control cap) were activated for wealth & exchange (GRS-0156): `active.profile_scoring_context` routes both to their client-usable elicited coefficient sets and `active_uncertainty_model` flips with them (ADR-0022). Formal weight-elicitation panel ratification remains the scheduled review (`review_due`), refining values in place without structural change; it is no longer a release blocker.
 - **Date:** 2026-07-20
 - **Deciders:** Founder + the Bruntsfield weight-elicitation panel (the panel VALUES are the deliverable of this ADR; engineering only wires them in).
 - **Normative source:** `docs/ATLAS-Methodology-v1.2.md` §6 (weight elicitation), ADR-0006 (weights live in the CoefficientSet), ADR-0022 (elicited-coefficient activation), ADR-0035 (segment fit, Phase 4).

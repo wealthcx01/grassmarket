@@ -97,12 +97,12 @@ def elicited_v1_coefficient_set(registry: Registry) -> CoefficientSet:
 # --- Segment starter sets (GRS-0150, ADR-0037) -------------------------------------------
 #
 # STARTER elicited sets for the wealth & exchange profiles. These are an ENGINEERING PROPOSAL,
-# refined by the ADR-0037 deep-research validation (cited in docs/elicitation/), *pending founder +
-# panel ratification*. They are `client_usable=True` structurally (like the retail elicited set) but
-# are NOT the active default — `active.profile_scoring_context` still routes both profiles to their
-# DRAFT sets, so the "indicative, not client-usable" banner and the client-pack gate are unchanged.
-# Activation is the single recorded flip in `profile_scoring_context` on the founder's sign-off
-# (ADR-0022). Values are relative weights (the engine normalises).
+# refined by the ADR-0037 deep-research validation (cited in docs/elicitation/). They are
+# `client_usable=True` and, as of 2026-07-20, ACTIVATED (founder sign-off, ADR-0037/ADR-0022):
+# `active.profile_scoring_context` routes wealth/exchange to THESE sets, so those segments score
+# client-usable and the client-pack gate now passes for them. Formal weight-elicitation panel
+# ratification is the scheduled review (`review_due`), not a blocker. Values are relative weights
+# (the engine normalises).
 
 _STARTER_SET_ON = date(2026, 7, 20)
 _STARTER_REVIEW_DUE = date(2027, 7, 20)
@@ -115,7 +115,8 @@ def _starter_prov(method: WeightMethod, dispersion: str) -> WeightProvenanceReco
         method=method,
         dispersion=dispersion,
         review_due=_STARTER_REVIEW_DUE,
-        notes="ADR-0037 research-validated STARTER; PENDING founder + panel ratification.",
+        notes="ADR-0037 research-validated starter; founder-activated 2026-07-20, "
+        "panel ratification scheduled (review_due).",
     )
 
 

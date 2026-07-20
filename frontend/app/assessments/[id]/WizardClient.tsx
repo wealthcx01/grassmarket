@@ -293,6 +293,9 @@ export function WizardClient({ id }: { id: string }) {
   if (!registry || !assessment || !document) return <p>Loading…</p>;
 
   const Current = WIZARD_STEPS[step]!.component;
+  // Whether this profile scores on a client-usable set (GRS-0156). Default false (show the caveat)
+  // until the profiles load — fail-safe. Retail is never caveated (the banner also checks !retail).
+  const clientUsable = profiles.find((p) => p.key === profileKey)?.client_usable ?? false;
   const stepProps: StepProps = {
     registry,
     profiles,
@@ -309,6 +312,7 @@ export function WizardClient({ id }: { id: string }) {
     provenance: assessment.provenance,
     onPreviewInSandbox: previewInSandbox,
     previewingSandbox: cloningSandbox,
+    clientUsable,
   };
 
   return (
@@ -349,7 +353,7 @@ export function WizardClient({ id }: { id: string }) {
           </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <LiveSummary live={live} profileKey={profileKey} />
+          <LiveSummary live={live} profileKey={profileKey} clientUsable={clientUsable} />
           {!readOnly ? (
             <WizardSuggestionsPanel
               suggestions={suggestions.filter((s) => !dismissed.has(s.id))}
@@ -403,11 +407,22 @@ function SaveBadge({ state, readOnly }: { state: SaveState; readOnly: boolean })
 /** A compact always-visible live summary in the side rail (the full panel lives on the Summary step).
  * Exported for test: it must render V through BandDisplay so an unmodelled band stays an honest
  * point, never a false range (§7 / ADR-0008). */
-export function LiveSummary({ live, profileKey }: { live: LiveScore | null; profileKey?: string }) {
+export function LiveSummary({
+  live,
+  profileKey,
+  clientUsable,
+}: {
+  live: LiveScore | null;
+  profileKey?: string;
+  clientUsable?: boolean;
+}) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", position: "sticky", top: "1rem" }}>
-      {/* The draft-profile caveat travels with the rail V (GRS-0152), not just the Overview step. */}
-      {live?.scoreable && live.v ? <ProvisionalScoreBanner profileKey={profileKey} /> : null}
+      {/* The draft-profile caveat travels with the rail V (GRS-0152), gated on client-usability
+          (GRS-0156) so an activated segment drops it. */}
+      {live?.scoreable && live.v ? (
+        <ProvisionalScoreBanner profileKey={profileKey} clientUsable={clientUsable} />
+      ) : null}
       {live?.scoreable && live.v ? (
         <div className="card" style={{ padding: "0.9rem 1rem" }}>
           {/* Delegate to BandDisplay so an UNMODELLED band (modelled=false) shows an honest labelled
