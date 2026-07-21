@@ -108,6 +108,7 @@ def render_diagnostic_document(
     client_facing: bool,
     narratives: Sequence[AINarrative] = (),
     committee_decisions: Sequence[CommitteeDecision] = (),
+    reported_c: float | None = None,
 ) -> RenderedDeliverable:
     """Render one single-run Diagnostic-pack document. Enforces the client-usable AND committee
     gates first (may raise `ClientUsabilityError` / `CommitteePendingError`), then re-derives the
@@ -138,6 +139,7 @@ def render_diagnostic_document(
         uncertainty_version=model.version,
         generated_on=generated_on,
         committee_decisions=tuple(committee_decisions),
+        reported_c=reported_c,
     )
     build = _SINGLE_RUN_BUILDERS[deliverable_type].build
     return RenderedDeliverable(mode=mode, docx_bytes=build(context, mode, narratives))
@@ -155,6 +157,7 @@ def render_platform_power_report(
     client_facing: bool,
     narratives: Sequence[AINarrative] = (),
     committee_decisions: Sequence[CommitteeDecision] = (),
+    reported_c: float | None = None,
 ) -> RenderedDeliverable:
     """Render the Platform Power Report (a thin wrapper over `render_diagnostic_document`). Approved
     AI narratives and the committee-approved triad rationale render into its methods appendix."""
@@ -170,6 +173,7 @@ def render_platform_power_report(
         client_facing=client_facing,
         narratives=narratives,
         committee_decisions=committee_decisions,
+        reported_c=reported_c,
     )
 
 

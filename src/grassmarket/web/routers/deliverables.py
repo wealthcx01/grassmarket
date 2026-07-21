@@ -13,7 +13,7 @@ from datetime import UTC, date, datetime
 from io import BytesIO
 from uuid import UUID
 
-from bcap_contracts.assessments import AssessmentState
+from bcap_contracts.assessments import AssessmentDocument, AssessmentState
 from bcap_contracts.committee import CommitteeDecision
 from bcap_contracts.deliverables import Deliverable, DeliverableMode, DeliverableType
 from bcap_contracts.narratives import AINarrative
@@ -21,6 +21,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
+from grassmarket.assessments.service import c_index_of
 from grassmarket.atlas import AssessmentInputs
 from grassmarket.atlas.active import (
     active_uncertainty_model,
@@ -94,6 +95,7 @@ def _render(
     subject: str,
     *,
     profile_key: str,
+    document: AssessmentDocument,
     deliverable_type: DeliverableType,
     client_facing: bool,
     generated_on: date,
@@ -106,6 +108,9 @@ def _render(
     registry, coefficients = profile_scoring_context(profile_key)
     inputs = AssessmentInputs.model_validate_json(record.inputs_json)
     result = AtlasResult.model_validate_json(record.result_json)
+    # C is reported alongside V (ADR-0023 / GRS-0164). Computed from the DOCUMENT (the run's stored
+    # inputs drop C), the same deterministic path the portfolio + live rail use — so it surfaces
+    # even when the coefficients don't fold C into the composite (retail ⇒ result.customer None).
     return render_diagnostic_document(
         deliverable_type=deliverable_type,
         inputs=inputs,
@@ -118,6 +123,7 @@ def _render(
         client_facing=client_facing,
         narratives=narratives,
         committee_decisions=committee_decisions,
+        reported_c=c_index_of(document, registry),
     )
 
 
@@ -138,6 +144,7 @@ def generate_deliverable(
         raise _not_found("Engagement not found.") from exc
 
     record, subject, profile_key = _resolve_run(repo, principal, engagement)
+    document = repo.get_assessment(principal, record.assessment_id).document
     dtype = payload.deliverable_type
     now = datetime.now(UTC)
     try:
@@ -146,6 +153,7 @@ def generate_deliverable(
             record,
             subject,
             profile_key=profile_key,
+            document=document,
             deliverable_type=dtype,
             client_facing=payload.client_facing,
             generated_on=now.date(),
@@ -222,7 +230,8 @@ def download_deliverable(
 
     record = repo.get_scoring_run_record(principal, deliverable.scoring_run_id)
     subject = repo.get_prospect(principal, engagement.prospect_id).company_name
-    profile_key = profile_key_of(repo.get_assessment(principal, record.assessment_id).document)
+    document = repo.get_assessment(principal, record.assessment_id).document
+    profile_key = profile_key_of(document)
     generated_on = (deliverable.generated_at or datetime.now(UTC)).date()
     try:
         committee_decisions = repo.list_committee_decisions(principal, record.assessment_id)
@@ -230,6 +239,7 @@ def download_deliverable(
             record,
             subject,
             profile_key=profile_key,
+            document=document,
             deliverable_type=deliverable.type,
             client_facing=client_facing,
             generated_on=generated_on,
@@ -286,6 +296,7 @@ def preview_assessment_deliverable(
             record,
             assessment.subject,
             profile_key=profile_key,
+            document=assessment.document,
             deliverable_type=deliverable_type,
             client_facing=False,  # a preview is internal + watermarked, never client-facing
             generated_on=now.date(),
