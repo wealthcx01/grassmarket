@@ -58,6 +58,15 @@ class Settings(BaseSettings):
         default=_PLACEHOLDER_TRANSCRIPT_KEY,
         validation_alias=AliasChoices("GM_TRANSCRIPT_ENCRYPTION_KEY", "TRANSCRIPT_ENCRYPTION_KEY"),
     )
+
+    # Publish the authored Academy catalog into the DB once at boot, after migrations (GRS-0158).
+    # The content lives in code but is only inserted by an admin-gated seed, so a fresh Railway DB
+    # would show an empty Workbench. Off by default (tests build many apps); set on the Railway
+    # services so a deploy always serves the courses. Idempotent — safe on every boot.
+    seed_academy_on_boot: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("GM_SEED_ACADEMY_ON_BOOT", "SEED_ACADEMY_ON_BOOT"),
+    )
     # Upload guard (GRS-0029): reject media larger than this before scanning/transcribing.
     max_upload_bytes: int = Field(default=25 * 1024 * 1024, validation_alias="GM_MAX_UPLOAD_BYTES")
 

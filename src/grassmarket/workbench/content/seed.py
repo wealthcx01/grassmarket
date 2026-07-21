@@ -8,10 +8,15 @@ just publishes a new version over the top.
 
 from __future__ import annotations
 
-from datetime import datetime
+import secrets
+from collections.abc import Callable
+from datetime import UTC, datetime
 
 from bcap_contracts.commissions import load_commission_config
+from bcap_contracts.common import AssessorLevel, ConsultantTier, Role
+from sqlalchemy.orm import Session
 
+from grassmarket.auth.security import hash_password
 from grassmarket.data.repository import Principal, Repository
 from grassmarket.earnings.product_carrot import product_commission_carrot
 from grassmarket.workbench.content.benzinga_course import (
@@ -88,3 +93,36 @@ def seed_academy_content(repo: Repository, admin: Principal, *, now: datetime) -
             target_powers=spec.target_powers,
             evidence_cues=spec.evidence_cues,
         )
+
+
+# The dedicated non-login admin the boot/CLI seed authors as (authoring is admin-gated, ADR-0028).
+# Created with an UNGUESSABLE, never-recorded password so it can never be logged into — it exists
+# only to own the seeded catalog. Distinct from any real human admin.
+_SEEDER_EMAIL = "academy-seeder@system.bruntsfield.internal"
+
+
+def ensure_seed_admin(repo: Repository) -> Principal:
+    """Ensure the system seeding admin exists (idempotent); return a principal to author as."""
+    admin = repo.get_consultant_by_email(_SEEDER_EMAIL)
+    if admin is None:
+        admin = repo.create_consultant(
+            email=_SEEDER_EMAIL,
+            full_name="Academy Seeder (system)",
+            hashed_password=hash_password(secrets.token_urlsafe(32)),  # unusable — no login path
+            role=Role.ADMIN,
+            tier=ConsultantTier.CONSULTANT,
+            assessor_level=AssessorLevel.TRAINED,
+        )
+    return Principal(consultant_id=admin.id, role=admin.role)
+
+
+def seed_academy(session_factory: Callable[[], Session], *, now: datetime | None = None) -> None:
+    """Ensure the seeding admin, then publish the Academy catalog. Idempotent; one commit. Called at
+    boot (GM_SEED_ACADEMY_ON_BOOT) and by ``scripts/seed_academy.py`` (GRS-0158)."""
+    session = session_factory()
+    try:
+        repo = Repository(session)
+        seed_academy_content(repo, ensure_seed_admin(repo), now=now or datetime.now(UTC))
+        session.commit()
+    finally:
+        session.close()
