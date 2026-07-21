@@ -117,13 +117,14 @@ def _platform_power_section(doc: DocxDocument, context: DeliverableContext) -> N
         "carried no confidence grade, uncertainty is NOT modelled and the figure is stated as a "
         "point, never a tight range (Methodology §7)."
     )
-    for name, band in (
-        ("V (Platform Value)", unc.v_band),
-        ("B (Business)", unc.b_band),
-        ("P (Powers)", unc.p_band),
-        ("L (Platform/Infrastructure)", unc.l_band),
+    comp = context.result.composite
+    for name, point, band in (
+        ("V (Platform Value)", comp.v_index, unc.v_band),
+        ("B (Business)", comp.b_index, unc.b_band),
+        ("P (Powers)", comp.p_index, unc.p_band),
+        ("L (Platform/Infrastructure)", comp.l_index, unc.l_band),
     ):
-        doc.add_paragraph(format_index_statement(name, band), style="List Bullet")
+        doc.add_paragraph(format_index_statement(name, point, band), style="List Bullet")
 
     doc.add_paragraph(
         f"Overall assessment uncertainty: {unc.overall_uncertainty.value}.",

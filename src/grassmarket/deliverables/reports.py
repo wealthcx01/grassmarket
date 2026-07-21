@@ -60,7 +60,9 @@ def build_executive_summary(
     unc = context.uncertainty
 
     doc.add_heading("Headline", level=1)
-    doc.add_paragraph(format_index_statement("Platform value V", unc.v_band))
+    doc.add_paragraph(
+        format_index_statement("Platform value V", result.composite.v_index, unc.v_band)
+    )
     doc.add_paragraph(f"Overall assessment uncertainty: {unc.overall_uncertainty.value}.")
 
     doc.add_heading("Platform Power triad", level=1)
@@ -193,13 +195,14 @@ def build_workshop_output(
         doc.add_paragraph(line, style="List Bullet")
 
     doc.add_heading("Current reading (wide, provisional)", level=1)
-    for name, band in (
-        ("V", context.uncertainty.v_band),
-        ("B", context.uncertainty.b_band),
-        ("P", context.uncertainty.p_band),
-        ("L", context.uncertainty.l_band),
+    comp = context.result.composite
+    for name, point, band in (
+        ("V", comp.v_index, context.uncertainty.v_band),
+        ("B", comp.b_index, context.uncertainty.b_band),
+        ("P", comp.p_index, context.uncertainty.p_band),
+        ("L", comp.l_index, context.uncertainty.l_band),
     ):
-        doc.add_paragraph(format_index_statement(name, band), style="List Bullet")
+        doc.add_paragraph(format_index_statement(name, point, band), style="List Bullet")
 
     doc.add_heading("Workshop discussion prompts", level=1)
     for prompt in (
