@@ -1,6 +1,6 @@
 # GRS-0161 — Reconcile the two V numbers (portfolio deterministic vs deliverable median)
 
-**Status:** Planned (2026-07-21). Found by a clean-room recompute during the staging verification.
+**Status:** Done (2026-07-21). Deliverable headline + component statements now report the deterministic v_index (matching the portfolio), band clamped to contain the point. Found by a clean-room recompute during the staging verification.
 **Priority:** HIGH — trust/correctness. **Loop:** demo-readiness.
 
 ## Why
