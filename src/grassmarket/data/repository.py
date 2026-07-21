@@ -2608,6 +2608,9 @@ class Repository:
         re-implemented."""
         from bcap_contracts.registry import load_registry
 
+        from grassmarket.assessments.service import c_index_of
+        from grassmarket.atlas.active import profile_key_of, profile_scoring_context
+
         registry = load_registry()
         total_subs = len(registry.all_subcomponent_keys())
         entries: list[BrokeragePortfolioEntry] = []
@@ -2618,6 +2621,11 @@ class Repository:
                 run = self.get_scoring_run(principal, a.scoring_run_id)  # own + exists
                 v_index = run.v_index
                 uncertainty_rating = run.uncertainty_rating
+            # C is reported alongside V (ADR-0023): deterministic and document-derived, so it is
+            # recomputed here from the locked/current document under the profile's registry view —
+            # no immutable run needed, None when C is not yet scoreable.
+            c_registry, _ = profile_scoring_context(profile_key_of(a.document))
+            c_index = c_index_of(a.document, c_registry)
             segment = a.document.profile.segment if a.document.profile else None
             entries.append(
                 BrokeragePortfolioEntry(
@@ -2627,6 +2635,7 @@ class Repository:
                     state=a.state,
                     provenance=a.provenance,
                     v_index=v_index,
+                    c_index=c_index,
                     uncertainty_rating=uncertainty_rating,
                     coverage=_document_coverage(a.document, total_subs),
                     finalised_at=a.finalised_at,

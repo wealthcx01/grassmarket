@@ -116,3 +116,43 @@ def test_http_portfolio_route_resolves_and_is_scoped(
 
 def test_http_portfolio_requires_authentication(client: TestClient) -> None:
     assert client.get("/assessments/portfolio").status_code == 401
+
+
+def test_portfolio_surfaces_customer_proposition_index(
+    repo: Repository, alice: SeededConsultant
+) -> None:
+    """C is reported alongside V (ADR-0023): document-derived and deterministic, so it surfaces on
+    the portfolio row even for a draft — the demo-critical customer-experience score (GRS-0164)."""
+    registry = load_registry()
+    c_subs = tuple(
+        SubcomponentRating(
+            module_key=m.key,
+            subcomponent_key=s.key,
+            level=MaturityLevel.ADVANCED,
+            evidence_grade=EvidenceGrade.E3_ARTIFACT,
+        )
+        for m in registry.c_modules
+        for s in m.subcomponents
+    )
+    a = repo.create_assessment(alice.principal, subject="Customer Co")
+    repo.update_assessment(
+        alice.principal,
+        a.id,
+        document=AssessmentDocument(subject="Customer Co", c_subcomponents=c_subs),
+    )
+    entry = next(
+        e for e in repo.list_brokerage_portfolio(alice.principal) if e.assessment_id == a.id
+    )
+    assert entry.c_index is not None
+    assert 0.0 < entry.c_index <= 1.0
+
+
+def test_portfolio_c_index_is_none_without_customer_data(
+    repo: Repository, alice: SeededConsultant
+) -> None:
+    """No C inputs ⇒ C not scoreable ⇒ null, never a fabricated 0 (fail-loud honesty)."""
+    a = repo.create_assessment(alice.principal, subject="No Customer Data Co")
+    entry = next(
+        e for e in repo.list_brokerage_portfolio(alice.principal) if e.assessment_id == a.id
+    )
+    assert entry.c_index is None
