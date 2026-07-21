@@ -32,9 +32,11 @@ def test_portfolio_is_owner_scoped_and_surfaces_segment(
     assert {e.subject for e in alice_portfolio} == {"Meridian", "Northgate"}
     assert {e.subject for e in bob_portfolio} == {"Bob's Brokerage"}
     meridian = next(e for e in alice_portfolio if e.subject == "Meridian")
-    assert meridian.segment == "Retail broker"
-    # An assessment with no profile set surfaces a null segment, never a fabricated one.
-    assert next(e for e in alice_portfolio if e.subject == "Northgate").segment is None
+    assert meridian.segment == "Retail broker"  # explicit free-text segment wins
+    # No free-text segment falls back to the operating-model NAME (retail is the scoring default),
+    # so the column is never a bare "—" for an assessment that has an operating model (GRS-0163).
+    northgate = next(e for e in alice_portfolio if e.subject == "Northgate")
+    assert northgate.segment == "Retail brokerage"
 
 
 def test_portfolio_has_no_score_until_finalised(repo: Repository, alice: SeededConsultant) -> None:

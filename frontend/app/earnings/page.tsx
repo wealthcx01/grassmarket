@@ -47,6 +47,17 @@ function humanize(value: string | null | undefined): string {
   return value.charAt(0).toUpperCase() + value.slice(1).replace(/_/g, " ");
 }
 
+// What a commission line is attributed to (GRS-0163): the sourcing for a consultancy line, else the
+// represented product's name for a product sale (so the column is never a bare "—" when there's a
+// product), falling back to the product id.
+function attributionLabel(line: CommissionLine, carrots: ProductCommissionCarrot[]): string {
+  if (line.attribution) return humanize(line.attribution);
+  if (line.product_id) {
+    return carrots.find((c) => c.product_id === line.product_id)?.name ?? humanize(line.product_id);
+  }
+  return "—";
+}
+
 function triggerBlobDownload(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -272,7 +283,7 @@ export default function EarningsPage() {
                     {line.earned_on ?? "—"}
                   </td>
                   <td style={{ padding: "0.55rem 0.6rem", color: "var(--color-ink-muted)" }}>
-                    {humanize(line.attribution)}
+                    {attributionLabel(line, carrots)}
                   </td>
                 </tr>
               ))}

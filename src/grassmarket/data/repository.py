@@ -2606,12 +2606,13 @@ class Repository:
         finalised — its last Platform Value + uncertainty rating from the immutable scoring run.
         Reuses `list_assessments` for scoping, so the owner-only guarantee is inherited, not
         re-implemented."""
-        from bcap_contracts.registry import load_registry
+        from bcap_contracts.registry import load_profiles, load_registry
 
         from grassmarket.assessments.service import c_index_of
         from grassmarket.atlas.active import profile_key_of, profile_scoring_context
 
         registry = load_registry()
+        profiles = load_profiles()  # key -> ProfileDef, for the operating-model display name
         total_subs = len(registry.all_subcomponent_keys())
         entries: list[BrokeragePortfolioEntry] = []
         for a in self.list_assessments(principal):
@@ -2624,9 +2625,15 @@ class Repository:
             # C is reported alongside V (ADR-0023): deterministic and document-derived, so it is
             # recomputed here from the locked/current document under the profile's registry view —
             # no immutable run needed, None when C is not yet scoreable.
-            c_registry, _ = profile_scoring_context(profile_key_of(a.document))
+            profile_key = profile_key_of(a.document)
+            c_registry, _ = profile_scoring_context(profile_key)
             c_index = c_index_of(a.document, c_registry)
-            segment = a.document.profile.segment if a.document.profile else None
+            # Segment reads the free-text profile segment first; when it is blank, fall back to the
+            # operating-model NAME (retail is the scoring default) so the column is never a bare "—"
+            # for an assessment that plainly has an operating model (GRS-0163).
+            free_text = a.document.profile.segment if a.document.profile else None
+            profile_def = profiles.get(profile_key)
+            segment = free_text or (profile_def.name if profile_def else None)
             entries.append(
                 BrokeragePortfolioEntry(
                     assessment_id=a.id,
