@@ -658,6 +658,11 @@ class BrokeragePortfolioEntry(BaseModel):
     # appears (portfolio home, engagement view) — production is the unremarkable default (GRS-0117).
     provenance: RecordProvenance = RecordProvenance.PRODUCTION
     v_index: Score | None = None
+    # Customer-Proposition index (ADR-0023 Stage 1) — reported ALONGSIDE V, never folded into it.
+    # Deterministic and document-derived (no Monte Carlo, no immutable run), so it can surface for a
+    # draft too and discriminates far more sharply than V across segments. None when C is not yet
+    # scoreable / the profile has no C dimension.
+    c_index: Score | None = None
     uncertainty_rating: UncertaintyRating | None = None
     # Assessed subcomponents over APPLICABLE ones (Not Applicable excluded) — the coverage notion
     # live panel shows, so a linked assessment's progress reads at a glance (GRS-0116). None when

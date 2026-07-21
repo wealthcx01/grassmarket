@@ -69,6 +69,13 @@ function LastScore({ entry }: { entry: BrokeragePortfolioEntry }) {
   );
 }
 
+function CustomerScore({ entry }: { entry: BrokeragePortfolioEntry }) {
+  if (entry.c_index == null) {
+    return <span style={{ color: "var(--color-ink-faint)" }}>—</span>;
+  }
+  return <strong className="mono">{toDisplay(entry.c_index).toFixed(1)}</strong>;
+}
+
 export default function BrokeragesPage() {
   const router = useRouter();
   const [items, setItems] = useState<BrokeragePortfolioEntry[] | null>(null);
@@ -228,8 +235,14 @@ export default function BrokeragesPage() {
                   <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }} title="Share of applicable subcomponents rated">
                     Completeness
                   </th>
-                  <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }} title="Last finalised Platform Value (0–100)">
-                    Last score
+                  <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }} title="Last finalised Platform Value V (0–100)">
+                    Platform (V)
+                  </th>
+                  <th
+                    style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }}
+                    title="Customer-Proposition index C (0–100) — how good the platform is for a customer. Reported alongside V, not folded into it."
+                  >
+                    Customer (C)
                   </th>
                   <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }}>Status</th>
                   <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }}>Last updated</th>
@@ -257,6 +270,9 @@ export default function BrokeragesPage() {
                     </td>
                     <td style={{ padding: "0.55rem 0.6rem" }}>
                       <LastScore entry={e} />
+                    </td>
+                    <td style={{ padding: "0.55rem 0.6rem" }}>
+                      <CustomerScore entry={e} />
                     </td>
                     <td style={{ padding: "0.55rem 0.6rem" }}>
                       <span

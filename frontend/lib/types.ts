@@ -177,6 +177,9 @@ export interface BrokeragePortfolioEntry {
   state: AssessmentState;
   provenance: RecordProvenance;
   v_index?: number | null;
+  // Customer-Proposition index (ADR-0023 Stage 1) — reported alongside V, not folded in. Deterministic
+  // and document-derived, so it can be present even for a draft; null when C is not yet scoreable.
+  c_index?: number | null;
   uncertainty_rating?: UncertaintyRating | null;
   // Assessed / applicable subcomponents (GRS-0116) — the live-panel coverage notion; null when none.
   coverage?: number | null;
