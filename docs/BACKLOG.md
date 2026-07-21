@@ -7,6 +7,21 @@ ticket's status and appends "What shipped" when its PR lands.
 landed (GRS-0035–0065), plus an estate-reconciliation + guided-consulting track (GRS-0066–). The
 authoritative sequencing narrative is `NEXT-STEPS-2026-07.md` (the binder); this file is just the index.
 
+## Demo-readiness program (GRS-0158–0163, 2026-07-21) — get the studio performant enough to show advisor hires
+
+From the staging deep-dive + brokerage end-to-end run (`reports/product-confidence-staging-2026-07-20.md`,
+`reports/brokerage-e2e-staging-2026-07-21.md`). Target = **demo-ready** (recruit advisors), distinct from
+**production-ready** (real client deliverables — still gated on founder coefficient elicitation).
+
+| Ticket | Title | Phase | Priority |
+|---|---|---|---|
+| GRS-0158 | Academy production seed (empty-Workbench fix) | 1 populate | HIGH |
+| GRS-0159 | Repeatable demo-data seed (Revolut + HL end-to-end) | 1 populate | HIGH |
+| GRS-0161 | Reconcile the two V numbers (portfolio vs deliverable) | 1 legible | HIGH |
+| GRS-0163 | Demo-polish sweep (segment/attribution/error copy/spinner) | 1 legible | MED |
+| GRS-0160 | Assessment wizard density UX pass (the "clunky" fix) | 2 feel | HIGH |
+| GRS-0162 | "What can I sell against this report" (gaps → products) | 3 value | MED-HIGH |
+
 ## Shipped
 
 | Range | Theme |
