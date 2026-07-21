@@ -61,6 +61,15 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
     # Schema is the Alembic migrations (GRS-0006 retired create_all from the app path).
     run_migrations(engine)
 
+    # Publish the authored Academy catalog once the schema is up (GRS-0158). The content lives in
+    # code but is admin-gated and never inserted by a migration, so a fresh Railway DB would show an
+    # empty Workbench. Idempotent; gated to the deployed services via GM_SEED_ACADEMY_ON_BOOT so the
+    # test/CI hot path (many app builds) is untouched.
+    if settings.seed_academy_on_boot:
+        from grassmarket.workbench.content.seed import seed_academy
+
+        seed_academy(session_factory)
+
     app = FastAPI(
         title="Grassmarket — Bruntsfield Advisor Studio",
         version=__version__,
