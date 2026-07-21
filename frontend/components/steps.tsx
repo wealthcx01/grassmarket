@@ -536,25 +536,70 @@ type SubChoice = "" | MaturityLevel | "Not Applicable" | "Not Assessed";
 
 export function InfrastructureDeepDiveStep({ registry, document: d, update, readOnly }: StepProps) {
   const [openGuidance, setOpenGuidance] = useState<string | null>(null);
+  // Collapse each module so the 51-subcomponent page is navigable, not one endless scroll (GRS-0160).
+  // Modules that are already fully rated start collapsed; the rest open. Controlled by state so a
+  // manual toggle is never overridden on the next render.
+  const isRated = (key: string) => doc.findSub(d, key)?.level != null;
+  const [collapsed, setCollapsed] = useState<Set<string>>(
+    () =>
+      new Set(
+        registry.modules
+          .filter((m) => m.subcomponents.length > 0 && m.subcomponents.every((s) => isRated(s.key)))
+          .map((m) => m.key),
+      ),
+  );
+  const toggle = (key: string) =>
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-      <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem", margin: 0 }}>
-        Work each of the {registry.modules.length} modules, front end to liquidity. A ★ marks a critical
-        subcomponent — it gates the module rating (a module can&rsquo;t outrun its critical bottleneck).
-        Each row&rsquo;s Guidance opens the §4 rubric anchor inline. The count by each module is your
-        progress so far.
-      </p>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "1rem", flexWrap: "wrap" }}>
+        <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem", margin: 0, maxWidth: "46rem" }}>
+          Work each of the {registry.modules.length} modules, front end to liquidity. A ★ marks a critical
+          subcomponent — it gates the module rating (a module can&rsquo;t outrun its critical bottleneck).
+          Each row&rsquo;s Guidance opens the §4 rubric anchor inline. Click a module to collapse it.
+        </p>
+        <button
+          type="button"
+          className={smallBtn}
+          style={smallBtnStyle}
+          onClick={() =>
+            setCollapsed((prev) =>
+              prev.size === registry.modules.length ? new Set() : new Set(registry.modules.map((m) => m.key)),
+            )
+          }
+        >
+          {collapsed.size === registry.modules.length ? "Expand all" : "Collapse all"}
+        </button>
+      </div>
       {registry.modules.map((m) => {
         const rated = m.subcomponents.filter((s) => doc.findSub(d, s.key)?.level != null).length;
+        const isOpen = !collapsed.has(m.key);
+        const complete = rated === m.subcomponents.length && m.subcomponents.length > 0;
         return (
-        <div key={m.key}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.75rem", margin: "0 0 0.4rem" }}>
-            <h3 style={{ fontSize: "1rem", margin: 0 }}>{m.name}</h3>
-            <span className="mono" style={{ fontSize: "0.75rem", color: "var(--color-ink-muted)" }}>
-              {rated}/{m.subcomponents.length} rated
+        <div key={m.key} className="card" style={{ padding: "0.5rem 0.85rem" }}>
+          <button
+            type="button"
+            onClick={() => toggle(m.key)}
+            aria-expanded={isOpen}
+            style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.75rem", width: "100%", background: "none", border: "none", cursor: "pointer", padding: "0.3rem 0", textAlign: "left" }}
+          >
+            <h3 style={{ fontSize: "1rem", margin: 0, display: "flex", alignItems: "baseline", gap: "0.5rem" }}>
+              <span aria-hidden="true" style={{ display: "inline-block", width: "0.75rem", color: "var(--color-ink-muted)", fontSize: "0.7rem" }}>
+                {isOpen ? "▾" : "▸"}
+              </span>
+              {m.name}
+            </h3>
+            <span className="mono" style={{ fontSize: "0.75rem", color: complete ? "var(--color-accent)" : "var(--color-ink-muted)" }}>
+              {rated}/{m.subcomponents.length} rated{complete ? " ✓" : ""}
             </span>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+          </button>
+          {isOpen ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem", marginTop: "0.4rem" }}>
             {m.subcomponents.map((s) => {
               const r = doc.findSub(d, s.key);
               const choice: SubChoice = r?.level ?? (r?.state as SubChoice) ?? "";
@@ -626,6 +671,7 @@ export function InfrastructureDeepDiveStep({ registry, document: d, update, read
               );
             })}
           </div>
+          ) : null}
         </div>
         );
       })}
