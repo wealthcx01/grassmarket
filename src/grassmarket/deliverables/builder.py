@@ -49,6 +49,10 @@ class DeliverableContext:
     # Rating Committee calls on this run's high-stakes items (GRS-0021, §8). The approved triad
     # rationale is the text a client sees; every decision + dissent renders into the appendix.
     committee_decisions: tuple[CommitteeDecision, ...] = ()
+    # The deterministic C-index reported alongside V (ADR-0023 Stage 1 / GRS-0164). Present whenever
+    # C is scoreable, even when the coefficients don't fold C into the composite (retail draft),
+    # so the headline shows C the same way the portfolio does — None when C is not scoreable.
+    reported_c: float | None = None
     # Customer-Proposition (C) inputs (ADR-0023 / GRS-0085), all optional — the C sections render
     # ONLY when `result.customer` is present, and omit cleanly (no blanks/zeros) when it is not.
     # `c_peers` are the APPROVED benchmark rows (GRS-0084); `widgets` are the subject's captured
@@ -125,6 +129,13 @@ def _platform_power_section(doc: DocxDocument, context: DeliverableContext) -> N
         ("L (Platform/Infrastructure)", comp.l_index, unc.l_band),
     ):
         doc.add_paragraph(format_index_statement(name, point, band), style="List Bullet")
+    # C sits alongside V/B/P/L — deterministic (no band, ADR-0023 Stage 1); reported, not summed.
+    if context.reported_c is not None:
+        doc.add_paragraph(
+            f"C (Customer Proposition) = {to_display(context.reported_c):.1f} "
+            "(reported alongside V, not folded into it)",
+            style="List Bullet",
+        )
 
     doc.add_paragraph(
         f"Overall assessment uncertainty: {unc.overall_uncertainty.value}.",

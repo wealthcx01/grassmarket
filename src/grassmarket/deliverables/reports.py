@@ -63,6 +63,14 @@ def build_executive_summary(
     doc.add_paragraph(
         format_index_statement("Platform value V", result.composite.v_index, unc.v_band)
     )
+    # C is reported ALONGSIDE V, never folded into it (ADR-0023 Stage 1). It reads the customer
+    # proposition — how good the platform is for a customer — and discriminates far more sharply
+    # than V across segments, so it belongs on the headline (GRS-0164 follow-up).
+    if context.reported_c is not None:
+        doc.add_paragraph(
+            f"Customer Proposition C = {to_display(context.reported_c):.1f} "
+            "(reported alongside V, not folded into it)."
+        )
     doc.add_paragraph(f"Overall assessment uncertainty: {unc.overall_uncertainty.value}.")
 
     doc.add_heading("Platform Power triad", level=1)
