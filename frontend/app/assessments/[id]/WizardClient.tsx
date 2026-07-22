@@ -16,6 +16,7 @@ import { ConsumingEngagements } from "@/components/ConsumingEngagements";
 import { ProvenanceBadge } from "@/components/ProvenanceBadge";
 import { WIZARD_STEPS, type StepProps } from "@/components/steps";
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { SellOpportunitiesPanel } from "@/components/SellOpportunitiesPanel";
 import { WizardSuggestionsPanel } from "@/components/WizardSuggestionsPanel";
 import { ApiError, api, clearToken, getToken } from "@/lib/api";
 import { setSub, subAssessed } from "@/lib/doc";
@@ -361,7 +362,11 @@ export function WizardClient({ id }: { id: string }) {
               onAccept={acceptSuggestion}
               onDismiss={dismissSuggestion}
             />
-          ) : null}
+          ) : (
+            // Finalised: the score is locked, so the "what do I sell against this report?" join
+            // (GRS-0162) replaces the input suggestions in the rail.
+            <SellOpportunitiesPanel assessmentId={id} />
+          )}
         </div>
       </div>
     </div>

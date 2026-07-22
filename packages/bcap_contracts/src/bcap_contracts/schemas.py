@@ -73,6 +73,7 @@ from bcap_contracts.money import Money
 from bcap_contracts.narratives import AINarrative
 from bcap_contracts.pipeline import PipelineBoard, PipelineForecast, StageHistoryEntry
 from bcap_contracts.predictions import BenchmarkRow, CBenchmarkRow, Prediction
+from bcap_contracts.product_fit import ProductFitMap, SellOpportunities, SellOpportunity
 from bcap_contracts.provenance import WeightProvenanceRecord
 from bcap_contracts.registry import Registry
 from bcap_contracts.rubric import RubricAnchor
@@ -113,6 +114,9 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "EarningsSummary": EarningsSummary,
     "EarningsTimeline": EarningsTimeline,
     "ProductCommissionCarrot": ProductCommissionCarrot,
+    "ProductFitMap": ProductFitMap,
+    "SellOpportunity": SellOpportunity,
+    "SellOpportunities": SellOpportunities,
     "MeetingTranscript": MeetingTranscript,
     "Extraction": Extraction,
     "FieldProvenance": FieldProvenance,

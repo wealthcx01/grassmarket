@@ -23,6 +23,7 @@ from bcap_contracts.assessments import (
     SubcomponentRating,
 )
 from bcap_contracts.common import AssessorLevel
+from bcap_contracts.product_fit import SellOpportunities
 from bcap_contracts.registry import Registry, UnknownKeyError, load_registry
 from bcap_contracts.value import ScenarioComparison
 from bcap_contracts.wizard import WizardSuggestions
@@ -248,6 +249,31 @@ def get_live_score(
         active_uncertainty_model(profile_key_of(assessment.document)),
         random.Random(_LIVE_SEED),
     )
+
+
+@router.get("/{assessment_id}/sell-opportunities", response_model=SellOpportunities)
+def get_sell_opportunities(
+    assessment_id: UUID,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> SellOpportunities:
+    """The deterministic "what can I sell against this report?" join (GRS-0162, ADR-0039):
+    products whose authored fit addresses this assessment's assessed-and-weak targets, deepest gap
+    first, with the live commission carrot alongside (never in the ordering). Owner-scoped;
+    refused until finalised — the sales case quotes a locked score, not a moving draft.
+    Advisor-facing only: never rendered into a client deliverable."""
+    from grassmarket.earnings.opportunities import sell_opportunities
+
+    try:
+        assessment = repo.get_assessment(principal, assessment_id)
+    except (NotFoundError, ScopeViolationError) as exc:
+        raise _not_found(exc) from exc
+    if assessment.state.value != "finalised":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Sell opportunities read a locked score — finalise the assessment first.",
+        )
+    return sell_opportunities(assessment)
 
 
 @router.get("/{assessment_id}/suggestions", response_model=WizardSuggestions)
