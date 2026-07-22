@@ -47,7 +47,7 @@ export function NarrativeReview({
         .listNarratives(deliverableId, signal)
         .then(setItems)
         .catch((err: unknown) => {
-          if (err instanceof ApiError && err.status === 0) return;
+          if (err instanceof ApiError && err.status === 0 && err.aborted) return;
           setLoadError(err instanceof ApiError ? err.message : "Could not load AI narratives.");
         }),
     [deliverableId],

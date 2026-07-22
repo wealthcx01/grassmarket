@@ -46,7 +46,7 @@ export default function CourseEditorPage() {
           setVersions(vers);
         })
         .catch((err: unknown) => {
-          if (err instanceof ApiError && err.status === 0) return;
+          if (err instanceof ApiError && err.status === 0 && err.aborted) return;
           if (err instanceof ApiError && err.status === 401) return router.replace("/login");
           if (err instanceof ApiError && err.status === 403)
             return setError("Course authoring is admin-only.");

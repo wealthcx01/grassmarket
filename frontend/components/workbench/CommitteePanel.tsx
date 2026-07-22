@@ -23,7 +23,7 @@ export function CommitteePanel() {
       .committeeReviewQueue(ctrl.signal)
       .then(setQueue)
       .catch((err: unknown) => {
-        if (err instanceof ApiError && err.status === 0) return;
+        if (err instanceof ApiError && err.status === 0 && err.aborted) return;
         setError(err instanceof ApiError ? err.message : "Could not load the committee queue.");
       });
     return () => ctrl.abort();

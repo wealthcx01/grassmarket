@@ -108,7 +108,7 @@ export function DeliverablesPanel({
         );
         setNarr(Object.fromEntries(summaries));
       } catch (err) {
-        if (err instanceof ApiError && err.status === 0) return; // backend unreachable
+        if (err instanceof ApiError && err.status === 0 && err.aborted) return; // aborted / superseded
         setLoadError(err instanceof ApiError ? err.message : "Could not load deliverables.");
       }
     },

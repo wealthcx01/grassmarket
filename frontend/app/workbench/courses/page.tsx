@@ -33,7 +33,7 @@ export default function CoursesPage() {
       .listCourses(ctrl.signal)
       .then(setCourses)
       .catch((err: unknown) => {
-        if (err instanceof ApiError && err.status === 0) return;
+        if (err instanceof ApiError && err.status === 0 && err.aborted) return;
         if (err instanceof ApiError && err.status === 401) return router.replace("/login");
         if (err instanceof ApiError && err.status === 403) {
           setError("Course authoring is admin-only.");

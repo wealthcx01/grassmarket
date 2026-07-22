@@ -70,13 +70,9 @@ export default function PipelinePage() {
             router.replace("/login");
             return;
           }
-          setLoadError(
-            err instanceof ApiError && err.status === 0
-              ? "Couldn't reach the server. Check your connection and try again."
-              : err instanceof ApiError
-                ? err.message
-                : "Could not load the pipeline.",
-          );
+          // A status-0 ApiError now carries the generic "can't reach the studio" copy itself
+          // (GRS-0163) — no per-page network wording to drift.
+          setLoadError(err instanceof ApiError ? err.message : "Could not load the pipeline.");
         })
         .finally(() => {
           if (!signal?.aborted) setLoading(false);

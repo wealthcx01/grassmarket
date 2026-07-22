@@ -106,10 +106,9 @@ def assert_uncertainty_client_usable(model: UncertaintyModel, *, client_facing: 
         return
     if not model.client_usable:
         raise UncertaintyNotClientUsableError(
-            f"Refusing to generate a client-facing deliverable: uncertainty model "
-            f"'{model.version}' is not client-usable (client_usable=False). A client pack's ranges "
-            f"must be drawn from elicited widths; draft models may emit '{DRAFT_WATERMARK}' "
-            f"internal documents only."
+            "This assessment's uncertainty ranges are still provisional (drawn from draft "
+            "placeholder widths, pending expert elicitation), so a client-facing deliverable can't "
+            "be produced yet. Generate the internal, watermarked draft instead."
         )
 
 
@@ -123,10 +122,9 @@ def resolve_mode(coefficients: CoefficientSet, *, client_facing: bool) -> Delive
     if client_facing:
         if not coefficients.client_usable:
             raise ClientUsabilityError(
-                f"Refusing to generate a client-facing deliverable from coefficient set "
-                f"'{coefficients.version}' (client_usable=False). Only a client-usable "
-                f"(elicited/ratified) set may price a client pack; draft sets may emit "
-                f"'{DRAFT_WATERMARK}' internal documents only."
+                "This assessment's scores are still in draft (weights pending expert elicitation), "
+                "so a client-facing deliverable can't be produced yet. Generate the internal, "
+                "watermarked draft instead."
             )
         return DeliverableMode.CLIENT
     return DeliverableMode.DRAFT_INTERNAL

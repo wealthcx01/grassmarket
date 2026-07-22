@@ -182,7 +182,7 @@ export default function AcademyReaderPage() {
           setCompleted(new Set(comps.map((c) => c.lesson_id)));
         })
         .catch((err: unknown) => {
-          if (err instanceof ApiError && err.status === 0) return;
+          if (err instanceof ApiError && err.status === 0 && err.aborted) return;
           if (err instanceof ApiError && err.status === 401) {
             clearToken();
             router.replace("/login");

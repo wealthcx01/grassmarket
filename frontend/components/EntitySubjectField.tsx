@@ -55,7 +55,7 @@ export function EntitySubjectField({
           setOpen(r.length > 0);
         })
         .catch((err: unknown) => {
-          if (err instanceof ApiError && err.status === 0) return;
+          if (err instanceof ApiError && err.status === 0 && err.aborted) return;
           setResults([]);
         });
     }, 220);

@@ -38,7 +38,7 @@ export function LinkAssessmentControl({
           setLoadError(null);
         })
         .catch((err: unknown) => {
-          if (err instanceof ApiError && err.status === 0) return; // aborted
+          if (err instanceof ApiError && err.status === 0 && err.aborted) return; // aborted
           // Surface the failure instead of silently rendering nothing (which looked identical to
           // "you have no finalisable assessments"). Keeps the advisor from thinking it's empty.
           setLoadError(err instanceof ApiError ? err.message : "Could not load your assessments.");

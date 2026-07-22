@@ -62,7 +62,7 @@ export default function CoRaterModulePage() {
           }),
         );
       } catch (err) {
-        if (err instanceof ApiError && err.status === 0) return;
+        if (err instanceof ApiError && err.status === 0 && err.aborted) return;
         if (err instanceof ApiError && err.status === 401) {
           router.replace("/login");
           return;

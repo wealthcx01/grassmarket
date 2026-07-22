@@ -1,6 +1,6 @@
 # GRS-0160 — Assessment wizard density UX pass (the core "clunky" fix)
 
-**Status:** Planned (2026-07-21). From the founder's "clunky, hard to use" feedback + the staging audit.
+**Status:** Done (2026-07-21). Infrastructure step now collapsible; live rail was already sticky. From the founder's "clunky, hard to use" feedback + the staging audit.
 **Priority:** HIGH — the headline UX debt. **Loop:** demo-readiness. Frontend-led.
 
 ## Why

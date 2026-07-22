@@ -23,7 +23,7 @@ export function ArenaPanel() {
       setScenarios(sces);
       setHistory(sessions);
     } catch (err) {
-      if (err instanceof ApiError && err.status === 0) return;
+      if (err instanceof ApiError && err.status === 0 && err.aborted) return;
       setError(err instanceof ApiError ? err.message : "Could not load the arena.");
     }
   }, []);

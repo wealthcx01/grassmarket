@@ -88,7 +88,7 @@ export function LearningDrillsPanel() {
         ),
       );
     } catch (err) {
-      if (err instanceof ApiError && err.status === 0) return;
+      if (err instanceof ApiError && err.status === 0 && err.aborted) return;
       setNotice({ kind: "error", text: err instanceof ApiError ? err.message : "Could not load." });
     }
   }, []);

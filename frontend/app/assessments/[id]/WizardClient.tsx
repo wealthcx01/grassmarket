@@ -108,7 +108,7 @@ export function WizardClient({ id }: { id: string }) {
         }
       })
       .catch((err: unknown) => {
-        if (err instanceof ApiError && err.status === 0) return;
+        if (err instanceof ApiError && err.status === 0 && err.aborted) return;
         if (handleAuth(err)) return;
         // 404 (no such assessment) or 422 (malformed id in the URL) → not a real record; bounce to
         // the portfolio rather than leak a raw "Request failed (422)" (GRS-0143).
@@ -132,7 +132,7 @@ export function WizardClient({ id }: { id: string }) {
         if (mounted.current) setRegistry(reg);
       })
       .catch((err: unknown) => {
-        if (err instanceof ApiError && err.status === 0) return;
+        if (err instanceof ApiError && err.status === 0 && err.aborted) return;
         if (handleAuth(err)) return;
         setLoadError(err instanceof ApiError ? err.message : "Could not load the registry.");
       });
@@ -152,7 +152,7 @@ export function WizardClient({ id }: { id: string }) {
         setLive(s);
       })
       .catch((err: unknown) => {
-        if (err instanceof ApiError && err.status === 0) return; // aborted / superseded
+        if (err instanceof ApiError && err.status === 0 && err.aborted) return; // aborted / superseded
         if (handleAuth(err)) return;
         setLiveError(err instanceof ApiError ? err.message : "Live score failed.");
       })
@@ -190,7 +190,7 @@ export function WizardClient({ id }: { id: string }) {
           refreshSuggestions();
         })
         .catch((err: unknown) => {
-          if (err instanceof ApiError && err.status === 0) return; // aborted / superseded
+          if (err instanceof ApiError && err.status === 0 && err.aborted) return; // aborted / superseded
           if (handleAuth(err)) return;
           if (err instanceof ApiError && err.status === 409) {
             // Finalised elsewhere — reload to reflect the lock.

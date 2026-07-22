@@ -73,6 +73,13 @@ import type {
 export const API_BASE_URL: string =
   process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, "") ?? "http://localhost:8000";
 
+/**
+ * User-facing copy for a transport failure (backend unreachable, CORS, DNS). Deliberately generic —
+ * it never leaks the internal API host:port into the UI (GRS-0163). A caught `ApiError` with
+ * `status === 0` is the signal to render a "can't reach — retry" state rather than a dead spinner.
+ */
+export const NETWORK_ERROR_MESSAGE = "Can't reach the studio. Check your connection and try again.";
+
 /** Where the access + refresh tokens live (GRS-0120). The access token is short-lived; the refresh
  *  token rotates it silently so an active advisor is not signed out at the 30-min TTL. */
 export const TOKEN_KEY = "bas.access_token";
@@ -160,13 +167,28 @@ export interface LoginResponse {
 export class ApiError extends Error {
   readonly status: number;
   readonly body: unknown;
+  /**
+   * True when this status-0 error is an intentional fetch abort (navigation / a superseded request),
+   * NOT a real transport failure. Callers swallow aborts but must SURFACE a genuine unreachable
+   * backend — otherwise a page that renders "Loading…" while its data is null sits there forever
+   * (GRS-0163). `status === 0 && !aborted` is the "can't reach the studio" signal.
+   */
+  readonly aborted: boolean;
 
-  constructor(status: number, message: string, body: unknown) {
+  constructor(status: number, message: string, body: unknown, aborted = false) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.body = body;
+    this.aborted = aborted;
   }
+}
+
+/** Was this thrown cause an AbortController abort (navigation / superseded fetch)? Checked by
+ *  `name`, not `instanceof` alone — DOMException does not reliably extend Error across browsers,
+ *  and a false negative here would flash phantom "can't reach" errors on every navigation. */
+function isAbort(cause: unknown): boolean {
+  return (cause instanceof DOMException || cause instanceof Error) && cause.name === "AbortError";
 }
 
 async function parseBody(res: Response): Promise<unknown> {
@@ -208,7 +230,7 @@ async function request<T>(path: string, init?: RequestInit, retried = false): Pr
     });
   } catch (cause) {
     // Network failure (backend not running, CORS, DNS). Surface it, don't swallow.
-    throw new ApiError(0, `Cannot reach API at ${API_BASE_URL}`, cause);
+    throw new ApiError(0, NETWORK_ERROR_MESSAGE, cause, isAbort(cause));
   }
 
   // Expiry-aware retry (GRS-0120): a 401 on an authed call means the access token likely lapsed —
@@ -758,7 +780,7 @@ export const api = {
     try {
       res = await fetch(url, { method: "GET", headers: authHeaders(), signal: opts?.signal });
     } catch (cause) {
-      throw new ApiError(0, `Cannot reach API at ${API_BASE_URL}`, cause);
+      throw new ApiError(0, NETWORK_ERROR_MESSAGE, cause, isAbort(cause));
     }
     if (!res.ok) {
       const body = await parseBody(res);
@@ -786,7 +808,7 @@ export const api = {
     try {
       res = await fetch(url, { method: "GET", headers: authHeaders(), signal: opts?.signal });
     } catch (cause) {
-      throw new ApiError(0, `Cannot reach API at ${API_BASE_URL}`, cause);
+      throw new ApiError(0, NETWORK_ERROR_MESSAGE, cause, isAbort(cause));
     }
     if (!res.ok) {
       const body = await parseBody(res);
@@ -1137,7 +1159,7 @@ export const api = {
     try {
       res = await fetch(url, { method: "GET", headers: authHeaders(), signal });
     } catch (cause) {
-      throw new ApiError(0, `Cannot reach API at ${API_BASE_URL}`, cause);
+      throw new ApiError(0, NETWORK_ERROR_MESSAGE, cause, isAbort(cause));
     }
     if (!res.ok) {
       const body = await parseBody(res);
