@@ -74,7 +74,7 @@ export default function EngagementDetailPage() {
         .getEngagement(id, signal)
         .then(setEngagement)
         .catch((err: unknown) => {
-          if (err instanceof ApiError && err.status === 0) return;
+          if (err instanceof ApiError && err.status === 0 && err.aborted) return;
           if (err instanceof ApiError && err.status === 401) {
             clearToken();
             return router.replace("/login");

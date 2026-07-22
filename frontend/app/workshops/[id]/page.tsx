@@ -32,7 +32,7 @@ export default function WorkshopDetailPage() {
           setFee(fees.find((f) => f.workshop_id === id) ?? null);
         })
         .catch((err: unknown) => {
-          if (err instanceof ApiError && err.status === 0) return;
+          if (err instanceof ApiError && err.status === 0 && err.aborted) return;
           // 404/422 (missing or malformed id) → not a real record; bounce to the pipeline rather than
           // leak a raw "Request failed (422)" (GRS-0143b).
           if (err instanceof ApiError && (err.status === 404 || err.status === 422))

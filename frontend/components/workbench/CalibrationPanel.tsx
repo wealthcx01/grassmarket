@@ -29,7 +29,7 @@ export function CalibrationPanel() {
       .calibrationSessions(ctrl.signal)
       .then(setSessions)
       .catch((err: unknown) => {
-        if (err instanceof ApiError && err.status === 0) return;
+        if (err instanceof ApiError && err.status === 0 && err.aborted) return;
         setError(err instanceof ApiError ? err.message : "Could not load calibration sessions.");
       });
     return () => ctrl.abort();
@@ -104,7 +104,7 @@ function CalibrationSessionView({ session, onBack }: { session: CalibrationSessi
         try {
           setResult(await api.calibrationResult(session.id, signal));
         } catch (err) {
-          if (!(err instanceof ApiError && err.status === 0)) setResult(null);
+          if (!(err instanceof ApiError && err.status === 0 && err.aborted)) setResult(null);
         }
       }
     },

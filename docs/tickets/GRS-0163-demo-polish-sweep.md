@@ -1,6 +1,8 @@
 # GRS-0163 — Demo-polish sweep (legibility gaps found in the end-to-end run)
 
-**Status:** Planned (2026-07-21). Small trust/legibility fixes from the staging deep-dive + brokerage run.
+**Status:** Done (2026-07-22). Items 1–2 in PR #188; item 3 promoted to GRS-0164 (#184/#187); items 4–5
+(generic network copy, no host:port leak; abort-vs-failure distinction so dead spinners surface a real
+error) in the follow-up PR. Small trust/legibility fixes from the staging deep-dive + brokerage run.
 **Priority:** MED. **Loop:** demo-readiness. Mostly frontend.
 
 ## Items

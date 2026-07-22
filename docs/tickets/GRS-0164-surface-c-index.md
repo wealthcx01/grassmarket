@@ -1,6 +1,6 @@
 # GRS-0164 — Surface the Customer-Proposition index (C) alongside V
 
-**Status:** In progress (2026-07-21). Founder-directed ("surface C first"). Promotes GRS-0163 item 3.
+**Status:** Done (2026-07-21). Merged PR #184, deployed to staging (V+C columns live). Founder-directed ("surface C first"). Promotes GRS-0163 item 3.
 **Priority:** HIGH — highest-leverage demo fix. **Loop:** demo-readiness.
 
 ## Why

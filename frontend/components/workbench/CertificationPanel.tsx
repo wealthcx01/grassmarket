@@ -53,7 +53,7 @@ export function CertificationPanel({ advisorId }: { advisorId: string }) {
         setEvents(evs);
         setCourseCerts(certs);
       } catch (err) {
-        if (err instanceof ApiError && err.status === 0) return;
+        if (err instanceof ApiError && err.status === 0 && err.aborted) return;
         setError(err instanceof ApiError ? err.message : "Could not load certification.");
       }
     },

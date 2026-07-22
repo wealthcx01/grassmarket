@@ -49,7 +49,7 @@ export default function ProspectDetailPage() {
           setHistory(hist);
         })
         .catch((err: unknown) => {
-          if (err instanceof ApiError && err.status === 0) return;
+          if (err instanceof ApiError && err.status === 0 && err.aborted) return;
           // 404 (no such prospect) or 422 (malformed id in the URL) both mean "not a real record" —
           // bounce back to the pipeline rather than leak a raw "Request failed (422)" (GRS-0143).
           if (err instanceof ApiError && (err.status === 404 || err.status === 422))

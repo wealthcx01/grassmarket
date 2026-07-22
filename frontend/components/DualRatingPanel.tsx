@@ -43,7 +43,7 @@ export function DualRatingPanel({
           if (mounted.current) setAssessment(a);
         })
         .catch((err: unknown) => {
-          if (err instanceof ApiError && err.status === 0) return;
+          if (err instanceof ApiError && err.status === 0 && err.aborted) return;
           setLoadError(err instanceof ApiError ? err.message : "Could not load the assessment.");
         }),
     [assessmentId],

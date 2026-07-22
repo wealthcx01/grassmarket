@@ -27,7 +27,7 @@ export default function EngagementsPage() {
       .listEngagements(ctrl.signal)
       .then(setItems)
       .catch((err: unknown) => {
-        if (err instanceof ApiError && err.status === 0) return;
+        if (err instanceof ApiError && err.status === 0 && err.aborted) return;
         if (err instanceof ApiError && err.status === 401) return router.replace("/login");
         setError(err instanceof ApiError ? err.message : "Could not load engagements.");
       });
