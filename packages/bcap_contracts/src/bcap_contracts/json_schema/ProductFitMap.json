@@ -1,0 +1,66 @@
+{
+  "$defs": {
+    "ProductFit": {
+      "additionalProperties": false,
+      "description": "One product's authored fit: the registry targets it addresses + the one-line pitch.",
+      "properties": {
+        "c_modules": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "C Modules",
+          "type": "array"
+        },
+        "modules": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Modules",
+          "type": "array"
+        },
+        "pitch": {
+          "minLength": 1,
+          "title": "Pitch",
+          "type": "string"
+        },
+        "powers": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Powers",
+          "type": "array"
+        }
+      },
+      "required": [
+        "pitch"
+      ],
+      "title": "ProductFit",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The whole map, keyed by product_id. Structural validation here; cross-registry /\ncross-catalogue validation happens in `load_product_fit` (where both are loadable).",
+  "properties": {
+    "products": {
+      "additionalProperties": {
+        "$ref": "#/$defs/ProductFit"
+      },
+      "title": "Products",
+      "type": "object"
+    },
+    "version": {
+      "minLength": 1,
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "version",
+    "products"
+  ],
+  "title": "ProductFitMap",
+  "type": "object"
+}

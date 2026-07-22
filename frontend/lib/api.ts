@@ -66,6 +66,7 @@ import type {
   RegistryProfile,
   RubricAnchor,
   ScenarioComparison,
+  SellOpportunities,
   StageHistoryEntry,
   Workshop,
 } from "@/lib/types";
@@ -379,6 +380,16 @@ export const api = {
   // AI-assisted wizard input suggestions (GRS-0101, ADR-0032).
   wizardSuggestions(id: string, signal?: AbortSignal): Promise<WizardSuggestions> {
     return request<WizardSuggestions>(`/assessments/${id}/suggestions`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  // "What can I sell against this report?" — the deterministic gap→product join (GRS-0162,
+  // ADR-0039). Finalised assessments only (409 otherwise); advisor-facing, never client-facing.
+  sellOpportunities(id: string, signal?: AbortSignal): Promise<SellOpportunities> {
+    return request<SellOpportunities>(`/assessments/${id}/sell-opportunities`, {
       method: "GET",
       headers: authHeaders(),
       signal,

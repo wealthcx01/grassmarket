@@ -19,6 +19,7 @@ import {
 } from "@/lib/types";
 import { DeliverablesPanel } from "@/components/DeliverablesPanel";
 import { LinkAssessmentControl } from "@/components/LinkAssessmentControl";
+import { SellOpportunitiesPanel } from "@/components/SellOpportunitiesPanel";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ProvenanceBadge } from "@/components/ProvenanceBadge";
 
@@ -164,6 +165,14 @@ export default function EngagementDetailPage() {
           portfolio.find((p) => p.assessment_id === engagement.assessment_ids[0])?.provenance
         }
       />
+
+      {/* "What do I sell against this report?" (GRS-0162) — one panel per finalised linked
+          assessment. Draft assessments have no locked score, so nothing renders for them. */}
+      {engagement.assessment_ids
+        .filter((aid) => portfolio.find((p) => p.assessment_id === aid)?.state === "finalised")
+        .map((aid) => (
+          <SellOpportunitiesPanel key={aid} assessmentId={aid} />
+        ))}
 
       <CommsLog engagement={engagement} onAdded={reload} />
     </div>

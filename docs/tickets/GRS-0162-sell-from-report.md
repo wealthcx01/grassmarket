@@ -1,7 +1,11 @@
 # GRS-0162 — "What can I sell against this report" — assessment gaps → recommended products
 
-**Status:** Planned (2026-07-21). Founder-requested ("look at the Workbench and know what can be sold
-based on the report"). **Priority:** MED-HIGH — compelling demo feature + revenue narrative.
+**Status:** Done (2026-07-22, ADR-0039). `product_fit.yaml` (per-product modules/c_modules/powers +
+pitch, fail-loud loader), `earnings/opportunities.py` deterministic join (gap = assessed-and-weak by
+the report's own gate band; Not Assessed never a gap; ranked by min q_m — commission displayed, never
+ordered on), `GET /assessments/{id}/sell-opportunities` (owner-scoped, finalised-only), panel on the
+finalised wizard rail + engagement detail. Founder-requested ("look at the Workbench and know what can
+be sold based on the report"). **Priority:** MED-HIGH — compelling demo feature + revenue narrative.
 
 ## Why
 

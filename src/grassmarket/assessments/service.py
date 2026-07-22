@@ -208,11 +208,11 @@ def c_scoreable(document: AssessmentDocument, registry: Registry) -> bool:
     return any(r.level is not None and r.subcomponent_key in core for r in document.c_subcomponents)
 
 
-def c_index_of(document: AssessmentDocument, registry: Registry) -> float | None:
-    """The deterministic C-index for the current document, reported alongside V (ADR-0023 Stage 1),
-    or None when C is not yet scoreable / the registry has no C dimension. C is deterministic in
-    Stage 1 (no Monte Carlo band) and scored INDEPENDENTLY of B/P/L — no powers/metrics required —
-    so it can surface before the rest of the assessment. Routes through the C activation seam."""
+def c_result_of(document: AssessmentDocument, registry: Registry):
+    """The full deterministic C result (per-C-module q_m + gate bands, ADR-0023 Stage 1) for the
+    current document, or None when C is not yet scoreable / the registry has no C dimension.
+    Routes through the C activation seam; the source `c_index_of` reads its headline from — and
+    the per-module detail report-driven surfaces need (GRS-0162)."""
     from grassmarket.atlas import score_customer
     from grassmarket.atlas.active import active_c_coefficient_set
 
@@ -222,7 +222,25 @@ def c_index_of(document: AssessmentDocument, registry: Registry) -> float | None
     if c_coefficients is None:
         return None
     c_subs = complete_c_subcomponents(document, registry)
-    return score_customer(c_subs, c_coefficients, registry).value
+    return score_customer(c_subs, c_coefficients, registry)
+
+
+def c_index_of(document: AssessmentDocument, registry: Registry) -> float | None:
+    """The deterministic C-index for the current document, reported alongside V (ADR-0023 Stage 1),
+    or None when C is not yet scoreable / the registry has no C dimension. C is deterministic in
+    Stage 1 (no Monte Carlo band) and scored INDEPENDENTLY of B/P/L — no powers/metrics required —
+    so it can surface before the rest of the assessment. Routes through the C activation seam."""
+    result = c_result_of(document, registry)
+    return result.value if result is not None else None
+
+
+def deterministic_result(
+    document: AssessmentDocument, coefficients: CoefficientSet, registry: Registry
+) -> AtlasResult:
+    """The deterministic engine result alone (no Monte Carlo) for a scoreable document — the
+    per-module q_m + gate bands report-driven surfaces read (GRS-0162). Caller checks
+    `scoreability_blockers` first, exactly as with `compute_score`."""
+    return score(_complete_inputs(document, registry), coefficients, registry)
 
 
 def _to_metric_obs(m: MetricEntry) -> MetricObservation:

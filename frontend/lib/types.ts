@@ -477,6 +477,43 @@ export interface ProductCommissionCarrot {
   schedule_version: string;
 }
 
+// --- Sell-from-report (GRS-0162, ADR-0039) — mirrors bcap_contracts.product_fit ---
+
+export type GapKind = "module" | "c_module" | "power";
+
+// One assessed-and-weak target a product addresses. Module gaps carry q_m + the report's gate
+// band; power gaps carry the benefit/barrier strengths. Not Assessed never appears here (D9).
+export interface OpportunityGap {
+  kind: GapKind;
+  key: string;
+  name: string;
+  q_m?: number | null;
+  gate_band?: MaturityLevel | null;
+  benefit?: StrengthRating | null;
+  barrier?: StrengthRating | null;
+}
+
+// One recommended product: the gaps it addresses in THIS assessment (evidence first) with the
+// live carrot displayed alongside — the carrot never enters the ordering (ADR-0002).
+export interface SellOpportunity {
+  product_id: string;
+  name: string;
+  pitch: string;
+  gaps: OpportunityGap[];
+  not_yet_assessed: string[];
+  carrot: ProductCommissionCarrot;
+}
+
+// Advisor-facing only — never rendered into a client deliverable (ADR-0039).
+export interface SellOpportunities {
+  assessment_id: string;
+  subject: string;
+  opportunities: SellOpportunity[];
+  fit_version: string;
+  coefficient_version: string;
+  schedule_version: string;
+}
+
 export type WorkshopState = "scheduled" | "delivered";
 
 export interface Workshop {
