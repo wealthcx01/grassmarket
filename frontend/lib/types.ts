@@ -177,6 +177,11 @@ export interface BrokeragePortfolioEntry {
   state: AssessmentState;
   provenance: RecordProvenance;
   v_index?: number | null;
+  // The finalised run's stored P10/P90 band (GRS-0166) — so every surface quoting the locked score
+  // (portfolio, deliverable, finalised wizard rail) shows the SAME v_index + band, never a fresh
+  // Monte-Carlo recompute. Null until finalised, like v_index.
+  v_p10?: number | null;
+  v_p90?: number | null;
   // Customer-Proposition index (ADR-0023 Stage 1) — reported alongside V, not folded in. Deterministic
   // and document-derived, so it can be present even for a draft; null when C is not yet scoreable.
   c_index?: number | null;

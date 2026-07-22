@@ -18,6 +18,7 @@ import * as doc from "@/lib/doc";
 import { POWER_GUIDANCE } from "@/lib/powerGuidance";
 import type {
   AssessmentDocument,
+  BrokeragePortfolioEntry,
   EvidenceGrade,
   LiveScore,
   MaturityLevel,
@@ -58,6 +59,10 @@ export interface StepProps {
   // Whether the assessment's operating-model profile scores on a client-usable set (GRS-0156) —
   // gates the "indicative, not client-usable" caveat on the score views.
   clientUsable: boolean;
+  // The finalised portfolio row (GRS-0166): the immutable run's v_index + stored band, so the
+  // Summary panel headlines the SAME locked score the portfolio and deliverable quote. Null while
+  // draft/in-progress (the live view applies).
+  finalEntry?: BrokeragePortfolioEntry | null;
 }
 
 // Controls inherit the global form styling (border, radius, focus ring, select chevron);
@@ -1005,9 +1010,22 @@ export function CustomerPropositionStep({ registry, document: d, update, readOnl
 /** The interpretation (GRS-0110): read the RANGE not the point, name the bottleneck, remind that
  *  words rate / numbers rank, and point at the value bridge — computed from the live diagnostics the
  *  engine already produces, never recomputed. */
-function Interpretation({ live, moduleLabels }: { live: LiveScore; moduleLabels: Record<string, string> }) {
+function Interpretation({
+  live,
+  moduleLabels,
+  final,
+}: {
+  live: LiveScore;
+  moduleLabels: Record<string, string>;
+  final?: BrokeragePortfolioEntry | null;
+}) {
   if (!live.scoreable || !live.v) return null;
   const pct = (x: number) => Math.round(x * 100);
+  // Finalised: quote the LOCKED score + its stored band (GRS-0166), never the live median — the
+  // prose must agree with the headline right above it (and the portfolio/deliverable).
+  const vPoint = final?.v_index ?? live.v.p50;
+  const vLow = final?.v_index != null && final.v_p10 != null ? Math.min(final.v_p10, final.v_index) : live.v.p10;
+  const vHigh = final?.v_index != null && final.v_p90 != null ? Math.max(final.v_p90, final.v_index) : live.v.p90;
   const modules = Object.entries(live.module_qm);
   const bottleneck = modules.length
     ? modules.reduce((min, cur) => (cur[1].p50 < min[1].p50 ? cur : min))
@@ -1023,8 +1041,8 @@ function Interpretation({ live, moduleLabels }: { live: LiveScore; moduleLabels:
       <ul style={{ margin: 0, paddingLeft: "1.15rem", fontSize: "0.86rem", lineHeight: 1.6, color: "var(--color-ink-muted)" }}>
         <li>
           <strong>Read the range, not the point.</strong> Platform Value sits at{" "}
-          <strong style={{ color: "var(--color-ink)" }}>{pct(live.v.p50)}</strong>, but the honest
-          answer is the <strong style={{ color: "var(--color-ink)" }}>{pct(live.v.p10)}–{pct(live.v.p90)}</strong>{" "}
+          <strong style={{ color: "var(--color-ink)" }}>{pct(vPoint)}</strong>, but the honest
+          answer is the <strong style={{ color: "var(--color-ink)" }}>{pct(vLow)}–{pct(vHigh)}</strong>{" "}
           range (overall uncertainty {live.overall_uncertainty}). Quote the range; the point alone loses a technical audience.
         </li>
         {bottleneck ? (
@@ -1121,11 +1139,12 @@ export function SummaryStep(props: StepProps) {
         moduleLabels={moduleLabels}
         profileKey={props.document?.profile?.operating_model ?? "retail"}
         clientUsable={props.clientUsable}
+        final={props.finalEntry}
       />
       {/* A finalised assessment can preview its real deliverable here — no engagement needed
           (GRS-0154), so the solo/sandbox "see the real deliverable" promise actually pays off. */}
       {readOnly ? <DeliverablePreviewButton assessmentId={props.assessmentId} /> : null}
-      {live ? <Interpretation live={live} moduleLabels={moduleLabels} /> : null}
+      {live ? <Interpretation live={live} moduleLabels={moduleLabels} final={props.finalEntry} /> : null}
       {live?.c != null ? (
         <Card>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "1rem" }}>

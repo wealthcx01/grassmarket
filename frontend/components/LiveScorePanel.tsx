@@ -6,9 +6,10 @@
  */
 
 import { BandDisplay } from "@/components/BandDisplay";
+import { LockedScore } from "@/components/LockedScore";
 import { toDisplay } from "@/lib/band";
 import { humanizeKey, summarizeBlocking } from "@/lib/labels";
-import type { IndexBand, LiveScore } from "@/lib/types";
+import type { BrokeragePortfolioEntry, IndexBand, LiveScore } from "@/lib/types";
 
 export function LiveScorePanel({
   score,
@@ -18,6 +19,7 @@ export function LiveScorePanel({
   moduleLabels,
   profileKey,
   clientUsable,
+  final,
 }: {
   score: LiveScore | null;
   loading: boolean;
@@ -26,6 +28,10 @@ export function LiveScorePanel({
   moduleLabels?: Record<string, string>;
   profileKey?: string;
   clientUsable?: boolean;
+  /** The finalised portfolio row (GRS-0166): when present with a v_index, the headline V is the
+   *  LOCKED score (the number the portfolio and deliverable quote), never a live-MC median. The
+   *  L/B/P and module diagnostics stay live-derived — deterministic on locked inputs. */
+  final?: BrokeragePortfolioEntry | null;
 }) {
   return (
     <aside
@@ -57,7 +63,11 @@ export function LiveScorePanel({
       ) : (
         <div className="stack" style={{ gap: "0.85rem" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem 1rem" }}>
-            <BandDisplay label="V — PLATFORM VALUE" band={score.v} />
+            {final?.v_index != null ? (
+              <LockedScore entry={final} />
+            ) : (
+              <BandDisplay label="V — PLATFORM VALUE" band={score.v} />
+            )}
             <BandDisplay label="L — INFRASTRUCTURE · THE TECHNOLOGY LAYER" band={score.l_index} />
             <BandDisplay label="B — BUSINESS" band={score.b} />
             <BandDisplay label="P — POWER" band={score.p} />

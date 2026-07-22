@@ -133,6 +133,34 @@
       ],
       "default": null,
       "title": "V Index"
+    },
+    "v_p10": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "V P10"
+    },
+    "v_p90": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "V P90"
     }
   },
   "required": [
