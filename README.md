@@ -54,6 +54,15 @@ Frontend:
 cd frontend && npm install && npm run dev    # http://localhost:3000
 ```
 
+Spin up a demo instance (GRS-0159) — populates a clean environment end to end (showcase
+brokerage assessments with V + C scores, pipeline, engagements, real generated deliverables,
+and a non-zero earnings statement; all DEMO-watermarked, idempotent on re-run):
+
+```bash
+uv run python scripts/seed_dev.py    # advisor/admin accounts, Academy catalogue, Meridian chain
+uv run python scripts/seed_demo.py   # the Revolut / Hargreaves Lansdown / WeBull showcase
+```
+
 ## Layout
 
 ```

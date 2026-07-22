@@ -1,6 +1,9 @@
 # GRS-0159 — Repeatable demo-data seed (Revolut + HL end-to-end)
 
-**Status:** Planned (2026-07-21). So a demo instance is never empty when showing advisor hires.
+**Status:** Done (2026-07-22). `grassmarket.demo.brokerage_showcase` + extended `scripts/seed_demo.py`:
+Revolut/HL/WeBull complete DEMO assessments (V+C), engagements, real deliverables, £49,500 statement;
+idempotent; one-command path documented in the README. So a demo instance is never empty when showing
+advisor hires.
 **Priority:** HIGH — demo enabler. **Loop:** demo-readiness.
 
 ## Why
