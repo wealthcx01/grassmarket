@@ -658,6 +658,12 @@ class BrokeragePortfolioEntry(BaseModel):
     # appears (portfolio home, engagement view) — production is the unremarkable default (GRS-0117).
     provenance: RecordProvenance = RecordProvenance.PRODUCTION
     v_index: Score | None = None
+    # The finalised run's stored P10/P90 band (GRS-0166) — so every surface that quotes the locked
+    # score (portfolio, deliverable, the finalised wizard rail) can show the SAME v_index + band,
+    # never a fresh Monte-Carlo recompute that lands on a slightly different number (GRS-0161's
+    # consistency rule). None until finalised, like v_index.
+    v_p10: Score | None = None
+    v_p90: Score | None = None
     # Customer-Proposition index (ADR-0023 Stage 1) — reported ALONGSIDE V, never folded into it.
     # Deterministic and document-derived (no Monte Carlo, no immutable run), so it can surface for a
     # draft too and discriminates far more sharply than V across segments. None when C is not yet

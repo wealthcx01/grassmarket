@@ -44,7 +44,36 @@ def test_portfolio_has_no_score_until_finalised(repo: Repository, alice: SeededC
     entry = repo.list_brokerage_portfolio(alice.principal)[0]
     assert entry.state == "draft"
     assert entry.v_index is None
+    assert entry.v_p10 is None
+    assert entry.v_p90 is None
     assert entry.uncertainty_rating is None
+
+
+def test_finalised_entry_carries_the_stored_band(
+    client: TestClient, alice: SeededConsultant
+) -> None:
+    """GRS-0166: the portfolio row carries the run's stored P10/P90 alongside v_index, so the
+    finalised wizard rail can quote the SAME locked score+band as this row and the deliverable —
+    never a fresh Monte-Carlo recompute."""
+    from grassmarket.demo.brokerage_showcase import REVOLUT, showcase_document
+
+    headers = auth_header(alice)
+    aid = client.post(
+        "/assessments", json={"subject": "Revolut", "provenance": "sandbox"}, headers=headers
+    ).json()["id"]
+    doc = showcase_document(REVOLUT)
+    assert (
+        client.put(
+            f"/assessments/{aid}", json=doc.model_dump(mode="json"), headers=headers
+        ).status_code
+        == 200
+    )
+    assert client.post(f"/assessments/{aid}/finalise", headers=headers).status_code == 200
+
+    entry = client.get("/assessments/portfolio", headers=headers).json()[0]
+    assert entry["v_index"] is not None
+    assert entry["v_p10"] is not None and entry["v_p90"] is not None
+    assert entry["v_p10"] <= entry["v_p90"]  # a band, stored at finalisation, not recomputed
 
 
 def test_portfolio_surfaces_coverage(repo: Repository, alice: SeededConsultant) -> None:

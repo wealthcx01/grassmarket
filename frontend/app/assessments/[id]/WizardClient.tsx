@@ -11,6 +11,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { BandDisplay } from "@/components/BandDisplay";
+import { LockedScore } from "@/components/LockedScore";
 import { ProvisionalScoreBanner } from "@/components/LiveScorePanel";
 import { ConsumingEngagements } from "@/components/ConsumingEngagements";
 import { ProvenanceBadge } from "@/components/ProvenanceBadge";
@@ -25,6 +26,7 @@ import type {
   AssessmentDocument,
   LiveScore,
   Registry,
+  BrokeragePortfolioEntry,
   RegistryProfile,
   WizardSuggestion,
 } from "@/lib/types";
@@ -46,6 +48,10 @@ export function WizardClient({ id }: { id: string }) {
   const [liveError, setLiveError] = useState<string | null>(null);
   const [finalising, setFinalising] = useState(false);
   const [cloningSandbox, setCloningSandbox] = useState(false);
+  // The portfolio row for a FINALISED assessment (GRS-0166): the immutable run's v_index + stored
+  // band, so the rail/summary headline the SAME locked score the portfolio and deliverable quote —
+  // never a fresh Monte-Carlo recompute that lands on a slightly different number.
+  const [finalEntry, setFinalEntry] = useState<BrokeragePortfolioEntry | null>(null);
 
   // Wizard input assistant (GRS-0101/0136): deterministic rule-based suggestions + the ids the advisor has dismissed.
   const [suggestions, setSuggestions] = useState<WizardSuggestion[]>([]);
@@ -119,6 +125,24 @@ export function WizardClient({ id }: { id: string }) {
       });
     return () => ctrl.abort();
   }, [id, router, handleAuth]);
+
+  // A finalised assessment's locked score (GRS-0166): read the portfolio row (v_index + stored
+  // band). Failure is non-fatal — the rail then shows the live view it always showed.
+  useEffect(() => {
+    if (assessment?.state !== "finalised") {
+      setFinalEntry(null);
+      return;
+    }
+    const ctrl = new AbortController();
+    api
+      .brokeragePortfolio(ctrl.signal)
+      .then((entries) => {
+        if (!mounted.current) return;
+        setFinalEntry(entries.find((e) => e.assessment_id === id) ?? null);
+      })
+      .catch(() => {});
+    return () => ctrl.abort();
+  }, [assessment?.state, id]);
 
   // Fetch the registry for the document's operating-model profile (GRS-0079). Re-runs only when the
   // profile KEY changes (a primitive dep) — not on every keystroke — so choosing "Exchange" reshapes
@@ -314,6 +338,7 @@ export function WizardClient({ id }: { id: string }) {
     onPreviewInSandbox: previewInSandbox,
     previewingSandbox: cloningSandbox,
     clientUsable,
+    finalEntry,
   };
 
   return (
@@ -354,7 +379,7 @@ export function WizardClient({ id }: { id: string }) {
           </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <LiveSummary live={live} profileKey={profileKey} clientUsable={clientUsable} />
+          <LiveSummary live={live} profileKey={profileKey} clientUsable={clientUsable} final={finalEntry} />
           {!readOnly ? (
             <WizardSuggestionsPanel
               suggestions={suggestions.filter((s) => !dismissed.has(s.id))}
@@ -416,19 +441,28 @@ export function LiveSummary({
   live,
   profileKey,
   clientUsable,
+  final,
 }: {
   live: LiveScore | null;
   profileKey?: string;
   clientUsable?: boolean;
+  /** The finalised portfolio row (GRS-0166): when present with a v_index, the rail headlines the
+   *  LOCKED score — the same number the portfolio and deliverable quote — never a live median. */
+  final?: BrokeragePortfolioEntry | null;
 }) {
+  const locked = final?.v_index != null ? final : null;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", position: "sticky", top: "1rem" }}>
       {/* The draft-profile caveat travels with the rail V (GRS-0152), gated on client-usability
           (GRS-0156) so an activated segment drops it. */}
-      {live?.scoreable && live.v ? (
+      {(locked || (live?.scoreable && live.v)) ? (
         <ProvisionalScoreBanner profileKey={profileKey} clientUsable={clientUsable} />
       ) : null}
-      {live?.scoreable && live.v ? (
+      {locked ? (
+        <div className="card" style={{ padding: "0.9rem 1rem" }}>
+          <LockedScore entry={locked} />
+        </div>
+      ) : live?.scoreable && live.v ? (
         <div className="card" style={{ padding: "0.9rem 1rem" }}>
           {/* Delegate to BandDisplay so an UNMODELLED band (modelled=false) shows an honest labelled
               point, never a falsely confident p10–p90 range (§7 / ADR-0008). */}

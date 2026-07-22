@@ -2617,10 +2617,16 @@ class Repository:
         entries: list[BrokeragePortfolioEntry] = []
         for a in self.list_assessments(principal):
             v_index = None
+            v_p10 = None
+            v_p90 = None
             uncertainty_rating = None
             if a.scoring_run_id is not None:
                 run = self.get_scoring_run(principal, a.scoring_run_id)  # own + exists
                 v_index = run.v_index
+                # The run's stored band travels with the point (GRS-0166) so the finalised
+                # wizard rail can quote the SAME locked score+band as this row + deliverable.
+                v_p10 = run.v_p10
+                v_p90 = run.v_p90
                 uncertainty_rating = run.uncertainty_rating
             # C is reported alongside V (ADR-0023): deterministic and document-derived, so it is
             # recomputed here from the locked/current document under the profile's registry view —
@@ -2642,6 +2648,8 @@ class Repository:
                     state=a.state,
                     provenance=a.provenance,
                     v_index=v_index,
+                    v_p10=v_p10,
+                    v_p90=v_p90,
                     c_index=c_index,
                     uncertainty_rating=uncertainty_rating,
                     coverage=_document_coverage(a.document, total_subs),
