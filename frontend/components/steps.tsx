@@ -13,6 +13,7 @@ import { DiagnosticsPanel } from "@/components/Diagnostics";
 import { DualRatingPanel } from "@/components/DualRatingPanel";
 import { GuidancePanel } from "@/components/GuidancePanel";
 import { LiveScorePanel } from "@/components/LiveScorePanel";
+import { RatingControl } from "@/components/RatingControl";
 import * as doc from "@/lib/doc";
 import { POWER_GUIDANCE } from "@/lib/powerGuidance";
 import type {
@@ -579,25 +580,16 @@ export function InfrastructureDeepDiveStep({ registry, document: d, update, read
       {registry.modules.map((m) => {
         const rated = m.subcomponents.filter((s) => doc.findSub(d, s.key)?.level != null).length;
         const isOpen = !collapsed.has(m.key);
-        const complete = rated === m.subcomponents.length && m.subcomponents.length > 0;
         return (
         <div key={m.key} className="card" style={{ padding: "0.5rem 0.85rem" }}>
-          <button
-            type="button"
-            onClick={() => toggle(m.key)}
-            aria-expanded={isOpen}
-            style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.75rem", width: "100%", background: "none", border: "none", cursor: "pointer", padding: "0.3rem 0", textAlign: "left" }}
-          >
-            <h3 style={{ fontSize: "1rem", margin: 0, display: "flex", alignItems: "baseline", gap: "0.5rem" }}>
-              <span aria-hidden="true" style={{ display: "inline-block", width: "0.75rem", color: "var(--color-ink-muted)", fontSize: "0.7rem" }}>
-                {isOpen ? "▾" : "▸"}
-              </span>
-              {m.name}
-            </h3>
-            <span className="mono" style={{ fontSize: "0.75rem", color: complete ? "var(--color-accent)" : "var(--color-ink-muted)" }}>
-              {rated}/{m.subcomponents.length} rated{complete ? " ✓" : ""}
-            </span>
-          </button>
+          <SectionHeader
+            title={m.name}
+            rated={rated}
+            total={m.subcomponents.length}
+            noun="rated"
+            isOpen={isOpen}
+            onToggle={() => toggle(m.key)}
+          />
           {isOpen ? (
           <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem", marginTop: "0.4rem" }}>
             {m.subcomponents.map((s) => {
@@ -616,29 +608,20 @@ export function InfrastructureDeepDiveStep({ registry, document: d, update, read
                       ) : null}
                     </div>
                     <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
-                      <select
+                      {/* One-click segmented rating (GRS-0165) — same transitions the old select made. */}
+                      <RatingControl
+                        choice={choice}
                         disabled={readOnly}
-                        value={choice}
-                        onChange={(e) => {
-                          const v = e.target.value as SubChoice;
+                        ariaLabel={s.name}
+                        onChange={(v) =>
                           update((x) => {
                             if (v === "") return doc.setSub(x, s.key, null);
                             if (v === "Not Applicable" || v === "Not Assessed")
                               return doc.setSub(x, s.key, doc.subState(m.key, s.key, v));
                             return doc.setSub(x, s.key, doc.subAssessed(m.key, s.key, v, r?.evidence_grade ?? "E2"));
-                          });
-                        }}
-                        style={selectStyle}
-                      >
-                        <option value="">— unrated —</option>
-                        {MATURITY_LEVELS.map((l) => (
-                          <option key={l} value={l}>
-                            {l}
-                          </option>
-                        ))}
-                        <option value="Not Applicable">Not Applicable</option>
-                        <option value="Not Assessed">Not Assessed</option>
-                      </select>
+                          })
+                        }
+                      />
                       {r?.level != null ? (
                         <GradeSelect
                           value={r.evidence_grade}
@@ -734,11 +717,72 @@ function ScoreSelect({
   );
 }
 
+/** The shared collapsible section header (GRS-0165): title + "n/m" progress + disclosure caret.
+ *  The whole header is the toggle, mirroring the Infrastructure treatment (GRS-0160). */
+function SectionHeader({
+  title,
+  rated,
+  total,
+  noun,
+  isOpen,
+  onToggle,
+}: {
+  title: string;
+  rated: number;
+  total: number;
+  noun: string;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  const complete = total > 0 && rated === total;
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-expanded={isOpen}
+      style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.75rem", width: "100%", background: "none", border: "none", cursor: "pointer", padding: "0.3rem 0", textAlign: "left" }}
+    >
+      <h3 style={{ fontSize: "1rem", margin: 0, display: "flex", alignItems: "baseline", gap: "0.5rem" }}>
+        <span aria-hidden="true" style={{ display: "inline-block", width: "0.75rem", color: "var(--color-ink-muted)", fontSize: "0.7rem" }}>
+          {isOpen ? "▾" : "▸"}
+        </span>
+        {title}
+      </h3>
+      <span className="mono" style={{ fontSize: "0.75rem", color: complete ? "var(--color-accent)" : "var(--color-ink-muted)" }}>
+        {rated}/{total} {noun}{complete ? " ✓" : ""}
+      </span>
+    </button>
+  );
+}
+
 export function CustomerPropositionStep({ registry, document: d, update, readOnly }: StepProps) {
   const [openGuidance, setOpenGuidance] = useState<string | null>(null);
   const profileKey = d.profile?.operating_model ?? "retail";
   const showGrid = registry.c_widgets.length > 0 && profileKey === registry.c_widget_profile;
   const categories = Array.from(new Set(registry.c_widgets.map((w) => w.category)));
+  // Collapse the C modules and widget categories the same way Infrastructure collapses (GRS-0165):
+  // fully-complete sections start collapsed; a manual toggle is never overridden on re-render.
+  const isCRated = (key: string) => doc.findCSub(d, key)?.level != null;
+  const catWidgets = (category: string) => registry.c_widgets.filter((w) => w.category === category);
+  const recordedIn = (category: string) =>
+    catWidgets(category).filter((w) => widgetChoiceOf(doc.findWidget(d, w.key)) !== "").length;
+  const [collapsed, setCollapsed] = useState<Set<string>>(() => {
+    const done = registry.c_modules
+      .filter((m) => m.subcomponents.length > 0 && m.subcomponents.every((s) => isCRated(s.key)))
+      .map((m) => m.key);
+    const doneCats = categories
+      .filter((c) => catWidgets(c).length > 0 && recordedIn(c) === catWidgets(c).length)
+      .map((c) => `cat:${c}`);
+    return new Set([...done, ...doneCats]);
+  });
+  const allSectionKeys = [...registry.c_modules.map((m) => m.key), ...categories.map((c) => `cat:${c}`)];
+  const toggle = (key: string) =>
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
   // The Customer-Proposition taxonomy is a retail-brokerage customer-experience model (GRS-0152).
   // A non-retail profile carries no C modules (profiles.yaml → c_modules: []), so instead of asking
   // a wealth/exchange firm retail neobroker questions, degrade honestly: this dimension is not yet
@@ -777,10 +821,36 @@ export function CustomerPropositionStep({ registry, document: d, update, readOnl
         rail) and reported alongside V (ADR-0023); it does not change V yet.
       </p>
 
-      {registry.c_modules.map((m) => (
-        <div key={m.key}>
-          <h3 style={{ fontSize: "1rem", margin: "0 0 0.4rem" }}>{m.name}</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <button
+          type="button"
+          className={smallBtn}
+          style={smallBtnStyle}
+          onClick={() =>
+            setCollapsed((prev) =>
+              prev.size === allSectionKeys.length ? new Set() : new Set(allSectionKeys),
+            )
+          }
+        >
+          {collapsed.size === allSectionKeys.length ? "Expand all" : "Collapse all"}
+        </button>
+      </div>
+
+      {registry.c_modules.map((m) => {
+        const rated = m.subcomponents.filter((s) => isCRated(s.key)).length;
+        const isOpen = !collapsed.has(m.key);
+        return (
+        <div key={m.key} className="card" style={{ padding: "0.5rem 0.85rem" }}>
+          <SectionHeader
+            title={m.name}
+            rated={rated}
+            total={m.subcomponents.length}
+            noun="rated"
+            isOpen={isOpen}
+            onToggle={() => toggle(m.key)}
+          />
+          {isOpen ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem", marginTop: "0.4rem" }}>
             {m.subcomponents.map((s) => {
               const r = doc.findCSub(d, s.key);
               const choice: SubChoice = r?.level ?? (r?.state as SubChoice) ?? "";
@@ -797,29 +867,20 @@ export function CustomerPropositionStep({ registry, document: d, update, readOnl
                       ) : null}
                     </div>
                     <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", flexWrap: "wrap" }}>
-                      <select
+                      {/* One-click segmented rating (GRS-0165) — same transitions the old select made. */}
+                      <RatingControl
+                        choice={choice}
                         disabled={readOnly}
-                        value={choice}
-                        onChange={(e) => {
-                          const v = e.target.value as SubChoice;
+                        ariaLabel={s.name}
+                        onChange={(v) =>
                           update((x) => {
                             if (v === "") return doc.setCSub(x, s.key, null);
                             if (v === "Not Applicable" || v === "Not Assessed")
                               return doc.setCSub(x, s.key, doc.subState(m.key, s.key, v));
                             return doc.setCSub(x, s.key, doc.subAssessed(m.key, s.key, v, r?.evidence_grade ?? "E2"));
-                          });
-                        }}
-                        style={selectStyle}
-                      >
-                        <option value="">— unrated —</option>
-                        {MATURITY_LEVELS.map((l) => (
-                          <option key={l} value={l}>
-                            {l}
-                          </option>
-                        ))}
-                        <option value="Not Applicable">Not Applicable</option>
-                        <option value="Not Assessed">Not Assessed</option>
-                      </select>
+                          })
+                        }
+                      />
                       {r?.level != null ? (
                         <GradeSelect
                           value={r.evidence_grade}
@@ -841,8 +902,10 @@ export function CustomerPropositionStep({ registry, document: d, update, readOnl
               );
             })}
           </div>
+          ) : null}
         </div>
-      ))}
+        );
+      })}
 
       <div>
         <h3 style={{ fontSize: "1rem", margin: "0 0 0.4rem" }}>Level-1 widget checklist</h3>
@@ -852,12 +915,21 @@ export function CustomerPropositionStep({ registry, document: d, update, readOnl
             operating model; it is not shown for the <strong>{profileKey}</strong> profile.
           </p>
         ) : (
-          categories.map((category) => (
-            <div key={category} style={{ marginBottom: "0.75rem" }}>
-              <h4 style={{ fontSize: "0.82rem", margin: "0.5rem 0 0.3rem", color: "var(--color-ink-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                {category}
-              </h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+          categories.map((category) => {
+            const catKey = `cat:${category}`;
+            const isOpen = !collapsed.has(catKey);
+            return (
+            <div key={category} className="card" style={{ padding: "0.4rem 0.85rem", marginBottom: "0.5rem" }}>
+              <SectionHeader
+                title={category}
+                rated={recordedIn(category)}
+                total={catWidgets(category).length}
+                noun="recorded"
+                isOpen={isOpen}
+                onToggle={() => toggle(catKey)}
+              />
+              {isOpen ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", marginTop: "0.35rem" }}>
                 {registry.c_widgets
                   .filter((w) => w.category === category)
                   .map((w) => {
@@ -918,8 +990,10 @@ export function CustomerPropositionStep({ registry, document: d, update, readOnl
                     );
                   })}
               </div>
+              ) : null}
             </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>
