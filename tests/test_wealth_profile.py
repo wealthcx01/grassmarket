@@ -129,7 +129,7 @@ def test_wealth_signed_metric_allows_a_net_outflow() -> None:
     # refused (GRS-0144 sign handling carried into the wealth set).
     view = _wealth_view()
     nnm = view.require_metric("WEALTH_NET_NEW_MONEY_RATE")
-    assert nnm.min_raw is None
+    # GRS-0144b added a refuse-only outer bound; a real outflow year stays a valid input.
     assert nnm.domain_violation(-3) is None
     # A non-negative wealth magnitude still refuses a negative.
     assert view.require_metric("WEALTH_AUM").domain_violation(-1) is not None

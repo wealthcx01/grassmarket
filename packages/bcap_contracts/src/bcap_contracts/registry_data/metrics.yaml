@@ -99,6 +99,8 @@ metrics:
       Revenue left after the direct cost of serving it (clearing, market data, execution) — unit
       profitability before overheads.
     unit: percent
+    min_raw: -1000  # refuse-only bound (GRS-0144b): below this cannot exist
+    max_raw: 100  # refuse-only bound (GRS-0144b): above this cannot exist
     direction: higher_is_better
     group: unit_economics
     status: draft-pending-ratification
@@ -136,6 +138,7 @@ metrics:
       The share of client flow or assets captured as revenue — pricing power. A few basis points
       for an exchange; far higher for a bundled wealth proposition.
     unit: bps
+    max_raw: 10000  # refuse-only bound (GRS-0144b): above this cannot exist
     direction: higher_is_better
     min_raw: 0  # a magnitude/count/rate that cannot be negative (GRS-0144)
     group: unit_economics
@@ -159,6 +162,7 @@ metrics:
       Revenue kept and grown from the existing book over a year, net of churn and contraction —
       the compounding engine. Above 100% means the base grows without new logos.
     unit: percent
+    max_raw: 1000  # refuse-only bound (GRS-0144b): above this cannot exist
     direction: higher_is_better
     min_raw: 0  # a magnitude/count/rate that cannot be negative (GRS-0144)
     group: momentum
@@ -178,6 +182,8 @@ metrics:
       Year-on-year growth in active clients — top-of-funnel momentum. The headline for a scaling
       neobroker; a mature private bank optimises depth over count.
     unit: percent
+    min_raw: -100  # refuse-only bound (GRS-0144b): below this cannot exist
+    max_raw: 10000  # refuse-only bound (GRS-0144b): above this cannot exist
     direction: higher_is_better
     group: momentum
     status: draft-pending-ratification
