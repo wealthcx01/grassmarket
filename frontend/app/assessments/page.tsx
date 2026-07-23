@@ -16,6 +16,7 @@ import * as doc from "@/lib/doc";
 import type { BrokeragePortfolioEntry, RegistryProfile } from "@/lib/types";
 import { ProvenanceBadge } from "@/components/ProvenanceBadge";
 import { EntitySubjectField } from "@/components/EntitySubjectField";
+import { NotFoundNotice } from "@/components/NotFoundNotice";
 
 const STATE_LABEL: Record<BrokeragePortfolioEntry["state"], string> = {
   draft: "Draft",
@@ -146,6 +147,7 @@ export default function BrokeragesPage() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
+      <NotFoundNotice noun="assessment" />
       <section>
         <p className="eyebrow" style={{ margin: 0 }}>
           Platform Power · Path A (manual)

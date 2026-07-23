@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+import { NotFoundNotice } from "@/components/NotFoundNotice";
 import { ApiError, api, getToken } from "@/lib/api";
 import type { Engagement } from "@/lib/types";
 
@@ -36,6 +37,7 @@ export default function EngagementsPage() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", maxWidth: "42rem" }}>
+      <NotFoundNotice noun="engagement" />
       <div>
         <Link href="/pipeline" style={{ fontSize: "0.8rem" }}>
           ← Pipeline

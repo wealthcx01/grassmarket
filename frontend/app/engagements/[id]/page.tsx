@@ -83,7 +83,7 @@ export default function EngagementDetailPage() {
           // 404 (no such engagement) or 422 (malformed id in the URL) → not a real record; bounce to
           // the list rather than leak a raw "Request failed (422)" (GRS-0143b, stress-test finding).
           if (err instanceof ApiError && (err.status === 404 || err.status === 422))
-            return router.replace("/engagements");
+            return router.replace("/engagements?notfound=1");
           setError(err instanceof ApiError ? err.message : "Could not load the engagement.");
         }),
     [id, router],
@@ -132,9 +132,9 @@ export default function EngagementDetailPage() {
         {engagement.assessment_ids.length === 0 ? (
           <div className="card" style={{ padding: "1.1rem 1.25rem", display: "flex", gap: "1rem", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
             <p style={{ margin: 0, color: "var(--color-ink-muted)", fontSize: "0.9rem", maxWidth: "30rem" }}>
-              No assessment yet. Start a Platform Power assessment for{" "}
-              <strong style={{ color: "var(--color-ink)" }}>{engagement.title}</strong> — the deliverables
-              below generate from it once it&rsquo;s finalised.
+              No assessment linked yet. Start a Platform Power assessment for{" "}
+              <strong style={{ color: "var(--color-ink)" }}>{engagement.title}</strong> — or, if you
+              already have a finalised assessment, link it just below instead of starting over.
             </p>
             <Link
               href={`/assessments?subject=${encodeURIComponent(engagement.title)}`}
