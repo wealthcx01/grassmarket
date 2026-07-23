@@ -41,9 +41,12 @@ export function LockedScore({ entry }: { entry: BrokeragePortfolioEntry }) {
           </>
         ) : null}
         {entry.uncertainty_rating ? (
+          <>
+            {" "}
           <span className="tag" style={{ marginLeft: "0.35rem", fontSize: "0.62rem" }}>
             {entry.uncertainty_rating}
           </span>
+          </>
         ) : null}
       </span>
       <p style={{ margin: "0.15rem 0 0", fontSize: "0.68rem", color: "var(--color-ink-faint)" }}>

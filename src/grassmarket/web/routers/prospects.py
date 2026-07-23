@@ -13,7 +13,7 @@ from uuid import UUID
 from bcap_contracts.entities import Contact, PipelineStage, Prospect
 from bcap_contracts.pipeline import IllegalStageTransition, StageHistoryEntry
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from grassmarket.data.repository import (
     ConflictError,
@@ -33,6 +33,17 @@ def _not_found() -> HTTPException:
 
 class CreateProspectRequest(BaseModel):
     company_name: str = Field(min_length=1)
+
+    @field_validator("company_name")
+    @classmethod
+    def _name_has_substance(cls, v: str) -> str:
+        """A CRM record needs a nameable company (GRS-0172): whitespace was already refused, but
+        "🚀🚀🚀" became a real prospect and polluted conversion stats. Require at least one
+        letter or digit — refuse loud, never store a joke record silently."""
+        if not any(ch.isalnum() for ch in v):
+            raise ValueError("Company name must contain at least one letter or number.")
+        return v
+
     sector: str | None = None
     website: str | None = None
     primary_contact_name: str | None = None

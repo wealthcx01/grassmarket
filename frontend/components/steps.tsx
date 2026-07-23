@@ -1465,7 +1465,7 @@ export function ScenariosStep({ registry, document: d, assessmentId }: StepProps
         <Card>
           <h3 style={{ margin: "0 0 0.1rem", fontSize: "1rem" }}>Upgrade Priority Index</h3>
           <p style={{ margin: "0 0 0.6rem", fontSize: "0.75rem", color: "var(--color-ink-muted)" }}>
-            Ranked by ΔV (score points ×100). Longest bar = the highest-leverage single upgrade.
+            Ranked by ΔV in display score points (0–100 scale). Longest bar = the highest-leverage single upgrade.
           </p>
           {result.baseline_v != null && result.priority_index.length > 0 ? (
             <p style={{ margin: "0 0 0.7rem", fontSize: "0.82rem" }}>

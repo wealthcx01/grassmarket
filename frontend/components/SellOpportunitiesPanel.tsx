@@ -15,6 +15,10 @@ import { toDisplay } from "@/lib/band";
 import { formatMoney } from "@/lib/money";
 import type { OpportunityGap, SellOpportunities } from "@/lib/types";
 
+/** bps → percent with the exact precision the schedule states: 375 → "3.75", 1500 → "15" — a
+ *  quoted commission rate is never rounded (staging rerun: "3.8%" vs the schedule's 3.75%). */
+const formatBps = (bps: number) => String(parseFloat((bps / 100).toFixed(2)));
+
 function GapChip({ gap }: { gap: OpportunityGap }) {
   const label =
     gap.kind === "power"
@@ -99,10 +103,10 @@ export function SellOpportunitiesPanel({ assessmentId }: { assessmentId: string 
                 <strong style={{ fontSize: "0.85rem" }}>{o.name}</strong>
                 <span
                   className="mono"
-                  title={`Year-1 rate ${(o.carrot.yr1_bps / 100).toFixed(2)}% — e.g. ${formatMoney(o.carrot.yr1_commission)} on a ${formatMoney(o.carrot.example_deal)} deal (schedule ${o.carrot.schedule_version})`}
+                  title={`Year-1 rate ${formatBps(o.carrot.yr1_bps)}% — e.g. ${formatMoney(o.carrot.yr1_commission)} on a ${formatMoney(o.carrot.example_deal)} deal (schedule ${o.carrot.schedule_version})`}
                   style={{ fontSize: "0.7rem", color: "var(--color-ink-muted)" }}
                 >
-                  Yr-1 {(o.carrot.yr1_bps / 100).toFixed(1)}% · e.g. {formatMoney(o.carrot.yr1_commission)}
+                  Yr-1 {formatBps(o.carrot.yr1_bps)}% · e.g. {formatMoney(o.carrot.yr1_commission)}
                 </span>
               </div>
               <p style={{ margin: "0.3rem 0 0.4rem", fontSize: "0.76rem", color: "var(--color-ink-muted)" }}>

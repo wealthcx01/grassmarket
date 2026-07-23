@@ -81,6 +81,12 @@ export function LiveScorePanel({
 
           <Bottleneck score={score} moduleLabels={moduleLabels} />
           <ModuleBreakdown score={score} moduleLabels={moduleLabels} />
+          {/* The table invites recomputation, so disclose the full formula (staging rerun, Elena:
+              Σ weight·q_m ≠ L by the undisclosed min-term — the one table that failed audit). */}
+          <p style={{ margin: 0, fontSize: "0.68rem", color: "var(--color-ink-faint)", lineHeight: 1.5 }}>
+            L is not the plain weighted sum: L = α·(Σ weight·q_m) + (1−α)·(min q_m over critical
+            modules) — the bottleneck term drags L below the weighted average by design.
+          </p>
 
           <div className="hr" />
           <p style={{ margin: 0, fontSize: "0.78rem", color: "var(--color-ink-muted)" }}>

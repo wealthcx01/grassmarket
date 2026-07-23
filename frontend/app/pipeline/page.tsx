@@ -13,6 +13,7 @@ import Link from "next/link";
 
 import { KanbanBoard } from "@/components/KanbanBoard";
 import { DealDetailPanel } from "@/components/DealDetailPanel";
+import { NotFoundNotice } from "@/components/NotFoundNotice";
 import { ApiError, api, clearToken, getToken } from "@/lib/api";
 import type { PipelineBoard, PipelineBoardEntry, PipelineForecast, PipelineStage } from "@/lib/types";
 
@@ -129,6 +130,7 @@ export default function PipelinePage() {
     e.preventDefault();
     if (!company.trim()) return;
     setCreating(true);
+    setNotice(null); // a stale illegal-move banner must not outlive the next successful action
     try {
       await api.createProspect({ company_name: company.trim() });
       setCompany("");
@@ -158,6 +160,7 @@ export default function PipelinePage() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
+      <NotFoundNotice noun="prospect" />
       <section style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "0.75rem" }}>
         <div>
           <p className="mono" style={{ margin: 0, fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-ink-muted)" }}>

@@ -64,7 +64,7 @@ describe("SellOpportunitiesPanel", () => {
     // Gap chip: name + display score (0.2 → 20) + the report's band word.
     expect(screen.getByText(/Order & Execution Management · 20 Basic/)).toBeTruthy();
     // The carrot is information alongside, with the honest unassessed note.
-    expect(screen.getByText(/Yr-1 15\.0%/)).toBeTruthy();
+    expect(screen.getByText(/Yr-1 15%/)).toBeTruthy(); // formatBps: schedule-exact, no rounding
     expect(screen.getByText(/Not yet assessed \(no claim made\): Trading Experience/)).toBeTruthy();
   });
 
