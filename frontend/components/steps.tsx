@@ -1021,9 +1021,9 @@ function Interpretation({
 }) {
   if (!live.scoreable || !live.v) return null;
   const pct = (x: number) => Math.round(x * 100);
-  // Finalised: quote the LOCKED score + its stored band (GRS-0166), never the live median — the
-  // prose must agree with the headline right above it (and the portfolio/deliverable).
-  const vPoint = final?.v_index ?? live.v.p50;
+  // The one-number rule (ADR-0040): quote the deterministic point (locked value when finalised,
+  // live v_point otherwise) — the prose must agree with the headline right above it.
+  const vPoint = final?.v_index ?? live.v_point ?? live.v.p50;
   const vLow = final?.v_index != null && final.v_p10 != null ? Math.min(final.v_p10, final.v_index) : live.v.p10;
   const vHigh = final?.v_index != null && final.v_p90 != null ? Math.max(final.v_p90, final.v_index) : live.v.p90;
   const modules = Object.entries(live.module_qm);

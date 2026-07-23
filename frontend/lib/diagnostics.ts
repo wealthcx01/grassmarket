@@ -35,16 +35,24 @@ const LENS_LABEL: Record<WaterfallStep["key"], string> = {
 /** Build the B→P→L→V waterfall, or null if any weight/band is missing (panel then hides). */
 export function waterfallSteps(live: LiveScore | null): Waterfall | null {
   if (!live || !live.scoreable) return null;
-  const parts: { key: WaterfallStep["key"]; theta?: number | null; band?: IndexBand | null }[] = [
-    { key: "B", theta: live.theta_b, band: live.b },
-    { key: "P", theta: live.theta_p, band: live.p },
-    { key: "L", theta: live.theta_l, band: live.l_index },
+  // The one-number rule (ADR-0040): the build-up uses the DETERMINISTIC points, so the chart
+  // recomposes exactly to the quoted headline (θ_B·B + θ_P·P + θ_L·L = V_point). Falling back to
+  // the band P50 only for an older API without points.
+  const parts: {
+    key: WaterfallStep["key"];
+    theta?: number | null;
+    point?: number | null;
+    band?: IndexBand | null;
+  }[] = [
+    { key: "B", theta: live.theta_b, point: live.b_point, band: live.b },
+    { key: "P", theta: live.theta_p, point: live.p_point, band: live.p },
+    { key: "L", theta: live.theta_l, point: live.l_point, band: live.l_index },
   ];
   let cumulative = 0;
   const steps: WaterfallStep[] = [];
   for (const part of parts) {
-    if (part.theta == null || !part.band) return null;
-    const index = part.band.p50;
+    if (part.theta == null || (part.point == null && !part.band)) return null;
+    const index = part.point ?? (part.band as IndexBand).p50;
     const contribution = part.theta * index;
     const before = cumulative;
     cumulative += contribution;

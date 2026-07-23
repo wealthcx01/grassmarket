@@ -7,8 +7,50 @@
 import { NOT_MODELLED_LABEL, describeBand, toDisplay } from "@/lib/band";
 import type { IndexBand } from "@/lib/types";
 
-export function BandDisplay({ label, band }: { label: string; band?: IndexBand | null }) {
+export function BandDisplay({
+  label,
+  band,
+  point,
+}: {
+  label: string;
+  band?: IndexBand | null;
+  /** The one-number rule (ADR-0040): when given, THIS deterministic point is the bold figure and
+   *  the band (clamped to include it) is the modelled range — the band's P50 is never headlined.
+   *  Without it, legacy band rendering applies. */
+  point?: number | null;
+}) {
   const view = describeBand(band);
+  if (point != null && view !== null && view.mode === "range") {
+    const low = Math.min(view.low, point);
+    const high = Math.max(view.high, point);
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
+        <span
+          className="mono"
+          style={{ fontSize: "0.66rem", letterSpacing: "0.08em", color: "var(--color-ink-muted)" }}
+        >
+          {label}
+        </span>
+        <span
+          data-testid="band-det-point"
+          title="The deterministic score (Methodology §5) — the number a finalised run stores — with the modelled P10–P90 uncertainty range around it (§7, ADR-0040)"
+        >
+          <strong className="mono" style={{ fontSize: "1.25rem" }}>
+            {toDisplay(point).toFixed(1)}
+          </strong>{" "}
+          <span className="mono" style={{ fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
+            ({toDisplay(low).toFixed(1)}–{toDisplay(high).toFixed(1)})
+          </span>{" "}
+          <span
+            className="mono"
+            style={{ fontSize: "0.6rem", color: "var(--color-ink-faint)", letterSpacing: "0.03em" }}
+          >
+            point · modelled P10–P90
+          </span>
+        </span>
+      </div>
+    );
+  }
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "0.15rem" }}>
       <span
