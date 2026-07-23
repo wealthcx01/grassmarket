@@ -202,6 +202,12 @@ export interface IndexBand {
 
 export interface LiveScore {
   scoreable: boolean;
+  // The one-number rule (ADR-0040): the DETERMINISTIC engine points — THE quoted score on every
+  // surface. The bands supply the modelled range only; their p50 is never headlined.
+  v_point?: number | null;
+  b_point?: number | null;
+  p_point?: number | null;
+  l_point?: number | null;
   blocking: string[];
   v?: IndexBand | null;
   b?: IndexBand | null;

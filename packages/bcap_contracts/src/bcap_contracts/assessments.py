@@ -743,6 +743,14 @@ class LiveScore(BaseModel):
     b: IndexBand | None = None
     p: IndexBand | None = None
     l_index: IndexBand | None = None
+    # The one-number rule (ADR-0040, GRS-0167): the DETERMINISTIC engine points — THE quoted score
+    # on every surface, live or locked. The bands above supply the modelled range only; their P50
+    # is never headlined (the MC median sits systematically below the deterministic score, so
+    # headlining it made the number jump at finalisation).
+    v_point: Score | None = None
+    b_point: Score | None = None
+    p_point: Score | None = None
+    l_point: Score | None = None
     # C-index (ADR-0023 Stage 1): a DETERMINISTIC value reported alongside V, never summed in and
     # never a Monte Carlo band (uncertainty modelling of C is post-Stage-1). None until C is
     # scoreable (a rated C subcomponent in a critical-for-C module), independent of V-scoreability.

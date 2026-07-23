@@ -465,8 +465,9 @@ export function LiveSummary({
       ) : live?.scoreable && live.v ? (
         <div className="card" style={{ padding: "0.9rem 1rem" }}>
           {/* Delegate to BandDisplay so an UNMODELLED band (modelled=false) shows an honest labelled
-              point, never a falsely confident p10–p90 range (§7 / ADR-0008). */}
-          <BandDisplay label="V — PLATFORM VALUE" band={live.v} />
+              point, never a falsely confident p10–p90 range (§7 / ADR-0008). The deterministic
+              v_point is THE quoted figure (ADR-0040) — it equals what finalisation will store. */}
+          <BandDisplay label="V — PLATFORM VALUE" band={live.v} point={live.v_point} />
           <p style={{ margin: "0.3rem 0 0", fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
             {live.subcomponents_assessed}/{live.subcomponents_total} rated · uncertainty {live.overall_uncertainty}
           </p>

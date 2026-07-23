@@ -344,12 +344,20 @@ def live_score(
     art = compute_score(document, coefficients, registry, model, rng, draws=draws)
     unc = art.uncertainty
     triad = art.result.triad
+    composite = art.result.composite
     return LiveScore(
         scoreable=True,
         v=_band(unc.v_band),
         b=_band(unc.b_band),
         p=_band(unc.p_band),
         l_index=_band(unc.l_band),
+        # The one-number rule (ADR-0040): the deterministic points are THE quoted scores; the
+        # bands above are the modelled range around them. v_point is what finalisation stores as
+        # v_index — so the headline does not move at the finalise click.
+        v_point=composite.v_index,
+        b_point=composite.b_index,
+        p_point=composite.p_index,
+        l_point=composite.l_index,
         c=c,
         module_qm={k: _band(v) for k, v in unc.module_qm.items()},
         triad_economic=_triad_rating(triad.economic_value.rating),

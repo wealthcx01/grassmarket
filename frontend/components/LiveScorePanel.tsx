@@ -66,11 +66,17 @@ export function LiveScorePanel({
             {final?.v_index != null ? (
               <LockedScore entry={final} />
             ) : (
-              <BandDisplay label="V — PLATFORM VALUE" band={score.v} />
+              <BandDisplay label="V — PLATFORM VALUE" band={score.v} point={score.v_point} />
             )}
-            <BandDisplay label="L — INFRASTRUCTURE · THE TECHNOLOGY LAYER" band={score.l_index} />
-            <BandDisplay label="B — BUSINESS" band={score.b} />
-            <BandDisplay label="P — POWER" band={score.p} />
+            {/* The one-number rule (ADR-0040): every headline bolds the deterministic point; the
+                band supplies the modelled range only. */}
+            <BandDisplay
+              label="L — INFRASTRUCTURE · THE TECHNOLOGY LAYER"
+              band={score.l_index}
+              point={score.l_point}
+            />
+            <BandDisplay label="B — BUSINESS" band={score.b} point={score.b_point} />
+            <BandDisplay label="P — POWER" band={score.p} point={score.p_point} />
           </div>
 
           <Bottleneck score={score} moduleLabels={moduleLabels} />

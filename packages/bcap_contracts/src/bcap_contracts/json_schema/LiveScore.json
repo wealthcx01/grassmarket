@@ -73,6 +73,20 @@
       ],
       "default": null
     },
+    "b_point": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "B Point"
+    },
     "blocking": {
       "default": [],
       "items": {
@@ -128,6 +142,20 @@
       ],
       "default": null
     },
+    "l_point": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "L Point"
+    },
     "methodology_version": {
       "title": "Methodology Version",
       "type": "string"
@@ -167,6 +195,20 @@
         }
       ],
       "default": null
+    },
+    "p_point": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "P Point"
     },
     "scoreable": {
       "title": "Scoreable",
@@ -271,6 +313,20 @@
         }
       ],
       "default": null
+    },
+    "v_point": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "V Point"
     }
   },
   "required": [
