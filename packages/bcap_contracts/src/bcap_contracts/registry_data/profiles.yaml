@@ -270,6 +270,8 @@ profiles:
         name: EBITDA / operating margin
         description: Operating margin — the toll-booth economics. Legitimately negative early-stage.
         unit: percent
+        min_raw: -1000  # refuse-only bound (GRS-0144b): below this cannot exist
+        max_raw: 100  # refuse-only bound (GRS-0144b): above this cannot exist
         direction: higher_is_better
         group: unit_economics
         status: draft-pending-ratification
@@ -285,6 +287,7 @@ profiles:
         name: Recurring / subscription revenue share
         description: Share of revenue that is recurring (data/subscriptions) vs cyclical transactions.
         unit: percent
+        max_raw: 100  # refuse-only bound (GRS-0144b): above this cannot exist
         direction: higher_is_better
         min_raw: 0
         group: unit_economics
@@ -301,6 +304,8 @@ profiles:
         name: Net revenue growth (YoY)
         description: Year-on-year net revenue growth. Can be negative in a down year.
         unit: percent
+        min_raw: -100  # refuse-only bound (GRS-0144b): below this cannot exist
+        max_raw: 10000  # refuse-only bound (GRS-0144b): above this cannot exist
         direction: higher_is_better
         group: momentum
         status: draft-pending-ratification
@@ -316,6 +321,8 @@ profiles:
         name: Volume growth (YoY)
         description: Year-on-year ADV/volume growth — the most cyclical driver. Can be negative.
         unit: percent
+        min_raw: -100  # refuse-only bound (GRS-0144b): below this cannot exist
+        max_raw: 10000  # refuse-only bound (GRS-0144b): above this cannot exist
         direction: higher_is_better
         group: momentum
         status: draft-pending-ratification
@@ -543,6 +550,7 @@ profiles:
           Net revenue as basis points of average AUM — the fee yield. Bounded above by a Consumer-Duty
           fair-value ceiling: an unexplained-high margin is a liability, not pure quality.
         unit: bps
+        max_raw: 10000  # refuse-only bound (GRS-0144b): above this cannot exist
         direction: higher_is_better
         min_raw: 0
         group: unit_economics
@@ -560,6 +568,7 @@ profiles:
         name: Cost / income ratio
         description: Operating cost as a share of income — lower is a more efficient, more resilient franchise.
         unit: percent
+        max_raw: 1000  # refuse-only bound (GRS-0144b): above this cannot exist
         direction: lower_is_better
         min_raw: 0
         group: unit_economics
@@ -592,6 +601,7 @@ profiles:
         name: Recurring revenue share
         description: Share of revenue that is recurring (ongoing advice / management fees) vs transactional.
         unit: percent
+        max_raw: 100  # refuse-only bound (GRS-0144b): above this cannot exist
         direction: higher_is_better
         min_raw: 0
         group: unit_economics
@@ -610,6 +620,8 @@ profiles:
           Organic net inflows as a percent of opening AUM (strips market beta) — the single best
           growth signal for a wealth manager. Legitimately NEGATIVE in a net-outflow year.
         unit: percent
+        min_raw: -100  # refuse-only bound (GRS-0144b): below this cannot exist
+        max_raw: 1000  # refuse-only bound (GRS-0144b): above this cannot exist
         direction: higher_is_better
         group: momentum
         status: draft-pending-ratification
@@ -626,6 +638,8 @@ profiles:
         name: AUM growth (total YoY)
         description: Total AUM growth year on year (flows + market). Can be negative in a down market.
         unit: percent
+        min_raw: -100  # refuse-only bound (GRS-0144b): below this cannot exist
+        max_raw: 10000  # refuse-only bound (GRS-0144b): above this cannot exist
         direction: higher_is_better
         group: momentum
         status: draft-pending-ratification
@@ -641,6 +655,7 @@ profiles:
         name: Client / asset retention
         description: Annual client (or asset) retention rate — the durability of the AUM base.
         unit: percent
+        max_raw: 100  # refuse-only bound (GRS-0144b): above this cannot exist
         direction: higher_is_better
         min_raw: 0
         group: momentum

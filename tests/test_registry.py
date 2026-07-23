@@ -87,12 +87,12 @@ def test_metric_domain_bounds_reject_impossible_values() -> None:
 
 
 def test_signed_metrics_allow_negative_values() -> None:
-    # A margin or a growth rate can legitimately be negative (loss-making / shrinking) — those
-    # metrics leave min_raw None so a negative is a valid input, not a refusal.
+    # A margin or a growth rate can legitimately be negative (loss-making / shrinking) — a real
+    # negative stays a valid input. Since GRS-0144b those metrics also carry refuse-only OUTER
+    # bounds, so only impossible magnitudes refuse — the negative-allowed guarantee is unchanged.
     r = load_registry()
     for key in ("GROSS_MARGIN", "CLIENT_GROWTH_RATE"):
         metric = r.require_metric(key)
-        assert metric.min_raw is None
         assert metric.domain_violation(-5) is None
         assert metric.domain_violation(float("nan")) is not None  # non-finite still refused
 
@@ -350,3 +350,29 @@ def _tiny_registry(extra_module: bool = False) -> Registry:
             ),
         ),
     )
+
+
+def test_percent_metrics_refuse_impossible_values() -> None:
+    """GRS-0144b (staging rerun, Marcus): a 1,234,567,890% gross margin was accepted and scored.
+    Percent/bps metrics now carry refuse-only bounds — values that cannot exist refuse loudly,
+    while legitimately extreme real values (negative growth, >100% NRR) stay in-domain."""
+    from bcap_contracts.registry import load_profile, load_registry
+
+    registry = load_registry()
+    by_key = {m.key: m for m in registry.metrics}
+    assert by_key["GROSS_MARGIN"].domain_violation(1_234_567_890) is not None
+    assert by_key["GROSS_MARGIN"].domain_violation(85) is None
+    assert by_key["GROSS_MARGIN"].domain_violation(-50) is None  # loss-making is real
+    assert by_key["CLIENT_GROWTH_RATE"].domain_violation(-150) is not None  # < -100% impossible
+    assert by_key["CLIENT_GROWTH_RATE"].domain_violation(-40) is None  # shrinking is real
+    assert by_key["NET_REVENUE_RETENTION"].domain_violation(180) is None  # >100% NRR is real
+    assert by_key["NET_REVENUE_RETENTION"].domain_violation(5000) is not None
+
+    # Every percent/bps metric in every profile view now has an upper bound (no silent absurdity).
+    from bcap_contracts.registry import load_profiles
+
+    for profile_key in load_profiles():
+        view = registry.for_profile(load_profile(profile_key))
+        for m in view.metrics:
+            if m.unit in ("percent", "bps"):
+                assert m.max_raw is not None, f"{m.key} ({m.unit}) has no upper bound"
