@@ -58,7 +58,13 @@ def test_fit_map_loads_and_covers_the_whole_catalogue() -> None:
 def _fit_yaml_with(overrides: dict) -> dict:
     """The real catalogue as a raw fit mapping, with per-product overrides applied."""
     products = {
-        pid: {"modules": ["APP_SERVER"], "c_modules": [], "powers": [], "pitch": "x"}
+        pid: {
+            "modules": ["APP_SERVER"],
+            "c_modules": [],
+            "powers": [],
+            "profiles": ["retail"],
+            "pitch": "x",
+        }
         for pid in load_commission_config().products
     }
     products.update(overrides)
@@ -93,6 +99,7 @@ def test_unknown_product_refuses(patched_fit) -> None:
                     "modules": ["APP_SERVER"],
                     "c_modules": [],
                     "powers": [],
+                    "profiles": ["retail"],
                     "pitch": "x",
                 }
             }
@@ -105,7 +112,15 @@ def test_unknown_product_refuses(patched_fit) -> None:
 def test_unknown_registry_key_refuses(patched_fit) -> None:
     patched_fit(
         _fit_yaml_with(
-            {"openbb": {"modules": ["NOT_A_MODULE"], "c_modules": [], "powers": [], "pitch": "x"}}
+            {
+                "openbb": {
+                    "modules": ["NOT_A_MODULE"],
+                    "c_modules": [],
+                    "powers": [],
+                    "profiles": ["retail"],
+                    "pitch": "x",
+                }
+            }
         )
     )
     with pytest.raises(ProductFitError, match="unknown registry"):
@@ -118,7 +133,13 @@ def test_product_addressing_nothing_refuses() -> None:
             {
                 "version": "t",
                 "products": {
-                    "openbb": {"modules": [], "c_modules": [], "powers": [], "pitch": "x"}
+                    "openbb": {
+                        "modules": [],
+                        "c_modules": [],
+                        "powers": [],
+                        "profiles": ["retail"],
+                        "pitch": "x",
+                    }
                 },
             }
         )
@@ -325,3 +346,67 @@ def test_endpoint_is_owner_scoped(client, alice, bob) -> None:
     aid = _finalise_sandbox(client, auth_header(alice), showcase_document(HARGREAVES_LANSDOWN))
     res = client.get(f"/assessments/{aid}/sell-opportunities", headers=auth_header(bob))
     assert res.status_code == 404  # scoping is absolute: not even existence is revealed
+
+
+# ---------------------------------------------------------------- segment scoping (GRS-0169)
+
+
+def test_wealth_assessment_gets_no_retail_products_and_an_honest_note() -> None:
+    """The staging-rerun finding: a wealth report was pitched Brandfetch off a power gap, citing a
+    retail C-module its taxonomy doesn't contain. The catalogue is retail-only, so a wealth
+    assessment now gets ZERO recommendations plus the explicit segment-not-covered note — never a
+    wrong-segment pitch, and never a silent empty state."""
+    from bcap_contracts.assessments import BusinessProfile, MetricEntry
+    from bcap_contracts.registry import load_profile
+
+    # A minimal genuinely-scoreable WEALTH document: one rated core subcomponent from the wealth
+    # view, one in-domain wealth metric (first anchor's raw), all 7 powers (shared across
+    # profiles) — with a WEAK BRANDING power, the exact gap Brandfetch used to pitch off.
+    view = load_registry().for_profile(load_profile("wealth"))
+    core_sub = next(s for m in view.modules if m.key == "APP_SERVER" for s in m.subcomponents)
+    metric = view.metrics[0]
+    base = showcase_document(WEBULL)  # its powers carry the Emerging BRANDING gap
+    doc = AssessmentDocument(
+        subject="Wealth Co",
+        profile=BusinessProfile(operating_model="wealth"),
+        subcomponents=(
+            SubcomponentRating(
+                module_key="APP_SERVER",
+                subcomponent_key=core_sub.key,
+                level="Basic",
+                evidence_grade=EvidenceGrade.E3_ARTIFACT,
+            ),
+        ),
+        metrics=(
+            MetricEntry(
+                metric_key=metric.key,
+                raw=metric.normalisation.anchors[0].raw,
+                confidence="estimated",
+            ),
+        ),
+        powers=base.powers,
+    )
+    out = sell_opportunities(_finalised(doc))
+    assert out.opportunities == ()  # no wrong-segment Brandfetch pitch despite the BRANDING gap
+    assert out.note is not None and "wealth" in out.note
+    # And retail keeps its recommendations + no note (in-segment behaviour unchanged).
+    retail = sell_opportunities(_finalised(showcase_document(WEBULL)))
+    assert retail.opportunities and retail.note is None
+
+
+def test_unknown_profile_in_fit_map_refuses(patched_fit) -> None:
+    patched_fit(
+        _fit_yaml_with(
+            {
+                "openbb": {
+                    "modules": ["MARKET_DATA"],
+                    "c_modules": [],
+                    "powers": [],
+                    "profiles": ["hedge_fund"],
+                    "pitch": "x",
+                }
+            }
+        )
+    )
+    with pytest.raises(ProductFitError, match="unknown operating-model profile"):
+        load_product_fit()

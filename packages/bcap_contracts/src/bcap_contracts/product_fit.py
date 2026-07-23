@@ -37,6 +37,10 @@ class ProductFit(BaseModel):
     modules: tuple[str, ...] = ()
     c_modules: tuple[str, ...] = ()
     powers: tuple[str, ...] = ()
+    # The operating models this product is actually sellable into (GRS-0169) — a REQUIRED, explicit
+    # authoring decision, validated against the profile registry. A product never surfaces for an
+    # assessment scored under a profile it doesn't list.
+    profiles: tuple[str, ...] = Field(min_length=1)
     pitch: str = Field(min_length=1)
 
 
@@ -86,8 +90,17 @@ def load_product_fit() -> ProductFitMap:
             "Every represented product needs an authored fit (an explicit decision, ADR-0039)."
         )
 
+    from bcap_contracts.registry import load_profiles
+
+    known_profiles = set(load_profiles())
     registry = load_registry()
     for product_id, fit in fit_map.products.items():
+        unknown_profiles = set(fit.profiles) - known_profiles
+        if unknown_profiles:
+            raise ProductFitError(
+                f"product_fit.yaml: {product_id!r} names unknown operating-model profile(s) "
+                f"{sorted(unknown_profiles)}."
+            )
         # A fit is a SUBSET of the registry (a product addresses some targets, not all), so the
         # check is unknown-key refusal — not the exact-coverage rule coefficient sets use.
         for dimension, legal, supplied in (
@@ -153,6 +166,10 @@ class SellOpportunities(BaseModel):
     assessment_id: UUID
     subject: str
     opportunities: tuple[SellOpportunity, ...]
+    # Honest empty-state context (GRS-0169): set when the catalogue has NO product applicable to
+    # this assessment's operating model — so a wealth/exchange advisor is told the segment isn't
+    # covered yet, not that their report has no weak areas.
+    note: str | None = None
     fit_version: str
     coefficient_version: str
     schedule_version: str

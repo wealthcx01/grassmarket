@@ -520,6 +520,9 @@ export interface SellOpportunities {
   assessment_id: string;
   subject: string;
   opportunities: SellOpportunity[];
+  // Set when the catalogue has no product applicable to this operating model (GRS-0169) — the
+  // honest "segment not covered yet" explanation for an empty list.
+  note?: string | null;
   fit_version: string;
   coefficient_version: string;
   schedule_version: string;

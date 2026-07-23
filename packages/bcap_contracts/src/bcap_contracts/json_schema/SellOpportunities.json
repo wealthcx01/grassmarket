@@ -262,6 +262,18 @@
       "title": "Fit Version",
       "type": "string"
     },
+    "note": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Note"
+    },
     "opportunities": {
       "items": {
         "$ref": "#/$defs/SellOpportunity"
