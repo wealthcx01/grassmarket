@@ -117,6 +117,42 @@ def test_portfolio_surfaces_coverage(repo: Repository, alice: SeededConsultant) 
     assert fresh_entry.coverage == 0.0
 
 
+def test_coverage_uses_the_assessments_own_profile_view(
+    repo: Repository, alice: SeededConsultant
+) -> None:
+    """GRS-0168: a profile-scoped assessment's coverage is measured against ITS operating model's
+    subcomponents, not the retail superset — the staging-rerun bug showed a fully-rated exchange
+    assessment as 'Completeness 47%' (24/51) beside the wizard's '100% of applicable'."""
+    from bcap_contracts.assessments import BusinessProfile
+    from bcap_contracts.registry import load_profile
+
+    view = load_registry().for_profile(load_profile("exchange"))
+    subs = tuple(
+        SubcomponentRating(
+            module_key=m.key,
+            subcomponent_key=s.key,
+            level=MaturityLevel.ADVANCED,
+            evidence_grade=EvidenceGrade.E3_ARTIFACT,
+        )
+        for m in view.modules
+        for s in m.subcomponents
+    )
+    a = repo.create_assessment(alice.principal, subject="Fully Rated Exchange")
+    repo.update_assessment(
+        alice.principal,
+        a.id,
+        document=AssessmentDocument(
+            subject="Fully Rated Exchange",
+            profile=BusinessProfile(operating_model="exchange"),
+            subcomponents=subs,
+        ),
+    )
+    entry = next(
+        e for e in repo.list_brokerage_portfolio(alice.principal) if e.assessment_id == a.id
+    )
+    assert entry.coverage == 1.0  # every applicable subcomponent rated — 100%, not 47%
+
+
 def test_portfolio_is_newest_touched_first(repo: Repository, alice: SeededConsultant) -> None:
     first = repo.create_assessment(alice.principal, subject="First")
     repo.create_assessment(alice.principal, subject="Second")
