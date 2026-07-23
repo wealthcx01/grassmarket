@@ -1226,6 +1226,9 @@ function DeliverablePreviewButton({ assessmentId }: { assessmentId: string }) {
 
 export function SummaryStep(props: StepProps) {
   const { live, readOnly, onFinalise, finalising } = props;
+  // Two-step finalise (GRS-0171): the irreversible lock needs an explicit confirm that names the
+  // consequences and the sandbox-vs-production difference.
+  const [confirmingFinalise, setConfirmingFinalise] = useState(false);
   const moduleLabels = Object.fromEntries(props.registry.modules.map((m) => [m.key, m.name]));
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: "42rem" }}>
@@ -1287,14 +1290,63 @@ export function SummaryStep(props: StepProps) {
         </p>
       ) : (
         <div>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={onFinalise}
-            disabled={finalising || !live?.scoreable}
-          >
-            {finalising ? "Finalising…" : "Finalise & lock inputs"}
-          </button>
+          {/* Finalisation is irreversible — a one-click lock alarmed every persona (GRS-0171).
+              The confirm states the consequences AND what the current path does/doesn't include,
+              so a solo advisor knows exactly what a sandbox lock is. */}
+          {!confirmingFinalise ? (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => setConfirmingFinalise(true)}
+              disabled={finalising || !live?.scoreable}
+            >
+              Finalise & lock inputs
+            </button>
+          ) : (
+            <div
+              className="callout callout-warn"
+              role="alertdialog"
+              aria-label="Confirm finalisation"
+              style={{ fontSize: "0.85rem", lineHeight: 1.55, display: "grid", gap: "0.6rem", maxWidth: "36rem" }}
+            >
+              <p style={{ margin: 0 }}>
+                <strong>Finalise and lock?</strong> This creates the immutable, versioned scoring
+                run and locks every input — the assessment cannot be edited afterwards
+                {live?.v_point != null ? (
+                  <>
+                    {" "}(the locked score will be{" "}
+                    <strong className="mono">{(live.v_point * 100).toFixed(1)}</strong> — the same
+                    number showing above).
+                  </>
+                ) : (
+                  "."
+                )}
+              </p>
+              <p style={{ margin: 0, color: "var(--color-ink-muted)" }}>
+                {props.provenance === "production"
+                  ? "Production path: this score carries dual-rating consensus and committee sign-off, and can feed client-facing work (subject to the client-usability gates)."
+                  : "Sandbox/demo path: self-approved with NO second rater or committee — permanently watermarked, never client-facing. The production path adds dual rating and committee sign-off."}
+              </p>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={onFinalise}
+                  disabled={finalising}
+                >
+                  {finalising ? "Finalising…" : "Yes — finalise & lock"}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setConfirmingFinalise(false)}
+                  disabled={finalising}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
           {!live?.scoreable ? (
             <p style={{ margin: "0.4rem 0 0", fontSize: "0.8rem", color: "var(--color-warn)" }}>
               Complete the blocking items above before finalising.
