@@ -3,10 +3,17 @@
 # sell-from-report join never string-matches course prose. Validated at load (fail loud,
 # ADR-0001): every product here must exist in commissions.yaml, every key must exist in the
 # registry, and EVERY catalogue product must appear here — an empty fit is an explicit decision.
-version: product-fit-v1
+#
+# `profiles` (GRS-0169): the operating models a product is actually sellable into. The current
+# catalogue is retail-brokerage tooling — recommending a logo API to an exchange or a ticker-news
+# feed to a wealth manager "would get laughed out of the room" (staging personas, 3/5). A product
+# only surfaces for assessments scored under a listed profile; wealth/exchange get an honest
+# "catalogue doesn't cover this segment yet" instead.
+version: product-fit-v2
 
 products:
   openbb:
+    profiles: [retail]
     # Research/data workspace + API — the course ties it to "a research/tooling infrastructure
     # gap" a Platform Power read surfaces.
     modules: [MARKET_DATA]
@@ -16,6 +23,7 @@ products:
       OpenBB's research workspace closes a market-data / research-tooling infrastructure gap and
       lifts the research & education side of the customer proposition.
   benzinga:
+    profiles: [retail]
     # News / ratings / signals content — the course ties it to "a market-content / engagement
     # gap: news, ratings and signals to enrich ticker pages".
     modules: [MARKET_DATA]
@@ -25,6 +33,7 @@ products:
       An always-fresh Benzinga news / ratings / signals feed answers a market-content and
       engagement gap — enriched ticker pages and research surfaces that keep clients in-app.
   connecttrade:
+    profiles: [retail]
     # OEMS / order-type execution stack (the GRS-0162 mapping: ConnectTrade → OEMS/order-types).
     modules: [OEMS, EMS_GATEWAY]
     c_modules: [CUST_TRADING_EXPERIENCE]
@@ -33,6 +42,7 @@ products:
       ConnectTrade upgrades the order/execution stack — order types, routing and gateway depth —
       closing OEMS gaps that cap the trading experience.
   brandfetch_distribution:
+    profiles: [retail]
     # Brand-asset API (distribution licence) — brand consistency across surfaces.
     modules: [CMS, FRONTEND]
     c_modules: [CUST_UI_NAVIGATION]
@@ -41,6 +51,7 @@ products:
       Brandfetch's logo/brand API keeps every instrument and merchant surface on-brand — a fix
       for content-management and front-end consistency gaps that cheapen the UI.
   brandfetch_redistribution:
+    profiles: [retail]
     modules: [CMS, FRONTEND]
     c_modules: [CUST_UI_NAVIGATION]
     powers: [BRANDING]

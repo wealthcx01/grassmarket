@@ -78,8 +78,10 @@ export function SellOpportunitiesPanel({ assessmentId }: { assessmentId: string 
       </p>
       {data.opportunities.length === 0 ? (
         <p style={{ margin: 0, fontSize: "0.8rem", color: "var(--color-ink-muted)" }}>
-          No represented product addresses this report&rsquo;s weak areas — nothing honest to
-          recommend.
+          {/* The segment-not-covered note (GRS-0169) beats the generic empty state — an advisor
+              must never read "no recommendations" as "no weak areas". */}
+          {data.note ??
+            "No represented product addresses this report's weak areas — nothing honest to recommend."}
         </p>
       ) : (
         <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "0.65rem" }}>

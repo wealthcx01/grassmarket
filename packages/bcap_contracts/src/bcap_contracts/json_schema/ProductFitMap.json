@@ -32,9 +32,18 @@
           },
           "title": "Powers",
           "type": "array"
+        },
+        "profiles": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Profiles",
+          "type": "array"
         }
       },
       "required": [
+        "profiles",
         "pitch"
       ],
       "title": "ProductFit",

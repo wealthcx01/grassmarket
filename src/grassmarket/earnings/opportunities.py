@@ -92,15 +92,19 @@ def sell_opportunities(assessment: Assessment) -> SellOpportunities:
     state). Deterministic and reproducible: the stored document + the active profile coefficient
     seam + the versioned fit map fully determine the output."""
     document = assessment.document
-    view, coefficients = profile_scoring_context(profile_key_of(document))
+    profile_key = profile_key_of(document)
+    view, coefficients = profile_scoring_context(profile_key)
     result = deterministic_result(document, coefficients, view)
     modules_by_key = {m.key: m for m in result.modules}
 
-    # C scores off the FULL registry (C modules are not profile-filtered — same as the portfolio).
-    registry = load_registry()
-    c_result = c_result_of(document, registry)
+    # C scores off the assessment's PROFILE VIEW — the same seam the portfolio's C column uses
+    # (GRS-0169; the full-registry shortcut listed retail C modules as "not yet assessed" on
+    # wealth/exchange reports, whose taxonomy doesn't contain them at all).
+    c_result = c_result_of(document, view)
     c_by_key = {m.key: m for m in c_result.modules} if c_result is not None else {}
+    view_c_keys = view.c_module_keys()
 
+    registry = load_registry()  # powers are shared across profiles; names come from here
     powers_by_key = {p.power_key: p for p in document.powers}
     config = load_commission_config()
     fit_map = load_product_fit()
@@ -108,6 +112,8 @@ def sell_opportunities(assessment: Assessment) -> SellOpportunities:
     opportunities: list[SellOpportunity] = []
     for product_id in sorted(fit_map.products):
         fit = fit_map.products[product_id]
+        if profile_key not in fit.profiles:
+            continue  # not sellable into this operating model (GRS-0169) — never recommended
         gaps: list[OpportunityGap] = []
         unassessed: list[str] = []
 
@@ -126,9 +132,11 @@ def sell_opportunities(assessment: Assessment) -> SellOpportunities:
                 gaps.append(gap)
 
         for key in fit.c_modules:
+            if key not in view_c_keys:
+                continue  # not in this operating model's C taxonomy — not applicable (GRS-0169)
             c_module = c_by_key.get(key)
             if c_module is None or c_module.q_m is None:  # same D9 rule as the V modules
-                unassessed.append(registry.require_c_module(key).name)
+                unassessed.append(view.require_c_module(key).name)
                 continue
             gap = _module_gap(GapKind.C_MODULE, key, c_module.name, c_module)
             if gap is not None:
@@ -165,10 +173,23 @@ def sell_opportunities(assessment: Assessment) -> SellOpportunities:
             )
         )
 
+    # Honest empty-state (GRS-0169): when NO catalogue product lists this profile, say so — the
+    # advisor must never read "no recommendations" as "no weak areas".
+    any_applicable = any(profile_key in f.profiles for f in fit_map.products.values())
+    note = (
+        None
+        if any_applicable
+        else (
+            f"The represented-product catalogue doesn't cover the {profile_key} operating model "
+            "yet, so no product is recommended for this report — this says nothing about the "
+            "report's gaps."
+        )
+    )
     return SellOpportunities(
         assessment_id=assessment.id,
         subject=assessment.subject,
         opportunities=tuple(sorted(opportunities, key=_product_sort_key)),
+        note=note,
         fit_version=fit_map.version,
         coefficient_version=coefficients.version,
         schedule_version=config.version,
