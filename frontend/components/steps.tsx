@@ -14,6 +14,7 @@ import { DualRatingPanel } from "@/components/DualRatingPanel";
 import { GuidancePanel } from "@/components/GuidancePanel";
 import { LiveScorePanel } from "@/components/LiveScorePanel";
 import { RatingControl } from "@/components/RatingControl";
+import { StrengthControl } from "@/components/StrengthControl";
 import * as doc from "@/lib/doc";
 import { POWER_GUIDANCE } from "@/lib/powerGuidance";
 import type {
@@ -24,6 +25,7 @@ import type {
   MaturityLevel,
   MetricConfidence,
   NonScoreState,
+  PowerEntry,
   RecordProvenance,
   Registry,
   RegistryProfile,
@@ -34,7 +36,6 @@ import {
   EVIDENCE_GRADES,
   MATURITY_LEVELS,
   METRIC_CONFIDENCES,
-  STRENGTHS,
 } from "@/lib/types";
 import { api, ApiError } from "@/lib/api";
 
@@ -363,31 +364,124 @@ export function BusinessMetricsStep({ registry, document: d, update, readOnly }:
 
 // --- 3. Powers (Helmer) ----------------------------------------------------------------
 
-function StrengthSelect({
-  value,
-  disabled,
-  onChange,
-  title,
+/** One power's Benefit/Barrier rating grid (GRS-0170). An unrated side shows NO active segment —
+ *  "None" is an explicit zero-power rating, never the face of an untouched control (D9). A power
+ *  is only PERSISTED once both sides are rated (the contract requires the pair); a half-rating
+ *  lives in local pending state with a visible hint, and clearing a side un-rates honestly
+ *  (removes the entry) instead of silently writing "None". */
+function PowerStrengthGrid({
+  powerKey,
+  powerName,
+  entry,
+  readOnly,
+  benefitHint,
+  barrierHint,
+  update,
 }: {
-  value: StrengthRating | undefined;
-  disabled: boolean;
-  onChange: (v: StrengthRating) => void;
-  title: string;
+  powerKey: string;
+  powerName: string;
+  entry: PowerEntry | undefined;
+  readOnly: boolean;
+  benefitHint?: string;
+  barrierHint?: string;
+  update: StepProps["update"];
 }) {
+  const [pending, setPending] = useState<{
+    benefit?: StrengthRating;
+    barrier?: StrengthRating;
+  }>({});
+  const benefit = entry?.benefit ?? pending.benefit ?? null;
+  const barrier = entry?.barrier ?? pending.barrier ?? null;
+
+  const pick = (side: "benefit" | "barrier", v: StrengthRating | null) => {
+    const nextBenefit = side === "benefit" ? v : benefit;
+    const nextBarrier = side === "barrier" ? v : barrier;
+    if (nextBenefit != null && nextBarrier != null) {
+      // Both sides rated → persist (grades/evidence survive an in-place strength change).
+      update((x) =>
+        doc.setPower(
+          x,
+          doc.powerEntry(
+            powerKey,
+            nextBenefit,
+            nextBarrier,
+            entry?.benefit_grade ?? null,
+            entry?.barrier_grade ?? null,
+            entry?.benefit_evidence ?? null,
+            entry?.barrier_evidence ?? null,
+          ),
+        ),
+      );
+      setPending({});
+    } else {
+      // A half-rating (or a cleared side): the power goes back to UNRATED in the document —
+      // never a silent "None" on the side that wasn't chosen.
+      if (entry) update((x) => doc.removePower(x, powerKey));
+      setPending({
+        benefit: nextBenefit ?? undefined,
+        barrier: nextBarrier ?? undefined,
+      });
+    }
+  };
+
+  const half = !entry && (pending.benefit != null || pending.barrier != null);
   return (
-    <select
-      disabled={disabled}
-      value={value ?? "None"}
-      onChange={(e) => onChange(e.target.value as StrengthRating)}
-      style={selectStyle}
-      title={title}
-    >
-      {STRENGTHS.map((s) => (
-        <option key={s} value={s}>
-          {s}
-        </option>
-      ))}
-    </select>
+    <>
+      <div style={{ display: "grid", gridTemplateColumns: "auto 1fr auto", gap: "0.4rem 0.6rem", marginTop: "0.55rem", alignItems: "center", maxWidth: "40rem" }}>
+        <span style={{ fontSize: "0.8rem" }} title={benefitHint}>Benefit</span>
+        <StrengthControl
+          value={benefit}
+          disabled={readOnly}
+          ariaLabel={`${powerName} benefit strength`}
+          onChange={(v) => pick("benefit", v)}
+        />
+        {entry ? (
+          <GradeSelect
+            value={entry.benefit_grade}
+            disabled={readOnly}
+            onChange={(gr) =>
+              update((x) =>
+                doc.setPower(
+                  x,
+                  doc.powerEntry(powerKey, entry.benefit, entry.barrier, gr, entry.barrier_grade ?? null, entry.benefit_evidence ?? null, entry.barrier_evidence ?? null),
+                ),
+              )
+            }
+          />
+        ) : (
+          <span />
+        )}
+        <span style={{ fontSize: "0.8rem" }} title={barrierHint}>Barrier</span>
+        <StrengthControl
+          value={barrier}
+          disabled={readOnly}
+          ariaLabel={`${powerName} barrier strength`}
+          onChange={(v) => pick("barrier", v)}
+        />
+        {entry ? (
+          <GradeSelect
+            value={entry.barrier_grade}
+            disabled={readOnly}
+            onChange={(gr) =>
+              update((x) =>
+                doc.setPower(
+                  x,
+                  doc.powerEntry(powerKey, entry.benefit, entry.barrier, entry.benefit_grade ?? null, gr, entry.benefit_evidence ?? null, entry.barrier_evidence ?? null),
+                ),
+              )
+            }
+          />
+        ) : (
+          <span />
+        )}
+      </div>
+      {half ? (
+        <p style={{ margin: "0.35rem 0 0", fontSize: "0.72rem", color: "var(--color-warn)" }}>
+          Rate the {pending.benefit != null ? "Barrier" : "Benefit"} too — a power records only
+          with both sides (the engine takes the weaker one).
+        </p>
+      ) : null}
+    </>
   );
 }
 
@@ -447,14 +541,15 @@ export function StrategicPowersStep({ registry, document: d, update, readOnly }:
       {registry.powers.map((p) => {
         const e = doc.findPower(d, p.key);
         const g = POWER_GUIDANCE[p.key];
-        const set = (
-          benefit: StrengthRating,
-          barrier: StrengthRating,
-          bg: EvidenceGrade | null,
-          rg: EvidenceGrade | null,
-          be: string | null = e?.benefit_evidence ?? null,
-          ba: string | null = e?.barrier_evidence ?? null,
-        ) => update((x) => doc.setPower(x, doc.powerEntry(p.key, benefit, barrier, bg, rg, be, ba)));
+        const setEvidence = (be: string | null, ba: string | null) => {
+          if (!e) return; // rationale attaches to a recorded rating; both sides come first
+          update((x) =>
+            doc.setPower(
+              x,
+              doc.powerEntry(p.key, e.benefit, e.barrier, e.benefit_grade ?? null, e.barrier_grade ?? null, be, ba),
+            ),
+          );
+        };
         const showExample = openExample === p.key;
         return (
           <Card key={p.key}>
@@ -472,24 +567,26 @@ export function StrategicPowersStep({ registry, document: d, update, readOnly }:
                 {p.description}
               </p>
             ) : null}
-            <div style={{ display: "grid", gridTemplateColumns: "auto 1fr auto", gap: "0.4rem 0.6rem", marginTop: "0.55rem", alignItems: "center", maxWidth: "34rem" }}>
-              <span style={{ fontSize: "0.8rem" }} title={g?.benefitHint}>Benefit</span>
-              <StrengthSelect value={e?.benefit} disabled={readOnly} title={g?.benefitHint ?? "Benefit strength"} onChange={(v) => set(v, e?.barrier ?? "None", e?.benefit_grade ?? null, e?.barrier_grade ?? null)} />
-              <GradeSelect value={e?.benefit_grade} disabled={readOnly} onChange={(gr) => set(e?.benefit ?? "None", e?.barrier ?? "None", gr, e?.barrier_grade ?? null)} />
-              <span style={{ fontSize: "0.8rem" }} title={g?.barrierHint}>Barrier</span>
-              <StrengthSelect value={e?.barrier} disabled={readOnly} title={g?.barrierHint ?? "Barrier strength"} onChange={(v) => set(e?.benefit ?? "None", v, e?.benefit_grade ?? null, e?.barrier_grade ?? null)} />
-              <GradeSelect value={e?.barrier_grade} disabled={readOnly} onChange={(gr) => set(e?.benefit ?? "None", e?.barrier ?? "None", e?.benefit_grade ?? null, gr)} />
-            </div>
-            {/* Optional rationale per side — records WHY, using the contract's evidence fields. */}
+            <PowerStrengthGrid
+              powerKey={p.key}
+              powerName={p.name}
+              entry={e}
+              readOnly={readOnly}
+              benefitHint={g?.benefitHint}
+              barrierHint={g?.barrierHint}
+              update={update}
+            />
+            {/* Optional rationale per side — records WHY. Attaches to a recorded rating. */}
+            {e ? (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", marginTop: "0.5rem", maxWidth: "34rem" }}>
               <label style={{ fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
                 Why this benefit?
                 <input
                   type="text"
                   disabled={readOnly}
-                  value={e?.benefit_evidence ?? ""}
+                  value={e.benefit_evidence ?? ""}
                   placeholder="evidence / rationale"
-                  onChange={(ev) => set(e?.benefit ?? "None", e?.barrier ?? "None", e?.benefit_grade ?? null, e?.barrier_grade ?? null, ev.target.value || null, e?.barrier_evidence ?? null)}
+                  onChange={(ev) => setEvidence(ev.target.value || null, e.barrier_evidence ?? null)}
                   style={{ ...selectStyle, display: "block", width: "100%", marginTop: "0.2rem" }}
                 />
               </label>
@@ -498,13 +595,14 @@ export function StrategicPowersStep({ registry, document: d, update, readOnly }:
                 <input
                   type="text"
                   disabled={readOnly}
-                  value={e?.barrier_evidence ?? ""}
+                  value={e.barrier_evidence ?? ""}
                   placeholder="evidence / rationale"
-                  onChange={(ev) => set(e?.benefit ?? "None", e?.barrier ?? "None", e?.benefit_grade ?? null, e?.barrier_grade ?? null, e?.benefit_evidence ?? null, ev.target.value || null)}
+                  onChange={(ev) => setEvidence(e.benefit_evidence ?? null, ev.target.value || null)}
                   style={{ ...selectStyle, display: "block", width: "100%", marginTop: "0.2rem" }}
                 />
               </label>
             </div>
+            ) : null}
             {g ? (
               <div style={{ marginTop: "0.5rem" }}>
                 <button type="button" className={smallBtn} style={smallBtnStyle} onClick={() => setOpenExample(showExample ? null : p.key)}>

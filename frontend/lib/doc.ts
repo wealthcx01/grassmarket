@@ -128,6 +128,12 @@ export function setPower(doc: AssessmentDocument, entry: PowerEntry): Assessment
   return { ...doc, powers: [...rest, entry] };
 }
 
+/** Un-rate a power (GRS-0170): back to first-class UNRATED (the entry is removed), which the
+ *  engine treats as "not assessed" — never coerced into the StrengthRating "None" moat floor. */
+export function removePower(doc: AssessmentDocument, key: string): AssessmentDocument {
+  return { ...doc, powers: doc.powers.filter((p) => p.power_key !== key) };
+}
+
 export function powerEntry(
   key: string,
   benefit: StrengthRating,

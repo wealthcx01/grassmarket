@@ -6,7 +6,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { emptyDoc, parseList, setProfile, subAssessed, setSub } from "@/lib/doc";
+import { emptyDoc, parseList, powerEntry, removePower, setPower, setProfile, subAssessed, setSub } from "@/lib/doc";
 
 describe("setProfile (GRS-0068)", () => {
   it("creates the profile when the document has none", () => {
@@ -36,5 +36,15 @@ describe("parseList (GRS-0068)", () => {
     expect(parseList("equities, funds ,, FX,")).toEqual(["equities", "funds", "FX"]);
     expect(parseList("")).toEqual([]);
     expect(parseList("  ")).toEqual([]);
+  });
+});
+
+describe("removePower (GRS-0170)", () => {
+  it("un-rates a power back to first-class UNRATED, leaving others intact", () => {
+    let d = emptyDoc("X");
+    d = setPower(d, powerEntry("BRANDING", "Established", "Emerging", null, null));
+    d = setPower(d, powerEntry("SCALE_ECONOMIES", "Wide", "Wide", null, null));
+    const out = removePower(d, "BRANDING");
+    expect(out.powers.map((p) => p.power_key)).toEqual(["SCALE_ECONOMIES"]);
   });
 });
