@@ -232,8 +232,10 @@ export default function BrokeragesPage() {
                 <tr style={{ textAlign: "left", color: "var(--color-ink-muted)", fontSize: "0.78rem" }}>
                   <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }}>Subject</th>
                   <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }}>Segment</th>
-                  <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }} title="Share of applicable subcomponents rated">
-                    Completeness
+                  {/* Same word, same number as the wizard's "of applicable" figure (GRS-0168) —
+                      "Completeness" beside the wizard's "Coverage 100%" read as a contradiction. */}
+                  <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }} title="Assessed share of the subcomponents applicable to this assessment's operating model — the same figure the wizard shows">
+                    Coverage
                   </th>
                   <th style={{ padding: "0.4rem 0.6rem", fontWeight: 600 }} title="Last finalised Platform Value V (0–100)">
                     Platform (V)

@@ -287,13 +287,18 @@ def _clamp_limit(limit: int | None) -> int:
     return max(1, min(limit, MAX_PAGE_LIMIT))
 
 
-def _document_coverage(document: object, total_subs: int) -> float | None:
-    """Assessed subcomponents over APPLICABLE ones (Not Applicable excluded) — the portfolio
-    coverage (GRS-0116), matching the live panel's coverage notion. None when nothing applicable."""
-    subs = getattr(document, "subcomponents", ())
+def _document_coverage(document: object, registry_view) -> float | None:
+    """Assessed subcomponents over APPLICABLE ones (Not Applicable excluded), measured against the
+    assessment's OWN operating-model view (GRS-0168) — a wealth/exchange assessment is judged on
+    its profile's subcomponents, never the full retail superset. Using the superset produced the
+    staging-rerun contradiction: a fully-rated 24-subcomponent exchange assessment showed
+    "Completeness 47%" (24/51) beside the wizard's "100% of applicable". Rows outside the view
+    (e.g. after a profile switch) are ignored, matching the live panel's coverage notion."""
+    legal = registry_view.all_subcomponent_keys()
+    subs = [r for r in getattr(document, "subcomponents", ()) if r.subcomponent_key in legal]
     assessed = sum(1 for r in subs if r.level is not None)
     not_applicable = sum(1 for r in subs if r.state == NonScoreState.NOT_APPLICABLE)
-    applicable = total_subs - not_applicable
+    applicable = len(legal) - not_applicable
     return round(assessed / applicable, 4) if applicable > 0 else None
 
 
@@ -2606,14 +2611,12 @@ class Repository:
         finalised — its last Platform Value + uncertainty rating from the immutable scoring run.
         Reuses `list_assessments` for scoping, so the owner-only guarantee is inherited, not
         re-implemented."""
-        from bcap_contracts.registry import load_profiles, load_registry
+        from bcap_contracts.registry import load_profiles
 
         from grassmarket.assessments.service import c_index_of
         from grassmarket.atlas.active import profile_key_of, profile_scoring_context
 
-        registry = load_registry()
         profiles = load_profiles()  # key -> ProfileDef, for the operating-model display name
-        total_subs = len(registry.all_subcomponent_keys())
         entries: list[BrokeragePortfolioEntry] = []
         for a in self.list_assessments(principal):
             v_index = None
@@ -2652,7 +2655,9 @@ class Repository:
                     v_p90=v_p90,
                     c_index=c_index,
                     uncertainty_rating=uncertainty_rating,
-                    coverage=_document_coverage(a.document, total_subs),
+                    # Coverage against the assessment's OWN profile view (GRS-0168) — the same
+                    # denominator the wizard's "of applicable" figure uses.
+                    coverage=_document_coverage(a.document, c_registry),
                     finalised_at=a.finalised_at,
                     updated_at=a.updated_at,
                 )
