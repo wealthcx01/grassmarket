@@ -11,7 +11,7 @@ The GTM data exists as operator files and needs to live in the product: the Exch
 List v2 (1,001 audited supplier-service rows with contacts, URLs, LinkedIn), the List of Banks
 (150 institutions), the Barclays Live influencer map (the LSEG 3-tab shape), and — since
 2026-07-23 — the network-wide **LSEG analyst roster dataset** pulled via bcap-lseg (GRS-0200:
-1,754 rows / 53 RICs / 134 contributor banks, in the OneDrive Advisory `GTM Data` estate).
+1,754 rows / 53 RICs / 134 contributor banks, committed in-repo at `data/gtm/lseg/`).
 Today prospects are typed by hand against a 15-row in-repo stub (`StubEntityRegistry`,
 `src/grassmarket/entities/registry.py`) and the Bench radar has nothing external to draw on.
 
@@ -70,19 +70,19 @@ the two have different scoping (shared read vs owner-private) and different life
    still works). Decision: merge — the adapter unions the imported targets with the stub seed on
    an empty overlap, so the demo subjects (Revolut/HL/WeBull) never disappear.
 
-5. **Ingest scripts** (operator-run from OneDrive paths — files never committed, per the
-   ESTATE-RECONCILIATION policy), one per source shape, each fail-loud on malformed rows with a
-   per-import summary (`{rows_read, targets_upserted, contacts_upserted, skipped: [...reasons]}`):
-   - `scripts/import_exchange_suppliers.py` — the Supplier List v2 (`Supplier`,
-     `Supplier Service`, `Content Type`, audited contact/URL/LinkedIn columns) → one target per
-     supplier, contacts from the audited `Contact Name`/`Email`/`LinkedIn` columns.
-   - `scripts/import_bank_list.py` — the 150-row `Country, Company` list → targets only
-     (no contacts), `segment="Bank"`.
-   - `scripts/import_lseg_rosters.py` — the GRS-0200 `analysts_unified.csv` +
-     `contributor_institution_map.csv`: one target per `ctb_id` (name from the curated
-     institution map, `ric` and `ctb_id` set), one contact per named analyst row. **Applies the
-     GRS-0200 caveats:** decode the epoch-nanosecond `rec_rating_24m`, drop the 311 anonymous
-     slots (blank `analyst_name`), and treat `<NA>`/`NaT` as null.
+5. **Ingest scripts** (operator/admin-run, reading the committed files under `data/gtm/`), one
+   per source shape, each fail-loud on malformed rows with a per-import summary
+   (`{rows_read, targets_upserted, contacts_upserted, skipped: [...reasons]}`):
+   - `scripts/import_exchange_suppliers.py` — `data/gtm/sources/exchange-supplier-list.xlsx`
+     (`Supplier`, `Supplier Service`, `Content Type`, audited contact/URL/LinkedIn columns) → one
+     target per supplier, contacts from the audited `Contact Name`/`Email`/`LinkedIn` columns.
+   - `scripts/import_bank_list.py` — `data/gtm/sources/list-of-banks.xlsx` (150-row
+     `Country, Company`) → targets only (no contacts), `segment="Bank"`.
+   - `scripts/import_lseg_rosters.py` — `data/gtm/lseg/analysts_unified.csv` +
+     `data/gtm/lseg/contributor_institution_map.csv`: one target per `ctb_id` (name from the
+     curated institution map, `ric` and `ctb_id` set), one contact per named analyst row.
+     **Applies the GRS-0200 caveats:** decode the epoch-nanosecond `rec_rating_24m`, drop the 311
+     anonymous slots (blank `analyst_name`), and treat `<NA>`/`NaT` as null.
    - `scripts/import_barclays_influencer.py` — the 3-tab workbook → the Barclays target + its
      analyst and owner contacts, owner rows carrying `verified` from the workbook's verification
      column.

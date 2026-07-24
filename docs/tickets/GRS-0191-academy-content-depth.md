@@ -36,11 +36,10 @@ Per-course PRs, each republishing its course as a new `CourseVersion`:
    OpenBB YouTube video carry it as `video_ref`. At least 6 interpretive SVG assets (e.g. the
    pivot timeline, the barbell, the four-layer stack).
 2. **PR 2 — Benzinga** (`benzinga_course.py`): per-product-family modules generated from the
-   37-row Full Product Catalog — one lesson per family covering description, delivery
-   mechanism, and use case, with the family's Docs URL and Marketing URL as two link cards.
-   Decision: the catalog rows are transcribed into the content file as code data (the
-   spreadsheet itself is operator material and is not committed); a comment records the
-   source file name and date.
+   37-row Full Product Catalog at `data/gtm/sources/benzinga-product-catalog.xlsx` — one lesson
+   per family covering description, delivery mechanism, and use case, with the family's Docs URL
+   and Marketing URL as two link cards. Decision: the catalog rows are transcribed into the
+   content file as code data; a comment records the source file path and date.
 3. **PR 3 — Brandfetch** (`brandfetch_course.py`): split into two tracks matching GRS-0185's
    segment scoping — Distribution (retail brokerages) and Redistribution (exchanges and
    information vendors) — as separate modules, each with the segment-correct sell motion,

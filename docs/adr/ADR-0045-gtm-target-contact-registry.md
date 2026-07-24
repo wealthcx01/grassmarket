@@ -23,8 +23,12 @@ exist only as rows on individual prospects, and the Bench radar has no external 
 2. **Scoping:** the target/contact registry is network-shared **read**; an advisor's pipeline
    claims (which targets they are working) remain private to them. Writes are operator/admin
    imports and explicit edits — never silent enrichment.
-3. **Ingestion is operator-run, file-referenced:** import scripts read the operator's files
-   from OneDrive paths and fail loud on malformed rows; source files are never committed.
+3. **Ingestion is operator-run, file-referenced:** import scripts read the operator's source
+   files and fail loud on malformed rows. Default posture is that source files live outside the
+   repo. **Exception (founder decision, 2026-07-23):** for execution on a workbench VM with no
+   OneDrive access, this program's GTM data is committed to the private repo under `data/gtm/`
+   (see `data/README.md` PII notice); the scripts read those committed paths. This exception is
+   scoped to the private repo staying private.
 4. **PII posture:** contacts are personal data — included in SAR export and scrub paths,
    excluded from committed fixtures, and never placed in generated artifacts without the
    compliance caveats the source method carries (see GRS-0194).

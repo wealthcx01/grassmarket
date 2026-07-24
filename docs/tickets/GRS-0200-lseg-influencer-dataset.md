@@ -27,10 +27,11 @@ productise it with no unknowns.
   succeeded, 1 failed honestly (AJB.L / AJ Bell — no analyst-coverage rows), 134 distinct
   contributor codes. Contributor 10333 resolved to Barclays with 50 rows, matching the Barclays
   Live influencer brief and validating the method end to end.
-- **Deliverables (OneDrive `Business/Advisory/GTM Data/lseg-influencer-pull-2026-07-23/`, never
-  the repo — PII policy):** `analysts_unified.csv`, `contributor_institution_map.csv`,
-  `pull_summary_unified.json`, a `README.md` documenting provenance and caveats, and the raw
-  per-shard files.
+- **Deliverables, committed in-repo at `data/gtm/lseg/`** (founder decision 2026-07-23 — the
+  workbench VM has no OneDrive access, so the dataset lives in the private repo; see
+  `data/README.md` PII notice): `analysts_unified.csv`, `contributor_institution_map.csv`,
+  `pull_summary.json`. A full-provenance copy including the raw per-shard files is retained in the
+  OneDrive `GTM Data` estate.
 
 ## Method facts settled for GRS-0194 (do not rediscover)
 
@@ -56,6 +57,8 @@ productise it with no unknowns.
 
 ## Acceptance
 
-Met: the unified dataset, the first-draft contributor map, and the provenance README exist in
-the GTM Data estate; the numbers and caveats are recorded here and in the README; the Barclays
-validation confirms the roster→institution method. No PII entered the repo.
+Met: the unified dataset and the first-draft contributor map are committed at `data/gtm/lseg/`
+(with a full-provenance copy retained in the OneDrive GTM Data estate); the numbers and caveats
+are recorded here and in `data/README.md`; the Barclays validation confirms the
+roster→institution method. The PII is committed to the private repo by founder decision
+(2026-07-23) so the workbench VM can execute the import without OneDrive access.

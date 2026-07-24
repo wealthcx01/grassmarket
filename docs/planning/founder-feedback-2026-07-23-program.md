@@ -17,19 +17,22 @@ decisions are `docs/adr/ADR-00nn-*.md`. One ticket = one branch = one PR.
   + TS mirror.** Standing non-negotiables from CLAUDE.md.
 - Write all new copy in the STYLE-VOICE register defined by GRS-0174.
 
-## Inputs that are NOT in this repo (deliberate — do not look for them in git)
+## Program inputs — in the repo under `data/`
 
-| Input | Location | Needed by |
+By founder decision (2026-07-23), the program's data inputs are committed to this private repo
+so the workbench VM can execute with **only git access** (no OneDrive/Downloads). See
+`data/README.md` for the full layout and provenance.
+
+| Input | In-repo path | Needed by |
 |---|---|---|
-| LSEG analyst dataset (1,754 rows) + contributor map | OneDrive `Business/Advisory/GTM Data/lseg-influencer-pull-2026-07-23/` | GRS-0193, GRS-0194 |
-| 7 Powers extraction memo (667 lines) | OneDrive `Strategy/7Powers-Adaptation-Working/7powers-math-extraction-2026-07-23.md` | GRS-0180 |
-| 7 Powers source PDF | `Downloads/7Powers.pdf` | GRS-0180 (verification) |
-| Benzinga catalog, Exchange Supplier List, Bank list, Barclays workbook, OpenBB strategy | OneDrive Advisory / Downloads | GRS-0191, GRS-0193 |
+| 7 Powers mathematics extraction memo | `data/reference/7powers-math-extraction.md` | GRS-0180 → GRS-0201 |
+| LSEG analyst dataset (1,754 rows) + contributor map | `data/gtm/lseg/` | GRS-0193, GRS-0194 |
+| Exchange Supplier List, Bank list, Barclays workbook/brief | `data/gtm/sources/` | GRS-0193 |
+| Benzinga catalog, OpenBB strategy | `data/gtm/sources/` | GRS-0191 |
 
-A worker executing this program needs **git plus access to this machine's OneDrive and
-Downloads**. PII and partner material are never committed (ESTATE-RECONCILIATION policy). The
-7 Powers PDF is used under Hamilton Helmer's personal permission (ADR-0046) and is likewise
-never committed.
+**Not committed:** the raw `7Powers.pdf` (Helmer's grant covers adapting the *mathematics* — the
+extraction memo — not redistributing his copyrighted file). The `data/gtm/` files carry named
+business-contact PII; this repo must stay private. See `data/README.md` for the PII notice.
 
 ## Waves and order
 

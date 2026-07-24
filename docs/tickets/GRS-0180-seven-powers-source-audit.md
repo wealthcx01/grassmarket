@@ -17,9 +17,8 @@ explicit where we adapt, precise everywhere.
 ## Inputs
 
 - The supplement: `7Powers.pdf` (87 pages, image-set — equations are figures, not text).
-- The full-supplement extraction memo produced during planning, preserved at
-  `OneDrive/BruntsfieldCapital/Strategy/7Powers-Adaptation-Working/7powers-math-extraction-2026-07-23.md`
-  (667 lines): the Fundamental Equation and its derivation; all seven Surplus Leader Margin
+- The full-supplement extraction memo, committed in-repo at
+  `data/reference/7powers-math-extraction.md`: the Fundamental Equation and its derivation; all seven Surplus Leader Margin
   formulas with every symbol defined; the Power Intensity Determinants; the Power Dynamics
   toolkit, graphical representation, and full glossary; and per-power first-pass ATLAS mapping
   notes with worked wealth-platform examples per segment. All 87 pages were read with no
