@@ -467,7 +467,7 @@ export function LiveSummary({
           {/* Delegate to BandDisplay so an UNMODELLED band (modelled=false) shows an honest labelled
               point, never a falsely confident p10–p90 range (§7 / ADR-0008). The deterministic
               v_point is THE quoted figure (ADR-0040) — it equals what finalisation will store. */}
-          <BandDisplay label="V — PLATFORM VALUE" band={live.v} point={live.v_point} />
+          <BandDisplay label="Platform Value (V)" band={live.v} point={live.v_point} />
           <p style={{ margin: "0.3rem 0 0", fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
             {live.subcomponents_assessed}/{live.subcomponents_total} rated · uncertainty {live.overall_uncertainty}
           </p>
@@ -505,14 +505,15 @@ export function LiveSummary({
       {live?.c != null ? (
         <div className="card" style={{ padding: "0.9rem 1rem" }}>
           <p style={{ margin: 0, fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.04em", color: "var(--color-ink-muted)" }}>
-            C — CUSTOMER PROPOSITION
+            Customer Proposition (C)
           </p>
           <div style={{ display: "flex", alignItems: "baseline", gap: "0.4rem", marginTop: "0.2rem" }}>
             <strong className="mono" style={{ fontSize: "1.35rem" }}>{(live.c * 100).toFixed(0)}</strong>
             <span style={{ fontSize: "0.72rem", color: "var(--color-ink-faint)" }}>/ 100</span>
           </div>
           <p style={{ margin: "0.25rem 0 0", fontSize: "0.7rem", color: "var(--color-ink-faint)" }}>
-            From the widget checklist + Ease/Usability/Depth. Reported alongside V.
+            Scored from the widget checklist and its ease, usability, and depth ratings. Reported
+            alongside Platform Value, not folded into it.
           </p>
         </div>
       ) : null}

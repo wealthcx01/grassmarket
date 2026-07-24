@@ -96,7 +96,7 @@ describe("LiveSummary (GRS-0166 finalised-score consistency)", () => {
     expect(screen.getByText("60.5")).toBeDefined();
     expect(screen.queryByText("58.9")).toBeNull(); // the live median never shows
     expect(screen.getByText(/55\.0–64\.0/)).toBeDefined(); // the STORED band, not the live one
-    expect(screen.getByText(/portfolio and the deliverable/i)).toBeDefined();
+    expect(screen.getByText(/same number shown on your portfolio/i)).toBeDefined();
   });
 
   it("keeps the live view for a draft (no final entry)", () => {

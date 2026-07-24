@@ -215,8 +215,9 @@ export default function EarningsPage() {
         <section>
           <h2 style={{ fontSize: "1rem", margin: "0 0 0.6rem" }}>Product commissions</h2>
           <p style={{ margin: "0 0 0.75rem", color: "var(--color-ink-muted)", fontSize: "0.82rem", maxWidth: "42rem" }}>
-            What you earn for selling each represented product — read live from the Earnings schedule
-            (never a typed-in number). The £ figures price an illustrative first-year deal.
+            What you earn for selling each represented product. These rates are read live from the
+            commission schedule, never typed in by hand. The pound figures price an illustrative
+            first-year deal.
           </p>
           <ul
             style={{

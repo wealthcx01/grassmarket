@@ -136,7 +136,7 @@ export function OverviewStep({ document: d, update, readOnly, profiles }: StepPr
             update((x) => doc.setProfile(x, { operating_model: e.target.value }))
           }
           style={fieldStyle}
-          title="Which operating model this business runs — reshapes the modules assessed and the weights."
+          title="Which operating model this business runs. It reshapes the modules assessed and the weights applied."
         >
           {(profiles.length ? profiles : [{ key: "retail", name: "Retail" }]).map((p) => (
             <option key={p.key} value={p.key}>
@@ -775,9 +775,9 @@ const WIDGET_SCORE_FIELDS: { key: "ease" | "usability" | "depth"; label: string 
   { key: "depth", label: "Depth" },
 ];
 const RARITY_TITLE: Record<string, string> = {
-  Common: "Common — table stakes; a gap here is a bottleneck",
-  Uncommon: "Uncommon — above baseline",
-  Rare: "Rare — a differentiator when done well",
+  Common: "Common. This is table stakes, so a gap here is a bottleneck.",
+  Uncommon: "Uncommon. This is above the baseline.",
+  Rare: "Rare. This is a differentiator when it is done well.",
 };
 
 function widgetChoiceOf(w: { present: boolean; state?: NonScoreState | null } | undefined): WidgetChoice {
@@ -1106,7 +1106,7 @@ export function CustomerPropositionStep({ registry, document: d, update, readOnl
 // --- 6. Summary & Interpretation --------------------------------------------------------
 
 /** The interpretation (GRS-0110): read the RANGE not the point, name the bottleneck, remind that
- *  words rate / numbers rank, and point at the value bridge — computed from the live diagnostics the
+ *  explain the band-versus-score point, and point at the value bridge — computed from the live diagnostics the
  *  engine already produces, never recomputed. */
 function Interpretation({
   live,
@@ -1138,10 +1138,10 @@ function Interpretation({
       <h3 style={{ margin: "0 0 0.6rem", fontSize: "1rem" }}>What this means</h3>
       <ul style={{ margin: 0, paddingLeft: "1.15rem", fontSize: "0.86rem", lineHeight: 1.6, color: "var(--color-ink-muted)" }}>
         <li>
-          <strong>Read the range, not the point.</strong> Platform Value sits at{" "}
-          <strong style={{ color: "var(--color-ink)" }}>{pct(vPoint)}</strong>, but the honest
-          answer is the <strong style={{ color: "var(--color-ink)" }}>{pct(vLow)}–{pct(vHigh)}</strong>{" "}
-          range (overall uncertainty {live.overall_uncertainty}). Quote the range; the point alone loses a technical audience.
+          <strong>The range matters more than the single number.</strong> Platform Value is{" "}
+          <strong style={{ color: "var(--color-ink)" }}>{pct(vPoint)}</strong>, with a likely range of{" "}
+          <strong style={{ color: "var(--color-ink)" }}>{pct(vLow)} to {pct(vHigh)}</strong>{" "}
+          (overall uncertainty {live.overall_uncertainty}). Quote the range to a technical audience, because the single number on its own overstates how precise the assessment is.
         </li>
         {bottleneck ? (
           <li>
@@ -1150,26 +1150,26 @@ function Interpretation({
             is the current weakest link at <strong style={{ color: "var(--color-ink)" }}>{pct(bottleneck[1].p50)}</strong>
             {lowCoverage ? (
               <>
-                {" "}— but at only{" "}
+                . At only{" "}
                 <strong style={{ color: "var(--color-ink)" }}>{pct(live.coverage as number)}%</strong> coverage this is
-                provisional: a module can rank weakest simply because it hasn&rsquo;t been assessed yet. Assess more before
-                acting on it.
+                still provisional, because a module can rank weakest simply because it has not been assessed yet. Assess more before
+                you act on it.
               </>
             ) : (
               <>
-                {" "}— it caps the whole. The fastest lift comes from fixing the weakest critical part, not the
-                already-strong ones.
+                , and it caps the whole score. The fastest improvement comes from fixing the weakest critical part rather than the
+                parts that are already strong.
               </>
             )}
           </li>
         ) : null}
         <li>
-          <strong>Words rate; numbers rank.</strong> The module bands (Basic → Frontier) are what you
-          defend in the boardroom; the continuous scores decide <em>what to fix first</em>. Use the word to communicate, the number to prioritise.
+          <strong>The band communicates, the score prioritises.</strong> The module band (Basic to Frontier) is the rating you
+          put in front of a client. The underlying score, which is more precise, is what decides{" "}
+          <em>which weakness to fix first</em>.
         </li>
         <li>
-          <strong>The value bridge.</strong> The finalised deliverable prices the gaps in three layers
-          kept apart — cost (£) to upgrade, the cash-flow levers it moves (NPV), and strategic value (words). It never divides a score gap into pounds.
+          <strong>The value bridge.</strong> The finalised deliverable prices the gaps in three separate layers: the cost in pounds to upgrade, the cash-flow value it unlocks as a net present value, and the strategic value expressed in words. It never converts a score gap directly into pounds.
         </li>
       </ul>
     </Card>
@@ -1311,12 +1311,12 @@ export function SummaryStep(props: StepProps) {
             >
               <p style={{ margin: 0 }}>
                 <strong>Finalise and lock?</strong> This creates the immutable, versioned scoring
-                run and locks every input — the assessment cannot be edited afterwards
+                run and locks every input, so the assessment cannot be edited afterwards
                 {live?.v_point != null ? (
                   <>
                     {" "}(the locked score will be{" "}
-                    <strong className="mono">{(live.v_point * 100).toFixed(1)}</strong> — the same
-                    number showing above).
+                    <strong className="mono">{(live.v_point * 100).toFixed(1)}</strong>, which is the
+                    same number showing above).
                   </>
                 ) : (
                   "."
@@ -1324,8 +1324,8 @@ export function SummaryStep(props: StepProps) {
               </p>
               <p style={{ margin: 0, color: "var(--color-ink-muted)" }}>
                 {props.provenance === "production"
-                  ? "Production path: this score carries dual-rating consensus and committee sign-off, and can feed client-facing work (subject to the client-usability gates)."
-                  : "Sandbox/demo path: self-approved with NO second rater or committee — permanently watermarked, never client-facing. The production path adds dual rating and committee sign-off."}
+                  ? "This is a production score. It carries dual-rating consensus and committee sign-off, and it can feed client-facing work once the client-usability gates are met."
+                  : "This is a sandbox score. You approve it on your own, with no second rater or committee, and it is permanently watermarked and never client-facing. The production path adds a second rater and committee sign-off."}
               </p>
               <div style={{ display: "flex", gap: "0.5rem" }}>
                 <button
@@ -1334,7 +1334,7 @@ export function SummaryStep(props: StepProps) {
                   onClick={onFinalise}
                   disabled={finalising}
                 >
-                  {finalising ? "Finalising…" : "Yes — finalise & lock"}
+                  {finalising ? "Finalising…" : "Yes, finalise and lock"}
                 </button>
                 <button
                   type="button"
@@ -1367,10 +1367,10 @@ export function SummaryStep(props: StepProps) {
               }}
             >
               <p style={{ margin: "0 0 0.5rem", fontSize: "0.82rem", color: "var(--color-ink-muted)" }}>
-                <strong style={{ color: "var(--color-ink)" }}>Working solo?</strong> A production score
-                finalises with a second independent rater and committee sign-off. To see a finished,
-                watermarked deliverable draft <em>now</em>, create a Sandbox preview of this assessment —
-                self-approved, and never client-facing.
+                <strong style={{ color: "var(--color-ink)" }}>Working on your own?</strong> A production
+                score finalises with a second independent rater and committee sign-off. To see a
+                finished, watermarked deliverable draft <em>now</em>, create a sandbox preview of this
+                assessment. You approve it yourself, and it is never client-facing.
               </p>
               <button
                 type="button"
