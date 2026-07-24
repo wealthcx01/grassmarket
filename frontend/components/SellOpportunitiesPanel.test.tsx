@@ -29,16 +29,16 @@ const payload: SellOpportunities = {
   subject: "Hargreaves Lansdown",
   opportunities: [
     {
-      product_id: "connecttrade",
-      name: "ConnectTrade",
-      pitch: "Upgrades the order/execution stack.",
+      product_id: "openbb",
+      name: "OpenBB",
+      pitch: "Adds a research and market-data workspace.",
       gaps: [
-        { kind: "module", key: "OEMS", name: "Order & Execution Management", q_m: 0.2, gate_band: "Basic" },
+        { kind: "module", key: "MARKET_DATA", name: "Market Data", q_m: 0.2, gate_band: "Basic" },
       ],
-      not_yet_assessed: ["Trading Experience"],
+      not_yet_assessed: ["Research & Education"],
       carrot: {
-        product_id: "connecttrade",
-        name: "ConnectTrade",
+        product_id: "openbb",
+        name: "OpenBB",
         yr1_bps: 1500,
         yr2_bps: 1000,
         window_months: 24,
@@ -60,12 +60,12 @@ describe("SellOpportunitiesPanel", () => {
   it("renders the ranked product with its gap evidence and carrot", async () => {
     mocked.sellOpportunities.mockResolvedValue(payload);
     render(<SellOpportunitiesPanel assessmentId="a1" />);
-    expect(await screen.findByText("ConnectTrade")).toBeTruthy();
+    expect(await screen.findByText("OpenBB")).toBeTruthy();
     // Gap chip: name + display score (0.2 → 20) + the report's band word.
-    expect(screen.getByText(/Order & Execution Management · 20 Basic/)).toBeTruthy();
+    expect(screen.getByText(/Market Data · 20 Basic/)).toBeTruthy();
     // The carrot is information alongside, with the honest unassessed note.
     expect(screen.getByText(/Yr-1 15%/)).toBeTruthy(); // formatBps: schedule-exact, no rounding
-    expect(screen.getByText(/Not yet assessed \(no claim made\): Trading Experience/)).toBeTruthy();
+    expect(screen.getByText(/Not yet assessed \(no claim made\): Research & Education/)).toBeTruthy();
   });
 
   it("shows the honest empty state when nothing addresses the report's weak areas", async () => {

@@ -43,10 +43,9 @@ def _gbp(minor: int, ref: str = "contract:test") -> Money:
 @pytest.mark.parametrize(
     ("product_id", "contract_year", "expected_minor"),
     [
-        ("connecttrade", 1, 1_500_000),  # yr1 15%
-        ("connecttrade", 2, 1_000_000),  # yr2 10%
-        ("connecttrade", 3, 0),  # Yr3+ / past window → £0
-        ("openbb", 1, 1_500_000),
+        ("openbb", 1, 1_500_000),  # yr1 15%
+        ("openbb", 2, 1_000_000),  # yr2 10%
+        ("openbb", 3, 0),  # Yr3+ / past window → £0
         ("brandfetch_distribution", 1, 750_000),  # 7.5%
         ("brandfetch_distribution", 2, 500_000),  # 5%
         ("brandfetch_redistribution", 1, 375_000),  # 3.75%
@@ -103,13 +102,13 @@ def test_commission_refuses_cross_currency() -> None:
     config = load_commission_config()  # GBP
     usd = Money(amount_minor=1000, currency=Currency.USD, assumption_register_ref="x")
     with pytest.raises(ValueError, match="no silent FX"):
-        compute_product_commission(usd, "connecttrade", 1, config)
+        compute_product_commission(usd, "openbb", 1, config)
 
 
 def test_commission_refuses_negative_value() -> None:
     config = load_commission_config()
     with pytest.raises(ValueError, match="negative"):
-        compute_product_commission(_gbp(-1), "connecttrade", 1, config)
+        compute_product_commission(_gbp(-1), "openbb", 1, config)
 
 
 # --- Config completeness fails loud ------------------------------------------------------
@@ -121,8 +120,8 @@ def _v7_kwargs() -> dict:
         version="test-v7",
         currency=Currency.GBP,
         products={
-            "connecttrade": ProductRate(
-                name="ConnectTrade", yr1_bps=1500, yr2_bps=1000, window_months=24
+            "openbb": ProductRate(
+                name="OpenBB", yr1_bps=1500, yr2_bps=1000, window_months=24
             )
         },
         consultancy={
@@ -171,7 +170,7 @@ def test_v7_product_lookup_refuses_unknown() -> None:
     with pytest.raises(CommissionConfigError, match="No Stream-A product"):
         config.require_product("nonexistent")
     # A known product resolves a validated ProductRef.
-    assert config.product_ref("connecttrade").name == "ConnectTrade"
+    assert config.product_ref("openbb").name == "OpenBB"
 
 
 # --- Immutability seal -------------------------------------------------------------------
@@ -207,7 +206,7 @@ def test_seal_pins_the_v7_provenance_fields() -> None:
     # Each of the four sealed v7 fields changes the hash; a legacy (all-None) line is stable.
     assert _hash() == _hash(stream=None, product_id=None)  # defaults are the legacy shape
     assert _hash() != _hash(stream=CommissionStream.PRODUCT)
-    assert _hash() != _hash(product_id="connecttrade")
+    assert _hash() != _hash(product_id="openbb")
     assert _hash() != _hash(delivery_type=DeliveryType.BRUNTSFIELD_LED)
     assert _hash() != _hash(contract_year=2)
     assert _hash() != _hash(window_end=date(2028, 7, 14))

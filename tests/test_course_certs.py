@@ -29,10 +29,10 @@ _NOW = datetime(2026, 7, 17, 12, 0, tzinfo=UTC)
 
 # ---------------------------------------------------------------- pure logic
 def test_subjects_are_sales_egoist_plus_one_per_product() -> None:
-    subjects = course_cert_subjects(["openbb", "connecttrade"])
+    subjects = course_cert_subjects(["openbb", "benzinga"])
     keys = [s.key for s in subjects]
     assert keys[0] == SALES_EGOIST_SUBJECT
-    assert "product:openbb" in keys and "product:connecttrade" in keys
+    assert "product:openbb" in keys and "product:benzinga" in keys
 
 
 def test_underscore_product_ids_get_a_valid_hyphenated_backing_slug() -> None:

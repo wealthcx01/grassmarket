@@ -1,6 +1,6 @@
 # GRS-0183 — Remove ConnectTrade from the catalogue
 
-**Status:** Planned (2026-07-23, founder feedback item 11). **Priority:** HIGH — the demo's top
+**Status:** In review (2026-07-24) — removed from catalogue, WeBull deal reassigned to OpenBB, tests/docs updated, PR open. **Priority:** HIGH — the demo's top
 sell recommendation is a product with no agreement.
 **Loop:** founder-feedback remediation, Wave 1. ADR-0026 amendment note (config change).
 

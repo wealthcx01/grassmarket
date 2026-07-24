@@ -161,23 +161,29 @@ def _finalised(document: AssessmentDocument) -> Assessment:
     )
 
 
-def test_hl_report_recommends_connecttrade_against_its_basic_gaps() -> None:
-    out = sell_opportunities(_finalised(showcase_document(HARGREAVES_LANSDOWN)))
-    assert [o.product_id for o in out.opportunities] == ["connecttrade"]
-    gap_keys = {g.key for g in out.opportunities[0].gaps}
-    assert "OEMS" in gap_keys  # the report's Basic-banded execution stack
-    assert "CUST_TRADING_EXPERIENCE" in gap_keys
-    # The carrot rides along for information.
-    assert out.opportunities[0].carrot.product_id == "connecttrade"
-    assert out.opportunities[0].carrot.yr1_commission.amount_minor > 0
+def test_market_data_gap_recommends_the_agreed_research_products() -> None:
+    """A Market Data gap is addressed by the agreed research products (benzinga, openbb), which
+    tie on the same gap and order by product_id. (Replaces the old ConnectTrade/OEMS case: with
+    ConnectTrade removed, GRS-0183, no agreed product addresses OEMS, so the positive coverage
+    moves to a gap an agreed product genuinely fits.)"""
+    levels = dict(_ALL_MODULES)
+    levels["MARKET_DATA"] = "Basic"
+    out = sell_opportunities(_finalised(showcase_document(_spec_with(levels, {}, _ALL_C))))
+    assert [o.product_id for o in out.opportunities] == ["benzinga", "openbb"]
+    for o in out.opportunities:
+        assert "MARKET_DATA" in {g.key for g in o.gaps}
+        assert o.carrot.product_id == o.product_id
+        assert o.carrot.yr1_commission.amount_minor > 0
 
 
-def test_recommendations_cohere_with_the_report_banding() -> None:
-    """Revolut's MARKET_DATA is all-Developing, which the rating gate bands Advanced — so no
-    market-data product is recommended (the pitch must never contradict the report's own words).
-    Its OEMS bands Developing → ConnectTrade is the one honest recommendation."""
+def test_report_with_no_agreed_product_for_its_gaps_recommends_nothing() -> None:
+    """Revolut's Market Data is all-Developing, which the rating gate bands Advanced, so no
+    market-data product is recommended (a pitch must never contradict the report's own words).
+    Its one real gap was OEMS, which ConnectTrade used to address; with ConnectTrade removed
+    (GRS-0183) no agreed product fits, so the report honestly recommends nothing rather than a
+    product with no agreement."""
     out = sell_opportunities(_finalised(showcase_document(REVOLUT)))
-    assert [o.product_id for o in out.opportunities] == ["connecttrade"]
+    assert out.opportunities == ()
 
 
 def test_power_only_gaps_rank_after_module_gaps_and_tie_on_product_id() -> None:
@@ -261,46 +267,55 @@ def test_strong_everywhere_recommends_nothing() -> None:
 
 
 def test_ranking_is_deepest_module_gap_first_never_commission() -> None:
-    """MARKET_DATA all-Basic (deepest) beats OEMS's shallower Developing-banded gap regardless of
-    rates: benzinga+openbb (tie → product_id) come before connecttrade."""
+    """A deep Market Data gap is recommended by both agreed research products, which tie on that
+    gap and order by product_id, never by commission (benzinga 750bps and openbb 1500bps sort
+    identically). (Previously proved ordering against ConnectTrade; retargeted after GRS-0183.)"""
     levels = dict(_ALL_MODULES)
     levels["MARKET_DATA"] = "Basic"
-    levels["OEMS"] = "Developing"
-    doc = showcase_document(_spec_with(levels, {"OEMS_ORDER_TYPES": "Basic"}, _ALL_C))
+    doc = showcase_document(_spec_with(levels, {}, _ALL_C))
     out = sell_opportunities(_finalised(doc))
-    assert [o.product_id for o in out.opportunities] == ["benzinga", "openbb", "connecttrade"]
-    deepest = [o.gaps[0].q_m for o in out.opportunities[:2]]
+    assert [o.product_id for o in out.opportunities] == ["benzinga", "openbb"]
+    deepest = [o.gaps[0].q_m for o in out.opportunities]
     assert all(q is not None and q < 0.3 for q in deepest)
 
 
 def test_not_assessed_is_never_a_gap() -> None:
-    """A scoreable-but-sparse document — only OEMS rated (Basic), no C dimension, MARKET_DATA /
-    CMS / FRONTEND untouched: ConnectTrade lists on the OEMS gap and reports the unassessed C
-    module honestly; no market-data/brandfetch product invents a gap from absence of data.
-    (Powers/metric present because a finalised assessment is always V-scoreable — REVOLUT's
-    powers keep BRANDING Established, so no power gap either.)"""
+    """A scoreable-but-sparse document with only Market Data rated (Basic) and the rest untouched:
+    the agreed research products list on the Market Data gap and report the unassessed Research &
+    Education C module honestly, rather than inventing a gap from absence of data. (Retargeted from
+    OEMS/ConnectTrade to Market Data/openbb after GRS-0183.) Powers and a metric are present
+    because a finalised assessment is always V-scoreable; REVOLUT's powers keep BRANDING
+    Established, so there is no power gap either."""
     registry = load_registry()
-    oems = registry.require_module("OEMS")
     base = showcase_document(REVOLUT)  # for its scoreable powers + metrics
+    # Market Data Basic is the gap. APP_SERVER (a critical-for-L module) rated Frontier makes the
+    # document V-scoreable without itself being a gap; no agreed product addresses it anyway.
+    subs = tuple(
+        SubcomponentRating(
+            module_key="MARKET_DATA",
+            subcomponent_key=s.key,
+            level="Basic",
+            evidence_grade=EvidenceGrade.E3_ARTIFACT,
+        )
+        for s in registry.require_module("MARKET_DATA").subcomponents
+    ) + tuple(
+        SubcomponentRating(
+            module_key="APP_SERVER",
+            subcomponent_key=s.key,
+            level="Frontier",
+            evidence_grade=EvidenceGrade.E3_ARTIFACT,
+        )
+        for s in registry.require_module("APP_SERVER").subcomponents
+    )
     doc = AssessmentDocument(
-        subject="Sparse",
-        subcomponents=tuple(
-            SubcomponentRating(
-                module_key="OEMS",
-                subcomponent_key=s.key,
-                level="Basic",
-                evidence_grade=EvidenceGrade.E3_ARTIFACT,
-            )
-            for s in oems.subcomponents
-        ),
-        metrics=base.metrics,
-        powers=base.powers,
+        subject="Sparse", subcomponents=subs, metrics=base.metrics, powers=base.powers
     )
     out = sell_opportunities(_finalised(doc))
-    assert [o.product_id for o in out.opportunities] == ["connecttrade"]
-    only = out.opportunities[0]
-    assert {g.key for g in only.gaps} == {"OEMS"}  # EMS_GATEWAY unassessed → not a gap
-    assert "Trading Experience" in ", ".join(only.not_yet_assessed)
+    assert [o.product_id for o in out.opportunities] == ["benzinga", "openbb"]
+    for o in out.opportunities:
+        assert {g.key for g in o.gaps} == {"MARKET_DATA"}
+        # The addressed C module was never assessed, so it is reported honestly, not a gap.
+        assert "Research & Education" in ", ".join(o.not_yet_assessed)
 
 
 # ---------------------------------------------------------------- HTTP boundary
@@ -325,13 +340,32 @@ def _finalise_sandbox(client, headers, document: AssessmentDocument) -> str:
 
 def test_endpoint_returns_the_join_for_a_finalised_assessment(client, alice) -> None:
     headers = auth_header(alice)
-    aid = _finalise_sandbox(client, headers, showcase_document(HARGREAVES_LANSDOWN))
+    # A Market Data gap yields the agreed research products (post-GRS-0183; HL's own gaps are now
+    # served by no agreed product, so the join-returns-opportunities case uses a fitted gap).
+    levels = dict(_ALL_MODULES)
+    levels["MARKET_DATA"] = "Basic"
+    doc = showcase_document(_spec_with(levels, {}, _ALL_C)).model_copy(
+        update={"subject": "Market Data Gap Co"}
+    )
+    aid = _finalise_sandbox(client, headers, doc)
     res = client.get(f"/assessments/{aid}/sell-opportunities", headers=headers)
     assert res.status_code == 200
     body = res.json()
-    assert body["subject"] == "Hargreaves Lansdown"
-    assert [o["product_id"] for o in body["opportunities"]] == ["connecttrade"]
+    assert body["subject"] == "Market Data Gap Co"
+    assert [o["product_id"] for o in body["opportunities"]] == ["benzinga", "openbb"]
     assert body["fit_version"] == load_product_fit().version
+
+
+def test_connecttrade_never_appears_in_any_recommendation() -> None:
+    """GRS-0183 guard: the removed product must not surface for any showcase assessment, and the
+    two loaders no longer know it."""
+    from bcap_contracts.commissions import load_commission_config
+
+    assert "connecttrade" not in load_commission_config().products
+    assert "connecttrade" not in load_product_fit().products
+    for spec in (REVOLUT, HARGREAVES_LANSDOWN, WEBULL):
+        out = sell_opportunities(_finalised(showcase_document(spec)))
+        assert all(o.product_id != "connecttrade" for o in out.opportunities)
 
 
 def test_endpoint_refuses_an_unfinalised_assessment(client, alice) -> None:

@@ -32,15 +32,6 @@ products:
     pitch: >-
       An always-fresh Benzinga news / ratings / signals feed answers a market-content and
       engagement gap — enriched ticker pages and research surfaces that keep clients in-app.
-  connecttrade:
-    profiles: [retail]
-    # OEMS / order-type execution stack (the GRS-0162 mapping: ConnectTrade → OEMS/order-types).
-    modules: [OEMS, EMS_GATEWAY]
-    c_modules: [CUST_TRADING_EXPERIENCE]
-    powers: []
-    pitch: >-
-      ConnectTrade upgrades the order/execution stack — order types, routing and gateway depth —
-      closing OEMS gaps that cap the trading experience.
   brandfetch_distribution:
     profiles: [retail]
     # Brand-asset API (distribution licence) — brand consistency across surfaces.

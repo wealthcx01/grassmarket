@@ -231,7 +231,10 @@ WEBULL = BrokerageSpec(
         ("CUST_SECURITY_REGULATION", "Developing"),
         ("CUST_INNOVATION_DIFFERENTIATORS", "Advanced"),
     ),
-    product_id="connecttrade",
+    # Reassigned from the removed ConnectTrade catalogue product (GRS-0183). OpenBB's rate schedule
+    # is identical (yr1 1500 / yr2 1000 / window 24), so the illustrative £80,000 deal and every
+    # earnings figure derived from it keep the same magnitude; only the product name changes.
+    product_id="openbb",
     deal_value_minor=8_000_000,  # £80,000 Year-1 deal
 )
 

@@ -17,7 +17,9 @@ The earnings kernel is reusable as-is: Money discipline + banker's rounding + no
 
 Adopt the **two-stream v7 model** as the commission config schema (`commissions.yaml` → `commissions-v7`).
 
-**Stream A — Product commission.** Per product: `{Year-1 rate, Year-2 rate, window months}`, applied to Cash Received under a Qualifying Deal. Year 1 / Year 2 are the first / second twelve-month periods measured from the first Cash Received; past the window the rate is zero. Seed products: ConnectTrade 15%/10%/24mo, OpenBB 15%/10%/24mo, Brandfetch distribution 7.5%/5%/24mo, Brandfetch redistribution 3.75%/3.75%/36mo. **Amendable by written notice** (new products / future rates) — the existing `version`+`rate_ref` freeze already guarantees non-retroactivity.
+**Stream A — Product commission.** Per product: `{Year-1 rate, Year-2 rate, window months}`, applied to Cash Received under a Qualifying Deal. Year 1 / Year 2 are the first / second twelve-month periods measured from the first Cash Received; past the window the rate is zero. Seed products: OpenBB 15%/10%/24mo, Brandfetch distribution 7.5%/5%/24mo, Brandfetch redistribution 3.75%/3.75%/36mo. **Amendable by written notice** (new products / future rates) — the existing `version`+`rate_ref` freeze already guarantees non-retroactivity.
+
+**Amendment, 2026-07-23 (GRS-0183):** ConnectTrade is removed from the catalogue. There is no signed agreement for it, so it must not be a sellable product. Non-retroactivity holds trivially: no production commission line ever referenced ConnectTrade (it existed only in demo seed data), so no recorded line's content hash changes. The demo showcase's illustrative ConnectTrade deal is reassigned to OpenBB, whose rate schedule is identical (15%/10%/24mo), so the demo earnings figures keep the same magnitude and only the product name changes.
 
 **Stream B — Consultancy commission.** A matrix **delivery-type × sourcing → {first-12-month rate, thereafter rate}**:
 

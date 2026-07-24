@@ -80,7 +80,7 @@ def test_template_exposes_all_four_sections() -> None:
 
 def test_template_is_reusable_across_products() -> None:
     cfg = load_commission_config()  # the real catalogue
-    for pid in ("openbb", "brandfetch_distribution", "connecttrade"):
+    for pid in ("openbb", "brandfetch_distribution", "benzinga"):
         spec = ProductCourseSpec(
             product_id=pid,
             slug=pid.replace("_", "-"),
@@ -97,9 +97,9 @@ def test_template_is_reusable_across_products() -> None:
 def test_carrot_mismatch_refuses() -> None:
     import pytest
 
-    other = product_commission_carrot("connecttrade", load_commission_config())
+    other = product_commission_carrot("benzinga", load_commission_config())
     with pytest.raises(ValueError):
-        build_product_course(_SPEC, other)  # spec is 'openbb', carrot is 'connecttrade'
+        build_product_course(_SPEC, other)  # spec is 'openbb', carrot is 'benzinga'
 
 
 def test_unknown_product_fails_loud() -> None:
@@ -115,6 +115,6 @@ def test_http_product_commissions_are_live(client, alice: SeededConsultant) -> N
     assert resp.status_code == 200
     carrots = resp.json()
     ids = {c["product_id"] for c in carrots}
-    assert {"openbb", "connecttrade"} <= ids  # the live catalogue
+    assert {"openbb", "benzinga"} <= ids  # the live catalogue
     for c in carrots:
         assert c["schedule_version"]  # stamped, never bare
