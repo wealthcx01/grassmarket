@@ -1,0 +1,88 @@
+{
+  "pull_date": "2026-07-23",
+  "source": "LSEG/I-B-E-S via bcap-lseg MCP (Workspace SDK 2.1.1)",
+  "total_rows": 1754,
+  "named_rows": 1443,
+  "anonymous_slots": 311,
+  "distinct_rics": 53,
+  "distinct_ctb_ids": 134,
+  "named_with_email": 1266,
+  "named_with_phone": 1188,
+  "top_contributors": [
+    {
+      "ctb_id": "10333",
+      "inferred_institution": "barclays",
+      "analyst_rows": 50
+    },
+    {
+      "ctb_id": "6",
+      "inferred_institution": "gs",
+      "analyst_rows": 48
+    },
+    {
+      "ctb_id": "138",
+      "inferred_institution": "jefferies",
+      "analyst_rows": 48
+    },
+    {
+      "ctb_id": "47",
+      "inferred_institution": "db",
+      "analyst_rows": 46
+    },
+    {
+      "ctb_id": "178117",
+      "inferred_institution": "cfraresearch",
+      "analyst_rows": 45
+    },
+    {
+      "ctb_id": "4614",
+      "inferred_institution": "jpmorgan",
+      "analyst_rows": 44
+    },
+    {
+      "ctb_id": "2975",
+      "inferred_institution": "morganstanley",
+      "analyst_rows": 41
+    },
+    {
+      "ctb_id": "2182",
+      "inferred_institution": "rbccm",
+      "analyst_rows": 36
+    },
+    {
+      "ctb_id": "38750",
+      "inferred_institution": "redburnatlantic",
+      "analyst_rows": 35
+    },
+    {
+      "ctb_id": "60797",
+      "inferred_institution": "morningstar",
+      "analyst_rows": 31
+    },
+    {
+      "ctb_id": "9584",
+      "inferred_institution": "argusresearch",
+      "analyst_rows": 30
+    },
+    {
+      "ctb_id": "85",
+      "inferred_institution": "tdsecurities",
+      "analyst_rows": 25
+    },
+    {
+      "ctb_id": "62195",
+      "inferred_institution": "evercoreisi",
+      "analyst_rows": 24
+    },
+    {
+      "ctb_id": "2233",
+      "inferred_institution": "uk",
+      "analyst_rows": 24
+    },
+    {
+      "ctb_id": "43418",
+      "inferred_institution": "wolferesearch",
+      "analyst_rows": 24
+    }
+  ]
+}

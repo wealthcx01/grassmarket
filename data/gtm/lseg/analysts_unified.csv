@@ -1,0 +1,1755 @@
+ric,analyst_name,email,phone,job_role,ctb_id,uid,create_date,est_rating,rec_rating_24m
+AAPL.OQ,"Kelleher, Jim N",jkelleher@argusresearch.com,212-425-5474,Director of Research,9584,30042327,1995-05-29 00:00:00,52,64
+AAPL.OQ,"Moffett, Craig E",craig@moffettnathanson.com,212-519-0021,Senior Analyst,111984,30301084,2013-11-01 00:00:00,6,31
+AAPL.OQ,"Long, Tim P",tim.long@barclays.com,212-526-4043,Equity Analyst,10333,30346843,2019-08-07 15:09:25,45,3
+AAPL.OQ,"Woodring, Erik W",Erik.Woodring@morganstanley.com,212-296-8083,Equity Analyst,2975,30315943,2015-09-04 00:00:00,57,2
+AAPL.OQ,"Goldberg, Jay",jgoldberg@seaportrp.com,,Equity Analyst,59786,30403069,2025-04-27 20:29:03,32,68
+AAPL.OQ,"Power, William V",wpower@rwbaird.com,214-220-3055,Senior Research Anal,10924,30069182,2000-08-16 13:47:00,82,99
+AAPL.OQ,"Chatterjee, Samik",samik.x.chatterjee@jpmorgan.com,212-622-0798,Equity Analyst,4614,30202817,2009-12-17 00:00:00,,5
+AAPL.OQ,"Nagpure, Prajwal",nprajwal@crispidea.com,,Research Analyst,61498,30405497,2025-08-01 00:00:00,27,28
+AAPL.OQ,"Luria, Gil B",gluria@dadco.com,503-603-3020,Managing Director,158,30364684,2021-03-02 00:00:00,68,80
+AAPL.OQ,"Kerwin, William",william.kerwin@morningstar.com,312-244-7872,Senior Equity Analys,60797,30360789,2020-10-13 00:00:00,49,93
+AAPL.OQ,"Feinseth, Ivan",ifeinseth@tigressfp.com,646-780-8901,Director of Research,117104,30305378,2012-01-01 00:00:00,43,36
+AAPL.OQ,"Vajpayee, Bhavtosh",bhavtosh.vajpayee@clsa.com,212-549-5063,Director of Research,2843,30123411,2002-10-23 08:08:01,30,2
+AAPL.OQ,"Ng, Michael",michael.ng@gs.com,212-902-8618,Equity Analyst,6,30325910,2017-02-12 00:00:00,30,93
+AAPL.OQ,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,57,40
+AAPL.OQ,"Saeed, Amman",asaeed@accountabilityresearch.com,,Equity Analyst,60372,30400173,2024-10-17 12:32:43,63,92
+AAPL.OQ,"Newman, Mark C",mark.newman@bernsteinsg.com,212-845-7822,Senior Analyst,6872,30272708,2011-08-15 00:00:00,50,41
+AAPL.OQ,"Yao, Barney",barney.sq.yao@htisec.com,,Equity Analyst,60474,30376433,2022-02-24 21:20:02,69,56
+AAPL.OQ,"Forte, Thomas F",tforte@maximgrp.com,212-895-3830,Equity Analyst,22991,30396275,2024-04-16 07:00:51,83,7
+AAPL.OQ,"Fairbanks, Melissa A",melissa.fairbanks@raymondjames.com,727-567-1081,Equity Analyst,2690,30275747,2009-09-14 00:00:00,,27
+AAPL.OQ,"Malik, Atif",,+1-415-951-1892,,3202,30304538,2014-04-01 00:00:00,53,76
+AAPL.OQ,"Sankar, Krish",krish.sankar@tdsecurities.com,415-646-7372,Equity Analyst,85,30335834,2018-05-14 00:00:00,65,23
+AAPL.OQ,"Crockett, Barton E",bcrockett@rblt.com,212-607-3108,Senior Analyst,120252,30377793,2022-04-01 06:21:30,11,72
+AAPL.OQ,"Nispel, Brandon",bnispel@key.com,503-821-3871,Equity Analyst,12336,30328246,2017-06-30 00:00:00,84,55
+AAPL.OQ,"Cote-Colisson, Nicolas S",nicolas.cote-colisson@hsbcib.com,44-20-7991-6826,Senior Analyst,358,30117473,2002-03-18 00:00:00,54,68
+AAPL.OQ,"Lee, Edison",edison.lee@jefferies.com,852-3743-8009,Equity Analyst,138,30324600,2016-11-01 00:00:00,100,81
+AAPL.OQ,"Fan, Zhiyuan",fanzhiyuan@gjzq.com.cn,86-21-6103-8318,Equity Analyst,35228,30322836,2016-09-01 00:00:00,37,84
+AAPL.OQ,"Daryanani, Amit J",amit.daryanani@evercoreisi.com,415-800-0185,Equity Analyst,62195,30345618,2019-06-01 00:00:00,70,32
+AAPL.OQ,"Kramer, Richard A",richard.kramer@arete.net,44-20-7959-1303,Equity Analyst,35539,30167859,2003-10-01 00:00:00,68,28
+AAPL.OQ,"Seo, Youngjae",youngjae.seo@daishin.com,,Equity Analyst,60471,30374632,2021-12-15 12:00:00,26,
+AAPL.OQ,"Zino, Angelo",,,Equity Analyst,178117,30368481,2021-07-08 00:00:00,56,7
+AAPL.OQ,"Yang, Martin",martin.yang@opco.com,212-667-7623,Equity Analyst,954,30346948,2019-07-29 00:00:00,1,
+AAPL.OQ,"Martin, Laura A",lmartin@needhamco.com,917-373-3066,Equity Analyst,110,30194180,2009-11-07 00:00:00,36,30
+AAPL.OQ,"White, Brian J",bwhite@mchny.com,212-583-8510,Equity Analyst,49781,30335345,2018-04-01 00:00:00,28,89
+AAPL.OQ,"Baruah, Ananda P",ananda.baruah@loopcapital.com,212-823-1314,Managing Director,12605,30328668,2017-07-01 00:00:00,43,39
+AAPL.OQ,"Ives, Daniel H",Dan.Ives@wedbush.com,212-344-2073,Equity Analyst,78,30339255,2018-10-01 00:00:00,58,39
+AAPL.OQ,"Chang, Rob",rob.cd.chang@kgi.com,886-2-2181-8717,Equity Analyst,10877,30402661,2025-03-01 00:00:00,71,45
+AAPL.OQ,"Rakers, Aaron C",Aaron.Rakers@wellsfargo.com,314-875-2508,Equity Analyst,7671,30330901,2017-10-01 00:00:00,4,21
+AAPL.OQ,"Reitzes, Ben A",ben.reitzes@meliusresearch.com,212-503-6222,Equity Analyst,150887,30389991,2023-07-01 00:00:00,46,
+AAPL.OQ,"Lau, Warren",warren.lau@aletheia-capital.com,852-9181-4766,Equity Analyst,204276,30398083,2024-07-12 11:04:36,59,26
+AAPL.OQ,"Fu, Tianzi",futz@ebscn.com,86-21-5252-3692,Equity Analyst,30477,30327756,2017-05-01 00:00:00,61,41
+AAPL.OQ,Research Department,,,Other,126605,30325967,2017-02-10 00:00:00,,70
+AAPL.OQ,"Li, Chengning",chengning.li@cicc.com.cn,,Equity Analyst,20783,30358208,2020-07-17 00:00:00,63,45
+AAPL.OQ,"Wermann, Ingo",ingo.wermann@dzbank.de,49-69-74-47-90544,Equity Analyst,18658,30192920,2009-09-24 07:48:00,36,45
+AAPL.OQ,"Im, JiYong",jiyong.im@nhqv.com,82-2-768-7350,Equity Analyst,17150,30345401,2019-05-21 00:00:00,39,34
+AAPL.OQ,,,,,,,,76,69
+AAPL.OQ,,,,,,,,72,24
+AAPL.OQ,,,,,,,,43,37
+AAPL.OQ,,,,,,,,50,71
+AAPL.OQ,,,,,,,,34,45
+AAPL.OQ,,,,,,,,24,45
+AAPL.OQ,,,,,,,,1,30
+AAPL.OQ,,,,,,,,41,45
+AAPL.OQ,,,,,,,,66,5
+AAPL.OQ,,,,,,,,27,99
+AAPL.OQ,,,,,,,,50,99
+AAPL.OQ,,,,,,,,100,27
+AAPL.OQ,,,,,,,,42,94
+AAPL.OQ,,,,,,,,23,12
+AAPL.OQ,,,,,,,,53,45
+MSFT.OQ,"Bachman, Keith F",keith.bachman@bmo.com,347-891-0258,Equity Analyst,4104,30171872,2007-07-09 00:00:00,43,1
+MSFT.OQ,"Borges, Gabriela",,,Equity Analyst,6,30258099,2010-10-18 14:31:00,6,31
+MSFT.OQ,"Moerdler, Mark L",mark.moerdler@bernsteinsg.com,917-344-8506,Equity Analyst,6872,30272739,2011-08-17 00:00:00,71,59
+MSFT.OQ,"Seo, Youngjae",youngjae.seo@daishin.com,,Equity Analyst,60471,30374632,2021-12-15 12:00:00,57,2
+MSFT.OQ,"Gaonkar, Satish",satishg@crispidea.com,,Research Analyst,61498,30407473,2025-12-01 00:00:00,73,23
+MSFT.OQ,"Tao, Ye",ye3.tao@cicc.com.cn,,Equity Analyst,20783,30370032,2021-08-16 12:32:35,34,23
+MSFT.OQ,"Lee, Yi Fu",yifu.lee@stonex.com,212-379-5451,Equity Analyst,31149,30409270,2026-03-28 00:00:00,44,45
+MSFT.OQ,"Luria, Gil B",gluria@dadco.com,503-603-3020,Managing Director,158,30364684,2021-03-02 00:00:00,45,7
+MSFT.OQ,"Romanoff, Dan",dan.romanoff@morningstar.com,312-244-7816,Senior Equity Analys,60797,30343317,2019-01-11 00:00:00,54,33
+MSFT.OQ,"Xie, Chunsheng",xiechunsheng@htsc.com,86-21-2987-2036,Equity Analyst,83242,30367807,2021-05-30 06:10:50,36,27
+MSFT.OQ,"Slowinski, Stefan J",stefan.slowinski@uk.bnpparibas.com,44-203-430-8549,Research Analyst,2233,30329106,2017-08-01 00:00:00,12,5
+MSFT.OQ,"Vleeschhouwer, Jay",jvleeschhouwer@griffinsecurities.co,646-442-4251,Equity Analyst,3732,30268027,2011-06-03 00:00:00,55,51
+MSFT.OQ,"Lenschow, Raimo",raimo.lenschow@barclays.com,212-526-2712,Equity Analyst,10333,30205547,2010-09-02 00:00:00,68,80
+MSFT.OQ,"Yao, Barney",barney.sq.yao@htisec.com,,Equity Analyst,60474,30376433,2022-02-24 21:20:02,53,41
+MSFT.OQ,"Schwartz, Brian J",brian.schwartz@opco.com,415-399-5732,Equity Analyst,954,30279452,2012-04-30 00:00:00,56,12
+MSFT.OQ,"Blakey, Thomas",thomas.blakey@cantor.com,617-443-4487,Research Analyst,5698,30401609,2025-01-15 00:00:00,26,73
+MSFT.OQ,"Shepherd, Adam J",adam.shepherd@arete.net,44-20-7959-1310,Equity Analyst,35539,30196572,2009-06-22 00:00:00,62,33
+MSFT.OQ,"Zelnick, Brad A",brad.zelnick@db.com,212-250-8563,Research Analyst,47,30373507,2021-11-01 00:00:00,54,34
+MSFT.OQ,"Thill, Brent J",bthill@jefferies.com,415-229-1559,Equity Analyst,138,30329537,2017-08-02 00:00:00,100,13
+MSFT.OQ,"Ader, Jackson E",jackson.ader@key.com,216-471-3813,Equity Analyst,12336,30393936,2024-01-02 16:06:58,48,13
+MSFT.OQ,"Bonner, Joseph F",jbonner@argusresearch.com,212-425-5464,Equity Analyst,9584,30135805,2003-09-24 00:00:00,59,25
+MSFT.OQ,"Ives, Daniel H",Dan.Ives@wedbush.com,212-344-2073,Equity Analyst,78,30339255,2018-10-01 00:00:00,57,40
+MSFT.OQ,"Kim, Seunghyuk",ocean93@kiwoom.com,,Equity Analyst,60468,30395604,2024-03-22 00:00:00,48,
+MSFT.OQ,"Zhang, Lunke L",zhanglunke@guosen.com.cn,82-755-8198-2651,Equity Analyst,35004,30375148,2022-01-10 03:03:37,78,11
+MSFT.OQ,"Daptardar, Kadambari",kdaptardar@accountabilityresearch.c,,Equity Analyst,60372,30377842,2022-04-01 00:00:00,59,33
+MSFT.OQ,"Turrin, Michael",Michael.Turrin@wellsfargo.com,628-629-7565,Equity Analyst,7671,30349771,2020-01-07 00:00:00,,27
+MSFT.OQ,"Moskowitz, Gregg S",Gregg.Moskowitz@mizuhogroup.com,646-949-9557,Managing Director,61910,30344083,2019-03-01 00:00:00,61,78
+MSFT.OQ,"Kim, Yun S",Yun.Kim@loopcapital.com,212-823-1310,Managing Director,12605,30359048,2020-08-20 00:00:00,53,76
+MSFT.OQ,"Wood, Derrick",derrick.wood@tdsecurities.com,415-646-7370,Equity Analyst,85,30321522,2016-06-10 00:00:00,39,25
+MSFT.OQ,"Zhang, Liangwei",zhanglw@dwzq.com.cn,86-21-6019-9793,Equity Analyst,133525,30325620,2016-08-08 00:00:00,1,26
+MSFT.OQ,"Fitzsimmons, Billy",billy.fitzsimmons@psc.com,312-281-3438,Senior Research Anal,2691,30408500,2026-02-01 16:07:20,69,53
+MSFT.OQ,"Freeman, John",,,Equity Analyst,178117,30368256,2021-07-01 00:00:00,68,28
+MSFT.OQ,"He, Saiyi",hesaiyi@cmbi.com.hk,852-3916-1739,Equity Analyst,81441,30383736,2022-10-09 20:57:23,31,
+MSFT.OQ,"Zukin, Alex",azukin@wolferesearch.com,415-878-6420,Equity Analyst,43418,30365633,2021-04-20 00:00:00,69,30
+MSFT.OQ,"Herlinghaus, Axel",,,Equity Analyst,18658,30343706,2019-01-28 00:00:00,76,61
+MSFT.OQ,"Park, Yeon Ju",yeonju.park@miraeasset.com,822-3774-1755,Equity Analyst,5169,30186753,2006-05-03 00:00:00,50,11
+MSFT.OQ,"Fu, Tianzi",futz@ebscn.com,86-21-5252-3692,Equity Analyst,30477,30327756,2017-05-01 00:00:00,21,58
+MSFT.OQ,"Feinseth, Ivan",ifeinseth@tigressfp.com,646-780-8901,Director of Research,117104,30305378,2012-01-01 00:00:00,59,6
+MSFT.OQ,"Ader, Jason N",jader@williamblair.com,617-235-7519,Equity Analyst,11266,30185049,2008-11-20 00:00:00,48,24
+MSFT.OQ,"Reback, Brad R",rebackb@stifel.com,404-869-8051,Equity Analyst,107,30279549,2012-04-30 00:00:00,39,50
+MSFT.OQ,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,38,28
+MSFT.OQ,"Wong, Tommy",tommywong@cmschina.com.hk,852-3189-6634,Equity Analyst,60410,30343582,2019-01-01 00:00:00,79,69
+MSFT.OQ,"Jaluria, Rishi N",rishi.jaluria@rbccm.com,415-633-8798,Equity Analyst,2182,30366016,2021-05-01 00:00:00,100,70
+MSFT.OQ,"Won-seok, Jeong",jeong.won-seok@shinyoung.com,822-2004-9092,Equity Analyst,25134,30401508,2025-01-07 05:06:12,59,26
+MSFT.OQ,"Fogh, Per",,,Equity Analyst,170823,30394049,2024-01-01 06:18:18,34,41
+MSFT.OQ,"Materne, Kirk",kirk.materne@evercoreisi.com,212-497-0873,Equity Analyst,62195,30211271,2010-09-07 00:00:00,9,11
+MSFT.OQ,"Radke, Tyler",,+1-415-951-1660,,3202,30330240,2017-09-21 00:00:00,66,33
+MSFT.OQ,"DiFucci, John S",john.difucci@guggenheimpartners.com,212-518-9670,Equity Analyst,62598,30382169,2022-08-01 00:00:00,,70
+MSFT.OQ,"Colville, Patrick",patrick.colville@scotiabank.com,925-503-9802,Equity Analyst,82,30386198,2023-01-01 16:01:23,70,74
+MSFT.OQ,"Haissl, Alexander A",alex.haissl@redburnatlantic.com,44-20-70-00-21-13,Equity Analyst,38750,30379654,2022-07-01 00:00:00,45,
+MSFT.OQ,"Ji, Ella",ellaji@chinarenaissance.com,212-554-2966,Director of Research,134810,30326216,2017-02-28 00:00:00,49,4
+MSFT.OQ,"Bersey, Stephen D",stephen.bersey@us.hsbc.com,212-525-4153,Equity Analyst,358,30389135,2023-06-01 00:00:00,36,45
+MSFT.OQ,"Yoo, Jungho",yoojh@kbfg.com,822-6114-2923,Equity Analyst,15154,30370735,2021-09-08 07:18:22,61,10
+MSFT.OQ,"Power, William V",wpower@rwbaird.com,214-220-3055,Senior Research Anal,10924,30069182,2000-08-16 13:47:00,53,
+MSFT.OQ,Research Department,,,Other,126605,30325967,2017-02-10 00:00:00,45,54
+MSFT.OQ,"Marok, Andrew J",andrew.marok@raymondjames.com,212-856-4885,Equity Analyst,2690,30359692,2020-08-09 00:00:00,39,34
+MSFT.OQ,"Reitzes, Ben A",ben.reitzes@meliusresearch.com,212-503-6222,Equity Analyst,150887,30389991,2023-07-01 00:00:00,38,67
+MSFT.OQ,"Tillman, Terry",Terry.Tillman@truist.com,404-926-5362,Equity Analyst,5179,30147099,2005-01-02 00:00:00,64,47
+MSFT.OQ,,,,,,,,72,24
+MSFT.OQ,,,,,,,,39,15
+MSFT.OQ,,,,,,,,55,40
+MSFT.OQ,,,,,,,,32,61
+MSFT.OQ,,,,,,,,1,
+MSFT.OQ,,,,,,,,82,14
+MSFT.OQ,,,,,,,,43,37
+MSFT.OQ,,,,,,,,50,71
+MSFT.OQ,,,,,,,,34,45
+MSFT.OQ,,,,,,,,35,81
+MSFT.OQ,,,,,,,,,21
+MSFT.OQ,,,,,,,,24,45
+MSFT.OQ,,,,,,,,66,5
+MSFT.OQ,,,,,,,,41,45
+MSFT.OQ,,,,,,,,60,16
+MSFT.OQ,,,,,,,,42,28
+MSFT.OQ,,,,,,,,61,83
+MSFT.OQ,,,,,,,,2,59
+NVDA.OQ,"Stein, William S",William.Stein@truist.com,212-319-3808,Equity Analyst,5179,30294464,2012-11-28 00:00:00,52,64
+NVDA.OQ,"Kelleher, Jim N",jkelleher@argusresearch.com,212-425-5474,Director of Research,9584,30042327,1995-05-29 00:00:00,57,2
+NVDA.OQ,"Kim, Sehwan",usa@kbfg.com,822-6114-2906,Equity Analyst,15154,30342013,2018-12-01 00:00:00,60,49
+NVDA.OQ,"Gerra, Tristan",tgerra@rwbaird.com,415-593-8058,Senior Research Anal,10924,30146817,2005-02-18 00:00:00,37,10
+NVDA.OQ,"Rolland, Christopher",christopher.rolland@sig.com,212-709-5314,Equity Analyst,22972,30322662,2016-08-23 00:00:00,44,53
+NVDA.OQ,"Moore, Joseph L",joseph.moore@morganstanley.com,212-761-7516,Equity Analyst,2975,30280053,2012-05-28 00:00:00,85,5
+NVDA.OQ,"Tolmachev, Egor",egor.tolmachev@ffin.ae,,Senior Analyst,148183,30397231,2024-05-31 12:23:56,71,13
+NVDA.OQ,"Fogh, Per",,,Equity Analyst,170823,30394049,2024-01-01 06:18:18,76,25
+NVDA.OQ,Research Department,,,Other,126605,30325967,2017-02-10 00:00:00,81,50
+NVDA.OQ,"Chan, Kinngai",kchan@summitinsightsgroup.com,646-849-5363,Senior Analyst,107587,30327273,2017-04-28 00:00:00,20,25
+NVDA.OQ,"Rasgon, Stacy A",stacy.rasgon@bernsteinsg.com,213-559-5917,Senior Analyst,6872,30189600,2009-06-04 00:00:00,57,64
+NVDA.OQ,"Purdy, Ho",purdyho@htsc.com,852-3658-6000,Equity Analyst,83242,30392842,2023-10-02 00:00:00,,5
+NVDA.OQ,"Lipacis, Mark J",Mark.Lipacis@evercoreisi.com,214-459-4007,Equity Analyst,62195,30396211,2024-04-10 00:00:00,72,
+NVDA.OQ,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,63,27
+NVDA.OQ,"Wang, Dawei",Dawei.wang@bocomgroup.com,852-3766-1867,Equity Analyst,102322,30393332,2023-11-29 19:42:35,56,97
+NVDA.OQ,"Curtis, Blayne P",bcurtis@jefferies.com,212-336-7493,Equity Analyst,138,30169588,2007-04-03 06:41:00,44,70
+NVDA.OQ,"Zhang, Lunke L",zhanglunke@guosen.com.cn,82-755-8198-2651,Equity Analyst,35004,30375148,2022-01-10 03:03:37,97,37
+NVDA.OQ,"Lau, Warren",warren.lau@aletheia-capital.com,852-9181-4766,Equity Analyst,204276,30398083,2024-07-12 11:04:36,64,73
+NVDA.OQ,"Feinseth, Ivan",ifeinseth@tigressfp.com,646-780-8901,Director of Research,117104,30305378,2012-01-01 00:00:00,47,77
+NVDA.OQ,"Vajpayee, Bhavtosh",bhavtosh.vajpayee@clsa.com,212-549-5063,Director of Research,2843,30123411,2002-10-23 08:08:01,35,
+NVDA.OQ,"Kim, Roko",roko.kim@hanafn.com,82-2-3771-7523,Equity Analyst,30219,30301097,2013-11-04 00:00:00,35,54
+NVDA.OQ,"O'Malley, Tom J",THOMAS.O'MALLEY@BARCLAYS.COM,212-526-0692,Equity Analyst,10333,30316704,2015-10-07 00:00:00,51,27
+NVDA.OQ,"Schulze-Melander, Timm N",timm.schulze-melander@redburn.com,44-20-7000-2076,Equity Analyst,38750,30344422,2019-04-01 00:00:00,30,93
+NVDA.OQ,"Buchalter, Joshua L",joshua.buchalter@tdsecurities.com,646-562-1303,Equity Analyst,85,30336199,2018-05-29 11:43:13,57,40
+NVDA.OQ,"Pajjuri, Srini R",srini.pajjuri@rbccm.com,415-515-0779,Equity Analyst,2182,30406812,2025-10-29 17:09:35,54,2
+NVDA.OQ,"Roy, Ruben",royr@stifel.com,212-271-3825,Equity Analyst,107,30382889,2022-09-01 00:00:00,99,67
+NVDA.OQ,"Cheng, Qiaosheng",qiaosheng.cheng@cicc.com.cn,,Equity Analyst,20783,30342887,2019-01-01 00:00:00,47,84
+NVDA.OQ,"Baruah, Ananda P",ananda.baruah@loopcapital.com,212-823-1314,Managing Director,12605,30328668,2017-07-01 00:00:00,50,15
+NVDA.OQ,"Lee, Frank I",frank.lee@hsbc.com.hk,852-2996-6916,Equity Analyst,358,30299450,2013-08-20 00:00:00,63,49
+NVDA.OQ,"Simpson, Brett W",brett.simpson@arete.net,44-20-7959-1320,Equity Analyst,35539,30167860,2003-10-03 00:00:00,37,45
+NVDA.OQ,"Reitzes, Ben A",ben.reitzes@meliusresearch.com,212-503-6222,Equity Analyst,150887,30389991,2023-07-01 00:00:00,64,58
+NVDA.OQ,"Wermann, Ingo",ingo.wermann@dzbank.de,49-69-74-47-90544,Equity Analyst,18658,30192920,2009-09-24 07:48:00,50,41
+NVDA.OQ,"Zhang, Liangwei",zhanglw@dwzq.com.cn,86-21-6019-9793,Equity Analyst,133525,30325620,2016-08-08 00:00:00,59,33
+NVDA.OQ,"Rakers, Aaron C",Aaron.Rakers@wellsfargo.com,314-875-2508,Equity Analyst,7671,30330901,2017-10-01 00:00:00,,27
+NVDA.OQ,"Leopold, Simon M",Simon.Leopold@RaymondJames.com,212-856-5464,Equity Analyst,2690,30279039,2012-04-04 00:00:00,,87
+NVDA.OQ,"Bryson, Matthew S",matthew.bryson@wedbush.com,617-695-6302,Equity Analyst,78,30345949,2019-06-01 00:00:00,53,76
+NVDA.OQ,"Muse, C.J.",CJ.Muse@cantor.com,212-915-1935,Research Analyst,5698,30394375,2024-01-11 00:00:00,11,72
+NVDA.OQ,"Sur, Harlan L",harlan.sur@jpmorgan.com,415-315-6700,Equity Analyst,4614,30197439,2010-02-25 00:00:00,47,80
+NVDA.OQ,"Acree, Cody",cody.acree@stonex.com,214-335-1811,Equity Analyst,31149,30366771,2021-05-01 00:00:00,84,55
+NVDA.OQ,"Gabriel, Stephano",stephano.gabriel@itaubba.com,55-11-3073-3239,Equity Analyst,18026,30406312,2025-10-01 00:00:00,65,39
+NVDA.OQ,"Lim, Haein",haein.lim@hanwha.com,822-3772-7799,Equity Analyst,22919,30390967,2023-08-22 02:33:29,98,75
+NVDA.OQ,"Malik, Atif",,+1-415-951-1892,,3202,30304538,2014-04-01 00:00:00,52,15
+NVDA.OQ,"Rakesh, Vijay R",Vijay.Rakesh@mizuhogroup.com,312-294-8682,Managing Director,61910,30313682,2015-05-01 00:00:00,70,32
+NVDA.OQ,"Caso, Chris",ccaso@wolferesearch.com,646-582-9360,Equity Analyst,43418,30389875,2023-07-01 00:00:00,26,
+NVDA.OQ,"Cassidy, Kevin E",kcassidy@rblt.com,212-607-3165,Equity Analyst,120252,30356405,2020-05-05 05:10:51,60,45
+NVDA.OQ,"Naji, Sebastien",snaji@williamblair.com,212-245-6508,Equity Analyst,11266,30361865,2020-11-01 00:00:00,56,7
+NVDA.OQ,"Siegel, Chaim",siegel@elazarllc.com,972-527671964,Equity Analyst,123617,30311508,2015-03-01 00:00:00,43,92
+NVDA.OQ,"Colello, Brian",brian.colello@morningstar.com,312-384-3742,Director,60797,30196332,2009-12-22 00:00:00,58,39
+NVDA.OQ,"Seo, Youngjae",youngjae.seo@daishin.com,,Equity Analyst,60471,30374632,2021-12-15 12:00:00,47,59
+NVDA.OQ,"Zino, Angelo",,,Equity Analyst,178117,30368481,2021-07-08 00:00:00,66,55
+NVDA.OQ,"Pan, Felix X",felix.pan@kgi.com,886-2-2181-8706,Equity Analyst,10877,30398124,2024-07-01 00:00:00,59,26
+NVDA.OQ,"Fan, Zhiyuan",fanzhiyuan@gjzq.com.cn,86-21-6103-8318,Equity Analyst,35228,30322836,2016-09-01 00:00:00,58,79
+NVDA.OQ,"Bolton, N. Quinn",qbolton@needhamco.com,212-705-0322,Equity Analyst,110,30142060,2004-02-28 00:00:00,,70
+NVDA.OQ,"Luria, Gil B",gluria@dadco.com,503-603-3020,Managing Director,158,30364684,2021-03-02 00:00:00,68,45
+NVDA.OQ,"Schafer, Rick E",rick.schafer@opco.com,720-554-1119,Equity Analyst,954,30177489,2008-01-14 00:00:00,33,45
+NVDA.OQ,"Shannon, Richard C",richard.shannon@craig-hallum.com,612-334-6339,Senior Research Anal,21613,30273536,2011-09-21 00:00:00,36,45
+NVDA.OQ,"Goldberg, Jay",jgoldberg@seaportrp.com,,Equity Analyst,59786,30403069,2025-04-27 20:29:03,61,10
+NVDA.OQ,"Vinh, John",jvinh@key.com,503-821-3882,Equity Analyst,12336,30312349,2015-04-09 00:00:00,45,54
+NVDA.OQ,"Schneider, Ph.D., James E",,,,6,30165718,2006-06-19 02:13:00,39,34
+NVDA.OQ,"Nagpure, Prajwal",nprajwal@crispidea.com,,Research Analyst,61498,30405497,2025-08-01 00:00:00,35,86
+NVDA.OQ,"Yao, Barney",barney.sq.yao@htisec.com,,Equity Analyst,60474,30376433,2022-02-24 21:20:02,1,25
+NVDA.OQ,,,,,,,,1,
+NVDA.OQ,,,,,,,,60,45
+NVDA.OQ,,,,,,,,43,37
+NVDA.OQ,,,,,,,,8,36
+NVDA.OQ,,,,,,,,50,71
+NVDA.OQ,,,,,,,,34,45
+NVDA.OQ,,,,,,,,23,
+NVDA.OQ,,,,,,,,42,79
+NVDA.OQ,,,,,,,,,21
+NVDA.OQ,,,,,,,,44,74
+NVDA.OQ,,,,,,,,40,45
+NVDA.OQ,,,,,,,,46,58
+NVDA.OQ,,,,,,,,66,5
+NVDA.OQ,,,,,,,,52,40
+NVDA.OQ,,,,,,,,27,99
+NVDA.OQ,,,,,,,,74,12
+NVDA.OQ,,,,,,,,42,94
+NVDA.OQ,,,,,,,,23,12
+NVDA.OQ,,,,,,,,1,75
+NVDA.OQ,,,,,,,,49,64
+NVDA.OQ,,,,,,,,53,45
+GOOGL.OQ,"Anmuth, Doug",douglas.anmuth@jpmorgan.com,212-622-6571,Equity Analyst,4614,30270190,2011-06-10 00:00:00,62,70
+GOOGL.OQ,"Khajuria, Shweta R",skhajuria@wolferesearch.com,415-878-6425,Equity Analyst,43418,30398118,2024-07-15 00:00:00,73,23
+GOOGL.OQ,"Nathanson, Michael B",michael@moffettnathanson.com,212-519-0010,Senior Analyst,111984,30301085,2013-11-01 00:00:00,75,27
+GOOGL.OQ,"Bonner, Joseph F",jbonner@argusresearch.com,212-425-5464,Equity Analyst,9584,30135805,2003-09-24 00:00:00,32,68
+GOOGL.OQ,"Thill, Brent J",bthill@jefferies.com,415-229-1559,Equity Analyst,138,30329537,2017-08-02 00:00:00,45,7
+GOOGL.OQ,"Cheng, Andrew",andrew.cheng@kgi.com,88-62-2181-8748,Equity Analyst,10877,30346963,2019-08-01 00:00:00,54,36
+GOOGL.OQ,"Blackledge, John R",john.blackledge@cowen.com,646-562-1359,Equity Analyst,85,30293867,2012-10-16 00:00:00,58,30
+GOOGL.OQ,"Ripps, Maria",MRipps@cgf.com,212-849-3923,Equity Analyst,10642,30335245,2018-04-01 12:00:01,,38
+GOOGL.OQ,"Bai, Yang",yang3.bai@cicc.com.cn,,Equity Analyst,20783,30360765,2020-10-01 00:00:00,27,28
+GOOGL.OQ,"Josey, Ronald",,+1-212-816-4545,,3202,30376243,2022-02-01 00:00:00,55,57
+GOOGL.OQ,"Yao, Barney",barney.sq.yao@htisec.com,,Equity Analyst,60474,30376433,2022-02-24 21:20:02,28,58
+GOOGL.OQ,"Beck, Josh",josh.beck@raymondjames.com,727-567-2201,Equity Analyst,2690,30393791,2023-12-18 16:27:02,63,66
+GOOGL.OQ,"Wlodarczak, Jeffrey D",jeff@pvtl.com,212-514-4680,Equity Analyst,60962,30197118,2010-02-26 00:00:00,53,25
+GOOGL.OQ,"Black, Benjamin T",benjamin.black@db.com,212-250-9218,Research Analyst,47,30375867,2022-02-01 16:33:28,77,76
+GOOGL.OQ,"Walmsley, Lloyd",Lloyd.Walmsley@mizuhogroup.com,212-373-5703,Managing Director,61910,30404816,2025-07-01 00:00:00,77,96
+GOOGL.OQ,"Crockett, Barton E",bcrockett@rblt.com,212-607-3108,Senior Analyst,120252,30377793,2022-04-01 06:21:30,57,40
+GOOGL.OQ,"Helfstein, Jason S",jason.helfstein@opco.com,212-667-6433,Equity Analyst,954,30177446,2008-01-14 00:00:00,94,72
+GOOGL.OQ,"Rossington, Paul",paul.rossington@hsbcib.com,44-20-7991-6734,Senior Analyst,358,30178831,2008-02-02 00:00:00,48,
+GOOGL.OQ,"Mahaney, Mark S",mark.mahaney@evercoreisi.com,415-531-5882,Equity Analyst,62195,30365247,2021-04-01 00:00:00,28,33
+GOOGL.OQ,"Purdy, Ho",purdyho@htsc.com,852-3658-6000,Equity Analyst,83242,30392842,2023-10-02 00:00:00,,27
+GOOGL.OQ,"Jones, Nicholas F",nick.2.jones@us.bnpparibas.com,929-742-0211,Research Analyst,2233,30407256,2025-11-02 00:00:00,61,78
+GOOGL.OQ,"Nowak, Brian T",Brian.Nowak@morganstanley.com,212-761-3365,Equity Analyst,2975,30311395,2015-02-03 00:00:00,39,40
+GOOGL.OQ,"Erickson, Brad D",brad.erickson@rbccm.com,971-842-9607,Equity Analyst,2182,30365985,2021-05-03 00:00:00,63,32
+GOOGL.OQ,"Champion, Thomas",tom.champion@psc.com,212-284-6132,Senior Research Anal,2691,30359931,2020-09-01 00:00:00,37,15
+GOOGL.OQ,"Martin, Laura A",lmartin@needhamco.com,917-373-3066,Equity Analyst,110,30194180,2009-11-07 00:00:00,1,26
+GOOGL.OQ,"Boone, Andrew",Andrew.Boone@citizensbank.com,415-835-3902,Equity Analyst,17304,30329157,2017-08-01 00:00:00,68,75
+GOOGL.OQ,"Zhang, Lunke L",zhanglunke@guosen.com.cn,82-755-8198-2651,Equity Analyst,35004,30375148,2022-01-10 03:03:37,100,81
+GOOGL.OQ,"Reitzes, Ben A",ben.reitzes@meliusresearch.com,212-503-6222,Equity Analyst,150887,30389991,2023-07-01 00:00:00,58,4
+GOOGL.OQ,"Ismailov, Saken",saken.ismailov@fbroker.kz,,Equity Analyst,148183,30398436,2024-07-01 00:00:00,52,34
+GOOGL.OQ,"Kulkarni, Rohit R",rkulkarni@roth.com,203-340-5188,Managing Director,69,30386536,2023-02-01 00:00:00,26,
+GOOGL.OQ,"Gabriel, Stephano",stephano.gabriel@itaubba.com,55-11-3073-3239,Equity Analyst,18026,30406312,2025-10-01 00:00:00,69,30
+GOOGL.OQ,"Sandler, Ross",ross.sandler@barclays.com,415-263-4470,Equity Analyst,10333,30326735,2017-03-28 00:00:00,73,27
+GOOGL.OQ,"Schackart, Ralph E",rschackart@williamblair.com,312-364-8753,Equity Analyst,11266,30129270,2005-03-08 13:35:00,21,58
+GOOGL.OQ,"Sanderson, Robert J",Rob.Sanderson@loopcapital.com,312-356-5856,Managing Director,12605,30345589,2019-06-01 00:00:00,85,4
+GOOGL.OQ,"Squali, Youssef H",Youssef.Squali@truist.com,212-303-4180,Equity Analyst,5179,30328648,2017-07-01 00:00:00,48,24
+GOOGL.OQ,"Luria, Gil B",gluria@dadco.com,503-603-3020,Managing Director,158,30364684,2021-03-02 00:00:00,51,27
+GOOGL.OQ,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,83,70
+GOOGL.OQ,"Sebastian, Colin A",csebastian@rwbaird.com,415-364-3350,Senior Research Anal,10924,30268030,2011-07-12 00:00:00,87,48
+GOOGL.OQ,"Patil, Shyam",Shyam.Patil@sig.com,212-510-4417,Equity Analyst,22972,30315350,2015-08-05 00:00:00,20,82
+GOOGL.OQ,"Fogh, Per",,,Equity Analyst,170823,30394049,2024-01-01 06:18:18,59,26
+GOOGL.OQ,"Pitz, Brian J",brian.pitz@bmo.com,212-671-8052,Equity Analyst,4104,30394060,2024-01-07 19:04:08,67,41
+GOOGL.OQ,"Ji, Ella",ellaji@chinarenaissance.com,212-554-2966,Director of Research,134810,30326216,2017-02-28 00:00:00,51,66
+GOOGL.OQ,"White, Brian J",bwhite@mchny.com,212-583-8510,Equity Analyst,49781,30335345,2018-04-01 00:00:00,,70
+GOOGL.OQ,"Feinseth, Ivan",ifeinseth@tigressfp.com,646-780-8901,Director of Research,117104,30305378,2012-01-01 00:00:00,47,21
+GOOGL.OQ,"Mathivanan, Deepak",Deepak.Mathivanan@cantor.com,415-869-2041,Research Analyst,5698,30399020,2024-09-04 00:00:00,70,
+GOOGL.OQ,"Gawrelski, Ken",Ken.Gawrelski@wellsfargo.com,617-210-3707,Equity Analyst,7671,30389119,2023-05-07 16:09:09,36,45
+GOOGL.OQ,"Sheridan, Eric J",eric.sheridan@gs.com,917-343-8683,Equity Analyst,6,30370949,2021-09-01 01:47:28,45,54
+GOOGL.OQ,"Ahmed Khan, Malik",malikahmed.khan@morningstar.com,,Senior Equity Analys,60797,30373389,2021-10-01 00:00:00,14,
+GOOGL.OQ,"Shmulik, Mark E",mark.shmulik@bernsteinsg.com,212-823-3237,Equity Analyst,6872,30349841,2020-01-09 00:00:00,44,40
+GOOGL.OQ,"Patterson, Justin T",justin.patterson@key.com,415-486-3406,Equity Analyst,12336,30359941,2020-09-01 00:00:00,23,59
+GOOGL.OQ,"Zino, Angelo",,,Equity Analyst,178117,30368481,2021-07-08 00:00:00,39,34
+GOOGL.OQ,"Gaonkar, Satish",satishg@crispidea.com,,Research Analyst,61498,30407473,2025-12-01 00:00:00,76,69
+GOOGL.OQ,"Heasman, David",dheasman@accountabilityresearch.com,,Equity Analyst,60372,30360992,2020-10-19 00:00:00,55,40
+GOOGL.OQ,"Morris, Michael",michael.morris@guggenheimpartners.c,804-253-8025,Managing Director,62598,30299858,2013-09-10 00:00:00,71,60
+GOOGL.OQ,"Wong, Tommy",tommywong@cmschina.com.hk,852-3189-6634,Equity Analyst,60410,30343582,2019-01-01 00:00:00,1,
+GOOGL.OQ,"Seo, Youngjae",youngjae.seo@daishin.com,,Equity Analyst,60471,30374632,2021-12-15 12:00:00,88,12
+GOOGL.OQ,Research Department,,,Other,126605,30325967,2017-02-10 00:00:00,43,37
+GOOGL.OQ,"Kramer, Richard A",richard.kramer@arete.net,44-20-7959-1303,Equity Analyst,35539,30167859,2003-10-01 00:00:00,50,71
+GOOGL.OQ,"He, Saiyi",hesaiyi@cmbi.com.hk,852-3916-1739,Equity Analyst,81441,30383736,2022-10-09 20:57:23,34,45
+GOOGL.OQ,,,,,,,,23,
+GOOGL.OQ,,,,,,,,41,18
+GOOGL.OQ,,,,,,,,26,77
+GOOGL.OQ,,,,,,,,,21
+GOOGL.OQ,,,,,,,,11,18
+GOOGL.OQ,,,,,,,,36,38
+GOOGL.OQ,,,,,,,,45,28
+GOOGL.OQ,,,,,,,,81,35
+GOOGL.OQ,,,,,,,,43,45
+GOOGL.OQ,,,,,,,,57,37
+GOOGL.OQ,,,,,,,,1,75
+GOOGL.OQ,,,,,,,,42,57
+GOOGL.OQ,,,,,,,,42,28
+META.OQ,Research Department,,,Other,126605,30325967,2017-02-10 00:00:00,45,3
+META.OQ,"Kim, Joong-han",joonghan1.kim@samsung.com,,Senior Analyst,5168,30375488,2022-01-19 07:08:57,62,70
+META.OQ,"White, Brian J",bwhite@mchny.com,212-583-8510,Equity Analyst,49781,30335345,2018-04-01 00:00:00,73,23
+META.OQ,"Walmsley, Lloyd",Lloyd.Walmsley@mizuhogroup.com,212-373-5703,Managing Director,61910,30404816,2025-07-01 00:00:00,75,27
+META.OQ,"Jones, Nicholas F",nick.2.jones@us.bnpparibas.com,929-742-0211,Research Analyst,2233,30407256,2025-11-02 00:00:00,45,7
+META.OQ,"Ripps, Maria",MRipps@cgf.com,212-849-3923,Equity Analyst,10642,30335245,2018-04-01 12:00:01,54,36
+META.OQ,"Kim, Sehwan",usa@kbfg.com,822-6114-2906,Equity Analyst,15154,30342013,2018-12-01 00:00:00,12,5
+META.OQ,"Anmuth, Doug",douglas.anmuth@jpmorgan.com,212-622-6571,Equity Analyst,4614,30270190,2011-06-10 00:00:00,,5
+META.OQ,"Heasman, David",dheasman@accountabilityresearch.com,,Equity Analyst,60372,30360992,2020-10-19 00:00:00,27,28
+META.OQ,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,55,57
+META.OQ,"Martin, Laura A",lmartin@needhamco.com,917-373-3066,Equity Analyst,110,30194180,2009-11-07 00:00:00,33,9
+META.OQ,"Khajuria, Shweta R",skhajuria@wolferesearch.com,415-878-6425,Equity Analyst,43418,30398118,2024-07-15 00:00:00,28,58
+META.OQ,"He, Saiyi",hesaiyi@cmbi.com.hk,852-3916-1739,Equity Analyst,81441,30383736,2022-10-09 20:57:23,63,66
+META.OQ,"Schackart, Ralph E",rschackart@williamblair.com,312-364-8753,Equity Analyst,11266,30129270,2005-03-08 13:35:00,53,25
+META.OQ,"Gawrelski, Ken",Ken.Gawrelski@wellsfargo.com,617-210-3707,Equity Analyst,7671,30389119,2023-05-07 16:09:09,77,76
+META.OQ,"Sanderson, Robert J",Rob.Sanderson@loopcapital.com,312-356-5856,Managing Director,12605,30345589,2019-06-01 00:00:00,77,96
+META.OQ,"Luria, Gil B",gluria@dadco.com,503-603-3020,Managing Director,158,30364684,2021-03-02 00:00:00,57,40
+META.OQ,"Zgutowicz, Mark",mzgutowicz@benchmarkcompany.com,612-554-6700,Equity Analyst,31149,30376490,2022-03-01 00:00:00,45,96
+META.OQ,"Patil, Shyam",Shyam.Patil@sig.com,212-510-4417,Equity Analyst,22972,30315350,2015-08-05 00:00:00,94,72
+META.OQ,"Ji, Ella",ellaji@chinarenaissance.com,212-554-2966,Director of Research,134810,30326216,2017-02-28 00:00:00,48,
+META.OQ,"Xia, Lulu",xialulu@htsc.com,852-3658-6000,Equity Analyst,83242,30388754,2023-04-01 00:00:00,28,33
+META.OQ,"Mathivanan, Deepak",Deepak.Mathivanan@cantor.com,415-869-2041,Research Analyst,5698,30399020,2024-09-04 00:00:00,,27
+META.OQ,"Sebastian, Colin A",csebastian@rwbaird.com,415-364-3350,Senior Research Anal,10924,30268030,2011-07-12 00:00:00,61,78
+META.OQ,"Park, Yeon Ju",yeonju.park@miraeasset.com,822-3774-1755,Equity Analyst,5169,30186753,2006-05-03 00:00:00,39,40
+META.OQ,"Feinseth, Ivan",ifeinseth@tigressfp.com,646-780-8901,Director of Research,117104,30305378,2012-01-01 00:00:00,53,76
+META.OQ,"Pitz, Brian J",brian.pitz@bmo.com,212-671-8052,Equity Analyst,4104,30394060,2024-01-07 19:04:08,63,32
+META.OQ,"Ismailov, Saken",saken.ismailov@fbroker.kz,,Equity Analyst,148183,30398436,2024-07-01 00:00:00,37,15
+META.OQ,"Beck, Josh",josh.beck@raymondjames.com,727-567-2201,Equity Analyst,2690,30393791,2023-12-18 16:27:02,1,26
+META.OQ,"Sheridan, Eric J",eric.sheridan@gs.com,917-343-8683,Equity Analyst,6,30370949,2021-09-01 01:47:28,68,75
+META.OQ,"Wong, Tommy",tommywong@cmschina.com.hk,852-3189-6634,Equity Analyst,60410,30343582,2019-01-01 00:00:00,100,81
+META.OQ,"Schindler, Nathaniel",nat.schindler@scotiabank.com,415-490-2648,Equity Analyst,82,30399974,2024-10-10 00:00:00,100,8
+META.OQ,"Wermann, Ingo",ingo.wermann@dzbank.de,49-69-74-47-90544,Equity Analyst,18658,30192920,2009-09-24 07:48:00,58,4
+META.OQ,"Nathanson, Michael B",michael@moffettnathanson.com,212-519-0010,Senior Analyst,111984,30301085,2013-11-01 00:00:00,26,
+META.OQ,"Bai, Yang",yang3.bai@cicc.com.cn,,Equity Analyst,20783,30360765,2020-10-01 00:00:00,69,30
+META.OQ,"Huber, Craig A",craig.huber@huberresearch.com,203-930-7755,Equity Analyst,155953,30336732,2018-06-20 00:00:00,73,27
+META.OQ,"Mahaney, Mark S",mark.mahaney@evercoreisi.com,415-531-5882,Equity Analyst,62195,30365247,2021-04-01 00:00:00,21,58
+META.OQ,"Nowak, Brian T",Brian.Nowak@morganstanley.com,212-761-3365,Equity Analyst,2975,30311395,2015-02-03 00:00:00,85,4
+META.OQ,"Helfstein, Jason S",jason.helfstein@opco.com,212-667-6433,Equity Analyst,954,30177446,2008-01-14 00:00:00,48,24
+META.OQ,"Squali, Youssef H",Youssef.Squali@truist.com,212-303-4180,Equity Analyst,5179,30328648,2017-07-01 00:00:00,39,50
+META.OQ,"Cote-Colisson, Nicolas S",nicolas.cote-colisson@hsbcib.com,44-20-7991-6826,Senior Analyst,358,30117473,2002-03-18 00:00:00,51,27
+META.OQ,"Wlodarczak, Jeffrey D",jeff@pvtl.com,212-514-4680,Equity Analyst,60962,30197118,2010-02-26 00:00:00,83,70
+META.OQ,"Black, Benjamin T",benjamin.black@db.com,212-250-9218,Research Analyst,47,30375867,2022-02-01 16:33:28,87,48
+META.OQ,"Crockett, Barton E",bcrockett@rblt.com,212-607-3108,Senior Analyst,120252,30377793,2022-04-01 06:21:30,20,82
+META.OQ,"Yao, Barney",barney.sq.yao@htisec.com,,Equity Analyst,60474,30376433,2022-02-24 21:20:02,59,26
+META.OQ,"Erickson, Brad D",brad.erickson@rbccm.com,971-842-9607,Equity Analyst,2182,30365985,2021-05-03 00:00:00,67,41
+META.OQ,"Champion, Thomas",tom.champion@psc.com,212-284-6132,Senior Research Anal,2691,30359931,2020-09-01 00:00:00,51,66
+META.OQ,"Boone, Andrew",Andrew.Boone@citizensbank.com,415-835-3902,Equity Analyst,17304,30329157,2017-08-01 00:00:00,,70
+META.OQ,"Josey, Ronald",,+1-212-816-4545,,3202,30376243,2022-02-01 00:00:00,47,21
+META.OQ,"Thill, Brent J",bthill@jefferies.com,415-229-1559,Equity Analyst,138,30329537,2017-08-02 00:00:00,70,
+META.OQ,"Bonner, Joseph F",jbonner@argusresearch.com,212-425-5464,Equity Analyst,9584,30135805,2003-09-24 00:00:00,36,45
+META.OQ,"Kim, Seunghyuk",ocean93@kiwoom.com,,Equity Analyst,60468,30395604,2024-03-22 00:00:00,61,10
+META.OQ,"Sandler, Ross",ross.sandler@barclays.com,415-263-4470,Equity Analyst,10333,30326735,2017-03-28 00:00:00,45,54
+META.OQ,"Cheng, Andrew",andrew.cheng@kgi.com,88-62-2181-8748,Equity Analyst,10877,30346963,2019-08-01 00:00:00,14,
+META.OQ,"Blackledge, John R",john.blackledge@cowen.com,646-562-1359,Equity Analyst,85,30293867,2012-10-16 00:00:00,44,40
+META.OQ,"Seo, Youngjae",youngjae.seo@daishin.com,,Equity Analyst,60471,30374632,2021-12-15 12:00:00,23,59
+META.OQ,"Patterson, Justin T",justin.patterson@key.com,415-486-3406,Equity Analyst,12336,30359941,2020-09-01 00:00:00,39,34
+META.OQ,"Morris, Michael",michael.morris@guggenheimpartners.c,804-253-8025,Managing Director,62598,30299858,2013-09-10 00:00:00,45,19
+META.OQ,"Zino, Angelo",,,Equity Analyst,178117,30368481,2021-07-08 00:00:00,76,69
+META.OQ,"Shmulik, Mark E",mark.shmulik@bernsteinsg.com,212-823-3237,Equity Analyst,6872,30349841,2020-01-09 00:00:00,72,24
+META.OQ,"Strauss, Rocco",rocco.strauss@arete.net,44-20-3934-0019,Equity Analyst,35539,30305999,2014-07-01 00:00:00,55,40
+META.OQ,"Ahmed Khan, Malik",malikahmed.khan@morningstar.com,,Senior Equity Analys,60797,30373389,2021-10-01 00:00:00,71,60
+META.OQ,"Kulkarni, Rohit R",rkulkarni@roth.com,203-340-5188,Managing Director,69,30386536,2023-02-01 00:00:00,1,
+META.OQ,"Zhang, Lunke L",zhanglunke@guosen.com.cn,82-755-8198-2651,Equity Analyst,35004,30375148,2022-01-10 03:03:37,52,60
+META.OQ,,,,,,,,88,12
+META.OQ,,,,,,,,43,37
+META.OQ,,,,,,,,23,99
+META.OQ,,,,,,,,34,45
+META.OQ,,,,,,,,41,18
+META.OQ,,,,,,,,26,77
+META.OQ,,,,,,,,11,18
+META.OQ,,,,,,,,24,45
+META.OQ,,,,,,,,52,40
+META.OQ,,,,,,,,36,38
+META.OQ,,,,,,,,45,28
+META.OQ,,,,,,,,81,35
+META.OQ,,,,,,,,31,66
+META.OQ,,,,,,,,57,37
+META.OQ,,,,,,,,42,57
+AMZN.OQ,"Luria, Gil B",gluria@dadco.com,503-603-3020,Managing Director,158,30364684,2021-03-02 00:00:00,52,64
+AMZN.OQ,"Seo, Youngjae",youngjae.seo@daishin.com,,Equity Analyst,60471,30374632,2021-12-15 12:00:00,75,27
+AMZN.OQ,"Kurnos, Daniel L",Daniel.Kurnos@StoneX.com,561-943-9766,Equity Analyst,31149,30258511,2010-12-23 00:00:00,45,7
+AMZN.OQ,"Patterson, Justin T",justin.patterson@key.com,415-486-3406,Equity Analyst,12336,30359941,2020-09-01 00:00:00,54,36
+AMZN.OQ,"Kelleher, Jim N",jkelleher@argusresearch.com,212-425-5474,Director of Research,9584,30042327,1995-05-29 00:00:00,58,30
+AMZN.OQ,"Shmulik, Mark E",mark.shmulik@bernsteinsg.com,212-823-3237,Equity Analyst,6872,30349841,2020-01-09 00:00:00,12,5
+AMZN.OQ,"Strauss, Rocco",rocco.strauss@arete.net,44-20-3934-0019,Equity Analyst,35539,30305999,2014-07-01 00:00:00,,5
+AMZN.OQ,"He, Saiyi",hesaiyi@cmbi.com.hk,852-3916-1739,Equity Analyst,81441,30383736,2022-10-09 20:57:23,27,28
+AMZN.OQ,"Kulkarni, Rohit R",rkulkarni@roth.com,203-340-5188,Managing Director,69,30386536,2023-02-01 00:00:00,55,57
+AMZN.OQ,"Sandler, Ross",ross.sandler@barclays.com,415-263-4470,Equity Analyst,10333,30326735,2017-03-28 00:00:00,36,50
+AMZN.OQ,"Squali, Youssef H",Youssef.Squali@truist.com,212-303-4180,Equity Analyst,5179,30328648,2017-07-01 00:00:00,28,58
+AMZN.OQ,"Sebastian, Colin A",csebastian@rwbaird.com,415-364-3350,Senior Research Anal,10924,30268030,2011-07-12 00:00:00,63,66
+AMZN.OQ,"Romanoff, Dan",dan.romanoff@morningstar.com,312-244-7816,Senior Equity Analys,60797,30343317,2019-01-11 00:00:00,53,25
+AMZN.OQ,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,91,12
+AMZN.OQ,"Patil, Shyam",Shyam.Patil@sig.com,212-510-4417,Equity Analyst,22972,30315350,2015-08-05 00:00:00,57,40
+AMZN.OQ,"Haissl, Alexander A",alex.haissl@redburnatlantic.com,44-20-70-00-21-13,Equity Analyst,38750,30379654,2022-07-01 00:00:00,45,96
+AMZN.OQ,"Ji, Ella",ellaji@chinarenaissance.com,212-554-2966,Director of Research,134810,30326216,2017-02-28 00:00:00,94,72
+AMZN.OQ,"Xia, Lulu",xialulu@htsc.com,852-3658-6000,Equity Analyst,83242,30388754,2023-04-01 00:00:00,28,33
+AMZN.OQ,"Mathivanan, Deepak",Deepak.Mathivanan@cantor.com,415-869-2041,Research Analyst,5698,30399020,2024-09-04 00:00:00,97,85
+AMZN.OQ,"White, Brian J",bwhite@mchny.com,212-583-8510,Equity Analyst,49781,30335345,2018-04-01 00:00:00,1,28
+AMZN.OQ,"Siegel, Simeon A",simeon.siegel@guggenheimpartners.co,212-518-9852,Equity Analyst,62598,30407620,2025-12-01 16:08:50,,27
+AMZN.OQ,"Forte, Thomas F",tforte@maximgrp.com,212-895-3830,Equity Analyst,22991,30396275,2024-04-16 07:00:51,61,78
+AMZN.OQ,"Kang, Seongjin",seongjin.kang@kbfg.com,82-2-6114-2911,Equity Analyst,15154,30325273,2017-01-12 00:00:00,39,40
+AMZN.OQ,"Martin, Laura A",lmartin@needhamco.com,917-373-3066,Equity Analyst,110,30194180,2009-11-07 00:00:00,53,76
+AMZN.OQ,"Wlodarczak, Jeffrey D",jeff@pvtl.com,212-514-4680,Equity Analyst,60962,30197118,2010-02-26 00:00:00,63,32
+AMZN.OQ,"Black, Benjamin T",benjamin.black@db.com,212-250-9218,Research Analyst,47,30375867,2022-02-01 16:33:28,37,15
+AMZN.OQ,"Crockett, Barton E",bcrockett@rblt.com,212-607-3108,Senior Analyst,120252,30377793,2022-04-01 06:21:30,1,26
+AMZN.OQ,"Walmsley, Lloyd",Lloyd.Walmsley@mizuhogroup.com,212-373-5703,Managing Director,61910,30404816,2025-07-01 00:00:00,68,75
+AMZN.OQ,"Rossington, Paul",paul.rossington@hsbcib.com,44-20-7991-6734,Senior Analyst,358,30178831,2008-02-02 00:00:00,100,81
+AMZN.OQ,"Yao, Barney",barney.sq.yao@htisec.com,,Equity Analyst,60474,30376433,2022-02-24 21:20:02,58,4
+AMZN.OQ,"Lim, Haein",haein.lim@hanwha.com,822-3772-7799,Equity Analyst,22919,30390967,2023-08-22 02:33:29,52,34
+AMZN.OQ,"Erickson, Brad D",brad.erickson@rbccm.com,971-842-9607,Equity Analyst,2182,30365985,2021-05-03 00:00:00,31,
+AMZN.OQ,"Champion, Thomas",tom.champion@psc.com,212-284-6132,Senior Research Anal,2691,30359931,2020-09-01 00:00:00,73,27
+AMZN.OQ,"Boone, Andrew",Andrew.Boone@citizensbank.com,415-835-3902,Equity Analyst,17304,30329157,2017-08-01 00:00:00,21,58
+AMZN.OQ,"Morton, Michael P",michael.morton@moffettnathanson.com,212-519-0015,Equity Analyst,111984,30386377,2023-01-02 06:36:11,85,4
+AMZN.OQ,"Josey, Ronald",,+1-212-816-4545,,3202,30376243,2022-02-01 00:00:00,48,24
+AMZN.OQ,"Tolmachev, Egor",egor.tolmachev@ffin.ae,,Senior Analyst,148183,30397231,2024-05-31 12:23:56,51,27
+AMZN.OQ,"Thill, Brent J",bthill@jefferies.com,415-229-1559,Equity Analyst,138,30329537,2017-08-02 00:00:00,83,70
+AMZN.OQ,"Khajuria, Shweta R",skhajuria@wolferesearch.com,415-878-6425,Equity Analyst,43418,30398118,2024-07-15 00:00:00,59,26
+AMZN.OQ,"Kim, Seunghyuk",ocean93@kiwoom.com,,Equity Analyst,60468,30395604,2024-03-22 00:00:00,,50
+AMZN.OQ,"Daptardar, Kadambari",kdaptardar@accountabilityresearch.c,,Equity Analyst,60372,30377842,2022-04-01 00:00:00,67,41
+AMZN.OQ,"Cheng, Andrew",andrew.cheng@kgi.com,88-62-2181-8748,Equity Analyst,10877,30346963,2019-08-01 00:00:00,51,66
+AMZN.OQ,"Anmuth, Doug",douglas.anmuth@jpmorgan.com,212-622-6571,Equity Analyst,4614,30270190,2011-06-10 00:00:00,,32
+AMZN.OQ,"Blackledge, John R",john.blackledge@cowen.com,646-562-1359,Equity Analyst,85,30293867,2012-10-16 00:00:00,70,74
+AMZN.OQ,"Zhang, Lunke L",zhanglunke@guosen.com.cn,82-755-8198-2651,Equity Analyst,35004,30375148,2022-01-10 03:03:37,47,21
+AMZN.OQ,"Dinesh, Aishwarya",aishwaryad@crispidea.com,,Associate,61498,30386977,2023-02-20 04:28:38,36,45
+AMZN.OQ,"Helfstein, Jason S",jason.helfstein@opco.com,212-667-6433,Equity Analyst,954,30177446,2008-01-14 00:00:00,45,54
+AMZN.OQ,"Sheridan, Eric J",eric.sheridan@gs.com,917-343-8683,Equity Analyst,6,30370949,2021-09-01 01:47:28,14,
+AMZN.OQ,"Ripps, Maria",MRipps@cgf.com,212-849-3923,Equity Analyst,10642,30335245,2018-04-01 12:00:01,44,40
+AMZN.OQ,"Tao, Ye",ye3.tao@cicc.com.cn,,Equity Analyst,20783,30370032,2021-08-16 12:32:35,23,59
+AMZN.OQ,"Feldman, Joseph I",jfeldman@telseygroup.com,212-584-4605,Equity Analyst,101198,30296222,2013-03-08 00:00:00,39,34
+AMZN.OQ,"Nowak, Brian T",Brian.Nowak@morganstanley.com,212-761-3365,Equity Analyst,2975,30311395,2015-02-03 00:00:00,76,69
+AMZN.OQ,"Kehl, Klaus",,,Equity Analyst,170823,30364814,2020-11-01 00:00:00,38,67
+AMZN.OQ,"Sanderson, Robert J",Rob.Sanderson@loopcapital.com,312-356-5856,Managing Director,12605,30345589,2019-06-01 00:00:00,64,47
+AMZN.OQ,"Wong, Tommy T",tommywong@cmschina.com.hk,852-3189-6634,Equity Analyst,60410,30394675,2024-02-05 19:11:28,72,24
+AMZN.OQ,"Carden, Dylan",dcarden@williamblair.com,312-801-7857,Equity Analyst,11266,30325542,2017-01-23 00:00:00,55,40
+AMZN.OQ,Research Department,,,Other,126605,30325967,2017-02-10 00:00:00,69,14
+AMZN.OQ,"Sundaram, Arun",,,Equity Analyst,178117,30368236,2021-07-01 00:00:00,71,60
+AMZN.OQ,"Schindler, Nathaniel",nat.schindler@scotiabank.com,415-490-2648,Equity Analyst,82,30399974,2024-10-10 00:00:00,50,63
+AMZN.OQ,"Pitz, Brian J",brian.pitz@bmo.com,212-671-8052,Equity Analyst,4104,30394060,2024-01-07 19:04:08,1,
+AMZN.OQ,"Jones, Nicholas F",nick.2.jones@us.bnpparibas.com,929-742-0211,Research Analyst,2233,30407256,2025-11-02 00:00:00,52,60
+AMZN.OQ,"Park, Yeon Ju",yeonju.park@miraeasset.com,822-3774-1755,Equity Analyst,5169,30186753,2006-05-03 00:00:00,88,12
+AMZN.OQ,"Fu, Tianzi",futz@ebscn.com,86-21-5252-3692,Equity Analyst,30477,30327756,2017-05-01 00:00:00,43,37
+AMZN.OQ,"Feinseth, Ivan",ifeinseth@tigressfp.com,646-780-8901,Director of Research,117104,30305378,2012-01-01 00:00:00,34,45
+AMZN.OQ,"Wermann, Ingo",ingo.wermann@dzbank.de,49-69-74-47-90544,Equity Analyst,18658,30192920,2009-09-24 07:48:00,41,18
+AMZN.OQ,"Mahaney, Mark S",mark.mahaney@evercoreisi.com,415-531-5882,Equity Analyst,62195,30365247,2021-04-01 00:00:00,26,77
+AMZN.OQ,"Beck, Josh",josh.beck@raymondjames.com,727-567-2201,Equity Analyst,2690,30393791,2023-12-18 16:27:02,11,18
+AMZN.OQ,"Gawrelski, Ken",Ken.Gawrelski@wellsfargo.com,617-210-3707,Equity Analyst,7671,30389119,2023-05-07 16:09:09,23,45
+AMZN.OQ,"Ko, Minsung",minsung.ko@nhsec.com,822-768-7707,Junior Analyst,17150,30388097,2023-04-20 06:01:34,24,45
+AMZN.OQ,,,,,,,,1,30
+AMZN.OQ,,,,,,,,66,5
+AMZN.OQ,,,,,,,,36,38
+AMZN.OQ,,,,,,,,81,35
+AMZN.OQ,,,,,,,,31,66
+AMZN.OQ,,,,,,,,28,7
+AMZN.OQ,,,,,,,,57,37
+AMZN.OQ,,,,,,,,42,57
+AMZN.OQ,,,,,,,,99,10
+NFLX.OQ,"Reese, Alicia",Alicia.Reese@wedbush.com,212-938-9927,Equity Analyst,78,30296730,2013-04-05 01:54:00,93,12
+NFLX.OQ,"Blackledge, John R",john.blackledge@cowen.com,646-562-1359,Equity Analyst,85,30293867,2012-10-16 00:00:00,62,70
+NFLX.OQ,"Marok, Andrew J",andrew.marok@raymondjames.com,212-856-4885,Equity Analyst,2690,30359692,2020-08-09 00:00:00,73,23
+NFLX.OQ,"Kim, Gyuyeon",gyuyeon.kim@miraeasset.com,,Equity Analyst,5169,30382298,2022-08-16 11:23:33,49,76
+NFLX.OQ,"Anmuth, Doug",douglas.anmuth@jpmorgan.com,212-622-6571,Equity Analyst,4614,30270190,2011-06-10 00:00:00,44,98
+NFLX.OQ,"Wlodarczak, Jeffrey D",jeff@pvtl.com,212-514-4680,Equity Analyst,60962,30197118,2010-02-26 00:00:00,45,7
+NFLX.OQ,"White, Brian J",bwhite@mchny.com,212-583-8510,Equity Analyst,49781,30335345,2018-04-01 00:00:00,54,36
+NFLX.OQ,"Fishman, Robert S",robert@moffettnathanson.com,212-519-0013,Equity Analyst,111984,30301215,2013-11-07 00:00:00,71,64
+NFLX.OQ,"Condon, Matthew D",mattew.condon@citizensbank.com,617-235-8502,Equity Analyst,17304,30369306,2021-07-28 01:39:07,27,28
+NFLX.OQ,"Martin, Laura A",lmartin@needhamco.com,917-373-3066,Equity Analyst,110,30194180,2009-11-07 00:00:00,55,57
+NFLX.OQ,"Champion, Thomas",tom.champion@psc.com,212-284-6132,Senior Research Anal,2691,30359931,2020-09-01 00:00:00,36,50
+NFLX.OQ,"Crockett, Barton E",bcrockett@rblt.com,212-607-3108,Senior Analyst,120252,30377793,2022-04-01 06:21:30,63,66
+NFLX.OQ,"Kim, Seunghyuk",ocean93@kiwoom.com,,Equity Analyst,60468,30395604,2024-03-22 00:00:00,53,25
+NFLX.OQ,"Patterson, Justin T",justin.patterson@key.com,415-486-3406,Equity Analyst,12336,30359941,2020-09-01 00:00:00,56,81
+NFLX.OQ,"Thomsen, Anne Sofie D",,,Equity Analyst,170823,30407456,2025-11-01 00:00:00,77,76
+NFLX.OQ,"Bonner, Joseph F",jbonner@argusresearch.com,212-425-5464,Equity Analyst,9584,30135805,2003-09-24 00:00:00,64,39
+NFLX.OQ,"Bazinet, Jason",,+1-212-816-6395,,3202,30148998,2005-03-01 10:28:00,52,87
+NFLX.OQ,"Faber, Hamilton S",,,Equity Analyst,38750,30390620,2023-08-01 00:00:00,69,45
+NFLX.OQ,"Gabriel, Stephano",stephano.gabriel@itaubba.com,55-11-3073-3239,Equity Analyst,18026,30406312,2025-10-01 00:00:00,83,21
+NFLX.OQ,"Morris, Michael",michael.morris@guggenheimpartners.c,804-253-8025,Managing Director,62598,30299858,2013-09-10 00:00:00,,27
+NFLX.OQ,"ZHANG, Xueqing",xueqing.zhang@cicc.com.cn,,Equity Analyst,20783,30320446,2016-04-07 00:00:00,46,
+NFLX.OQ,"Supino, Peter L",psupino@wolferesearch.com,646-582-9330,Equity Analyst,43418,30378837,2022-04-01 22:53:40,68,75
+NFLX.OQ,"Yoon, Laurent",laurent.yoon@bernsteinsg.com,212-969-1361,Equity Analyst,6872,30392179,2023-10-05 00:00:00,100,81
+NFLX.OQ,"Xia, Lulu",xialulu@htsc.com,852-3658-6000,Equity Analyst,83242,30388754,2023-04-01 00:00:00,100,8
+NFLX.OQ,"Leistner, Markus",,,Equity Analyst,18658,30386280,2023-01-01 00:00:00,39,51
+NFLX.OQ,"Lai, Tommy",tommy.lai@kgi.com,886-2-2181-8710,Equity Analyst,10877,30398141,2024-07-01 00:00:00,26,
+NFLX.OQ,"Venkateshwar, Kannan",kannan.venkateshwar@barclays.com,212-528-7054,Equity Analyst,10333,30177535,2008-01-11 00:00:00,69,30
+NFLX.OQ,"Ismailov, Saken",saken.ismailov@fbroker.kz,,Equity Analyst,148183,30398436,2024-07-01 00:00:00,73,27
+NFLX.OQ,"Huber, Craig A",craig.huber@huberresearch.com,203-930-7755,Equity Analyst,155953,30336732,2018-06-20 00:00:00,75,52
+NFLX.OQ,"Joyce, David C",djoyce@seaportrp.com,201-421-4229,Senior Analyst,59786,30388178,2023-01-01 17:00:15,52,98
+NFLX.OQ,"Diffley, Sean P",Sean.DIFFLEY@morganstanley.com,212-761-5868,Equity Analyst,2975,30409456,2026-04-01 00:14:33,79,69
+NFLX.OQ,"Beale, Andrew C",andrew.beale@arete.net,44-20-7959-1316,Equity Analyst,35539,30168095,2003-10-01 00:00:00,51,27
+NFLX.OQ,"Pitz, Brian J",brian.pitz@bmo.com,212-671-8052,Equity Analyst,4104,30394060,2024-01-07 19:04:08,83,70
+NFLX.OQ,"Cahall, Steven",steven.cahall@wellsfargo.com,212-214-8240,Equity Analyst,7671,30347582,2019-08-26 00:00:00,67,41
+NFLX.OQ,"Khallouf, Mohammed",mohammed.khallouf@hsbc.com,971-4-509-3337,Equity Analyst,358,30389801,2023-07-12 23:29:14,20,42
+NFLX.OQ,"Sanderson, Robert J",Rob.Sanderson@loopcapital.com,312-356-5856,Managing Director,12605,30345589,2019-06-01 00:00:00,51,48
+NFLX.OQ,"Sheridan, Eric J",eric.sheridan@gs.com,917-343-8683,Equity Analyst,6,30370949,2021-09-01 01:47:28,64,39
+NFLX.OQ,"Dolgin, Matthew",matthew.dolgin@morningstar.com,312-696-6783,Senior Equity Analys,60797,30334748,2018-03-18 20:00:19,60,73
+NFLX.OQ,"Wong, Tommy",tommywong@cmschina.com.hk,852-3189-6634,Equity Analyst,60410,30343582,2019-01-01 00:00:00,47,21
+NFLX.OQ,"Shetty, Sukshith",shettys@crispidea.com,,Research Analyst,61498,30396504,2024-04-28 07:13:24,76,69
+NFLX.OQ,"Heaney, James",,,,138,30341484,2018-11-21 17:10:42,52,68
+NFLX.OQ,"Kesavabhotla, Vikram",vkesavabhotla@rwbaird.com,646-557-2727,Senior Research Anal,10924,30365629,2021-04-01 00:00:00,35,45
+NFLX.OQ,"Leon, Kenneth M",kenneth.leon@cfraresearch.com,,Equity Analyst,178117,30368178,2021-07-06 00:00:00,,90
+NFLX.OQ,"Kurnos, Daniel L",Daniel.Kurnos@StoneX.com,561-943-9766,Equity Analyst,31149,30258511,2010-12-23 00:00:00,28,61
+NFLX.OQ,Research Department,,,Other,126605,30325967,2017-02-10 00:00:00,52,60
+NFLX.OQ,"Helfstein, Jason S",jason.helfstein@opco.com,212-667-6433,Equity Analyst,954,30177446,2008-01-14 00:00:00,43,37
+NFLX.OQ,"Kraft, Bryan D",bryan.kraft@db.com,212-250-0117,Research Analyst,47,30311568,2015-03-04 00:00:00,60,76
+NFLX.OQ,"Zhang, Yiwen",yiwenzhang@chinarenaissance.com,852-2287-1624,Research Analyst,134810,30368584,2021-07-12 19:07:23,1,72
+NFLX.OQ,"Ripps, Maria",MRipps@cgf.com,212-849-3923,Equity Analyst,10642,30335245,2018-04-01 12:00:01,34,45
+NFLX.OQ,"Mahaney, Mark S",mark.mahaney@evercoreisi.com,415-531-5882,Equity Analyst,62195,30365247,2021-04-01 00:00:00,54,9
+NFLX.OQ,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,11,18
+NFLX.OQ,"Schackart, Ralph E",rschackart@williamblair.com,312-364-8753,Equity Analyst,11266,30129270,2005-03-08 13:35:00,24,45
+NFLX.OQ,,,,,,,,36,35
+NFLX.OQ,,,,,,,,75,48
+NFLX.OQ,,,,,,,,45,28
+NFLX.OQ,,,,,,,,73,45
+NFLX.OQ,,,,,,,,1,75
+NFLX.OQ,,,,,,,,,45
+NFLX.OQ,,,,,,,,56,7
+NFLX.OQ,,,,,,,,64,48
+CRM.N,"Gaonkar, Satish",satishg@crispidea.com,,Research Analyst,61498,30407473,2025-12-01 00:00:00,43,1
+CRM.N,"DiFucci, John S",john.difucci@guggenheimpartners.com,212-518-9670,Equity Analyst,62598,30382169,2022-08-01 00:00:00,71,59
+CRM.N,"Luria, Gil B",gluria@dadco.com,503-603-3020,Managing Director,158,30364684,2021-03-02 00:00:00,57,2
+CRM.N,"Bhatia, Arjun",abhatia@williamblair.com,312-364-5696,Equity Analyst,11266,30348014,2019-09-30 00:00:00,61,18
+CRM.N,"Tillman, Terry",Terry.Tillman@truist.com,404-926-5362,Equity Analyst,5179,30147099,2005-01-02 00:00:00,73,23
+CRM.N,"Baldry, Richard K",rbaldry@roth.com,617-953-8995,Equity Analyst,69,30131436,2003-06-09 00:00:00,34,23
+CRM.N,"Zino, Angelo",,,Equity Analyst,178117,30368481,2021-07-08 00:00:00,45,7
+CRM.N,"Romanoff, Dan",dan.romanoff@morningstar.com,312-244-7816,Senior Equity Analys,60797,30343317,2019-01-11 00:00:00,54,33
+CRM.N,"Hynes, David E",DHynes@cgf.com,617-371-3882,Equity Analyst,10642,30205925,2010-07-13 06:18:00,28,7
+CRM.N,"Huff, Brett R",brett.huff@stephens.com,501-377-8068,Equity Analyst,2701,30174361,2005-09-13 00:00:00,55,51
+CRM.N,"Bachman, Keith F",keith.bachman@bmo.com,347-891-0258,Equity Analyst,4104,30171872,2007-07-09 00:00:00,68,80
+CRM.N,"Jaluria, Rishi N",rishi.jaluria@rbccm.com,415-633-8798,Equity Analyst,2182,30366016,2021-05-01 00:00:00,53,41
+CRM.N,"Slowinski, Stefan J",stefan.slowinski@uk.bnpparibas.com,44-203-430-8549,Research Analyst,2233,30329106,2017-08-01 00:00:00,49,38
+CRM.N,"Kim, Yun S",Yun.Kim@loopcapital.com,212-823-1310,Managing Director,12605,30359048,2020-08-20 00:00:00,56,12
+CRM.N,"Tolmachev, Egor",egor.tolmachev@ffin.ae,,Senior Analyst,148183,30397231,2024-05-31 12:23:56,26,73
+CRM.N,"White, Brian J",bwhite@mchny.com,212-583-8510,Equity Analyst,49781,30335345,2018-04-01 00:00:00,62,33
+CRM.N,Research Department,,,Other,126605,30325967,2017-02-10 00:00:00,70,45
+CRM.N,"Ader, Jackson E",jackson.ader@key.com,216-471-3813,Equity Analyst,12336,30393936,2024-01-02 16:06:58,100,13
+CRM.N,"Schwartz, Brian J",brian.schwartz@opco.com,415-399-5732,Equity Analyst,954,30279452,2012-04-30 00:00:00,48,13
+CRM.N,"VanVliet, Matthew",matthew.vanvliet@cantor.com,312-469-7405,Research Analyst,5698,30403876,2025-06-02 12:44:09,36,62
+CRM.N,"Wood, Derrick",derrick.wood@tdsecurities.com,415-646-7370,Equity Analyst,85,30321522,2016-06-10 00:00:00,48,
+CRM.N,"Radke, Tyler",,+1-415-951-1660,,3202,30330240,2017-09-21 00:00:00,57,11
+CRM.N,"Tao, Ye",ye3.tao@cicc.com.cn,,Equity Analyst,20783,30370032,2021-08-16 12:32:35,78,11
+CRM.N,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,,27
+CRM.N,"Sheikh, Omar F",,,Equity Analyst,38750,30402046,2025-02-01 01:43:22,35,18
+CRM.N,"Chokshi, Nehal",nchokshi@northlandcapitalmarkets.co,212-405-8081,Equity Analyst,25188,30351552,2020-03-25 00:00:00,39,25
+CRM.N,"Bersey, Stephen D",stephen.bersey@us.hsbc.com,212-525-4153,Equity Analyst,358,30389135,2023-06-01 00:00:00,1,26
+CRM.N,"He, Saiyi",hesaiyi@cmbi.com.hk,852-3916-1739,Equity Analyst,81441,30383736,2022-10-09 20:57:23,69,53
+CRM.N,"Berg, Scott R",sberg@needhamco.com,763-350-4027,Equity Analyst,110,30313601,2015-05-01 00:00:00,100,81
+CRM.N,"Materne, Kirk",kirk.materne@evercoreisi.com,212-497-0873,Equity Analyst,62195,30211271,2010-09-07 00:00:00,68,28
+CRM.N,"Oliver, Robert",roliver@rwbaird.com,203-602-1604,Senior Research Anal,10924,30326202,2017-02-01 00:00:00,31,
+CRM.N,"Moerdler, Mark L",mark.moerdler@bernsteinsg.com,917-344-8506,Equity Analyst,6872,30272739,2011-08-17 00:00:00,50,11
+CRM.N,"Walravens, Patrick D",patrick.D.walravens@citizensbank.co,415-835-8943,Equity Analyst,17304,30113375,2002-01-23 00:00:00,36,45
+CRM.N,"Thill, Brent J",bthill@jefferies.com,415-229-1559,Equity Analyst,138,30329537,2017-08-02 00:00:00,36,50
+CRM.N,"Peterson, Brian",brian.c.peterson@raymondjames.com,404-442-5888,Equity Analyst,2690,30304313,2014-04-04 00:00:00,59,6
+CRM.N,"Verkhovski, Allan",averkhovski@btig.com,415-248-5407,Equity Analyst,61553,30407767,2025-12-01 16:33:23,27,59
+CRM.N,"Borges, Gabriela",,,Equity Analyst,6,30258099,2010-10-18 14:31:00,38,28
+CRM.N,"Shepherd, Adam J",adam.shepherd@arete.net,44-20-7959-1310,Equity Analyst,35539,30196572,2009-06-22 00:00:00,100,70
+CRM.N,"Bonner, Joseph F",jbonner@argusresearch.com,212-425-5464,Equity Analyst,9584,30135805,2003-09-24 00:00:00,91,16
+CRM.N,"Seyrafi, Shebly",sseyrafi@fbnsecurities.com,212-618-2185,Equity Analyst,60577,30267376,2011-05-09 00:00:00,59,26
+CRM.N,"Ives, Daniel H",Dan.Ives@wedbush.com,212-344-2073,Equity Analyst,78,30339255,2018-10-01 00:00:00,34,41
+CRM.N,"Xiong, Li",xiongli1@guosen.com.cn,86-21-6176-1067,Equity Analyst,35004,30344709,2019-04-01 00:00:00,9,11
+CRM.N,"Lenschow, Raimo",raimo.lenschow@barclays.com,212-526-2712,Equity Analyst,10333,30205547,2010-09-02 00:00:00,,70
+CRM.N,"Zelnick, Brad A",brad.zelnick@db.com,212-250-8563,Research Analyst,47,30373507,2021-11-01 00:00:00,70,74
+CRM.N,"Turrin, Michael",Michael.Turrin@wellsfargo.com,628-629-7565,Equity Analyst,7671,30349771,2020-01-07 00:00:00,45,
+CRM.N,"Fitzsimmons, Billy",billy.fitzsimmons@psc.com,312-281-3438,Senior Research Anal,2691,30408500,2026-02-01 16:07:20,49,4
+CRM.N,"Zukin, Alex",azukin@wolferesearch.com,415-878-6420,Equity Analyst,43418,30365633,2021-04-20 00:00:00,53,
+CRM.N,"Lane, J. Parker",lanep@stifel.com,312-564-8705,Equity Analyst,107,30362625,2020-12-01 00:00:00,34,85
+CRM.N,"Moskowitz, Gregg S",Gregg.Moskowitz@mizuhogroup.com,646-949-9557,Managing Director,61910,30344083,2019-03-01 00:00:00,38,67
+CRM.N,"Koenig, Steven R",steve.koenig@macquarie.com,646-617-7806,Equity Analyst,5219,30401229,2024-12-01 04:07:12,39,15
+CRM.N,"Daptardar, Kadambari",kdaptardar@accountabilityresearch.c,,Equity Analyst,60372,30377842,2022-04-01 00:00:00,55,40
+CRM.N,,,,,,,,82,14
+CRM.N,,,,,,,,43,37
+CRM.N,,,,,,,,34,45
+CRM.N,,,,,,,,35,81
+CRM.N,,,,,,,,,45
+CRM.N,,,,,,,,66,5
+CRM.N,,,,,,,,100,14
+CRM.N,,,,,,,,31,10
+CRM.N,,,,,,,,47,80
+CRM.N,,,,,,,,42,28
+CRM.N,,,,,,,,55,57
+CRM.N,,,,,,,,61,83
+ORCL.N,"Walravens, Patrick D",patrick.D.walravens@citizensbank.co,415-835-8943,Equity Analyst,17304,30113375,2002-01-23 00:00:00,43,1
+ORCL.N,"Zukin, Alex",azukin@wolferesearch.com,415-878-6420,Equity Analyst,43418,30365633,2021-04-20 00:00:00,71,59
+ORCL.N,"Ko, Minsung",minsung.ko@nhsec.com,822-768-7707,Junior Analyst,17150,30388097,2023-04-20 06:01:34,57,2
+ORCL.N,"Zino, Angelo",,,Equity Analyst,178117,30368481,2021-07-08 00:00:00,73,23
+ORCL.N,"Reitzes, Ben A",ben.reitzes@meliusresearch.com,212-503-6222,Equity Analyst,150887,30389991,2023-07-01 00:00:00,54,33
+ORCL.N,"Bonner, Joseph F",jbonner@argusresearch.com,212-425-5464,Equity Analyst,9584,30135805,2003-09-24 00:00:00,28,7
+ORCL.N,"Ives, Daniel H",Dan.Ives@wedbush.com,212-344-2073,Equity Analyst,78,30339255,2018-10-01 00:00:00,36,27
+ORCL.N,"Yoo, Jungho",yoojh@kbfg.com,822-6114-2923,Equity Analyst,15154,30370735,2021-09-08 07:18:22,55,51
+ORCL.N,"Borges, Gabriela",,,Equity Analyst,6,30258099,2010-10-18 14:31:00,68,80
+ORCL.N,"Blakey, Thomas",thomas.blakey@cantor.com,617-443-4487,Research Analyst,5698,30401609,2025-01-15 00:00:00,53,41
+ORCL.N,"Lenschow, Raimo",raimo.lenschow@barclays.com,212-526-2712,Equity Analyst,10333,30205547,2010-09-02 00:00:00,26,73
+ORCL.N,"Yao, Barney",barney.sq.yao@htisec.com,,Equity Analyst,60474,30376433,2022-02-24 21:20:02,62,33
+ORCL.N,"Lim, Haein",haein.lim@hanwha.com,822-3772-7799,Equity Analyst,22919,30390967,2023-08-22 02:33:29,100,13
+ORCL.N,"Fitzsimmons, Billy",billy.fitzsimmons@psc.com,312-281-3438,Senior Research Anal,2691,30408500,2026-02-01 16:07:20,48,13
+ORCL.N,"Zelnick, Brad A",brad.zelnick@db.com,212-250-8563,Research Analyst,47,30373507,2021-11-01 00:00:00,59,25
+ORCL.N,"Thill, Brent J",bthill@jefferies.com,415-229-1559,Equity Analyst,138,30329537,2017-08-02 00:00:00,37,89
+ORCL.N,"Moerdler, Mark L",mark.moerdler@bernsteinsg.com,917-344-8506,Equity Analyst,6872,30272739,2011-08-17 00:00:00,48,
+ORCL.N,"Turrin, Michael",Michael.Turrin@wellsfargo.com,628-629-7565,Equity Analyst,7671,30349771,2020-01-07 00:00:00,78,11
+ORCL.N,"Herlinghaus, Axel",,,Equity Analyst,18658,30343706,2019-01-28 00:00:00,35,18
+ORCL.N,"Schwartz, Brian J",brian.schwartz@opco.com,415-399-5732,Equity Analyst,954,30279452,2012-04-30 00:00:00,39,25
+ORCL.N,"Colville, Patrick",patrick.colville@scotiabank.com,925-503-9802,Equity Analyst,82,30386198,2023-01-01 16:01:23,1,26
+ORCL.N,"Wood, Derrick",derrick.wood@tdsecurities.com,415-646-7370,Equity Analyst,85,30321522,2016-06-10 00:00:00,69,53
+ORCL.N,"Reback, Brad R",rebackb@stifel.com,404-869-8051,Equity Analyst,107,30279549,2012-04-30 00:00:00,100,81
+ORCL.N,"Radke, Tyler",,+1-415-951-1660,,3202,30330240,2017-09-21 00:00:00,68,28
+ORCL.N,"White, Brian J",bwhite@mchny.com,212-583-8510,Equity Analyst,49781,30335345,2018-04-01 00:00:00,76,61
+ORCL.N,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,36,45
+ORCL.N,"Bersey, Stephen D",stephen.bersey@us.hsbc.com,212-525-4153,Equity Analyst,358,30389135,2023-06-01 00:00:00,62,26
+ORCL.N,"Haissl, Alexander A",alex.haissl@redburnatlantic.com,44-20-70-00-21-13,Equity Analyst,38750,30379654,2022-07-01 00:00:00,59,6
+ORCL.N,"Luria, Gil B",gluria@dadco.com,503-603-3020,Managing Director,158,30364684,2021-03-02 00:00:00,100,70
+ORCL.N,"DiFucci, John S",john.difucci@guggenheimpartners.com,212-518-9670,Equity Analyst,62598,30382169,2022-08-01 00:00:00,59,26
+ORCL.N,"Oliver, Robert",roliver@rwbaird.com,203-602-1604,Senior Research Anal,10924,30326202,2017-02-01 00:00:00,34,41
+ORCL.N,"Ader, Jason N",jader@williamblair.com,617-235-7519,Equity Analyst,11266,30185049,2008-11-20 00:00:00,9,11
+ORCL.N,"Singh, Sanjit K",Sanjit.Singh@morganstanley.com,415-576-2060,Equity Analyst,2975,30308392,2014-10-05 00:00:00,,70
+ORCL.N,"Panigrahi, Siti",Siti.Panigrahi@mizuhogroup.com,415-268-5522,Managing Director,61910,30347023,2019-07-29 00:00:00,45,
+ORCL.N,"Gaonkar, Satish",satishg@crispidea.com,,Research Analyst,61498,30407473,2025-12-01 00:00:00,49,4
+ORCL.N,"Bachman, Keith F",keith.bachman@bmo.com,347-891-0258,Equity Analyst,4104,30171872,2007-07-09 00:00:00,53,
+ORCL.N,"Huff, Brett R",brett.huff@stephens.com,501-377-8068,Equity Analyst,2701,30174361,2005-09-13 00:00:00,67,13
+ORCL.N,"Jaluria, Rishi N",rishi.jaluria@rbccm.com,415-633-8798,Equity Analyst,2182,30366016,2021-05-01 00:00:00,39,34
+ORCL.N,"Yang, Luke",luke.yang@morningstar.com,,Equity Analyst,60797,30402018,2025-02-01 06:26:57,64,47
+ORCL.N,"Slowinski, Stefan J",stefan.slowinski@uk.bnpparibas.com,44-203-430-8549,Research Analyst,2233,30329106,2017-08-01 00:00:00,39,15
+ORCL.N,"Naing, Nay Soe S",naysoe.naing@berenberg.com,44-20-3753-3131,Equity Analyst,7821,30375854,2022-02-01 04:47:45,32,61
+ORCL.N,"Materne, Kirk",kirk.materne@evercoreisi.com,212-497-0873,Equity Analyst,62195,30211271,2010-09-07 00:00:00,1,
+ORCL.N,"Ader, Jackson E",jackson.ader@key.com,216-471-3813,Equity Analyst,12336,30393936,2024-01-02 16:06:58,60,45
+ORCL.N,,,,,,,,82,14
+ORCL.N,,,,,,,,43,37
+ORCL.N,,,,,,,,43,38
+ORCL.N,,,,,,,,50,71
+ORCL.N,,,,,,,,34,45
+ORCL.N,,,,,,,,35,81
+ORCL.N,,,,,,,,24,45
+ORCL.N,,,,,,,,66,5
+ORCL.N,,,,,,,,60,16
+ORCL.N,,,,,,,,28,
+ORCL.N,,,,,,,,42,28
+ORCL.N,,,,,,,,61,83
+QCOM.OQ,"Gerra, Tristan",tgerra@rwbaird.com,415-593-8058,Senior Research Anal,10924,30146817,2005-02-18 00:00:00,52,64
+QCOM.OQ,"Goldberg, Jay",jgoldberg@seaportrp.com,,Equity Analyst,59786,30403069,2025-04-27 20:29:03,59,69
+QCOM.OQ,"Acree, Cody",cody.acree@stonex.com,214-335-1811,Equity Analyst,31149,30366771,2021-05-01 00:00:00,37,10
+QCOM.OQ,"Vinh, John",jvinh@key.com,503-821-3882,Equity Analyst,12336,30312349,2015-04-09 00:00:00,44,53
+QCOM.OQ,"Moore, Joseph L",joseph.moore@morganstanley.com,212-761-7516,Equity Analyst,2975,30280053,2012-05-28 00:00:00,85,5
+QCOM.OQ,"Schafer, Rick E",rick.schafer@opco.com,720-554-1119,Equity Analyst,954,30177489,2008-01-14 00:00:00,81,50
+QCOM.OQ,"Schneider, Ph.D., James E",,,,6,30165718,2006-06-19 02:13:00,57,64
+QCOM.OQ,"Wen, Hanjing",hanjing.wen@cicc.com.cn,,Equity Analyst,20783,30358205,2020-07-17 03:16:33,,5
+QCOM.OQ,"Nagpure, Prajwal",nprajwal@crispidea.com,,Research Analyst,61498,30405497,2025-08-01 00:00:00,72,
+QCOM.OQ,"Rolland, Christopher",christopher.rolland@sig.com,212-709-5314,Equity Analyst,22972,30322662,2016-08-23 00:00:00,73,94
+QCOM.OQ,"Rakers, Aaron C",Aaron.Rakers@wellsfargo.com,314-875-2508,Equity Analyst,7671,30330901,2017-10-01 00:00:00,43,36
+QCOM.OQ,"Pajjuri, Srini R",srini.pajjuri@rbccm.com,415-515-0779,Equity Analyst,2182,30406812,2025-10-29 17:09:35,64,73
+QCOM.OQ,"Fu, Tianzi",futz@ebscn.com,86-21-5252-3692,Equity Analyst,30477,30327756,2017-05-01 00:00:00,35,54
+QCOM.OQ,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,51,27
+QCOM.OQ,"Reitzes, Ben A",ben.reitzes@meliusresearch.com,212-503-6222,Equity Analyst,150887,30389991,2023-07-01 00:00:00,30,93
+QCOM.OQ,"Wermann, Ingo",ingo.wermann@dzbank.de,49-69-74-47-90544,Equity Analyst,18658,30192920,2009-09-24 07:48:00,57,40
+QCOM.OQ,"O'Malley, Tom J",THOMAS.O'MALLEY@BARCLAYS.COM,212-526-0692,Equity Analyst,10333,30316704,2015-10-07 00:00:00,99,67
+QCOM.OQ,"Muse, C.J.",CJ.Muse@cantor.com,212-915-1935,Research Analyst,5698,30394375,2024-01-11 00:00:00,47,84
+QCOM.OQ,Research Department,,,Other,126605,30325967,2017-02-10 00:00:00,63,49
+QCOM.OQ,"Lee, Frank I",frank.lee@hsbc.com.hk,852-2996-6916,Equity Analyst,358,30299450,2013-08-20 00:00:00,64,58
+QCOM.OQ,"Chang, Stefan",stefan.chang@aletheia-capital.com,852-3470-0011,Equity Analyst,204276,30405644,2025-09-01 00:00:00,39,23
+QCOM.OQ,"Seymore, Ross",ross.seymore@db.com,415-617-3268,Research Analyst,47,30053157,1999-10-27 22:21:00,50,41
+QCOM.OQ,"Buchalter, Joshua L",joshua.buchalter@tdsecurities.com,646-562-1303,Equity Analyst,85,30336199,2018-05-29 11:43:13,,27
+QCOM.OQ,"Feinseth, Ivan",ifeinseth@tigressfp.com,646-780-8901,Director of Research,117104,30305378,2012-01-01 00:00:00,,87
+QCOM.OQ,"Caso, Chris",ccaso@wolferesearch.com,646-582-9360,Equity Analyst,43418,30389875,2023-07-01 00:00:00,53,76
+QCOM.OQ,"Chan, Kinngai",kchan@summitinsightsgroup.com,646-849-5363,Senior Analyst,107587,30327273,2017-04-28 00:00:00,84,55
+QCOM.OQ,"Chen, Leon",Leon.cw.chen@kgi.com,886-2-2181-8744,Equity Analyst,10877,30402741,2025-04-09 01:08:42,98,75
+QCOM.OQ,"Fairbanks, Melissa A",melissa.fairbanks@raymondjames.com,727-567-1081,Equity Analyst,2690,30275747,2009-09-14 00:00:00,52,15
+QCOM.OQ,"Malik, Atif",,+1-415-951-1892,,3202,30304538,2014-04-01 00:00:00,64,83
+QCOM.OQ,"Rakesh, Vijay R",Vijay.Rakesh@mizuhogroup.com,312-294-8682,Managing Director,61910,30313682,2015-05-01 00:00:00,70,32
+QCOM.OQ,"Snyder, Edward F",esnyder@charterequityresearch.com,719-434-8725,Managing Director,63528,30211640,2004-02-09 00:00:00,1,
+QCOM.OQ,"Cassidy, Kevin E",kcassidy@rblt.com,212-607-3165,Equity Analyst,120252,30356405,2020-05-05 05:10:51,58,39
+QCOM.OQ,"Rasgon, Stacy A",stacy.rasgon@bernsteinsg.com,213-559-5917,Senior Analyst,6872,30189600,2009-06-04 00:00:00,47,59
+QCOM.OQ,"Colello, Brian",brian.colello@morningstar.com,312-384-3742,Director,60797,30196332,2009-12-22 00:00:00,69,11
+QCOM.OQ,"Zino, Angelo",,,Equity Analyst,178117,30368481,2021-07-08 00:00:00,58,79
+QCOM.OQ,"Kelleher, Jim N",jkelleher@argusresearch.com,212-425-5474,Director of Research,9584,30042327,1995-05-29 00:00:00,,70
+QCOM.OQ,"Lipacis, Mark J",Mark.Lipacis@evercoreisi.com,214-459-4007,Equity Analyst,62195,30396211,2024-04-10 00:00:00,68,45
+QCOM.OQ,,,,,,,,45,
+QCOM.OQ,,,,,,,,61,10
+QCOM.OQ,,,,,,,,43,37
+QCOM.OQ,,,,,,,,8,36
+QCOM.OQ,,,,,,,,50,71
+QCOM.OQ,,,,,,,,44,74
+QCOM.OQ,,,,,,,,58,63
+QCOM.OQ,,,,,,,,46,58
+QCOM.OQ,,,,,,,,66,5
+QCOM.OQ,,,,,,,,90,49
+QCOM.OQ,,,,,,,,42,94
+QCOM.OQ,,,,,,,,23,12
+QCOM.OQ,,,,,,,,41,69
+QCOM.OQ,,,,,,,,49,64
+AVGO.OQ,"Simpson, Brett W",brett.simpson@arete.net,44-20-7959-1320,Equity Analyst,35539,30167860,2003-10-03 00:00:00,52,64
+AVGO.OQ,"Naji, Sebastien",snaji@williamblair.com,212-245-6508,Equity Analyst,11266,30361865,2020-11-01 00:00:00,57,2
+AVGO.OQ,"Seo, Youngjae",youngjae.seo@daishin.com,,Equity Analyst,60471,30374632,2021-12-15 12:00:00,37,10
+AVGO.OQ,"Zino, Angelo",,,Equity Analyst,178117,30368481,2021-07-08 00:00:00,44,53
+AVGO.OQ,"Snyder, Edward F",esnyder@charterequityresearch.com,719-434-8725,Managing Director,63528,30211640,2004-02-09 00:00:00,85,5
+AVGO.OQ,"O'Malley, Tom J",THOMAS.O'MALLEY@BARCLAYS.COM,212-526-0692,Equity Analyst,10333,30316704,2015-10-07 00:00:00,71,13
+AVGO.OQ,"Buchalter, Joshua L",joshua.buchalter@tdsecurities.com,646-562-1303,Equity Analyst,85,30336199,2018-05-29 11:43:13,76,25
+AVGO.OQ,"Pajjuri, Srini R",srini.pajjuri@rbccm.com,415-515-0779,Equity Analyst,2182,30406812,2025-10-29 17:09:35,81,50
+AVGO.OQ,"Caso, Chris",ccaso@wolferesearch.com,646-582-9360,Equity Analyst,43418,30389875,2023-07-01 00:00:00,57,64
+AVGO.OQ,"Reitzes, Ben A",ben.reitzes@meliusresearch.com,212-503-6222,Equity Analyst,150887,30389991,2023-07-01 00:00:00,63,27
+AVGO.OQ,"Rakers, Aaron C",Aaron.Rakers@wellsfargo.com,314-875-2508,Equity Analyst,7671,30330901,2017-10-01 00:00:00,73,94
+AVGO.OQ,"Leopold, Simon M",Simon.Leopold@RaymondJames.com,212-856-5464,Equity Analyst,2690,30279039,2012-04-04 00:00:00,97,37
+AVGO.OQ,"Muse, C.J.",CJ.Muse@cantor.com,212-915-1935,Research Analyst,5698,30394375,2024-01-11 00:00:00,64,73
+AVGO.OQ,"Sur, Harlan L",harlan.sur@jpmorgan.com,415-315-6700,Equity Analyst,4614,30197439,2010-02-25 00:00:00,47,77
+AVGO.OQ,"Lee, Frank I",frank.lee@hsbc.com.hk,852-2996-6916,Equity Analyst,358,30299450,2013-08-20 00:00:00,35,54
+AVGO.OQ,"Cassidy, Kevin E",kcassidy@rblt.com,212-607-3165,Equity Analyst,120252,30356405,2020-05-05 05:10:51,51,27
+AVGO.OQ,"Kerwin, William",william.kerwin@morningstar.com,312-244-7872,Senior Equity Analys,60797,30360789,2020-10-13 00:00:00,30,93
+AVGO.OQ,"Luria, Gil B",gluria@dadco.com,503-603-3020,Managing Director,158,30364684,2021-03-02 00:00:00,99,67
+AVGO.OQ,"Schafer, Rick E",rick.schafer@opco.com,720-554-1119,Equity Analyst,954,30177489,2008-01-14 00:00:00,47,84
+AVGO.OQ,"Goldberg, Jay",jgoldberg@seaportrp.com,,Equity Analyst,59786,30403069,2025-04-27 20:29:03,63,49
+AVGO.OQ,"Vinh, John",jvinh@key.com,503-821-3882,Equity Analyst,12336,30312349,2015-04-09 00:00:00,64,58
+AVGO.OQ,"Schneider, Ph.D., James E",,,,6,30165718,2006-06-19 02:13:00,39,23
+AVGO.OQ,"Nagpure, Prajwal",nprajwal@crispidea.com,,Research Analyst,61498,30405497,2025-08-01 00:00:00,50,41
+AVGO.OQ,"Acree, Cody",cody.acree@stonex.com,214-335-1811,Equity Analyst,31149,30366771,2021-05-01 00:00:00,,27
+AVGO.OQ,"Fan, Zhiyuan",fanzhiyuan@gjzq.com.cn,86-21-6103-8318,Equity Analyst,35228,30322836,2016-09-01 00:00:00,,87
+AVGO.OQ,"Harrison, Mike",mike.harrison@redburnatlantic.com,44-20-7000-2079,Equity Analyst,38750,30356976,2020-06-01 00:00:00,47,80
+AVGO.OQ,"Vajpayee, Bhavtosh",bhavtosh.vajpayee@clsa.com,212-549-5063,Director of Research,2843,30123411,2002-10-23 08:08:01,84,55
+AVGO.OQ,"Chen, Leon",Leon.cw.chen@kgi.com,886-2-2181-8744,Equity Analyst,10877,30402741,2025-04-09 01:08:42,98,75
+AVGO.OQ,"Yao, Barney",barney.sq.yao@htisec.com,,Equity Analyst,60474,30376433,2022-02-24 21:20:02,52,15
+AVGO.OQ,"Malik, Atif",,+1-415-951-1892,,3202,30304538,2014-04-01 00:00:00,70,32
+AVGO.OQ,"Rakesh, Vijay R",Vijay.Rakesh@mizuhogroup.com,312-294-8682,Managing Director,61910,30313682,2015-05-01 00:00:00,26,
+AVGO.OQ,"Lipacis, Mark J",Mark.Lipacis@evercoreisi.com,214-459-4007,Equity Analyst,62195,30396211,2024-04-10 00:00:00,36,45
+AVGO.OQ,"Wang, Dawei",Dawei.wang@bocomgroup.com,852-3766-1867,Equity Analyst,102322,30393332,2023-11-29 19:42:35,47,59
+AVGO.OQ,"Guo, Yali",guoyali@htsc.com,86-21-3847-6016,Equity Analyst,83242,30364766,2021-03-01 00:00:00,70,2
+AVGO.OQ,"Stein, William S",William.Stein@truist.com,212-319-3808,Equity Analyst,5179,30294464,2012-11-28 00:00:00,46,
+AVGO.OQ,"Rasgon, Stacy A",stacy.rasgon@bernsteinsg.com,213-559-5917,Senior Analyst,6872,30189600,2009-06-04 00:00:00,66,55
+AVGO.OQ,"Curtis, Blayne P",bcurtis@jefferies.com,212-336-7493,Equity Analyst,138,30169588,2007-04-03 06:41:00,59,26
+AVGO.OQ,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,48,12
+AVGO.OQ,"Moore, Joseph L",joseph.moore@morganstanley.com,212-761-7516,Equity Analyst,2975,30280053,2012-05-28 00:00:00,58,79
+AVGO.OQ,"Chang, Stefan",stefan.chang@aletheia-capital.com,852-3470-0011,Equity Analyst,204276,30405644,2025-09-01 00:00:00,,70
+AVGO.OQ,"Kelleher, Jim N",jkelleher@argusresearch.com,212-425-5474,Director of Research,9584,30042327,1995-05-29 00:00:00,68,45
+AVGO.OQ,"Rolland, Christopher",christopher.rolland@sig.com,212-709-5314,Equity Analyst,22972,30322662,2016-08-23 00:00:00,36,45
+AVGO.OQ,"Chan, Kinngai",kchan@summitinsightsgroup.com,646-849-5363,Senior Analyst,107587,30327273,2017-04-28 00:00:00,39,34
+AVGO.OQ,Research Department,,,Other,126605,30325967,2017-02-10 00:00:00,1,25
+AVGO.OQ,"Gerra, Tristan",tgerra@rwbaird.com,415-593-8058,Senior Research Anal,10924,30146817,2005-02-18 00:00:00,60,45
+AVGO.OQ,"Ackerman, Karl F",karl.ackerman@us.bnpparibas.com,415-846-1575,Equity Analyst,2233,30383032,2022-09-01 06:01:39,1,
+AVGO.OQ,,,,,,,,43,37
+AVGO.OQ,,,,,,,,8,36
+AVGO.OQ,,,,,,,,50,71
+AVGO.OQ,,,,,,,,42,79
+AVGO.OQ,,,,,,,,44,74
+AVGO.OQ,,,,,,,,46,58
+AVGO.OQ,,,,,,,,66,5
+AVGO.OQ,,,,,,,,90,49
+AVGO.OQ,,,,,,,,42,94
+AVGO.OQ,,,,,,,,75,45
+AVGO.OQ,,,,,,,,23,12
+AVGO.OQ,,,,,,,,41,69
+AVGO.OQ,,,,,,,,49,64
+AVGO.OQ,,,,,,,,25,
+INTC.OQ,"Snyder, Edward F",esnyder@charterequityresearch.com,719-434-8725,Managing Director,63528,30211640,2004-02-09 00:00:00,52,64
+INTC.OQ,"Vinh, John",jvinh@key.com,503-821-3882,Equity Analyst,12336,30312349,2015-04-09 00:00:00,60,49
+INTC.OQ,"Zino, Angelo",,,Equity Analyst,178117,30368481,2021-07-08 00:00:00,37,10
+INTC.OQ,"Kelleher, Jim N",jkelleher@argusresearch.com,212-425-5474,Director of Research,9584,30042327,1995-05-29 00:00:00,44,53
+INTC.OQ,"O'Malley, Tom J",THOMAS.O'MALLEY@BARCLAYS.COM,212-526-0692,Equity Analyst,10333,30316704,2015-10-07 00:00:00,85,5
+INTC.OQ,"Moore, Joseph L",joseph.moore@morganstanley.com,212-761-7516,Equity Analyst,2975,30280053,2012-05-28 00:00:00,71,13
+INTC.OQ,"Rasgon, Stacy A",stacy.rasgon@bernsteinsg.com,213-559-5917,Senior Analyst,6872,30189600,2009-06-04 00:00:00,76,25
+INTC.OQ,"Colello, Brian",brian.colello@morningstar.com,312-384-3742,Director,60797,30196332,2009-12-22 00:00:00,81,50
+INTC.OQ,"Nagpure, Prajwal",nprajwal@crispidea.com,,Research Analyst,61498,30405497,2025-08-01 00:00:00,20,25
+INTC.OQ,"Cassidy, Kevin E",kcassidy@rblt.com,212-607-3165,Equity Analyst,120252,30356405,2020-05-05 05:10:51,57,64
+INTC.OQ,"Caso, Chris",ccaso@wolferesearch.com,646-582-9360,Equity Analyst,43418,30389875,2023-07-01 00:00:00,,5
+INTC.OQ,"Stein, William S",William.Stein@truist.com,212-319-3808,Equity Analyst,5179,30294464,2012-11-28 00:00:00,72,
+INTC.OQ,"Pan, Felix X",felix.pan@kgi.com,886-2-2181-8706,Equity Analyst,10877,30398124,2024-07-01 00:00:00,63,27
+INTC.OQ,"Rakesh, Vijay R",Vijay.Rakesh@mizuhogroup.com,312-294-8682,Managing Director,61910,30313682,2015-05-01 00:00:00,73,94
+INTC.OQ,"Malik, Atif",,+1-415-951-1892,,3202,30304538,2014-04-01 00:00:00,97,37
+INTC.OQ,"Acree, Cody",cody.acree@stonex.com,214-335-1811,Equity Analyst,31149,30366771,2021-05-01 00:00:00,64,73
+INTC.OQ,"Chan, Kinngai",kchan@summitinsightsgroup.com,646-849-5363,Senior Analyst,107587,30327273,2017-04-28 00:00:00,47,77
+INTC.OQ,"Gerra, Tristan",tgerra@rwbaird.com,415-593-8058,Senior Research Anal,10924,30146817,2005-02-18 00:00:00,35,54
+INTC.OQ,"Purdy, Ho",purdyho@htsc.com,852-3658-6000,Equity Analyst,83242,30392842,2023-10-02 00:00:00,51,27
+INTC.OQ,"Feinseth, Ivan",ifeinseth@tigressfp.com,646-780-8901,Director of Research,117104,30305378,2012-01-01 00:00:00,30,93
+INTC.OQ,"Sur, Harlan L",harlan.sur@jpmorgan.com,415-315-6700,Equity Analyst,4614,30197439,2010-02-25 00:00:00,57,40
+INTC.OQ,"Rakers, Aaron C",Aaron.Rakers@wellsfargo.com,314-875-2508,Equity Analyst,7671,30330901,2017-10-01 00:00:00,72,28
+INTC.OQ,"Schafer, Rick E",rick.schafer@opco.com,720-554-1119,Equity Analyst,954,30177489,2008-01-14 00:00:00,99,67
+INTC.OQ,"Leopold, Simon M",Simon.Leopold@RaymondJames.com,212-856-5464,Equity Analyst,2690,30279039,2012-04-04 00:00:00,47,84
+INTC.OQ,"Bryson, Matthew S",matthew.bryson@wedbush.com,617-695-6302,Equity Analyst,78,30345949,2019-06-01 00:00:00,63,49
+INTC.OQ,"Muse, C.J.",CJ.Muse@cantor.com,212-915-1935,Research Analyst,5698,30394375,2024-01-11 00:00:00,45,52
+INTC.OQ,"Luria, Gil B",gluria@dadco.com,503-603-3020,Managing Director,158,30364684,2021-03-02 00:00:00,64,58
+INTC.OQ,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,39,23
+INTC.OQ,"Lee, Frank I",frank.lee@hsbc.com.hk,852-2996-6916,Equity Analyst,358,30299450,2013-08-20 00:00:00,50,41
+INTC.OQ,"Rolland, Christopher",christopher.rolland@sig.com,212-709-5314,Equity Analyst,22972,30322662,2016-08-23 00:00:00,,87
+INTC.OQ,"Richard, Gus",grichard@northlandcapitalmarkets.co,612-460-4865,Equity Analyst,25188,30308466,2014-10-01 00:00:00,47,80
+INTC.OQ,"Bolton, N. Quinn",qbolton@needhamco.com,212-705-0322,Equity Analyst,110,30142060,2004-02-28 00:00:00,84,55
+INTC.OQ,"Lipacis, Mark J",Mark.Lipacis@evercoreisi.com,214-459-4007,Equity Analyst,62195,30396211,2024-04-10 00:00:00,65,39
+INTC.OQ,"Buchalter, Joshua L",joshua.buchalter@tdsecurities.com,646-562-1303,Equity Analyst,85,30336199,2018-05-29 11:43:13,98,75
+INTC.OQ,"Wermann, Ingo",ingo.wermann@dzbank.de,49-69-74-47-90544,Equity Analyst,18658,30192920,2009-09-24 07:48:00,52,15
+INTC.OQ,"Curtis, Blayne P",bcurtis@jefferies.com,212-336-7493,Equity Analyst,138,30169588,2007-04-03 06:41:00,70,32
+INTC.OQ,"Reitzes, Ben A",ben.reitzes@meliusresearch.com,212-503-6222,Equity Analyst,150887,30389991,2023-07-01 00:00:00,43,92
+INTC.OQ,"Pajjuri, Srini R",srini.pajjuri@rbccm.com,415-515-0779,Equity Analyst,2182,30406812,2025-10-29 17:09:35,58,39
+INTC.OQ,"Desilva, Suji",sdesilva@roth.com,415-306-5120,Managing Director,69,30322065,2016-07-13 00:00:00,47,59
+INTC.OQ,"Simpson, Brett W",brett.simpson@arete.net,44-20-7959-1320,Equity Analyst,35539,30167860,2003-10-03 00:00:00,59,26
+INTC.OQ,"Goldberg, Jay",jgoldberg@seaportrp.com,,Equity Analyst,59786,30403069,2025-04-27 20:29:03,58,79
+INTC.OQ,"Roy, Ruben",royr@stifel.com,212-271-3825,Equity Analyst,107,30382889,2022-09-01 00:00:00,,70
+INTC.OQ,,,,,,,,68,45
+INTC.OQ,,,,,,,,61,10
+INTC.OQ,,,,,,,,35,86
+INTC.OQ,,,,,,,,1,25
+INTC.OQ,,,,,,,,43,37
+INTC.OQ,,,,,,,,8,36
+INTC.OQ,,,,,,,,50,71
+INTC.OQ,,,,,,,,23,
+INTC.OQ,,,,,,,,45,45
+INTC.OQ,,,,,,,,44,74
+INTC.OQ,,,,,,,,46,58
+INTC.OQ,,,,,,,,66,5
+INTC.OQ,,,,,,,,74,12
+INTC.OQ,,,,,,,,42,94
+INTC.OQ,,,,,,,,23,12
+INTC.OQ,,,,,,,,49,64
+DIS.N,"Leistner, Markus",,,Equity Analyst,18658,30386280,2023-01-01 00:00:00,93,12
+DIS.N,"Lai, Tommy",tommy.lai@kgi.com,886-2-2181-8710,Equity Analyst,10877,30398141,2024-07-01 00:00:00,73,23
+DIS.N,"Choi, Minha",minha22.choi@samsung.com,82-2-2020-7798,Senior Analyst,5168,30346040,2019-07-01 00:00:00,49,76
+DIS.N,"Maral, Kutgun",kutgun.maral@evercoreisi.com,212-497-0804,Equity Analyst,62195,30390003,2023-07-01 00:00:00,44,98
+DIS.N,"Yoon, Laurent",laurent.yoon@bernsteinsg.com,212-969-1361,Equity Analyst,6872,30392179,2023-10-05 00:00:00,84,22
+DIS.N,"Morris, Michael",michael.morris@guggenheimpartners.c,804-253-8025,Managing Director,62598,30299858,2013-09-10 00:00:00,71,64
+DIS.N,"Bazinet, Jason",,+1-212-816-6395,,3202,30148998,2005-03-01 10:28:00,27,28
+DIS.N,"Faber, Hamilton S",,,Equity Analyst,38750,30390620,2023-08-01 00:00:00,54,77
+DIS.N,"Arthur, Douglas M",doug.arthur@huberresearch.com,203-930-7751,Equity Analyst,155953,30336733,2018-06-20 00:00:00,77,76
+DIS.N,"Supino, Peter L",psupino@wolferesearch.com,646-582-9330,Equity Analyst,43418,30378837,2022-04-01 22:53:40,56,12
+DIS.N,"Venkateshwar, Kannan",kannan.venkateshwar@barclays.com,212-528-7054,Equity Analyst,10333,30177535,2008-01-11 00:00:00,64,39
+DIS.N,"Creutz, Doug",douglas.creutz@tdsecurities.com,415-646-7225,Equity Analyst,85,30170475,2007-07-25 00:00:00,52,87
+DIS.N,"Bonner, Joseph F",jbonner@argusresearch.com,212-425-5464,Equity Analyst,9584,30135805,2003-09-24 00:00:00,69,45
+DIS.N,"Crockett, Barton E",bcrockett@rblt.com,212-607-3108,Senior Analyst,120252,30377793,2022-04-01 06:21:30,83,7
+DIS.N,"Fishman, Robert S",robert@moffettnathanson.com,212-519-0013,Equity Analyst,111984,30301215,2013-11-07 00:00:00,46,
+DIS.N,"Martin, Laura A",lmartin@needhamco.com,917-373-3066,Equity Analyst,110,30194180,2009-11-07 00:00:00,62,29
+DIS.N,"Fogh, Per",,,Equity Analyst,170823,30394049,2024-01-01 06:18:18,39,51
+DIS.N,"Leon, Kenneth M",kenneth.leon@cfraresearch.com,,Equity Analyst,178117,30368178,2021-07-06 00:00:00,26,
+DIS.N,"Prentiss, Ric H",ric.prentiss@raymondjames.com,727-567-2567,Equity Analyst,2690,30013863,1996-12-02 00:00:00,75,52
+DIS.N,"Cahall, Steven",steven.cahall@wellsfargo.com,212-214-8240,Equity Analyst,7671,30347582,2019-08-26 00:00:00,52,98
+DIS.N,"Ismailov, Saken",saken.ismailov@fbroker.kz,,Equity Analyst,148183,30398436,2024-07-01 00:00:00,20,82
+DIS.N,"Diffley, Sean P",Sean.DIFFLEY@morganstanley.com,212-761-5868,Equity Analyst,2975,30409456,2026-04-01 00:14:33,51,48
+DIS.N,"Joyce, David C",djoyce@seaportrp.com,201-421-4229,Senior Analyst,59786,30388178,2023-01-01 17:00:15,81,11
+DIS.N,"Beale, Andrew C",andrew.beale@arete.net,44-20-7959-1316,Equity Analyst,35539,30168095,2003-10-01 00:00:00,76,69
+DIS.N,"Ng, Michael",michael.ng@gs.com,212-902-8618,Equity Analyst,6,30325910,2017-02-12 00:00:00,52,68
+DIS.N,"Heaney, James",,,,138,30341484,2018-11-21 17:10:42,,90
+DIS.N,"Heasman, David",dheasman@accountabilityresearch.com,,Equity Analyst,60372,30360992,2020-10-19 00:00:00,28,61
+DIS.N,"Kraft, Bryan D",bryan.kraft@db.com,212-250-0117,Research Analyst,47,30311568,2015-03-04 00:00:00,43,37
+DIS.N,"Dolgin, Matthew",matthew.dolgin@morningstar.com,312-696-6783,Senior Equity Analys,60797,30334748,2018-03-18 20:00:19,61,20
+DIS.N,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,1,72
+DIS.N,"Karnovsky, David",david.karnovsky@jpmorgan.com,212-622-1206,Equity Analyst,4614,30300665,2013-10-10 00:00:00,54,9
+DIS.N,,,,,,,,,21
+DIS.N,,,,,,,,75,48
+DIS.N,,,,,,,,45,28
+DIS.N,,,,,,,,73,45
+DIS.N,,,,,,,,56,7
+DIS.N,,,,,,,,64,48
+DIS.N,,,,,,,,49,3
+VZ.N,"Atkin, Jonathan",jonathan.atkin@rbccm.com,415-633-8589,Equity Analyst,2182,30058082,2000-06-22 19:36:00,14,3
+VZ.N,"Yoon, Laurent",laurent.yoon@bernsteinsg.com,212-969-1361,Equity Analyst,6872,30392179,2023-10-05 00:00:00,51,51
+VZ.N,"Horan, Timothy K",Timothy.Horan@opco.com,212-667-8137,Equity Analyst,954,30177450,2008-01-14 00:00:00,93,12
+VZ.N,"Petti, Sebastiano C",sebastiano.c.petti@jpmorgan.com,212-622-8529,Equity Analyst,4614,30323238,2016-09-23 00:00:00,41,71
+VZ.N,"Maral, Kutgun",kutgun.maral@evercoreisi.com,212-497-0804,Equity Analyst,62195,30390003,2023-07-01 00:00:00,,34
+VZ.N,"Ng, Michael",michael.ng@gs.com,212-902-8618,Equity Analyst,6,30325910,2017-02-12 00:00:00,44,98
+VZ.N,"Diffley, Sean P",Sean.DIFFLEY@morganstanley.com,212-761-5868,Equity Analyst,2975,30409456,2026-04-01 00:14:33,56,23
+VZ.N,"Supino, Peter L",psupino@wolferesearch.com,646-582-9330,Equity Analyst,43418,30378837,2022-04-01 22:53:40,71,64
+VZ.N,"Yaghi, Maher",maher.yaghi@scotiabank.com,437-995-5548,Equity Analyst,82,30379310,2022-06-27 00:00:00,34,5
+VZ.N,"Venkateshwar, Kannan",kannan.venkateshwar@barclays.com,212-528-7054,Equity Analyst,10333,30177535,2008-01-11 00:00:00,1,
+VZ.N,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,30,2
+VZ.N,"Snyder, Keith",,,Equity Analyst,178117,30368480,2021-07-10 00:00:00,57,40
+VZ.N,"Rollins, Michael",,+1-212-816-1116,,3202,30057274,2000-01-31 00:00:00,52,87
+VZ.N,"Williams, Gregory",gregory.williams@cowen.com,646-562-1367,Equity Analyst,85,30316814,2015-10-01 00:00:00,70,30
+VZ.N,"Louthan, Frank G",frank.louthan@raymondjames.com,404-442-5867,Equity Analyst,2690,30100960,2001-07-06 00:00:00,1,100
+VZ.N,"Kraft, Bryan D",bryan.kraft@db.com,212-250-0117,Research Analyst,47,30311568,2015-03-04 00:00:00,35,19
+VZ.N,"McHugh, Samuel",sam.mchugh@us.bnpparibas.com,212-471-6569,Research Analyst,2233,30317354,2015-11-04 08:02:32,21,22
+VZ.N,"Naqvi, Ali",ali.naqvi@hsbc.com,44-20-7992-2176,Equity Analyst,358,30323945,2016-10-30 00:00:00,83,7
+VZ.N,"Moffett, Craig E",craig@moffettnathanson.com,212-519-0021,Senior Analyst,111984,30301084,2013-11-01 00:00:00,65,23
+VZ.N,"Beale, Andrew C",andrew.beale@arete.net,44-20-7959-1316,Equity Analyst,35539,30168095,2003-10-01 00:00:00,52,98
+VZ.N,"Volkert, Matthias",,,Equity Analyst,18658,30132106,2003-05-22 03:00:00,,67
+VZ.N,"Ferguson, Marie",,,Equity Analyst,9584,30375825,2022-01-01 00:00:00,81,11
+VZ.N,"Nispel, Brandon",bnispel@key.com,503-821-3871,Equity Analyst,12336,30328246,2017-06-30 00:00:00,65,49
+VZ.N,,,,,,,,52,68
+VZ.N,,,,,,,,6,14
+VZ.N,,,,,,,,43,37
+VZ.N,,,,,,,,61,20
+VZ.N,,,,,,,,54,9
+VZ.N,,,,,,,,27,19
+VZ.N,,,,,,,,56,7
+TMUS.OQ,"Venkateshwar, Kannan",kannan.venkateshwar@barclays.com,212-528-7054,Equity Analyst,10333,30177535,2008-01-11 00:00:00,14,3
+TMUS.OQ,"Yaghi, Maher",maher.yaghi@scotiabank.com,437-995-5548,Equity Analyst,82,30379310,2022-06-27 00:00:00,51,51
+TMUS.OQ,"Atkin, Jonathan",jonathan.atkin@rbccm.com,415-633-8589,Equity Analyst,2182,30058082,2000-06-22 19:36:00,46,99
+TMUS.OQ,"Nispel, Brandon",bnispel@key.com,503-821-3871,Equity Analyst,12336,30328246,2017-06-30 00:00:00,93,12
+TMUS.OQ,"Rollins, Michael",,+1-212-816-1116,,3202,30057274,2000-01-31 00:00:00,41,71
+TMUS.OQ,"Ferguson, Marie",,,Equity Analyst,9584,30375825,2022-01-01 00:00:00,,34
+TMUS.OQ,"Naqvi, Ali",ali.naqvi@hsbc.com,44-20-7992-2176,Equity Analyst,358,30323945,2016-10-30 00:00:00,44,98
+TMUS.OQ,"McHugh, Samuel",sam.mchugh@us.bnpparibas.com,212-471-6569,Research Analyst,2233,30317354,2015-11-04 08:02:32,56,23
+TMUS.OQ,"Beale, Andrew C",andrew.beale@arete.net,44-20-7959-1316,Equity Analyst,35539,30168095,2003-10-01 00:00:00,71,64
+TMUS.OQ,"Kraft, Bryan D",bryan.kraft@db.com,212-250-0117,Research Analyst,47,30311568,2015-03-04 00:00:00,34,5
+TMUS.OQ,"Harrigan, Matthew",Matthew.Harrigan@StoneX.com,720-428-8909,Equity Analyst,31149,30346543,2019-07-01 00:00:00,1,
+TMUS.OQ,"Hodel, Michael",michael.hodel@morningstar.com,312-696-6578,Director,60797,30196220,2009-04-12 00:00:00,30,2
+TMUS.OQ,"Petti, Sebastiano C",sebastiano.c.petti@jpmorgan.com,212-622-8529,Equity Analyst,4614,30323238,2016-09-23 00:00:00,57,40
+TMUS.OQ,"Louthan, Frank G",frank.louthan@raymondjames.com,404-442-5867,Equity Analyst,2690,30100960,2001-07-06 00:00:00,52,87
+TMUS.OQ,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,70,30
+TMUS.OQ,"Volkert, Matthias",,,Equity Analyst,18658,30132106,2003-05-22 03:00:00,1,100
+TMUS.OQ,"Snyder, Keith",,,Equity Analyst,178117,30368480,2021-07-10 00:00:00,35,19
+TMUS.OQ,"Maral, Kutgun",kutgun.maral@evercoreisi.com,212-497-0804,Equity Analyst,62195,30390003,2023-07-01 00:00:00,21,22
+TMUS.OQ,"Moffett, Craig E",craig@moffettnathanson.com,212-519-0021,Senior Analyst,111984,30301084,2013-11-01 00:00:00,83,7
+TMUS.OQ,"Sedova, Lyaysyan",lyaysyan.sedova@ffin.ae,,Senior Analyst,148183,30408697,2026-02-01 12:30:29,,27
+TMUS.OQ,"Yoon, Laurent",laurent.yoon@bernsteinsg.com,212-969-1361,Equity Analyst,6872,30392179,2023-10-05 00:00:00,65,23
+TMUS.OQ,"Feinseth, Ivan",ifeinseth@tigressfp.com,646-780-8901,Director of Research,117104,30305378,2012-01-01 00:00:00,72,34
+TMUS.OQ,"Horan, Timothy K",Timothy.Horan@opco.com,212-667-8137,Equity Analyst,954,30177450,2008-01-14 00:00:00,52,98
+TMUS.OQ,Research Department,,,Other,126605,30325967,2017-02-10 00:00:00,,67
+TMUS.OQ,"Ng, Michael",michael.ng@gs.com,212-902-8618,Equity Analyst,6,30325910,2017-02-12 00:00:00,81,11
+TMUS.OQ,"Supino, Peter L",psupino@wolferesearch.com,646-582-9330,Equity Analyst,43418,30378837,2022-04-01 22:53:40,65,49
+TMUS.OQ,"Williams, Gregory",gregory.williams@cowen.com,646-562-1367,Equity Analyst,85,30316814,2015-10-01 00:00:00,52,68
+TMUS.OQ,,,,,,,,6,14
+TMUS.OQ,,,,,,,,43,37
+TMUS.OQ,,,,,,,,61,20
+TMUS.OQ,,,,,,,,54,9
+TMUS.OQ,,,,,,,,27,19
+TMUS.OQ,,,,,,,,56,7
+JPM.N,"Leon, Kenneth M",kenneth.leon@cfraresearch.com,,Equity Analyst,178117,30368178,2021-07-06 00:00:00,77,88
+JPM.N,"Biggar, Stephen",SBiggar@ArgusResearch.com,646-747-5446,Equity Analyst,9584,30076454,1980-07-20 00:00:00,29,54
+JPM.N,"Park, Jein",jane8314@hanwha.com,822-3772-7380,Equity Analyst,22919,30407938,2025-12-01 23:08:40,16,5
+JPM.N,"Gosalia, Manan",manan.gosalia@morganstanley.com,212-761-4092,Equity Analyst,2975,30279148,2012-04-13 11:34:55,8,65
+JPM.N,"Chubak, Steven J",schubak@wolferesearch.com,646-582-9315,Equity Analyst,43418,30338972,2018-09-24 00:00:00,81,84
+JPM.N,"Mitchell, James F",jmitchell@seaportrp.com,646-760-3906,Senior Analyst,59786,30357948,2020-05-01 00:00:00,70,17
+JPM.N,"Kim, Eun-gab",egab@kiwoom.com,822-3787-5139,Equity Analyst,60468,30388729,2023-04-22 06:48:37,66,33
+JPM.N,"Cassidy, Gerard S",gerard.cassidy@rbccm.com,207-780-1554,Equity Analyst,2182,30111247,2001-10-15 13:02:00,66,21
+JPM.N,"George, David A",dgeorge@rwbaird.com,314-445-6510,Senior Research Anal,10924,30175940,2008-01-08 01:07:00,45,33
+JPM.N,"Haessler, Philipp",,,Equity Analyst,18658,30399019,2024-08-01 09:28:32,65,17
+JPM.N,"McDonald, John E",John.McDonald@truist.com,212-303-4179,Equity Analyst,5179,30401460,2025-01-05 00:00:00,59,53
+JPM.N,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,47,94
+JPM.N,"Ramsden, Richard N",richard.ramsden@gs.com,212-357-9981,Equity Analyst,6,30021579,1997-08-21 00:00:00,46,7
+JPM.N,"Schorr, Glenn P",glenn.schorr@evercoreisi.com,212-653-9045,Equity Analyst,62195,30309096,2014-10-30 17:00:00,80,30
+JPM.N,"McGratty, Christopher E",cmcgratty@kbw.com,212-887-7704,Equity Analyst,4570,30147606,2005-03-07 07:01:00,65,12
+JPM.N,"Kotowski, Chris M",chris.kotowski@opco.com,212-667-6699,Equity Analyst,954,30186930,2009-03-16 00:00:00,74,35
+JPM.N,"Gerlinger, Benjamin",,+1-212-816-3538,,3202,30393064,2023-11-13 01:09:49,71,43
+JPM.N,"Chiaverini, David J",dchiaverini@jefferies.com,212-778-8554,Equity Analyst,138,30403566,2025-05-01 00:00:00,75,54
+JPM.N,"O-Connor, Matt D",matthew.o-connor@db.com,212-250-8489,Research Analyst,47,30188877,2009-04-27 00:00:00,51,48
+JPM.N,"Goldberg, Jason M",jason.goldberg@barclays.com,212-526-8580,Equity Analyst,10333,30067441,2000-07-14 00:00:00,37,62
+JPM.N,"Shih, Eric",eric.shih@kgi.com,88-62-2181-8733,Equity Analyst,10877,30308356,2014-10-02 00:00:00,32,45
+JPM.N,"Martinez, Saul",saul1.martinez@us.hsbc.com,212-525-6874,Equity Analyst,358,30389623,2023-07-04 00:39:44,39,20
+JPM.N,"Paramonov, Mikhail",mikhail.paramonov@fbroker.kz,,Senior Analyst,148183,30397748,2024-06-25 00:00:00,43,37
+JPM.N,"Li, Peifeng",peifeng.li@cicc.com.cn,,Equity Analyst,20783,30384617,2022-11-10 03:24:36,46,26
+JPM.N,"Mayo, Mike",mike.mayo@wellsfargo.com,212-214-5300,Equity Analyst,7671,30328340,2017-06-02 00:00:00,68,32
+JPM.N,,,,,,,,56,39
+JPM.N,,,,,,,,39,61
+JPM.N,,,,,,,,63,28
+JPM.N,,,,,,,,26,4
+JPM.N,,,,,,,,25,
+JPM.N,,,,,,,,65,17
+GS.N,"Hawken, Brennan M",brennan.hawken@bmo.com,646-648-2408,Equity Analyst,4104,30406211,2025-09-03 00:51:39,37,77
+GS.N,"Martinez, Saul",saul1.martinez@us.hsbc.com,212-525-6874,Equity Analyst,358,30389623,2023-07-04 00:39:44,77,88
+GS.N,"Paramonov, Mikhail",mikhail.paramonov@fbroker.kz,,Senior Analyst,148183,30397748,2024-06-25 00:00:00,29,54
+GS.N,"McGratty, Christopher E",cmcgratty@kbw.com,212-887-7704,Equity Analyst,4570,30147606,2005-03-07 07:01:00,16,5
+GS.N,"Gerlinger, Benjamin",,+1-212-816-3538,,3202,30393064,2023-11-13 01:09:49,26,89
+GS.N,"Kotowski, Chris M",chris.kotowski@opco.com,212-667-6699,Equity Analyst,954,30186930,2009-03-16 00:00:00,8,65
+GS.N,"Ryan, Devin P",devin.ryan@citizensbank.com,212-906-3578,Equity Analyst,17304,30299137,2013-08-01 00:00:00,28,5
+GS.N,"Schorr, Glenn P",glenn.schorr@evercoreisi.com,212-653-9045,Equity Analyst,62195,30309096,2014-10-30 17:00:00,70,17
+GS.N,"Mayo, Mike",mike.mayo@wellsfargo.com,212-214-5300,Equity Analyst,7671,30328340,2017-06-02 00:00:00,66,33
+GS.N,"Dunlop, Sean",sean.dunlop@morningstar.com,571-455-6905,Director,60797,30361128,2020-10-01 00:00:00,66,21
+GS.N,"Biggar, Stephen",SBiggar@ArgusResearch.com,646-747-5446,Equity Analyst,9584,30076454,1980-07-20 00:00:00,45,33
+GS.N,"Goldberg, Jason M",jason.goldberg@barclays.com,212-526-8580,Equity Analyst,10333,30067441,2000-07-14 00:00:00,65,17
+GS.N,"Gosalia, Manan",manan.gosalia@morganstanley.com,212-761-4092,Equity Analyst,2975,30279148,2012-04-13 11:34:55,59,53
+GS.N,"Abouhossein, Kian",kian.abouhossein@jpmorgan.com,44-20-7134-4575,Equity Analyst,4614,30064538,2000-05-19 00:00:00,51,62
+GS.N,"Chubak, Steven J",schubak@wolferesearch.com,646-582-9315,Equity Analyst,43418,30338972,2018-09-24 00:00:00,46,7
+GS.N,"Li, Peifeng",peifeng.li@cicc.com.cn,,Equity Analyst,20783,30384617,2022-11-10 03:24:36,80,30
+GS.N,"Fannon, Daniel T",dfannon@jefferies.com,415-229-1523,Equity Analyst,138,30123275,2005-02-04 00:00:00,32,60
+GS.N,"Mitchell, James F",jmitchell@seaportrp.com,646-760-3906,Senior Analyst,59786,30357948,2020-05-01 00:00:00,65,12
+GS.N,"Sigee, Jeremy C",jeremy.sigee@uk.bnpparibas.com,44-20-3430-8540,Research Analyst,2233,30329727,2017-08-28 00:00:00,75,54
+GS.N,"Watts, Nicholas J",nicholas.watts@redburnatlantic.com,44-20-7000-2187,Equity Analyst,38750,30179651,2008-04-02 00:00:00,25,
+GS.N,"Cassidy, Gerard S",gerard.cassidy@rbccm.com,207-780-1554,Equity Analyst,2182,30111247,2001-10-15 13:02:00,51,48
+GS.N,"Leon, Kenneth M",kenneth.leon@cfraresearch.com,,Equity Analyst,178117,30368178,2021-07-06 00:00:00,37,62
+GS.N,"O-Connor, Matt D",matthew.o-connor@db.com,212-250-8489,Research Analyst,47,30188877,2009-04-27 00:00:00,39,20
+GS.N,,,,,,,,43,37
+GS.N,,,,,,,,68,32
+GS.N,,,,,,,,56,39
+GS.N,,,,,,,,50,42
+GS.N,,,,,,,,56,45
+MS.N,"Fannon, Daniel T",dfannon@jefferies.com,415-229-1523,Equity Analyst,138,30123275,2005-02-04 00:00:00,37,77
+MS.N,"Mitchell, James F",jmitchell@seaportrp.com,646-760-3906,Senior Analyst,59786,30357948,2020-05-01 00:00:00,77,88
+MS.N,"Watts, Nicholas J",nicholas.watts@redburnatlantic.com,44-20-7000-2187,Equity Analyst,38750,30179651,2008-04-02 00:00:00,29,54
+MS.N,"McGratty, Christopher E",cmcgratty@kbw.com,212-887-7704,Equity Analyst,4570,30147606,2005-03-07 07:01:00,16,5
+MS.N,"Cassidy, Gerard S",gerard.cassidy@rbccm.com,207-780-1554,Equity Analyst,2182,30111247,2001-10-15 13:02:00,26,89
+MS.N,"Kotowski, Chris M",chris.kotowski@opco.com,212-667-6699,Equity Analyst,954,30186930,2009-03-16 00:00:00,8,65
+MS.N,"Leon, Kenneth M",kenneth.leon@cfraresearch.com,,Equity Analyst,178117,30368178,2021-07-06 00:00:00,28,5
+MS.N,"Li, Peifeng",peifeng.li@cicc.com.cn,,Equity Analyst,20783,30384617,2022-11-10 03:24:36,70,17
+MS.N,"Schorr, Glenn P",glenn.schorr@evercoreisi.com,212-653-9045,Equity Analyst,62195,30309096,2014-10-30 17:00:00,66,33
+MS.N,"Ramsden, Richard N",richard.ramsden@gs.com,212-357-9981,Equity Analyst,6,30021579,1997-08-21 00:00:00,66,21
+MS.N,"Martinez, Saul",saul1.martinez@us.hsbc.com,212-525-6874,Equity Analyst,358,30389623,2023-07-04 00:39:44,45,33
+MS.N,"Chubak, Steven J",schubak@wolferesearch.com,646-582-9315,Equity Analyst,43418,30338972,2018-09-24 00:00:00,59,53
+MS.N,"Paramonov, Mikhail",mikhail.paramonov@fbroker.kz,,Senior Analyst,148183,30397748,2024-06-25 00:00:00,51,62
+MS.N,"O-Connor, Matt D",matthew.o-connor@db.com,212-250-8489,Research Analyst,47,30188877,2009-04-27 00:00:00,46,7
+MS.N,"Goldberg, Jason M",jason.goldberg@barclays.com,212-526-8580,Equity Analyst,10333,30067441,2000-07-14 00:00:00,80,30
+MS.N,"Abouhossein, Kian",kian.abouhossein@jpmorgan.com,44-20-7134-4575,Equity Analyst,4614,30064538,2000-05-19 00:00:00,32,60
+MS.N,"Gerlinger, Benjamin",,+1-212-816-3538,,3202,30393064,2023-11-13 01:09:49,65,12
+MS.N,"Mayo, Mike",mike.mayo@wellsfargo.com,212-214-5300,Equity Analyst,7671,30328340,2017-06-02 00:00:00,75,54
+MS.N,"Hawken, Brennan M",brennan.hawken@bmo.com,646-648-2408,Equity Analyst,4104,30406211,2025-09-03 00:51:39,25,
+MS.N,"Dunlop, Sean",sean.dunlop@morningstar.com,571-455-6905,Director,60797,30361128,2020-10-01 00:00:00,51,48
+MS.N,"Ryan, Devin P",devin.ryan@citizensbank.com,212-906-3578,Equity Analyst,17304,30299137,2013-08-01 00:00:00,37,62
+MS.N,"Biggar, Stephen",SBiggar@ArgusResearch.com,646-747-5446,Equity Analyst,9584,30076454,1980-07-20 00:00:00,65,45
+MS.N,,,,,,,,39,20
+MS.N,,,,,,,,43,37
+MS.N,,,,,,,,68,32
+MS.N,,,,,,,,56,39
+MS.N,,,,,,,,50,42
+MS.N,,,,,,,,56,45
+MS.N,,,,,,,,65,17
+BAC.N,Research Department,,,Other,126605,30325967,2017-02-10 00:00:00,77,88
+BAC.N,"Cassidy, Gerard S",gerard.cassidy@rbccm.com,207-780-1554,Equity Analyst,2182,30111247,2001-10-15 13:02:00,29,54
+BAC.N,"Gosalia, Manan",manan.gosalia@morganstanley.com,212-761-4092,Equity Analyst,2975,30279148,2012-04-13 11:34:55,16,5
+BAC.N,"Li, Peifeng",peifeng.li@cicc.com.cn,,Equity Analyst,20783,30384617,2022-11-10 03:24:36,8,65
+BAC.N,"Schorr, Glenn P",glenn.schorr@evercoreisi.com,212-653-9045,Equity Analyst,62195,30309096,2014-10-30 17:00:00,81,84
+BAC.N,"Chubak, Steven J",schubak@wolferesearch.com,646-582-9315,Equity Analyst,43418,30338972,2018-09-24 00:00:00,70,17
+BAC.N,"Martinez, Saul",saul1.martinez@us.hsbc.com,212-525-6874,Equity Analyst,358,30389623,2023-07-04 00:39:44,66,33
+BAC.N,"Leon, Kenneth M",kenneth.leon@cfraresearch.com,,Equity Analyst,178117,30368178,2021-07-06 00:00:00,66,21
+BAC.N,"McDonald, John E",John.McDonald@truist.com,212-303-4179,Equity Analyst,5179,30401460,2025-01-05 00:00:00,45,33
+BAC.N,"Paramonov, Mikhail",mikhail.paramonov@fbroker.kz,,Senior Analyst,148183,30397748,2024-06-25 00:00:00,65,17
+BAC.N,"Ramsden, Richard N",richard.ramsden@gs.com,212-357-9981,Equity Analyst,6,30021579,1997-08-21 00:00:00,47,94
+BAC.N,"McGratty, Christopher E",cmcgratty@kbw.com,212-887-7704,Equity Analyst,4570,30147606,2005-03-07 07:01:00,46,7
+BAC.N,"George, David A",dgeorge@rwbaird.com,314-445-6510,Senior Research Anal,10924,30175940,2008-01-08 01:07:00,,27
+BAC.N,"Shih, Eric",eric.shih@kgi.com,88-62-2181-8733,Equity Analyst,10877,30308356,2014-10-02 00:00:00,80,30
+BAC.N,"Chiaverini, David J",dchiaverini@jefferies.com,212-778-8554,Equity Analyst,138,30403566,2025-05-01 00:00:00,65,12
+BAC.N,"O-Connor, Matt D",matthew.o-connor@db.com,212-250-8489,Research Analyst,47,30188877,2009-04-27 00:00:00,71,43
+BAC.N,"Mayo, Mike",mike.mayo@wellsfargo.com,212-214-5300,Equity Analyst,7671,30328340,2017-06-02 00:00:00,75,54
+BAC.N,"Gerlinger, Benjamin",,+1-212-816-3538,,3202,30393064,2023-11-13 01:09:49,51,48
+BAC.N,"Kotowski, Chris M",chris.kotowski@opco.com,212-667-6699,Equity Analyst,954,30186930,2009-03-16 00:00:00,37,62
+BAC.N,"Biggar, Stephen",SBiggar@ArgusResearch.com,646-747-5446,Equity Analyst,9584,30076454,1980-07-20 00:00:00,32,45
+BAC.N,"Goldberg, Jason M",jason.goldberg@barclays.com,212-526-8580,Equity Analyst,10333,30067441,2000-07-14 00:00:00,39,20
+BAC.N,"Mitchell, James F",jmitchell@seaportrp.com,646-760-3906,Senior Analyst,59786,30357948,2020-05-01 00:00:00,43,37
+BAC.N,"Juneja, Vivek",vivek.juneja@jpmorgan.com,212-622-6465,Equity Analyst,4614,30027261,1996-11-08 15:52:00,68,32
+BAC.N,"Kim, Eun-gab",egab@kiwoom.com,822-3787-5139,Equity Analyst,60468,30388729,2023-04-22 06:48:37,56,39
+BAC.N,,,,,,,,63,28
+BAC.N,,,,,,,,26,4
+BAC.N,,,,,,,,65,17
+BAC.N,,,,,,,,15,56
+C.N,"Cassidy, Gerard S",gerard.cassidy@rbccm.com,207-780-1554,Equity Analyst,2182,30111247,2001-10-15 13:02:00,77,88
+C.N,"O-Connor, Matt D",matthew.o-connor@db.com,212-250-8489,Research Analyst,47,30188877,2009-04-27 00:00:00,29,54
+C.N,"Kotowski, Chris M",chris.kotowski@opco.com,212-667-6699,Equity Analyst,954,30186930,2009-03-16 00:00:00,16,5
+C.N,"Biggar, Stephen",SBiggar@ArgusResearch.com,646-747-5446,Equity Analyst,9584,30076454,1980-07-20 00:00:00,8,65
+C.N,"McGratty, Christopher E",cmcgratty@kbw.com,212-887-7704,Equity Analyst,4570,30147606,2005-03-07 07:01:00,70,17
+C.N,"Mitchell, James F",jmitchell@seaportrp.com,646-760-3906,Senior Analyst,59786,30357948,2020-05-01 00:00:00,66,33
+C.N,"Ramsden, Richard N",richard.ramsden@gs.com,212-357-9981,Equity Analyst,6,30021579,1997-08-21 00:00:00,66,21
+C.N,"Gosalia, Manan",manan.gosalia@morganstanley.com,212-761-4092,Equity Analyst,2975,30279148,2012-04-13 11:34:55,45,33
+C.N,"Schorr, Glenn P",glenn.schorr@evercoreisi.com,212-653-9045,Equity Analyst,62195,30309096,2014-10-30 17:00:00,65,17
+C.N,"Chubak, Steven J",schubak@wolferesearch.com,646-582-9315,Equity Analyst,43418,30338972,2018-09-24 00:00:00,59,53
+C.N,"Leon, Kenneth M",kenneth.leon@cfraresearch.com,,Equity Analyst,178117,30368178,2021-07-06 00:00:00,46,7
+C.N,"McDonald, John E",John.McDonald@truist.com,212-303-4179,Equity Analyst,5179,30401460,2025-01-05 00:00:00,80,30
+C.N,"Goldberg, Jason M",jason.goldberg@barclays.com,212-526-8580,Equity Analyst,10333,30067441,2000-07-14 00:00:00,65,12
+C.N,"Li, Peifeng",peifeng.li@cicc.com.cn,,Equity Analyst,20783,30384617,2022-11-10 03:24:36,71,43
+C.N,"Mayo, Mike",mike.mayo@wellsfargo.com,212-214-5300,Equity Analyst,7671,30328340,2017-06-02 00:00:00,65,56
+C.N,"Paramonov, Mikhail",mikhail.paramonov@fbroker.kz,,Senior Analyst,148183,30397748,2024-06-25 00:00:00,75,54
+C.N,"Juneja, Vivek",vivek.juneja@jpmorgan.com,212-622-6465,Equity Analyst,4614,30027261,1996-11-08 15:52:00,51,48
+C.N,"Chiaverini, David J",dchiaverini@jefferies.com,212-778-8554,Equity Analyst,138,30403566,2025-05-01 00:00:00,37,62
+C.N,"Martinez, Saul",saul1.martinez@us.hsbc.com,212-525-6874,Equity Analyst,358,30389623,2023-07-04 00:39:44,39,20
+C.N,,,,,,,,43,37
+C.N,,,,,,,,56,39
+C.N,,,,,,,,63,28
+C.N,,,,,,,,26,4
+C.N,,,,,,,,25,
+C.N,,,,,,,,65,17
+C.N,,,,,,,,15,56
+SCHW.N,"Bendit, Charles J",charles.bendit@redburn.com,020 7000 2171,,38750,30346078,2019-07-08 00:00:00,29,54
+SCHW.N,"Schmitt, Jeff",jschmitt@williamblair.com,312-364-8106,Equity Analyst,11266,30361877,2020-11-01 00:00:00,26,89
+SCHW.N,Research Department,,,Other,126605,30325967,2017-02-10 00:00:00,61,7
+SCHW.N,"Katz, Bill R",bill.katz@tdsecurities.com,212-468-7802,Equity Analyst,85,30393984,2024-01-01 16:04:35,64,59
+SCHW.N,"Hawken, Brennan M",brennan.hawken@bmo.com,646-648-2408,Equity Analyst,4104,30406211,2025-09-03 00:51:39,100,73
+SCHW.N,"Cyprys, Michael J",Michael.Cyprys@morganstanley.com,212-761-7619,Equity Analyst,2975,30201588,2010-04-27 21:34:00,26,20
+SCHW.N,"Bedell, Brian B",brian.bedell@db.com,212-250-6600,Research Analyst,47,30302962,2014-01-28 00:00:00,37,60
+SCHW.N,"Blostein, Alexander",,,,6,30194726,2009-01-14 00:00:00,51,62
+SCHW.N,"Worthington, Kenneth B",kenneth.b.worthington@jpmorgan.com,212-622-6613,Equity Analyst,4614,30157718,2006-02-09 00:00:00,55,70
+SCHW.N,"Blankenship, Caydee",,,Equity Analyst,178117,30391491,2023-09-08 16:33:01,,27
+SCHW.N,"Smith, David",david.smith@truist.com,212-319-3623,Equity Analyst,5179,30401457,2025-01-01 16:05:21,65,12
+SCHW.N,"Biggar, Stephen",SBiggar@ArgusResearch.com,646-747-5446,Equity Analyst,9584,30076454,1980-07-20 00:00:00,65,74
+SCHW.N,"Chubak, Steven J",schubak@wolferesearch.com,646-582-9315,Equity Analyst,43418,30338972,2018-09-24 00:00:00,56,10
+SCHW.N,"Fannon, Daniel T",dfannon@jefferies.com,415-229-1523,Equity Analyst,138,30123275,2005-02-04 00:00:00,34,88
+SCHW.N,"Budish, Benjamin E",benjamin.budish@barclays.com,212-526-2418,Equity Analyst,10333,30341344,2018-11-14 16:08:55,50,53
+SCHW.N,"O'Shaughnessy, Patrick J",patrick.oshaughnessy@raymondjames.c,312-612-7687,Equity Analyst,2690,30179079,2008-03-18 00:00:00,25,
+SCHW.N,"Fan, You",you.fan@cicc.com.cn,,Equity Analyst,20783,30360739,2020-10-12 05:04:27,70,22
+SCHW.N,"Moley, Patrick M",Patrick.Moley@psc.com,212 284-9350,Senior Research Anal,2691,30352699,2020-05-04 10:57:32,50,68
+SCHW.N,"Allen, Christopher J",allenchr@kbw.com,212-887-7715,Equity Analyst,4570,30408757,2026-02-19 17:06:12,65,45
+SCHW.N,"Ryan, Devin P",devin.ryan@citizensbank.com,212-906-3578,Equity Analyst,17304,30299137,2013-08-01 00:00:00,43,37
+SCHW.N,,,,,,,,50,68
+SCHW.N,,,,,,,,81,54
+SCHW.N,,,,,,,,50,60
+SCHW.N,,,,,,,,49,33
+SCHW.N,,,,,,,,50,42
+SCHW.N,,,,,,,,64,12
+HOOD.OQ,"Budish, Benjamin E",benjamin.budish@barclays.com,212-526-2418,Equity Analyst,10333,30341344,2018-11-14 16:08:55,29,54
+HOOD.OQ,"Todaro, John",jtodaro@needhamco.com,212-705-0446,Equity Analyst,110,30366768,2021-05-01 00:00:00,26,89
+HOOD.OQ,"Seo, Youngjae",youngjae.seo@daishin.com,,Equity Analyst,60471,30374632,2021-12-15 12:00:00,61,7
+HOOD.OQ,"Gaonkar, Satish",satishg@crispidea.com,,Research Analyst,61498,30407473,2025-12-01 00:00:00,64,59
+HOOD.OQ,Research Department,,,Other,60474,30237199,2009-06-08 00:00:00,26,20
+HOOD.OQ,"Engel, Ed",eengel@compasspointllc.com,202-548-8352,Equity Analyst,63952,30401763,2025-01-28 16:06:46,,50
+HOOD.OQ,"Chhugani, Gautam",gautam.chhugani@bernsteinsg.com,91-22-6842-1416,Equity Analyst,6872,30324317,2016-11-16 00:00:00,37,60
+HOOD.OQ,"O'Shaughnessy, Patrick J",patrick.oshaughnessy@raymondjames.c,312-612-7687,Equity Analyst,2690,30179079,2008-03-18 00:00:00,51,62
+HOOD.OQ,"Fan, You",you.fan@cicc.com.cn,,Equity Analyst,20783,30360739,2020-10-12 05:04:27,55,70
+HOOD.OQ,"Moley, Patrick M",Patrick.Moley@psc.com,212 284-9350,Senior Research Anal,2691,30352699,2020-05-04 10:57:32,8,82
+HOOD.OQ,"Fannon, Daniel T",dfannon@jefferies.com,415-229-1523,Equity Analyst,138,30123275,2005-02-04 00:00:00,65,12
+HOOD.OQ,"Cyprys, Michael J",Michael.Cyprys@morganstanley.com,212-761-7619,Equity Analyst,2975,30201588,2010-04-27 21:34:00,65,74
+HOOD.OQ,"Bedell, Brian B",brian.bedell@db.com,212-250-6600,Research Analyst,47,30302962,2014-01-28 00:00:00,36,45
+HOOD.OQ,"El-Assal, Ramsey C",ramsey.el-assal@cantor.com,212-915-1239,Research Analyst,5698,30408382,2026-01-21 16:16:14,56,10
+HOOD.OQ,"Blankenship, Caydee",,,Equity Analyst,178117,30391491,2023-09-08 16:33:01,84,91
+HOOD.OQ,"Biggar, Stephen",SBiggar@ArgusResearch.com,646-747-5446,Equity Analyst,9584,30076454,1980-07-20 00:00:00,46,9
+HOOD.OQ,"Bendit, Charles J",charles.bendit@redburn.com,020 7000 2171,,38750,30346078,2019-07-08 00:00:00,34,88
+HOOD.OQ,"Worthington, Kenneth B",kenneth.b.worthington@jpmorgan.com,212-622-6613,Equity Analyst,4614,30157718,2006-02-09 00:00:00,36,66
+HOOD.OQ,"Kim, Yumin",yumin.kim@hanwha.com,822-3772-7392,Equity Analyst,22919,30391217,2023-08-28 06:28:10,50,53
+HOOD.OQ,"Ahn, Hyojeong",yj.ahn@kiwoom.com,,Equity Analyst,60468,30270462,2011-06-30 04:06:00,25,
+HOOD.OQ,"Yaro, James",james.e.yaro@gs.com,212-902-1913,Equity Analyst,6,30350853,2020-02-17 22:58:20,80,69
+HOOD.OQ,"Ko, Minsung",minsung.ko@nhsec.com,822-768-7707,Junior Analyst,17150,30388097,2023-04-20 06:01:34,47,52
+HOOD.OQ,"Ryan, Devin P",devin.ryan@citizensbank.com,212-906-3578,Equity Analyst,17304,30299137,2013-08-01 00:00:00,50,68
+HOOD.OQ,"Markgraff, Alex",alexander.markgraff@key.com,503-821-3935,Equity Analyst,12336,30362067,2020-11-19 00:00:00,36,45
+HOOD.OQ,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,73,47
+HOOD.OQ,"Chubak, Steven J",schubak@wolferesearch.com,646-582-9315,Equity Analyst,43418,30338972,2018-09-24 00:00:00,65,45
+HOOD.OQ,"Allen, Christopher J",allenchr@kbw.com,212-887-7715,Equity Analyst,4570,30408757,2026-02-19 17:06:12,1,
+HOOD.OQ,"Dolev, Dan",dan.dolev@mizuhogroup.com,646-949-9599,Managing Director,61910,30359264,2020-01-01 00:00:00,43,37
+HOOD.OQ,"Smith, David",david.smith@truist.com,212-319-3623,Equity Analyst,5179,30401457,2025-01-01 16:05:21,35,
+HOOD.OQ,,,,,,,,50,68
+HOOD.OQ,,,,,,,,49,33
+HOOD.OQ,,,,,,,,49,84
+HOOD.OQ,,,,,,,,42,28
+HOOD.OQ,,,,,,,,41,72
+HOOD.OQ,,,,,,,,64,12
+IBKR.OQ,"Fannon, Daniel T",dfannon@jefferies.com,415-229-1523,Equity Analyst,138,30123275,2005-02-04 00:00:00,26,89
+IBKR.OQ,"Chubak, Steven J",schubak@wolferesearch.com,646-582-9315,Equity Analyst,43418,30338972,2018-09-24 00:00:00,65,52
+IBKR.OQ,"Yaro, James",james.e.yaro@gs.com,212-902-1913,Equity Analyst,6,30350853,2020-02-17 22:58:20,65,12
+IBKR.OQ,"Hawken, Brennan M",brennan.hawken@bmo.com,646-648-2408,Equity Analyst,4104,30406211,2025-09-03 00:51:39,65,74
+IBKR.OQ,"Allen, Christopher J",allenchr@kbw.com,212-887-7715,Equity Analyst,4570,30408757,2026-02-19 17:06:12,56,10
+IBKR.OQ,"Budish, Benjamin E",benjamin.budish@barclays.com,212-526-2418,Equity Analyst,10333,30341344,2018-11-14 16:08:55,84,91
+IBKR.OQ,"Blankenship, Caydee",,,Equity Analyst,178117,30391491,2023-09-08 16:33:01,34,88
+IBKR.OQ,"Bendit, Charles J",charles.bendit@redburn.com,020 7000 2171,,38750,30346078,2019-07-08 00:00:00,50,53
+IBKR.OQ,"Fan, You",you.fan@cicc.com.cn,,Equity Analyst,20783,30360739,2020-10-12 05:04:27,25,
+IBKR.OQ,"Moley, Patrick M",Patrick.Moley@psc.com,212 284-9350,Senior Research Anal,2691,30352699,2020-05-04 10:57:32,50,68
+IBKR.OQ,,,,,,,,73,47
+IBKR.OQ,,,,,,,,43,37
+IBKR.OQ,,,,,,,,50,68
+IBKR.OQ,,,,,,,,50,42
+IBKR.OQ,,,,,,,,56,45
+IBKR.OQ,,,,,,,,64,12
+COIN.OQ,"Christiansen, Peter",,+1-212-816-8702,,3202,30323022,2016-08-01 00:00:00,48,54
+COIN.OQ,"Heal, Kevin",,,Equity Analyst,9584,30341607,2018-11-01 00:00:00,26,89
+COIN.OQ,"Jeffrey, Andrew W",ajeffrey@williamblair.com,415-796-6896,Equity Analyst,11266,30398174,2024-07-18 00:00:00,61,7
+COIN.OQ,"Harte, Andrew J",aharte@btig.com,212-863-0706,Equity Analyst,61553,30351864,2020-04-04 00:00:00,28,5
+COIN.OQ,"Ahn, Hyojeong",yj.ahn@kiwoom.com,,Equity Analyst,60468,30270462,2011-06-30 04:06:00,37,60
+COIN.OQ,"Kumar, Rayna",Rayna.Kumar@opco.com,212-667-6675,Equity Analyst,954,30399548,2024-09-30 16:16:48,51,62
+COIN.OQ,"Wang, Cindy",cindywang@chinarenaissance.com,852-2287-1209,Research Analyst,134810,30375665,2022-01-25 18:05:38,55,70
+COIN.OQ,"Kim, Yumin",yumin.kim@hanwha.com,822-3772-7392,Equity Analyst,22919,30391217,2023-08-28 06:28:10,14,50
+COIN.OQ,"Palmerr, Mark",Mark.Palmer@StoneX.com,917-797-4919,Equity Analyst,31149,30394792,2024-02-10 00:00:00,8,82
+COIN.OQ,"Fannon, Daniel T",dfannon@jefferies.com,415-229-1523,Equity Analyst,138,30123275,2005-02-04 00:00:00,65,74
+COIN.OQ,"Brendler, Christopher C",cbrendler@rblt.com,212-607-3124,Equity Analyst,120252,30402328,2025-03-01 00:00:00,33,74
+COIN.OQ,"Chhugani, Gautam",gautam.chhugani@bernsteinsg.com,91-22-6842-1416,Equity Analyst,6872,30324317,2016-11-16 00:00:00,44,90
+COIN.OQ,"Engel, Ed",eengel@compasspointllc.com,202-548-8352,Equity Analyst,63952,30401763,2025-01-28 16:06:46,48,41
+COIN.OQ,"Schmidt, Nathan K",,,Equity Analyst,178117,30399526,2024-09-01 04:12:08,84,91
+COIN.OQ,"Budish, Benjamin E",benjamin.budish@barclays.com,212-526-2418,Equity Analyst,10333,30341344,2018-11-14 16:08:55,44,
+COIN.OQ,"He, Saiyi",hesaiyi@cmbi.com.hk,852-3916-1739,Equity Analyst,81441,30383736,2022-10-09 20:57:23,46,9
+COIN.OQ,"Lau, Owen",olau@clearstreet.io,332-232-7570,Equity Analyst,212759,30406581,2025-10-20 00:00:00,34,88
+COIN.OQ,"Dolev, Dan",dan.dolev@mizuhogroup.com,646-949-9599,Managing Director,61910,30359264,2020-01-01 00:00:00,36,66
+COIN.OQ,"Miller, Michael",michael.miller@morningstar.com,312-244-7629,Equity Analyst,60797,30363357,2020-12-01 00:00:00,80,69
+COIN.OQ,"Goetsch, Hal L",hgoetsch@brileyfin.com,617-951-6995,Equity Analyst,2341,30388626,2022-05-01 00:00:00,1,
+COIN.OQ,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,21,76
+COIN.OQ,"Colonnese, Mike",mcolonnese@hcwresearch.com,212-356-0530,Equity Analyst,3802,30381763,2022-06-01 06:06:43,47,52
+COIN.OQ,"El-Assal, Ramsey C",ramsey.el-assal@cantor.com,212-915-1239,Research Analyst,5698,30408382,2026-01-21 16:16:14,50,68
+COIN.OQ,"Pei, Bo",Bo.Pei@ustigersecurities.com,646-437-6971,Equity Analyst,183383,30373552,2021-10-01 00:00:00,89,94
+COIN.OQ,"Ryan, Devin P",devin.ryan@citizensbank.com,212-906-3578,Equity Analyst,17304,30299137,2013-08-01 00:00:00,36,45
+COIN.OQ,"Markgraff, Alex",alexander.markgraff@key.com,503-821-3935,Equity Analyst,12336,30362067,2020-11-19 00:00:00,73,47
+COIN.OQ,"Gala, Gus",ggala@mchny.com,212-729-3831,Equity Analyst,49781,30392172,2023-08-02 00:00:00,50,59
+COIN.OQ,"Watts, Nicholas J",nicholas.watts@redburnatlantic.com,44-20-7000-2187,Equity Analyst,38750,30179651,2008-04-02 00:00:00,48,39
+COIN.OQ,"Bedell, Brian B",brian.bedell@db.com,212-250-6600,Research Analyst,47,30302962,2014-01-28 00:00:00,55,40
+COIN.OQ,"Todaro, John",jtodaro@needhamco.com,212-705-0446,Equity Analyst,110,30366768,2021-05-01 00:00:00,48,53
+COIN.OQ,"Worthington, Kenneth B",kenneth.b.worthington@jpmorgan.com,212-622-6613,Equity Analyst,4614,30157718,2006-02-09 00:00:00,43,37
+COIN.OQ,"Koning, David J",dkoning@rwbaird.com,414-298-7494,Senior Research Anal,10924,30120488,2002-07-30 00:00:00,35,
+COIN.OQ,"Vafi, Joseph A",JVafi@cgf.com,415-229-0651,Equity Analyst,10642,30347384,2019-09-11 00:00:00,33,58
+COIN.OQ,"Moley, Patrick M",Patrick.Moley@psc.com,212 284-9350,Senior Research Anal,2691,30352699,2020-05-04 10:57:32,45,34
+COIN.OQ,"Yaro, James",james.e.yaro@gs.com,212-902-1913,Equity Analyst,6,30350853,2020-02-17 22:58:20,27,74
+COIN.OQ,"Gaonkar, Satish",satishg@crispidea.com,,Research Analyst,61498,30407473,2025-12-01 00:00:00,,22
+COIN.OQ,,,,,,,,79,34
+COIN.OQ,,,,,,,,49,84
+COIN.OQ,,,,,,,,65,63
+COIN.OQ,,,,,,,,49,63
+COIN.OQ,,,,,,,,42,28
+COIN.OQ,,,,,,,,41,72
+COIN.OQ,,,,,,,,47,20
+BLK.N,"Fan, You",you.fan@cicc.com.cn,,Equity Analyst,20783,30360739,2020-10-12 05:04:27,29,54
+BLK.N,"Park, Jein",jane8314@hanwha.com,822-3772-7380,Equity Analyst,22919,30407938,2025-12-01 23:08:40,26,89
+BLK.N,"Schorr, Glenn P",glenn.schorr@evercoreisi.com,212-653-9045,Equity Analyst,62195,30309096,2014-10-30 17:00:00,100,73
+BLK.N,"Katz, Bill R",bill.katz@tdsecurities.com,212-468-7802,Equity Analyst,85,30393984,2024-01-01 16:04:35,40,
+BLK.N,Research Department,,,Other,126605,30325967,2017-02-10 00:00:00,26,20
+BLK.N,"Hawken, Brennan M",brennan.hawken@bmo.com,646-648-2408,Equity Analyst,4104,30406211,2025-09-03 00:51:39,55,70
+BLK.N,"Seifert, Catherine",,,Equity Analyst,178117,30368247,2021-07-07 00:00:00,46,7
+BLK.N,"Warren, Greggory",greggory.warren@morningstar.com,312-384-4015,Senior Equity Analys,60797,30196254,2009-12-15 00:00:00,48,11
+BLK.N,"Giblat, Arnaud M",arnaud.giblat@uk.bnpparibas.com,44-203-430-8513,Research Analyst,2233,30314573,2015-01-01 00:00:00,,27
+BLK.N,"Budish, Benjamin E",benjamin.budish@barclays.com,212-526-2418,Equity Analyst,10333,30341344,2018-11-14 16:08:55,70,5
+BLK.N,"Cho, Michael Y",michael.cho@jpmorgan.com,212-622-3619,Equity Analyst,4614,30329308,2017-08-02 00:00:00,65,74
+BLK.N,"Bond, Alexander",bonda@kbw.com,212-887-7782,Equity Analyst,4570,30384900,2022-11-21 00:00:00,50,53
+BLK.N,"Paramonov, Mikhail",mikhail.paramonov@fbroker.kz,,Senior Analyst,148183,30397748,2024-06-25 00:00:00,51,31
+BLK.N,"Bedell, Brian B",brian.bedell@db.com,212-250-6600,Research Analyst,47,30302962,2014-01-28 00:00:00,50,68
+BLK.N,"Fannon, Daniel T",dfannon@jefferies.com,415-229-1523,Equity Analyst,138,30123275,2005-02-04 00:00:00,63,13
+BLK.N,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,43,37
+BLK.N,"Blostein, Alexander",,,,6,30194726,2009-01-14 00:00:00,81,54
+BLK.N,"Cyprys, Michael J",Michael.Cyprys@morganstanley.com,212-761-7619,Equity Analyst,2975,30201588,2010-04-27 21:34:00,50,60
+BLK.N,"Biggar, Stephen",SBiggar@ArgusResearch.com,646-747-5446,Equity Analyst,9584,30076454,1980-07-20 00:00:00,24,45
+BLK.N,,,,,,,,56,39
+BLK.N,,,,,,,,50,42
+BLK.N,,,,,,,,25,
+BX.N,"Cyprys, Michael J",Michael.Cyprys@morganstanley.com,212-761-7619,Equity Analyst,2975,30201588,2010-04-27 21:34:00,29,54
+BX.N,"Fannon, Daniel T",dfannon@jefferies.com,415-229-1523,Equity Analyst,138,30123275,2005-02-04 00:00:00,26,89
+BX.N,"Allen, Christopher J",allenchr@kbw.com,212-887-7715,Equity Analyst,4570,30408757,2026-02-19 17:06:12,61,7
+BX.N,Research Department,,,Other,126605,30325967,2017-02-10 00:00:00,28,5
+BX.N,"Budish, Benjamin E",benjamin.budish@barclays.com,212-526-2418,Equity Analyst,10333,30341344,2018-11-14 16:08:55,66,33
+BX.N,"Chubak, Steven J",schubak@wolferesearch.com,646-582-9315,Equity Analyst,43418,30338972,2018-09-24 00:00:00,100,73
+BX.N,"Schorr, Glenn P",glenn.schorr@evercoreisi.com,212-653-9045,Equity Analyst,62195,30309096,2014-10-30 17:00:00,40,
+BX.N,"Warren, Greggory",greggory.warren@morningstar.com,312-384-4015,Senior Equity Analys,60797,30196254,2009-12-15 00:00:00,26,20
+BX.N,"Giblat, Arnaud M",arnaud.giblat@uk.bnpparibas.com,44-203-430-8513,Research Analyst,2233,30314573,2015-01-01 00:00:00,51,62
+BX.N,"Bedell, Brian B",brian.bedell@db.com,212-250-6600,Research Analyst,47,30302962,2014-01-28 00:00:00,55,70
+BX.N,"Watts, Nicholas J",nicholas.watts@redburnatlantic.com,44-20-7000-2187,Equity Analyst,38750,30179651,2008-04-02 00:00:00,46,7
+BX.N,"Blostein, Alexander",,,,6,30194726,2009-01-14 00:00:00,48,11
+BX.N,"Worthington, Kenneth B",kenneth.b.worthington@jpmorgan.com,212-622-6613,Equity Analyst,4614,30157718,2006-02-09 00:00:00,,27
+BX.N,"Biggar, Stephen",SBiggar@ArgusResearch.com,646-747-5446,Equity Analyst,9584,30076454,1980-07-20 00:00:00,65,12
+BX.N,"Fan, You",you.fan@cicc.com.cn,,Equity Analyst,20783,30360739,2020-10-12 05:04:27,65,74
+BX.N,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,47,50
+BX.N,"Kotowski, Chris M",chris.kotowski@opco.com,212-667-6699,Equity Analyst,954,30186930,2009-03-16 00:00:00,59,83
+BX.N,"Hawken, Brennan M",brennan.hawken@bmo.com,646-648-2408,Equity Analyst,4104,30406211,2025-09-03 00:51:39,50,53
+BX.N,"Katz, Bill R",bill.katz@tdsecurities.com,212-468-7802,Equity Analyst,85,30393984,2024-01-01 16:04:35,51,48
+BX.N,"Dziarski, Bart",bart.dziarski@rbccm.com,416-842-8611,Equity Analyst,2182,30402188,2025-02-28 12:36:51,50,68
+BX.N,"Gandhi, Vikram",vikram.gandhi@hsbc.co.in,91-80-4555-2430,Equity Analyst,358,30390562,2023-08-09 16:06:31,43,37
+BX.N,"Leon, Kenneth M",kenneth.leon@cfraresearch.com,,Equity Analyst,178117,30368178,2021-07-06 00:00:00,57,61
+BX.N,"Love, Crispin E",Crispin.Love@psc.com,212-466-7938,Director,2691,30349896,2020-01-01 00:00:00,81,54
+BX.N,,,,,,,,50,60
+BX.N,,,,,,,,54,39
+BX.N,,,,,,,,50,42
+BX.N,,,,,,,,64,12
+ICE.N,"Cyprys, Michael J",Michael.Cyprys@morganstanley.com,212-761-7619,Equity Analyst,2975,30201588,2010-04-27 21:34:00,26,89
+ICE.N,"O'Shaughnessy, Patrick J",patrick.oshaughnessy@raymondjames.c,312-612-7687,Equity Analyst,2690,30179079,2008-03-18 00:00:00,61,7
+ICE.N,"Sabadra, Ashish",ashish.sabadra@rbccm.com,415-633-8659,Equity Analyst,2182,30366994,2021-06-07 00:00:00,64,59
+ICE.N,"Bedell, Brian B",brian.bedell@db.com,212-250-6600,Research Analyst,47,30302962,2014-01-28 00:00:00,100,73
+ICE.N,"Budish, Benjamin E",benjamin.budish@barclays.com,212-526-2418,Equity Analyst,10333,30341344,2018-11-14 16:08:55,65,52
+ICE.N,"Fannon, Daniel T",dfannon@jefferies.com,415-229-1523,Equity Analyst,138,30123275,2005-02-04 00:00:00,26,20
+ICE.N,"Blostein, Alexander",,,,6,30194726,2009-01-14 00:00:00,55,70
+ICE.N,"Yokum, Alexander",,,Equity Analyst,178117,30373850,2021-11-01 00:00:00,65,74
+ICE.N,"Katz, Bill R",bill.katz@tdsecurities.com,212-468-7802,Equity Analyst,85,30393984,2024-01-01 16:04:35,33,74
+ICE.N,"Worthington, Kenneth B",kenneth.b.worthington@jpmorgan.com,212-622-6613,Equity Analyst,4614,30157718,2006-02-09 00:00:00,34,88
+ICE.N,"Clinch, Simon A",,,Equity Analyst,38750,30390613,2023-08-11 00:00:00,1,
+ICE.N,"Allen, Christopher J",allenchr@kbw.com,212-887-7715,Equity Analyst,4570,30408757,2026-02-19 17:06:12,38,78
+ICE.N,"Heal, Kevin",,,Equity Analyst,9584,30341607,2018-11-01 00:00:00,50,68
+ICE.N,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,,16
+ICE.N,"Moley, Patrick M",Patrick.Moley@psc.com,212 284-9350,Senior Research Anal,2691,30352699,2020-05-04 10:57:32,43,37
+ICE.N,,,,,,,,61,5
+ICE.N,,,,,,,,81,54
+ICE.N,,,,,,,,64,12
+CME.OQ,"Allen, Christopher J",allenchr@kbw.com,212-887-7715,Equity Analyst,4570,30408757,2026-02-19 17:06:12,26,89
+CME.OQ,"Budish, Benjamin E",benjamin.budish@barclays.com,212-526-2418,Equity Analyst,10333,30341344,2018-11-14 16:08:55,61,7
+CME.OQ,"Sabadra, Ashish",ashish.sabadra@rbccm.com,415-633-8659,Equity Analyst,2182,30366994,2021-06-07 00:00:00,64,59
+CME.OQ,"Fannon, Daniel T",dfannon@jefferies.com,415-229-1523,Equity Analyst,138,30123275,2005-02-04 00:00:00,100,73
+CME.OQ,"Cyprys, Michael J",Michael.Cyprys@morganstanley.com,212-761-7619,Equity Analyst,2975,30201588,2010-04-27 21:34:00,65,52
+CME.OQ,"Katz, Bill R",bill.katz@tdsecurities.com,212-468-7802,Equity Analyst,85,30393984,2024-01-01 16:04:35,26,20
+CME.OQ,"Clinch, Simon A",,,Equity Analyst,38750,30390613,2023-08-11 00:00:00,55,70
+CME.OQ,"O'Shaughnessy, Patrick J",patrick.oshaughnessy@raymondjames.c,312-612-7687,Equity Analyst,2690,30179079,2008-03-18 00:00:00,65,74
+CME.OQ,"Moley, Patrick M",Patrick.Moley@psc.com,212 284-9350,Senior Research Anal,2691,30352699,2020-05-04 10:57:32,33,74
+CME.OQ,"Heal, Kevin",,,Equity Analyst,9584,30341607,2018-11-01 00:00:00,34,88
+CME.OQ,"Yokum, Alexander",,,Equity Analyst,178117,30373850,2021-11-01 00:00:00,1,
+CME.OQ,"Worthington, Kenneth B",kenneth.b.worthington@jpmorgan.com,212-622-6613,Equity Analyst,4614,30157718,2006-02-09 00:00:00,38,78
+CME.OQ,"Bedell, Brian B",brian.bedell@db.com,212-250-6600,Research Analyst,47,30302962,2014-01-28 00:00:00,50,68
+CME.OQ,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,,16
+CME.OQ,"Blostein, Alexander",,,,6,30194726,2009-01-14 00:00:00,43,37
+CME.OQ,,,,,,,,61,5
+CME.OQ,,,,,,,,81,54
+CME.OQ,,,,,,,,64,12
+NDAQ.OQ,"Katz, Bill R",bill.katz@tdsecurities.com,212-468-7802,Equity Analyst,85,30393984,2024-01-01 16:04:35,26,89
+NDAQ.OQ,"Heal, Kevin",,,Equity Analyst,9584,30341607,2018-11-01 00:00:00,64,59
+NDAQ.OQ,"Sabadra, Ashish",ashish.sabadra@rbccm.com,415-633-8659,Equity Analyst,2182,30366994,2021-06-07 00:00:00,100,73
+NDAQ.OQ,"Schmitt, Jeff",jschmitt@williamblair.com,312-364-8106,Equity Analyst,11266,30361877,2020-11-01 00:00:00,65,52
+NDAQ.OQ,"O'Shaughnessy, Patrick J",patrick.oshaughnessy@raymondjames.c,312-612-7687,Equity Analyst,2690,30179079,2008-03-18 00:00:00,26,20
+NDAQ.OQ,"Cho, Michael Y",michael.cho@jpmorgan.com,212-622-3619,Equity Analyst,4614,30329308,2017-08-02 00:00:00,55,70
+NDAQ.OQ,"Budish, Benjamin E",benjamin.budish@barclays.com,212-526-2418,Equity Analyst,10333,30341344,2018-11-14 16:08:55,70,5
+NDAQ.OQ,"Fannon, Daniel T",dfannon@jefferies.com,415-229-1523,Equity Analyst,138,30123275,2005-02-04 00:00:00,65,74
+NDAQ.OQ,"Cyprys, Michael J",Michael.Cyprys@morganstanley.com,212-761-7619,Equity Analyst,2975,30201588,2010-04-27 21:34:00,33,74
+NDAQ.OQ,"Lau, Owen",olau@clearstreet.io,332-232-7570,Equity Analyst,212759,30406581,2025-10-20 00:00:00,34,88
+NDAQ.OQ,"Clinch, Simon A",,,Equity Analyst,38750,30390613,2023-08-11 00:00:00,70,22
+NDAQ.OQ,"Allen, Christopher J",allenchr@kbw.com,212-887-7715,Equity Analyst,4570,30408757,2026-02-19 17:06:12,1,
+NDAQ.OQ,"Moley, Patrick M",Patrick.Moley@psc.com,212 284-9350,Senior Research Anal,2691,30352699,2020-05-04 10:57:32,38,78
+NDAQ.OQ,"Yokum, Alexander",,,Equity Analyst,178117,30373850,2021-11-01 00:00:00,,16
+NDAQ.OQ,"Blostein, Alexander",,,,6,30194726,2009-01-14 00:00:00,99,97
+NDAQ.OQ,"Bedell, Brian B",brian.bedell@db.com,212-250-6600,Research Analyst,47,30302962,2014-01-28 00:00:00,61,5
+NDAQ.OQ,,,,,,,,81,54
+NDAQ.OQ,,,,,,,,49,63
+NDAQ.OQ,,,,,,,,64,12
+CBOE.Z,"Bedell, Brian B",brian.bedell@db.com,212-250-6600,Research Analyst,47,30302962,2014-01-28 00:00:00,26,89
+CBOE.Z,"Blostein, Alexander",,,,6,30194726,2009-01-14 00:00:00,61,7
+CBOE.Z,"Katz, Bill R",bill.katz@tdsecurities.com,212-468-7802,Equity Analyst,85,30393984,2024-01-01 16:04:35,64,59
+CBOE.Z,"Worthington, Kenneth B",kenneth.b.worthington@jpmorgan.com,212-622-6613,Equity Analyst,4614,30157718,2006-02-09 00:00:00,100,73
+CBOE.Z,"Yokum, Alexander",,,Equity Analyst,178117,30373850,2021-11-01 00:00:00,65,52
+CBOE.Z,"Heal, Kevin",,,Equity Analyst,9584,30341607,2018-11-01 00:00:00,26,20
+CBOE.Z,"Sabadra, Ashish",ashish.sabadra@rbccm.com,415-633-8659,Equity Analyst,2182,30366994,2021-06-07 00:00:00,55,70
+CBOE.Z,Research Department,,,Other,126605,30325967,2017-02-10 00:00:00,,27
+CBOE.Z,"Schmitt, Jeff",jschmitt@williamblair.com,312-364-8106,Equity Analyst,11266,30361877,2020-11-01 00:00:00,65,74
+CBOE.Z,"O'Shaughnessy, Patrick J",patrick.oshaughnessy@raymondjames.c,312-612-7687,Equity Analyst,2690,30179079,2008-03-18 00:00:00,33,74
+CBOE.Z,"Budish, Benjamin E",benjamin.budish@barclays.com,212-526-2418,Equity Analyst,10333,30341344,2018-11-14 16:08:55,34,88
+CBOE.Z,"Fannon, Daniel T",dfannon@jefferies.com,415-229-1523,Equity Analyst,138,30123275,2005-02-04 00:00:00,70,22
+CBOE.Z,"Cyprys, Michael J",Michael.Cyprys@morganstanley.com,212-761-7619,Equity Analyst,2975,30201588,2010-04-27 21:34:00,1,
+CBOE.Z,"Moley, Patrick M",Patrick.Moley@psc.com,212 284-9350,Senior Research Anal,2691,30352699,2020-05-04 10:57:32,38,78
+CBOE.Z,"Clinch, Simon A",,,Equity Analyst,38750,30390613,2023-08-11 00:00:00,,16
+CBOE.Z,"Allen, Christopher J",allenchr@kbw.com,212-887-7715,Equity Analyst,4570,30408757,2026-02-19 17:06:12,99,97
+CBOE.Z,,,,,,,,61,5
+CBOE.Z,,,,,,,,81,54
+CBOE.Z,,,,,,,,64,12
+LSEG.L,"Gastaldy, Valerie",gastaldy@daybyday-pro.com,33-1-58-18-37-50,Equity Analyst,57329,30187993,2009-03-31 00:00:00,,95
+LSEG.L,"Perret, Sylvain",,,Equity Analyst,216858,30407991,2026-01-01 00:00:00,,3
+LSEG.L,"Sanderson, Michael",michael.sanderson@barclays.com,44-20-3134-2487,Equity Analyst,10333,30342761,2019-01-01 00:00:00,,9
+LSEG.L,"Dobrovolschi, Julian",julian.dobrovochi@aa-ob.com,31-65-771-0390,Equity Analyst,12796,30364932,2021-03-18 00:00:00,22,8
+LSEG.L,"Mills, Tom",tom.mills@jefferies.com,44-20-7029-8478,Equity Analyst,138,30349962,2020-01-01 00:00:00,65,4
+LSEG.L,"Giblat, Arnaud M",arnaud.giblat@uk.bnpparibas.com,44-203-430-8513,Research Analyst,2233,30314573,2015-01-01 00:00:00,48,11
+LSEG.L,"Ehrenberg, Jens",jehrenberg@cavendish.com,44-20-7220-0540,Equity Analyst,40027,30406988,2025-11-10 00:00:00,76,15
+LSEG.L,"Massuti, Marina",Marina.Massuti@morganstanley.com,,Equity Analyst,2975,30373649,2021-11-08 14:40:35,1,
+LSEG.L,"Werner, Mike",michael.werner@ubs.com,44-20-7568-8086,Equity Analyst,63807,30318271,2015-12-01 00:00:00,61,100
+LSEG.L,"Ibrahim, Firdaus",,,Equity Analyst,178117,30368177,2021-07-06 00:00:00,77,59
+LSEG.L,"Kammer, Niklas",niklas.kammer@morningstar.com,31-20-797-0014,Senior Analyst,60797,30324070,2016-11-07 00:00:00,56,3
+LSEG.L,"Bathurst, Ben E",ben.bathurst@rbccm.com,44-20-7429-8910,Equity Analyst,2182,30342744,2019-01-29 00:00:00,56,10
+LSEG.L,"Lowe, Andrew",,44-20-7986-4042,Equity Analyst,63721,30387147,2023-02-01 00:00:00,59,39
+LSEG.L,"Bolzoni, Enrico",enrico.bolzoni@jpmorgan.com,44-20-7134-4222,Equity Analyst,4614,30374381,2021-12-06 19:17:47,52,5
+LSEG.L,"Lukesch, Tobias",tlukesch@keplercheuvreux.com,49-69-7569-6217,Equity Research Anal,33362,30324759,2016-12-01 00:00:00,35,73
+LSEG.L,"Goy, Benjamin",benjamin.goy@db.com,49-69-910-31946,Research Analyst,47,30293461,2012-09-03 00:00:00,45,1
+LSEG.L,"Ainley, James R",james.ainley@investec.com,44-7772-085-407,Equity Analyst,7042,30406026,2025-09-25 03:16:38,67,2
+LSEG.L,"Lam, Hubert",hubert.lam@bofa.com,44-20-7996-7112,Equity Analyst,2,30308671,2014-10-17 09:02:40,79,77
+LSEG.L,"Carruthers, Oliver",oliver.carruthers@gs.com,44-20-7552-9364,Equity Analyst,6,30350844,2020-02-17 00:00:00,48,29
+LSEG.L,"Bendit, Charles J",charles.bendit@redburn.com,020 7000 2171,,38750,30346078,2019-07-08 00:00:00,48,7
+LSEG.L,,,,,,,,48,36
+LSEG.L,,,,,,,,44,1
+DB1Gn.DE,"Thomson, Cara",cara.thomson@redburnatlantic.com,,Equity Analyst,38750,30402243,2025-03-04 09:06:36,31,10
+DB1Gn.DE,"Lowe, Andrew",,44-20-7986-4042,Equity Analyst,63721,30387147,2023-02-01 00:00:00,63,100
+DB1Gn.DE,"Lukesch, Tobias",tlukesch@keplercheuvreux.com,49-69-7569-6217,Equity Research Anal,33362,30324759,2016-12-01 00:00:00,,95
+DB1Gn.DE,"Bathurst, Ben E",ben.bathurst@rbccm.com,44-20-7429-8910,Equity Analyst,2182,30342744,2019-01-29 00:00:00,,9
+DB1Gn.DE,"Giblat, Arnaud M",arnaud.giblat@uk.bnpparibas.com,44-203-430-8513,Research Analyst,2233,30314573,2015-01-01 00:00:00,22,8
+DB1Gn.DE,"Kammer, Niklas",niklas.kammer@morningstar.com,31-20-797-0014,Senior Analyst,60797,30324070,2016-11-07 00:00:00,65,4
+DB1Gn.DE,"Haessler, Philipp",,,Equity Analyst,18658,30399019,2024-08-01 09:28:32,48,11
+DB1Gn.DE,"Perret, Sylvain",,,Equity Analyst,216858,30407991,2026-01-01 00:00:00,100,81
+DB1Gn.DE,"Schmitt, Jochen",JSchmitt@metzler.com,49-69-2104-4359,Financial Analyst,6195,30162048,2002-08-18 00:00:00,76,15
+DB1Gn.DE,Research Department,KBWResearch@kbw.com,,Other,4570,30247147,1990-12-19 00:00:00,1,
+DB1Gn.DE,"Carruthers, Oliver",oliver.carruthers@gs.com,44-20-7552-9364,Equity Analyst,6,30350844,2020-02-17 00:00:00,61,100
+DB1Gn.DE,"Werner, Mike",michael.werner@ubs.com,44-20-7568-8086,Equity Analyst,63807,30318271,2015-12-01 00:00:00,77,59
+DB1Gn.DE,"Gastaldy, Valerie",gastaldy@daybyday-pro.com,33-1-58-18-37-50,Equity Analyst,57329,30187993,2009-03-31 00:00:00,84,1
+DB1Gn.DE,"Mills, Tom",tom.mills@jefferies.com,44-20-7029-8478,Equity Analyst,138,30349962,2020-01-01 00:00:00,59,39
+DB1Gn.DE,"Bolzoni, Enrico",enrico.bolzoni@jpmorgan.com,44-20-7134-4222,Equity Analyst,4614,30374381,2021-12-06 19:17:47,52,5
+DB1Gn.DE,"Lam, Hubert",hubert.lam@bofa.com,44-20-7996-7112,Equity Analyst,2,30308671,2014-10-17 09:02:40,45,1
+DB1Gn.DE,"Goy, Benjamin",benjamin.goy@db.com,49-69-910-31946,Research Analyst,47,30293461,2012-09-03 00:00:00,79,77
+DB1Gn.DE,"Dargan, Grace",grace.dargan@barclays.com,44-20-3555-4065,Equity Analyst,10333,30345517,2019-05-29 00:00:00,48,29
+DB1Gn.DE,"Plasier, Andreas",aplaesier@warburg-research.com,49-40-309537-246,Equity Analyst,20579,30152199,2005-09-26 03:00:00,71,9
+DB1Gn.DE,"Pfaender, Roland",roland.pfaender@oddo-bhf.com,49-69-71-83-527,Equity Analyst,12796,30316261,2015-09-22 00:00:00,39,61
+DB1Gn.DE,"Ibrahim, Firdaus",,,Equity Analyst,178117,30368177,2021-07-06 00:00:00,52,8
+DB1Gn.DE,,,,,,,,44,1
+ENX.PA,"Dobrovolschi, Julian",julian.dobrovochi@aa-ob.com,31-65-771-0390,Equity Analyst,12796,30364932,2021-03-18 00:00:00,,9
+ENX.PA,"Couvreur, Thomas",thomas.couvreur@kbcsecurities.be,32-2429-0663,Equity Analyst,16705,30341913,2018-11-26 00:00:00,22,8
+ENX.PA,"Lowe, Andrew",,44-20-7986-4042,Equity Analyst,63721,30387147,2023-02-01 00:00:00,65,4
+ENX.PA,"Lukesch, Tobias",tlukesch@keplercheuvreux.com,49-69-7569-6217,Equity Research Anal,33362,30324759,2016-12-01 00:00:00,48,11
+ENX.PA,"Kammer, Niklas",niklas.kammer@morningstar.com,31-20-797-0014,Senior Analyst,60797,30324070,2016-11-07 00:00:00,17,83
+ENX.PA,"Drouet, Herve",herve.drouet@cic.fr,33-1-53-48-23-45,Financial Analyst,12981,30386978,2023-02-01 00:00:00,76,15
+ENX.PA,"Mills, Tom",tom.mills@jefferies.com,44-20-7029-8478,Equity Analyst,138,30349962,2020-01-01 00:00:00,1,
+ENX.PA,"Giblat, Arnaud M",arnaud.giblat@uk.bnpparibas.com,44-203-430-8513,Research Analyst,2233,30314573,2015-01-01 00:00:00,61,100
+ENX.PA,"Thomson, Cara",cara.thomson@redburnatlantic.com,,Equity Analyst,38750,30402243,2025-03-04 09:06:36,1,20
+ENX.PA,"Lam, Hubert",hubert.lam@bofa.com,44-20-7996-7112,Equity Analyst,2,30308671,2014-10-17 09:02:40,84,1
+ENX.PA,"Carruthers, Oliver",oliver.carruthers@gs.com,44-20-7552-9364,Equity Analyst,6,30350844,2020-02-17 00:00:00,59,39
+ENX.PA,"Perret, Sylvain",,,Equity Analyst,216858,30407991,2026-01-01 00:00:00,52,5
+ENX.PA,"Werner, Mike",michael.werner@ubs.com,44-20-7568-8086,Equity Analyst,63807,30318271,2015-12-01 00:00:00,35,73
+ENX.PA,"Dargan, Grace",grace.dargan@barclays.com,44-20-3555-4065,Equity Analyst,10333,30345517,2019-05-29 00:00:00,79,77
+ENX.PA,"Bolzoni, Enrico",enrico.bolzoni@jpmorgan.com,44-20-7134-4222,Equity Analyst,4614,30374381,2021-12-06 19:17:47,76,99
+ENX.PA,"Watson, Reginald",reg.watson@ing.com,31-20-563-8758,Equity Analyst,20304,30318036,2015-11-24 00:00:00,48,29
+ENX.PA,"Goy, Benjamin",benjamin.goy@db.com,49-69-910-31946,Research Analyst,47,30293461,2012-09-03 00:00:00,70,41
+ENX.PA,,,,,,,,52,8
+ENX.PA,,,,,,,,44,1
+MKTX.OQ,"O'Shaughnessy, Patrick J",patrick.oshaughnessy@raymondjames.c,312-612-7687,Equity Analyst,2690,30179079,2008-03-18 00:00:00,26,89
+MKTX.OQ,"Moley, Patrick M",Patrick.Moley@psc.com,212 284-9350,Senior Research Anal,2691,30352699,2020-05-04 10:57:32,64,59
+MKTX.OQ,"Clinch, Simon A",,,Equity Analyst,38750,30390613,2023-08-11 00:00:00,100,73
+MKTX.OQ,"Bedell, Brian B",brian.bedell@db.com,212-250-6600,Research Analyst,47,30302962,2014-01-28 00:00:00,65,52
+MKTX.OQ,"Heal, Kevin",,,Equity Analyst,9584,30341607,2018-11-01 00:00:00,26,20
+MKTX.OQ,"Talsania, Parth",info@equisights.com,,Chief Executive Offi,194556,30389650,2023-02-01 00:00:00,55,70
+MKTX.OQ,"Fannon, Daniel T",dfannon@jefferies.com,415-229-1523,Equity Analyst,138,30123275,2005-02-04 00:00:00,65,74
+MKTX.OQ,"Miller, Michael",michael.miller@morningstar.com,312-244-7629,Equity Analyst,60797,30363357,2020-12-01 00:00:00,33,74
+MKTX.OQ,"Budish, Benjamin E",benjamin.budish@barclays.com,212-526-2418,Equity Analyst,10333,30341344,2018-11-14 16:08:55,34,88
+MKTX.OQ,"Schmitt, Jeff",jschmitt@williamblair.com,312-364-8106,Equity Analyst,11266,30361877,2020-11-01 00:00:00,70,22
+MKTX.OQ,"Blostein, Alexander",,,,6,30194726,2009-01-14 00:00:00,1,
+MKTX.OQ,"Cyprys, Michael J",Michael.Cyprys@morganstanley.com,212-761-7619,Equity Analyst,2975,30201588,2010-04-27 21:34:00,99,97
+MKTX.OQ,"Allen, Christopher J",allenchr@kbw.com,212-887-7715,Equity Analyst,4570,30408757,2026-02-19 17:06:12,43,37
+MKTX.OQ,,,,,,,,61,5
+MKTX.OQ,,,,,,,,64,12
+TW.OQ,"Blostein, Alexander",,,,6,30194726,2009-01-14 00:00:00,26,89
+TW.OQ,"Worthington, Kenneth B",kenneth.b.worthington@jpmorgan.com,212-622-6613,Equity Analyst,4614,30157718,2006-02-09 00:00:00,61,7
+TW.OQ,"Schmitt, Jeff",jschmitt@williamblair.com,312-364-8106,Equity Analyst,11266,30361877,2020-11-01 00:00:00,64,59
+TW.OQ,"Bedell, Brian B",brian.bedell@db.com,212-250-6600,Research Analyst,47,30302962,2014-01-28 00:00:00,100,73
+TW.OQ,"Fannon, Daniel T",dfannon@jefferies.com,415-229-1523,Equity Analyst,138,30123275,2005-02-04 00:00:00,65,52
+TW.OQ,"Moley, Patrick M",Patrick.Moley@psc.com,212 284-9350,Senior Research Anal,2691,30352699,2020-05-04 10:57:32,26,20
+TW.OQ,"Allen, Christopher J",allenchr@kbw.com,212-887-7715,Equity Analyst,4570,30408757,2026-02-19 17:06:12,55,70
+TW.OQ,"Clinch, Simon A",,,Equity Analyst,38750,30390613,2023-08-11 00:00:00,65,74
+TW.OQ,"O'Shaughnessy, Patrick J",patrick.oshaughnessy@raymondjames.c,312-612-7687,Equity Analyst,2690,30179079,2008-03-18 00:00:00,34,88
+TW.OQ,"Cyprys, Michael J",Michael.Cyprys@morganstanley.com,212-761-7619,Equity Analyst,2975,30201588,2010-04-27 21:34:00,70,22
+TW.OQ,"Budish, Benjamin E",benjamin.budish@barclays.com,212-526-2418,Equity Analyst,10333,30341344,2018-11-14 16:08:55,1,
+TW.OQ,"Katz, Bill R",bill.katz@tdsecurities.com,212-468-7802,Equity Analyst,85,30393984,2024-01-01 16:04:35,50,68
+TW.OQ,,,,,,,,61,5
+TW.OQ,,,,,,,,81,54
+TW.OQ,,,,,,,,64,12
+SJP.L,"Bathurst, Ben E",ben.bathurst@rbccm.com,44-20-7429-8910,Equity Analyst,2182,30342744,2019-01-29 00:00:00,53,75
+SJP.L,"Bowers, Alexander",alex.bowers@kbw.com,44-20-7710-7462,Equity Analyst,27363,30409366,2026-04-01 00:06:00,35,29
+SJP.L,"Changazi, Fahad U",,44-207-621-5151,Equity Research Anal,33362,30401973,2025-02-01 01:33:13,77,59
+SJP.L,"Roberts, Julian",jroberts1@jefferies.com,44-20-7548-5316,Equity Analyst,138,30332785,2018-01-08 09:17:44,56,3
+SJP.L,"Ahmed, Nasib",nasib-za.ahmed@ubs.com,44-20-7568-8231,Equity Analyst,63807,30373754,2021-11-01 00:00:00,56,10
+SJP.L,"Allen, James",,,Equity Analyst,7821,30407330,2025-11-01 00:00:00,34,69
+SJP.L,"Maile, Rae A",rae.maile@peelhunt.com,44-20-7418-8936,Equity Analyst,27967,30409823,2026-05-06 04:02:49,41,24
+SJP.L,"Bolzoni, Enrico",enrico.bolzoni@jpmorgan.com,44-20-7134-4222,Equity Analyst,4614,30374381,2021-12-06 19:17:47,79,77
+SJP.L,"McCann, David",david.mccann@db.com,44-20-754-11564,Research Analyst,47,30396618,2024-05-01 00:00:00,48,29
+SJP.L,"Lowe, Andrew",,44-20-7986-4042,Equity Analyst,63721,30387147,2023-02-01 00:00:00,76,40
+SJP.L,"Bendit, Charles J",charles.bendit@redburn.com,020 7000 2171,,38750,30346078,2019-07-08 00:00:00,69,42
+SJP.L,"Simpson, Gregory",gregory.simpson@uk.bnpparibas.com,44-203-430-8548,Research Analyst,2233,30314572,2015-07-01 00:00:00,45,88
+SJP.L,"Goh, Alex",,,Equity Analyst,178117,30401736,2025-01-21 00:00:00,89,52
+SJP.L,"Holstein, Christiane",,61-2-9226-5840,Research Analyst,2,30368217,2021-07-07 05:33:20,44,69
+SJP.L,,,,,,,,78,66
+SJP.L,,,,,,,,69,60
+ABDN.L,"Werner, Mike",michael.werner@ubs.com,44-20-7568-8086,Equity Analyst,63807,30318271,2015-12-01 00:00:00,65,4
+ABDN.L,"McCann, David",david.mccann@db.com,44-20-754-11564,Research Analyst,47,30396618,2024-05-01 00:00:00,77,18
+ABDN.L,"Massuti, Marina",Marina.Massuti@morganstanley.com,,Equity Analyst,2975,30373649,2021-11-08 14:40:35,53,75
+ABDN.L,"Gaulard, Jacques-Henri M",jhgaulard@keplercheuvreux.com,44-207-621-5198,Director of Research,33362,30317918,2015-11-17 01:16:48,31,81
+ABDN.L,"Bathurst, Ben E",ben.bathurst@rbccm.com,44-20-7429-8910,Equity Analyst,2182,30342744,2019-01-29 00:00:00,76,15
+ABDN.L,"Maile, Rae A",rae.maile@peelhunt.com,44-20-7418-8936,Equity Analyst,27967,30409823,2026-05-06 04:02:49,35,29
+ABDN.L,"Ehrenberg, Jens",jehrenberg@cavendish.com,44-20-7220-0540,Equity Analyst,40027,30406988,2025-11-10 00:00:00,77,59
+ABDN.L,"Bendit, Charles J",charles.bendit@redburn.com,020 7000 2171,,38750,30346078,2019-07-08 00:00:00,56,3
+ABDN.L,"Simpson, Gregory",gregory.simpson@uk.bnpparibas.com,44-203-430-8548,Research Analyst,2233,30314572,2015-07-01 00:00:00,56,10
+ABDN.L,"Sanderson, Michael",michael.sanderson@barclays.com,44-20-3134-2487,Equity Analyst,10333,30342761,2019-01-01 00:00:00,52,5
+ABDN.L,"Carruthers, Oliver",oliver.carruthers@gs.com,44-20-7552-9364,Equity Analyst,6,30350844,2020-02-17 00:00:00,45,1
+ABDN.L,"Roberts, Julian",jroberts1@jefferies.com,44-20-7548-5316,Equity Analyst,138,30332785,2018-01-08 09:17:44,67,2
+ABDN.L,"Lam, Hubert",hubert.lam@bofa.com,44-20-7996-7112,Equity Analyst,2,30308671,2014-10-17 09:02:40,79,77
+ABDN.L,"Bolzoni, Enrico",enrico.bolzoni@jpmorgan.com,44-20-7134-4222,Equity Analyst,4614,30374381,2021-12-06 19:17:47,76,40
+ABDN.L,"Herman, Nicholas",,44-20-7986-4203,Equity Analyst,63721,30311235,2015-02-06 00:00:00,69,42
+ABDN.L,,,,,,,,48,36
+ABDN.L,,,,,,,,69,60
+QLT.L,"McCann, David",david.mccann@db.com,44-20-754-11564,Research Analyst,47,30396618,2024-05-01 00:00:00,94,54
+QLT.L,"Gaulard, Jacques-Henri M",jhgaulard@keplercheuvreux.com,44-207-621-5198,Director of Research,33362,30317918,2015-11-17 01:16:48,53,75
+QLT.L,"Lowe, Andrew",,44-20-7986-4042,Equity Analyst,63721,30387147,2023-02-01 00:00:00,31,81
+QLT.L,"Simpson, Gregory",gregory.simpson@uk.bnpparibas.com,44-203-430-8548,Research Analyst,2233,30314572,2015-07-01 00:00:00,29,71
+QLT.L,"Savage, Robin",robin.savage@zeuscapital.co.uk,44-7879-848-885,Equity Analyst,128016,30319085,2016-01-13 00:00:00,35,29
+QLT.L,"Roberts, Julian",jroberts1@jefferies.com,44-20-7548-5316,Equity Analyst,138,30332785,2018-01-08 09:17:44,77,59
+QLT.L,"Christelis, Michael",michael.christelis@ubs.com,27-11-322-7320,,63807,30212464,2007-02-22 06:47:00,56,3
+QLT.L,"Allen, James",,,Equity Analyst,7821,30407330,2025-11-01 00:00:00,52,5
+QLT.L,"Fieldsend, Jonathan",jon.fieldsend@investec.com,44-20-7597-5000,Equity Analyst,7042,30406290,2025-10-01 03:16:05,34,69
+QLT.L,"Bowers, Alexander",alex.bowers@kbw.com,44-20-7710-7462,Equity Analyst,27363,30409366,2026-04-01 00:06:00,79,77
+QLT.L,"Holstein, Christiane",,61-2-9226-5840,Research Analyst,2,30368217,2021-07-07 05:33:20,68,2
+QLT.L,"Sanderson, Michael",michael.sanderson@barclays.com,44-20-3134-2487,Equity Analyst,10333,30342761,2019-01-01 00:00:00,48,29
+QLT.L,"Bathurst, Ben E",ben.bathurst@rbccm.com,44-20-7429-8910,Equity Analyst,2182,30342744,2019-01-29 00:00:00,76,40
+QLT.L,"Carruthers, Oliver",oliver.carruthers@gs.com,44-20-7552-9364,Equity Analyst,6,30350844,2020-02-17 00:00:00,69,42
+QLT.L,"Bolzoni, Enrico",enrico.bolzoni@jpmorgan.com,44-20-7134-4222,Equity Analyst,4614,30374381,2021-12-06 19:17:47,46,66
+QLT.L,,,,,,,,44,69
+QLT.L,,,,,,,,78,66
+IGG.L,"Potter, Hal",hal.potter@bofa.com,44-20-7996-3010,Research Analyst,2,30407209,2025-10-21 02:25:21,49,79
+IGG.L,"Roberts, Julian",jroberts1@jefferies.com,44-20-7548-5316,Equity Analyst,138,30332785,2018-01-08 09:17:44,52,84
+IGG.L,"Taylor, Richard M",richard.e.taylor@barclays.com,44-20-3555-2650,Senior Research Anal,10333,30273095,2011-09-01 07:08:00,35,29
+IGG.L,"Tam, Haley A",haley.tam@ubs.com,44-20-7567-6176,Equity Analyst,63807,30392942,2023-11-01 07:19:47,77,59
+IGG.L,"McCann, David",david.mccann@db.com,44-20-754-11564,Research Analyst,47,30396618,2024-05-01 00:00:00,79,74
+IGG.L,"Bowers, Alexander",alex.bowers@kbw.com,44-20-7710-7462,Equity Analyst,27363,30409366,2026-04-01 00:06:00,47,33
+IGG.L,"Bathurst, Ben E",ben.bathurst@rbccm.com,44-20-7429-8910,Equity Analyst,2182,30342744,2019-01-29 00:00:00,83,54
+IGG.L,,,,,,,,76,40
+IGG.L,,,,,,,,68,2
+IGG.L,,,,,,,,51,2
+IGG.L,,,,,,,,78,66
+CMCX.L,"Singh, Barun",,,Equity Analyst,62340,30409098,2026-03-01 13:36:39,35,29
+CMCX.L,"Bathurst, Ben E",ben.bathurst@rbccm.com,44-20-7429-8910,Equity Analyst,2182,30342744,2019-01-29 00:00:00,77,59
+CMCX.L,"Raja, Vivek",vivek.raja@shorecap.co.uk,44-781-636-1775,Research Analyst,39772,30344432,2019-04-03 09:40:48,79,74
+CMCX.L,"Roberts, Julian",jroberts1@jefferies.com,44-20-7548-5316,Equity Analyst,138,30332785,2018-01-08 09:17:44,51,2
+HSBA.L,"Coombs, Andrew P",andrew.coombs@citi.com,44-20-7986-4053,Equity Analyst,63721,30212033,2006-02-03 20:03:00,37,77
+HSBA.L,"Dickerson, Joseph E",jdickerson@jefferies.com,44-20-7029-8309,Equity Analyst,138,30298307,2013-06-01 00:00:00,50,
+HSBA.L,"Mao, Junhua",junhua.mao@cicc.com.cn,,Equity Analyst,20783,30187470,2004-05-18 00:00:00,,95
+HSBA.L,"Napier, Jason C",jason.napier@ubs.com,44-20-7568-5037,Equity Analyst,63807,30319621,2016-01-01 00:00:00,61,76
+HSBA.L,"Lu, Manyi",manyilu@dbs.com,852-3668-4186,Equity Analyst,19070,30326854,2017-04-06 00:00:00,84,12
+HSBA.L,"Hallam, Chris J",chris.hallam@gs.com,44-20-7552-2958,Equity Analyst,6,30301891,2013-12-01 00:00:00,29,69
+HSBA.L,"Rakkar, Aman",aman.rakkar@barclays.com,44-203-555-1425,Equity Analyst,10333,30316682,2015-10-07 08:33:50,43,67
+HSBA.L,"Greenwood, Gary",gary.greenwood@shorecap.co.uk,44-151-600-3717,Research Analyst,39772,30271495,2011-08-02 00:00:00,96,56
+HSBA.L,"Invine, James",james.invine@redburnatlantic.com,44-20-7000-2020,Equity Analyst,38750,30400244,2024-10-22 00:00:00,1,82
+HSBA.L,"Serrano, Alvaro",Alvaro.Serrano@morganstanley.com,44-20-7425-6942,Equity Analyst,2975,30273120,2011-08-31 00:00:00,65,5
+HSBA.L,"Abouhossein, Kian",kian.abouhossein@jpmorgan.com,44-20-7134-4575,Equity Analyst,4614,30064538,2000-05-19 00:00:00,30,76
+HSBA.L,"Firth, Edward",firthe@kbw.com,44-20-7663-5284,Equity Analyst,27363,30327693,2017-04-01 00:00:00,90,6
+HSBA.L,"Grinsztajn, David",,,Equity Analyst,216858,30408124,2026-01-01 03:12:17,85,67
+HSBA.L,"Mong, Perlie",,+44 20 7996 6717,,2,30399788,2024-10-08 11:31:52,17,2
+HSBA.L,"Gastaldy, Valerie",gastaldy@daybyday-pro.com,33-1-58-18-37-50,Equity Analyst,57329,30187993,2009-03-31 00:00:00,37,11
+HSBA.L,"Noble, Robert",robert.noble@db.com,44-20-754-10088,Research Analyst,47,30358052,2020-07-01 00:00:00,45,1
+HSBA.L,"Ibrahim, Firdaus",,,Equity Analyst,178117,30368177,2021-07-06 00:00:00,70,12
+HSBA.L,"Toms, Benjamin",benjamin.toms@rbccm.com,44-20-7002-2258,Associate,2182,30322204,2016-07-21 00:00:00,43,41
+HSBA.L,,,,,,,,45,11
+BARC.L,"Hallam, Chris J",chris.hallam@gs.com,44-20-7552-2958,Equity Analyst,6,30301891,2013-12-01 00:00:00,37,77
+BARC.L,"Gastaldy, Valerie",gastaldy@daybyday-pro.com,33-1-58-18-37-50,Equity Analyst,57329,30187993,2009-03-31 00:00:00,,95
+BARC.L,"Ibrahim, Firdaus",,,Equity Analyst,178117,30368177,2021-07-06 00:00:00,61,76
+BARC.L,"Grinsztajn, David",,,Equity Analyst,216858,30408124,2026-01-01 03:12:17,84,12
+BARC.L,"Artoni, Alberto",alberto.artoni@intesasanpaolo.com,39-02-4127-9011,Research Analyst,32963,30392678,2023-10-26 03:12:02,29,69
+BARC.L,"Serrano, Alvaro",Alvaro.Serrano@morganstanley.com,44-20-7425-6942,Equity Analyst,2975,30273120,2011-08-31 00:00:00,96,56
+BARC.L,"Napier, Jason C",jason.napier@ubs.com,44-20-7568-5037,Equity Analyst,63807,30319621,2016-01-01 00:00:00,1,82
+BARC.L,"Toms, Benjamin",benjamin.toms@rbccm.com,44-20-7002-2258,Associate,2182,30322204,2016-07-21 00:00:00,30,76
+BARC.L,"Greenwood, Gary",gary.greenwood@shorecap.co.uk,44-151-600-3717,Research Analyst,39772,30271495,2011-08-02 00:00:00,90,6
+BARC.L,"Abouhossein, Kian",kian.abouhossein@jpmorgan.com,44-20-7134-4575,Equity Analyst,4614,30064538,2000-05-19 00:00:00,1,
+BARC.L,"Stebbings, Guy",Guy.Stebbings@exanebnpparibas.com,44-203-430-8618,Equity Analyst,2233,30311211,2015-02-10 00:00:00,17,2
+BARC.L,"Pierce, Jonathan R",jpierce@jefferies.com,44-20-7548-4079,Equity Analyst,138,30399467,2024-09-26 00:00:00,7,61
+BARC.L,"Mong, Perlie",,+44 20 7996 6717,,2,30399788,2024-10-08 11:31:52,73,78
+BARC.L,"Payen, Nicolas",npayen@keplercheuvreux.com,44-207-621-5128,Equity Research Anal,33362,30336822,2018-05-28 00:00:00,72,
+BARC.L,"Invine, James",james.invine@redburnatlantic.com,44-20-7000-2020,Equity Analyst,38750,30400244,2024-10-22 00:00:00,37,11
+BARC.L,"Noble, Robert",robert.noble@db.com,44-20-754-10088,Research Analyst,47,30358052,2020-07-01 00:00:00,45,1
+BARC.L,"Coombs, Andrew P",andrew.coombs@citi.com,44-20-7986-4053,Equity Analyst,63721,30212033,2006-02-03 20:03:00,26,82
+BARC.L,"Firth, Edward",firthe@kbw.com,44-20-7663-5284,Equity Analyst,27363,30327693,2017-04-01 00:00:00,39,94
+BARC.L,,,,,,,,70,12
+BARC.L,,,,,,,,43,41
+BARC.L,,,,,,,,45,11
+LLOY.L,"Firth, Edward",firthe@kbw.com,44-20-7663-5284,Equity Analyst,27363,30327693,2017-04-01 00:00:00,,95
+LLOY.L,"Shah, Sheel",sheel.shah@jpmorgan.com,44-20-7134-8455,Equity Analyst,4614,30330934,2017-10-25 19:16:17,61,76
+LLOY.L,"Toms, Benjamin",benjamin.toms@rbccm.com,44-20-7002-2258,Associate,2182,30322204,2016-07-21 00:00:00,84,12
+LLOY.L,"Mong, Perlie",,+44 20 7996 6717,,2,30399788,2024-10-08 11:31:52,29,69
+LLOY.L,"Pierce, Jonathan R",jpierce@jefferies.com,44-20-7548-4079,Equity Analyst,138,30399467,2024-09-26 00:00:00,1,82
+LLOY.L,"Invine, James",james.invine@redburnatlantic.com,44-20-7000-2020,Equity Analyst,38750,30400244,2024-10-22 00:00:00,65,5
+LLOY.L,"Artoni, Alberto",alberto.artoni@intesasanpaolo.com,39-02-4127-9011,Research Analyst,32963,30392678,2023-10-26 03:12:02,30,76
+LLOY.L,"Gastaldy, Valerie",gastaldy@daybyday-pro.com,33-1-58-18-37-50,Equity Analyst,57329,30187993,2009-03-31 00:00:00,90,6
+LLOY.L,"Ibrahim, Firdaus",,,Equity Analyst,178117,30368177,2021-07-06 00:00:00,1,
+LLOY.L,"Noble, Robert",robert.noble@db.com,44-20-754-10088,Research Analyst,47,30358052,2020-07-01 00:00:00,17,2
+LLOY.L,"Grinsztajn, David",,,Equity Analyst,216858,30408124,2026-01-01 03:12:17,40,26
+LLOY.L,"Rakkar, Aman",aman.rakkar@barclays.com,44-203-555-1425,Equity Analyst,10333,30316682,2015-10-07 08:33:50,7,61
+LLOY.L,"Greenwood, Gary",gary.greenwood@shorecap.co.uk,44-151-600-3717,Research Analyst,39772,30271495,2011-08-02 00:00:00,73,78
+LLOY.L,"Serrano, Alvaro",Alvaro.Serrano@morganstanley.com,44-20-7425-6942,Equity Analyst,2975,30273120,2011-08-31 00:00:00,37,11
+LLOY.L,"Kammer, Niklas",niklas.kammer@morningstar.com,31-20-797-0014,Senior Analyst,60797,30324070,2016-11-07 00:00:00,45,1
+LLOY.L,"Napier, Jason C",jason.napier@ubs.com,44-20-7568-5037,Equity Analyst,63807,30319621,2016-01-01 00:00:00,97,66
+LLOY.L,"Coombs, Andrew P",andrew.coombs@citi.com,44-20-7986-4053,Equity Analyst,63721,30212033,2006-02-03 20:03:00,26,82
+LLOY.L,"Payen, Nicolas",npayen@keplercheuvreux.com,44-207-621-5128,Equity Research Anal,33362,30336822,2018-05-28 00:00:00,39,94
+LLOY.L,"Caven-Roberts, Benjamin",benjamin.d.caven-roberts@gs.com,44-20-7552-7066,Equity Analyst,6,30373212,2021-10-20 08:44:43,70,12
+LLOY.L,,,,,,,,43,41
+LLOY.L,,,,,,,,45,11
+NWG.L,"Caven-Roberts, Benjamin",benjamin.d.caven-roberts@gs.com,44-20-7552-7066,Equity Analyst,6,30373212,2021-10-20 08:44:43,,95
+NWG.L,"Firth, Edward",firthe@kbw.com,44-20-7663-5284,Equity Analyst,27363,30327693,2017-04-01 00:00:00,61,76
+NWG.L,"Invine, James",james.invine@redburnatlantic.com,44-20-7000-2020,Equity Analyst,38750,30400244,2024-10-22 00:00:00,84,12
+NWG.L,"Coombs, Andrew P",andrew.coombs@citi.com,44-20-7986-4053,Equity Analyst,63721,30212033,2006-02-03 20:03:00,29,69
+NWG.L,"Greenwood, Gary",gary.greenwood@shorecap.co.uk,44-151-600-3717,Research Analyst,39772,30271495,2011-08-02 00:00:00,1,82
+NWG.L,"Napier, Jason C",jason.napier@ubs.com,44-20-7568-5037,Equity Analyst,63807,30319621,2016-01-01 00:00:00,65,5
+NWG.L,"Stebbings, Guy",Guy.Stebbings@exanebnpparibas.com,44-203-430-8618,Equity Analyst,2233,30311211,2015-02-10 00:00:00,30,76
+NWG.L,"Toms, Benjamin",benjamin.toms@rbccm.com,44-20-7002-2258,Associate,2182,30322204,2016-07-21 00:00:00,90,6
+NWG.L,"Shah, Sheel",sheel.shah@jpmorgan.com,44-20-7134-8455,Equity Analyst,4614,30330934,2017-10-25 19:16:17,1,
+NWG.L,"Rakkar, Aman",aman.rakkar@barclays.com,44-203-555-1425,Equity Analyst,10333,30316682,2015-10-07 08:33:50,17,2
+NWG.L,"Noble, Robert",robert.noble@db.com,44-20-754-10088,Research Analyst,47,30358052,2020-07-01 00:00:00,40,26
+NWG.L,"Payen, Nicolas",npayen@keplercheuvreux.com,44-207-621-5128,Equity Research Anal,33362,30336822,2018-05-28 00:00:00,7,61
+NWG.L,"Gastaldy, Valerie",gastaldy@daybyday-pro.com,33-1-58-18-37-50,Equity Analyst,57329,30187993,2009-03-31 00:00:00,73,78
+NWG.L,"Ibrahim, Firdaus",,,Equity Analyst,178117,30368177,2021-07-06 00:00:00,37,11
+NWG.L,"Mong, Perlie",,+44 20 7996 6717,,2,30399788,2024-10-08 11:31:52,45,1
+NWG.L,"Grinsztajn, David",,,Equity Analyst,216858,30408124,2026-01-01 03:12:17,97,66
+NWG.L,"Artoni, Alberto",alberto.artoni@intesasanpaolo.com,39-02-4127-9011,Research Analyst,32963,30392678,2023-10-26 03:12:02,26,82
+NWG.L,"Serrano, Alvaro",Alvaro.Serrano@morganstanley.com,44-20-7425-6942,Equity Analyst,2975,30273120,2011-08-31 00:00:00,39,94
+NWG.L,"Kammer, Niklas",niklas.kammer@morningstar.com,31-20-797-0014,Senior Analyst,60797,30324070,2016-11-07 00:00:00,70,12
+NWG.L,"Pierce, Jonathan R",jpierce@jefferies.com,44-20-7548-4079,Equity Analyst,138,30399467,2024-09-26 00:00:00,43,41
+NWG.L,,,,,,,,45,11
+STAN.L,"Lord, Nick P",nick.lord@morganstanley.com,65-6834-6746,Equity Analyst,2975,30210308,2010-10-03 21:12:00,37,77
+STAN.L,"Mong, Perlie",,+44 20 7996 6717,,2,30399788,2024-10-08 11:31:52,60,74
+STAN.L,"Tan, Lorraine",lorraine.tan@morningstar.com,65-6340-1296,Director,60797,30315652,2015-08-01 00:00:00,61,76
+STAN.L,"Noble, Robert",robert.noble@db.com,44-20-754-10088,Research Analyst,47,30358052,2020-07-01 00:00:00,84,12
+STAN.L,"Abouhossein, Kian",kian.abouhossein@jpmorgan.com,44-20-7134-4575,Equity Analyst,4614,30064538,2000-05-19 00:00:00,43,67
+STAN.L,"Dickerson, Joseph E",jdickerson@jefferies.com,44-20-7029-8309,Equity Analyst,138,30298307,2013-06-01 00:00:00,96,56
+STAN.L,"Greenwood, Gary",gary.greenwood@shorecap.co.uk,44-151-600-3717,Research Analyst,39772,30271495,2011-08-02 00:00:00,1,82
+STAN.L,"Coombs, Andrew P",andrew.coombs@citi.com,44-20-7986-4053,Equity Analyst,63721,30212033,2006-02-03 20:03:00,28,
+STAN.L,"Ibrahim, Firdaus",,,Equity Analyst,178117,30368177,2021-07-06 00:00:00,65,5
+STAN.L,"Hallam, Chris J",chris.hallam@gs.com,44-20-7552-2958,Equity Analyst,6,30301891,2013-12-01 00:00:00,30,76
+STAN.L,"Firth, Edward",firthe@kbw.com,44-20-7663-5284,Equity Analyst,27363,30327693,2017-04-01 00:00:00,17,2
+STAN.L,"Napier, Jason C",jason.napier@ubs.com,44-20-7568-5037,Equity Analyst,63807,30319621,2016-01-01 00:00:00,37,11
+STAN.L,"Invine, James",james.invine@redburnatlantic.com,44-20-7000-2020,Equity Analyst,38750,30400244,2024-10-22 00:00:00,45,1
+STAN.L,"Rakkar, Aman",aman.rakkar@barclays.com,44-203-555-1425,Equity Analyst,10333,30316682,2015-10-07 08:33:50,51,81
+STAN.L,,,,,,,,70,12
+STAN.L,,,,,,,,43,41
+DBKGn.DE,"Gastaldy, Valerie",gastaldy@daybyday-pro.com,33-1-58-18-37-50,Equity Analyst,57329,30187993,2009-03-31 00:00:00,37,77
+DBKGn.DE,"Pfaender, Roland",roland.pfaender@oddo-bhf.com,49-69-71-83-527,Equity Analyst,12796,30316261,2015-09-22 00:00:00,31,10
+DBKGn.DE,"Dickerson, Joseph E",jdickerson@jefferies.com,44-20-7029-8309,Equity Analyst,138,30298307,2013-06-01 00:00:00,63,100
+DBKGn.DE,"Grinsztajn, David",,,Equity Analyst,216858,30408124,2026-01-01 03:12:17,,95
+DBKGn.DE,"Coombs, Andrew P",andrew.coombs@citi.com,44-20-7986-4053,Equity Analyst,63721,30212033,2006-02-03 20:03:00,36,69
+DBKGn.DE,"Reingen, Anke",anke.reingen@rbccm.com,44-20-7029-0784,Equity Analyst,2182,30260858,2011-06-08 00:00:00,61,76
+DBKGn.DE,"Haessler, Philipp",,,Equity Analyst,18658,30399019,2024-08-01 09:28:32,58,13
+DBKGn.DE,"Hallam, Chris J",chris.hallam@gs.com,44-20-7552-2958,Equity Analyst,6,30301891,2013-12-01 00:00:00,43,67
+DBKGn.DE,"Bocahut, Flora",flora.bocahut@barclays.com,33-1-4458-3131,Equity Analyst,10333,30397320,2024-05-03 00:00:00,59,99
+DBKGn.DE,"Ibrahim, Firdaus",,,Equity Analyst,178117,30368177,2021-07-06 00:00:00,96,56
+DBKGn.DE,"Frommen, Ingo A",ingo.a.frommen@lbbw.de,49-711-127-74648,,60465,30199377,2000-08-02 00:00:00,35,82
+DBKGn.DE,"Payen, Nicolas",npayen@keplercheuvreux.com,44-207-621-5128,Equity Research Anal,33362,30336822,2018-05-28 00:00:00,100,81
+DBKGn.DE,"Plasier, Andreas",aplaesier@warburg-research.com,49-40-309537-246,Equity Analyst,20579,30152199,2005-09-26 03:00:00,64,84
+DBKGn.DE,"Abouhossein, Kian",kian.abouhossein@jpmorgan.com,44-20-7134-4575,Equity Analyst,4614,30064538,2000-05-19 00:00:00,1,
+DBKGn.DE,"Hallett, Thomas",hallettt@kbw.com,44-20-7663-3231,Equity Analyst,27363,30324987,2016-12-01 00:00:00,83,100
+DBKGn.DE,"Miotto, Giulia Aurora A",Giulia.Aurora.Miotto@morganstanley.,44-20-7425-5344,Equity Analyst,2975,30316543,2015-10-03 00:00:00,32,60
+DBKGn.DE,"El Mejjad, Tarik",,+44 20 7996 0014,,2,30299819,2013-09-09 00:00:00,73,78
+DBKGn.DE,"Schmitt, Jochen",JSchmitt@metzler.com,49-69-2104-4359,Financial Analyst,6195,30162048,2002-08-18 00:00:00,45,1
+DBKGn.DE,"Nemes, Mate",mate.nemes@ubs.com,41-44-239-1667,Equity Analyst,63807,30303004,2014-01-13 00:00:00,51,48
+DBKGn.DE,,,,,,,,39,61
+DBKGn.DE,,,,,,,,43,41
+DBKGn.DE,,,,,,,,45,11
+BNPP.PA,"Lee, Delphine",delphine.x.lee@jpmorgan.com,44-20-7134-3971,Equity Analyst,4614,30161402,2006-06-06 23:16:00,68,95
+BNPP.PA,"Gaulard, Jacques-Henri M",jhgaulard@keplercheuvreux.com,44-207-621-5198,Director of Research,33362,30317918,2015-11-17 01:16:48,43,100
+BNPP.PA,"Scholtz, Johann",johann.scholtz@morningstar.com,31-20-797-0018,Senior Equity Analys,60797,30329247,2017-08-10 08:15:56,13,93
+BNPP.PA,"Kumar, Sharath K",sharath.ramanathan@db.com,44-20-7547-9527,Research Analyst,47,30339216,2018-10-01 00:00:00,,95
+BNPP.PA,"Miotto, Giulia Aurora A",Giulia.Aurora.Miotto@morganstanley.,44-20-7425-5344,Equity Analyst,2975,30316543,2015-10-03 00:00:00,62,45
+BNPP.PA,"El Mejjad, Tarik",,+44 20 7996 0014,,2,30299819,2013-09-09 00:00:00,61,76
+BNPP.PA,"Mendez, Ignacio",ignacio.mendez@gruposantander.com,34-696-549-272,Equity Analyst,10922,30375846,2022-02-01 01:03:34,58,13
+BNPP.PA,"Reingen, Anke",anke.reingen@rbccm.com,44-20-7029-0784,Equity Analyst,2182,30260858,2011-06-08 00:00:00,43,67
+BNPP.PA,"Hallam, Chris J",chris.hallam@gs.com,44-20-7552-2958,Equity Analyst,6,30301891,2013-12-01 00:00:00,59,99
+BNPP.PA,"Napier, Jason C",jason.napier@ubs.com,44-20-7568-5037,Equity Analyst,63807,30319621,2016-01-01 00:00:00,96,56
+BNPP.PA,"Gastaldy, Valerie",gastaldy@daybyday-pro.com,33-1-58-18-37-50,Equity Analyst,57329,30187993,2009-03-31 00:00:00,64,84
+BNPP.PA,"Bocahut, Flora",flora.bocahut@barclays.com,33-1-4458-3131,Equity Analyst,10333,30397320,2024-05-03 00:00:00,31,81
+BNPP.PA,"Ibrahim, Firdaus",,,Equity Analyst,178117,30368177,2021-07-06 00:00:00,30,76
+BNPP.PA,"Coombs, Andrew P",andrew.coombs@citi.com,44-20-7986-4053,Equity Analyst,63721,30212033,2006-02-03 20:03:00,83,100
+BNPP.PA,"Chedeville, Pierre",pierre.chedeville@cic.fr,33-1-53-48-80-97,Equity Analyst,12981,30166291,2006-09-25 03:00:00,1,
+BNPP.PA,"Valleaux, Benoit",benoit.valleaux@oddo-bhf.com,33-1-55-354-275,Equity Analyst,12796,30337118,2018-07-01 00:00:00,7,61
+BNPP.PA,"Haessler, Philipp",,,Equity Analyst,18658,30399019,2024-08-01 09:28:32,69,85
+BNPP.PA,"Hallett, Thomas",hallettt@kbw.com,44-20-7663-3231,Equity Analyst,27363,30324987,2016-12-01 00:00:00,54,19
+BNPP.PA,"Götz, Christian",christian.goetz@lbbw.de,49-711-127-4470,Equity Analyst,60465,30205454,2000-05-04 00:00:00,45,1
+BNPP.PA,"Dickerson, Joseph E",jdickerson@jefferies.com,44-20-7029-8309,Equity Analyst,138,30298307,2013-06-01 00:00:00,44,70
+BNPP.PA,"Invine, James",james.invine@redburnatlantic.com,44-20-7000-2020,Equity Analyst,38750,30400244,2024-10-22 00:00:00,51,48
+BNPP.PA,,,,,,,,39,61
+BNPP.PA,,,,,,,,43,41
+UBSG.S,"Dickerson, Joseph E",jdickerson@jefferies.com,44-20-7029-8309,Equity Analyst,138,30298307,2013-06-01 00:00:00,37,77
+UBSG.S,"Pfaender, Roland",roland.pfaender@oddo-bhf.com,49-69-71-83-527,Equity Analyst,12796,30316261,2015-09-22 00:00:00,28,5
+UBSG.S,"Peter, Martin",martin.peter@lbbw.de,49-711-127-42746,Equity Analyst,60465,30199417,2007-06-27 00:00:00,,95
+UBSG.S,"Crivelli, Ausano C",ausano.cajrati.crivelli@zkb.ch,41-44-292-35-28,Equity Analyst,31647,30387517,2023-03-22 12:48:40,58,
+UBSG.S,"Hallett, Thomas",hallettt@kbw.com,44-20-7663-3231,Equity Analyst,27363,30324987,2016-12-01 00:00:00,61,76
+UBSG.S,"Haessler, Philipp",,,Equity Analyst,18658,30399019,2024-08-01 09:28:32,58,13
+UBSG.S,"Reale, Antonio",,+44 20 7996 1763,,2,30384343,2022-10-02 00:00:00,22,8
+UBSG.S,"Scholtz, Johann",johann.scholtz@morningstar.com,31-20-797-0018,Senior Equity Analys,60797,30329247,2017-08-10 08:15:56,43,67
+UBSG.S,"Abouhossein, Kian",kian.abouhossein@jpmorgan.com,44-20-7134-4575,Equity Analyst,4614,30064538,2000-05-19 00:00:00,96,56
+UBSG.S,"Bocahut, Flora",flora.bocahut@barclays.com,33-1-4458-3131,Equity Analyst,10333,30397320,2024-05-03 00:00:00,100,81
+UBSG.S,"Gastaldy, Valerie",gastaldy@daybyday-pro.com,33-1-58-18-37-50,Equity Analyst,57329,30187993,2009-03-31 00:00:00,64,84
+UBSG.S,"Payen, Nicolas",npayen@keplercheuvreux.com,44-207-621-5128,Equity Research Anal,33362,30336822,2018-05-28 00:00:00,83,100
+UBSG.S,"Hallam, Chris J",chris.hallam@gs.com,44-20-7552-2958,Equity Analyst,6,30301891,2013-12-01 00:00:00,1,
+UBSG.S,"Mendez, Ignacio",ignacio.mendez@gruposantander.com,34-696-549-272,Equity Analyst,10922,30375846,2022-02-01 01:03:34,32,60
+UBSG.S,"Goy, Benjamin",benjamin.goy@db.com,49-69-910-31946,Research Analyst,47,30293461,2012-09-03 00:00:00,73,78
+UBSG.S,"Miotto, Giulia Aurora A",Giulia.Aurora.Miotto@morganstanley.,44-20-7425-5344,Equity Analyst,2975,30316543,2015-10-03 00:00:00,45,1
+UBSG.S,"Watts, Nicholas J",nicholas.watts@redburnatlantic.com,44-20-7000-2187,Equity Analyst,38750,30179651,2008-04-02 00:00:00,44,70
+UBSG.S,"Ibrahim, Firdaus",,,Equity Analyst,178117,30368177,2021-07-06 00:00:00,59,22
+UBSG.S,"Reingen, Anke",anke.reingen@rbccm.com,44-20-7029-0784,Equity Analyst,2182,30260858,2011-06-08 00:00:00,35,77
+UBSG.S,"Coombs, Andrew P",andrew.coombs@citi.com,44-20-7986-4053,Equity Analyst,63721,30212033,2006-02-03 20:03:00,51,48
+UBSG.S,"Gauthier, Pierre-Yves",,,Equity Analyst,216858,30407831,2026-01-01 00:00:00,39,61
+UBSG.S,,,,,,,,49,1
+ASML.AS,"Lipacis, Mark J",Mark.Lipacis@evercoreisi.com,214-459-4007,Equity Analyst,62195,30396211,2024-04-10 00:00:00,59,69
+ASML.AS,"Sankar, Krish",krish.sankar@tdsecurities.com,415-646-7372,Equity Analyst,85,30335834,2018-05-14 00:00:00,44,64
+ASML.AS,"Hesselink, Marc",Marc.Hesselink@ing.com,31-20-501-3793,Equity Analyst,20304,30337422,2018-07-25 01:00:26,62,73
+ASML.AS,"Fogh, Per",,,Equity Analyst,170823,30394049,2024-01-01 06:18:18,25,20
+ASML.AS,"Roeg, Michael H",m.roeg@degroofpetercam.com,31-20-573-5422,Senior Equity Analys,10255,30347996,2019-09-16 03:30:13,,95
+ASML.AS,"Coles, Simon A",simon.coles@barclays.com,44-20-3555-4519,Equity Analyst,10333,30314654,2015-07-07 16:09:50,,5
+ASML.AS,"Wang, Kevin",kevin.wang@hk.mizuho-sc.com,852-2685-2032,Senior Analyst,78658,30322730,2016-08-29 00:00:00,69,87
+ASML.AS,"Caso, Chris",ccaso@wolferesearch.com,646-582-9360,Equity Analyst,43418,30389875,2023-07-01 00:00:00,9,55
+ASML.AS,"Metuku, Adithya",adithya.metuku@hsbc.com,44-203-268-2960,Equity Analyst,358,30392129,2023-10-01 00:00:00,25,56
+ASML.AS,"Frongillo, Antonella",antonella.frongillo@intesasanpaolo.,39-2-4127-9017,Research Analyst,32963,30305394,2014-06-04 00:00:00,68,61
+ASML.AS,"Gardiner, Andrew M",,44-20-7986-4206,Equity Analyst,63721,30375261,2022-01-01 00:00:00,51,27
+ASML.AS,"Menon, Janardan N",jmenon@jefferies.com,44-20-7029-8413,Equity Analyst,138,30376275,2022-02-16 00:00:00,69,84
+ASML.AS,"Sanders, Robert",rob.sanders@db.com,44-20-754-58394,Research Analyst,47,30102589,2001-07-30 00:00:00,39,69
+ASML.AS,"Deshpande, Sandeep S",sandeep.s.deshpande@jpmorgan.com,44-20-7134-5276,Equity Analyst,4614,30163784,2006-10-11 00:00:00,58,62
+ASML.AS,"Trevino Peinador, Carlos Javier J",cjtrevio@gruposantander.com,34-61-590-2332,Equity Analyst,10922,30149275,2005-08-02 00:00:00,29,15
+ASML.AS,"Qiu, Tammy",tammy.qiu@berenberg.com,44-20-3465-2673,Equity Analyst,7821,30279172,2012-04-16 00:00:00,,85
+ASML.AS,"Dai, David",david.dai@bernsteinsg.com,852-2918-5704,Equity Analyst,6872,30327186,2017-04-20 00:00:00,83,32
+ASML.AS,"Scemama, Didier",,+44 20 7995 6751,,2,30279790,2012-05-16 00:00:00,37,84
+ASML.AS,"Hosseini, Mehdi",mehdi.hosseini@sig.com,415-403-6516,Equity Analyst,22972,30210437,2010-09-28 00:00:00,59,42
+ASML.AS,"Schulze-Melander, Timm N",timm.schulze-melander@redburn.com,44-20-7000-2076,Equity Analyst,38750,30344422,2019-04-01 00:00:00,100,8
+ASML.AS,"Wermann, Ingo",ingo.wermann@dzbank.de,49-69-74-47-90544,Equity Analyst,18658,30192920,2009-09-24 07:48:00,37,72
+ASML.AS,"Leneeuw, Thibault",thibault.leneeuw2@kbcsecurities.be,32-2-448-34-83,Financial Analyst,16705,30378704,2022-05-02 02:40:15,56,7
+ASML.AS,"Muse, C.J.",CJ.Muse@cantor.com,212-915-1935,Research Analyst,5698,30394375,2024-01-11 00:00:00,31,42
+ASML.AS,"Duval, Alexander W",alexander.duval@gs.com,44-20-7552-2995,Equity Analyst,6,30258131,2010-09-01 20:40:00,4,
+ASML.AS,"Lau, Warren",warren.lau@aletheia-capital.com,852-9181-4766,Equity Analyst,204276,30398083,2024-07-12 11:04:36,51,83
+ASML.AS,"Correonero, Javier",javier.correonero@morningstar.com,312-0751-1352,Equity Analyst,60797,30350738,2020-02-13 00:00:00,68,45
+ASML.AS,"Devos, Ruben",rdevos@keplercheuvreux.com,32-11-49-14-68,Equity Research Anal,33362,30384802,2022-11-16 00:00:00,93,19
+ASML.AS,"Bouvignies, Francois-Xavier",francois.bouvignies@ubs.com,44-20-7568-7105,Equity Analyst,63807,30319663,2014-11-14 15:14:48,39,50
+ASML.AS,"Houri, Stephane",stephane.houri@oddo-bhf.com,33-1-55-35-42-62,Equity Analyst,12796,30336991,2018-07-05 00:00:00,,29
+ASML.AS,"Sinha, Utsav",,33-1-70-61-10-50,Equity Analyst,216858,30407963,2026-01-02 11:13:36,55,9
+ASML.AS,"Simpson, Lee J",Lee.Simpson@morganstanley.com,44-20-7425-3378,Equity Analyst,2975,30384526,2022-11-01 11:35:49,51,43
+ASML.AS,"Fontanelli, Jim",jim.fontanelli@arete.net,44-20-7959-1312,Equity Analyst,35539,30168102,2003-10-03 00:00:00,40,85
+ASML.AS,"Kim, Roko",roko.kim@hanafn.com,82-2-3771-7523,Equity Analyst,30219,30301097,2013-11-04 00:00:00,59,1
+ASML.AS,"Idlet, Brooks",,,Equity Analyst,178117,30391457,2023-09-07 09:04:32,8,36
+ASML.AS,"Bluestone, Jakob",jakob.bluestone@uk.bnpparibas.com,44-203-430-8468,Research Analyst,2233,30390053,2023-07-19 00:00:00,29,19
+ASML.AS,"Nagpure, Prajwal",nprajwal@crispidea.com,,Research Analyst,61498,30405497,2025-08-01 00:00:00,,6
+ASML.AS,"Gastaldy, Valerie",gastaldy@daybyday-pro.com,33-1-58-18-37-50,Equity Analyst,57329,30187993,2009-03-31 00:00:00,53,7
+ASML.AS,,,,,,,,,21
+ASML.AS,,,,,,,,44,74
+ASML.AS,,,,,,,,40,45
+ASML.AS,,,,,,,,46,58
+ASML.AS,,,,,,,,27,99
+ASML.AS,,,,,,,,90,49
+ASML.AS,,,,,,,,23,12
+ASML.AS,,,,,,,,37,1
+SAPG.DE,"Ader, Jackson E",jackson.ader@key.com,216-471-3813,Equity Analyst,12336,30393936,2024-01-02 16:06:58,40,4
+SAPG.DE,"Walravens, Patrick D",patrick.D.walravens@citizensbank.co,415-835-8943,Equity Analyst,17304,30113375,2002-01-23 00:00:00,71,59
+SAPG.DE,"Wood, Derrick",derrick.wood@tdsecurities.com,415-646-7370,Equity Analyst,85,30321522,2016-06-10 00:00:00,16,18
+SAPG.DE,"Shepherd, Adam J",adam.shepherd@arete.net,44-20-7959-1310,Equity Analyst,35539,30196572,2009-06-22 00:00:00,64,13
+SAPG.DE,"Maier, Mirko",mirko.maier@lbbw.de,49-711-127-73264,Equity Analyst,60465,30199408,2000-02-05 00:00:00,,95
+SAPG.DE,"Schwartz, Brian J",brian.schwartz@opco.com,415-399-5732,Equity Analyst,954,30279452,2012-04-30 00:00:00,55,51
+SAPG.DE,"Quek, Janice",,,Equity Analyst,178117,30372935,2021-10-01 00:00:00,72,95
+SAPG.DE,"Schaller, Johannes",johannes.schaller@db.com,49-69-910-31731,Research Analyst,47,30197918,2009-11-09 00:00:00,48,2
+SAPG.DE,"Gastaldy, Valerie",gastaldy@daybyday-pro.com,33-1-58-18-37-50,Equity Analyst,57329,30187993,2009-03-31 00:00:00,,47
+SAPG.DE,"Shukla, Abhishek",,,Equity Analyst,358,30389802,2023-07-12 23:30:59,56,12
+SAPG.DE,"Tirupati, Balajee",,,Equity Analyst,63721,30334123,2018-02-01 00:00:00,26,73
+SAPG.DE,"Moawalla, Mohammed",,,,6,30040034,1997-11-06 00:00:00,77,86
+SAPG.DE,"Hales, Rob",rob.hales@morningstar.com,31-20-560-2968,Senior Equity Analys,60797,30315727,2015-08-24 00:00:00,48,13
+SAPG.DE,"Frey, Oliver",Oliver.Frey@metzler.com,49-69-2104-4360,Financial Analyst,6195,30384648,2022-11-01 00:00:00,77,9
+SAPG.DE,"Sheikh, Omar F",,,Equity Analyst,38750,30402046,2025-02-01 01:43:22,53,1
+SAPG.DE,"Kremser, Armin E",armin.kremser@dzbank.de,49-69-7447-3999,Equity Analyst,18658,30118813,2001-04-12 00:00:00,42,10
+SAPG.DE,"Naing, Nay Soe S",naysoe.naing@berenberg.com,44-20-3753-3131,Equity Analyst,7821,30375854,2022-02-01 04:47:45,30,
+SAPG.DE,"Woller, Knut",knut.woller@baaderbank.de,49-89-5150-1807,Equity Analyst,99974,30294974,2013-01-11 00:00:00,78,11
+SAPG.DE,"Wood, Adam D",adam.wood@morganstanley.com,212-761-3656,Equity Analyst,2975,30209849,2010-07-11 23:06:00,80,27
+SAPG.DE,"Li, Hongjie",Hongjie.Li@cicc.com.cn,,Equity Analyst,20783,30363363,2020-01-01 00:00:00,79,95
+SAPG.DE,"Daure, Laurent",ldaure@keplercheuvreux.com,33-1-53-65-36-36,Director of Research,33362,30162713,2000-02-04 00:00:00,92,29
+SAPG.DE,"Pascaud, Maximilien",,33-1-70-61-10-50,Equity Analyst,216858,30408148,2026-01-11 00:00:00,1,35
+SAPG.DE,"Boulan, Frederic E",,+44 20 7995 7101,,2,30307689,2014-09-12 00:00:00,59,6
+SAPG.DE,"Castillo-Bernaus, Ben",ben.castillo-bernaus@uk.bnpparibas.,44-203-430-8527,Research Analyst,2233,30346770,2019-07-01 00:00:00,36,45
+SAPG.DE,"Materne, Kirk",kirk.materne@evercoreisi.com,212-497-0873,Equity Analyst,62195,30211271,2010-09-07 00:00:00,49,94
+SAPG.DE,"Fitzsimmons, Billy",billy.fitzsimmons@psc.com,312-281-3438,Senior Research Anal,2691,30408500,2026-02-01 16:07:20,50,25
+SAPG.DE,"Briest, Michael J",michael.briest@ubs.com,44-20-7568-8367,Equity Analyst,63807,30212456,2000-11-28 00:00:00,67,13
+SAPG.DE,"Nguyen, Richard",richard.nguyen@bernsteinsg.com,33-1-42-13-54-22,Equity Analyst,6872,30395919,2024-04-01 19:23:47,,29
+SAPG.DE,"Ogg, Toby S",toby.ogg@jpmorgan.com,44-20-7742-3278,Equity Analyst,4614,30330533,2017-01-05 00:00:00,31,75
+SAPG.DE,"Merkt, Sven",sven.merkt@barclays.com,44-20-3134-1254,Equity Analyst,10333,30322492,2016-08-09 14:32:40,51,4
+SAPG.DE,"Gaonkar, Satish",satishg@crispidea.com,,Research Analyst,61498,30407473,2025-12-01 00:00:00,77,14
+SAPG.DE,"David, Nicolas",nicolas.david@oddo-bhf.com,34-660-711-068,Equity Analyst,12796,30309023,2014-10-01 00:00:00,35,81
+SAPG.DE,"Turrin, Michael",Michael.Turrin@wellsfargo.com,628-629-7565,Equity Analyst,7671,30349771,2020-01-07 00:00:00,,21
+SAPG.DE,"Brennan, Charles A",cbrennan@jefferies.com,44-20-7548-4140,Equity Analyst,138,30367082,2021-06-01 00:00:00,87,89
+SAPG.DE,"Trevino Peinador, Carlos Javier J",cjtrevio@gruposantander.com,34-61-590-2332,Equity Analyst,10922,30149275,2005-08-02 00:00:00,31,10
+SAPG.DE,"Fogh, Per",,,Equity Analyst,170823,30394049,2024-01-01 06:18:18,42,28
+SAPG.DE,,,,,,,,41,19
+SAPG.DE,,,,,,,,61,83
+VOD.L,"Devita, Andrea",andrea.devita@intesasanpaolo.com,39-02-4127-9016,Research Analyst,32963,30393137,2023-11-17 00:00:00,,34
+VOD.L,"Grindle, Robert",robert.grindle@db.com,44-20-754-58490,Research Analyst,47,30181823,2008-05-30 00:00:00,46,7
+VOD.L,"Wright, David A",,+44 20 7995 6355,,2,30306797,2014-08-05 00:00:00,73,30
+VOD.L,"Correonero, Javier",javier.correonero@morningstar.com,312-0751-1352,Equity Analyst,60797,30350738,2020-02-13 00:00:00,,95
+VOD.L,"Dattani, Akhil",akhil.dattani@jpmorgan.com,44-20-7134-4725,Equity Analyst,4614,30150548,2005-06-23 16:59:00,58,98
+VOD.L,"Beyazian, Stephane",stephane.beyazian@oddo-bhf.com,33-6-25-80-17-56,Equity Analyst,12796,30374505,2021-12-01 00:00:00,58,90
+VOD.L,"Volkert, Matthias",,,Equity Analyst,18658,30132106,2003-05-22 03:00:00,56,95
+VOD.L,"Lee, Andrew",andrew.j.lee@gs.com,44-20-7774-1383,Equity Analyst,6,30011099,1996-08-14 12:19:00,55,60
+VOD.L,"Mills, Joshua",joshua.mills@uk.bnpparibas.com,44-203-430-8670,Research Analyst,2233,30347398,2019-07-01 00:00:00,45,56
+VOD.L,"Borrachero, Javier",jborrachero@keplercheuvreux.com,34-914-36-5161,Equity Analyst,33362,30193400,2009-10-06 00:00:00,45,91
+VOD.L,"Murdock Smith, Carl",,44-20-7986-5747,Equity Analyst,63721,30402036,2025-02-01 00:00:00,35,17
+VOD.L,"Pound, Alex",alex.pound@arete.net,44-20-7959-1307,Equity Analyst,35539,30373818,2021-11-17 00:00:00,4,
+VOD.L,"Kelly, Emmet B",Emmet.Kelly@morganstanley.com,44-20-7425-6830,Equity Analyst,2975,30306347,2014-07-07 00:00:00,58,81
+VOD.L,"Tang, Polo",polo.tang@ubs.com,44-20-7568-1286,,63807,30212541,2002-07-18 00:00:00,52,83
+VOD.L,"Deuscher, Bettina",,,Equity Analyst,60465,30199370,2001-12-17 00:00:00,69,65
+VOD.L,"Salvador, Jean-Michel",,,Equity Analyst,216858,30408264,2026-01-01 00:00:00,56,58
+VOD.L,"Ng, Adrian",,,Equity Analyst,178117,30368366,2021-07-09 00:00:00,40,91
+VOD.L,"Rathe, Ulrich W",ulrich.rathe@bernsteinsg.com,44-20-7762-5157,Equity Analyst,6872,30395909,2024-04-01 00:00:01,68,16
+VOD.L,"Patrick, Maurice G",maurice.patrick@barclays.com,44-20-3134-3622,Equity Analyst,10333,30207644,2009-10-28 04:04:00,46,2
+VOD.L,"Gastaldy, Valerie",gastaldy@daybyday-pro.com,33-1-58-18-37-50,Equity Analyst,57329,30187993,2009-03-31 00:00:00,51,1
+VOD.L,"Sidney, Paul C",,,Equity Analyst,7821,30401821,2025-01-01 10:46:13,41,2
+DTEGn.DE,"Tang, Polo",polo.tang@ubs.com,44-20-7568-1286,,63807,30212541,2002-07-18 00:00:00,37,24
+DTEGn.DE,"Treisch, Florian",ftreisch@keplercheuvreux.com,49-697-569-6132,Equity Research Anal,33362,30378786,2022-05-01 00:00:00,46,7
+DTEGn.DE,"Sidney, Paul C",,,Equity Analyst,7821,30401821,2025-01-01 10:46:13,44,98
+DTEGn.DE,"Gastaldy, Valerie",gastaldy@daybyday-pro.com,33-1-58-18-37-50,Equity Analyst,57329,30187993,2009-03-31 00:00:00,73,30
+DTEGn.DE,"Rathe, Ulrich W",ulrich.rathe@bernsteinsg.com,44-20-7762-5157,Equity Analyst,6872,30395909,2024-04-01 00:00:01,,95
+DTEGn.DE,"Ng, Adrian",,,Equity Analyst,178117,30368366,2021-07-09 00:00:00,58,90
+DTEGn.DE,"Murdock Smith, Carl",,44-20-7986-5747,Equity Analyst,63721,30402036,2025-02-01 00:00:00,55,60
+DTEGn.DE,"Pozo, Alvaro Del",alvaro.delpozo@bancsabadell.com,34-91-782-91-58,Equity Analyst,8707,30323633,2016-10-01 00:00:00,45,56
+DTEGn.DE,"Oblinger, Karsten",karsten.oblinger@dzbank.de,49-697-4479-9268,Equity Analyst,18658,30143952,2004-09-30 03:00:00,45,91
+DTEGn.DE,"Devita, Andrea",andrea.devita@intesasanpaolo.com,39-02-4127-9016,Research Analyst,32963,30393137,2023-11-17 00:00:00,46,93
+DTEGn.DE,"Dattani, Akhil",akhil.dattani@jpmorgan.com,44-20-7134-4725,Equity Analyst,4614,30150548,2005-06-23 16:59:00,,85
+DTEGn.DE,"Robilliard, Mathieu",mathieu.robilliard@barclays.com,44-20-3134-3288,Equity Analyst,10333,30308562,2014-10-01 00:00:00,35,17
+DTEGn.DE,"Deuscher, Bettina",,,Equity Analyst,60465,30199370,2001-12-17 00:00:00,4,
+DTEGn.DE,Robilliard,,,,2233,30251845,2010-11-24 04:01:00,58,81
+DTEGn.DE,"Lee, Andrew",andrew.j.lee@gs.com,44-20-7774-1383,Equity Analyst,6,30011099,1996-08-14 12:19:00,69,65
+DTEGn.DE,"Beale, Andrew C",andrew.beale@arete.net,44-20-7959-1316,Equity Analyst,35539,30168095,2003-10-01 00:00:00,48,18
+DTEGn.DE,"Beyazian, Stephane",stephane.beyazian@oddo-bhf.com,33-6-25-80-17-56,Equity Analyst,12796,30374505,2021-12-01 00:00:00,56,58
+DTEGn.DE,"Grindle, Robert",robert.grindle@db.com,44-20-754-58490,Research Analyst,47,30181823,2008-05-30 00:00:00,40,91
+DTEGn.DE,"Kelly, Emmet B",Emmet.Kelly@morganstanley.com,44-20-7425-6830,Equity Analyst,2975,30306347,2014-07-07 00:00:00,68,16
+DTEGn.DE,"Wright, David A",,+44 20 7995 6355,,2,30306797,2014-08-05 00:00:00,46,2
+DTEGn.DE,,,,,,,,41,10
+DTEGn.DE,,,,,,,,41,2
+ERICb.ST,"Sanders, Robert",rob.sanders@db.com,44-20-754-58394,Research Analyst,47,30102589,2001-07-30 00:00:00,59,69
+ERICb.ST,"Sztabowicz, Sebastien",ssztabowicz@keplercheuvreux.com,33-1-5365-3510,Director of Research,33362,30165618,2004-07-19 00:00:00,44,64
+ERICb.ST,"Maier, Mirko",mirko.maier@lbbw.de,49-711-127-73264,Equity Analyst,60465,30199408,2000-02-05 00:00:00,62,73
+ERICb.ST,"Stenvall, Kimmo",kimmo.stenvall@op.fi,358-10-252-4561,Equity Analyst,29885,30164614,2006-08-21 00:00:00,66,3
+ERICb.ST,"Rathe, Ulrich W",ulrich.rathe@bernsteinsg.com,44-20-7762-5157,Equity Analyst,6872,30395909,2024-04-01 00:00:01,65,8
+ERICb.ST,"Kramer, Richard A",richard.kramer@arete.net,44-20-7959-1303,Equity Analyst,35539,30167859,2003-10-01 00:00:00,32,68
+ERICb.ST,"Coles, Simon A",simon.coles@barclays.com,44-20-3555-4519,Equity Analyst,10333,30314654,2015-07-07 16:09:50,20,51
+ERICb.ST,"Wong, Oliver",oliver.wong2@bofa.com,44-20-7995-9014,Research Analyst,2,30398441,2024-07-30 11:46:00,,95
+ERICb.ST,"Kim, Hongseek",pro11@hanafn.com,822-3771-7505,Equity Analyst,30219,30303758,2014-03-05 00:00:00,48,2
+ERICb.ST,"Tsui, Terence M",terence.tsui@morganstanley.com,44-20-7425-3095,Equity Analyst,2975,30175123,2007-10-29 00:00:00,9,55
+ERICb.ST,"Deshpande, Sandeep S",sandeep.s.deshpande@jpmorgan.com,44-20-7134-5276,Equity Analyst,4614,30163784,2006-10-11 00:00:00,50,68
+ERICb.ST,"Duval, Alexander W",alexander.duval@gs.com,44-20-7552-2995,Equity Analyst,6,30258131,2010-09-01 20:40:00,60,31
+ERICb.ST,"Trevino Peinador, Carlos Javier J",cjtrevio@gruposantander.com,34-61-590-2332,Equity Analyst,10922,30149275,2005-08-02 00:00:00,39,69
+ERICb.ST,"Menon, Janardan N",jmenon@jefferies.com,44-20-7029-8413,Equity Analyst,138,30376275,2022-02-16 00:00:00,48,85
+ERICb.ST,"Gardiner, Andrew M",,44-20-7986-4206,Equity Analyst,63721,30375261,2022-01-01 00:00:00,58,62
+ERICb.ST,"Sarkamies, Sami",sami.sarkamies@danskebank.com,358-10-546-8468,Equity Analyst,7638,30377879,2022-04-01 00:00:00,59,42
+ERICb.ST,"Lithell, Fredrik",fredrik.lithell@handelsbanken.se,46-703-602-715,Equity Analyst,5587,30276883,2012-01-17 00:00:00,61,49
+ERICb.ST,"Gastaldy, Valerie",gastaldy@daybyday-pro.com,33-1-58-18-37-50,Equity Analyst,57329,30187993,2009-03-31 00:00:00,72,84
+ERICb.ST,"Henriksson, Felix",felix.henriksson@nordea.com,358-9-5300-8453,Equity Analyst,21348,30348415,2019-10-01 00:00:00,51,95
+ERICb.ST,"Houri, Stephane",stephane.houri@oddo-bhf.com,33-1-55-35-42-62,Equity Analyst,12796,30336991,2018-07-05 00:00:00,62,45
+ERICb.ST,"Bouvignies, Francois-Xavier",francois.bouvignies@ubs.com,44-20-7568-7105,Equity Analyst,63807,30319663,2014-11-14 15:14:48,93,19
+ERICb.ST,"Granath, Simon",simon.granath@abgsc.se,46-8-566-286-32,Equity Analyst,1013,30338520,2018-09-10 00:00:00,39,50
+ERICb.ST,"Joelsson, Andreas",andreas.joelsson@dnbcarnegie.se,46-8-5886-89-62,Research Analyst,30291,30316651,2015-06-01 00:00:00,67,31
+ERICb.ST,,,,,,,,29,19
+ERICb.ST,,,,,,,,40,91
+ERICb.ST,,,,,,,,62,85
+ERICb.ST,,,,,,,,,93
