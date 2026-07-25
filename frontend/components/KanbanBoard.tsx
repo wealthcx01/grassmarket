@@ -1,9 +1,11 @@
 /**
- * The pipeline kanban (GRS-0111 CRM rebuild). Ten stage columns rendered from /pipeline/board.
- * Cards are DRAGGABLE (@dnd-kit) between columns; a drop calls onMove(id, targetStage). The BACKEND
- * owns legality — the parent applies the move optimistically and reverts + surfaces the reason on a
- * 409, so an illegal drop snaps back. A plain click (no drag past ~5px) opens the deal slide-over.
- * StageMoveControl stays on the card as the keyboard/mobile-accessible fallback.
+ * The pipeline kanban (GRS-0111 CRM rebuild; GRS-0176 vertical layout). Ten stage BANDS rendered
+ * from /pipeline/board, stacked vertically in lifecycle order so the whole pipeline reads
+ * top-to-bottom with no horizontal scroll at any width. Cards are DRAGGABLE (@dnd-kit) between
+ * bands; a drop calls onMove(id, targetStage). The BACKEND owns legality: the parent applies the
+ * move optimistically and reverts and surfaces the reason on a 409, so an illegal drop snaps back.
+ * A plain click (no drag past ~5px) opens the deal slide-over. The keyboard and mobile stage-move
+ * fallback lives on StageMoveControl inside DealDetailPanel, one click from any card.
  */
 
 "use client";
@@ -24,7 +26,6 @@ import {
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 
-import { StageMoveControl } from "@/components/StageMoveControl";
 import {
   PIPELINE_STAGES,
   STAGE_LABEL,
@@ -124,11 +125,9 @@ function CardBody({ entry }: { entry: PipelineBoardEntry }) {
 function DraggableCard({
   entry,
   onOpen,
-  onMove,
 }: {
   entry: PipelineBoardEntry;
   onOpen: (id: string) => void;
-  onMove: (id: string, stage: PipelineStage) => Promise<unknown>;
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: entry.prospect.id,
@@ -137,6 +136,8 @@ function DraggableCard({
     <article
       ref={setNodeRef}
       style={{
+        // Keep the card width; cards WRAP within a full-width band instead of scrolling (GRS-0176).
+        flex: "0 1 15rem",
         background: "var(--color-paper-raised)",
         border: "1px solid var(--color-border)",
         borderRadius: "var(--radius)",
@@ -167,58 +168,53 @@ function DraggableCard({
       >
         <CardBody entry={entry} />
       </button>
-      <div style={{ marginTop: "0.4rem" }}>
-        <StageMoveControl prospectId={entry.prospect.id} currentStage={entry.prospect.stage} onMove={onMove} />
-      </div>
     </article>
   );
 }
 
-function Column({
+// A full-width horizontal band per stage, stacked vertically (GRS-0176). An empty band collapses to
+// a single slim labelled row that is still a valid drop target.
+function StageBand({
   stage,
   label,
   entries,
   onOpen,
-  onMove,
 }: {
   stage: PipelineStage;
   label: string;
   entries: PipelineBoardEntry[];
   onOpen: (id: string) => void;
-  onMove: (id: string, stage: PipelineStage) => Promise<unknown>;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: stage });
+  const empty = entries.length === 0;
   return (
     <section
       ref={setNodeRef}
       aria-label={label}
       style={{
-        flex: "0 0 15rem",
         display: "flex",
         flexDirection: "column",
-        gap: "0.5rem",
-        padding: "0.5rem",
+        gap: "0.4rem",
+        padding: "0.4rem 0.6rem",
         borderRadius: "var(--radius)",
         background: isOver ? "var(--color-paper-raised)" : "transparent",
         outline: isOver ? "2px dashed var(--color-accent)" : "1px solid var(--color-border)",
-        minHeight: "6rem",
+        minHeight: empty ? "2.25rem" : "4rem",
         transition: "outline-color 0.12s, background 0.12s",
       }}
     >
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+      <header style={{ display: "flex", alignItems: "baseline", gap: "0.5rem" }}>
         <h3 style={{ margin: 0, fontSize: "0.78rem", fontWeight: 600 }}>{label}</h3>
         <span className="mono" style={{ fontSize: "0.7rem", color: "var(--color-ink-muted)" }}>
           {entries.length}
         </span>
       </header>
-      {entries.length === 0 ? (
-        <p style={{ margin: 0, fontSize: "0.72rem", color: "var(--color-ink-faint)", padding: "0.4rem 0" }}>
-          No prospects
-        </p>
-      ) : (
-        entries.map((e) => (
-          <DraggableCard key={e.prospect.id} entry={e} onOpen={onOpen} onMove={onMove} />
-        ))
+      {empty ? null : (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+          {entries.map((e) => (
+            <DraggableCard key={e.prospect.id} entry={e} onOpen={onOpen} />
+          ))}
+        </div>
       )}
     </section>
   );
@@ -267,15 +263,15 @@ export function KanbanBoard({
       onDragEnd={onDragEnd}
       onDragCancel={() => setActiveId(null)}
     >
-      <div style={{ display: "flex", gap: "0.75rem", overflowX: "auto", paddingBottom: "0.5rem" }}>
+      {/* Vertical stack of full-width bands in lifecycle order (GRS-0176) — no horizontal scroll. */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         {PIPELINE_STAGES.map((s) => (
-          <Column
+          <StageBand
             key={s.stage}
             stage={s.stage}
             label={s.label}
             entries={byStage.get(s.stage) ?? []}
             onOpen={onOpen}
-            onMove={onMove}
           />
         ))}
       </div>
