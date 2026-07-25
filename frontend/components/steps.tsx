@@ -1232,6 +1232,17 @@ export function SummaryStep(props: StepProps) {
   const moduleLabels = Object.fromEntries(props.registry.modules.map((m) => [m.key, m.name]));
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: "42rem" }}>
+      {/* One source of truth for the maths (GRS-0179): link to the explainer, never duplicate it.
+          The app has no docs server, so this points at the published doc in the repository. */}
+      <p style={{ margin: 0, fontSize: "0.78rem" }}>
+        <a
+          href="https://github.com/wealthcx01/grassmarket/blob/main/docs/ATLAS-Scoring-Explained.md"
+          target="_blank"
+          rel="noreferrer"
+        >
+          How the maths works
+        </a>
+      </p>
       <LiveScorePanel
         score={live}
         loading={props.liveLoading}

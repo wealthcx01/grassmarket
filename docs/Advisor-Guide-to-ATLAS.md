@@ -67,6 +67,9 @@ This isn't bureaucracy — it directly drives the output. E1 ratings make the sc
 
 ## 6. Scoring the 7 Powers: benefit AND barrier
 
+The mechanics of every lens, including this one, are explained in full in
+[How ATLAS scoring works](./ATLAS-Scoring-Explained.md).
+
 For each power you record two things, with evidence for each:
 
 - **Benefit** — is there a real economic advantage here? (e.g. scale genuinely lowers their unit costs)
@@ -79,6 +82,10 @@ Strength comes out as: **None** (matchable within a year), **Emerging** (a serio
 Two more rules: **every power gets scored, always** — "not applicable" doesn't exist for powers; a power that's irrelevant to this business is simply weak, and that's information. And **the stage filter**: young firms plausibly have counter-positioning or a cornered resource, mature firms have branding and process power — if a claimed power doesn't fit the firm's life stage, the tool will challenge it and so should you.
 
 ## 7. What the outputs mean (and don't mean)
+
+For the full account of how the scores are built, the per-segment weights, the module bottleneck
+blend, uncertainty and P10/P50/P90, and why the demo scores cluster, see
+[How ATLAS scoring works](./ATLAS-Scoring-Explained.md).
 
 **Scores are ranges, not points.** The report says "V = 61 (range 55–68)", and each module carries an uncertainty rating. Never quote a bare point score to a client — the range *is* the honest answer.
 

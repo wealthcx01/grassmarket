@@ -1,6 +1,6 @@
 # GRS-0179 — docs/ATLAS-Scoring-Explained.md: the maths, in English
 
-**Status:** Planned (2026-07-23, founder feedback items 6 and 8). **Priority:** HIGH.
+**Status:** In review (2026-07-25) — docs/ATLAS-Scoring-Explained.md authored + linked from the Guide and the Summary step; PR open. **Priority:** HIGH.
 **Loop:** founder-feedback remediation, Wave 1. Docs only; no engine change.
 
 ## Why
