@@ -805,6 +805,26 @@ export interface ContentCompletion {
 // --- Bruntsfield Academy courses (GRS-0121) ---
 export type LessonAuthor = "human" | "ai";
 
+/** What a lesson reference points at (GRS-0190), used to label its link card. */
+export type SourceRefKind = "docs" | "video" | "blog" | "repo";
+
+/** A cited public source on a lesson (GRS-0190). `url` is https-only, enforced at the contract. */
+export interface SourceRef {
+  title: string;
+  url: string;
+  kind: SourceRefKind;
+}
+
+/**
+ * An interpretive diagram on a lesson (GRS-0190). Inline SVG rather than a file, so a published
+ * CourseVersion snapshot stays genuinely immutable. `alt` is required, never derived.
+ */
+export interface LessonAsset {
+  caption: string;
+  alt: string;
+  svg: string;
+}
+
 export interface Lesson {
   id: string;
   title: string;
@@ -812,6 +832,8 @@ export interface Lesson {
   order: number;
   author: LessonAuthor;
   video_ref?: string | null;
+  references: SourceRef[];
+  assets: LessonAsset[];
   drill_topics: string[];
   measurement?: string | null;
   check_question?: string | null;

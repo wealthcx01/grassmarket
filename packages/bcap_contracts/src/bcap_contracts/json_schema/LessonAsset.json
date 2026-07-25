@@ -1,0 +1,29 @@
+{
+  "additionalProperties": false,
+  "description": "An interpretive diagram on a lesson (GRS-0190).\n\nAssets are inline SVG strings held in the content itself, not files. A published\n`CourseVersion` is an immutable snapshot, and a snapshot that pointed at external asset storage\nwould not actually be immutable: the file behind it could change or vanish. Raster images are\ndeliberately out of contract; a photograph belongs behind a `SourceRef`.",
+  "properties": {
+    "alt": {
+      "description": "Text alternative. Required, never derived.",
+      "minLength": 1,
+      "title": "Alt",
+      "type": "string"
+    },
+    "caption": {
+      "minLength": 1,
+      "title": "Caption",
+      "type": "string"
+    },
+    "svg": {
+      "minLength": 1,
+      "title": "Svg",
+      "type": "string"
+    }
+  },
+  "required": [
+    "caption",
+    "alt",
+    "svg"
+  ],
+  "title": "LessonAsset",
+  "type": "object"
+}

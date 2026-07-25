@@ -11,34 +11,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
+import { LessonBody } from "@/components/workbench/LessonBody";
 import { ApiError, api, clearToken, getToken } from "@/lib/api";
 import type { CourseVersion, Lesson } from "@/lib/types";
-
-// Lesson bodies are prose (optionally blank-line separated) with inline **bold** emphasis. Render as
-// paragraphs, building React elements for the bold spans — no markdown dependency, no HTML injection.
-function inline(text: string): React.ReactNode {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((part, i) =>
-    part.startsWith("**") && part.endsWith("**") ? (
-      <strong key={i}>{part.slice(2, -2)}</strong>
-    ) : (
-      part
-    ),
-  );
-}
-
-function Body({ text }: { text: string }) {
-  const paras = text.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
-  return (
-    <>
-      {paras.map((p, i) => (
-        <p key={i} style={{ margin: i === 0 ? 0 : "0.6rem 0 0", fontSize: "0.9rem", lineHeight: 1.6 }}>
-          {inline(p)}
-        </p>
-      ))}
-    </>
-  );
-}
 
 function LessonCard({
   lesson,
@@ -82,7 +57,12 @@ function LessonCard({
         ) : null}
       </div>
       <div style={{ marginTop: "0.5rem", color: "var(--color-ink)" }}>
-        <Body text={lesson.body} />
+        <LessonBody
+          body={lesson.body}
+          videoRef={lesson.video_ref}
+          references={lesson.references}
+          assets={lesson.assets}
+        />
       </div>
       {lesson.measurement ? (
         <p style={{ margin: "0.6rem 0 0", fontSize: "0.78rem", color: "var(--color-ink-muted)", borderLeft: "2px solid var(--color-border)", paddingLeft: "0.6rem" }}>

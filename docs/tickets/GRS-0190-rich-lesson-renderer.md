@@ -1,6 +1,8 @@
 # GRS-0190 — Rich lesson renderer + content contracts
 
-**Status:** Planned (2026-07-23, founder feedback items 20/21). **Priority:** HIGH.
+**Status:** In review (2026-07-25) — contracts, markdown renderer, SVG sanitiser, LessonBody
+and both integrations shipped; PR open. Unblocks GRS-0191. (2026-07-23, founder feedback
+items 20/21.) **Priority:** HIGH.
 **Loop:** founder-feedback remediation, Wave 4. Carries ADR-0043 (in-house build — founder
 decision 23/07: no external LMS).
 
@@ -42,7 +44,12 @@ depth program (GRS-0191) fills.
    (assets are the image mechanism). External links render with `target="_blank"`,
    `rel="noopener noreferrer"`, and a visible external-link marker.
 
-3. **SVG sanitiser** (new `frontend/lib/svg.ts`): `sanitizeSvg(svg: string): string | null`
+3. **SVG sanitiser** (new `frontend/lib/svg.ts`). *Shipped signature:*
+   `sanitizeSvg(svg: string): SvgElementNode | null` — a parsed node TREE, not a string.
+   Returning a string would have forced the renderer to use `dangerouslySetInnerHTML`, which
+   the Acceptance section of this ticket forbids; a tree lets the renderer build React
+   elements from allowlisted structure, so there is no injection point at all. Original
+   sketch: `sanitizeSvg(svg: string): string | null`
    allowlisting SVG structural/shape/text elements and presentation attributes; strips
    `<script>`, `<foreignObject>`, `<use>` with external href, event-handler attributes
    (`on*`), and any `href`/`xlink:href` that is not a fragment. Returns `null` (renderer shows
