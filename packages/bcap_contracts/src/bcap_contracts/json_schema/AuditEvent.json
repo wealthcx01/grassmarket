@@ -5,6 +5,7 @@
       "enum": [
         "auth_login",
         "auth_password_changed",
+        "auth_account_autoprovisioned",
         "assessment_finalised",
         "deliverable_generated",
         "deliverable_downloaded",

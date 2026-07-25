@@ -58,11 +58,30 @@ export default function LoginPage() {
   return (
     <div style={{ maxWidth: "26rem", margin: "3rem auto 0" }}>
       <div className="card" style={{ padding: "2rem 2rem 2.25rem" }}>
-        <p className="eyebrow">Invitation-based access</p>
+        <p className="eyebrow">Bruntsfield Advisory Network</p>
         <h1 style={{ fontSize: "1.7rem", margin: "0.4rem 0 0.5rem" }}>Sign in</h1>
         <p style={{ margin: "0 0 1.5rem", color: "var(--color-ink-muted)", fontSize: "0.92rem", lineHeight: 1.5 }}>
-          Bruntsfield Advisory Network consultants only. Accounts are created by invitation.
+          Sign in with your Bruntsfield Google account. If you are on another account, use the
+          email and password form below.
         </p>
+
+        {/* Primary path (GRS-0173): Workspace Google sign-in. A plain link to the backend's OAuth
+            start, since the backend is the OAuth client. */}
+        <a
+          href={`${API_BASE_URL}/auth/google/start`}
+          className="btn btn-primary"
+          style={{ width: "100%", padding: "0.7rem 1rem", fontSize: "0.95rem", textAlign: "center", textDecoration: "none", display: "block" }}
+        >
+          Sign in with Bruntsfield Google
+        </a>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", margin: "1.25rem 0" }}>
+          <span className="hr" style={{ flex: 1 }} />
+          <span style={{ fontSize: "0.75rem", color: "var(--color-ink-faint)" }}>
+            Not on a Bruntsfield account?
+          </span>
+          <span className="hr" style={{ flex: 1 }} />
+        </div>
 
         <form onSubmit={onSubmit} noValidate>
           <Field id="email" label="Email" type="email" value={email} autoComplete="email" onChange={setEmail} />
@@ -87,24 +106,9 @@ export default function LoginPage() {
             disabled={submitting || !email || !password}
             style={{ width: "100%", padding: "0.7rem 1rem", fontSize: "0.95rem" }}
           >
-            {submitting ? "Signing in…" : "Sign in"}
+            {submitting ? "Signing in…" : "Sign in with email"}
           </button>
         </form>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", margin: "1.25rem 0" }}>
-          <span className="hr" style={{ flex: 1 }} />
-          <span style={{ fontSize: "0.75rem", color: "var(--color-ink-faint)" }}>or</span>
-          <span className="hr" style={{ flex: 1 }} />
-        </div>
-
-        {/* Google sign-in: a plain link to the backend's OAuth start (backend is the OAuth client). */}
-        <a
-          href={`${API_BASE_URL}/auth/google/start`}
-          className="btn btn-secondary"
-          style={{ width: "100%", padding: "0.7rem 1rem", fontSize: "0.95rem", textAlign: "center", textDecoration: "none" }}
-        >
-          Sign in with Google
-        </a>
       </div>
 
       <p style={{ marginTop: "1.25rem", fontSize: "0.82rem", color: "var(--color-ink-muted)", textAlign: "center" }}>

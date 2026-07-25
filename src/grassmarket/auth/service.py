@@ -214,26 +214,65 @@ class AuthService:
             raise InvalidCredentialsError("Account is inactive.")
         return self._issue_tokens(stored, now=moment)
 
-    def _resolve_google_consultant(self, *, email: str, google_sub: str):
-        """Invite-only Google resolution (ADR-0024). Google has already verified `email`/`sub`; here
-        we resolve a *pre-provisioned* consultant — an unknown email is refused (no auto-provision),
-        an inactive account is refused, and the Google id is bound on first use."""
+    def _resolve_google_consultant(self, *, email: str, google_sub: str, hd: str | None = None):
+        """Resolve a Google-verified sign-in to a consultant (ADR-0024, ADR-0044). Google has
+        verified `email`/`sub`/`hd`.
+
+        Resolution order: (a) a known email is the unchanged invite path — inactive is refused, the
+        Google id binds; (b) an unknown email auto-provisions ONLY when a Workspace domain is
+        configured and the verified `hd` matches it exactly (Workspace domain SSO, GRS-0173); (c)
+        otherwise an unknown email is refused, exactly as the invite-only flow does.
+        Domain membership never bypasses the inactive check."""
         stored = self._repo.get_consultant_by_email(email)
-        if stored is None:
-            raise UnprovisionedGoogleAccountError(
-                "No Grassmarket consultant is provisioned for this Google account. "
-                "Sign-in is invitation-only."
-            )
-        if not stored.is_active:
-            raise InvalidCredentialsError("Account is inactive.")
-        self._repo.bind_google_sub(stored.id, google_sub)  # set-if-null; refuse a different sub
+        if stored is not None:
+            if not stored.is_active:
+                raise InvalidCredentialsError("Account is inactive.")
+            self._repo.bind_google_sub(stored.id, google_sub)  # set-if-null; refuse a different sub
+            return stored
+
+        domain = self._settings.google_workspace_domain
+        if domain and hd and hd.lower() == domain.lower():
+            return self._autoprovision_domain_consultant(email=email, google_sub=google_sub)
+
+        raise UnprovisionedGoogleAccountError(
+            "No Grassmarket consultant is provisioned for this Google account. "
+            "Sign-in is invitation-only."
+        )
+
+    def _autoprovision_domain_consultant(self, *, email: str, google_sub: str):
+        """Create a consultant for a first-time Workspace-domain sign-in (ADR-0044, GRS-0173). The
+        role is ALWAYS Role.CONSULTANT (never elevated by auto-provisioning, GRS-0042); the tier
+        comes from config. A passwordless (OAuth-only) account is created, the Google id bound, and
+        an audit event recorded. `full_name` is derived from the email local part (no `profile`
+        scope, so no verified display name); the advisor can correct it later."""
+        local = email.split("@", 1)[0]
+        full_name = local.replace(".", " ").replace("_", " ").title()
+        stored = self._repo.create_consultant(
+            email=email,
+            full_name=full_name,
+            hashed_password=None,  # OAuth-only account (login/change-password already handle this)
+            role=Role.CONSULTANT,
+            tier=ConsultantTier(self._settings.google_autoprovision_tier),
+        )
+        self._repo.bind_google_sub(stored.id, google_sub)
+        self._repo.record_audit(
+            actor_consultant_id=stored.id,
+            event_type=AuditEventType.AUTH_ACCOUNT_AUTOPROVISIONED,
+            resource_type="consultant",
+            resource_id=stored.id,
+            now=datetime.now(UTC),
+            detail=(
+                f"Auto-provisioned from Workspace domain {self._settings.google_workspace_domain}."
+            ),
+        )
         return stored
 
-    def begin_google_session(self, *, email: str, google_sub: str) -> str:
-        """Resolve the invited consultant, then issue a single-use, short-TTL hand-off code bound to
-        them (GRS-0074). The OAuth callback carries this opaque code back to the advisory app in a
-        query string — never the JWT — and the app exchanges it. Only the code's hash is stored."""
-        stored = self._resolve_google_consultant(email=email, google_sub=google_sub)
+    def begin_google_session(self, *, email: str, google_sub: str, hd: str | None = None) -> str:
+        """Resolve (or auto-provision) the consultant, then issue a single-use, short-TTL hand-off
+        code bound to them (GRS-0074). The OAuth callback carries this opaque code back to the
+        advisory app in a query string — never the JWT — and the app exchanges it. Only the code's
+        hash is stored."""
+        stored = self._resolve_google_consultant(email=email, google_sub=google_sub, hd=hd)
         raw_code = secrets.token_urlsafe(32)
         self._repo.create_login_handoff_code(
             consultant_id=stored.id,

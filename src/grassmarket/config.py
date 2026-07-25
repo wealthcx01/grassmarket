@@ -110,6 +110,34 @@ class Settings(BaseSettings):
         default=None,
         validation_alias=AliasChoices("GM_GOOGLE_REDIRECT_URI", "GOOGLE_REDIRECT_URI"),
     )
+    # Workspace domain SSO (ADR-0044, GRS-0173). When set (e.g. "bruntsfield.capital"), a first-time
+    # Google sign-in whose VERIFIED `hd` claim equals this domain auto-provisions a consultant.
+    # UNSET means today's invite-only flow, byte-for-byte — the feature is off by default.
+    google_workspace_domain: str | None = Field(
+        default=None, validation_alias=AliasChoices("GM_GOOGLE_WORKSPACE_DOMAIN")
+    )
+    # The tier an auto-provisioned account is created at (role is ALWAYS Role.CONSULTANT, never
+    # configurable — auto-provisioning must not be able to mint an elevated role, GRS-0042).
+    google_autoprovision_tier: str = Field(
+        default="venture_associate",
+        validation_alias=AliasChoices("GM_GOOGLE_AUTOPROVISION_TIER"),
+    )
+
+    @field_validator("google_autoprovision_tier", mode="after")
+    @classmethod
+    def _validate_autoprovision_tier(cls, value: str) -> str:
+        """An unknown tier is a startup refusal, never a silent default (ADR-0001 fail-loud)."""
+        from bcap_contracts.common import ConsultantTier
+
+        try:
+            ConsultantTier(value)
+        except ValueError as exc:
+            legal = ", ".join(t.value for t in ConsultantTier)
+            raise ValueError(
+                f"GM_GOOGLE_AUTOPROVISION_TIER {value!r} is not a valid consultant tier "
+                f"(one of: {legal})."
+            ) from exc
+        return value
 
     @field_validator("database_url", mode="after")
     @classmethod

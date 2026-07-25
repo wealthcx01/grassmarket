@@ -1,6 +1,6 @@
 # GRS-0173 — Workspace domain SSO: @bruntsfield.capital sign-in
 
-**Status:** Planned (2026-07-23, founder feedback item 1). **Priority:** HIGH.
+**Status:** In review (2026-07-25) — Workspace domain auto-provisioning + login primary Google button; PR open. **Priority:** HIGH.
 **Loop:** founder-feedback remediation, Wave 1. Carries ADR-0044 (amends ADR-0024).
 
 ## Why

@@ -204,7 +204,9 @@ def google_callback(
     except GoogleOAuthError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
     try:
-        handoff_code = auth.begin_google_session(email=identity.email, google_sub=identity.sub)
+        handoff_code = auth.begin_google_session(
+            email=identity.email, google_sub=identity.sub, hd=identity.hd
+        )
     except UnprovisionedGoogleAccountError as exc:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
     except InvalidCredentialsError as exc:

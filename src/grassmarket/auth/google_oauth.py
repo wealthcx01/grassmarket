@@ -53,6 +53,9 @@ class GoogleIdentity:
     email: str
     email_verified: bool
     sub: str
+    # The Google Workspace hosted-domain claim (GRS-0173), read only from the JWKS-verified token.
+    # None for a personal Google account or a token without the claim. Never sourced elsewhere.
+    hd: str | None = None
 
 
 def pkce_pair() -> tuple[str, str]:
@@ -138,7 +141,14 @@ class HttpGoogleOAuthClient:
             raise GoogleOAuthError("Google ID token carried no email claim.")
         if not claims.get("email_verified", False):
             raise GoogleOAuthError("Google email is not verified.")
-        return GoogleIdentity(email=email, email_verified=True, sub=str(claims["sub"]))
+        # The hosted-domain claim comes ONLY from the verified, audience-checked token (ADR-0044).
+        hd = claims.get("hd")
+        return GoogleIdentity(
+            email=email,
+            email_verified=True,
+            sub=str(claims["sub"]),
+            hd=str(hd) if hd else None,
+        )
 
 
 def build_google_client(settings: Settings) -> GoogleOAuthClient:
