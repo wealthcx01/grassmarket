@@ -1,6 +1,7 @@
 # GRS-0195 — Agentic GTM research spike
 
-**Status:** Planned (2026-07-23, founder feedback item 16c). **Priority:** MED. Time-boxed.
+**Status:** Closed 2026-07-25 — memo written, recommendation is BUILD THIN; PR open.
+(2026-07-23, founder feedback item 16c.) **Priority:** MED. Time-boxed.
 **Loop:** founder-feedback remediation, Wave 5. Research output, no adoption in this ticket.
 
 ## Why
