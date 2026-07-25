@@ -129,7 +129,10 @@ def create_assessment(
     )
     # A supplied entity_id must be a real registry entity — a fabricated link can never be stored
     # (GRS-0100/ADR-0033, fail loud #3). Null is the explicit manual/unlinked fallback.
-    if payload.entity_id is not None and active_entity_registry().get(payload.entity_id) is None:
+    if (
+        payload.entity_id is not None
+        and active_entity_registry(repo).get(payload.entity_id) is None
+    ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unknown company entity '{payload.entity_id}'.",

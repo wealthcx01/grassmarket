@@ -1,0 +1,94 @@
+{
+  "additionalProperties": false,
+  "description": "A named person at a `RegistryTarget` (GRS-0193, ADR-0045). Network-shared: any authenticated\nconsultant may read the shared universe, which is the one deliberate exception to owner-scoping\n(#9) and is test-enforced so it cannot leak into owner-scoped resources.\n\nThis is personal data. Rows live in the database only, never in a committed fixture, and they\nare carried by the SAR export and erasure paths.",
+  "properties": {
+    "contact_id": {
+      "minLength": 1,
+      "title": "Contact Id",
+      "type": "string"
+    },
+    "email": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Email"
+    },
+    "full_name": {
+      "minLength": 1,
+      "title": "Full Name",
+      "type": "string"
+    },
+    "imported_on": {
+      "format": "date",
+      "title": "Imported On",
+      "type": "string"
+    },
+    "job_role": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Job Role"
+    },
+    "linkedin": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Linkedin"
+    },
+    "phone": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Phone"
+    },
+    "source": {
+      "minLength": 1,
+      "title": "Source",
+      "type": "string"
+    },
+    "target_id": {
+      "minLength": 1,
+      "title": "Target Id",
+      "type": "string"
+    },
+    "verified": {
+      "default": false,
+      "description": "Whether a human confirmed this person and role against a named source. An inferred or unaudited row stays False and renders flagged, never as verified.",
+      "title": "Verified",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "contact_id",
+    "target_id",
+    "full_name",
+    "source",
+    "imported_on"
+  ],
+  "title": "RegistryContact",
+  "type": "object"
+}

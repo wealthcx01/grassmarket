@@ -175,6 +175,60 @@ class ContactORM(Base):
     )
 
 
+class RegistryTargetORM(Base):
+    """An institution in the shared GTM target registry (GRS-0193, ADR-0045).
+
+    Network-shared reference data, NOT owner-scoped: it carries no consultant's data and every
+    advisor searches the same imported universe. Deliberately kept apart from `prospects` (a
+    consultant's own pipeline) — the registry is the universe, a prospect is one advisor's claim on
+    part of it. `target_id` is the natural primary key so re-importing a source overwrites its rows
+    rather than duplicating them.
+    """
+
+    __tablename__ = "registry_targets"
+
+    target_id: Mapped[str] = mapped_column(String(160), primary_key=True)
+    name: Mapped[str] = mapped_column(String(300), index=True, nullable=False)
+    aliases: Mapped[list[str]] = mapped_column(JSON, default=list, nullable=False)
+    domain: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    segment: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    country: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    ric: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    ctb_id: Mapped[int | None] = mapped_column(Integer, index=True, nullable=True)
+    source: Mapped[str] = mapped_column(String(64), nullable=False)
+    imported_on: Mapped[date] = mapped_column(Date, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
+class RegistryContactORM(Base):
+    """A named person at a registry target (GRS-0193, ADR-0045).
+
+    Personal data, network-shared for read. Distinct from `ContactORM`: that table is an advisor's
+    own buying unit on their own prospect (owner-private), this one is the shared imported universe.
+    The two are never merged, because their scoping and lifecycles differ. Rows are carried by the
+    SAR export and erasure paths (matched on email) so an imported person retains their rights.
+    """
+
+    __tablename__ = "registry_contacts"
+
+    contact_id: Mapped[str] = mapped_column(String(200), primary_key=True)
+    target_id: Mapped[str] = mapped_column(
+        ForeignKey("registry_targets.target_id"), index=True, nullable=False
+    )
+    full_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    email: Mapped[str | None] = mapped_column(String(320), index=True, nullable=True)
+    phone: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    job_role: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    linkedin: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    source: Mapped[str] = mapped_column(String(64), nullable=False)
+    imported_on: Mapped[date] = mapped_column(Date, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+
 class ProspectStageHistoryORM(Base):
     """Append-only audit of a prospect's stage transitions (GRS-0111). One row is written at the
     ``update_prospect_stage`` choke-point on every validated move, plus one creation row

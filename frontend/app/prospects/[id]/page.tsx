@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
+import { RegistryContactsPanel } from "@/components/RegistryContactsPanel";
 import { StageMoveControl } from "@/components/StageMoveControl";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ApiError, api, getToken } from "@/lib/api";
@@ -96,6 +97,7 @@ export default function ProspectDetailPage() {
         </div>
       </div>
 
+      <RegistryContactsPanel companyName={prospect.company_name} />
       <WorkshopsSection prospectId={id} workshops={workshops} onChanged={reload} />
       <EngagementsSection prospectId={id} engagements={engagements} canEngage={canEngage} />
       <StageHistorySection history={history} />

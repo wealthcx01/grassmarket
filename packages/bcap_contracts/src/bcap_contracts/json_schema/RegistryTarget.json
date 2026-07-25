@@ -1,0 +1,107 @@
+{
+  "additionalProperties": false,
+  "description": "An institution in the shared GTM target registry (GRS-0193, ADR-0045). Network-shared\nreference data, deliberately NOT owner-scoped: every consultant searches the same imported\nuniverse. `CompanyEntity` is derived from this by a pure adapter, so the `EntityRegistry`\nsearch port is unchanged and only its corpus grows.\n\n`source` records which dataset the row came from, and `imported_on` when, so a row's provenance\nsurvives re-import. Both are required: an unattributed target is not importable (fail loud, #3).",
+  "properties": {
+    "aliases": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Aliases",
+      "type": "array"
+    },
+    "country": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Country"
+    },
+    "ctb_id": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "LSEG/I-B-E-S contributor id — the per-institution grouping key for analyst rosters. Null for targets from non-LSEG sources.",
+      "title": "Ctb Id"
+    },
+    "domain": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Domain"
+    },
+    "imported_on": {
+      "format": "date",
+      "title": "Imported On",
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "ric": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "An LSEG RIC this institution was seen against, where known (GRS-0194).",
+      "title": "Ric"
+    },
+    "segment": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Coarse sector hint, e.g. 'Bank' or 'Exchange supplier'.",
+      "title": "Segment"
+    },
+    "source": {
+      "description": "Dataset provenance token, e.g. 'lseg-roster'.",
+      "minLength": 1,
+      "title": "Source",
+      "type": "string"
+    },
+    "target_id": {
+      "description": "Stable slug, unique across all sources.",
+      "minLength": 1,
+      "title": "Target Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "target_id",
+    "name",
+    "source",
+    "imported_on"
+  ],
+  "title": "RegistryTarget",
+  "type": "object"
+}

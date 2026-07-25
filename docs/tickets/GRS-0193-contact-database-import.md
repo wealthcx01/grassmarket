@@ -1,6 +1,7 @@
 # GRS-0193 — Import the GTM contact databases
 
-**Status:** Planned (2026-07-23, founder feedback item 16a). **Priority:** HIGH within Wave 5 —
+**Status:** In review (2026-07-25) — registry, adapter, four importers and the prospect panel
+shipped; PR open. (2026-07-23, founder feedback item 16a.) **Priority:** HIGH within Wave 5 —
 it unblocks GRS-0194 and the GRS-0199 radar wiring. **Loop:** founder-feedback remediation,
 Wave 5. Carries ADR-0045 (target & contact registry; extends ADR-0027). Supersedes the scope of
 the planned GRS-0115. Consumes GRS-0200 (the dataset already pulled).

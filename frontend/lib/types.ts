@@ -129,6 +129,40 @@ export interface CompanyEntity {
   segment?: string | null;
 }
 
+/**
+ * An institution in the shared GTM registry (GRS-0193, ADR-0045). Network-shared reference data:
+ * every consultant reads the same imported universe, unlike a prospect's own contacts.
+ */
+export interface RegistryTarget {
+  target_id: string;
+  name: string;
+  aliases: string[];
+  domain?: string | null;
+  segment?: string | null;
+  country?: string | null;
+  ric?: string | null;
+  ctb_id?: number | null;
+  source: string;
+  imported_on: string;
+}
+
+/**
+ * A named person at a RegistryTarget (GRS-0193). `verified` means a human confirmed the person and
+ * their role against a named source; an inferred or unaudited row stays false and renders flagged.
+ */
+export interface RegistryContact {
+  contact_id: string;
+  target_id: string;
+  full_name: string;
+  email?: string | null;
+  phone?: string | null;
+  job_role?: string | null;
+  linkedin?: string | null;
+  verified: boolean;
+  source: string;
+  imported_on: string;
+}
+
 export interface Assessment {
   id: string;
   owner_consultant_id: string;
