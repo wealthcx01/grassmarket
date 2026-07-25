@@ -13,6 +13,9 @@ const nextConfig = {
       { source: "/academy/:slug", destination: "/workbench/academy/:slug", permanent: true },
       { source: "/courses", destination: "/workbench/courses", permanent: true },
       { source: "/deliverables", destination: "/engagements", permanent: false },
+      // GRS-0175: /help merged into /guide (one canonical Guide). Section ids are preserved, so
+      // /help#anchor deep links resolve to the same content under /guide.
+      { source: "/help", destination: "/guide", permanent: true },
     ];
   },
 };

@@ -112,7 +112,7 @@ export default function RootLayout({
             Workbench
           </Link>
           <Link
-            href="/help"
+            href="/guide"
             style={{
               color: "var(--color-ink-soft)",
               textDecoration: "none",

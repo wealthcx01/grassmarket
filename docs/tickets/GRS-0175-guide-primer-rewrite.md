@@ -1,6 +1,7 @@
 # GRS-0175 — Guide & Primer rewrite
 
-**Status:** Planned (2026-07-23, founder feedback items 27 and 6-partial). **Priority:** HIGH.
+**Status:** In review (2026-07-25) — /help merged into /guide, page rewritten in the STYLE-VOICE
+register, PR open. (2026-07-23, founder feedback items 27 and 6-partial.) **Priority:** HIGH.
 **Loop:** founder-feedback remediation, Wave 1. Depends on GRS-0174 (style guide) and GRS-0179
 (the maths explainer it summarises).
 
