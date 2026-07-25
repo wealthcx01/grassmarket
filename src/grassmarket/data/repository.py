@@ -87,6 +87,7 @@ from bcap_contracts.common import (
 from bcap_contracts.deliverables import (
     ApprovalStatus,
     Deliverable,
+    DeliverableIndexRow,
     DeliverableMode,
     DeliverableType,
 )
@@ -2313,6 +2314,41 @@ class Repository:
     def get_deliverable(self, principal: Principal, deliverable_id: UUID) -> Deliverable:
         return self._to_deliverable(self._require_deliverable(principal, deliverable_id))
 
+    def list_deliverables_for_consultant(
+        self, principal: Principal
+    ) -> list[DeliverableIndexRow]:
+        """The advisor's OWN deliverables index (GRS-0186), newest-generated first. One query
+        joining the deliverable to its engagement (title, prospect) and prospect (company name),
+        filtered strictly to `principal`'s rows — self-only even for an admin (mirrors the
+        `_own_prospects` rule, ADR-0016), never the whole org's. Null `generated_at` sorts last."""
+        stmt = (
+            select(DeliverableORM, EngagementORM, ProspectORM)
+            .join(EngagementORM, DeliverableORM.engagement_id == EngagementORM.id)
+            .join(ProspectORM, EngagementORM.prospect_id == ProspectORM.id)
+            .where(DeliverableORM.owner_consultant_id == principal.consultant_id)
+            .order_by(
+                DeliverableORM.generated_at.is_(None),  # False (0) first → non-null before null
+                DeliverableORM.generated_at.desc(),
+                DeliverableORM.created_at.desc(),
+            )
+        )
+        rows: list[DeliverableIndexRow] = []
+        for deliverable, engagement, prospect in self._session.execute(stmt).all():
+            rows.append(
+                DeliverableIndexRow(
+                    id=deliverable.id,
+                    type=DeliverableType(deliverable.type),
+                    title=deliverable.title,
+                    mode=DeliverableMode(deliverable.mode),
+                    generated_at=deliverable.generated_at,
+                    engagement_id=engagement.id,
+                    engagement_title=engagement.title,
+                    prospect_id=prospect.id,
+                    prospect_company_name=prospect.company_name,
+                )
+            )
+        return rows
+
     def list_deliverables(self, principal: Principal, engagement_id: UUID) -> list[Deliverable]:
         self.get_engagement(principal, engagement_id)  # scope check on the parent
         stmt = (
@@ -2617,6 +2653,24 @@ class Repository:
         from grassmarket.atlas.active import profile_key_of, profile_scoring_context
 
         profiles = load_profiles()  # key -> ProfileDef, for the operating-model display name
+        # assessment_id -> prospect_id for the caller's engagements (GRS-0186), built once so the
+        # portfolio row can link to the client record. A link is recorded only where it genuinely
+        # exists; an unlinked assessment stays None (never a fabricated link).
+        import json as _json
+
+        linked_prospect: dict[UUID, UUID] = {}
+        eng_rows = (
+            self._session.execute(
+                select(EngagementORM).where(
+                    EngagementORM.owner_consultant_id == principal.consultant_id
+                )
+            )
+            .scalars()
+            .all()
+        )
+        for eng in eng_rows:
+            for aid in _json.loads(eng.assessment_ids_json or "[]"):
+                linked_prospect.setdefault(UUID(str(aid)), eng.prospect_id)
         entries: list[BrokeragePortfolioEntry] = []
         for a in self.list_assessments(principal):
             v_index = None
@@ -2660,6 +2714,7 @@ class Repository:
                     coverage=_document_coverage(a.document, c_registry),
                     finalised_at=a.finalised_at,
                     updated_at=a.updated_at,
+                    linked_prospect_id=linked_prospect.get(a.id),
                 )
             )
         entries.sort(key=lambda e: e.updated_at, reverse=True)

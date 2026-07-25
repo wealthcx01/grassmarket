@@ -40,6 +40,7 @@ import type {
   LessonCompletion,
   CertificationCredit,
   Deliverable,
+  DeliverableIndexRow,
   DeliverableSlot,
   DeliverableType,
   DrillCard,
@@ -756,6 +757,15 @@ export const api = {
   // --- Deliverables (GRS-0015/0018; JWT-scoped, cross-owner → 404) ---
   listDeliverables(engagementId: string, signal?: AbortSignal): Promise<Deliverable[]> {
     return request<Deliverable[]>(`/engagements/${engagementId}/deliverables`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  // The advisor's own deliverables index (GRS-0186), owner-scoped, newest first.
+  listAllDeliverables(signal?: AbortSignal): Promise<DeliverableIndexRow[]> {
+    return request<DeliverableIndexRow[]>(`/deliverables`, {
       method: "GET",
       headers: authHeaders(),
       signal,

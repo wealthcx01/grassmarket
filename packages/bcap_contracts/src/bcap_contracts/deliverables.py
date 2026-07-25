@@ -12,7 +12,7 @@ from datetime import datetime
 from enum import StrEnum
 from uuid import UUID
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from bcap_contracts.base import OwnedResource
 
@@ -73,3 +73,22 @@ class Deliverable(OwnedResource):
                 "content never reaches a client without consultant sign-off (non-negotiable #8)."
             )
         return self
+
+
+class DeliverableIndexRow(BaseModel):
+    """A read projection for the advisor's own deliverables index (GRS-0186): one row per
+    generated deliverable, enriched with its engagement and client so the list links straight to
+    the record. Not a stored resource — it is only ever returned owner-scoped, so it carries no
+    `OwnedResource` base."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: UUID
+    type: DeliverableType
+    title: str
+    mode: DeliverableMode
+    generated_at: datetime | None = None
+    engagement_id: UUID
+    engagement_title: str
+    prospect_id: UUID
+    prospect_company_name: str

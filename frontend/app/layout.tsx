@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Source_Serif_4, Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { AccountMenu } from "@/components/AccountMenu";
+import { PrimaryNav } from "@/components/PrimaryNav";
 
 // Three faces from the Bruntsfield design system, exposed as CSS variables that
 // globals.css consumes (--font-serif / --font-sans / --font-mono).
@@ -95,25 +96,13 @@ export default function RootLayout({
             </span>
           </Link>
 
-          <span className="eyebrow" style={{ marginLeft: "auto" }}>
-            <span className="eyebrow-id">02</span> — Advisory
-          </span>
-          <Link
-            href="/workbench"
-            style={{
-              color: "var(--color-ink-soft)",
-              textDecoration: "none",
-              fontSize: "0.85rem",
-              padding: "0.3rem 0.75rem",
-              border: "1px solid var(--color-border-strong)",
-              borderRadius: "var(--radius-pill)",
-            }}
-          >
-            Workbench
-          </Link>
+          {/* Primary section navigation (GRS-0186), with a mobile drawer. */}
+          <PrimaryNav />
+
           <Link
             href="/help"
             style={{
+              marginLeft: "auto",
               color: "var(--color-ink-soft)",
               textDecoration: "none",
               fontSize: "0.85rem",

@@ -1,6 +1,6 @@
 # GRS-0186 — Global navigation + Deliverables reachability
 
-**Status:** Planned (2026-07-23, founder feedback items 14 and 15-navigation). **Priority:** HIGH.
+**Status:** In review (2026-07-25) — PrimaryNav + mobile drawer, /deliverables index (owner-scoped), RecordBreadcrumb + portfolio client-record link; PR open. **Priority:** HIGH.
 **Loop:** founder-feedback remediation, Wave 1.
 
 ## Why

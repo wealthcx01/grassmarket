@@ -52,7 +52,7 @@ from bcap_contracts.commissions import (
     ProductCommissionCarrot,
 )
 from bcap_contracts.committee import CommitteeDecision, CommitteeItem, CommitteeQueueEntry
-from bcap_contracts.deliverables import Deliverable
+from bcap_contracts.deliverables import Deliverable, DeliverableIndexRow
 from bcap_contracts.engagements import CommsLogEntry, Engagement, Workshop
 from bcap_contracts.entities import CompanyEntity, Contact, Prospect
 from bcap_contracts.extraction import Extraction, FieldProvenance
@@ -109,6 +109,7 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "Workshop": Workshop,
     "RecoveryFeeAttribution": RecoveryFeeAttribution,
     "Deliverable": Deliverable,
+    "DeliverableIndexRow": DeliverableIndexRow,
     "AINarrative": AINarrative,
     "CommissionLine": CommissionLine,
     "EarningsSummary": EarningsSummary,

@@ -81,6 +81,19 @@
       "default": null,
       "title": "Finalised At"
     },
+    "linked_prospect_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Linked Prospect Id"
+    },
     "provenance": {
       "$ref": "#/$defs/RecordProvenance",
       "default": "production"

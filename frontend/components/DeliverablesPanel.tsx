@@ -19,6 +19,7 @@ import type {
   DeliverableType,
   RecordProvenance,
 } from "@/lib/types";
+import { TYPE_LABEL } from "@/lib/deliverableLabels";
 import { NarrativeReview } from "@/components/NarrativeReview";
 import { ProvenanceBadge } from "@/components/ProvenanceBadge";
 
@@ -34,15 +35,6 @@ function summariseNarratives(narratives: AINarrative[]): NarrativeSummary {
   return { total: narratives.length, approved, pending };
 }
 
-const TYPE_LABEL: Record<DeliverableType, string> = {
-  executive_summary: "Executive Summary",
-  platform_power_report: "Platform Power Report",
-  infrastructure_heatmap: "Infrastructure Heatmap",
-  modernisation_roadmap: "Modernisation Roadmap",
-  technical_appendix: "Technical Appendix",
-  workshop_output: "Workshop Output",
-  score_evolution: "Score Evolution",
-};
 
 // The single-run types the generate endpoint accepts; the roadmap (needs the value bridge) and
 // score evolution (needs multiple runs) have their own paths and are not offered here.
