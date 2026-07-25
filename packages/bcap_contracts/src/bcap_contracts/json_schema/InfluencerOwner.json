@@ -1,0 +1,40 @@
+{
+  "additionalProperties": false,
+  "description": "One row of the ownership and leadership layer, established by human web research.",
+  "properties": {
+    "full_name": {
+      "minLength": 1,
+      "title": "Full Name",
+      "type": "string"
+    },
+    "job_role": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Job Role"
+    },
+    "source": {
+      "minLength": 1,
+      "title": "Source",
+      "type": "string"
+    },
+    "verified": {
+      "default": false,
+      "description": "True only where a human confirmed the person and role against a named source. Anything partial or unconfirmed stays false and renders flagged.",
+      "title": "Verified",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "full_name",
+    "source"
+  ],
+  "title": "InfluencerOwner",
+  "type": "object"
+}

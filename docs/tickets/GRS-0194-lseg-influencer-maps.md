@@ -1,6 +1,8 @@
 # GRS-0194 — LSEG influencer maps via bcap-lseg
 
-**Status:** Planned (2026-07-23, founder feedback item 16b). **Priority:** MED-HIGH.
+**Status:** In review (2026-07-25) — generator, ranking, two-source owner layer and the
+admin-only route shipped; PR open, stacked on GRS-0193. (2026-07-23, founder feedback item
+16b.) **Priority:** MED-HIGH.
 **Loop:** founder-feedback remediation, Wave 5. Elevates the planned GRS-0114; depends on
 GRS-0193 (registry) and GRS-0200 (the seed dataset pulled 2026-07-23).
 

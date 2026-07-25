@@ -21,6 +21,7 @@ from grassmarket.auth.security import InvalidTokenError, decode_access_token
 from grassmarket.auth.service import AuthService
 from grassmarket.config import Settings, get_settings
 from grassmarket.data.repository import Principal, Repository
+from grassmarket.gtm import LsegRosterSource
 
 _bearer = HTTPBearer(auto_error=False)
 
@@ -91,3 +92,17 @@ def get_current_principal(
 # app was built without state (e.g. unit tests importing a dependency in isolation).
 def get_settings_default() -> Settings:
     return get_settings()
+
+
+def get_lseg_roster_source() -> LsegRosterSource:
+    """The LSEG roster port (GRS-0194).
+
+    No live client is wired in this build: the connector is an interactively-authenticated operator
+    tool, so an unconfigured deployment refuses the pull loudly rather than returning an empty map
+    that would read as "this bank has no analysts". Tests and the operator console override this
+    dependency with a real source.
+    """
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail="No LSEG connector is configured for this deployment, so no roster can be pulled.",
+    )

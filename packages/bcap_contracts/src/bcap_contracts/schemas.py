@@ -63,6 +63,12 @@ from bcap_contracts.entities import (
 )
 from bcap_contracts.extraction import Extraction, FieldProvenance
 from bcap_contracts.fees import RecoveryFeeAttribution
+from bcap_contracts.influencer import (
+    InfluencerMap,
+    InfluencerMapProvenance,
+    InfluencerOwner,
+    InfluencerRank,
+)
 from bcap_contracts.learning import (
     CertificationProgress,
     ContentCompletion,
@@ -109,6 +115,10 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "CompanyEntity": CompanyEntity,
     "RegistryTarget": RegistryTarget,
     "RegistryContact": RegistryContact,
+    "InfluencerRank": InfluencerRank,
+    "InfluencerOwner": InfluencerOwner,
+    "InfluencerMapProvenance": InfluencerMapProvenance,
+    "InfluencerMap": InfluencerMap,
     "PipelineForecast": PipelineForecast,
     "PipelineBoard": PipelineBoard,
     "StageHistoryEntry": StageHistoryEntry,

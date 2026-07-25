@@ -6,6 +6,15 @@ what keeps the imported PII out of the test fixtures (§7). `scripts/import_*.py
 that call into this module and print the summary it returns.
 """
 
+from grassmarket.gtm.influencer_map import (
+    ROSTER_FIELDS,
+    LsegCell,
+    LsegRosterSource,
+    generate_influencer_map,
+    owners_from_registry,
+    rank_analysts,
+    reconstruct_rows,
+)
 from grassmarket.gtm.ingest import (
     ImportSummary,
     RowError,
@@ -20,7 +29,10 @@ from grassmarket.gtm.ingest import (
 )
 
 __all__ = [
+    "ROSTER_FIELDS",
     "ImportSummary",
+    "LsegCell",
+    "LsegRosterSource",
     "RowError",
     "decode_lseg_rating",
     "null_if_unset",
@@ -29,5 +41,9 @@ __all__ = [
     "parse_barclays_owner_row",
     "parse_lseg_roster",
     "parse_supplier_row",
+    "generate_influencer_map",
+    "owners_from_registry",
+    "rank_analysts",
+    "reconstruct_rows",
     "slugify",
 ]
