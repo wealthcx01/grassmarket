@@ -1,8 +1,6 @@
 # GRS-0180 — 7 Powers mathematics adaptation: the normative document
 
-**Status:** Planned (2026-07-23, founder feedback item 7; upgraded same day when the founder
-secured Hamilton Helmer's permission to embed and adapt the supplement's mathematics for wealth
-platforms). **Priority:** HIGH — Helmer will review the output.
+**Status:** In review (2026-07-24) — docs/ATLAS-7Powers-Adaptation.md authored, PR open; awaiting founder confirmation for the Helmer review packet (GRS-0201). **Priority:** HIGH — Helmer will review the output.
 **Loop:** founder-feedback remediation, Wave 1. Carries ADR-0046. Feeds GRS-0201 (wizard).
 
 ## Why

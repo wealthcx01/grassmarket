@@ -94,3 +94,9 @@ mechanisms:
 §5.2a gate, §5.3 group-weighted B, §5.4), §6 (Coefficient Provenance), §8 (Seven Powers), §9
 (Certification & Calibration), §10 (Value Bridge), §11 (Validation Loop), §12 (Method Sources) are
 carried forward verbatim from `docs/ATLAS-Methodology-v1.1.md`.
+
+**Source note (non-normative, GRS-0180 / ADR-0046).** The Seven Powers (§8) and their rubric
+anchors (§4) are grounded in `docs/ATLAS-7Powers-Adaptation.md`, the normative adaptation of the
+7 Powers mathematics authored under Hamilton Helmer's permission grant. That document is the single
+source for all Powers content; it does not change P scoring (strength = min(Benefit, Barrier),
+§5.4), which is unchanged here.
