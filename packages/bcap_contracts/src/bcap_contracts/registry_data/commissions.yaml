@@ -10,11 +10,6 @@ currency: GBP
 
 # --- Stream A — product commission (per product: Year-1 / Year-2 rate + window months) ---
 products:
-  connecttrade:
-    name: ConnectTrade
-    yr1_bps: 1500 # 15%
-    yr2_bps: 1000 # 10%
-    window_months: 24
   openbb:
     name: OpenBB
     yr1_bps: 1500 # 15%

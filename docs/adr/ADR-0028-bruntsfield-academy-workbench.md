@@ -23,7 +23,7 @@ ownership-scoped repositories. But its **training content is not modelled**: `Le
 in the system.
 
 This matters because **commission on selling represented products is a primary way Bruntsfield Advisory
-earns** (ADR-0026). Three products are signed — **Benzinga, Brandfetch, OpenBB** (ConnectTrade pending) —
+earns** (ADR-0026). Three products are signed: **Benzinga, Brandfetch, OpenBB** —
 each a potential solution to a gap found in an assessment *or* sold as-is. Advisers need in-depth,
 maintainable course catalogs per product, plus a deepened **Sales Egoist** core module (the intro "Sales 101"
 doctrine; two of eight lessons exist as teaser decks), all tied to the assessment work across retail

@@ -6,7 +6,7 @@ A full sweep of the three OneDrive business folders (Advisory, Briefing, Elite-V
 
 ### 1. My Earnings must encode Commission Schedule v7 — the placeholder assumption is wrong
 `Advisory\Resources\Bruntsfield_Consultant_CommissionSchedule_TEMPLATE_v7.docx` is the decided model, not an open item:
-- **Stream A — product commission:** per product, Yr1/Yr2 rates, commission window (ConnectTrade 15%/10% 24mo; OpenBB 15%/10% 24mo; Brandfetch distribution 7.5%/5% 24mo, redistribution 3.75%/3.75% 36mo). Rates amendable by notice.
+- **Stream A — product commission:** per product, Yr1/Yr2 rates, commission window (OpenBB 15%/10% 24mo; Brandfetch distribution 7.5%/5% 24mo, redistribution 3.75%/3.75% 36mo). Rates amendable by notice. (ConnectTrade removed 2026-07-23, GRS-0183 — no signed agreement.)
 - **Stream B — consultancy commission:** split by sourcing (self vs firm) AND by delivery type — "Bruntsfield-led (Power Platform Assessment / Bruntsfield-methodology)" carries a different rate than "consultant-led bespoke". Pay-when-paid; share of outcome; uncapped.
 - **Action (amend GRS-0028 follow-up):** earnings config schema must support two streams, per-product Yr1/Yr2 tiers, commission windows (dated), sourcing × delivery-type matrix for consultancy, and pay-when-paid status. Verify shipped schema covers this; if not, ticket the delta. Seed config from v7; filled instances (Consultants\Byoung, \Randy) validate against real records.
 
@@ -19,7 +19,7 @@ Real house output (Engagements\Active\ASX, \NSI): **Outside Read Deck, Note, Pri
 Active engagements are exchange-side (ASX, NSE Data & Analytics). The METHODOLOGY-V2-SCOPE question "which profile ships second (exchange vs wealth)?" is answered: **exchange first** — arguably promoted from v2-nice-to-have to early-v2 priority, since the methodology is already being applied to exchanges manually.
 
 ### 4. Pipeline/CRM stage model should mirror the real lifecycle
-Real flow observed: Proposal (versioned GTM decks + internal strategy + critique) → MSA + Engagement Schedule (versioned to executed) → Active engagement → Deliverables. Clients: OpenBB (executed v6), Brandfetch, ConnectTrade, Benzinga (reseller), ASX, NSE.
+Real flow observed: Proposal (versioned GTM decks + internal strategy + critique) → MSA + Engagement Schedule (versioned to executed) → Active engagement → Deliverables. Clients: OpenBB (executed v6), Brandfetch, Benzinga (reseller), ASX, NSE. (ConnectTrade removed until an agreement exists, GRS-0183.)
 - **Action:** verify GRS-0011–0013's stage model accommodates contract documents (MSA/ES versions, executed dates) and the internal-strategy + adversarial-critique pattern (OpenBB's InternalStrategy.md + GTM_Critique.md is the exemplar). Seed the pipeline with the real book at cutover (operator task — real client data enters production only, never fixtures).
 
 ### 5. Workbench content: the seed set exists, the library doesn't
