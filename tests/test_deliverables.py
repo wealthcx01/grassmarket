@@ -345,3 +345,132 @@ def test_http_preview_is_owner_scoped(
     aid = _finalised_assessment_http(client, alice)
     resp = client.get(f"/assessments/{aid}/deliverable-preview", headers=auth_header(bob))
     assert resp.status_code == 404  # another consultant cannot preview alice's assessment
+
+
+# --- Deliverables index (GRS-0186) --------------------------------------------------------------
+
+from datetime import UTC, datetime, timedelta  # noqa: E402
+
+from bcap_contracts.deliverables import DeliverableType  # noqa: E402
+
+from grassmarket.data.repository import Repository  # noqa: E402
+
+
+def _engagement_with_deliverable(
+    repo: Repository, owner, *, company: str, title: str, generated_at
+):
+    prospect = repo.create_prospect(owner.principal, company_name=company)
+    from bcap_contracts.entities import PipelineStage
+
+    for stage in (
+        PipelineStage.WORKSHOP_SCHEDULED,
+        PipelineStage.WORKSHOP_DELIVERED,
+        PipelineStage.QUALIFIED,
+        PipelineStage.SCOPED,
+        PipelineStage.CONTRACTED,
+    ):
+        prospect = repo.update_prospect_stage(owner.principal, prospect.id, stage)
+    eng = repo.create_engagement(owner.principal, prospect_id=prospect.id, title=title)
+    deliverable = repo.create_deliverable(
+        owner.principal,
+        engagement_id=eng.id,
+        deliverable_type=DeliverableType.EXECUTIVE_SUMMARY,
+        title="Executive Summary",
+        mode=DeliverableMode.DRAFT_INTERNAL,
+        scoring_run_id=None,
+        coefficient_version=None,
+        content_hash=None,
+        generated_at=generated_at,
+    )
+    return prospect, eng, deliverable
+
+
+def test_deliverables_index_is_owner_scoped(repo: Repository, alice, bob) -> None:
+    _engagement_with_deliverable(
+        repo, alice, company="AliceCo", title="Alice engagement", generated_at=datetime.now(UTC)
+    )
+    _engagement_with_deliverable(
+        repo, bob, company="BobCo", title="Bob engagement", generated_at=datetime.now(UTC)
+    )
+    alice_rows = repo.list_deliverables_for_consultant(alice.principal)
+    bob_rows = repo.list_deliverables_for_consultant(bob.principal)
+    assert [r.prospect_company_name for r in alice_rows] == ["AliceCo"]
+    assert [r.prospect_company_name for r in bob_rows] == ["BobCo"]
+    # Enriched fields resolve from the joined rows.
+    row = alice_rows[0]
+    assert row.engagement_title == "Alice engagement"
+    assert row.prospect_id is not None
+    assert row.type == DeliverableType.EXECUTIVE_SUMMARY
+
+
+def test_deliverables_index_orders_newest_first_nulls_last(repo: Repository, alice) -> None:
+    now = datetime.now(UTC)
+    _engagement_with_deliverable(
+        repo, alice, company="Older", title="e1", generated_at=now - timedelta(days=2)
+    )
+    _engagement_with_deliverable(repo, alice, company="Newer", title="e2", generated_at=now)
+    _engagement_with_deliverable(repo, alice, company="Ungenerated", title="e3", generated_at=None)
+    order = [
+        r.prospect_company_name for r in repo.list_deliverables_for_consultant(alice.principal)
+    ]
+    assert order == ["Newer", "Older", "Ungenerated"]  # newest generated first, null last
+
+
+def test_http_deliverables_index_is_self_scoped(client, alice, bob) -> None:
+    from tests.conftest import auth_header
+
+    # Seed via the repo behind a fresh session bound to the same engine.
+    session = client.app.state.session_factory()
+    try:
+        r = Repository(session)
+        _engagement_with_deliverable(
+            r, alice, company="AliceCo", title="A", generated_at=datetime.now(UTC)
+        )
+        _engagement_with_deliverable(
+            r, bob, company="BobCo", title="B", generated_at=datetime.now(UTC)
+        )
+        session.commit()
+    finally:
+        session.close()
+
+    a = client.get("/deliverables", headers=auth_header(alice))
+    assert a.status_code == 200
+    assert [row["prospect_company_name"] for row in a.json()] == ["AliceCo"]
+    # Cross-advisor negative: alice never sees bob's row.
+    assert all(row["prospect_company_name"] != "BobCo" for row in a.json())
+
+
+def test_http_deliverables_index_empty_for_new_advisor(client, alice) -> None:
+    from tests.conftest import auth_header
+
+    resp = client.get("/deliverables", headers=auth_header(alice))
+    assert resp.status_code == 200 and resp.json() == []
+
+
+def test_portfolio_row_linked_prospect_id(client, alice) -> None:
+    """The portfolio row links to the client record only when the assessment is linked to an
+    engagement (GRS-0186); an unlinked assessment stays None."""
+    from tests.conftest import auth_header
+    from tests.test_engagement_detail import (
+        _contracted_prospect_http,
+        _finalised_assessment_http,
+    )
+
+    headers = auth_header(alice)
+    # An unlinked assessment (no engagement references it).
+    unlinked_id = client.post(
+        "/assessments", json={"subject": "Unlinked Co"}, headers=headers
+    ).json()["id"]
+    # A linked one: finalise it, then open an engagement referencing it.
+    pid = _contracted_prospect_http(client, alice)
+    linked_id = _finalised_assessment_http(client, alice)
+    eng = client.post(
+        "/engagements",
+        json={"prospect_id": pid, "title": "Linked engagement", "assessment_ids": [linked_id]},
+        headers=headers,
+    ).json()
+    rows = {
+        r["assessment_id"]: r for r in client.get("/assessments/portfolio", headers=headers).json()
+    }
+    assert rows[unlinked_id]["linked_prospect_id"] is None
+    assert rows[linked_id]["linked_prospect_id"] == eng["prospect_id"]

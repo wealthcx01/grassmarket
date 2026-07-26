@@ -20,7 +20,7 @@ import {
 import { DeliverablesPanel } from "@/components/DeliverablesPanel";
 import { LinkAssessmentControl } from "@/components/LinkAssessmentControl";
 import { SellOpportunitiesPanel } from "@/components/SellOpportunitiesPanel";
-import { Breadcrumb } from "@/components/Breadcrumb";
+import { RecordBreadcrumb } from "@/components/RecordBreadcrumb";
 import { ProvenanceBadge } from "@/components/ProvenanceBadge";
 
 const STATE_LABEL: Record<string, string> = {
@@ -67,13 +67,21 @@ export default function EngagementDetailPage() {
 
   const [engagement, setEngagement] = useState<Engagement | null>(null);
   const [portfolio, setPortfolio] = useState<BrokeragePortfolioEntry[]>([]);
+  const [company, setCompany] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const reload = useCallback(
     (signal?: AbortSignal) =>
       api
         .getEngagement(id, signal)
-        .then(setEngagement)
+        .then((e) => {
+          setEngagement(e);
+          // The client's name for the record breadcrumb (GRS-0186). Non-fatal on failure.
+          api
+            .getProspect(e.prospect_id, signal)
+            .then((p) => setCompany(p.company_name))
+            .catch(() => {});
+        })
         .catch((err: unknown) => {
           if (err instanceof ApiError && err.status === 0 && err.aborted) return;
           if (err instanceof ApiError && err.status === 401) {
@@ -109,11 +117,10 @@ export default function EngagementDetailPage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem", maxWidth: "48rem" }}>
       <div>
-        <Breadcrumb
-          trail={[
-            { label: "Pipeline", href: "/pipeline" },
-            { label: "Prospect", href: `/prospects/${engagement.prospect_id}` },
-          ]}
+        {/* Record breadcrumb naming the client (GRS-0186): Pipeline › {Company} › {engagement}. */}
+        <RecordBreadcrumb
+          prospectId={engagement.prospect_id}
+          companyName={company ?? "Client"}
           current={engagement.title}
         />
         <p className="eyebrow" style={{ marginTop: "0.5rem" }}>

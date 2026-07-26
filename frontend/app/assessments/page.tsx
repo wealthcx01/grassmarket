@@ -265,6 +265,15 @@ export default function BrokeragesPage() {
                         </Link>
                         <ProvenanceBadge provenance={e.provenance} />
                       </span>
+                      {/* Link to the client record only when the assessment is linked to an
+                          engagement (GRS-0186) — never a guessed link when it is not. */}
+                      {e.linked_prospect_id ? (
+                        <div style={{ marginTop: "0.15rem", fontSize: "0.75rem" }}>
+                          <Link href={`/prospects/${e.linked_prospect_id}`} style={{ color: "var(--color-ink-muted)" }}>
+                            Client record →
+                          </Link>
+                        </div>
+                      ) : null}
                     </td>
                     <td style={{ padding: "0.55rem 0.6rem", color: e.segment ? "inherit" : "var(--color-ink-faint)" }}>
                       {e.segment ?? "—"}

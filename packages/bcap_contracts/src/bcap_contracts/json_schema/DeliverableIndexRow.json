@@ -1,0 +1,88 @@
+{
+  "$defs": {
+    "DeliverableMode": {
+      "description": "CLIENT — a clean, client-ready pack (only on a client-usable coefficient set). DRAFT_INTERNAL\n— a watermarked \"DRAFT — not client-usable\" internal document. The client-usable gate (GRS-0015)\ndecides which; a CLIENT document can never be produced from a draft coefficient set.",
+      "enum": [
+        "client",
+        "draft_internal"
+      ],
+      "title": "DeliverableMode",
+      "type": "string"
+    },
+    "DeliverableType": {
+      "enum": [
+        "executive_summary",
+        "platform_power_report",
+        "infrastructure_heatmap",
+        "modernisation_roadmap",
+        "technical_appendix",
+        "workshop_output",
+        "score_evolution"
+      ],
+      "title": "DeliverableType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A read projection for the advisor's own deliverables index (GRS-0186): one row per\ngenerated deliverable, enriched with its engagement and client so the list links straight to\nthe record. Not a stored resource — it is only ever returned owner-scoped, so it carries no\n`OwnedResource` base.",
+  "properties": {
+    "engagement_id": {
+      "format": "uuid",
+      "title": "Engagement Id",
+      "type": "string"
+    },
+    "engagement_title": {
+      "title": "Engagement Title",
+      "type": "string"
+    },
+    "generated_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Generated At"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "mode": {
+      "$ref": "#/$defs/DeliverableMode"
+    },
+    "prospect_company_name": {
+      "title": "Prospect Company Name",
+      "type": "string"
+    },
+    "prospect_id": {
+      "format": "uuid",
+      "title": "Prospect Id",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "type": {
+      "$ref": "#/$defs/DeliverableType"
+    }
+  },
+  "required": [
+    "id",
+    "type",
+    "title",
+    "mode",
+    "engagement_id",
+    "engagement_title",
+    "prospect_id",
+    "prospect_company_name"
+  ],
+  "title": "DeliverableIndexRow",
+  "type": "object"
+}

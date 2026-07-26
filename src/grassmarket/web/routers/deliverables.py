@@ -15,7 +15,12 @@ from uuid import UUID
 
 from bcap_contracts.assessments import AssessmentDocument, AssessmentState
 from bcap_contracts.committee import CommitteeDecision
-from bcap_contracts.deliverables import Deliverable, DeliverableMode, DeliverableType
+from bcap_contracts.deliverables import (
+    Deliverable,
+    DeliverableIndexRow,
+    DeliverableMode,
+    DeliverableType,
+)
 from bcap_contracts.narratives import AINarrative
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
@@ -201,6 +206,17 @@ def list_deliverables(
         return repo.list_deliverables(principal, engagement_id)
     except (NotFoundError, ScopeViolationError) as exc:
         raise _not_found("Engagement not found.") from exc
+
+
+@router.get("/deliverables", response_model=list[DeliverableIndexRow])
+def list_all_deliverables(
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> list[DeliverableIndexRow]:
+    """The advisor's own deliverables index (GRS-0186), newest first, each enriched with its
+    engagement and client. Owner-scoped (self-only, even for an admin); an advisor with none gets
+    an empty list, never a 404."""
+    return repo.list_deliverables_for_consultant(principal)
 
 
 @router.get("/deliverables/{deliverable_id}/download")

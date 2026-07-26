@@ -676,6 +676,10 @@ class BrokeragePortfolioEntry(BaseModel):
     coverage: Score | None = None
     finalised_at: datetime | None = None
     updated_at: datetime
+    # The prospect this assessment's engagement belongs to (GRS-0186), so the portfolio row can
+    # link straight to the client record — set ONLY when the assessment is linked to an engagement,
+    # never fabricated when it is not (a missing link is None, not a guess).
+    linked_prospect_id: UUID | None = None
 
 
 # --- Dual-rating governance (Methodology §9) --------------------------------------------

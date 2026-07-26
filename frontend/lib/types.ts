@@ -190,6 +190,9 @@ export interface BrokeragePortfolioEntry {
   coverage?: number | null;
   finalised_at?: string | null;
   updated_at: string;
+  // The prospect this assessment's engagement belongs to (GRS-0186) — set only when linked, so the
+  // portfolio row can deep-link to the client record; null (never guessed) when unlinked.
+  linked_prospect_id?: string | null;
 }
 
 /** P10/P50/P90 band + the ADR-0008 honesty flag. modelled=false ⟹ a point estimate. */
@@ -648,6 +651,20 @@ export interface Deliverable {
   generated_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+// The advisor's own deliverables index row (GRS-0186) — a read projection enriched with the
+// engagement and client so the list links straight to the record. Mirrors DeliverableIndexRow.
+export interface DeliverableIndexRow {
+  id: string;
+  type: DeliverableType;
+  title: string;
+  mode: DeliverableMode;
+  generated_at: string | null;
+  engagement_id: string;
+  engagement_title: string;
+  prospect_id: string;
+  prospect_company_name: string;
 }
 
 // --- AI first-draft narratives (GRS-0017 backend `AINarrative` contract) ---
