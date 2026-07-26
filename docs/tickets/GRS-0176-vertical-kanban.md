@@ -1,6 +1,6 @@
 # GRS-0176 — Vertical Kanban for the pipeline
 
-**Status:** Planned (2026-07-23, founder feedback item 3). **Priority:** MED-HIGH.
+**Status:** In review (2026-07-25) — vertical stage bands, no horizontal scroll, per-card select removed; PR open. **Priority:** MED-HIGH.
 **Loop:** founder-feedback remediation, Wave 1. Frontend only.
 
 ## Why
