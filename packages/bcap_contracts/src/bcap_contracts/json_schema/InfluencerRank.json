@@ -1,0 +1,117 @@
+{
+  "additionalProperties": false,
+  "description": "One ranked analyst, reconstructed from the LSEG roster fields for the sampled tickers.",
+  "properties": {
+    "covered_rics": {
+      "default": [],
+      "description": "Sampled tickers this analyst was returned against.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Covered Rics",
+      "type": "array"
+    },
+    "email": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Email"
+    },
+    "estimate_rating": {
+      "anyOf": [
+        {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "TR.OverallAnalystEstimateRating, 0-100.",
+      "title": "Estimate Rating"
+    },
+    "full_name": {
+      "minLength": 1,
+      "title": "Full Name",
+      "type": "string"
+    },
+    "job_role": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Job Role"
+    },
+    "phone": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Phone"
+    },
+    "rank": {
+      "minimum": 1,
+      "title": "Rank",
+      "type": "integer"
+    },
+    "recommendation_rating": {
+      "anyOf": [
+        {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "TR.OverallAnalystRecommendationRatingT24M, 0-100, epoch-decoded on ingest.",
+      "title": "Recommendation Rating"
+    },
+    "tenure_start": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "TR.AnalystCreateDate — the tenure signal, not a hire date.",
+      "title": "Tenure Start"
+    },
+    "verified": {
+      "default": false,
+      "description": "Always false for an LSEG-derived row: the institution is inferred, not confirmed. The field exists so the renderer treats both layers identically.",
+      "title": "Verified",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "rank",
+    "full_name"
+  ],
+  "title": "InfluencerRank",
+  "type": "object"
+}

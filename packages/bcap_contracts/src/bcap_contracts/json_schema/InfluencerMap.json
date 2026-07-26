@@ -1,0 +1,274 @@
+{
+  "$defs": {
+    "InfluencerMapProvenance": {
+      "additionalProperties": false,
+      "description": "What this map was built from, so a reader can judge and reproduce it.",
+      "properties": {
+        "connector": {
+          "description": "Connector and version used for the pull.",
+          "minLength": 1,
+          "title": "Connector",
+          "type": "string"
+        },
+        "ctb_id": {
+          "description": "The LSEG contributor id the roster was filtered to.",
+          "title": "Ctb Id",
+          "type": "integer"
+        },
+        "generated_on": {
+          "format": "date",
+          "title": "Generated On",
+          "type": "string"
+        },
+        "rows_for_contributor": {
+          "minimum": 0,
+          "title": "Rows For Contributor",
+          "type": "integer"
+        },
+        "rows_returned": {
+          "minimum": 0,
+          "title": "Rows Returned",
+          "type": "integer"
+        },
+        "sample_rics": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Sample Rics",
+          "type": "array"
+        }
+      },
+      "required": [
+        "generated_on",
+        "ctb_id",
+        "sample_rics",
+        "connector",
+        "rows_returned",
+        "rows_for_contributor"
+      ],
+      "title": "InfluencerMapProvenance",
+      "type": "object"
+    },
+    "InfluencerOwner": {
+      "additionalProperties": false,
+      "description": "One row of the ownership and leadership layer, established by human web research.",
+      "properties": {
+        "full_name": {
+          "minLength": 1,
+          "title": "Full Name",
+          "type": "string"
+        },
+        "job_role": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Job Role"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "verified": {
+          "default": false,
+          "description": "True only where a human confirmed the person and role against a named source. Anything partial or unconfirmed stays false and renders flagged.",
+          "title": "Verified",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "full_name",
+        "source"
+      ],
+      "title": "InfluencerOwner",
+      "type": "object"
+    },
+    "InfluencerRank": {
+      "additionalProperties": false,
+      "description": "One ranked analyst, reconstructed from the LSEG roster fields for the sampled tickers.",
+      "properties": {
+        "covered_rics": {
+          "default": [],
+          "description": "Sampled tickers this analyst was returned against.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Covered Rics",
+          "type": "array"
+        },
+        "email": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Email"
+        },
+        "estimate_rating": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "TR.OverallAnalystEstimateRating, 0-100.",
+          "title": "Estimate Rating"
+        },
+        "full_name": {
+          "minLength": 1,
+          "title": "Full Name",
+          "type": "string"
+        },
+        "job_role": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Job Role"
+        },
+        "phone": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Phone"
+        },
+        "rank": {
+          "minimum": 1,
+          "title": "Rank",
+          "type": "integer"
+        },
+        "recommendation_rating": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "TR.OverallAnalystRecommendationRatingT24M, 0-100, epoch-decoded on ingest.",
+          "title": "Recommendation Rating"
+        },
+        "tenure_start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "TR.AnalystCreateDate — the tenure signal, not a hire date.",
+          "title": "Tenure Start"
+        },
+        "verified": {
+          "default": false,
+          "description": "Always false for an LSEG-derived row: the institution is inferred, not confirmed. The field exists so the renderer treats both layers identically.",
+          "title": "Verified",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "rank",
+        "full_name"
+      ],
+      "title": "InfluencerRank",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The three-tab artifact: the ranked influencers, the ownership path, and the raw rows.\n\n`raw_rows` is retained because the ranking is a judgement built on top of the pull, and a\nreader who disagrees with the ranking must be able to see what it was computed from.",
+  "properties": {
+    "caveat": {
+      "default": "Communications to sell-side research staff are compliance-logged by their firm, so treat every name here as a route to an introduction rather than a cold-outreach list. A warm referral through the ownership path below reaches the platform owner far more reliably than an unsolicited email to an analyst, and it does not put the recipient in an awkward position.",
+      "title": "Caveat",
+      "type": "string"
+    },
+    "influencers": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/InfluencerRank"
+      },
+      "title": "Influencers",
+      "type": "array"
+    },
+    "owners": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/InfluencerOwner"
+      },
+      "title": "Owners",
+      "type": "array"
+    },
+    "provenance": {
+      "$ref": "#/$defs/InfluencerMapProvenance"
+    },
+    "raw_rows": {
+      "default": [],
+      "items": {
+        "additionalProperties": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "type": "object"
+      },
+      "title": "Raw Rows",
+      "type": "array"
+    },
+    "target_id": {
+      "minLength": 1,
+      "title": "Target Id",
+      "type": "string"
+    },
+    "target_name": {
+      "minLength": 1,
+      "title": "Target Name",
+      "type": "string"
+    }
+  },
+  "required": [
+    "target_id",
+    "target_name",
+    "provenance"
+  ],
+  "title": "InfluencerMap",
+  "type": "object"
+}

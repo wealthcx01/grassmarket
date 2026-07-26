@@ -1,0 +1,50 @@
+{
+  "additionalProperties": false,
+  "description": "What this map was built from, so a reader can judge and reproduce it.",
+  "properties": {
+    "connector": {
+      "description": "Connector and version used for the pull.",
+      "minLength": 1,
+      "title": "Connector",
+      "type": "string"
+    },
+    "ctb_id": {
+      "description": "The LSEG contributor id the roster was filtered to.",
+      "title": "Ctb Id",
+      "type": "integer"
+    },
+    "generated_on": {
+      "format": "date",
+      "title": "Generated On",
+      "type": "string"
+    },
+    "rows_for_contributor": {
+      "minimum": 0,
+      "title": "Rows For Contributor",
+      "type": "integer"
+    },
+    "rows_returned": {
+      "minimum": 0,
+      "title": "Rows Returned",
+      "type": "integer"
+    },
+    "sample_rics": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Sample Rics",
+      "type": "array"
+    }
+  },
+  "required": [
+    "generated_on",
+    "ctb_id",
+    "sample_rics",
+    "connector",
+    "rows_returned",
+    "rows_for_contributor"
+  ],
+  "title": "InfluencerMapProvenance",
+  "type": "object"
+}
