@@ -1,7 +1,7 @@
 /**
  * The live-score panel — V/L/B/P and per-module q_m, each rendered through `BandDisplay` so the
  * ADR-0008 honesty flag is honoured (an unmodelled B or P shows a point, never a tight range). It
- * also surfaces the platform BOTTLENECK (the weakest module by q_m — "numbers rank", per the guide)
+ * also surfaces the platform BOTTLENECK (the weakest module by q_m, which the guide explains as the score that decides what to fix first)
  * and the full module breakdown, and turns raw blocking/finalise keys into human prose.
  */
 
@@ -66,17 +66,17 @@ export function LiveScorePanel({
             {final?.v_index != null ? (
               <LockedScore entry={final} />
             ) : (
-              <BandDisplay label="V — PLATFORM VALUE" band={score.v} point={score.v_point} />
+              <BandDisplay label="Platform Value (V)" band={score.v} point={score.v_point} />
             )}
             {/* The one-number rule (ADR-0040): every headline bolds the deterministic point; the
                 band supplies the modelled range only. */}
             <BandDisplay
-              label="L — INFRASTRUCTURE · THE TECHNOLOGY LAYER"
+              label="Infrastructure (L)"
               band={score.l_index}
               point={score.l_point}
             />
-            <BandDisplay label="B — BUSINESS" band={score.b} point={score.b_point} />
-            <BandDisplay label="P — POWER" band={score.p} point={score.p_point} />
+            <BandDisplay label="Business (B)" band={score.b} point={score.b_point} />
+            <BandDisplay label="Power (P)" band={score.p} point={score.p_point} />
           </div>
 
           <Bottleneck score={score} moduleLabels={moduleLabels} />

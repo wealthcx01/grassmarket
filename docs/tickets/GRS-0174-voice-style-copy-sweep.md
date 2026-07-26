@@ -1,6 +1,6 @@
 # GRS-0174 — Voice & style guide + application copy sweep
 
-**Status:** Planned (2026-07-23, founder feedback item 2). **Priority:** HIGH — lands first;
+**Status:** In review (2026-07-24) — STYLE-VOICE.md founder-approved; sweep of core surfaces done, PR open. **Priority:** HIGH — lands first;
 every later frontend ticket writes in the new register.
 **Loop:** founder-feedback remediation, Wave 1.
 

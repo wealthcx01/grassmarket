@@ -7,8 +7,8 @@
 import type { RecordProvenance } from "@/lib/types";
 
 const LABEL: Partial<Record<RecordProvenance, string>> = {
-  sandbox: "SANDBOX — non-production, not client-facing",
-  demo: "DEMO — illustrative only",
+  sandbox: "Sandbox: non-production, not client-facing",
+  demo: "Demo: illustrative only",
 };
 
 export function ProvenanceBadge({ provenance }: { provenance: RecordProvenance }) {

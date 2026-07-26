@@ -90,8 +90,8 @@ export function NarrativeReview({
     <div style={{ marginTop: "0.6rem", paddingTop: "0.6rem", borderTop: "1px dashed var(--color-border)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <h3 style={{ fontSize: "0.9rem", margin: 0 }}>AI narratives</h3>
-        <span className="mono" style={{ fontSize: "0.64rem", color: "var(--color-ink-muted)" }}>
-          AI proposes · a human approves
+        <span style={{ fontSize: "0.7rem", color: "var(--color-ink-muted)" }}>
+          Drafted by AI, and approved by you before it reaches a client.
         </span>
       </div>
 

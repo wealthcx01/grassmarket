@@ -21,9 +21,9 @@ export function LockedScore({ entry }: { entry: BrokeragePortfolioEntry }) {
         className="mono"
         style={{ fontSize: "0.66rem", letterSpacing: "0.08em", color: "var(--color-ink-muted)" }}
       >
-        V — PLATFORM VALUE · FINALISED
+        Platform Value (V), finalised
       </span>
-      <span title="The finalised run's deterministic score, with its stored P10–P90 uncertainty range (Methodology §7)">
+      <span title="The finalised score, with its stored likely range from the tenth to the ninetieth percentile (Methodology §7)">
         <strong className="mono" style={{ fontSize: "1.25rem" }}>
           {toDisplay(v).toFixed(1)}
         </strong>{" "}
@@ -50,7 +50,8 @@ export function LockedScore({ entry }: { entry: BrokeragePortfolioEntry }) {
         ) : null}
       </span>
       <p style={{ margin: "0.15rem 0 0", fontSize: "0.68rem", color: "var(--color-ink-faint)" }}>
-        The locked score — the same number your portfolio and the deliverable quote.
+        This is the locked score. It is the same number shown on your portfolio and in the
+        deliverable.
       </p>
     </div>
   );
