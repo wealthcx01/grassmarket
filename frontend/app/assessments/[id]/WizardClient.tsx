@@ -40,6 +40,11 @@ export function WizardClient({ id }: { id: string }) {
   const [assessment, setAssessment] = useState<Assessment | null>(null);
   const [document, setDocument] = useState<AssessmentDocument | null>(null);
   const [step, setStep] = useState(0);
+  // A paged step reports its position here (GRS-0181) so the stepper pill can say "module 3 of 9".
+  // A callback rather than lifting the pager state keeps the paging local to the step and leaves
+  // this orchestrator ignorant of registry shapes.
+  const [subStepLabel, setSubStepLabel] = useState<string | null>(null);
+  useEffect(() => setSubStepLabel(null), [step]);
   const [save, setSave] = useState<SaveState>("idle");
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -339,6 +344,7 @@ export function WizardClient({ id }: { id: string }) {
     previewingSandbox: cloningSandbox,
     clientUsable,
     finalEntry,
+    onSubStepChange: setSubStepLabel,
   };
 
   return (
@@ -358,9 +364,12 @@ export function WizardClient({ id }: { id: string }) {
         <SaveBadge state={save} readOnly={!!readOnly} />
       </div>
 
-      <Stepper current={step} onSelect={setStep} />
+      <Stepper current={step} onSelect={setStep} subStepLabel={subStepLabel} />
 
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 20rem", gap: "1.5rem", marginTop: "1rem" }}>
+      {/* Two columns above 900px, one below (GRS-0182). The breakpoint lives in globals.css
+          because an inline style cannot hold a media query, and below it the rail stops being
+          sticky — a sticky element in a single stacked column just pins to the top oddly. */}
+      <div className="wizard-two-col" style={{ display: "grid", gap: "1.5rem", marginTop: "1rem" }}>
         <div>
           <h2 style={{ fontSize: "1.15rem" }}>{WIZARD_STEPS[step]!.title}</h2>
           <Current {...stepProps} />
@@ -378,7 +387,7 @@ export function WizardClient({ id }: { id: string }) {
             </button>
           </div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div data-wizard-rail style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <LiveSummary live={live} profileKey={profileKey} clientUsable={clientUsable} final={finalEntry} />
           {!readOnly ? (
             <WizardSuggestionsPanel
@@ -398,7 +407,17 @@ export function WizardClient({ id }: { id: string }) {
   );
 }
 
-function Stepper({ current, onSelect }: { current: number; onSelect: (i: number) => void }) {
+function Stepper({
+  current,
+  onSelect,
+  subStepLabel,
+}: {
+  current: number;
+  onSelect: (i: number) => void;
+  // Where inside the active step we are, when that step pages (GRS-0181). Null on a step that
+  // does not page, or in show-all mode.
+  subStepLabel?: string | null;
+}) {
   return (
     <ol style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", listStyle: "none", padding: 0, margin: 0 }}>
       {WIZARD_STEPS.map((s, i) => (
@@ -411,6 +430,9 @@ function Stepper({ current, onSelect }: { current: number; onSelect: (i: number)
             style={{ fontSize: "0.75rem", padding: "0.3rem 0.75rem" }}
           >
             {i + 1}. {s.title}
+            {i === current && subStepLabel ? (
+              <span style={{ opacity: 0.75 }}> · {subStepLabel}</span>
+            ) : null}
           </button>
         </li>
       ))}

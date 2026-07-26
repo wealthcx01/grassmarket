@@ -1,6 +1,8 @@
 # GRS-0181 — Wizard pagination: smaller pages per module
 
-**Status:** Planned (2026-07-23, founder feedback item 9). **Priority:** MED-HIGH.
+**Status:** In review (2026-07-26) — both steps paged, show-all preference and sub-step
+stepper shipped; PR open (stacked on GRS-0182).
+(2026-07-23, founder feedback item 9.) **Priority:** MED-HIGH.
 **Loop:** founder-feedback remediation, Wave 1. Frontend only; document autosave and engine untouched.
 
 ## Why
