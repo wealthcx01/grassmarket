@@ -30,6 +30,7 @@ from grassmarket.earnings.commission import (
     compute_product_commission,
 )
 from grassmarket.pipeline.fees import is_within_attribution_window
+from tests.conftest import SeededConsultant, auth_header
 
 
 def _gbp(minor: int, ref: str = "contract:test") -> Money:
@@ -228,3 +229,44 @@ def test_recovery_window_boundaries() -> None:
     assert is_within_attribution_window(delivered, date(2025, 12, 31), window) is False
     # Same day (day 0) is eligible.
     assert is_within_attribution_window(delivered, delivered, window) is True
+
+
+# --- Stream-B rate card (GRS-0187) --------------------------------------------------------
+
+
+def test_consultancy_commissions_endpoint_lists_the_matrix(
+    client, alice: SeededConsultant
+) -> None:
+    response = client.get("/earnings/consultancy-commissions", headers=auth_header(alice))
+    assert response.status_code == 200, response.text
+    rows = response.json()
+    assert len(rows) == 4
+    assert [(r["delivery_label"], r["sourcing_label"]) for r in rows] == [
+        ("Bruntsfield-led", "Self-sourced"),
+        ("Bruntsfield-led", "Firm-sourced"),
+        ("Consultant-led", "Self-sourced"),
+        ("Consultant-led", "Firm-sourced"),
+    ]
+    assert all(r["schedule_version"] for r in rows)
+
+
+def test_consultancy_commissions_needs_authentication(client) -> None:
+    assert client.get("/earnings/consultancy-commissions").status_code == 401
+
+
+def test_the_statement_states_how_consulting_pays_even_with_no_consultancy_lines(
+    client, alice: SeededConsultant
+) -> None:
+    """A statement showing no consultancy should still say how consulting would be paid — the
+    absence of a line is not an answer to "what do I earn on consulting?"."""
+    response = client.get("/earnings/statement", headers=auth_header(alice))
+    assert response.status_code == 200, response.text
+    # The .docx is a zip; the document text lives in word/document.xml.
+    import zipfile
+    from io import BytesIO
+
+    with zipfile.ZipFile(BytesIO(response.content)) as bundle:
+        xml = bundle.read("word/document.xml").decode("utf-8")
+    assert "Consulting commissions (Stream B)" in xml
+    assert "Consultant-led" in xml
+    assert "65% first year" in xml

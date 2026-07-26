@@ -373,7 +373,12 @@ def _two_tier_commission_lesson(
         f"**{_pct(redist.yr1_bps)}** ({_pct(redist.yr2_bps)} in Year 2). Distribution pays more "
         f"because it is the self-serve, higher-volume motion you can drive; redistribution is a "
         f"lower-rate, enterprise-negotiated model. Qualify which one a deal is before you forecast "
-        f"the commission."
+        f"the commission.\n\n"
+        f"The two are also scoped to different segments (GRS-0185), so the sell panel will not "
+        f"offer you both on the same report. DISTRIBUTION is for retail brokerages, where the "
+        f"motive is keeping the client's own app on-brand. REDISTRIBUTION is for exchanges and "
+        f"information vendors, where the motive is licensing brand data onward to their customers "
+        f"as part of the reference data they already distribute."
     )
     return Lesson(
         id=_id("lesson", "two-tier-rates"),

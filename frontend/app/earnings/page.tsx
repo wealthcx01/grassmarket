@@ -20,6 +20,7 @@ import type {
   EarningsSummary,
   EarningsTimeline,
   PaymentStatus,
+  ConsultancyCommissionCarrot,
   ProductCommissionCarrot,
 } from "@/lib/types";
 
@@ -74,6 +75,7 @@ export default function EarningsPage() {
   const [summary, setSummary] = useState<EarningsSummary | null>(null);
   const [lines, setLines] = useState<CommissionLine[] | null>(null);
   const [carrots, setCarrots] = useState<ProductCommissionCarrot[]>([]);
+  const [consultancyCarrots, setConsultancyCarrots] = useState<ConsultancyCommissionCarrot[]>([]);
   const [timeline, setTimeline] = useState<EarningsTimeline | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
@@ -84,12 +86,14 @@ export default function EarningsPage() {
       api.listCommissions(signal),
       api.productCommissions(signal),
       api.earningsTimeline(signal),
+      api.consultancyCommissions(signal),
     ])
-      .then(([s, l, c, t]) => {
+      .then(([s, l, c, t, cc]) => {
         setSummary(s);
         setLines(l);
         setCarrots(c);
         setTimeline(t);
+        setConsultancyCarrots(cc);
       })
       .catch((err: unknown) => {
         if (err instanceof ApiError && err.status === 0 && err.aborted) return;
@@ -240,6 +244,49 @@ export default function EarningsPage() {
                 </p>
                 <p style={{ margin: "0.35rem 0 0", fontSize: "0.8rem", color: "var(--color-ink-muted)" }}>
                   e.g. <MoneyAmount money={c.yr1_commission} /> then <MoneyAmount money={c.yr2_commission} />
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {/* Stream B (GRS-0187). The page used to show "Consultancy £0.00" and say nothing about how
+          consulting is paid at all, so an advisor could not tell whether the zero meant "you have
+          earned nothing yet" or "this is not a thing you earn on". */}
+      {consultancyCarrots.length > 0 ? (
+        <section>
+          <h2 style={{ fontSize: "1rem", margin: "0 0 0.6rem" }}>Consulting (Stream B)</h2>
+          <p style={{ margin: "0 0 0.75rem", color: "var(--color-ink-muted)", fontSize: "0.82rem", maxWidth: "42rem" }}>
+            What you earn on direct consulting work. What you take depends on two things: who
+            delivers the engagement, and who brought it in. These rates are read live from the
+            commission schedule, never typed in by hand. The first-year rate applies for twelve
+            months and the ongoing rate applies after that, uncapped.
+          </p>
+          <ul
+            style={{
+              listStyle: "none",
+              margin: 0,
+              padding: 0,
+              display: "grid",
+              gap: "0.75rem",
+              gridTemplateColumns: "repeat(auto-fill, minmax(14rem, 1fr))",
+            }}
+          >
+            {consultancyCarrots.map((c) => (
+              <li
+                key={`${c.delivery_type}:${c.sourcing}`}
+                style={{ padding: "0.9rem 1rem", background: "var(--color-paper-raised)", border: "1px solid var(--color-border)", borderRadius: "var(--radius)" }}
+              >
+                <p style={{ margin: 0, fontWeight: 600, fontSize: "0.92rem" }}>
+                  {c.delivery_label} · {c.sourcing_label}
+                </p>
+                <p className="mono" style={{ margin: "0.35rem 0 0", fontSize: "0.78rem", color: "var(--color-accent)" }}>
+                  {c.yr1_bps / 100}% first year · {c.thereafter_bps / 100}% thereafter
+                </p>
+                <p style={{ margin: "0.35rem 0 0", fontSize: "0.8rem", color: "var(--color-ink-muted)" }}>
+                  e.g. <MoneyAmount money={c.yr1_commission} /> then{" "}
+                  <MoneyAmount money={c.thereafter_commission} />
                 </p>
               </li>
             ))}

@@ -186,18 +186,56 @@ def test_report_with_no_agreed_product_for_its_gaps_recommends_nothing() -> None
     assert out.opportunities == ()
 
 
-def test_power_only_gaps_rank_after_module_gaps_and_tie_on_product_id() -> None:
-    """WeBull: no addressed module gaps, but BRANDING is Emerging → both Brandfetch products list
-    on the power gap, tied severity, product_id order. (Also proves commission never reorders —
-    distribution at 750bps and redistribution at 375bps sort identically.)"""
+def test_power_only_gaps_are_listed_and_scoped_to_the_segment() -> None:
+    """WeBull: no addressed module gaps, but BRANDING is Emerging, so a Brandfetch product lists
+    on the power gap.
+
+    Only the DISTRIBUTION variant, though. WeBull is a retail brokerage, and redistribution is an
+    exchange/vendor licence (GRS-0185). Before the re-scoping both variants carried
+    `profiles: [retail]` and this test asserted both were offered, which was the founder's
+    complaint: the panel could recommend a venue's data-licensing product to a retail broker."""
     out = sell_opportunities(_finalised(showcase_document(WEBULL)))
-    assert [o.product_id for o in out.opportunities] == [
-        "brandfetch_distribution",
-        "brandfetch_redistribution",
-    ]
+    assert [o.product_id for o in out.opportunities] == ["brandfetch_distribution"]
     for o in out.opportunities:
         assert [g.kind for g in o.gaps] == [GapKind.POWER]
         assert {g.key for g in o.gaps} == {"BRANDING"}
+
+
+def test_a_retail_report_never_offers_the_redistribution_licence() -> None:
+    """The segment separation, asserted across every retail showcase subject rather than one."""
+    for spec in (REVOLUT, WEBULL):
+        out = sell_opportunities(_finalised(showcase_document(spec)))
+        assert all(o.product_id != "brandfetch_redistribution" for o in out.opportunities), (
+            spec.subject
+        )
+
+
+def test_the_two_brandfetch_variants_target_different_segments() -> None:
+    """Config-level proof of the split, independent of any one assessment's gaps."""
+    fit = load_product_fit()
+    distribution = fit.products["brandfetch_distribution"]
+    redistribution = fit.products["brandfetch_redistribution"]
+    assert distribution.profiles == ("retail",)
+    assert redistribution.profiles == ("exchange",)
+    # No segment sees both.
+    assert set(distribution.profiles).isdisjoint(redistribution.profiles)
+    # The fit TARGETS differ too, not just the prose: a retail customer-navigation module does
+    # not describe a venue redistributing reference data.
+    assert distribution.c_modules == ("CUST_UI_NAVIGATION",)
+    assert redistribution.c_modules == ()
+
+
+def test_an_unknown_operating_model_profile_fails_loud(patched_fit) -> None:
+    """Key drift in the fit map must abort at load, not silently drop a product (#3).
+
+    This is what keeps the segment split honest: `information_vendor` is the profile the
+    redistribution licence should eventually carry, and until the registry has it, naming it here
+    fails the load rather than quietly scoping the product to nothing."""
+    raw = _fit_yaml_with({})
+    raw["products"]["brandfetch_redistribution"]["profiles"] = ["information_vendor"]
+    patched_fit(raw)
+    with pytest.raises(ProductFitError):
+        load_product_fit()
 
 
 def _spec_with(

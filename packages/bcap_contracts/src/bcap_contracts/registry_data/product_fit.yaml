@@ -32,20 +32,31 @@ products:
     pitch: >-
       An always-fresh Benzinga news / ratings / signals feed answers a market-content and
       engagement gap — enriched ticker pages and research surfaces that keep clients in-app.
+  # The two Brandfetch licences serve different segments and must never be offered to the wrong
+  # one (GRS-0185). Distribution is about the client's OWN app looking right; redistribution is
+  # about licensing brand data onward to the client's customers. They carried identical stanzas,
+  # so a retail report could be sold either.
   brandfetch_distribution:
     profiles: [retail]
-    # Brand-asset API (distribution licence) — brand consistency across surfaces.
+    # Brand-asset API (distribution licence) — brand consistency across the client's own surfaces.
     modules: [CMS, FRONTEND]
     c_modules: [CUST_UI_NAVIGATION]
     powers: [BRANDING]
     pitch: >-
-      Brandfetch's logo/brand API keeps every instrument and merchant surface on-brand — a fix
-      for content-management and front-end consistency gaps that cheapen the UI.
+      Brandfetch's brand API renders logos and brand assets inside your own app, so every
+      instrument and merchant surface stays on-brand. It addresses the content-management and
+      front-end gaps that make a retail interface look cheaper than the platform behind it.
   brandfetch_redistribution:
-    profiles: [retail]
+    # Exchanges and information vendors only. An information-vendor profile does not exist in the
+    # registry yet and the loader refuses an unknown one, so this stays [exchange] until that
+    # profile is added, at which point it becomes [exchange, information_vendor].
+    profiles: [exchange]
+    # No c_modules: CUST_UI_NAVIGATION is a retail customer-navigation module and does not
+    # describe a venue redistributing data. The fit targets differ, not just the prose, so this
+    # variant is matched against a venue's real gaps rather than a retail one's.
     modules: [CMS, FRONTEND]
-    c_modules: [CUST_UI_NAVIGATION]
     powers: [BRANDING]
     pitch: >-
-      Brandfetch under a redistribution licence — the same brand-asset coverage where the client
-      re-serves assets to their own customers.
+      A redistribution licence lets you serve Brandfetch's brand data onward to your own
+      customers, as part of the reference data your venue already distributes. This is a
+      data-licensing capability, not app chrome.

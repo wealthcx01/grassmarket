@@ -1,6 +1,7 @@
 # GRS-0185 — Brandfetch variant segment scoping
 
-**Status:** Planned (2026-07-23, founder feedback item 13). **Priority:** MED-HIGH.
+**Status:** In review (2026-07-26) — profiles split, stanzas differentiated, Academy note
+added; PR open. (2026-07-23, founder feedback item 13.) **Priority:** MED-HIGH.
 **Loop:** founder-feedback remediation, Wave 1. Amends the ADR-0039 fit map (config).
 
 ## Why

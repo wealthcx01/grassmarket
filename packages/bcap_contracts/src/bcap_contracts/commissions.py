@@ -270,6 +270,40 @@ class EarningsSummary(BaseModel):
     line_count: int = Field(ge=0)
 
 
+class ConsultancyCommissionCarrot(BaseModel):
+    """The live "how much you earn" figure for one Stream-B matrix cell (GRS-0187).
+
+    The earnings page explained product commissions and said nothing about direct consulting,
+    showing only "Consultancy (Stream B) £0.00" with no account of the matrix behind it. The
+    computation already existed; this is the shape that surfaces it.
+
+    Mirrors `ProductCommissionCarrot`: rates read from the live schedule, never re-typed, with a
+    worked example so an advisor sees a pound figure beside a percentage, and `schedule_version`
+    stamped so the figure is never bare.
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    delivery_type: DeliveryType
+    sourcing: SourcingAttribution
+    delivery_label: str = Field(
+        min_length=1, description="Human wording, produced with the rate rather than in the UI."
+    )
+    sourcing_label: str = Field(min_length=1)
+    yr1_bps: int = Field(ge=0)
+    thereafter_bps: int = Field(
+        ge=0, description="The ongoing rate after the first 12 months — uncapped (ADR-0026)."
+    )
+    example_deal: Money = Field(description="The illustrative engagement the example prices.")
+    yr1_commission: Money = Field(description="Year-1 commission on the example (live compute).")
+    thereafter_commission: Money = Field(
+        description="Ongoing annual commission on the example (live compute)."
+    )
+    schedule_version: str = Field(
+        min_length=1, description="The commission-config version stamped."
+    )
+
+
 class ProductCommissionCarrot(BaseModel):
     """The live "how much you earn" figure for a Stream-A product (GRS-0123) — the commission carrot
     on a product course. Resolved from the Earnings v7 schedule (never re-typed): the Year-1 and

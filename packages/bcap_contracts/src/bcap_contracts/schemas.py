@@ -47,6 +47,7 @@ from bcap_contracts.certification import (
 )
 from bcap_contracts.commissions import (
     CommissionLine,
+    ConsultancyCommissionCarrot,
     EarningsSummary,
     EarningsTimeline,
     ProductCommissionCarrot,
@@ -135,6 +136,7 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "EarningsSummary": EarningsSummary,
     "EarningsTimeline": EarningsTimeline,
     "ProductCommissionCarrot": ProductCommissionCarrot,
+    "ConsultancyCommissionCarrot": ConsultancyCommissionCarrot,
     "ProductFitMap": ProductFitMap,
     "SellOpportunity": SellOpportunity,
     "SellOpportunities": SellOpportunities,
