@@ -66,7 +66,9 @@ from bcap_contracts.learning import (
     DrillResult,
     GeneratedQuiz,
     LearningModule,
+    LessonAsset,
     LessonCompletion,
+    SourceRef,
 )
 from bcap_contracts.meetings import MeetingTranscript
 from bcap_contracts.money import Money
@@ -136,6 +138,8 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "CertificationProgress": CertificationProgress,
     "DrillResult": DrillResult,
     "DrillCard": DrillCard,
+    "SourceRef": SourceRef,
+    "LessonAsset": LessonAsset,
     "LearningModule": LearningModule,
     "ContentCompletion": ContentCompletion,
     "GeneratedQuiz": GeneratedQuiz,

@@ -12,6 +12,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { Breadcrumb } from "@/components/Breadcrumb";
+import { LessonBody } from "@/components/workbench/LessonBody";
 import { ApiError, api, getToken } from "@/lib/api";
 import type {
   CertificationCredit,
@@ -20,6 +21,8 @@ import type {
   CourseVersion,
   Lesson,
   LessonAuthor,
+  SourceRef,
+  SourceRefKind,
 } from "@/lib/types";
 
 function uid(): string {
@@ -262,6 +265,25 @@ function ModuleEditor({
   const [lessonTitle, setLessonTitle] = useState("");
   const [lessonBody, setLessonBody] = useState("");
   const [lessonAuthor, setLessonAuthor] = useState<LessonAuthor>("human");
+  const [lessonVideo, setLessonVideo] = useState("");
+  const [lessonReferences, setLessonReferences] = useState<SourceRef[]>([]);
+  const [refTitle, setRefTitle] = useState("");
+  const [refUrl, setRefUrl] = useState("");
+  const [refKind, setRefKind] = useState<SourceRefKind>("docs");
+
+  // A reference is only addable once it is one the contract would accept, so a bad URL is caught
+  // while the author is looking at it rather than as a 422 on save.
+  const refUrlOk = /^https:\/\/[^\s]+$/.test(refUrl.trim());
+
+  function addReference() {
+    if (!refTitle.trim() || !refUrlOk) return;
+    setLessonReferences((prev) => [
+      ...prev,
+      { title: refTitle.trim(), url: refUrl.trim(), kind: refKind },
+    ]);
+    setRefTitle("");
+    setRefUrl("");
+  }
 
   function addLesson() {
     if (!lessonTitle.trim() || !lessonBody.trim()) return;
@@ -271,7 +293,9 @@ function ModuleEditor({
       body: lessonBody.trim(),
       order: module.lessons.length,
       author: lessonAuthor,
-      video_ref: null,
+      video_ref: lessonVideo.trim() || null,
+      references: lessonReferences,
+      assets: [],
       drill_topics: [],
       measurement: null,
       // A human lesson is inherently approved; an AI lesson starts unapproved and is gated.
@@ -283,6 +307,8 @@ function ModuleEditor({
     setLessonTitle("");
     setLessonBody("");
     setLessonAuthor("human");
+    setLessonVideo("");
+    setLessonReferences([]);
   }
 
   return (
@@ -338,7 +364,46 @@ function ModuleEditor({
             <option value="ai">AI-authored</option>
           </select>
         </div>
-        <textarea value={lessonBody} onChange={(e) => setLessonBody(e.target.value)} placeholder="Lesson body (markdown)" rows={2} style={{ ...inputStyle, resize: "vertical" }} />
+        <textarea value={lessonBody} onChange={(e) => setLessonBody(e.target.value)} placeholder="Lesson body (markdown: ## headings, **bold**, lists, tables, ```code```, [links](https://…))" rows={4} style={{ ...inputStyle, resize: "vertical" }} />
+        <input value={lessonVideo} onChange={(e) => setLessonVideo(e.target.value)} placeholder="YouTube URL or 11-character id (optional)" style={inputStyle} />
+        <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
+          <input value={refTitle} onChange={(e) => setRefTitle(e.target.value)} placeholder="Source title" style={{ ...inputStyle, flex: "1 1 9rem" }} />
+          <input value={refUrl} onChange={(e) => setRefUrl(e.target.value)} placeholder="https://…" style={{ ...inputStyle, flex: "1 1 11rem" }} />
+          <select value={refKind} onChange={(e) => setRefKind(e.target.value as SourceRefKind)} style={inputStyle}>
+            <option value="docs">Docs</option>
+            <option value="video">Video</option>
+            <option value="blog">Article</option>
+            <option value="repo">Repo</option>
+          </select>
+          <button type="button" className="btn" onClick={addReference} disabled={!refTitle.trim() || !refUrlOk}>
+            + Source
+          </button>
+        </div>
+        {refUrl.trim() && !refUrlOk ? (
+          <p style={{ margin: 0, fontSize: "0.76rem", color: "var(--color-warn)" }}>
+            A source URL must start with https://. Anything else is refused when the draft is saved.
+          </p>
+        ) : null}
+        {lessonReferences.length > 0 ? (
+          <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexWrap: "wrap", gap: "0.35rem" }}>
+            {lessonReferences.map((r, i) => (
+              <li key={`${r.url}:${i}`} className="tag" style={{ fontSize: "0.68rem", display: "flex", gap: "0.35rem", alignItems: "center" }}>
+                {r.kind} · {r.title}
+                <button type="button" className="btn" style={{ padding: "0 0.25rem" }} onClick={() => setLessonReferences((prev) => prev.filter((_, n) => n !== i))} title="Remove source">
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {lessonBody.trim() ? (
+          <div style={{ borderTop: "1px dashed var(--color-border)", paddingTop: "0.5rem" }}>
+            <p className="mono" style={{ margin: "0 0 0.3rem", fontSize: "0.64rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-ink-faint)" }}>
+              Preview — exactly what an advisor sees
+            </p>
+            <LessonBody body={lessonBody} videoRef={lessonVideo.trim() || null} references={lessonReferences} />
+          </div>
+        ) : null}
         <button type="button" className="btn" style={{ alignSelf: "flex-start" }} onClick={addLesson} disabled={!lessonTitle.trim() || !lessonBody.trim()}>
           + Add lesson
         </button>

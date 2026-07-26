@@ -179,3 +179,133 @@ def test_completing_a_lesson_twice_is_refused(
     repo.complete_lesson(alice.principal, "once", a.id, now=_NOW)
     with pytest.raises(ConflictError):
         repo.complete_lesson(alice.principal, "once", a.id, now=_NOW)
+
+
+# ---------------------------------------------------- rich lesson content (GRS-0190)
+# The renderer's contract half: references are https-only and assets are non-empty AT THE CONTRACT,
+# so malformed content is refused by existing validation rather than reaching a published version
+# and having to be caught by the renderer.
+
+
+def _rich_lesson() -> Lesson:
+    from bcap_contracts.learning import LessonAsset, SourceRef, SourceRefKind
+
+    return Lesson(
+        id=uuid.uuid4(),
+        title="Rich lesson",
+        body=(
+            "## A heading\n\nProse with **bold** and a [link](https://docs.openbb.co).\n\n"
+            "- one\n- two"
+        ),
+        order=0,
+        video_ref="https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        references=(
+            SourceRef(title="Platform docs", url="https://docs.openbb.co", kind=SourceRefKind.DOCS),
+            SourceRef(
+                title="The pivot", url="https://openbb.co/blog/pivot", kind=SourceRefKind.BLOG
+            ),
+            SourceRef(
+                title="Repo",
+                url="https://github.com/OpenBB-finance/OpenBB",
+                kind=SourceRefKind.REPO,
+            ),
+        ),
+        assets=(
+            LessonAsset(
+                caption="The barbell",
+                alt="Two heavy ends joined by a thin bar",
+                svg='<svg viewBox="0 0 10 10"><rect x="0" y="0" width="4" height="10" /></svg>',
+            ),
+        ),
+    )
+
+
+def test_a_rich_lesson_round_trips_through_save_publish_and_fetch(
+    repo: Repository, admin: SeededConsultant
+) -> None:
+    repo.create_course(admin.principal, slug="rich", title="Rich", summary="s")
+    repo.save_course_draft(admin.principal, "rich", _tree(_rich_lesson()))
+    published = repo.publish_course(admin.principal, "rich", now=_NOW)
+    lesson = published.tree.modules[0].lessons[0]
+    assert lesson.video_ref == "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    assert [r.url for r in lesson.references] == [
+        "https://docs.openbb.co",
+        "https://openbb.co/blog/pivot",
+        "https://github.com/OpenBB-finance/OpenBB",
+    ]
+    assert lesson.assets[0].alt == "Two heavy ends joined by a thin bar"
+    assert "## A heading" in lesson.body
+
+
+def test_a_lesson_without_the_new_fields_still_publishes_and_serves(
+    repo: Repository, admin: SeededConsultant
+) -> None:
+    # Every seeded course predates GRS-0190 and must be unaffected by it.
+    repo.create_course(admin.principal, slug="plain", title="Plain", summary="s")
+    repo.save_course_draft(admin.principal, "plain", _tree(_lesson(0)))
+    published = repo.publish_course(admin.principal, "plain", now=_NOW)
+    lesson = published.tree.modules[0].lessons[0]
+    assert lesson.references == ()
+    assert lesson.assets == ()
+    assert lesson.video_ref is None
+
+
+def test_a_non_https_reference_is_refused_by_the_contract(
+    client, admin: SeededConsultant, repo: Repository
+) -> None:
+    repo.create_course(admin.principal, slug="badref", title="Bad", summary="s")
+    draft = _tree(_lesson(0)).model_dump(mode="json")
+    draft["modules"][0]["lessons"][0]["references"] = [
+        {"title": "Downgraded", "url": "http://example.com", "kind": "docs"}
+    ]
+    assert (
+        client.put(
+            "/workbench/courses/badref/draft", json=draft, headers=auth_header(admin)
+        ).status_code
+        == 422
+    )
+
+
+def test_an_unknown_reference_kind_is_refused(
+    client, admin: SeededConsultant, repo: Repository
+) -> None:
+    repo.create_course(admin.principal, slug="badkind", title="Bad", summary="s")
+    draft = _tree(_lesson(0)).model_dump(mode="json")
+    draft["modules"][0]["lessons"][0]["references"] = [
+        {"title": "Odd", "url": "https://example.com", "kind": "podcast"}
+    ]
+    assert (
+        client.put(
+            "/workbench/courses/badkind/draft", json=draft, headers=auth_header(admin)
+        ).status_code
+        == 422
+    )
+
+
+def test_an_empty_asset_is_refused(client, admin: SeededConsultant, repo: Repository) -> None:
+    repo.create_course(admin.principal, slug="badasset", title="Bad", summary="s")
+    draft = _tree(_lesson(0)).model_dump(mode="json")
+    draft["modules"][0]["lessons"][0]["assets"] = [{"caption": "c", "alt": "a", "svg": ""}]
+    assert (
+        client.put(
+            "/workbench/courses/badasset/draft", json=draft, headers=auth_header(admin)
+        ).status_code
+        == 422
+    )
+
+
+def test_an_asset_without_alt_text_is_refused(
+    client, admin: SeededConsultant, repo: Repository
+) -> None:
+    # Alt text is required and never derived: a diagram nobody can read is not accessible content.
+    repo.create_course(admin.principal, slug="noalt", title="Bad", summary="s")
+    draft = _tree(_lesson(0)).model_dump(mode="json")
+    draft["modules"][0]["lessons"][0]["assets"] = [
+        {"caption": "c", "alt": "", "svg": "<svg viewBox='0 0 1 1'></svg>"}
+    ]
+    assert (
+        client.put(
+            "/workbench/courses/noalt/draft", json=draft, headers=auth_header(admin)
+        ).status_code
+        == 422
+    )

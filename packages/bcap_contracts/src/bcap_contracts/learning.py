@@ -154,6 +154,47 @@ class GeneratedQuiz(OwnedResource):
 # version until a human approves it.
 
 
+class SourceRefKind(StrEnum):
+    """What kind of thing a lesson reference points at, so the reader can label the link card."""
+
+    DOCS = "docs"
+    VIDEO = "video"
+    BLOG = "blog"
+    REPO = "repo"
+
+
+class SourceRef(BaseModel):
+    """A cited public source on a lesson (GRS-0190).
+
+    `url` is https-only at the CONTRACT, not merely in the renderer: schema validation refuses
+    `http://` and non-URL strings, so a downgraded or javascript: link cannot reach a published
+    course version in the first place. The renderer's own check is then a second line rather than
+    the only one.
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    title: str = Field(min_length=1)
+    url: str = Field(pattern=r"^https://")
+    kind: SourceRefKind
+
+
+class LessonAsset(BaseModel):
+    """An interpretive diagram on a lesson (GRS-0190).
+
+    Assets are inline SVG strings held in the content itself, not files. A published
+    `CourseVersion` is an immutable snapshot, and a snapshot that pointed at external asset storage
+    would not actually be immutable: the file behind it could change or vanish. Raster images are
+    deliberately out of contract; a photograph belongs behind a `SourceRef`.
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    caption: str = Field(min_length=1)
+    alt: str = Field(min_length=1, description="Text alternative. Required, never derived.")
+    svg: str = Field(min_length=1)
+
+
 class LessonAuthor(StrEnum):
     """Who wrote a lesson. AI-authored content is approval-gated before it can be published (#8)."""
 
@@ -174,6 +215,12 @@ class Lesson(BaseModel):
     order: int = Field(ge=0)
     author: LessonAuthor = LessonAuthor.HUMAN
     video_ref: str | None = None
+    references: tuple[SourceRef, ...] = Field(
+        default=(), description="Cited public sources, rendered as link cards (GRS-0190)."
+    )
+    assets: tuple[LessonAsset, ...] = Field(
+        default=(), description="Inline SVG diagrams rendered with the lesson body (GRS-0190)."
+    )
     drill_topics: tuple[str, ...] = Field(
         default=(), description="Existing DrillCard topics this lesson reinforces (e.g. 'power:…')."
     )

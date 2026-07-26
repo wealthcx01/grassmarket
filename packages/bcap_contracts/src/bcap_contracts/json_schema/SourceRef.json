@@ -1,0 +1,39 @@
+{
+  "$defs": {
+    "SourceRefKind": {
+      "description": "What kind of thing a lesson reference points at, so the reader can label the link card.",
+      "enum": [
+        "docs",
+        "video",
+        "blog",
+        "repo"
+      ],
+      "title": "SourceRefKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A cited public source on a lesson (GRS-0190).\n\n`url` is https-only at the CONTRACT, not merely in the renderer: schema validation refuses\n`http://` and non-URL strings, so a downgraded or javascript: link cannot reach a published\ncourse version in the first place. The renderer's own check is then a second line rather than\nthe only one.",
+  "properties": {
+    "kind": {
+      "$ref": "#/$defs/SourceRefKind"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "url": {
+      "pattern": "^https://",
+      "title": "Url",
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "url",
+    "kind"
+  ],
+  "title": "SourceRef",
+  "type": "object"
+}
