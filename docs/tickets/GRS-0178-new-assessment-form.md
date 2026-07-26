@@ -1,6 +1,7 @@
 # GRS-0178 — New-assessment creation form redesign
 
-**Status:** Planned (2026-07-23, founder feedback item 5). **Priority:** MED.
+**Status:** In review (2026-07-26) — grid layout shipped, PR open (stacked on GRS-0177).
+(2026-07-23, founder feedback item 5.) **Priority:** MED.
 **Loop:** founder-feedback remediation, Wave 1. Frontend only.
 
 ## Why

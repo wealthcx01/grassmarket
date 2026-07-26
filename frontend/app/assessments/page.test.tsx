@@ -141,12 +141,41 @@ describe("Portfolio page (GRS-0177)", () => {
   });
 
   describe("the sandbox option reads in plain words", () => {
-    it("says what a practice copy is, without jargon", async () => {
+    it("says what a practice copy is, in visible text rather than a tooltip", async () => {
+      // GRS-0178: an advisor deciding whether to tick this should not have to hover to find out.
       await renderPage([entry("p", "Monzo", "production")]);
-      const label = await screen.findByText(/Make this a private practice copy/);
-      const title = (label.closest("label") as HTMLElement).getAttribute("title") ?? "";
-      expect(title).toMatch(/without a second rater or a committee/);
-      expect(title).toMatch(/never reach a client/);
+      await screen.findByText(/Make this a private practice copy/);
+      const explanation = screen.getByText(/without a second rater or a committee/);
+      expect(explanation).toBeTruthy();
+      expect(explanation.textContent).toMatch(/never reach a client/);
+    });
+
+    it("labels the checkbox so clicking the text toggles it", async () => {
+      await renderPage([entry("p", "Monzo", "production")]);
+      const checkbox = (await screen.findByLabelText(/Make this a private practice copy/)) as HTMLInputElement;
+      expect(checkbox.type).toBe("checkbox");
+      expect(checkbox.checked).toBe(false);
+      fireEvent.click(checkbox);
+      expect(checkbox.checked).toBe(true);
+    });
+  });
+
+  describe("the creation form is aligned by structure (GRS-0178)", () => {
+    it("lays the fields out on a grid rather than a flex row with padded alignment", async () => {
+      const { container } = await renderPage([entry("p", "Monzo", "production")]);
+      const form = container.querySelector("form") as HTMLElement;
+      expect(form.className).toBe("form-create-assessment");
+      // The magic number that used to fake the baseline is gone. (0.55rem still appears as
+      // ordinary input padding, so the assertion names the property, not the value.)
+      expect(form.innerHTML).not.toContain("padding-bottom");
+      expect(form.getAttribute("style")).toBeNull();
+    });
+
+    it("keeps the three fields and the submit control", async () => {
+      await renderPage([entry("p", "Monzo", "production")]);
+      expect(screen.getByText(/subject company/i)).toBeTruthy();
+      expect(screen.getByText("Operating model")).toBeTruthy();
+      expect(screen.getByRole("button", { name: /Create and open/ })).toBeTruthy();
     });
   });
 
