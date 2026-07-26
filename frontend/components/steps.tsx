@@ -6,7 +6,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { CommitteeReviewPanel } from "@/components/CommitteeReviewPanel";
 import { DiagnosticsPanel } from "@/components/Diagnostics";
@@ -59,6 +59,9 @@ export interface StepProps {
   // Whether the assessment's operating-model profile scores on a client-usable set (GRS-0156) —
   // gates the "indicative, not client-usable" caveat on the score views.
   clientUsable: boolean;
+  // Where a paged step currently is (GRS-0181), so the stepper pill can read
+  // "module 3 of 9". Null in show-all mode or on a step that does not page.
+  onSubStepChange?: (label: string | null) => void;
   // The finalised portfolio row (GRS-0166): the immutable run's v_index + stored band, so the
   // Summary panel headlines the SAME locked score the portfolio and deliverable quote. Null while
   // draft/in-progress (the live view applies).
@@ -637,8 +640,183 @@ export function StrategicPowersStep({ registry, document: d, update, readOnly }:
 
 type SubChoice = "" | MaturityLevel | "Not Applicable" | "Not Assessed";
 
-export function InfrastructureDeepDiveStep({ registry, document: d, update, readOnly }: StepProps) {
+/** The persisted reading preference shared by both paged steps (GRS-0181). A display habit that
+ *  should follow an advisor across every assessment on this device, so localStorage rather than
+ *  account data — the same reasoning as the portfolio's demo note. Default OFF, i.e. paged, so a
+ *  first-time advisor gets the smaller pages rather than the wall of modules. */
+const SHOW_ALL_MODULES_KEY = "gm:wizard:show-all-modules";
+
+function useShowAllModules(): [boolean, (next: boolean) => void] {
+  const [showAll, setShowAll] = useState(false);
+  useEffect(() => {
+    try {
+      setShowAll(window.localStorage.getItem(SHOW_ALL_MODULES_KEY) === "1");
+    } catch {
+      // Storage blocked: stay on the paged default rather than failing to render the step.
+    }
+  }, []);
+  const set = (next: boolean) => {
+    setShowAll(next);
+    try {
+      window.localStorage.setItem(SHOW_ALL_MODULES_KEY, next ? "1" : "0");
+    } catch {
+      // A preference that cannot be saved still applies for this session.
+    }
+  };
+  return [showAll, set];
+}
+
+export interface PagedModule {
+  key: string;
+  name: string;
+  rated: number;
+  total: number;
+}
+
+/**
+ * Page a long step one module at a time (GRS-0181).
+ *
+ * Density work made the long steps collapsible and the founder's instinct then was that "a long
+ * list may be daunting to an advisor, but lots of smaller pages may be easier to handle". Paging is
+ * per MODULE, not per subcomponent: 51 one-subcomponent pages would be worse than one long page,
+ * and an advisor should never land halfway through a module.
+ *
+ * Nothing about the document, autosave, or the engine changes here. Only which module's rows are
+ * on screen.
+ */
+function ModulePagedSection({
+  modules,
+  showAll,
+  onShowAllChange,
+  renderModule,
+  onSubStepChange,
+}: {
+  modules: readonly PagedModule[];
+  showAll: boolean;
+  onShowAllChange: (next: boolean) => void;
+  renderModule: (key: string, index: number) => React.ReactNode;
+  onSubStepChange?: (label: string | null) => void;
+}) {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const clamped = Math.min(activeIndex, Math.max(modules.length - 1, 0));
+
+  // Tell the stepper where we are, so the pill can read "module 3 of 9" rather than leaving the
+  // advisor to work out how much is left. Null in show-all mode: there is no sub-position then.
+  useEffect(() => {
+    if (!onSubStepChange) return;
+    onSubStepChange(
+      showAll || modules.length === 0 ? null : `module ${clamped + 1} of ${modules.length}`,
+    );
+    return () => onSubStepChange(null);
+  }, [onSubStepChange, showAll, clamped, modules.length]);
+
+  function goTo(index: number) {
+    setActiveIndex(index);
+    // A long module otherwise leaves the advisor scrolled halfway down the next one. Guarded
+    // because scrolling is a nicety: an environment without it must still change page rather
+    // than throw part-way through navigating.
+    const container = containerRef.current;
+    if (typeof container?.scrollIntoView === "function") {
+      container.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+  }
+
+  const toggle = (
+    <button
+      type="button"
+      className={smallBtn}
+      style={smallBtnStyle}
+      onClick={() => onShowAllChange(!showAll)}
+      aria-pressed={showAll}
+    >
+      {showAll ? "Page through modules" : "Show all modules on one page"}
+    </button>
+  );
+
+  if (showAll || modules.length === 0) {
+    return (
+      <div ref={containerRef} style={{ display: "contents" }}>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>{toggle}</div>
+        {modules.map((m, i) => renderModule(m.key, i))}
+      </div>
+    );
+  }
+
+  const active = modules[clamped]!;
+  return (
+    <div ref={containerRef} style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+        <nav aria-label="Modules" style={{ display: "flex", gap: "0.3rem", flexWrap: "wrap" }}>
+          {modules.map((m, i) => {
+            const complete = m.total > 0 && m.rated === m.total;
+            const isActive = i === clamped;
+            return (
+              <button
+                key={m.key}
+                type="button"
+                onClick={() => goTo(i)}
+                aria-current={isActive ? "step" : undefined}
+                data-active={isActive ? "true" : undefined}
+                title={`${m.name} — ${m.rated} of ${m.total} rated`}
+                style={{
+                  fontSize: "0.72rem",
+                  padding: "0.2rem 0.55rem",
+                  borderRadius: "var(--radius-pill)",
+                  cursor: "pointer",
+                  border: `1px solid ${isActive ? "var(--color-accent)" : "var(--color-border)"}`,
+                  background: isActive ? "var(--color-accent-tint)" : "transparent",
+                  color: isActive ? "var(--color-accent)" : "var(--color-ink-muted)",
+                  fontWeight: isActive ? 600 : 400,
+                }}
+              >
+                {complete ? "✓ " : ""}
+                {m.name} <span className="mono">{m.rated}/{m.total}</span>
+              </button>
+            );
+          })}
+        </nav>
+        {toggle}
+      </div>
+
+      {renderModule(active.key, clamped)}
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "0.75rem" }}>
+        <button
+          type="button"
+          className={smallBtn}
+          style={smallBtnStyle}
+          onClick={() => goTo(clamped - 1)}
+          disabled={clamped === 0}
+        >
+          ← Previous module
+        </button>
+        <span className="mono" style={{ fontSize: "0.72rem", color: "var(--color-ink-faint)" }}>
+          {clamped + 1} of {modules.length}
+        </span>
+        <button
+          type="button"
+          className={smallBtn}
+          style={smallBtnStyle}
+          onClick={() => goTo(clamped + 1)}
+          disabled={clamped >= modules.length - 1}
+        >
+          Next module →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function InfrastructureDeepDiveStep({
+  registry,
+  document: d,
+  update,
+  readOnly,
+  onSubStepChange,
+}: StepProps) {
   const [openGuidance, setOpenGuidance] = useState<string | null>(null);
+  const [showAll, setShowAll] = useShowAllModules();
   // Collapse each module so the 51-subcomponent page is navigable, not one endless scroll (GRS-0160).
   // Modules that are already fully rated start collapsed; the rest open. Controlled by state so a
   // manual toggle is never overridden on the next render.
@@ -658,6 +836,14 @@ export function InfrastructureDeepDiveStep({ registry, document: d, update, read
       else next.add(key);
       return next;
     });
+  // The jump-list chips reuse the exact count the section header shows, so the two can never
+  // disagree about how much of a module is done.
+  const pagedModules: PagedModule[] = registry.modules.map((m) => ({
+    key: m.key,
+    name: m.name,
+    rated: m.subcomponents.filter((s) => doc.findSub(d, s.key)?.level != null).length,
+    total: m.subcomponents.length,
+  }));
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "1rem", flexWrap: "wrap" }}>
@@ -666,22 +852,31 @@ export function InfrastructureDeepDiveStep({ registry, document: d, update, read
           subcomponent — it gates the module rating (a module can&rsquo;t outrun its critical bottleneck).
           Each row&rsquo;s Guidance opens the §4 rubric anchor inline. Click a module to collapse it.
         </p>
-        <button
-          type="button"
-          className={smallBtn}
-          style={smallBtnStyle}
-          onClick={() =>
-            setCollapsed((prev) =>
-              prev.size === registry.modules.length ? new Set() : new Set(registry.modules.map((m) => m.key)),
-            )
-          }
-        >
-          {collapsed.size === registry.modules.length ? "Expand all" : "Collapse all"}
-        </button>
+        {showAll ? (
+          <button
+            type="button"
+            className={smallBtn}
+            style={smallBtnStyle}
+            onClick={() =>
+              setCollapsed((prev) =>
+                prev.size === registry.modules.length ? new Set() : new Set(registry.modules.map((m) => m.key)),
+              )
+            }
+          >
+            {collapsed.size === registry.modules.length ? "Expand all" : "Collapse all"}
+          </button>
+        ) : null}
       </div>
-      {registry.modules.map((m) => {
+      <ModulePagedSection
+        modules={pagedModules}
+        showAll={showAll}
+        onShowAllChange={setShowAll}
+        onSubStepChange={onSubStepChange}
+        renderModule={(key) => {
+        const m = registry.modules.find((x) => x.key === key)!;
         const rated = m.subcomponents.filter((s) => doc.findSub(d, s.key)?.level != null).length;
-        const isOpen = !collapsed.has(m.key);
+        // Paging already puts one module on screen, so collapsing is only meaningful in show-all.
+        const isOpen = showAll ? !collapsed.has(m.key) : true;
         return (
         <div key={m.key} className="card" style={{ padding: "0.5rem 0.85rem" }}>
           <SectionHeader
@@ -759,7 +954,8 @@ export function InfrastructureDeepDiveStep({ registry, document: d, update, read
           ) : null}
         </div>
         );
-      })}
+        }}
+      />
     </div>
   );
 }
@@ -857,8 +1053,15 @@ function SectionHeader({
   );
 }
 
-export function CustomerPropositionStep({ registry, document: d, update, readOnly }: StepProps) {
+export function CustomerPropositionStep({
+  registry,
+  document: d,
+  update,
+  readOnly,
+  onSubStepChange,
+}: StepProps) {
   const [openGuidance, setOpenGuidance] = useState<string | null>(null);
+  const [showAll, setShowAll] = useShowAllModules();
   const profileKey = d.profile?.operating_model ?? "retail";
   const showGrid = registry.c_widgets.length > 0 && profileKey === registry.c_widget_profile;
   const categories = Array.from(new Set(registry.c_widgets.map((w) => w.category)));
@@ -890,6 +1093,27 @@ export function CustomerPropositionStep({ registry, document: d, update, readOnl
   // a wealth/exchange firm retail neobroker questions, degrade honestly: this dimension is not yet
   // modelled for the segment. A per-segment C taxonomy is a founder-scoped content build.
   const cModelled = registry.c_modules.length > 0;
+  // The widget checklist is one more page at the end, not a separate scroll: to an advisor it is
+  // simply the last thing to work through on this step (GRS-0181).
+  const WIDGETS_PAGE = "__widgets__";
+  const pagedModules: PagedModule[] = [
+    ...registry.c_modules.map((m) => ({
+      key: m.key,
+      name: m.name,
+      rated: m.subcomponents.filter((s) => isCRated(s.key)).length,
+      total: m.subcomponents.length,
+    })),
+    ...(showGrid
+      ? [
+          {
+            key: WIDGETS_PAGE,
+            name: "Widget checklist",
+            rated: categories.reduce((n, c) => n + recordedIn(c), 0),
+            total: registry.c_widgets.length,
+          },
+        ]
+      : []),
+  ];
 
   if (!cModelled) {
     return (
@@ -912,6 +1136,103 @@ export function CustomerPropositionStep({ registry, document: d, update, readOnl
     );
   }
 
+  /** The Level-1 widget checklist, rendered as the pager's final page (GRS-0181). Defined
+   *  inside the step so it keeps its closure over the registry and the document rather than
+   *  threading a dozen props through the pager. */
+  function WidgetChecklistPage() {
+    return (
+    <div>
+      <h3 style={{ fontSize: "1rem", margin: "0 0 0.4rem" }}>Level-1 widget checklist</h3>
+      {!showGrid ? (
+        <p style={{ color: "var(--color-ink-muted)", fontSize: "0.82rem", margin: 0 }}>
+          The widget checklist is scoped to the <strong>{registry.c_widget_profile}</strong>{" "}
+          operating model; it is not shown for the <strong>{profileKey}</strong> profile.
+        </p>
+      ) : (
+        categories.map((category) => {
+          const catKey = `cat:${category}`;
+          const isOpen = !collapsed.has(catKey);
+          return (
+          <div key={category} className="card" style={{ padding: "0.4rem 0.85rem", marginBottom: "0.5rem" }}>
+            <SectionHeader
+              title={category}
+              rated={recordedIn(category)}
+              total={catWidgets(category).length}
+              noun="recorded"
+              isOpen={isOpen}
+              onToggle={() => toggle(catKey)}
+            />
+            {isOpen ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", marginTop: "0.35rem" }}>
+              {registry.c_widgets
+                .filter((w) => w.category === category)
+                .map((w) => {
+                  const obs = doc.findWidget(d, w.key);
+                  const choice = widgetChoiceOf(obs);
+                  return (
+                    <Card key={w.key}>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", flexWrap: "wrap", alignItems: "center" }}>
+                        <div style={{ display: "flex", gap: "0.5rem", alignItems: "baseline" }}>
+                          <strong style={{ fontSize: "0.82rem" }}>{w.name}</strong>
+                          <span className="mono" title={RARITY_TITLE[w.rarity]} style={{ fontSize: "0.68rem", color: "var(--color-ink-muted)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-sm)", padding: "0 0.3rem" }}>
+                            {w.rarity}
+                          </span>
+                        </div>
+                        <div style={{ display: "flex", gap: "0.4rem", alignItems: "center", flexWrap: "wrap" }}>
+                          <select
+                            disabled={readOnly}
+                            value={choice}
+                            aria-label={`${w.name} presence`}
+                            onChange={(e) => {
+                              const v = e.target.value as WidgetChoice;
+                              update((x) => {
+                                if (v === "") return doc.setWidget(x, w.key, null);
+                                if (v === "Yes")
+                                  return doc.setWidget(x, w.key, doc.widgetPresent(w.key, obs ?? undefined));
+                                if (v === "No") return doc.setWidget(x, w.key, doc.widgetAbsent(w.key, null));
+                                const state: NonScoreState = v === "Paywalled" ? "Present (Paywalled)" : "Present (Defective)";
+                                return doc.setWidget(x, w.key, doc.widgetAbsent(w.key, state));
+                              });
+                            }}
+                            style={selectStyle}
+                          >
+                            <option value="">— untouched —</option>
+                            <option value="Yes">Present</option>
+                            <option value="No">Absent</option>
+                            <option value="Paywalled">Paywalled</option>
+                            <option value="Defective">Defective</option>
+                          </select>
+                          {choice === "Yes"
+                            ? WIDGET_SCORE_FIELDS.map((f) => (
+                                <ScoreSelect
+                                  key={f.key}
+                                  label={f.label}
+                                  value={obs?.[f.key]}
+                                  disabled={readOnly}
+                                  onChange={(n) =>
+                                    update((x) => {
+                                      const cur = doc.findWidget(x, w.key);
+                                      return doc.setWidget(x, w.key, doc.widgetPresent(w.key, { ...cur, [f.key]: n }));
+                                    })
+                                  }
+                                />
+                              ))
+                            : null}
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                })}
+            </div>
+            ) : null}
+          </div>
+          );
+        })
+      )}
+    </div>
+    );
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
       <p style={{ color: "var(--color-ink-muted)", fontSize: "0.9rem", margin: 0, lineHeight: 1.55 }}>
@@ -923,22 +1244,31 @@ export function CustomerPropositionStep({ registry, document: d, update, readOnl
         rail) and reported alongside V (ADR-0023); it does not change V yet.
       </p>
 
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <button
-          type="button"
-          className={smallBtn}
-          style={smallBtnStyle}
-          onClick={() =>
-            setCollapsed((prev) =>
-              prev.size === allSectionKeys.length ? new Set() : new Set(allSectionKeys),
-            )
-          }
-        >
-          {collapsed.size === allSectionKeys.length ? "Expand all" : "Collapse all"}
-        </button>
-      </div>
+      {showAll ? (
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <button
+            type="button"
+            className={smallBtn}
+            style={smallBtnStyle}
+            onClick={() =>
+              setCollapsed((prev) =>
+                prev.size === allSectionKeys.length ? new Set() : new Set(allSectionKeys),
+              )
+            }
+          >
+            {collapsed.size === allSectionKeys.length ? "Expand all" : "Collapse all"}
+          </button>
+        </div>
+      ) : null}
 
-      {registry.c_modules.map((m) => {
+      <ModulePagedSection
+        modules={pagedModules}
+        showAll={showAll}
+        onShowAllChange={setShowAll}
+        onSubStepChange={onSubStepChange}
+        renderModule={(key) => {
+        if (key === WIDGETS_PAGE) return <WidgetChecklistPage key={key} />;
+        const m = registry.c_modules.find((x) => x.key === key)!;
         const rated = m.subcomponents.filter((s) => isCRated(s.key)).length;
         const isOpen = !collapsed.has(m.key);
         return (
@@ -1007,97 +1337,9 @@ export function CustomerPropositionStep({ registry, document: d, update, readOnl
           ) : null}
         </div>
         );
-      })}
+        }}
+      />
 
-      <div>
-        <h3 style={{ fontSize: "1rem", margin: "0 0 0.4rem" }}>Level-1 widget checklist</h3>
-        {!showGrid ? (
-          <p style={{ color: "var(--color-ink-muted)", fontSize: "0.82rem", margin: 0 }}>
-            The widget checklist is scoped to the <strong>{registry.c_widget_profile}</strong>{" "}
-            operating model; it is not shown for the <strong>{profileKey}</strong> profile.
-          </p>
-        ) : (
-          categories.map((category) => {
-            const catKey = `cat:${category}`;
-            const isOpen = !collapsed.has(catKey);
-            return (
-            <div key={category} className="card" style={{ padding: "0.4rem 0.85rem", marginBottom: "0.5rem" }}>
-              <SectionHeader
-                title={category}
-                rated={recordedIn(category)}
-                total={catWidgets(category).length}
-                noun="recorded"
-                isOpen={isOpen}
-                onToggle={() => toggle(catKey)}
-              />
-              {isOpen ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem", marginTop: "0.35rem" }}>
-                {registry.c_widgets
-                  .filter((w) => w.category === category)
-                  .map((w) => {
-                    const obs = doc.findWidget(d, w.key);
-                    const choice = widgetChoiceOf(obs);
-                    return (
-                      <Card key={w.key}>
-                        <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", flexWrap: "wrap", alignItems: "center" }}>
-                          <div style={{ display: "flex", gap: "0.5rem", alignItems: "baseline" }}>
-                            <strong style={{ fontSize: "0.82rem" }}>{w.name}</strong>
-                            <span className="mono" title={RARITY_TITLE[w.rarity]} style={{ fontSize: "0.68rem", color: "var(--color-ink-muted)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-sm)", padding: "0 0.3rem" }}>
-                              {w.rarity}
-                            </span>
-                          </div>
-                          <div style={{ display: "flex", gap: "0.4rem", alignItems: "center", flexWrap: "wrap" }}>
-                            <select
-                              disabled={readOnly}
-                              value={choice}
-                              aria-label={`${w.name} presence`}
-                              onChange={(e) => {
-                                const v = e.target.value as WidgetChoice;
-                                update((x) => {
-                                  if (v === "") return doc.setWidget(x, w.key, null);
-                                  if (v === "Yes")
-                                    return doc.setWidget(x, w.key, doc.widgetPresent(w.key, obs ?? undefined));
-                                  if (v === "No") return doc.setWidget(x, w.key, doc.widgetAbsent(w.key, null));
-                                  const state: NonScoreState = v === "Paywalled" ? "Present (Paywalled)" : "Present (Defective)";
-                                  return doc.setWidget(x, w.key, doc.widgetAbsent(w.key, state));
-                                });
-                              }}
-                              style={selectStyle}
-                            >
-                              <option value="">— untouched —</option>
-                              <option value="Yes">Present</option>
-                              <option value="No">Absent</option>
-                              <option value="Paywalled">Paywalled</option>
-                              <option value="Defective">Defective</option>
-                            </select>
-                            {choice === "Yes"
-                              ? WIDGET_SCORE_FIELDS.map((f) => (
-                                  <ScoreSelect
-                                    key={f.key}
-                                    label={f.label}
-                                    value={obs?.[f.key]}
-                                    disabled={readOnly}
-                                    onChange={(n) =>
-                                      update((x) => {
-                                        const cur = doc.findWidget(x, w.key);
-                                        return doc.setWidget(x, w.key, doc.widgetPresent(w.key, { ...cur, [f.key]: n }));
-                                      })
-                                    }
-                                  />
-                                ))
-                              : null}
-                          </div>
-                        </div>
-                      </Card>
-                    );
-                  })}
-              </div>
-              ) : null}
-            </div>
-            );
-          })
-        )}
-      </div>
     </div>
   );
 }
