@@ -31,6 +31,7 @@ import type {
   CommitteeReviewSummary,
   CommsChannel,
   CommsLogEntry,
+  ConsultancyCommissionCarrot,
   CompanyEntity,
   RegistryContact,
   Contact,
@@ -1166,6 +1167,15 @@ export const api = {
 
   productCommissions(signal?: AbortSignal): Promise<ProductCommissionCarrot[]> {
     return request<ProductCommissionCarrot[]>("/earnings/product-commissions", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  // The Stream-B rate card (GRS-0187). Not personal data, so every signed-in advisor sees it.
+  consultancyCommissions(signal?: AbortSignal): Promise<ConsultancyCommissionCarrot[]> {
+    return request<ConsultancyCommissionCarrot[]>("/earnings/consultancy-commissions", {
       method: "GET",
       headers: authHeaders(),
       signal,

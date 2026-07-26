@@ -15,6 +15,7 @@ from uuid import UUID
 from bcap_contracts.commissions import (
     CommissionConfigError,
     CommissionLine,
+    ConsultancyCommissionCarrot,
     DeliveryType,
     EarningsSummary,
     EarningsTimeline,
@@ -112,6 +113,18 @@ def list_product_commissions(
     return all_product_carrots(load_commission_config())
 
 
+@router.get("/consultancy-commissions", response_model=list[ConsultancyCommissionCarrot])
+def list_consultancy_commissions(
+    principal: Principal = Depends(get_current_principal),
+) -> list[ConsultancyCommissionCarrot]:
+    """The live Stream-B matrix (GRS-0187). The page previously showed "Consultancy £0.00" with no
+    account of how consulting is paid at all; this is the same schedule the computation already
+    used, surfaced. Every signed-in advisor may see it — a rate card is not personal data."""
+    from grassmarket.earnings.consultancy_carrot import all_consultancy_carrots
+
+    return all_consultancy_carrots(load_commission_config())
+
+
 @router.get("/summary", response_model=EarningsSummary)
 def get_summary(
     principal: Principal = Depends(get_current_principal),
@@ -147,11 +160,14 @@ def download_statement(
     except ConflictError as exc:
         raise _conflict(exc) from exc
     lines = repo.list_commission_lines(principal)
+    from grassmarket.earnings.consultancy_carrot import all_consultancy_carrots
+
     docx = build_earnings_statement(
         summary=summary,
         lines=lines,
         consultant_name=repo.own_display_name(principal),
         generated_on=now.date(),
+        consultancy_carrots=all_consultancy_carrots(load_commission_config()),
     )
     return StreamingResponse(
         BytesIO(docx),

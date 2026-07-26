@@ -1,0 +1,124 @@
+{
+  "$defs": {
+    "Currency": {
+      "enum": [
+        "GBP",
+        "USD",
+        "EUR"
+      ],
+      "title": "Currency",
+      "type": "string"
+    },
+    "DeliveryType": {
+      "description": "The consultancy delivery model (ADR-0026), mirroring SourcingAttribution's shape.",
+      "enum": [
+        "bruntsfield_led",
+        "consultant_led"
+      ],
+      "title": "DeliveryType",
+      "type": "string"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "description": "A currency amount that cannot exist without an explicit currency and a reference to the\nassumption register that justifies it (Methodology §10, ADR-0002 compliance test).\n\nA lever NPV or remediation cost is only meaningful under stated assumptions; a `Money`\nwithout an ``assumption_register_ref`` is not constructible.",
+      "properties": {
+        "amount_minor": {
+          "description": "Amount in integer minor units (e.g. pence).",
+          "title": "Amount Minor",
+          "type": "integer"
+        },
+        "assumption_register_ref": {
+          "description": "Reference to the assumption-register entry that justifies this figure. Mandatory: currency claims are never made without stated assumptions (Methodology §10).",
+          "minLength": 1,
+          "title": "Assumption Register Ref",
+          "type": "string"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        }
+      },
+      "required": [
+        "amount_minor",
+        "currency",
+        "assumption_register_ref"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "SourcingAttribution": {
+      "description": "Who sourced the deal. v7 axes are SELF / FIRM; the two legacy values are retained for\nhistorical lines and fold into FIRM for v7 pricing (ADR-0026).",
+      "enum": [
+        "self_sourced",
+        "firm_sourced",
+        "bruntsfield_sourced",
+        "co_sourced"
+      ],
+      "title": "SourcingAttribution",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The live \"how much you earn\" figure for one Stream-B matrix cell (GRS-0187).\n\nThe earnings page explained product commissions and said nothing about direct consulting,\nshowing only \"Consultancy (Stream B) £0.00\" with no account of the matrix behind it. The\ncomputation already existed; this is the shape that surfaces it.\n\nMirrors `ProductCommissionCarrot`: rates read from the live schedule, never re-typed, with a\nworked example so an advisor sees a pound figure beside a percentage, and `schedule_version`\nstamped so the figure is never bare.",
+  "properties": {
+    "delivery_label": {
+      "description": "Human wording, produced with the rate rather than in the UI.",
+      "minLength": 1,
+      "title": "Delivery Label",
+      "type": "string"
+    },
+    "delivery_type": {
+      "$ref": "#/$defs/DeliveryType"
+    },
+    "example_deal": {
+      "$ref": "#/$defs/Money",
+      "description": "The illustrative engagement the example prices."
+    },
+    "schedule_version": {
+      "description": "The commission-config version stamped.",
+      "minLength": 1,
+      "title": "Schedule Version",
+      "type": "string"
+    },
+    "sourcing": {
+      "$ref": "#/$defs/SourcingAttribution"
+    },
+    "sourcing_label": {
+      "minLength": 1,
+      "title": "Sourcing Label",
+      "type": "string"
+    },
+    "thereafter_bps": {
+      "description": "The ongoing rate after the first 12 months — uncapped (ADR-0026).",
+      "minimum": 0,
+      "title": "Thereafter Bps",
+      "type": "integer"
+    },
+    "thereafter_commission": {
+      "$ref": "#/$defs/Money",
+      "description": "Ongoing annual commission on the example (live compute)."
+    },
+    "yr1_bps": {
+      "minimum": 0,
+      "title": "Yr1 Bps",
+      "type": "integer"
+    },
+    "yr1_commission": {
+      "$ref": "#/$defs/Money",
+      "description": "Year-1 commission on the example (live compute)."
+    }
+  },
+  "required": [
+    "delivery_type",
+    "sourcing",
+    "delivery_label",
+    "sourcing_label",
+    "yr1_bps",
+    "thereafter_bps",
+    "example_deal",
+    "yr1_commission",
+    "thereafter_commission",
+    "schedule_version"
+  ],
+  "title": "ConsultancyCommissionCarrot",
+  "type": "object"
+}

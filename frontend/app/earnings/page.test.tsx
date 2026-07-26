@@ -20,6 +20,7 @@ vi.mock("@/lib/api", async (importActual) => {
       earningsSummary: vi.fn(),
       listCommissions: vi.fn(),
       productCommissions: vi.fn(),
+      consultancyCommissions: vi.fn(),
       earningsTimeline: vi.fn(),
       downloadEarningsStatement: vi.fn(),
     },
@@ -30,6 +31,7 @@ const mocked = api as unknown as {
   earningsSummary: ReturnType<typeof vi.fn>;
   listCommissions: ReturnType<typeof vi.fn>;
   productCommissions: ReturnType<typeof vi.fn>;
+  consultancyCommissions: ReturnType<typeof vi.fn>;
   earningsTimeline: ReturnType<typeof vi.fn>;
   downloadEarningsStatement: ReturnType<typeof vi.fn>;
 };
@@ -79,6 +81,7 @@ describe("EarningsPage (GRS-0035)", () => {
     // The page loads the live product-commission carrots + the earnings timeline alongside the
     // summary; default to none so each test opts in only to what it asserts.
     mocked.productCommissions.mockResolvedValue([]);
+    mocked.consultancyCommissions.mockResolvedValue([]);
     mocked.earningsTimeline.mockResolvedValue({
       owner_consultant_id: "c1",
       currency: "GBP",
@@ -131,5 +134,47 @@ describe("EarningsPage (GRS-0035)", () => {
     const alert = await screen.findByRole("alert");
     expect(alert.textContent).toContain("multiple currencies");
     expect(alert.textContent).not.toContain("409");
+  });
+
+  describe("Consulting (Stream B) — GRS-0187", () => {
+    const CARROTS = [
+      {
+        delivery_type: "consultant_led",
+        sourcing: "self_sourced",
+        delivery_label: "Consultant-led",
+        sourcing_label: "Self-sourced",
+        yr1_bps: 6500,
+        thereafter_bps: 5500,
+        example_deal: { amount_minor: 10000000, currency: "GBP", assumption_register_ref: "x" },
+        yr1_commission: { amount_minor: 6500000, currency: "GBP", assumption_register_ref: "x" },
+        thereafter_commission: { amount_minor: 5500000, currency: "GBP", assumption_register_ref: "x" },
+        schedule_version: "commissions-v7",
+      },
+    ];
+
+    it("shows the rate card, so a zero balance is not the only thing said about consulting", async () => {
+      mocked.earningsSummary.mockResolvedValue(summary());
+    mocked.listCommissions.mockResolvedValue([]);
+    mocked.consultancyCommissions.mockResolvedValue(CARROTS);
+      render(<EarningsPage />);
+      expect(await screen.findByText("Consulting (Stream B)")).toBeTruthy();
+      expect(screen.getByText("Consultant-led · Self-sourced")).toBeTruthy();
+      expect(screen.getByText(/65% first year · 55% thereafter/)).toBeTruthy();
+    });
+
+    it("says the rates are read live rather than typed in", async () => {
+      mocked.earningsSummary.mockResolvedValue(summary());
+    mocked.listCommissions.mockResolvedValue([]);
+    mocked.consultancyCommissions.mockResolvedValue(CARROTS);
+      render(<EarningsPage />);
+      expect(await screen.findByText(/read live from the\s+commission schedule, never typed in by hand/)).toBeTruthy();
+    });
+
+    it("renders nothing at all if the schedule is unavailable, rather than an empty promise", async () => {
+      mocked.consultancyCommissions.mockResolvedValue([]);
+      render(<EarningsPage />);
+      await screen.findByText(/Earnings/);
+      expect(screen.queryByText("Consulting (Stream B)")).toBeNull();
+    });
   });
 });

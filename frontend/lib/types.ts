@@ -525,6 +525,24 @@ export interface ProductCommissionCarrot {
   schedule_version: string;
 }
 
+/**
+ * One cell of the Stream-B consultancy matrix (GRS-0187). Rates are read live from the Earnings v7
+ * schedule, never typed into the UI, and the labels travel with them so wording and number cannot
+ * drift apart.
+ */
+export interface ConsultancyCommissionCarrot {
+  delivery_type: string;
+  sourcing: string;
+  delivery_label: string;
+  sourcing_label: string;
+  yr1_bps: number;
+  thereafter_bps: number;
+  example_deal: Money;
+  yr1_commission: Money;
+  thereafter_commission: Money;
+  schedule_version: string;
+}
+
 // --- Sell-from-report (GRS-0162, ADR-0039) — mirrors bcap_contracts.product_fit ---
 
 export type GapKind = "module" | "c_module" | "power";
