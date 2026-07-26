@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments/cfc53762-0581-4523-bca3-bd9ef1b352b0","note":"reopen"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"fill","target":"input >> nth=0","value":"190"},
+  {"do":"read"},
+  {"do":"click","target":"text:1. Overview"},
+  {"do":"read"},
+  {"do":"shot","name":"overview-scored"}
+]

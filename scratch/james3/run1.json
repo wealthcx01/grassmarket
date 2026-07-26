@@ -1,0 +1,11 @@
+[
+  {"do":"goto","url":"/","note":"land on dashboard"},
+  {"do":"read"},
+  {"do":"shot","name":"dashboard"},
+  {"do":"goto","url":"/pipeline","note":"open pipeline"},
+  {"do":"read"},
+  {"do":"shot","name":"pipeline"},
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"read"},
+  {"do":"shot","name":"assessments"}
+]

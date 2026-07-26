@@ -1,0 +1,18 @@
+[
+  {"do":"goto","url":"/assessments/bde5bfc9-9ecf-499d-83db-acc530e81fb9","note":"open wizard"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"fill","target":":nth-match(input[placeholder='value'], 1)","value":"9000000"},
+  {"do":"select","target":":nth-match(select, 1)","value":"audited"},
+  {"do":"fill","target":":nth-match(input[placeholder='value'], 2)","value":"120000000"},
+  {"do":"select","target":":nth-match(select, 2)","value":"management_reported"},
+  {"do":"fill","target":":nth-match(input[placeholder='value'], 3)","value":"15"},
+  {"do":"select","target":":nth-match(select, 3)","value":"estimated"},
+  {"do":"fill","target":":nth-match(input[placeholder='value'], 4)","value":"800"},
+  {"do":"select","target":":nth-match(select, 4)","value":"management_reported"},
+  {"do":"fill","target":":nth-match(input[placeholder='value'], 5)","value":"0.32"},
+  {"do":"select","target":":nth-match(select, 5)","value":"estimated"},
+  {"do":"fill","target":":nth-match(input[placeholder='value'], 6)","value":"58"},
+  {"do":"select","target":":nth-match(select, 6)","value":"audited"},
+  {"do":"read"},
+  {"do":"shot","name":"08-metrics-filled"}
+]

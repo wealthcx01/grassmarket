@@ -1,0 +1,21 @@
+[
+  {"do":"goto","url":"/assessments/dcc3b25c-c60c-4472-b2f2-a2429617a793","note":"reopen Revolut wizard"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"read","note":"STEP 2 Business Metrics UX"},
+  {"do":"shot","name":"walk-02-metrics","full":true},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"read","note":"STEP 3 Powers UX"},
+  {"do":"shot","name":"walk-03-powers","full":true},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"read","note":"STEP 4 Infrastructure UX"},
+  {"do":"shot","name":"walk-04-infra","full":true},
+  {"do":"click","target":"text:5. Customer Proposition"},
+  {"do":"read","note":"STEP 5 Customer Proposition — is it retail-specific / 93 widgets?"},
+  {"do":"shot","name":"walk-05-customer","full":true},
+  {"do":"click","target":"text:6. Summary & Interpretation"},
+  {"do":"read","note":"STEP 6 Summary UX"},
+  {"do":"shot","name":"walk-06-summary","full":true},
+  {"do":"click","target":"text:7. Scenarios"},
+  {"do":"read","note":"STEP 7 Scenarios UX"},
+  {"do":"shot","name":"walk-07-scenarios","full":true}
+]

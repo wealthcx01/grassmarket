@@ -1,0 +1,12 @@
+[
+  {"do":"goto","url":"/assessments/bde5bfc9-9ecf-499d-83db-acc530e81fb9"},
+  {"do":"click","target":"text:7. Scenarios"},
+  {"do":"click","target":"text:+ Add scenario"},
+  {"do":"select","target":":nth-match(select, 1)","value":"Data fairness & latency equalisation"},
+  {"do":"select","target":":nth-match(select, 1)","value":"data_fairness_latency_equalisation"},
+  {"do":"select","target":":nth-match(select, 1)","value":"data_fairness"},
+  {"do":"click","target":":nth-match(button:text-is('Advanced'), 1)"},
+  {"do":"click","target":"text:Rank by ΔV"},
+  {"do":"read"},
+  {"do":"shot","name":"17-scenario-ranked","full":true}
+]

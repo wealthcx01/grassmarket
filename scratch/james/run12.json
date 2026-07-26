@@ -1,0 +1,7 @@
+[
+  {"do":"goto","url":"/workbench/academy/sales-egoist","note":"course"},
+  {"do":"fill","target":"textarea","value":"Because a competitor advances if you don't; the Egoist owns a dated next step on every live account."},
+  {"do":"click","target":"text:Reveal model answer"},
+  {"do":"shot","name":"check-revealed"},
+  {"do":"read"}
+]

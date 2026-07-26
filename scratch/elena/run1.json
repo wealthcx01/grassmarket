@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/","note":"dashboard"},
+  {"do":"read"},
+  {"do":"goto","url":"/assessments","note":"portfolio/assessments"},
+  {"do":"read"},
+  {"do":"goto","url":"/pipeline","note":"pipeline board"},
+  {"do":"read"}
+]

@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"fill","target":"input","value":"Deutsche Börse"},
+  {"do":"select","target":"label:Operating model","value":"exchange"},
+  {"do":"shot","name":"form-filled"},
+  {"do":"click","target":"role:button:Create & open"},
+  {"do":"read"},
+  {"do":"shot","name":"wizard-start"}
+]

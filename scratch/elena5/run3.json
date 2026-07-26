@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"fill","target":"placeholder:Type to find the company in the registry, or enter any name to keep it manual.","value":"Deutsche Börse"},
+  {"do":"select","target":"label:Operating model","value":"exchange"},
+  {"do":"click","target":"text:Create & open"},
+  {"do":"waittext","value":"Deutsche Börse"},
+  {"do":"read"},
+  {"do":"shot","name":"05-wizard-open"}
+]

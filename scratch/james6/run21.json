@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/prospects/e3da68b1-c640-49dd-94e3-81e92dc8f8ee","waitfor":"RBC Brewin Dolphin"},
+  {"do":"fill","target":"placeholder:Engagement title","value":"Platform modernisation diagnostic — RBC Brewin Dolphin"},
+  {"do":"click","target":"text:Open engagement"},
+  {"do":"read"},
+  {"do":"click","target":"text:Platform modernisation diagnostic — RBC Brewin Dolphin"},
+  {"do":"read"},
+  {"do":"shot","name":"37-engagement-open"},
+  {"do":"read"}
+]

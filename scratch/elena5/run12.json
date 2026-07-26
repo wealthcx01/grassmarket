@@ -1,0 +1,17 @@
+[
+  {"do":"goto","url":"/assessments/bde5bfc9-9ecf-499d-83db-acc530e81fb9"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"click","target":":nth-match(button:text-is('Advanced'), 1)"},
+  {"do":"click","target":":nth-match(button:text-is('Advanced'), 2)"},
+  {"do":"click","target":":nth-match(button:text-is('Advanced'), 3)"},
+  {"do":"click","target":":nth-match(button:text-is('Frontier'), 4)"},
+  {"do":"click","target":":nth-match(button:text-is('Advanced'), 5)"},
+  {"do":"click","target":":nth-match(button:text-is('Advanced'), 6)"},
+  {"do":"click","target":":nth-match(button:text-is('Advanced'), 7)"},
+  {"do":"click","target":":nth-match(button:text-is('Advanced'), 8)"},
+  {"do":"click","target":":nth-match(button:text-is('Developing'), 9)"},
+  {"do":"click","target":":nth-match(button:text-is('Frontier'), 10)"},
+  {"do":"click","target":":nth-match(button:text-is('Advanced'), 11)"},
+  {"do":"click","target":":nth-match(button:text-is('Advanced'), 12)"},
+  {"do":"read"}
+]

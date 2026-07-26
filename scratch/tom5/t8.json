@@ -1,0 +1,18 @@
+[
+  {"do":"goto","url":"/assessments/b6fd32d9-90eb-4040-8699-a599949edf8b","note":"open wizard"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"fill","target":"input[placeholder^='value'] >> nth=2","value":"1000000"},
+  {"do":"fill","target":"input[placeholder^='value'] >> nth=3","value":"50"},
+  {"do":"fill","target":"input[placeholder^='value'] >> nth=4","value":"65"},
+  {"do":"fill","target":"input[placeholder^='value'] >> nth=5","value":"39"},
+  {"do":"fill","target":"input[placeholder^='value'] >> nth=6","value":"90"},
+  {"do":"select","target":"select >> nth=0","value":"management_reported"},
+  {"do":"select","target":"select >> nth=1","value":"management_reported"},
+  {"do":"select","target":"select >> nth=2","value":"management_reported"},
+  {"do":"select","target":"select >> nth=3","value":"estimated"},
+  {"do":"select","target":"select >> nth=4","value":"management_reported"},
+  {"do":"select","target":"select >> nth=5","value":"estimated"},
+  {"do":"select","target":"select >> nth=6","value":"management_reported"},
+  {"do":"read"},
+  {"do":"shot","name":"t13-metrics-filled2","full":true}
+]

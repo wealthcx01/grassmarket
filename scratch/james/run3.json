@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/pipeline","note":"open pipeline"},
+  {"do":"click","target":"text:Brewin Dolphin"},
+  {"do":"read"},
+  {"do":"shot","name":"prospect-detail"},
+  {"do":"select","target":"label:Move stage","value":"workshop_scheduled"},
+  {"do":"read"},
+  {"do":"shot","name":"prospect-moved"}
+]

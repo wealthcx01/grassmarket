@@ -1,0 +1,14 @@
+import { chromium } from "/home/dev/projects/grassmarket/frontend/node_modules/playwright-core/index.js";
+const EXE = "/home/dev/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome";
+const BASE = "https://grassmarket-web-staging.up.railway.app";
+const b = await chromium.launch({ executablePath: EXE, headless: true });
+const p = await (await b.newContext()).newPage();
+await p.goto(`${BASE}/login`, { waitUntil: "domcontentloaded" });
+await p.locator("#email").waitFor(); await p.waitForTimeout(1200);
+await p.locator("#email").type("advisor@bruntsfieldcapital.com"); await p.locator("#password").type("grassmarket-demo");
+await p.waitForTimeout(300); await p.getByRole("button",{name:"Sign in"}).click();
+await p.waitForURL(/\/$/,{timeout:15000}).catch(()=>{});
+await p.goto(`${BASE}/assessments`, { waitUntil: "domcontentloaded" }); await p.waitForTimeout(1500);
+const inputs = await p.$$eval("input,select,textarea,button", els => els.map(e => ({tag:e.tagName, type:e.type||"", id:e.id||"", name:e.name||"", ph:e.placeholder||"", aria:e.getAttribute("aria-label")||"", txt:(e.innerText||e.value||"").slice(0,40), disabled:e.disabled||false})));
+console.log(JSON.stringify(inputs,null,1));
+await b.close();

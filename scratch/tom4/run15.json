@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments/344c6333-707b-4a8e-bb30-3e1738d534c7","note":"open sandbox"},
+  {"do":"click","target":"text:6. Summary"},
+  {"do":"click","target":"text:Finalise & lock inputs"},
+  {"do":"read"},
+  {"do":"shot","name":"finalised"},
+  {"do":"read"}
+]

@@ -1,0 +1,4 @@
+[
+  {"do":"goto","url":"/profile","note":"verify login works"},
+  {"do":"read"}
+]

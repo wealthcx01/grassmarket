@@ -1,0 +1,17 @@
+[
+  {"do":"goto","url":"/profile","note":"profile"},
+  {"do":"fill","target":"label:Current password","value":"mockadvisor-2026"},
+  {"do":"fill","target":"label:New password","value":"short"},
+  {"do":"fill","target":"label:Confirm new password","value":"short"},
+  {"do":"click","target":"text:Update password","note":"too short"},
+  {"do":"read"},
+  {"do":"fill","target":"label:New password","value":"aValidLongPassword123"},
+  {"do":"fill","target":"label:Confirm new password","value":"differentPassword123"},
+  {"do":"click","target":"text:Update password","note":"mismatch"},
+  {"do":"read"},
+  {"do":"fill","target":"label:Current password","value":"wrongCurrentPass"},
+  {"do":"fill","target":"label:New password","value":"aValidLongPassword123"},
+  {"do":"fill","target":"label:Confirm new password","value":"aValidLongPassword123"},
+  {"do":"click","target":"text:Update password","note":"wrong current"},
+  {"do":"read"}
+]

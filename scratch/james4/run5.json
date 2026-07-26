@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments/bec3356b-b5b1-4e75-abc5-9559f811ead0","note":"reopen"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"read"},
+  {"do":"shot","name":"infra"},
+  {"do":"click","target":"text:Guidance"},
+  {"do":"read"},
+  {"do":"shot","name":"infra-guidance"}
+]

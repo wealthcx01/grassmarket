@@ -1,0 +1,15 @@
+[
+  {"do":"goto","url":"/workbench"},
+  {"do":"click","target":"text:Practice Arena"},
+  {"do":"click","target":"text:Practise"},
+  {"do":"read","note":"arena session"},
+  {"do":"shot","name":"45-arena-session"},
+  {"do":"goto","url":"/assessments/acee244c-f6db-45e8-9e7c-90387d3a78a3"},
+  {"do":"click","target":"text:7. Scenarios"},
+  {"do":"click","target":"text:+ Add scenario"},
+  {"do":"select","target":":nth-match(select, 1)","value":"Resilience & Disaster Recovery"},
+  {"do":"click","target":":nth-match(button:text-is(\"Frontier\"), 1)"},
+  {"do":"click","target":"text:Rank by ΔV"},
+  {"do":"read","note":"delta V result"},
+  {"do":"shot","name":"46-scenario-dv"}
+]

@@ -1,0 +1,17 @@
+[
+  {"do":"goto","url":"/assessments/b6fd32d9-90eb-4040-8699-a599949edf8b","note":"open wizard"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"click","target":"text:Collapse all"},
+  {"do":"click","target":"text:Client Portal & Planning","note":"expand module 1 only"},
+  {"do":"click","target":"button:text-is('Developing') >> nth=0","note":"portal experience"},
+  {"do":"click","target":"button:text-is('Developing') >> nth=1","note":"onboarding"},
+  {"do":"click","target":"button:text-is('Advanced') >> nth=2","note":"planning tools"},
+  {"do":"click","target":"button:text-is('Advanced') >> nth=3","note":"accessibility"},
+  {"do":"click","target":"text:Client Portal & Planning","note":"collapse module 1"},
+  {"do":"click","target":"text:Client Management & Suitability","note":"expand module 5 only"},
+  {"do":"click","target":"button:text-is('Developing') >> nth=0","note":"COBS 9A"},
+  {"do":"click","target":"button:text-is('Advanced') >> nth=1","note":"risk profiling"},
+  {"do":"click","target":"button:text-is('Developing') >> nth=2","note":"mandate mix"},
+  {"do":"click","target":"button:text-is('Basic') >> nth=3","note":"ongoing-service evidencing"},
+  {"do":"read"}
+]

@@ -1,0 +1,7 @@
+[
+  {"do":"goto","url":"/assessments/1c7e4e2c-fd19-449d-af7c-90e5bd995859","note":"Revolut"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"click","target":"role:button:Expand all","note":"expand all modules"},
+  {"do":"read","note":"did modules expand (subcomponents visible)?"},
+  {"do":"shot","name":"wiz-03-expandall","full":true}
+]

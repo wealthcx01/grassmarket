@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"fill","target":"input","value":"London Stock Exchange Group"},
+  {"do":"select","target":"label:Operating model","value":"exchange"},
+  {"do":"read"},
+  {"do":"click","target":"text:Create & open","note":"create assessment"},
+  {"do":"read"},
+  {"do":"shot","name":"wizard_start"}
+]

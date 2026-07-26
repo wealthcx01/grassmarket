@@ -1,0 +1,15 @@
+[
+  {"do":"goto","url":"/assessments/f04a3afa-65eb-4671-9287-b3b37d2b4ea3"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"click","target":":nth-match(button:text-is(\"Established\"), 1)","note":"Scale benefit Established"},
+  {"do":"read","note":"did it register?"},
+  {"do":"click","target":":nth-match(button:text-is(\"Established\"), 1)","note":"click again - does it un-rate?"},
+  {"do":"read"},
+  {"do":"click","target":":nth-match(button:text-is(\"Established\"), 1)","note":"re-rate"},
+  {"do":"click","target":":nth-match(button:text-is(\"Emerging\"), 2)","note":"Scale barrier Emerging"},
+  {"do":"click","target":":nth-match(button:text-is(\"Emerging\"), 3)","note":"Network benefit Emerging"},
+  {"do":"click","target":":nth-match(button:text-is(\"Emerging\"), 4)","note":"Network barrier Emerging"},
+  {"do":"click","target":":nth-match(button:text-is(\"Established\"), 5)","note":"CP benefit Established"},
+  {"do":"click","target":":nth-match(button:text-is(\"Emerging\"), 6)","note":"CP barrier Emerging"},
+  {"do":"shot","name":"13-powers-half"}
+]

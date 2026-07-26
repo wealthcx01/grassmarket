@@ -1,0 +1,12 @@
+[
+  {"do":"goto","url":"/assessments/cfc53762-0581-4523-bca3-bd9ef1b352b0","note":"reopen"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"select","target":"select >> nth=8","value":"Advanced"},
+  {"do":"select","target":"select >> nth=10","value":"Developing"},
+  {"do":"select","target":"select >> nth=12","value":"Advanced"},
+  {"do":"select","target":"select >> nth=16","value":"Advanced"},
+  {"do":"select","target":"select >> nth=20","value":"Advanced"},
+  {"do":"select","target":"select >> nth=24","value":"Advanced"},
+  {"do":"click","target":"text:1. Overview"},
+  {"do":"read"}
+]

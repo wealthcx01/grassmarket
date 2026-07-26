@@ -1,0 +1,15 @@
+[
+  {"do":"goto","url":"/workbench/academy/sales-egoist"},
+  {"do":"click","target":"text:Reveal model answer","note":"reveal with empty answer - blocked?"},
+  {"do":"fill","target":"textarea","value":"🤷 idk man passivity = loss because zero sum, own the next step"},
+  {"do":"click","target":"text:Reveal model answer"},
+  {"do":"read","note":"model answer shown?"},
+  {"do":"shot","name":"42-check-yourself"},
+  {"do":"goto","url":"/workbench"},
+  {"do":"click","target":"text:Practice Arena"},
+  {"do":"read","note":"practice arena"},
+  {"do":"shot","name":"43-arena"},
+  {"do":"click","target":"text:Learning & Drills"},
+  {"do":"read","note":"drills"},
+  {"do":"shot","name":"44-drills"}
+]

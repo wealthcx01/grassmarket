@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/pipeline","note":"pipeline"},
+  {"do":"click","target":"text:London Stock Exchange Group","note":"open detail"},
+  {"do":"select","target":"label:Move stage","value":"contracted","note":"jump to contracted"},
+  {"do":"read"},
+  {"do":"goto","url":"/engagements","note":"engagements now"},
+  {"do":"read"},
+  {"do":"shot","name":"engagements_after"}
+]

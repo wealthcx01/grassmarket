@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments/1fce9b57-199d-4ce8-aa26-5e0ba47f822c","note":"open wizard"},
+  {"do":"click","target":"text:6. Summary & Interpretation"},
+  {"do":"click","target":"text:Preview in sandbox"},
+  {"do":"read"},
+  {"do":"shot","name":"sandbox-preview-1"},
+  {"do":"read"},
+  {"do":"shot","name":"sandbox-preview-2"}
+]

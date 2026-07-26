@@ -1,0 +1,13 @@
+[
+  {"do":"goto","url":"/engagements/4e855092-880d-45e2-a160-7df72b9afcbf","note":"engagement"},
+  {"do":"click","target":"text:Review AI"},
+  {"do":"click","target":"button:text-is('Approve as drafted') >> nth=0"},
+  {"do":"click","target":"button:text-is('Approve as drafted') >> nth=0"},
+  {"do":"click","target":"button:text-is('Approve as drafted') >> nth=0"},
+  {"do":"read"},
+  {"do":"shot","name":"t43-approved"},
+  {"do":"click","target":"input[type=radio] >> nth=1","note":"client-facing radio"},
+  {"do":"click","target":"button:text-is('Generate')"},
+  {"do":"read"},
+  {"do":"shot","name":"t44-clientfacing2"}
+]

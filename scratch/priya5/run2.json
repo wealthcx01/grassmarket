@@ -1,0 +1,13 @@
+[
+  {"do":"goto","url":"/pipeline","note":"back to board"},
+  {"do":"click","target":"text:LSEG","note":"open detail"},
+  {"do":"fill","target":"label:Sector","value":"Financial market infrastructure — exchange operator"},
+  {"do":"click","target":"text:Workshop Scheduled","note":"advance stage"},
+  {"do":"read"},
+  {"do":"click","target":"text:Qualified","note":"advance again"},
+  {"do":"read"},
+  {"do":"shot","name":"05-lseg-qualified"},
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"read"},
+  {"do":"shot","name":"06-portfolio"}
+]

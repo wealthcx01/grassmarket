@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"shot","name":"portfolio_after_final"},
+  {"do":"read"},
+  {"do":"goto","url":"/deliverables","note":"deliverables"},
+  {"do":"shot","name":"deliverables_route"},
+  {"do":"read"}
+]

@@ -1,0 +1,19 @@
+[
+  {"do":"goto","url":"/assessments/bec3356b-b5b1-4e75-abc5-9559f811ead0","note":"open wizard"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"click","target":"button:has-text('Established') >> nth=0"},
+  {"do":"click","target":"button:has-text('Established') >> nth=1"},
+  {"do":"click","target":"button:has-text('Established') >> nth=2"},
+  {"do":"click","target":"button:has-text('Established') >> nth=3"},
+  {"do":"click","target":"button:has-text('Established') >> nth=4"},
+  {"do":"click","target":"button:has-text('Established') >> nth=5"},
+  {"do":"click","target":"button:has-text('Established') >> nth=6"},
+  {"do":"click","target":"button:has-text('Established') >> nth=7"},
+  {"do":"click","target":"button:has-text('Established') >> nth=8"},
+  {"do":"click","target":"button:has-text('Established') >> nth=9"},
+  {"do":"click","target":"button:has-text('Established') >> nth=10"},
+  {"do":"click","target":"button:has-text('Established') >> nth=11"},
+  {"do":"click","target":"button:has-text('Established') >> nth=12"},
+  {"do":"click","target":"button:has-text('Established') >> nth=13"},
+  {"do":"read"}
+]

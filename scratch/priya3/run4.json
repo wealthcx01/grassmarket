@@ -1,0 +1,11 @@
+[
+  {"do":"goto","url":"/assessments/54add278-f810-4b70-b339-03ec8bed4b4e","note":"open wizard"},
+  {"do":"select","target":"label:Operating model","value":"exchange"},
+  {"do":"read"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"read"},
+  {"do":"shot","name":"infra_exchange"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"read"},
+  {"do":"shot","name":"metrics_exchange"}
+]

@@ -1,0 +1,11 @@
+[
+  {"do":"goto","url":"/engagements","note":"engagements"},
+  {"do":"read"},
+  {"do":"shot","name":"engagements"},
+  {"do":"goto","url":"/earnings","waitfor":"Earnings","note":"earnings"},
+  {"do":"read"},
+  {"do":"shot","name":"earnings"},
+  {"do":"goto","url":"/academy","note":"academy"},
+  {"do":"read"},
+  {"do":"shot","name":"academy"}
+]

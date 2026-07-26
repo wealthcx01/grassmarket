@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments/7c27b831-85fc-431d-aea8-023952524397","note":"open wizard"},
+  {"do":"select","target":"label:Operating model","value":"exchange","note":"set exchange model"},
+  {"do":"shot","name":"exchange-set"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"fill","target":"label:Net Revenue (TTM)","value":"-500000","note":"nonsensical negative revenue"},
+  {"do":"read"},
+  {"do":"shot","name":"negative-revenue"}
+]

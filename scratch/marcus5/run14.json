@@ -1,0 +1,15 @@
+[
+  {"do":"goto","url":"/assessments/f04a3afa-65eb-4671-9287-b3b37d2b4ea3"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"click","target":":nth-match(button:text-is(\"Advanced\"), 1)","note":"FE perf Advanced"},
+  {"do":"read","note":"registered?"},
+  {"do":"click","target":":nth-match(button:text-is(\"Not assessed\"), 1)","note":"un-rate it"},
+  {"do":"read"},
+  {"do":"click","target":":nth-match(button:text-is(\"Advanced\"), 1)","note":"re-rate"},
+  {"do":"click","target":":nth-match(button:text-is(\"Frontier\"), 2)","note":"FE UX Frontier"},
+  {"do":"click","target":":nth-match(button:text-is(\"Advanced\"), 3)","note":"FE device Advanced"},
+  {"do":"click","target":":nth-match(button:text-is(\"Advanced\"), 7)","note":"AppServer hosting Advanced"},
+  {"do":"click","target":":nth-match(button:text-is(\"Developing\"), 8)","note":"AppServer resilience Developing"},
+  {"do":"read","note":"live score now?"},
+  {"do":"shot","name":"18-infra-rated"}
+]

@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"read"},
+  {"do":"shot","name":"portfolio2"},
+  {"do":"goto","url":"/assessments/68dd8d67-cdb7-4216-a559-6a96d9f711f8","note":"finalised sandbox"},
+  {"do":"click","target":"text:7. Scenarios"},
+  {"do":"read"}
+]

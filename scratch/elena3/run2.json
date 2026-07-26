@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"fill","target":"placeholder:Type to find the company in the registry, or enter any name to keep it manual.","value":"Deutsche Börse"},
+  {"do":"shot","name":"typed-company"},
+  {"do":"click","target":"text:Exchange / market infrastructure"},
+  {"do":"shot","name":"model-selected"},
+  {"do":"click","target":"text:Create & open"},
+  {"do":"read"},
+  {"do":"shot","name":"wizard-start"}
+]

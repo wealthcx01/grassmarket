@@ -1,0 +1,6 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"click","target":"text:Robinhood","note":"open Robinhood assessment"},
+  {"do":"read"},
+  {"do":"shot","name":"assessment_open"}
+]

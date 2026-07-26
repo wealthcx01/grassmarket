@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/","note":"dashboard cold"},
+  {"do":"shot","name":"dashboard"},
+  {"do":"goto","url":"/pipeline","note":"pipeline board"},
+  {"do":"fill","target":"placeholder:New prospect — company name","value":"Brewin Dolphin"},
+  {"do":"click","target":"text:Add prospect"},
+  {"do":"waittext","value":"Brewin Dolphin"},
+  {"do":"shot","name":"pipeline"},
+  {"do":"read"}
+]

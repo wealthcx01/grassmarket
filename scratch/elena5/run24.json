@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/prospects/74fd07d8-1449-4982-a3fa-7ea88de69480"},
+  {"do":"fill","target":"placeholder:Engagement title","value":"Platform Power Assessment — Deutsche Börse"},
+  {"do":"click","target":"text:Open engagement"},
+  {"do":"waittext","value":"Platform Power Assessment — Deutsche Börse"},
+  {"do":"click","target":"text:Platform Power Assessment — Deutsche Börse"},
+  {"do":"read"},
+  {"do":"shot","name":"29-engagement-detail","full":true}
+]

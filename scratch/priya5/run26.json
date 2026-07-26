@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/workbench/academy/sales-egoist","waitfor":"lessons"},
+  {"do":"read"},
+  {"do":"goto","url":"/workbench","waitfor":"Workbench"},
+  {"do":"read"},
+  {"do":"goto","url":"/","waitfor":"Advisor Studio"},
+  {"do":"read"},
+  {"do":"shot","name":"38-dashboard-end"}
+]

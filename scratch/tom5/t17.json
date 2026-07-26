@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments/b6fd32d9-90eb-4040-8699-a599949edf8b","note":"open wizard"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"click","target":"button:text-is('Developing') >> nth=0","note":"COBS 9A suitability"},
+  {"do":"click","target":"button:text-is('Advanced') >> nth=1","note":"risk profiling"},
+  {"do":"click","target":"button:text-is('Developing') >> nth=2","note":"mandate mix"},
+  {"do":"click","target":"button:text-is('Basic') >> nth=3","note":"ongoing-service evidencing"},
+  {"do":"read"}
+]

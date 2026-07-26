@@ -1,0 +1,11 @@
+[
+  {"do":"goto","url":"/engagements/4e855092-880d-45e2-a160-7df72b9afcbf","note":"engagement"},
+  {"do":"click","target":"text:Review AI"},
+  {"do":"click","target":"text:Draft AI narratives"},
+  {"do":"read"},
+  {"do":"shot","name":"t41-ai-drafted","full":true},
+  {"do":"click","target":"text:Client-facing","note":"switch audience to client-facing"},
+  {"do":"click","target":"button:text-is('Generate')","note":"try client-facing generation"},
+  {"do":"read"},
+  {"do":"shot","name":"t42-clientfacing"}
+]

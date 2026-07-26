@@ -1,7 +1,8 @@
 # GRS-0177 — Portfolio demo clarity: dedupe, explain, clean
 
-**Status:** Planned (2026-07-23, founder feedback item 4). **Priority:** HIGH — the founder's
-own demo confusion.
+**Status:** In review (2026-07-26) — grouping, explanations and seed hygiene shipped; the
+staging cleanup script is written but has NOT been run (needs deploy access). **Priority:**
+HIGH — the founder's own demo confusion.
 **Loop:** founder-feedback remediation, Wave 1.
 
 ## Why

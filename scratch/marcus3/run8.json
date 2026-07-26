@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/assessments/08a4b9cc-ad8d-4ec2-8954-90eea684ba16","note":"open assessment"},
+  {"do":"click","target":"text:2. Business Metrics","note":"metrics tab"},
+  {"do":"fill","target":"placeholder:value","value":"-5000","note":"negative into first empty value"},
+  {"do":"read"},
+  {"do":"shot","name":"neg_metric"},
+  {"do":"fill","target":"placeholder:value","value":"abcdef","note":"letters into number field"},
+  {"do":"read"},
+  {"do":"shot","name":"alpha_metric"}
+]

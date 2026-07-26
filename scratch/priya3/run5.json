@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/assessments/54add278-f810-4b70-b339-03ec8bed4b4e","note":"open wizard"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"fill","target":"input[type=number]","value":"-500"},
+  {"do":"read"},
+  {"do":"shot","name":"neg_metric"},
+  {"do":"fill","target":"input[type=number]","value":"1200000"},
+  {"do":"read"},
+  {"do":"shot","name":"pos_metric"}
+]

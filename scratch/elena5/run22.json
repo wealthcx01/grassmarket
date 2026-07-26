@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/pipeline"},
+  {"do":"click","target":"text:Deutsche Börse"},
+  {"do":"waittext","value":"Win probability"},
+  {"do":"click","target":"text:Open full record (workshops, engagements) →"},
+  {"do":"read"},
+  {"do":"shot","name":"27-full-record","full":true}
+]

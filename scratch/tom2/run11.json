@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/workbench","note":"workbench"},
+  {"do":"click","target":"text:Practice Arena"},
+  {"do":"read"},
+  {"do":"shot","name":"practice-arena"},
+  {"do":"click","target":"text:the Demo weapon"},
+  {"do":"read"},
+  {"do":"shot","name":"practice-session"}
+]

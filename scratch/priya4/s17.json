@@ -1,0 +1,6 @@
+[
+  {"do":"goto","url":"/workbench/academy","note":"academy"},
+  {"do":"click","target":"text:Sales Egoist"},
+  {"do":"shot","name":"course_egoist"},
+  {"do":"read"}
+]

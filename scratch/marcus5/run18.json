@@ -1,0 +1,13 @@
+[
+  {"do":"goto","url":"/assessments/f04a3afa-65eb-4671-9287-b3b37d2b4ea3"},
+  {"do":"click","target":"text:5. Customer Proposition"},
+  {"do":"click","target":"text:Onboarding & Account"},
+  {"do":"read","note":"widget rows"},
+  {"do":"shot","name":"27-widgets"},
+  {"do":"goto","url":"/assessments"},
+  {"do":"read","note":"portfolio row"},
+  {"do":"shot","name":"28-portfolio"},
+  {"do":"click","target":"text:Sandbox preview"},
+  {"do":"read","note":"sandbox toggle state"},
+  {"do":"shot","name":"29-sandbox"}
+]

@@ -1,0 +1,11 @@
+[
+  {"do":"goto","url":"/","note":"dashboard"},
+  {"do":"read"},
+  {"do":"shot","name":"dashboard"},
+  {"do":"goto","url":"/pipeline","note":"open board"},
+  {"do":"read"},
+  {"do":"shot","name":"pipeline"},
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"read"},
+  {"do":"shot","name":"assessments"}
+]

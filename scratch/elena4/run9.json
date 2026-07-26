@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/pipeline","note":"pipeline"},
+  {"do":"click","target":"text:Deutsche Börse"},
+  {"do":"read"},
+  {"do":"shot","name":"prospect-detail"},
+  {"do":"goto","url":"/deliverables","note":"deliverables"},
+  {"do":"read"},
+  {"do":"shot","name":"deliverables"}
+]

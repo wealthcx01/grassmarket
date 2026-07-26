@@ -1,0 +1,6 @@
+[
+  {"do":"goto","url":"/engagements/4e855092-880d-45e2-a160-7df72b9afcbf","note":"engagement"},
+  {"do":"click","target":"text:Review AI"},
+  {"do":"read"},
+  {"do":"shot","name":"t40-review-ai","full":true}
+]

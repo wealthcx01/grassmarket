@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/assessments/bde5bfc9-9ecf-499d-83db-acc530e81fb9"},
+  {"do":"click","target":"text:6. Summary & Interpretation"},
+  {"do":"click","target":"text:Finalise & lock inputs"},
+  {"do":"read"},
+  {"do":"shot","name":"18-finalise-1","full":true},
+  {"do":"click","target":"text:Finalise"},
+  {"do":"read"},
+  {"do":"shot","name":"19-finalise-2","full":true}
+]
