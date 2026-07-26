@@ -32,6 +32,7 @@ import type {
   CommsChannel,
   CommsLogEntry,
   CompanyEntity,
+  RegistryContact,
   Contact,
   ContentCompletion,
   Course,
@@ -327,6 +328,15 @@ export const api = {
       headers: authHeaders(),
       signal,
     });
+  },
+
+  // The people known at an imported institution (GRS-0193, ADR-0045). Network-shared, so this is
+  // deliberately NOT the same call as a prospect's own owner-private contacts.
+  listRegistryContacts(targetId: string, signal?: AbortSignal): Promise<RegistryContact[]> {
+    return request<RegistryContact[]>(
+      `/entities/${encodeURIComponent(targetId)}/contacts`,
+      { method: "GET", headers: authHeaders(), signal },
+    );
   },
 
   assessmentsForEntity(entityId: string, signal?: AbortSignal): Promise<Assessment[]> {

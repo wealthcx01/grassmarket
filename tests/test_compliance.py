@@ -299,3 +299,74 @@ def test_erasure_is_self_or_admin(
 ) -> None:
     with pytest.raises(ScopeViolationError):
         repo.delete_personal_data(bob.principal, alice.stored.id, now=_NOW)
+
+
+# --- GTM registry contacts (GRS-0193 §7) ---------------------------------------------------
+# Registry contacts are imported business-contact PII in a table with NO owner_consultant_id, so
+# the reflection-based export/erasure loops never reach them. A consultant who also appears in an
+# imported roster is the same data subject and must be covered, matched on email.
+
+
+def _seed_registry_contact(repo: Repository, *, email: str | None, name: str) -> str:
+    from datetime import date
+
+    from bcap_contracts.entities import RegistryContact, RegistryTarget
+
+    on = date(2026, 7, 25)
+    repo.upsert_registry_target(
+        RegistryTarget(
+            target_id="lseg-acme",
+            name="Acme Research",
+            source="test",
+            imported_on=on,
+        )
+    )
+    contact_id = f"lseg-acme:{name.lower().replace(' ', '-')}"
+    repo.upsert_registry_contact(
+        RegistryContact(
+            contact_id=contact_id,
+            target_id="lseg-acme",
+            full_name=name,
+            email=email,
+            source="test",
+            imported_on=on,
+        )
+    )
+    return contact_id
+
+
+def test_export_includes_the_subjects_registry_contact(
+    repo: Repository, alice: SeededConsultant
+) -> None:
+    contact_id = _seed_registry_contact(repo, email=alice.stored.email, name="Alice Analyst")
+    export = repo.export_personal_data(alice.principal, alice.stored.id, now=_NOW)
+    rows = export.records["registry_contacts"]
+    assert [r["contact_id"] for r in rows] == [contact_id]
+
+
+def test_erasure_removes_the_subjects_registry_contact(
+    repo: Repository, alice: SeededConsultant
+) -> None:
+    _seed_registry_contact(repo, email=alice.stored.email, name="Alice Analyst")
+    counts = repo.delete_personal_data(alice.principal, alice.stored.id, now=_NOW)
+    assert counts["registry_contacts"] == 1
+    assert repo.list_registry_contacts("lseg-acme") == []
+
+
+def test_erasure_leaves_other_peoples_registry_contacts_alone(
+    repo: Repository, alice: SeededConsultant
+) -> None:
+    # A different person at the same institution is a different data subject.
+    _seed_registry_contact(repo, email="someone.else@acme.example", name="Other Person")
+    repo.delete_personal_data(alice.principal, alice.stored.id, now=_NOW)
+    assert [c.full_name for c in repo.list_registry_contacts("lseg-acme")] == ["Other Person"]
+
+
+def test_erasure_does_not_sweep_up_contacts_with_no_email(
+    repo: Repository, alice: SeededConsultant
+) -> None:
+    # An empty email must never match an anonymised consultant's blank one, or one erasure would
+    # silently delete every contact whose email was never published.
+    _seed_registry_contact(repo, email=None, name="Unlisted Person")
+    repo.delete_personal_data(alice.principal, alice.stored.id, now=_NOW)
+    assert [c.full_name for c in repo.list_registry_contacts("lseg-acme")] == ["Unlisted Person"]

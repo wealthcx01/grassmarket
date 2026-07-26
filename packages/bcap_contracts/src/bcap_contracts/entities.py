@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from enum import StrEnum
 from uuid import UUID
 
@@ -80,3 +80,63 @@ class CompanyEntity(BaseModel):
     segment: str | None = Field(
         default=None, description="Coarse sector hint, e.g. 'Neobank' or 'Broker'."
     )
+
+
+class RegistryTarget(BaseModel):
+    """An institution in the shared GTM target registry (GRS-0193, ADR-0045). Network-shared
+    reference data, deliberately NOT owner-scoped: every consultant searches the same imported
+    universe. `CompanyEntity` is derived from this by a pure adapter, so the `EntityRegistry`
+    search port is unchanged and only its corpus grows.
+
+    `source` records which dataset the row came from, and `imported_on` when, so a row's provenance
+    survives re-import. Both are required: an unattributed target is not importable (fail loud, #3).
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    target_id: str = Field(min_length=1, description="Stable slug, unique across all sources.")
+    name: str = Field(min_length=1)
+    aliases: tuple[str, ...] = ()
+    domain: str | None = None
+    segment: str | None = Field(
+        default=None, description="Coarse sector hint, e.g. 'Bank' or 'Exchange supplier'."
+    )
+    country: str | None = None
+    ric: str | None = Field(
+        default=None,
+        description="An LSEG RIC this institution was seen against, where known (GRS-0194).",
+    )
+    ctb_id: int | None = Field(
+        default=None,
+        description="LSEG/I-B-E-S contributor id — the per-institution grouping key for analyst "
+        "rosters. Null for targets from non-LSEG sources.",
+    )
+    source: str = Field(min_length=1, description="Dataset provenance token, e.g. 'lseg-roster'.")
+    imported_on: date
+
+
+class RegistryContact(BaseModel):
+    """A named person at a `RegistryTarget` (GRS-0193, ADR-0045). Network-shared: any authenticated
+    consultant may read the shared universe, which is the one deliberate exception to owner-scoping
+    (#9) and is test-enforced so it cannot leak into owner-scoped resources.
+
+    This is personal data. Rows live in the database only, never in a committed fixture, and they
+    are carried by the SAR export and erasure paths.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    contact_id: str = Field(min_length=1)
+    target_id: str = Field(min_length=1)
+    full_name: str = Field(min_length=1)
+    email: str | None = None
+    phone: str | None = None
+    job_role: str | None = None
+    linkedin: str | None = None
+    verified: bool = Field(
+        default=False,
+        description="Whether a human confirmed this person and role against a named source. An "
+        "inferred or unaudited row stays False and renders flagged, never as verified.",
+    )
+    source: str = Field(min_length=1)
+    imported_on: date

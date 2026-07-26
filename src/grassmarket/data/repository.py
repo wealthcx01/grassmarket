@@ -100,7 +100,13 @@ from bcap_contracts.engagements import (
     Workshop,
     WorkshopState,
 )
-from bcap_contracts.entities import Contact, PipelineStage, Prospect
+from bcap_contracts.entities import (
+    Contact,
+    PipelineStage,
+    Prospect,
+    RegistryContact,
+    RegistryTarget,
+)
 from bcap_contracts.extraction import (
     Extraction,
     ExtractionConfidence,
@@ -138,7 +144,7 @@ from bcap_contracts.predictions import (
     Prediction,
     PredictionOutcome,
 )
-from sqlalchemy import delete, select
+from sqlalchemy import Text, delete, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -181,6 +187,8 @@ from grassmarket.data.models import (
     ProspectStageHistoryORM,
     RecoveryFeeAttributionORM,
     RefreshTokenORM,
+    RegistryContactORM,
+    RegistryTargetORM,
     ScoringRunORM,
     WorkshopORM,
 )
@@ -189,6 +197,7 @@ from grassmarket.earnings.commission import (
     compute_consultancy_commission,
     compute_product_commission,
 )
+from grassmarket.entities.registry import rank_name
 from grassmarket.pathb.cipher import TranscriptCipher
 from grassmarket.pathb.extraction import Extractor
 from grassmarket.pathb.scanning import MediaScanner
@@ -811,6 +820,138 @@ class Repository:
                 self._session.add(prospect)
         self._session.delete(row)
         self._session.flush()
+
+    # ------------------------------------------------- GTM registry (NETWORK-SHARED, GRS-0193)
+    # ADR-0045 §2: the target/contact registry is shared reference data, not a consultant's own
+    # records, so these reads take no owner filter. That is the ONE deliberate exception to
+    # non-negotiable #9, and `tests/test_gtm_registry.py` asserts both halves of it: the registry
+    # is readable by any authenticated consultant, and a prospect's own `contacts` stay private.
+    # The write side is operator/ingest-only and never reachable from an advisor-facing route.
+
+    def upsert_registry_target(self, target: RegistryTarget) -> RegistryTarget:
+        """Insert or overwrite a registry target by its `target_id`. Idempotent by construction:
+        re-running an import overwrites the same row rather than duplicating it."""
+        row = self._session.get(RegistryTargetORM, target.target_id)
+        if row is None:
+            row = RegistryTargetORM(target_id=target.target_id)
+        row.name = target.name
+        row.aliases = list(target.aliases)
+        row.domain = target.domain
+        row.segment = target.segment
+        row.country = target.country
+        row.ric = target.ric
+        row.ctb_id = target.ctb_id
+        row.source = target.source
+        row.imported_on = target.imported_on
+        self._session.add(row)
+        self._session.flush()
+        return self._to_registry_target(row)
+
+    def upsert_registry_contact(self, contact: RegistryContact) -> RegistryContact:
+        """Insert or overwrite a registry contact by its `contact_id`. Fails loud if the target is
+        unknown: a contact with no institution is not importable (#3)."""
+        if self._session.get(RegistryTargetORM, contact.target_id) is None:
+            raise NotFoundError(f"Registry target '{contact.target_id}' not found.")
+        row = self._session.get(RegistryContactORM, contact.contact_id)
+        if row is None:
+            row = RegistryContactORM(contact_id=contact.contact_id)
+        row.target_id = contact.target_id
+        row.full_name = contact.full_name
+        row.email = contact.email
+        row.phone = contact.phone
+        row.job_role = contact.job_role
+        row.linkedin = contact.linkedin
+        row.verified = contact.verified
+        row.source = contact.source
+        row.imported_on = contact.imported_on
+        self._session.add(row)
+        self._session.flush()
+        return self._to_registry_contact(row)
+
+    def search_registry_targets(self, query: str, *, limit: int = 8) -> list[RegistryTarget]:
+        """Ranked targets matching `query`, using the same exact > prefix > alias > substring order
+        the stub registry applies, so behaviour is identical and only the corpus is larger.
+
+        The name filter runs in SQL so the whole imported universe is never loaded; the precise
+        ranking then runs over that candidate set, where alias matches (a JSON column, not portably
+        queryable) are resolved.
+        """
+        q = query.strip().lower()
+        if not q:
+            return []
+        like = f"%{q}%"
+        # Candidates: a name match in SQL, plus every row whose aliases might match. Aliases are
+        # JSON, so they are filtered in Python — bounded by taking only rows that could rank.
+        stmt = select(RegistryTargetORM).where(func.lower(RegistryTargetORM.name).like(like))
+        by_name = list(self._session.execute(stmt).scalars())
+        alias_stmt = select(RegistryTargetORM).where(
+            func.lower(func.cast(RegistryTargetORM.aliases, Text)).like(like)
+        )
+        seen = {r.target_id for r in by_name}
+        candidates = by_name + [
+            r for r in self._session.execute(alias_stmt).scalars() if r.target_id not in seen
+        ]
+        ranked: list[tuple[int, str, RegistryTargetORM]] = []
+        for row in candidates:
+            rank = rank_name(row.name, tuple(row.aliases or ()), q)
+            if rank is not None:
+                ranked.append((rank, row.name, row))
+        ranked.sort(key=lambda t: (t[0], t[1]))
+        return [self._to_registry_target(row) for _, _, row in ranked[:limit]]
+
+    def get_registry_target(self, target_id: str) -> RegistryTarget | None:
+        row = self._session.get(RegistryTargetORM, target_id)
+        return None if row is None else self._to_registry_target(row)
+
+    def count_registry_targets(self) -> int:
+        """How many targets are imported. The DB-backed entity registry uses this to decide whether
+        the imported universe is live yet, so a fresh dev database still resolves the stub seed."""
+        return int(
+            self._session.execute(select(func.count(RegistryTargetORM.target_id))).scalar_one()
+        )
+
+    def list_registry_contacts(self, target_id: str) -> list[RegistryContact]:
+        """Every known contact at an institution — network-shared, verified rows first. Fails loud
+        on an unknown target rather than returning an empty list that reads as 'nobody works here'.
+        """
+        if self._session.get(RegistryTargetORM, target_id) is None:
+            raise NotFoundError(f"Registry target '{target_id}' not found.")
+        stmt = (
+            select(RegistryContactORM)
+            .where(RegistryContactORM.target_id == target_id)
+            .order_by(RegistryContactORM.verified.desc(), RegistryContactORM.full_name)
+        )
+        return [self._to_registry_contact(r) for r in self._session.execute(stmt).scalars()]
+
+    @staticmethod
+    def _to_registry_target(row: RegistryTargetORM) -> RegistryTarget:
+        return RegistryTarget(
+            target_id=row.target_id,
+            name=row.name,
+            aliases=tuple(row.aliases or ()),
+            domain=row.domain,
+            segment=row.segment,
+            country=row.country,
+            ric=row.ric,
+            ctb_id=row.ctb_id,
+            source=row.source,
+            imported_on=row.imported_on,
+        )
+
+    @staticmethod
+    def _to_registry_contact(row: RegistryContactORM) -> RegistryContact:
+        return RegistryContact(
+            contact_id=row.contact_id,
+            target_id=row.target_id,
+            full_name=row.full_name,
+            email=row.email,
+            phone=row.phone,
+            job_role=row.job_role,
+            linkedin=row.linkedin,
+            verified=row.verified,
+            source=row.source,
+            imported_on=row.imported_on,
+        )
 
     def _require_consultant_owned_prospect(self, prospect_id: UUID) -> ProspectORM:
         prospect = self._session.get(ProspectORM, prospect_id)
@@ -2012,6 +2153,17 @@ class Repository:
             for r in rows
         ]
 
+    def _registry_contacts_for_email(self, email: str) -> list[RegistryContactORM]:
+        """Imported registry rows belonging to one data subject, matched case-insensitively on
+        email. An empty email never matches, so an anonymised consultant cannot sweep up the rows
+        of every contact whose email is unset."""
+        if not email.strip():
+            return []
+        stmt = select(RegistryContactORM).where(
+            func.lower(RegistryContactORM.email) == email.strip().lower()
+        )
+        return list(self._session.execute(stmt).scalars())
+
     def _require_self_or_admin(self, principal: Principal, subject_id: UUID) -> None:
         if not (principal.is_admin or subject_id == principal.consultant_id):
             raise ScopeViolationError("You may export or delete only your own personal data.")
@@ -2047,6 +2199,13 @@ class Repository:
         )
         records["invitations"] = [
             _row_to_dict(r, redact=frozenset({"token_hash"})) for r in invitations
+        ]
+        # Registry contacts are imported business-contact PII and are NOT owner-scoped, so the loop
+        # above never reaches them (GRS-0193 §7). A consultant who also appears in an imported
+        # roster — an analyst who later joins the network — is the same data subject, matched on
+        # email, and their SAR must include those rows.
+        records["registry_contacts"] = [
+            _row_to_dict(r) for r in self._registry_contacts_for_email(consultant.email)
         ]
         self.record_audit(
             actor_consultant_id=principal.consultant_id,
@@ -2126,6 +2285,15 @@ class Repository:
             )
         )
         counts["invitations"] = getattr(inv_result, "rowcount", 0) or 0
+
+        # Registry contacts carry the subject's PII but are not owner-scoped, so the loop above
+        # never reaches them (GRS-0193 §7). Erase the subject's own rows, matched on the email
+        # captured before the consultant row is anonymised below. Rows for OTHER people at the same
+        # institution are untouched: they are different data subjects.
+        registry_rows = self._registry_contacts_for_email(consultant.email)
+        for registry_row in registry_rows:
+            self._session.delete(registry_row)
+        counts["registry_contacts"] = len(registry_rows)
 
         consultant.email = f"deleted-{subject_id}@anonymised.invalid"
         consultant.full_name = "[deleted]"
