@@ -360,7 +360,10 @@ export function WizardClient({ id }: { id: string }) {
 
       <Stepper current={step} onSelect={setStep} />
 
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 20rem", gap: "1.5rem", marginTop: "1rem" }}>
+      {/* Two columns above 900px, one below (GRS-0182). The breakpoint lives in globals.css
+          because an inline style cannot hold a media query, and below it the rail stops being
+          sticky — a sticky element in a single stacked column just pins to the top oddly. */}
+      <div className="wizard-two-col" style={{ display: "grid", gap: "1.5rem", marginTop: "1rem" }}>
         <div>
           <h2 style={{ fontSize: "1.15rem" }}>{WIZARD_STEPS[step]!.title}</h2>
           <Current {...stepProps} />
@@ -378,7 +381,7 @@ export function WizardClient({ id }: { id: string }) {
             </button>
           </div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div data-wizard-rail style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <LiveSummary live={live} profileKey={profileKey} clientUsable={clientUsable} final={finalEntry} />
           {!readOnly ? (
             <WizardSuggestionsPanel

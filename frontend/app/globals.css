@@ -452,3 +452,18 @@ button {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* Wizard layout (GRS-0182). Two columns with a fixed-width rail on a laptop; one stacked column
+   below 900px, where a 20rem rail would otherwise crush the content it is meant to annotate. The
+   rail also stops being sticky there, because pinning it in a single column is just noise. */
+.wizard-two-col {
+  grid-template-columns: minmax(0, 1fr) 20rem;
+}
+@media (max-width: 900px) {
+  .wizard-two-col {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .wizard-two-col [data-wizard-rail] > * {
+    position: static !important;
+  }
+}
