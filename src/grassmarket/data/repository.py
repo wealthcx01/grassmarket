@@ -503,7 +503,7 @@ class Repository:
         *,
         email: str,
         full_name: str,
-        hashed_password: str,
+        hashed_password: str | None,
         role: Role,
         tier: ConsultantTier,
         assessor_level: AssessorLevel = AssessorLevel.TRAINED,
