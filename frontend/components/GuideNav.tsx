@@ -23,6 +23,9 @@ export const GUIDE_SECTIONS: ReadonlyArray<{ id: string; label: string }> = [
   { id: "reading-outputs", label: "Reading the outputs" },
   { id: "calibration", label: "Calibration" },
   { id: "mistakes", label: "Mistakes to avoid" },
+  { id: "scoring-explained", label: "Scoring, in full" },
+  { id: "working-the-app", label: "Working the app" },
+  { id: "principles", label: "Principles" },
 ];
 
 export function GuideNav() {

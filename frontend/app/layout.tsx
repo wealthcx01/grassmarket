@@ -100,7 +100,7 @@ export default function RootLayout({
           <PrimaryNav />
 
           <Link
-            href="/help"
+            href="/guide"
             style={{
               marginLeft: "auto",
               color: "var(--color-ink-soft)",
