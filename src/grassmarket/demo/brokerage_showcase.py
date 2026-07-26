@@ -23,6 +23,7 @@ from datetime import date
 
 from bcap_contracts.assessments import (
     AssessmentDocument,
+    AssessmentState,
     MetricEntry,
     PowerEntry,
     RecordProvenance,
@@ -347,11 +348,15 @@ def seed_brokerage_showcase(
             )
         session.commit()
         principal = Principal(consultant_id=owner.id, role=owner.role)
-        # Idempotency: a brokerage whose DEMO assessment already exists is skipped whole.
+        # Idempotency (GRS-0177): skip a brokerage that ALREADY has a finalised assessment for
+        # this owner, whatever its provenance. Checking only DEMO meant a subject already
+        # showcased as a sandbox record during a staging run was re-created as a demo row, which
+        # is how the founder ended up looking at Revolut, Hargreaves Lansdown and WeBull twice
+        # each with identical scores.
         seeded_subjects = {
             a.subject
             for a in repo.list_assessments(principal)
-            if a.provenance is RecordProvenance.DEMO
+            if a.state is AssessmentState.FINALISED
         }
         prospects = {p.company_name: p for p in repo.list_prospects(principal)}
     finally:
@@ -458,6 +463,31 @@ def seed_brokerage_showcase(
                 )
 
         # 6) The illustrative Year-1 product commission, recorded by the admin (ADR-0026).
+        # A partial run that created the engagement but died before this step must be resumable,
+        # and resuming must not record the commission twice (GRS-0177). The check reads through
+        # the API like everything else here, never a direct query.
+        existing = client.get("/earnings/commissions", headers=headers)
+        if existing.status_code != 200:
+            raise ShowcaseSeedError(
+                f"{spec.subject}: list commissions failed {existing.status_code}: {existing.text}"
+            )
+        already_recorded = any(
+            line.get("engagement_id") == eid and line.get("product_id") == spec.product_id
+            for line in existing.json()
+        )
+        if already_recorded:
+            results.append(
+                {
+                    "subject": spec.subject,
+                    "status": "exists (commission already recorded)",
+                    "prospect_id": pid,
+                    "assessment_id": aid,
+                    "engagement_id": eid,
+                    "product_sold": spec.product_id,
+                }
+            )
+            continue
+
         recorded = client.post(
             "/earnings/commissions/product",
             json={

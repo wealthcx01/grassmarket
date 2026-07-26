@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/pipeline","note":"open pipeline"},
+  {"do":"click","target":"text:Add prospect","note":"reveal add form"},
+  {"do":"read"},
+  {"do":"shot","name":"addform"},
+  {"do":"click","target":"text:Add prospect","note":"submit empty form - try to break"},
+  {"do":"read"}
+]

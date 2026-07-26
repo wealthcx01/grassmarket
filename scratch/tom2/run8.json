@@ -1,0 +1,12 @@
+[
+  {"do":"goto","url":"/engagements","note":"engagements"},
+  {"do":"click","target":"text:SJP Platform Power engagement"},
+  {"do":"read"},
+  {"do":"shot","name":"engagement-detail"},
+  {"do":"goto","url":"/workbench","note":"workbench"},
+  {"do":"read"},
+  {"do":"shot","name":"workbench"},
+  {"do":"goto","url":"/academy","note":"academy"},
+  {"do":"read"},
+  {"do":"shot","name":"academy"}
+]

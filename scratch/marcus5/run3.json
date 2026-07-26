@@ -1,0 +1,14 @@
+[
+  {"do":"goto","url":"/pipeline"},
+  {"do":"click","target":"text:Robinhood"},
+  {"do":"click","target":"role:button:Closed","note":"illegal jump Prospect->Closed"},
+  {"do":"read"},
+  {"do":"click","target":"role:button:Delivered","note":"jump terminal->Delivered"},
+  {"do":"read"},
+  {"do":"click","target":"role:button:Prospect","note":"back to start"},
+  {"do":"read"},
+  {"do":"shot","name":"05-stage-jumps"},
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"read"},
+  {"do":"shot","name":"06-assessments"}
+]

@@ -1,0 +1,7 @@
+[
+  {"do":"goto","url":"/assessments/3c5cca4b-9839-44a2-876b-56eb956ea07f","note":"sandbox"},
+  {"do":"click","target":"text:6. Summary"},
+  {"do":"click","target":"text:deliverable"},
+  {"do":"shot","name":"deliverable1"},
+  {"do":"read"}
+]

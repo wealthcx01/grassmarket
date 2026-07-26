@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/pipeline","note":"pipeline with 3 brokerages"},
+  {"do":"shot","name":"e01-pipeline","full":true},
+  {"do":"goto","url":"/assessments","note":"portfolio — 3 brokerages scored"},
+  {"do":"read","note":"portfolio scores"},
+  {"do":"shot","name":"e02-portfolio","full":true},
+  {"do":"goto","url":"/earnings","waitfor":"Earnings","note":"earnings £49,500"},
+  {"do":"read","note":"earnings totals"},
+  {"do":"shot","name":"e03-earnings","full":true}
+]

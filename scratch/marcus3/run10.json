@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/assessments/00000000-0000-0000-0000-000000000000","note":"valid uuid, nonexistent"},
+  {"do":"read"},
+  {"do":"goto","url":"/workbench/academy/no-such-course","note":"bad course slug"},
+  {"do":"read"},
+  {"do":"goto","url":"/engagements/00000000-0000-0000-0000-000000000000","note":"nonexistent engagement uuid"},
+  {"do":"read"},
+  {"do":"goto","url":"/pipeline?stage=<script>alert(1)</script>","note":"xss-ish query"},
+  {"do":"read"}
+]

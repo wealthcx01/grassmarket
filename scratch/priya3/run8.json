@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"click","target":"text:Sandbox preview — finalise solo & see the real deliverable (watermarked)"},
+  {"do":"fill","target":"input","value":"LSEG Sandbox Exchange Test"},
+  {"do":"select","target":"label:Operating model","value":"exchange"},
+  {"do":"click","target":"text:Create & open"},
+  {"do":"click","target":"text:6. Summary & Interpretation"},
+  {"do":"read"},
+  {"do":"shot","name":"summary_tab"}
+]

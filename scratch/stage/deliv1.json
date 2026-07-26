@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/engagements","note":"engagements list"},
+  {"do":"read","note":"engagements list UX"},
+  {"do":"shot","name":"d01-engagements","full":true},
+  {"do":"click","target":"text:Meridian Securities","note":"open the seeded engagement"},
+  {"do":"read","note":"engagement detail — deliverables path?"},
+  {"do":"shot","name":"d02-engagement-detail","full":true}
+]

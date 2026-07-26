@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments","waitfor":"Your Portfolio"},
+  {"do":"fill","target":"placeholder:Search a company","value":"Deutsche Börse"},
+  {"do":"select","target":"select","value":"exchange"},
+  {"do":"read"},
+  {"do":"click","target":"role:button:Create & open"},
+  {"do":"read"},
+  {"do":"shot","name":"wizard-open"}
+]

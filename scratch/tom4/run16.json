@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments/344c6333-707b-4a8e-bb30-3e1738d534c7","note":"open sandbox"},
+  {"do":"click","target":"text:1. Overview"},
+  {"do":"read"},
+  {"do":"shot","name":"overview-finalised"},
+  {"do":"goto","url":"/engagements","note":"engagements"},
+  {"do":"read"},
+  {"do":"shot","name":"engagements"}
+]

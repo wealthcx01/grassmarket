@@ -1,0 +1,7 @@
+[
+  {"do":"goto","url":"/assessments/7c27b831-85fc-431d-aea8-023952524397","note":"open wizard"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"read"},
+  {"do":"shot","name":"infra"},
+  {"do":"read"}
+]

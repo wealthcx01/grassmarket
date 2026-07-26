@@ -1,0 +1,13 @@
+[
+  {"do":"goto","url":"/assessments/71759c0d-ec1d-40fa-9c82-24c9e9297691","waitfor":"LSEG"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"select","target":"select:right-of(:text-is(\"Benefit\")):below(:text-is(\"Scale Economies\"))","value":"established"},
+  {"do":"select","target":"select:right-of(:text-is(\"Barrier\")):below(:text-is(\"Scale Economies\"))","value":"established"},
+  {"do":"select","target":"select:right-of(:text-is(\"Benefit\")):below(:text-is(\"Network Economies\"))","value":"wide"},
+  {"do":"select","target":"select:right-of(:text-is(\"Barrier\")):below(:text-is(\"Network Economies\"))","value":"wide"},
+  {"do":"select","target":"select:right-of(:text-is(\"Benefit\")):below(:text-is(\"Counter-Positioning\"))","value":"none"},
+  {"do":"select","target":"select:right-of(:text-is(\"Barrier\")):below(:text-is(\"Counter-Positioning\"))","value":"none"},
+  {"do":"select","target":"select:right-of(:text-is(\"Benefit\")):below(:text-is(\"Switching Costs\"))","value":"wide"},
+  {"do":"select","target":"select:right-of(:text-is(\"Barrier\")):below(:text-is(\"Switching Costs\"))","value":"established"},
+  {"do":"read"}
+]

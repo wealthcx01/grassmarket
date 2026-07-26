@@ -1,0 +1,11 @@
+[
+  {"do":"goto","url":"/pipeline","note":"open pipeline"},
+  {"do":"fill","target":"placeholder:New prospect — company name","value":"   ","note":"whitespace only"},
+  {"do":"shot","name":"whitespace"},
+  {"do":"read"},
+  {"do":"fill","target":"placeholder:New prospect — company name","value":"Robinhood","note":"real name"},
+  {"do":"click","target":"text:Add prospect","note":"submit"},
+  {"do":"waittext","value":"Robinhood"},
+  {"do":"read"},
+  {"do":"shot","name":"after-add"}
+]

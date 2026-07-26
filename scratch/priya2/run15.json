@@ -1,0 +1,6 @@
+[
+  {"do":"goto","url":"/workbench/academy/sales-egoist","note":"course"},
+  {"do":"click","target":"text:Reveal model answer","note":"test comprehension reveal"},
+  {"do":"read"},
+  {"do":"shot","name":"reveal"}
+]

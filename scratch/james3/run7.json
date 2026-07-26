@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments/bec3356b-b5b1-4e75-abc5-9559f811ead0","note":"open wizard"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"read"},
+  {"do":"shot","name":"powers"},
+  {"do":"click","target":"text:6. Summary & Interpretation"},
+  {"do":"read"},
+  {"do":"shot","name":"summary"}
+]

@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/pipeline","note":"pipeline"},
+  {"do":"click","target":"text:Deutsche Börse"},
+  {"do":"select","target":"select >> nth=0","value":"workshop_scheduled"},
+  {"do":"read"},
+  {"do":"select","target":"select >> nth=0","value":"workshop_delivered"},
+  {"do":"read"},
+  {"do":"select","target":"select >> nth=0","value":"qualified"},
+  {"do":"read"}
+]

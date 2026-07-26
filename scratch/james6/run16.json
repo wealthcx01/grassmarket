@@ -1,0 +1,19 @@
+[
+  {"do":"goto","url":"/assessments/f558706d-27c1-4790-b1f8-1eb79267aefc","waitfor":"RBC Brewin Dolphin"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"click","target":":nth-match(button:text-is(\"Developing\"), 14)"},
+  {"do":"click","target":":nth-match(button:text-is(\"Advanced\"), 15)"},
+  {"do":"click","target":":nth-match(button:text-is(\"Developing\"), 16)"},
+  {"do":"click","target":":nth-match(button:text-is(\"Advanced\"), 17)"},
+  {"do":"click","target":":nth-match(button:text-is(\"Developing\"), 18)"},
+  {"do":"click","target":":nth-match(button:text-is(\"Basic\"), 19)"},
+  {"do":"click","target":":nth-match(button:text-is(\"Developing\"), 20)"},
+  {"do":"click","target":":nth-match(button:text-is(\"Advanced\"), 21)"},
+  {"do":"click","target":":nth-match(button:text-is(\"Developing\"), 22)"},
+  {"do":"click","target":":nth-match(button:text-is(\"N/A\"), 23)","note":"test N/A renormalisation"},
+  {"do":"click","target":":nth-match(button:text-is(\"Developing\"), 24)"},
+  {"do":"click","target":":nth-match(button:text-is(\"Developing\"), 25)"},
+  {"do":"click","target":":nth-match(button:text-is(\"Developing\"), 26)"},
+  {"do":"read"},
+  {"do":"shot","name":"26-infra-done"}
+]

@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments/c4e183bc-19af-4fb8-980b-04fbc56a4917","note":"assessment"},
+  {"do":"click","target":"text:6. Summary & Interpretation"},
+  {"do":"read"},
+  {"do":"shot","name":"summary-tab"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"read"},
+  {"do":"shot","name":"metrics-tab"}
+]

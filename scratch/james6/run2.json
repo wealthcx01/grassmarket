@@ -1,0 +1,12 @@
+[
+  {"do":"goto","url":"/pipeline","note":"pipeline board"},
+  {"do":"shot","name":"04-pipeline-empty"},
+  {"do":"read"},
+  {"do":"fill","target":"placeholder:New prospect — company name","value":"RBC Brewin Dolphin"},
+  {"do":"click","target":"text:Add prospect"},
+  {"do":"waittext","value":"RBC Brewin Dolphin"},
+  {"do":"shot","name":"05-pipeline-added"},
+  {"do":"click","target":"text:RBC Brewin Dolphin","note":"open the prospect detail"},
+  {"do":"read"},
+  {"do":"shot","name":"06-prospect-detail"}
+]

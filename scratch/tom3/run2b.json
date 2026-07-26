@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"fill","target":"input","value":"St. James's Place"},
+  {"do":"select","target":"select","value":"wealth"},
+  {"do":"click","target":"role:button:Create & open"},
+  {"do":"read"},
+  {"do":"shot","name":"wizard-start"}
+]

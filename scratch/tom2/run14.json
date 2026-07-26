@@ -1,0 +1,12 @@
+[
+  {"do":"goto","url":"/workbench","note":"workbench"},
+  {"do":"click","target":"text:Practice Arena"},
+  {"do":"click","target":"role:button:Practise"},
+  {"do":"fill","target":"textarea","value":"What does it cost to onboard your next 1,000 clients, and does that unit cost fall as you scale?"},
+  {"do":"click","target":"text:Add my line"},
+  {"do":"fill","target":"textarea","value":"Honestly our costs are pretty flat, we haven't modelled it per client."},
+  {"do":"click","target":"text:Add client line"},
+  {"do":"click","target":"text:Submit for scoring"},
+  {"do":"read"},
+  {"do":"shot","name":"arena-feedback"}
+]

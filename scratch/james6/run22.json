@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/engagements/3f87b95b-d378-457a-b10a-2a3ba2786b02","waitfor":"ENGAGEMENT"},
+  {"do":"select","target":":nth-match(select, 1)","value":"f558706d-27c1-4790-b1f8-1eb79267aefc","note":"choose assessment"},
+  {"do":"click","target":"text:Link"},
+  {"do":"read"},
+  {"do":"click","target":"text:Generate","note":"generate with defaults"},
+  {"do":"read"},
+  {"do":"shot","name":"38-generate-1"}
+]

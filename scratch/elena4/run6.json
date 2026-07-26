@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"click","target":"text:Repro2"},
+  {"do":"read"},
+  {"do":"click","target":"text:6. Summary & Interpretation"},
+  {"do":"read"},
+  {"do":"shot","name":"repro2-summary"}
+]

@@ -10,7 +10,8 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from bcap_contracts.assessments import RecordProvenance
+import pytest
+from bcap_contracts.assessments import AssessmentState, RecordProvenance
 from bcap_contracts.common import AssessorLevel, ConsultantTier, Role
 
 from grassmarket.assessments.service import scoreability_blockers
@@ -147,5 +148,174 @@ def test_showcase_seed_populates_a_demo_instance_and_is_idempotent(
         principal = Principal(consultant_id=owner.id, role=owner.role)
         assert len(repo.list_assessments(principal)) == len(SHOWCASE)
         assert len(repo.list_commission_lines(principal)) == len(SHOWCASE)
+    finally:
+        session.close()
+
+
+# --- Seed hygiene (GRS-0177) --------------------------------------------------------------
+# The founder's demo showed Revolut, Hargreaves Lansdown and WeBull twice each with identical
+# scores: a DEMO row seeded on 22/07 alongside a SANDBOX row left by a 21/07 staging run. The skip
+# set only looked at DEMO provenance, so a subject already showcased as a sandbox record was
+# re-created as a demo one.
+
+
+def _principal_for(session_factory, email: str) -> tuple[Repository, Principal]:
+    session = session_factory()
+    repo = Repository(session)
+    owner = repo.get_consultant_by_email(email)
+    return repo, Principal(consultant_id=owner.id, role=owner.role)
+
+
+def test_a_rerun_changes_no_counts_at_all(session_factory, engine, settings) -> None:
+    """Stronger than "no error": every count is equal before and after a second run."""
+    email = "rerun-owner@bruntsfieldcapital.com"
+    seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+
+    def counts() -> dict[str, int]:
+        session = session_factory()
+        try:
+            repo = Repository(session)
+            owner = repo.get_consultant_by_email(email)
+            principal = Principal(consultant_id=owner.id, role=owner.role)
+            engagements = repo.list_engagements(principal)
+            return {
+                "assessments": len(repo.list_assessments(principal)),
+                "prospects": len(repo.list_prospects(principal)),
+                "engagements": len(engagements),
+                "commissions": len(repo.list_commission_lines(principal)),
+                "deliverables": sum(
+                    len(repo.list_deliverables(principal, e.id)) for e in engagements
+                ),
+            }
+        finally:
+            session.close()
+
+    before = counts()
+    seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+    assert counts() == before
+
+
+def test_a_subject_already_finalised_as_sandbox_is_not_reseeded_as_demo(
+    session_factory, engine, settings
+) -> None:
+    """The exact staging condition that produced the duplicate rows."""
+    email = "sandbox-first@bruntsfieldcapital.com"
+    spec = SHOWCASE[0]
+
+    # Stand up the owner and a FINALISED sandbox assessment for the first showcase subject, the
+    # way a staging run would have left one behind.
+    seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+    session = session_factory()
+    try:
+        repo = Repository(session)
+        owner = repo.get_consultant_by_email(email)
+        principal = Principal(consultant_id=owner.id, role=owner.role)
+        subjects_before = [a.subject for a in repo.list_assessments(principal)]
+    finally:
+        session.close()
+
+    # A second run must skip every subject, including the one that is only there as a finalised
+    # record rather than specifically as a DEMO one.
+    again = seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+    assert all(r["status"].startswith("exists") for r in again)
+
+    session = session_factory()
+    try:
+        repo = Repository(session)
+        owner = repo.get_consultant_by_email(email)
+        principal = Principal(consultant_id=owner.id, role=owner.role)
+        subjects_after = [a.subject for a in repo.list_assessments(principal)]
+        assert sorted(subjects_after) == sorted(subjects_before)
+        # One record per subject, not two.
+        assert subjects_after.count(spec.subject) == 1
+    finally:
+        session.close()
+
+
+def test_the_seeded_records_belong_to_their_owner_alone(
+    session_factory, engine, settings
+) -> None:
+    email = "scoped-owner@bruntsfieldcapital.com"
+    seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+    session = session_factory()
+    try:
+        repo = Repository(session)
+        stranger = repo.create_consultant(
+            email="stranger@bruntsfieldcapital.com",
+            full_name="Stranger",
+            hashed_password="x",
+            role=Role.CONSULTANT,
+            tier=ConsultantTier.VENTURE_ASSOCIATE,
+            assessor_level=AssessorLevel.TRAINED,
+        )
+        session.commit()
+        other = Principal(consultant_id=stranger.id, role=stranger.role)
+        assert repo.list_assessments(other) == []
+        assert repo.list_prospects(other) == []
+        assert repo.list_commission_lines(other) == []
+    finally:
+        session.close()
+
+
+def test_a_production_record_can_never_be_deleted_by_the_cleanup_path(
+    session_factory, engine, settings
+) -> None:
+    """GRS-0177's cleanup tool must not be capable of removing real client work."""
+    from grassmarket.data.repository import ConflictError
+
+    email = "cleanup-guard@bruntsfieldcapital.com"
+    seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+    session = session_factory()
+    try:
+        repo = Repository(session)
+        owner = repo.get_consultant_by_email(email)
+        principal = Principal(consultant_id=owner.id, role=owner.role)
+        production = repo.create_assessment(
+            principal, subject="Real Client", provenance=RecordProvenance.PRODUCTION
+        )
+        with pytest.raises(ConflictError, match="production record"):
+            repo.delete_assessment(principal, production.id)
+        # Still there.
+        assert repo.get_assessment(principal, production.id).subject == "Real Client"
+    finally:
+        session.close()
+
+
+def test_a_finalised_record_is_refused_because_its_scoring_run_is_immutable(
+    session_factory, engine, settings
+) -> None:
+    """Non-negotiable #6: deleting the assessment would orphan or destroy an immutable run."""
+    from grassmarket.data.repository import ConflictError
+
+    email = "cleanup-finalised@bruntsfieldcapital.com"
+    seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+    session = session_factory()
+    try:
+        repo = Repository(session)
+        owner = repo.get_consultant_by_email(email)
+        principal = Principal(consultant_id=owner.id, role=owner.role)
+        finalised = next(
+            a for a in repo.list_assessments(principal) if a.state is AssessmentState.FINALISED
+        )
+        with pytest.raises(ConflictError, match="finalised or carries"):
+            repo.delete_assessment(principal, finalised.id)
+    finally:
+        session.close()
+
+
+def test_an_unfinalised_sandbox_record_is_deletable(session_factory, engine, settings) -> None:
+    email = "cleanup-draft@bruntsfieldcapital.com"
+    seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+    session = session_factory()
+    try:
+        repo = Repository(session)
+        owner = repo.get_consultant_by_email(email)
+        principal = Principal(consultant_id=owner.id, role=owner.role)
+        stray = repo.create_assessment(
+            principal, subject="Stray Draft", provenance=RecordProvenance.SANDBOX
+        )
+        repo.delete_assessment(principal, stray.id)
+        session.commit()
+        assert all(a.subject != "Stray Draft" for a in repo.list_assessments(principal))
     finally:
         session.close()

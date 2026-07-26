@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments/bde5bfc9-9ecf-499d-83db-acc530e81fb9"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"read"},
+  {"do":"click","target":"text:7. Scenarios"},
+  {"do":"read"},
+  {"do":"shot","name":"40-final-scenarios","full":true}
+]

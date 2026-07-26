@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments/bec3356b-b5b1-4e75-abc5-9559f811ead0","note":"reopen"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"click","target":"text:Digital onboarding & account opening"},
+  {"do":"shot","name":"before-guidance"},
+  {"do":"click","target":"role:button:Guidance"},
+  {"do":"shot","name":"after-guidance"},
+  {"do":"read"}
+]

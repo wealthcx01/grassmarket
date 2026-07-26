@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"select","target":"select","value":"exchange"},
+  {"do":"fill","target":"input","value":"Deutsche Börse Sandbox"},
+  {"do":"click","target":"role:button:Sandbox preview — finalise solo & see the real deliverable (watermarked)"},
+  {"do":"read"},
+  {"do":"shot","name":"sandbox-deliverable1"},
+  {"do":"read"},
+  {"do":"shot","name":"sandbox-deliverable2"}
+]

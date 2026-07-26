@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"fill","target":"input","value":"Robinhood","note":"fill first text input"},
+  {"do":"shot","name":"newassess2"},
+  {"do":"click","target":"text:Create & open","note":"create assessment"},
+  {"do":"read"},
+  {"do":"shot","name":"wizard1"}
+]

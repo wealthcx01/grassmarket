@@ -1,0 +1,6 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"click","target":"text:NON-PRODUCTION, NOT CLIENT-FACING"},
+  {"do":"read"},
+  {"do":"shot","name":"sandbox2"}
+]

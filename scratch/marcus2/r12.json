@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/workbench","waitfor":"","note":"workbench"},
+  {"do":"click","target":"text:Practice Arena","note":"arena tab"},
+  {"do":"click","target":"text:Practise","note":"start scenario"},
+  {"do":"click","target":"text:Submit for scoring","note":"submit empty"},
+  {"do":"read"},
+  {"do":"click","target":"text:Submit for scoring","note":"double submit"},
+  {"do":"read"},
+  {"do":"shot","name":"arena_empty_submit"}
+]

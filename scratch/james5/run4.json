@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"select","target":"label:Operating model","value":"wealth"},
+  {"do":"fill","target":"role:textbox","value":"Brewin Dolphin Wealth Ltd"},
+  {"do":"click","target":"text:Create & open"},
+  {"do":"waittext","value":"Business metrics"},
+  {"do":"shot","name":"wizard-metrics"},
+  {"do":"read"}
+]

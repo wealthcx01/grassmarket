@@ -1,0 +1,12 @@
+[
+  {"do":"goto","url":"/assessments/f558706d-27c1-4790-b1f8-1eb79267aefc","waitfor":"RBC Brewin Dolphin"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"fill","target":":nth-match(input[placeholder^=\"value\"], 1)","value":"59"},
+  {"do":"fill","target":":nth-match(input[placeholder^=\"value\"], 2)","value":"450"},
+  {"do":"fill","target":":nth-match(input[placeholder^=\"value\"], 4)","value":"72"},
+  {"do":"fill","target":":nth-match(input[placeholder^=\"value\"], 5)","value":"71"},
+  {"do":"read"},
+  {"do":"select","target":":nth-match(select, 1)","value":"management_reported"},
+  {"do":"read"},
+  {"do":"shot","name":"21-metrics-filled2"}
+]

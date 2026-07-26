@@ -1,0 +1,7 @@
+[
+  {"do":"goto","url":"/assessments/b8cb1fa8-b952-4625-954b-d579453571f4","note":"open wizard"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"fill","target":"placeholder:value","value":"-5000"},
+  {"do":"read"},
+  {"do":"shot","name":"neg-metric"}
+]

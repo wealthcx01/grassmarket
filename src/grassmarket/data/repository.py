@@ -2798,6 +2798,55 @@ class Repository:
     def get_assessment(self, principal: Principal, assessment_id: UUID) -> Assessment:
         return self._to_assessment(self._require_assessment(principal, assessment_id))
 
+    def delete_assessment(self, principal: Principal, assessment_id: UUID) -> None:
+        """Remove ONE assessment the caller owns, named by id (GRS-0177 staging cleanup).
+
+        Two guards, both deliberate. A **production** record is never deletable through here: the
+        cleanup this exists for is about demo and sandbox clutter, and a tool that could remove
+        real client work is a worse problem than the clutter. And a record with a **finalised
+        scoring run** is refused, because runs are immutable and append-only (#6) — deleting the
+        assessment would either orphan the run or destroy it, and neither is this method's call to
+        make. A finalised non-production record is reported to an operator, not silently erased.
+
+        There is no bulk or wildcard form. Every deletion names one id.
+        """
+        row = self._require_assessment(principal, assessment_id)
+        if row.provenance == RecordProvenance.PRODUCTION.value:
+            raise ConflictError(
+                f"Assessment {assessment_id} is a production record and cannot be deleted here."
+            )
+        # Any stored run at all is the bar, not just a flagged one: runs are append-only, so a row
+        # existing is exactly the thing that must not be destroyed. A finalised assessment always
+        # has one, which is why the state check and the run check agree in practice.
+        runs = (
+            self._session.execute(
+                select(ScoringRunORM).where(ScoringRunORM.assessment_id == assessment_id)
+            )
+            .scalars()
+            .all()
+        )
+        if row.state == AssessmentState.FINALISED.value or runs:
+            raise ConflictError(
+                f"Assessment {assessment_id} is finalised or carries {len(runs)} immutable "
+                f"scoring run(s). Retire the record instead of deleting it."
+            )
+        # Children first, so no FK is left dangling.
+        self._session.execute(
+            delete(ModuleRatingDraftORM).where(
+                ModuleRatingDraftORM.assessment_id == assessment_id
+            )
+        )
+        self._session.execute(
+            delete(CommitteeDecisionORM).where(
+                CommitteeDecisionORM.assessment_id == assessment_id
+            )
+        )
+        self._session.execute(
+            delete(ScoringRunORM).where(ScoringRunORM.assessment_id == assessment_id)
+        )
+        self._session.delete(row)
+        self._session.flush()
+
     def list_assessments(self, principal: Principal) -> list[Assessment]:
         stmt = select(AssessmentORM)
         if not principal.is_admin:

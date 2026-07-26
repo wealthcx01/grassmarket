@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments/08a4b9cc-ad8d-4ec2-8954-90eea684ba16","note":"open"},
+  {"do":"click","target":"text:6. Summary & Interpretation","note":"summary tab"},
+  {"do":"read"},
+  {"do":"shot","name":"summary"},
+  {"do":"click","target":"text:7. Scenarios","note":"scenarios tab"},
+  {"do":"read"}
+]

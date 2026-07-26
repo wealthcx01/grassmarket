@@ -1,0 +1,13 @@
+[
+  {"do":"goto","url":"/pipeline","note":"board"},
+  {"do":"click","target":"text:St. James's Place","note":"open detail"},
+  {"do":"select","target":"label:Move stage","value":"workshop_delivered"},
+  {"do":"select","target":"label:Move stage","value":"qualified"},
+  {"do":"select","target":"label:Move stage","value":"scoped"},
+  {"do":"select","target":"label:Move stage","value":"contracted"},
+  {"do":"waittext","value":"Contracted"},
+  {"do":"read"},
+  {"do":"goto","url":"/engagements","note":"engagements now"},
+  {"do":"read"},
+  {"do":"shot","name":"t27-engagements2"}
+]

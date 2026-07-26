@@ -1,0 +1,6 @@
+[
+  {"do":"goto","url":"/prospects/d014f647-26cc-4768-a47c-1abca24752b1","note":"full record"},
+  {"do":"click","target":"text:Open engagement"},
+  {"do":"read"},
+  {"do":"shot","name":"t29-engagement"}
+]

@@ -1,0 +1,13 @@
+[
+  {"do":"goto","url":"/pipeline"},
+  {"do":"click","target":"text:RBC Brewin Dolphin"},
+  {"do":"click","target":"text:Open full record (workshops, engagements)","note":"full prospect record"},
+  {"do":"read"},
+  {"do":"shot","name":"11-full-record"},
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"read"},
+  {"do":"shot","name":"12-assessments"},
+  {"do":"click","target":"text:New assessment","note":"start assessment"},
+  {"do":"read"},
+  {"do":"shot","name":"13-new-assessment"}
+]

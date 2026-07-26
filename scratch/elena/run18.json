@@ -1,0 +1,6 @@
+[
+  {"do":"goto","url":"/pipeline","note":"pipeline"},
+  {"do":"click","target":"text:Add prospect"},
+  {"do":"read"},
+  {"do":"shot","name":"pipeline-add"}
+]

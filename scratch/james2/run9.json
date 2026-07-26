@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/assessments/68dd8d67-cdb7-4216-a559-6a96d9f711f8","note":"sandbox"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"select","target":"select >> nth=0","value":"Established"},
+  {"do":"select","target":"select >> nth=1","value":"Established"},
+  {"do":"select","target":"select >> nth=2","value":"Established"},
+  {"do":"select","target":"select >> nth=3","value":"Established"},
+  {"do":"click","target":"text:6. Summary & Interpretation"},
+  {"do":"read"}
+]

@@ -1,0 +1,7 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"click","target":"text:London Stock Exchange Group","note":"open existing LSEG assessment"},
+  {"do":"read"},
+  {"do":"shot","name":"wizard-open"},
+  {"do":"read"}
+]

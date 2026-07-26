@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments/7c27b831-85fc-431d-aea8-023952524397","note":"open wizard"},
+  {"do":"click","target":"text:6. Summary & Interpretation"},
+  {"do":"click","target":"text:Preview in sandbox","note":"attempt sandbox deliverable preview"},
+  {"do":"read"},
+  {"do":"shot","name":"sandbox-preview-result"},
+  {"do":"read"}
+]

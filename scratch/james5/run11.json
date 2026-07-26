@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"click","target":"text:Brewin Dolphin Wealth"},
+  {"do":"waittext","value":"Overview"},
+  {"do":"shot","name":"finalised-open"},
+  {"do":"read"},
+  {"do":"click","target":"text:6. Summary & Interpretation"},
+  {"do":"shot","name":"summary"},
+  {"do":"read"}
+]

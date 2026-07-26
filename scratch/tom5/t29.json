@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/engagements/4e855092-880d-45e2-a160-7df72b9afcbf","note":"engagement"},
+  {"do":"select","target":"select >> nth=0","value":"b6fd32d9-90eb-4040-8699-a599949edf8b"},
+  {"do":"click","target":"text:Link"},
+  {"do":"read"},
+  {"do":"shot","name":"t33-linked"},
+  {"do":"click","target":"button:text-is('Generate')","note":"generate deliverable"},
+  {"do":"read"},
+  {"do":"shot","name":"t34-generated"}
+]

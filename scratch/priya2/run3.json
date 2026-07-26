@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments/7c27b831-85fc-431d-aea8-023952524397","note":"open wizard"},
+  {"do":"click","target":"text:Exchange / market infrastructure","note":"pick exchange model"},
+  {"do":"shot","name":"exchange-selected"},
+  {"do":"click","target":"text:2. Business Metrics","note":"go to metrics"},
+  {"do":"read"},
+  {"do":"shot","name":"metrics"}
+]

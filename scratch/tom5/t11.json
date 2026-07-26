@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments/b6fd32d9-90eb-4040-8699-a599949edf8b","note":"open wizard"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"select","target":"select >> nth=0","value":"Established"},
+  {"do":"select","target":"select >> nth=0","value":"2"},
+  {"do":"read"},
+  {"do":"shot","name":"t16-probe"}
+]

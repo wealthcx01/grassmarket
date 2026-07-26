@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/pipeline","note":"open pipeline board"},
+  {"do":"click","target":"text:London Stock Exchange Group"},
+  {"do":"read"},
+  {"do":"shot","name":"prospect_detail"},
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"read"},
+  {"do":"shot","name":"portfolio"}
+]

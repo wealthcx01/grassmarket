@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/prospects/9c945345-cc19-4ea1-8ec4-3c5cfdaeaf84","waitfor":"LSEG"},
+  {"do":"click","target":"text:Open engagement"},
+  {"do":"read"},
+  {"do":"shot","name":"30-engagement-open"},
+  {"do":"read"},
+  {"do":"shot","name":"31-engagement-detail","full":true}
+]

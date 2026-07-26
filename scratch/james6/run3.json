@@ -1,0 +1,14 @@
+[
+  {"do":"goto","url":"/pipeline","note":"back to board"},
+  {"do":"click","target":"text:RBC Brewin Dolphin","note":"open detail"},
+  {"do":"fill","target":"label:Sector","value":"Wealth management"},
+  {"do":"fill","target":"label:Notes","value":"UK private-client wealth manager, part of RBC. Interested in platform modernisation review ahead of adviser-platform consolidation."},
+  {"do":"click","target":"text:Add contact"},
+  {"do":"read"},
+  {"do":"shot","name":"07-contact-form"},
+  {"do":"click","target":"text:Workshop Scheduled","note":"try to move stage forward"},
+  {"do":"read"},
+  {"do":"click","target":"text:Qualified","note":"try an illegal jump — does it stop me?"},
+  {"do":"read"},
+  {"do":"shot","name":"08-stage-moves"}
+]

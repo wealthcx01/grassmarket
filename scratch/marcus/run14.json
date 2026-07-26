@@ -1,0 +1,7 @@
+[
+  {"do":"goto","url":"/pipeline","note":"pipeline"},
+  {"do":"click","target":"text:DoubleClickCo","note":"open detail"},
+  {"do":"click","target":"text:Open full record","note":"full record page"},
+  {"do":"read"},
+  {"do":"shot","name":"fullrecord"}
+]

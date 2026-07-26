@@ -1,0 +1,14 @@
+[
+  {"do":"goto","url":"/foo","waitfor":"","note":"garbage route"},
+  {"do":"read"},
+  {"do":"goto","url":"/prospects/nonexistent","waitfor":"","note":"bad prospect id"},
+  {"do":"read"},
+  {"do":"goto","url":"/assessments/bad-id-12345","waitfor":"","note":"bad assessment id"},
+  {"do":"read"},
+  {"do":"goto","url":"/deliverables","waitfor":"","note":"deliverables index"},
+  {"do":"read"},
+  {"do":"goto","url":"/academy","waitfor":"","note":"academy index"},
+  {"do":"read"},
+  {"do":"goto","url":"/engagements/zzz-not-real","waitfor":"","note":"bad engagement id"},
+  {"do":"read"}
+]

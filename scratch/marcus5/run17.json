@@ -1,0 +1,14 @@
+[
+  {"do":"goto","url":"/assessments/f04a3afa-65eb-4671-9287-b3b37d2b4ea3"},
+  {"do":"click","target":"text:5. Customer Proposition"},
+  {"do":"click","target":"text:Collapse all"},
+  {"do":"read","note":"widget checklist visible below modules?"},
+  {"do":"shot","name":"24-c-collapsed"},
+  {"do":"click","target":"text:7. Scenarios"},
+  {"do":"read","note":"scenarios step"},
+  {"do":"shot","name":"25-scenarios"},
+  {"do":"click","target":"text:6. Summary & Interpretation"},
+  {"do":"click","target":"text:Finalise"},
+  {"do":"read","note":"finalise flow?"},
+  {"do":"shot","name":"26-finalise"}
+]

@@ -1,0 +1,18 @@
+[
+  {"do":"goto","url":"/assessments"},
+  {"do":"read","note":"portfolio rows - do scores agree?"},
+  {"do":"shot","name":"35-portfolio-final"},
+  {"do":"goto","url":"/assessments/acee244c-f6db-45e8-9e7c-90387d3a78a3"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"click","target":":nth-match(button:text-is(\"Frontier\"), 5)","note":"try to edit after lock"},
+  {"do":"read","note":"did it accept the edit?"},
+  {"do":"goto","url":"/assessments/00000000-0000-0000-0000-000000000000"},
+  {"do":"read","note":"nonexistent assessment"},
+  {"do":"goto","url":"/assessments/1fb11297-9130-4b85-87c9-01c462f3ac02"},
+  {"do":"read","note":"wrong-type id"},
+  {"do":"goto","url":"/admin"},
+  {"do":"read","note":"admin path"},
+  {"do":"goto","url":"/foo/bar/baz"},
+  {"do":"read","note":"garbage path"},
+  {"do":"shot","name":"36-notfound"}
+]
