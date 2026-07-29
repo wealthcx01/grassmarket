@@ -32,7 +32,6 @@ from pydantic import BaseModel
 
 from grassmarket.assessments import (
     compute_score,
-    consensus_blockers,
     evaluate_scenarios,
     live_score,
     module_rating_errors,
@@ -44,7 +43,6 @@ from grassmarket.atlas.active import (
     profile_key_of,
     profile_scoring_context,
 )
-from grassmarket.atlas.committee import committee_blockers, required_committee_items
 from grassmarket.data.repository import (
     ConflictError,
     NotFoundError,
@@ -356,32 +354,26 @@ def finalise_assessment(
     # entirely unchanged for production records, so the AI-approval non-negotiable is intact.
     gated = assessment.provenance is RecordProvenance.PRODUCTION
 
-    # Dual-rating governance (Methodology §9): solo ratings are drafts, never deliverables.
-    governance = consensus_blockers(assessment.document) if gated else []
-    if governance:
+    # The founder review gate (ADR-0041, GRS-0188). This replaces the dual-rating consensus gate
+    # and the Rating Committee gate that used to sit here and below. The network is one founder and
+    # a handful of advisors: peer sign-off was built for a scale it has not reached, and the founder
+    # signs what goes out instead. Both retired gates remain in the codebase, dormant, so the
+    # decision is reversible when the network is bigger.
+    #
+    # A demo or sandbox record still self-approves (ADR-0029): it is watermarked, never
+    # client-facing, and has no client on the other end to protect.
+    if gated and repo.current_founder_approval(assessment_id) is None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Cannot finalise — dual-rating consensus incomplete: " + " ".join(governance),
+            detail=(
+                "Cannot finalise — awaiting founder approval (ADR-0041). Submit for review and "
+                "have the founder approve the current version of the document."
+            ),
         )
 
     art = compute_score(
         assessment.document, coefficients, registry, model, random.Random(_LIVE_SEED)
     )
-    # Rating Committee sign-off on high-stakes ratings (Methodology §8): power Established+, triad
-    # above None, module Frontier. Any awaiting sign-off blocks finalisation.
-    committee = (
-        committee_blockers(
-            required_committee_items(art.result),
-            repo.list_committee_decisions(principal, assessment_id),
-        )
-        if gated
-        else []
-    )
-    if committee:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Cannot finalise — Rating Committee sign-off incomplete: " + " ".join(committee),
-        )
     # Certification (Methodology §9): a Frontier module or Wide power requires a Certified Lead to
     # lead the assessment. An admin may override with a recorded reason (fail-loud, audited).
     cert_reasons = requires_certified_lead(art.result) if gated else []
