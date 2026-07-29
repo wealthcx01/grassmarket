@@ -103,20 +103,37 @@ New tickets from that review:
 | 6 — demo account + founder admin acting-as | GRS-0208 |
 | 7 — Operating Model dropdown still misaligned | GRS-0209 (bug, follows GRS-0178) |
 | 8 — smart search knows too few firms | GRS-0210 |
-| 9, 10 — deliverable is terrible; PDF + interactive, Acquired-style | GRS-0211 (extends GRS-0189) |
+| 9, 10 — deliverable is terrible; PDF + interactive, Acquired-style | GRS-0211 content model · GRS-0219 branded PDF · GRS-0220 interactive web + read tracking · GRS-0221 Stage 6 sticky-panel bug |
 | 11 — Customer Proposition for exchanges | GRS-0212 |
-| 12 — scenario tool must be interactive, with a narrative assistant | GRS-0213 (absorbs GRS-0184) |
+| 12 — scenario tool must be interactive, with a narrative assistant | GRS-0213 workspace (absorbs GRS-0184) · GRS-0222 narrative assistant (ADR-0050) |
 | 13 — free vs engaged tiers, downstream reports | GRS-0214 |
-| 14 — courses are paragraphs, not courses | GRS-0215 (replaces the content half of GRS-0191) |
+| 14 — courses are paragraphs, not courses | GRS-0215 architecture + depth tests · GRS-0216 OpenBB · GRS-0217 remaining product courses · GRS-0218 Sales Egoist (blocked on source material) |
+
+Also raised on 23/07 and not previously ticketed on its own:
+
+| Review item | Ticket |
+|---|---|
+| 6 (second half) — "all the scores seem surprisingly similar" | GRS-0223 score-dispersion investigation |
+
+**Why the splits.** The founder asked for comprehensive coverage, more than one ticket per
+complaint where a complaint has more than one thing wrong with it. The three biggest items were
+each a single ticket doing four jobs, which is how GRS-0191 managed to ship a renderer and no
+content and still close. Each split piece is now separately reviewable and separately refusable.
 
 Also from that review, handled without a ticket:
 
 - **Staging cleanup (Grassmarket item 4): DONE 2026-07-29.** Four duplicate demo/sandbox records
   removed from staging; the advisor portfolio went from 8 rows to 4. Required ADR-0047, because
   `delete_assessment` refused any record carrying a scoring run and every duplicate was finalised.
-  Two production strays remain on that account and need a founder decision, because ADR-0047 keeps
-  production records undeletable: `Revolut` (draft, 0% coverage) and `Meridian Securities`
-  (finalised, 2% coverage).
+  The founder then reviewed the two production strays (`Revolut` draft at 0%, `Meridian Securities`
+  finalised at 2%) and asked for both to go, which needed the 2026-07-29 amendment to ADR-0047:
+  a per-call, founder-or-admin-only, audited deletion path driven by named ids and never by rule.
+- **GTM registry on staging (item 16): DONE 2026-07-29.** 584 targets and 530 contacts imported
+  against the staging database, not a local one: 307 exchange suppliers, 149 banks, 128 LSEG
+  institutions, plus the Barclays influencer map. Note for GRS-0210: the LSEG roster import
+  overwrites Barclays influencer contacts sharing a contact id, so the Barclays map contributes 9
+  of its 17 contacts after a full run. That is the idempotent upsert working across sources, but
+  the merge order is worth a decision rather than an accident.
 - **Permission layer (Grassmarket item 1).** `.claude/settings.json` now allowlists the commands
   the workbench needs. This does **not** fix `git push origin main` or `gh pr merge`: those are
   refused by the harness safety classifier, not by the permission allowlist, which already

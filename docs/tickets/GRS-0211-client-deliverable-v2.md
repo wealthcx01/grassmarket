@@ -1,7 +1,12 @@
-# GRS-0211 — The client deliverable, rebuilt: branded PDF and an interactive web report
+# GRS-0211 — The client deliverable, rebuilt: what it says
 
 **Status:** Planned (2026-07-26, staging review items 9 and 10). **Priority:** HIGHEST.
 **Loop:** founder-feedback remediation, Wave 3. **Extends GRS-0189 / ADR-0042.**
+
+**This ticket owns the narrative and the content model.** The renditions are split out so they can
+be built in parallel and reviewed separately: **GRS-0219** is the branded PDF, **GRS-0220** is the
+interactive web page with read tracking, **GRS-0221** is the Stage 6 sticky-panel bug. Both
+renditions consume the single content model defined here.
 
 ## Why
 
@@ -41,42 +46,41 @@ and the "recommended to sell" box scrolls underneath it.
    - **technical appendix**: coefficients, weights, uncertainty method, coverage, the full module
      breakdown, every number the body refers to.
    No score appears in the body without a sentence saying what it means for this firm.
-2. **Two renditions from one content model.** A single narrative model produces:
-   - **PDF** via the python-docx/report stack, Bruntsfield branded: paper/ink palette, Bottle
-     Green, Source Serif 4 and Inter, cover, running heads, page numbers.
-   - **Interactive web report** at a signed per-client URL, same content, with the radar, the
-     value build-up and the module breakdown as live visuals rather than flat images.
-3. **Read tracking on the web version**, per section, tied to the client link. Recorded against the
-   engagement so the advisor can see what was read and for how long. Disclosed on the page; no
-   covert tracking.
-4. **The maths moves out of the reader's way.** P10/P50/P90 never appear in the body. The body says
+2. **One content model, rendition-agnostic.** A structured narrative model that knows its sections,
+   their order, which tier each belongs to (GRS-0214), and which figures each references. It must
+   contain no formatting: the PDF (GRS-0219) and the web page (GRS-0220) both consume it, and
+   anything print-specific or web-specific leaking into the model makes the two renditions drift
+   apart in front of a client.
+3. **The maths moves out of the reader's way.** P10/P50/P90 never appear in the body. The body says
    "our central estimate is X, and on the evidence we have it could reasonably be between Y and Z".
    The appendix keeps the exact terms and points at `docs/ATLAS-Scoring-Explained.md`.
-5. **Fix the sticky box.** The Platform Value Finalised panel and the recommended-to-sell panel
-   stop overlapping on scroll. Reproduce at the founder's viewport first.
-6. **Approval gate unchanged.** Every AI-drafted section carries the founder review gate
+4. **Every figure is declared.** A section names the run values it cites, so a renderer can show
+   them and the narrative assistant (GRS-0222) can be checked against them. A number that appears
+   in prose without being declared is a build failure, not a proofreading problem.
+5. **Approval gate unchanged.** Every AI-drafted section carries the founder review gate
    (ADR-0041, non-negotiable #8). Nothing reaches a client without a recorded approval.
 
 ## Test plan
 
-1. Golden-master report test: one finalised assessment renders to a PDF and a web report whose
-   text content matches a committed fixture, so prose regressions are visible in review.
-2. Assert no P10/P50/P90 token appears outside the appendix section of the rendered body.
-3. Approval test: an unapproved narrative section cannot render into a client-facing artefact.
-4. Vitest per file for the web report shell, the radar, the value build-up and the scroll
-   behaviour of the two panels.
-5. Manual: the founder's own Deutsche Börse record rendered both ways, both attached to the PR.
-6. Standing gate: pytest, pyright, tsc, ESLint.
+1. Golden-master content test: one finalised assessment produces a content model matching a
+   committed fixture, so prose regressions are visible in review.
+2. Assert no P10/P50/P90 token appears outside the appendix section.
+3. Declared-figure test: every numeric token in a section's prose appears in that section's
+   declared figure set.
+4. Approval test: an unapproved narrative section cannot enter a client-facing content model.
+5. Manual: the founder's own Deutsche Börse record, rendered through GRS-0219 and GRS-0220.
+6. Standing gate: pytest, pyright, ruff.
 
 ## Out of scope
 
-- Free versus paid tiering of what the client receives (GRS-0214).
-- The scenario narrative assistant (GRS-0213).
+- The PDF rendition (GRS-0219) and the web rendition (GRS-0220).
+- The Stage 6 sticky-panel bug (GRS-0221).
+- Free versus engaged tiering (GRS-0214).
+- The narrative assistant (GRS-0222).
 - Course assets (GRS-0215).
 - Any change to scoring. The golden master stays byte-identical.
 
 ## Acceptance
 
-The founder downloads the Deutsche Börse review as a PDF and opens the web version, and both read
-like something Bruntsfield would put its name on. The maths is in the appendix. The panels do not
-overlap.
+The founder reads the Deutsche Börse review and it tells the story of that business, with the maths
+in the appendix and every number traceable.

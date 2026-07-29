@@ -3,6 +3,12 @@
 **Status:** Planned (2026-07-26, staging review item 14; 23/07 item 20). **Priority:** HIGHEST.
 **Loop:** founder-feedback remediation, Wave 4. **Replaces the content half of GRS-0191.**
 
+**This ticket owns the course architecture and the depth standard.** The courses themselves are
+split out so each is reviewable on its own: **GRS-0216** OpenBB (the worked standard the founder
+named), **GRS-0217** the remaining product courses, **GRS-0218** Sales Egoist (blocked on source
+material). This ticket ships the structure, the asset pipeline and the tests that make a thin
+course fail the build.
+
 ## Why
 
 This is the item the founder has now raised twice, in stronger terms the second time.
@@ -26,9 +32,10 @@ The founder also gave a concrete standard, which is the only sensible acceptance
 1. **Course structure, per course.** Each product course is built as sections; each section is
    20 to 40 interactive slides; each section ends in a test the learner must pass before the next
    section opens. This is the shape GRS-0190's renderer already supports and nobody used.
-2. **Courses in priority order.** OpenBB first, as the founder's named example and the deepest
-   product. Then the remaining product families, then Sales Egoist.
-3. **Content sourced from the products themselves**, not summarised from memory:
+2. **The depth tests, written here and run by every course ticket.** Minimum slides per section, a
+   test at the end of every section, at least one `SourceRef` per lesson, a minimum lesson length.
+   These have to exist before the content tickets start, or "thin" stays a matter of opinion.
+3. **The content sourcing rule**, applied by GRS-0216 to GRS-0218:
    - the product's own documentation, deep-linked per lesson rather than linked once at the top,
    - their YouTube material, embedded at the timestamp that matches the lesson,
    - their blog and release notes,
@@ -57,9 +64,8 @@ Coursera-grade, the LMS question is genuinely open and should be reopened rather
 
 ## Test plan
 
-1. Content-depth tests, run per course: minimum slide count per section, a test at the end of every
-   section, at least one `SourceRef` per lesson, and no lesson under a stated minimum length. These
-   fail loudly on a thin course, which is the failure mode that got us here.
+1. The content-depth tests themselves, proven against a deliberately thin fixture course that must
+   fail them. That is the point of the ticket: "thin" becomes a build error, not an opinion.
 2. Link integrity: every external link resolves at build time (the freshness watcher, GRS-0192,
    keeps them resolving afterwards).
 3. Progression test: a section does not unlock until its predecessor's test is passed.
@@ -68,11 +74,11 @@ Coursera-grade, the LMS question is genuinely open and should be reopened rather
 ## Out of scope
 
 - The renderer, which exists (GRS-0190).
+- Writing any actual course (GRS-0216, GRS-0217, GRS-0218).
 - Certification sign-off rules (unchanged).
 - The freshness watcher (GRS-0192), which follows this.
 
 ## Acceptance
 
-The founder takes the OpenBB course end to end and finishes it with OpenBB installed, two
-workspaces built, and a clear view of how and when to sell it. Not a summary of OpenBB. The
-thing itself.
+A course that does not meet the standard fails the build. The structure supports what GRS-0216 has
+to deliver, and the founder's judgement of that course is the real verdict on this one.

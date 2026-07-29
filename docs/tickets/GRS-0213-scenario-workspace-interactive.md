@@ -31,16 +31,10 @@ saved to the repository, comparable over time. On top of that:
    and currency stay in separate columns and are never combined into one figure (non-negotiable
    #7).
 3. **Comparison.** Two or three saved scenarios side by side, with the deltas called out.
-4. **The narrative assistant.** A chat panel scoped to this assessment. It can read the scored
-   data, the scenario the advisor is holding, and the module evidence. It drafts recommendation
-   prose in the advisor's voice.
-   - It reads real data only. It never invents a number, and every figure it writes must trace to
-     a value in the run. A drafting call that cannot ground a number refuses rather than
-     approximating (non-negotiable #3).
-   - Output is labelled AI-drafted and carries the founder review gate before it can reach a
-     client deliverable (ADR-0041, non-negotiable #8).
-   - The drafted narrative attaches to the scenario and flows into GRS-0211's report as a
-     proposed section, never as final text.
+4. **A slot for the narrative assistant**, built in **GRS-0222**. This ticket defines where a
+   drafted narrative attaches (to a named scenario) and how it flows onward into the report content
+   model, and stops there. The assistant itself, its grounding contract and its ADR are separate
+   because that is the risky half and it deserves its own review.
 5. **Explain the screen.** The founder said they understand what scenarios are for but not what to
    do with the screen. It opens with the three levers the engine already ranks highest and a
    sentence saying why those three.
@@ -51,17 +45,16 @@ saved to the repository, comparable over time. On top of that:
    immutable (#6).
 2. Determinism test: the same scenario evaluated twice gives identical results, and matches the
    existing evaluation path exactly.
-3. Grounding test: the assistant refuses to emit a figure that does not appear in the run data.
-   Asserted directly, with a fixture that tries to make it approximate.
-4. Approval test: assistant output cannot reach a client artefact without a recorded approval.
-5. Vitest per file for the workspace, the comparison view and the assistant panel.
-6. Golden master byte-identical.
-7. Standing gate: pytest, pyright, tsc, ESLint.
+3. Attachment test: a drafted narrative belongs to exactly one named scenario and travels with it.
+4. Vitest per file for the workspace and the comparison view.
+5. Golden master byte-identical.
+6. Standing gate: pytest, pyright, tsc, ESLint.
 
 ## Out of scope
 
 - Changing the scoring or the value bridge.
-- The report rendering itself (GRS-0211).
+- The narrative assistant itself (GRS-0222).
+- The report content model and its renditions (GRS-0211, GRS-0219, GRS-0220).
 - A general-purpose chat assistant anywhere else in the product.
 
 ## Acceptance
