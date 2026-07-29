@@ -1218,16 +1218,371 @@ def section_3() -> CourseModule:
     )
 
 
+# --- Section 4 — Build your first workspace, for a real target ----------------------------
+
+_S4_BODY = (
+    "By the end of this lesson you have built a working research dashboard for one of the three "
+    "firms you named in section 1, and you can rebuild it in front of someone in about five "
+    "minutes. This is the first thing in this course you could actually put on a screen in a "
+    "client meeting, and building it for a real target rather than a sample ticker is the whole "
+    "point: a demo about their business is a different conversation from a demo about Apple."
+)
+
+_SECTION_4_SLIDES: tuple[Slide, ...] = (
+    _s(
+        0,
+        SlideKind.CONCEPT,
+        "What you are building, and why this one",
+        "A morning research dashboard: the view an analyst would open at 7am. It is the most "
+        "common real use case, it is quick to build, and it maps directly onto the pain you "
+        "identified in section 1. Do not start with something clever.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        1,
+        SlideKind.WALKTHROUGH,
+        "Pick the target",
+        "Take the first of the three firms you wrote down. If they are listed, you will use their "
+        "own ticker. If they are not, pick the closest listed competitor and be ready to say why "
+        "you chose it, because in a real meeting someone will ask.",
+    ),
+    _s(
+        2,
+        SlideKind.WALKTHROUGH,
+        "Create and name the dashboard",
+        "Click the `+` in the sidebar, and give it a descriptive name. Name it after the firm and "
+        'the job, not after yourself: "Meridian — morning research" rather than "my '
+        'dashboard". You will be sharing this.',
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        3,
+        SlideKind.WALKTHROUGH,
+        "Add a price chart",
+        "Press `Cmd+K` or `Ctrl+K`, search for a price chart widget, and add it. Set the ticker to "
+        "your target. The charts are TradingView-based, so the interaction will already feel "
+        "familiar to anyone who has traded.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        4,
+        SlideKind.WALKTHROUGH,
+        "Add a fundamentals table",
+        "Add a table widget carrying the firm's fundamentals. Tables give you column sorting, "
+        "filtering and grouping. Sort it into the order an analyst would actually read, because a "
+        "default sort is a small signal that nobody has thought about the view.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        5,
+        SlideKind.WALKTHROUGH,
+        "Add news or filings",
+        "Add a widget carrying news or regulatory filings for the same firm. This is the slide "
+        "where the dashboard stops being a chart and becomes a workspace: two different shapes of "
+        "information, one subject.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        6,
+        SlideKind.WALKTHROUGH,
+        "Link the parameters",
+        "Make sure all three widgets use the same parameter name for the ticker. Now change it in "
+        "one and watch the others follow. This is the moment you will replay in every demo you "
+        "ever give of this product, so get it working before you go further.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        7,
+        SlideKind.CONCEPT,
+        "Why the linked parameter is the whole demo",
+        "A prospect does not care that you have three widgets. They care that one field drives the "
+        "whole view, because that is the thing their current spreadsheet cannot do. Everything "
+        "else on the dashboard is supporting evidence for that one interaction.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        8,
+        SlideKind.WALKTHROUGH,
+        "Arrange it for a screen share",
+        "Drag and resize so the chart is dominant, the table is readable without scrolling, and "
+        "the news sits to one side. Test it at the window size you actually present at, which is "
+        "usually smaller than the one you build at.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        9,
+        SlideKind.CONCEPT,
+        "Readability beats completeness",
+        "A dashboard with four legible widgets demos better than one with nine cramped ones. You "
+        "are not proving coverage, you are proving that a morning takes five minutes instead of "
+        "ninety. Cut anything that does not serve that sentence.",
+    ),
+    _s(
+        10,
+        SlideKind.WALKTHROUGH,
+        "Add a navigation bar if it has grown",
+        "If you have gone past one screen, add a navigation bar widget and separate the widgets "
+        "into categories. Do this rather than shrinking everything, because shrinking is how a "
+        "dashboard becomes unreadable on a shared screen.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        11,
+        SlideKind.WALKTHROUGH,
+        "Ask the agent something",
+        "Open the agent and ask a question about what is on the dashboard. It reads the metadata "
+        "from your widgets to query the right datasets, so ask something that needs two of your "
+        "widgets at once. That is what shows it is grounded rather than generic.",
+        refs=(DOCS_WORKSPACE,),
+    ),
+    _s(
+        12,
+        SlideKind.EXAMPLE,
+        "A question that lands, and one that does not",
+        '"What changed in the filings this week that the price has not reacted to?" needs two '
+        'sources and is the kind of thing an analyst actually asks. "What is the share price?" '
+        "is on the screen already, and asking it makes the agent look like a toy.",
+        refs=(DOCS_WORKSPACE,),
+    ),
+    _s(
+        13,
+        SlideKind.WALKTHROUGH,
+        "Refresh it",
+        "Use Refresh data and confirm every widget updates. Do this before any demo. Stale numbers "
+        "on screen while you talk about a real-time workflow is a small failure that costs more "
+        "credibility than it should.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        14,
+        SlideKind.WALKTHROUGH,
+        "Export something",
+        "Export one widget to CSV or Excel. You are checking it works, and you are learning where "
+        'the control is, because "can we get the data out?" is one of the most common quiet '
+        "objections and you want to answer it by doing it rather than saying yes.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        15,
+        SlideKind.WALKTHROUGH,
+        "Duplicate it",
+        "Use the ellipsis menu next to the dashboard and choose Duplicate. You now have a "
+        "template. "
+        "This is how you will build the second workspace in the next section, and how you will "
+        "spin one up per client without starting again.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        16,
+        SlideKind.CONCEPT,
+        "Dashboard, app, and which word to use",
+        "What you built is a dashboard: a blank canvas you configured. An app is a pre-configured "
+        "template with curated widgets, a chosen agent and its own prompt library. Use the right "
+        "word in front of a client, because they will hear both from OpenBB.",
+        refs=(DOCS_APPS,),
+    ),
+    _s(
+        17,
+        SlideKind.CONCEPT,
+        "What an app adds on top",
+        "Apps carry three things a dashboard does not: curated widgets with parameters already "
+        "synchronised, a library of pre-written prompts for that domain, and an AI agent tuned to "
+        "it that activates when you select the app. That prompt library is the part clients "
+        "underestimate.",
+        refs=(DOCS_APPS,),
+    ),
+    _s(
+        18,
+        SlideKind.CONCEPT,
+        "Turning your dashboard into something the team uses",
+        "Right-click and Export apps.json to export the configuration. That file is how a good "
+        "dashboard stops being one person's and becomes the desk's standard. It is also the "
+        'honest answer to "how do we roll this out?"',
+        refs=(DOCS_DASHBOARDS, DOCS_APPS),
+    ),
+    _s(
+        19,
+        SlideKind.WALKTHROUGH,
+        "Share it with someone",
+        "Use Share from the ellipsis menu and send it to a colleague. Watch what they do with it "
+        "cold, without you narrating. Anything they hesitate over is something a client will "
+        "hesitate over, and it is much cheaper to find out now.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        20,
+        SlideKind.EXAMPLE,
+        "What good looks like",
+        "Four to six widgets. One linked parameter that moves everything. One agent question that "
+        "needs two sources. Readable on a shared screen at meeting size. Buildable by you, from "
+        "nothing, in about five minutes while talking.",
+    ),
+    _s(
+        21,
+        SlideKind.EXAMPLE,
+        "The most common mistake",
+        "Building the dashboard you find interesting rather than the one your client's analyst "
+        "would open. You are not demonstrating the product's range, you are demonstrating that "
+        "you understood their morning. Those are different dashboards.",
+    ),
+    _s(
+        22,
+        SlideKind.CHECKPOINT,
+        "Build it",
+        "This is the section's deliverable. Not a screenshot from the documentation: your own "
+        "dashboard, for your own target, that you built.",
+        checkpoint="Build a working dashboard for one of your three named targets with at least "
+        "three widgets and one working linked parameter. Keep a screenshot.",
+    ),
+    _s(
+        23,
+        SlideKind.CHECKPOINT,
+        "Rebuild it from scratch, timed",
+        "Delete it and build it again while timing yourself. The second build is the one that "
+        "matters, because in a real meeting you will be building while talking and answering "
+        "questions. Aim to be under ten minutes.",
+        checkpoint="Rebuild the dashboard from an empty canvas and record how long it took.",
+    ),
+    _s(
+        24,
+        SlideKind.CONCEPT,
+        "What the next section does",
+        "One dashboard proves you can use the product. The founder asked for workspaces, plural, "
+        "and the reason is that the second one is where you learn what generalises. Next you build "
+        "a deliberately different one for a different job.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+)
+
+SECTION_4_TEST = SectionTest(
+    questions=(
+        TestQuestion(
+            prompt="What is the single most important interaction to get working before a demo?",
+            options=(
+                "Exporting to Excel",
+                "One linked parameter that moves every widget at once",
+                "The agent",
+                "Refreshing data",
+            ),
+            answer_index=1,
+            explanation=(
+                "A prospect does not care that you have three widgets. They care that one field "
+                "drives the whole view, because that is what their spreadsheet cannot do."
+            ),
+        ),
+        TestQuestion(
+            prompt="You built a configured canvas. Is that a dashboard or an app?",
+            options=(
+                "An app",
+                "A dashboard: an app is a pre-configured template with curated widgets, a chosen "
+                "agent and its own prompts",
+                "Either word is fine",
+                "A workspace",
+            ),
+            answer_index=1,
+            explanation=(
+                "The client will hear both words from OpenBB. Using the right one is a small "
+                "signal that you know the product."
+            ),
+        ),
+        TestQuestion(
+            prompt="How does a good dashboard become the desk's standard?",
+            options=(
+                "Share it with everyone individually",
+                "Right-click and Export apps.json, which is the configuration other people can use",
+                "Duplicate it per person",
+                "Rebuild it in each account",
+            ),
+            answer_index=1,
+            explanation=(
+                'Exporting the configuration is the honest answer to "how do we roll this out?", '
+                "which is a buying question rather than a technical one."
+            ),
+        ),
+        TestQuestion(
+            prompt="Which agent question demonstrates grounding best?",
+            options=(
+                "What is the share price?",
+                "What changed in the filings this week that the price has not reacted to?",
+                "Summarise this company",
+                "What do you think of this stock?",
+            ),
+            answer_index=1,
+            explanation=(
+                "It needs two of your widgets at once. A question whose answer is already on "
+                "screen makes the agent look like a toy."
+            ),
+        ),
+        TestQuestion(
+            prompt="Why build the dashboard for a real target rather than a sample ticker?",
+            options=(
+                "Sample tickers are not supported",
+                "A demo about their business is a different conversation from a demo about Apple",
+                "It loads faster",
+                "It is required for export",
+            ),
+            answer_index=1,
+            explanation=(
+                "You are not demonstrating the product's range. You are demonstrating that you "
+                "understood their morning, and those are different dashboards."
+            ),
+        ),
+        TestQuestion(
+            prompt="Your dashboard has grown past one screen. What do you do?",
+            options=(
+                "Shrink every widget",
+                "Add a navigation bar widget and separate widgets into categories",
+                "Delete widgets until it fits",
+                "Open it in a new window",
+            ),
+            answer_index=1,
+            explanation=(
+                "Shrinking is how a dashboard becomes unreadable on a shared screen, which is the "
+                "only size that matters for a demo."
+            ),
+        ),
+    ),
+)
+
+
+def section_4() -> CourseModule:
+    """Section 4: build your first workspace, for a real target."""
+    return CourseModule(
+        id=_id("module", "first-workspace"),
+        title="Build your first workspace, for a real target",
+        order=3,
+        lessons=(
+            Lesson(
+                id=_id("lesson", "first-workspace"),
+                title="Your first dashboard, built for a firm you are actually chasing",
+                body=_S4_BODY,
+                order=0,
+                slides=_SECTION_4_SLIDES,
+                drill_topics=("product:openbb:workspace",),
+                measurement=(
+                    "You can build a three-widget dashboard with a working linked parameter for a "
+                    "named target, from an empty canvas, in under ten minutes while talking."
+                ),
+            ),
+        ),
+        section_test=SECTION_4_TEST,
+    )
+
+
 def rebuilt_sections() -> tuple[CourseModule, ...]:
     """The sections rebuilt to the GRS-0215 standard, in order. Grows as GRS-0216 progresses."""
-    return (section_1(), section_2(), section_3())
+    return (section_1(), section_2(), section_3(), section_4())
 
 
 # Sections written so far, and sections still to write. The depth check fails while anything is in
 # SECTIONS_PLANNED, so this course cannot read as finished until it is.
-SECTIONS_AUTHORED: tuple[str, ...] = ("what-it-is", "install", "sign-up-and-orientation")
-SECTIONS_PLANNED: tuple[str, ...] = (
+SECTIONS_AUTHORED: tuple[str, ...] = (
+    "what-it-is",
+    "install",
+    "sign-up-and-orientation",
     "first-workspace",
+)
+SECTIONS_PLANNED: tuple[str, ...] = (
     "second-workspace",
     "the-data",
     "who-buys-and-why",
