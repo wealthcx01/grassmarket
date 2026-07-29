@@ -232,9 +232,7 @@ def test_a_subject_already_finalised_as_sandbox_is_not_reseeded_as_demo(
         session.close()
 
 
-def test_the_seeded_records_belong_to_their_owner_alone(
-    session_factory, engine, settings
-) -> None:
+def test_the_seeded_records_belong_to_their_owner_alone(session_factory, engine, settings) -> None:
     email = "scoped-owner@bruntsfieldcapital.com"
     seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
     session = session_factory()
@@ -299,6 +297,77 @@ def test_a_finalised_record_is_refused_because_its_scoring_run_is_immutable(
         )
         with pytest.raises(ConflictError, match="finalised or carries"):
             repo.delete_assessment(principal, finalised.id)
+    finally:
+        session.close()
+
+
+def test_a_production_record_is_refused_even_with_discard_scoring_runs(
+    session_factory, engine, settings
+) -> None:
+    """ADR-0047: the provenance guard is unconditional — no argument relaxes it."""
+    from grassmarket.data.repository import ConflictError
+
+    email = "cleanup-prod-flag@bruntsfieldcapital.com"
+    seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+    session = session_factory()
+    try:
+        repo = Repository(session)
+        owner = repo.get_consultant_by_email(email)
+        principal = Principal(consultant_id=owner.id, role=owner.role)
+        production = repo.create_assessment(
+            principal, subject="Real Client", provenance=RecordProvenance.PRODUCTION
+        )
+        with pytest.raises(ConflictError, match="production record"):
+            repo.delete_assessment(principal, production.id, discard_scoring_runs=True)
+        assert repo.get_assessment(principal, production.id).subject == "Real Client"
+    finally:
+        session.close()
+
+
+def test_a_finalised_demo_record_goes_with_its_runs_and_leaves_no_orphans(
+    session_factory, engine, settings
+) -> None:
+    """ADR-0047: the staging-cleanup path. The run goes, and so does everything pointing at it."""
+    from sqlalchemy import select
+
+    from grassmarket.data.models import (
+        AINarrativeORM,
+        DeliverableORM,
+        PredictionORM,
+        ScoringRunORM,
+    )
+
+    email = "cleanup-demo-runs@bruntsfieldcapital.com"
+    seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+    session = session_factory()
+    try:
+        repo = Repository(session)
+        owner = repo.get_consultant_by_email(email)
+        principal = Principal(consultant_id=owner.id, role=owner.role)
+        target = next(
+            a
+            for a in repo.list_assessments(principal)
+            if a.state is AssessmentState.FINALISED
+            and a.provenance is not RecordProvenance.PRODUCTION
+        )
+        run_ids = [
+            r.id
+            for r in session.execute(
+                select(ScoringRunORM).where(ScoringRunORM.assessment_id == target.id)
+            )
+            .scalars()
+            .all()
+        ]
+        assert run_ids, "fixture must give the record at least one run for this test to mean much"
+
+        repo.delete_assessment(principal, target.id, discard_scoring_runs=True)
+        session.commit()
+
+        assert all(a.id != target.id for a in repo.list_assessments(principal))
+        for orm in (ScoringRunORM, AINarrativeORM, PredictionORM, DeliverableORM):
+            column = orm.id if orm is ScoringRunORM else orm.scoring_run_id
+            left = session.execute(select(orm).where(column.in_(run_ids))).scalars().all()
+            assert left == [], f"{orm.__name__} rows were orphaned by the delete"
     finally:
         session.close()
 
