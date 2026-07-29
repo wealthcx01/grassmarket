@@ -26,6 +26,9 @@ class AuditEventType(StrEnum):
     AUTH_PASSWORD_CHANGED = "auth_password_changed"
     AUTH_ACCOUNT_AUTOPROVISIONED = "auth_account_autoprovisioned"
     ASSESSMENT_FINALISED = "assessment_finalised"
+    # ADR-0047 (2026-07-29 amendment): a production record was deleted by founder decision. The
+    # one deletion here that could ever have destroyed real work, so it leaves a permanent trace.
+    ASSESSMENT_DELETED = "assessment_deleted"
     DELIVERABLE_GENERATED = "deliverable_generated"
     DELIVERABLE_DOWNLOADED = "deliverable_downloaded"
     COMMITTEE_DECISION = "committee_decision"

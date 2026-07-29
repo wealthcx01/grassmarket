@@ -132,8 +132,20 @@ def main() -> int:
         "--discard-scoring-runs",
         action="store_true",
         help=(
-            "Also remove FINALISED demo/sandbox records together with their scoring runs. "
-            "Production records are never touched, with or without this flag (ADR-0047)."
+            "Also remove FINALISED demo/sandbox records together with their scoring runs "
+            "(ADR-0047)."
+        ),
+    )
+    parser.add_argument(
+        "--delete-production-id",
+        action="append",
+        default=[],
+        metavar="UUID",
+        type=UUID,
+        help=(
+            "Delete a PRODUCTION record by explicit id. Repeatable. Deliberately not driven by "
+            "the criteria above: a production record is only ever removed because the founder "
+            "named that record. Each deletion writes an audit event."
         ),
     )
     args = parser.parse_args()
@@ -148,7 +160,19 @@ def main() -> int:
         owner = repo.get_consultant_by_email(args.owner)
         if owner is None:
             raise SystemExit(f"No consultant found for {args.owner}.")
-        principal = Principal(consultant_id=owner.id, role=owner.role)
+        # Scoping stays the owner's, so every lookup is filtered exactly as it would be for their
+        # own request. The founder claim is asserted only when the operator named production ids
+        # on the command line: this script runs with direct database access, so the repository
+        # guard is defence in depth rather than the real control, and claiming the role here keeps
+        # the deletion on the audited path instead of routing around it.
+        principal = Principal(
+            consultant_id=owner.id, role=owner.role, is_founder=bool(args.delete_production_id)
+        )
+        if args.delete_production_id:
+            print(
+                f"Acting with founder authority to delete "
+                f"{len(args.delete_production_id)} named production record(s).\n"
+            )
         candidates = find_candidates(repo, principal)
 
         if not candidates:
@@ -159,16 +183,22 @@ def main() -> int:
         for candidate in candidates:
             print(candidate.describe())
 
-        # Two things this script will not decide for you, so the list is split rather than acted
-        # on wholesale. A PRODUCTION record is never deletable, whatever it looks like — retiring
-        # real client work is a founder decision. A FINALISED record carries a scoring run, and
-        # runs are append-only (#6); discarding one needs the operator to say so explicitly with
-        # --discard-scoring-runs, which ADR-0047 confines to demo and sandbox records.
+        # What this script will not decide for you, so the list is split rather than acted on
+        # wholesale. A PRODUCTION record is never removed by rule, only by an id the founder
+        # named on the command line: matching a criterion is evidence, not authority. A FINALISED
+        # record carries a scoring run, and runs are append-only (#6); discarding one needs
+        # --discard-scoring-runs (ADR-0047).
+        named_production = set(args.delete_production_id)
         deletable: list[Candidate] = []
         needs_decision: list[tuple[Candidate, str]] = []
         for candidate in candidates:
             if candidate.provenance == RecordProvenance.PRODUCTION.value:
-                needs_decision.append((candidate, "production record — never deleted here"))
+                if candidate.assessment_id in named_production:
+                    deletable.append(candidate)
+                else:
+                    needs_decision.append(
+                        (candidate, "production — pass --delete-production-id to remove it")
+                    )
             elif candidate.state == "finalised" and not args.discard_scoring_runs:
                 needs_decision.append(
                     (candidate, "finalised — re-run with --discard-scoring-runs to remove it")
@@ -185,11 +215,24 @@ def main() -> int:
             print(f"\nReport only. Re-run with --execute to delete the {len(deletable)} record(s).")
             return 0
 
+        unmatched = named_production - {c.assessment_id for c in candidates}
+        if unmatched:
+            # A named id that no criterion matched is a typo or a stale note, and deleting on the
+            # strength of it would be deleting something nobody looked at. Refuse the whole run.
+            raise SystemExit(
+                "These --delete-production-id values matched nothing for this owner: "
+                + ", ".join(str(u) for u in sorted(unmatched, key=str))
+            )
+
         for candidate in deletable:
+            is_production = candidate.provenance == RecordProvenance.PRODUCTION.value
             repo.delete_assessment(
                 principal,
                 candidate.assessment_id,
-                discard_scoring_runs=args.discard_scoring_runs,
+                # A production record always carries its runs away with it — there is no version
+                # of "delete this record but keep its runs" that leaves anything coherent.
+                discard_scoring_runs=args.discard_scoring_runs or is_production,
+                delete_production_record=is_production,
             )
         session.commit()
         print(f"\nDeleted {len(deletable)} record(s); left {len(needs_decision)} for a decision.")

@@ -65,6 +65,33 @@ records.
   assessment that owns them.
 - Bulk or wildcard deletion. Every call still names one assessment id and is owner-scoped.
 
+## Amendment, 2026-07-29 — deleting a production record by founder decision
+
+The cleanup left two production strays on the staging advisor account: a `Revolut` draft at 0%
+coverage and `Meridian Securities` finalised at 2%. Neither is client work. A record finalised on
+2% of the evidence is not an assessment of anything, and a 0% draft is a mis-click. The founder
+reviewed both and asked for them to go.
+
+The original decision said no argument relaxes the production guard. That was right as a default
+and wrong as an absolute: it left the only person entitled to make the call without a way to make
+it, and the alternative was routing around the repository layer with raw SQL, which is worse.
+
+So `delete_assessment` gains a second flag, `delete_production_record`, with three conditions that
+all have to hold:
+
+1. The flag is passed **in the call**, per record. It is not inferable from any criterion.
+2. The caller is the **founder or an admin** (`ScopeViolationError` otherwise).
+3. The deletion writes an **`ASSESSMENT_DELETED` audit event** naming the subject and the run
+   count. The audit log is append-only, so the trace outlives the record.
+
+`scripts/staging_cleanup_grs0177.py` exposes this as `--delete-production-id UUID`, repeatable and
+**deliberately not driven by the matching criteria**. The script finds candidates by rule; a
+production record is only removed when the founder has typed its id. A named id that matches no
+candidate aborts the whole run rather than deleting on the strength of a possible typo.
+
+What this does not do: it creates no bulk path, no criteria-driven production deletion, and no way
+for an advisor to delete their own production record. The default is still refusal.
+
 ## Consequences
 
 - The GRS-0177 cleanup can do its job on staging.

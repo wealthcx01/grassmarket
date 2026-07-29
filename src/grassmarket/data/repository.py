@@ -2812,30 +2812,37 @@ class Repository:
         assessment_id: UUID,
         *,
         discard_scoring_runs: bool = False,
+        delete_production_record: bool = False,
     ) -> None:
         """Remove ONE assessment the caller owns, named by id (GRS-0177 staging cleanup).
 
-        Two guards, both deliberate.
+        Three guards, each defaulting to refusal.
 
-        A **production** record is never deletable through here, and no argument relaxes that: the
-        cleanup this exists for is about demo and sandbox clutter, and a tool that could remove
-        real client work is a worse problem than the clutter.
+        A **production** record is refused unless the caller passes
+        `delete_production_record=True` AND is the founder or an admin. That combination is not a
+        convenience: it is a founder saying, about one named record, that it is a mis-click rather
+        than work. No criteria-based caller can reach it, because the flag is per call and the
+        method takes one id. Every such deletion writes an audit event naming the record. See the
+        2026-07-29 amendment to ADR-0047.
 
         A record carrying a **scoring run** is refused by default, because runs are immutable and
         append-only (#6) — deleting the assessment would either orphan the run or destroy it.
         `discard_scoring_runs=True` is the caller stating, in the call itself, that this record's
-        runs are seeded illustration rather than an audit trail, and that they should go with it.
-        Combined with the production guard above that flag can only ever reach a demo or sandbox
-        record: watermarked, never client-facing, excluded from the benchmark population. See
-        ADR-0047 for why that carve-out does not weaken #6. The default is still refusal, so no
-        caller discards a run without saying so.
+        runs should go with it. See ADR-0047 for why that carve-out does not weaken #6.
 
         There is no bulk or wildcard form. Every deletion names one id.
         """
         row = self._require_assessment(principal, assessment_id)
-        if row.provenance == RecordProvenance.PRODUCTION.value:
+        is_production = row.provenance == RecordProvenance.PRODUCTION.value
+        if is_production and not delete_production_record:
             raise ConflictError(
-                f"Assessment {assessment_id} is a production record and cannot be deleted here."
+                f"Assessment {assessment_id} is a production record and cannot be deleted here. "
+                f"Deleting one is a founder decision, taken per record: call with "
+                f"delete_production_record=True."
+            )
+        if is_production and not (principal.is_founder or principal.is_admin):
+            raise ScopeViolationError(
+                "Only the founder or an admin may delete a production record."
             )
         # Any stored run at all is the bar, not just a flagged one: runs are append-only, so a row
         # existing is exactly the thing that must not be destroyed. A finalised assessment always
@@ -2865,7 +2872,7 @@ class Repository:
         # Three tables point at a scoring run by id rather than at the assessment, so removing the
         # runs without them would leave rows referring to a run that no longer exists. Orphaned
         # rows are exactly the silent-inconsistency failure mode #3 exists to prevent, so they go
-        # in the same transaction. Only reachable for a non-production record (guard above).
+        # in the same transaction.
         run_ids = [run.id for run in runs]
         if run_ids:
             self._session.execute(
@@ -2880,8 +2887,24 @@ class Repository:
         self._session.execute(
             delete(ScoringRunORM).where(ScoringRunORM.assessment_id == assessment_id)
         )
+        subject = row.subject
         self._session.delete(row)
         self._session.flush()
+        if is_production:
+            # Removing a production record is the one deletion here that could ever have destroyed
+            # real work, so it leaves a permanent trace of who did it and to what. The audit log is
+            # append-only, so this survives the record it describes.
+            self.record_audit(
+                actor_consultant_id=principal.consultant_id,
+                event_type=AuditEventType.ASSESSMENT_DELETED,
+                now=datetime.now(UTC),
+                resource_type="assessment",
+                resource_id=assessment_id,
+                detail=(
+                    f"Deleted production record {subject!r} "
+                    f"({len(run_ids)} scoring run(s)) by founder decision."
+                ),
+            )
 
     def list_assessments(self, principal: Principal) -> list[Assessment]:
         stmt = select(AssessmentORM)
