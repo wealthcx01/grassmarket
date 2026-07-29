@@ -63,7 +63,10 @@ def test_production_still_requires_the_full_gate(
     resp = client.post(f"/assessments/{aid}/finalise", headers=auth_header(alice))
     assert resp.status_code == 409
     detail = resp.json()["detail"].lower()
-    assert "dual-rating" in detail or "consensus" in detail
+    # The gate that stands here changed with ADR-0041 (peer consensus out, founder review in).
+    # What this test guards is unchanged: a production record does NOT self-approve the way a
+    # sandbox one does, and the refusal says why.
+    assert "founder approval" in detail
 
 
 def test_a_client_cannot_create_a_demo_record(client: TestClient, alice: SeededConsultant) -> None:
