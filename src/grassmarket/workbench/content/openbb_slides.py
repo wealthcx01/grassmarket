@@ -1569,9 +1569,358 @@ def section_4() -> CourseModule:
     )
 
 
+# --- Section 5 — A second workspace, for a different job ----------------------------------
+
+_S5_BODY = (
+    "By the end of this lesson you have a second workspace that is deliberately not a copy of the "
+    "first, and you can say what generalises between them. The founder asked for workspaces, "
+    "plural, and this is why: one dashboard proves you can follow instructions, while the second "
+    "one is where you find out which parts of the first were the product and which parts were "
+    "the ticker you happened to pick."
+)
+
+_SECTION_5_SLIDES: tuple[Slide, ...] = (
+    _s(
+        0,
+        SlideKind.CONCEPT,
+        "Why a second one, and why different",
+        "If your second dashboard is the first with a new ticker, you have learned nothing. Pick a "
+        "different JOB: not another firm, another question. That is what exposes the parts of "
+        "Workspace you have not touched yet.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        1,
+        SlideKind.CONCEPT,
+        "Three jobs worth building for",
+        "A monitoring view that watches for something changing. A comparison view that puts "
+        "several "
+        "firms side by side. A client-reporting view that someone outside the desk will read. Each "
+        "stresses a different part of the product.",
+        refs=(DOCS_DASHBOARDS, DOCS_WORKSPACE),
+    ),
+    _s(
+        2,
+        SlideKind.CONCEPT,
+        "Pick by segment, not by preference",
+        "Choose the job that matches the segment you sell into most. Monitoring suits an exchange "
+        "or a data team. Comparison suits a broker's research desk. Client reporting suits a "
+        "wealth manager. Build the one you will actually demo.",
+    ),
+    _s(
+        3,
+        SlideKind.WALKTHROUGH,
+        "Start from a duplicate, then gut it",
+        "Duplicate your first dashboard from the ellipsis menu, then delete most of it. Starting "
+        "from a duplicate keeps your parameter naming; gutting it stops you accidentally "
+        "rebuilding the same view with a different title.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        4,
+        SlideKind.WALKTHROUGH,
+        "Name it for the job",
+        '"Retail brokers — weekly comparison" rather than "dashboard 2". You are building a '
+        "library, and in three months the name is the only thing that tells you which of these was "
+        "worth keeping.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        5,
+        SlideKind.WALKTHROUGH,
+        "Build the comparison view",
+        "If you chose comparison: add the same widget several times, one per firm, and do NOT link "
+        "their tickers. Then add one table that holds all of them. Side by side is a different "
+        "layout discipline from a single subject.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        6,
+        SlideKind.WALKTHROUGH,
+        "Or build the monitoring view",
+        "If you chose monitoring: build around something that changes, and lean on the agent's "
+        "ability to watch dashboards for anomalies. The value here is not the widgets, it is not "
+        "having to look at them every hour.",
+        refs=(DOCS_WORKSPACE,),
+    ),
+    _s(
+        7,
+        SlideKind.WALKTHROUGH,
+        "Or build the client-reporting view",
+        "If you chose reporting: build for someone who will not be in the room when they read it. "
+        "Fewer widgets, more labelling, and the source attribution visible. This one is a wealth "
+        "manager's buying trigger far more often than a data one.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        8,
+        SlideKind.CONCEPT,
+        "When to link parameters and when not to",
+        "Linking is right when every widget is about one subject and wrong when the whole point is "
+        "several subjects at once. Knowing which is which is the difference between using the "
+        "product and repeating a trick you were shown.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        9,
+        SlideKind.WALKTHROUGH,
+        "Use a static file",
+        "Add something that is not a market feed: a PDF, a spreadsheet, a note. Dashboards take "
+        "static files, AI artifacts and notes alongside widgets, and almost every client you meet "
+        "has an important file that currently lives in email.",
+        refs=(DOCS_DASHBOARDS, DOCS_WORKSPACE),
+    ),
+    _s(
+        10,
+        SlideKind.CONCEPT,
+        "Why the static file matters commercially",
+        "Structured plus unstructured in one interface is OpenBB's own claim, and it is abstract "
+        "until a client sees their own committee pack sitting next to a price series. Have this "
+        "ready, because it converts a nod into a question.",
+        refs=(DOCS_WORKSPACE,),
+    ),
+    _s(
+        11,
+        SlideKind.WALKTHROUGH,
+        "Give this one its own agent question",
+        "Write a question specific to this job rather than reusing the first one. A comparison "
+        "view "
+        'wants "which of these diverged most this week and why". A monitoring view wants "what '
+        'changed since yesterday that I should care about".',
+        refs=(DOCS_WORKSPACE,),
+    ),
+    _s(
+        12,
+        SlideKind.CONCEPT,
+        "Prompts are a product feature, not an afterthought",
+        "An app carries a library of pre-written prompts tailored to its analytical focus. Your "
+        "second dashboard is where you start building your own, and a good prompt you can reuse is "
+        "worth more in a demo than another widget.",
+        refs=(DOCS_APPS,),
+    ),
+    _s(
+        13,
+        SlideKind.WALKTHROUGH,
+        "Organise both dashboards",
+        "Use Move to folders from the ellipsis menu and put both into a folder named for you or "
+        "for "
+        "the segment. Two is when a library starts, and a library nobody organised is how an "
+        "advisor ends up rebuilding the same view for the fourth time.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        14,
+        SlideKind.EXAMPLE,
+        "What the second build teaches you",
+        "Usually one of three things. That your parameter naming from the first build was sloppy. "
+        "That you do not know the widget library as well as you thought. Or that the layout you "
+        "liked does not survive a different job. All three are worth finding now.",
+    ),
+    _s(
+        15,
+        SlideKind.WALKTHROUGH,
+        "Export both configurations",
+        "Right-click and Export apps.json on each. You now have two portable configurations. This "
+        "is the beginning of something you can hand to a client rather than something you have to "
+        "be present for.",
+        refs=(DOCS_DASHBOARDS, DOCS_APPS),
+    ),
+    _s(
+        16,
+        SlideKind.CONCEPT,
+        "The library you are actually building",
+        "By the end of your first quarter you should have one dashboard per job per segment, not "
+        "one per client. A client-specific dashboard is a duplicate with the ticker changed, and "
+        "that takes two minutes if the job-level one is right.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        17,
+        SlideKind.EXAMPLE,
+        "How this changes a meeting",
+        "Instead of showing a product, you open the dashboard that matches the job they just "
+        "described and change the ticker to their firm. The demo becomes about them within about "
+        "fifteen seconds, and that is the entire advantage of having built these in advance.",
+    ),
+    _s(
+        18,
+        SlideKind.EXAMPLE,
+        "A trap worth naming",
+        "Do not build a dashboard live in a first meeting to prove you can. You will be talking, "
+        "answering questions, and something will not load. Build in advance, change the ticker "
+        "live. Rebuild live only when someone asks how hard it is.",
+    ),
+    _s(
+        19,
+        SlideKind.CONCEPT,
+        "What to do when a widget you want does not exist",
+        "Workspace supports the organisation's own custom data as a widget data source, so the "
+        'answer to "can it show our internal book?" is usually yes with work rather than no. '
+        "Do not promise a timeline; promise to find out and come back.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        20,
+        SlideKind.CONCEPT,
+        "The honest limit of what you have built",
+        "Two dashboards on public data prove you can use the product. They do not prove it works "
+        "on "
+        "the client's own data behind their own controls, which is the question that decides "
+        "enterprise deals. Say so before they do.",
+        refs=(DOCS_WORKSPACE,),
+    ),
+    _s(
+        21,
+        SlideKind.CHECKPOINT,
+        "Build the second one",
+        "A different job, not a different ticker. This is the clause of the founder's standard "
+        "that says workspaces, plural, and it is the one that separates an advisor who has used "
+        "the product from one who has followed a tutorial once. Take the time to pick a job you "
+        "will genuinely demo rather than the quickest one to build.",
+        checkpoint="Build a second dashboard for a genuinely different job, including at least one "
+        "static file, and keep a screenshot of both.",
+    ),
+    _s(
+        22,
+        SlideKind.CHECKPOINT,
+        "Write down what generalised",
+        "In three sentences: what you reused, what you had to rethink, and which of the two you "
+        "would open in front of a client tomorrow. This is the reflection that turns two builds "
+        "into a method.",
+        checkpoint="Write three sentences on what carried over from the first dashboard, what did "
+        "not, and which one you would demo.",
+    ),
+    _s(
+        23,
+        SlideKind.CONCEPT,
+        "What the next section does",
+        "You can build. Next is the data itself: what OpenBB gives a client, what it does not, and "
+        "the licensing questions that decide whether a deal is possible at all. It is the least "
+        "glamorous section and the one that saves you the most wasted time.",
+        refs=(DOCS_WORKSPACE,),
+    ),
+)
+
+SECTION_5_TEST = SectionTest(
+    questions=(
+        TestQuestion(
+            prompt="What makes a second dashboard worth building?",
+            options=(
+                "A different ticker",
+                "A different job, which is what exposes the parts of the product you have not "
+                "touched",
+                "More widgets",
+                "A different client",
+            ),
+            answer_index=1,
+            explanation=(
+                "If the second is the first with a new ticker you have learned nothing. The second "
+                "build is where you find out what was the product and what was the ticker."
+            ),
+        ),
+        TestQuestion(
+            prompt="When should you NOT link parameters across widgets?",
+            options=(
+                "Never, always link them",
+                "When the whole point of the view is several subjects side by side",
+                "When using a table widget",
+                "When the agent is enabled",
+            ),
+            answer_index=1,
+            explanation=(
+                "Knowing when linking is wrong is the difference between using the product and "
+                "repeating a trick you were shown."
+            ),
+        ),
+        TestQuestion(
+            prompt="Why add a static file such as a PDF to a dashboard?",
+            options=(
+                "It loads faster than a feed",
+                "It makes OpenBB's structured-plus-unstructured claim concrete, and every client "
+                "has an important file living in email",
+                "It is required for sharing",
+                "It enables the agent",
+            ),
+            answer_index=1,
+            explanation=(
+                "The claim is abstract until a client sees their own committee pack next to a "
+                "price series. That is what turns a nod into a question."
+            ),
+        ),
+        TestQuestion(
+            prompt="Should you build a dashboard live in a first meeting?",
+            options=(
+                "Yes, it proves you can",
+                "No. Build in advance and change the ticker live; rebuild live only if asked how "
+                "hard it is",
+                "Only for wealth managers",
+                "Only if the client asks",
+            ),
+            answer_index=1,
+            explanation=(
+                "You will be talking, answering questions, and something will not load. The demo "
+                "should become about them in fifteen seconds, not in ten minutes."
+            ),
+        ),
+        TestQuestion(
+            prompt="How many dashboards should you have by the end of a quarter?",
+            options=(
+                "One per client",
+                "One per job per segment; a client-specific one is a two-minute duplicate",
+                "As many as possible",
+                "Exactly two",
+            ),
+            answer_index=1,
+            explanation=(
+                "A client-specific dashboard is a duplicate with the ticker changed. That is cheap "
+                "only if the job-level one is right."
+            ),
+        ),
+        TestQuestion(
+            prompt="What do two dashboards on public data NOT prove?",
+            options=(
+                "That you can use the product",
+                "That it works on the client's own data behind their own controls",
+                "That parameters link",
+                "That the agent is grounded",
+            ),
+            answer_index=1,
+            explanation=(
+                "That question decides enterprise deals, and saying it before the client does "
+                "makes you more credible rather than less."
+            ),
+        ),
+    ),
+)
+
+
+def section_5() -> CourseModule:
+    """Section 5: a second workspace, for a different job."""
+    return CourseModule(
+        id=_id("module", "second-workspace"),
+        title="A second workspace, for a different job",
+        order=4,
+        lessons=(
+            Lesson(
+                id=_id("lesson", "second-workspace"),
+                title="Your second dashboard, and what generalises",
+                body=_S5_BODY,
+                order=0,
+                slides=_SECTION_5_SLIDES,
+                drill_topics=("product:openbb:workspace",),
+                measurement=(
+                    "You have two dashboards for genuinely different jobs, one of them carrying a "
+                    "static file, and you can say in three sentences what carried over."
+                ),
+            ),
+        ),
+        section_test=SECTION_5_TEST,
+    )
+
+
 def rebuilt_sections() -> tuple[CourseModule, ...]:
     """The sections rebuilt to the GRS-0215 standard, in order. Grows as GRS-0216 progresses."""
-    return (section_1(), section_2(), section_3(), section_4())
+    return (section_1(), section_2(), section_3(), section_4(), section_5())
 
 
 # Sections written so far, and sections still to write. The depth check fails while anything is in
@@ -1581,9 +1930,9 @@ SECTIONS_AUTHORED: tuple[str, ...] = (
     "install",
     "sign-up-and-orientation",
     "first-workspace",
+    "second-workspace",
 )
 SECTIONS_PLANNED: tuple[str, ...] = (
-    "second-workspace",
     "the-data",
     "who-buys-and-why",
     "how-and-when-to-sell",
