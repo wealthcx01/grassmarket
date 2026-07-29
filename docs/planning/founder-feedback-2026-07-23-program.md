@@ -84,6 +84,57 @@ is `0031_drill_card_prompt_answer`. Whichever lands first takes `0032`; the rest
 new head. Do not pin `0032` in more than one PR — the tickets say "next free number after
 rebasing" for this reason.
 
+## Second review — 2026-07-26
+
+The founder reviewed staging on 2026-07-26 and found much of the 23/07 list still open, plus
+fourteen new points. The honest tally at that date was 9 of 27 items closed. Three things this
+program had reported as shipped were not visible to the founder at all, because the code existed
+and the environment did not: the staging duplicates were never cleaned, the GTM registry was
+imported into a throwaway local database rather than staging, and Google sign-in was never
+provisioned. **"Shipped" in this program now means the founder can see it working on staging.**
+
+New tickets from that review:
+
+| Review item | Ticket |
+|---|---|
+| 1, 2, 3 — all copy still reads as AI | GRS-0205 (supersedes the sweep half of GRS-0174) |
+| 4 — Rive CLI for wizard and pipeline | GRS-0206 (ADR-0049) |
+| 5 — email, CRM, AI prospecting platform | GRS-0207 (ADR-0048; reopens GRS-0195) |
+| 6 — demo account + founder admin acting-as | GRS-0208 |
+| 7 — Operating Model dropdown still misaligned | GRS-0209 (bug, follows GRS-0178) |
+| 8 — smart search knows too few firms | GRS-0210 |
+| 9, 10 — deliverable is terrible; PDF + interactive, Acquired-style | GRS-0211 (extends GRS-0189) |
+| 11 — Customer Proposition for exchanges | GRS-0212 |
+| 12 — scenario tool must be interactive, with a narrative assistant | GRS-0213 (absorbs GRS-0184) |
+| 13 — free vs engaged tiers, downstream reports | GRS-0214 |
+| 14 — courses are paragraphs, not courses | GRS-0215 (replaces the content half of GRS-0191) |
+
+Also from that review, handled without a ticket:
+
+- **Staging cleanup (Grassmarket item 4): DONE 2026-07-29.** Four duplicate demo/sandbox records
+  removed from staging; the advisor portfolio went from 8 rows to 4. Required ADR-0047, because
+  `delete_assessment` refused any record carrying a scoring run and every duplicate was finalised.
+  Two production strays remain on that account and need a founder decision, because ADR-0047 keeps
+  production records undeletable: `Revolut` (draft, 0% coverage) and `Meridian Securities`
+  (finalised, 2% coverage).
+- **Permission layer (Grassmarket item 1).** `.claude/settings.json` now allowlists the commands
+  the workbench needs. This does **not** fix `git push origin main` or `gh pr merge`: those are
+  refused by the harness safety classifier, not by the permission allowlist, which already
+  permitted `Bash(git *)`. See `merge-and-deploy-blocked-by-classifier`.
+
+### Wave 6 — the 2026-07-26 review
+
+Order, by the founder's stated priority plus what unblocks what:
+
+1. GRS-0188 + ADR-0041 (remove peer rating, committee, calibration; route approvals to the
+   founder). Items 23 and 24, still open from 23/07, and the founder's own first pick.
+2. GRS-0215 courses. The item raised twice and the one they are angriest about.
+3. GRS-0211 client deliverable. The only artefact a client ever sees.
+4. GRS-0213 scenarios.
+5. GRS-0208 demo tenancy, GRS-0205 copy, GRS-0209 dropdown, GRS-0210 search: the four that make a
+   walkthrough survivable.
+6. GRS-0207 outreach platform, GRS-0212 exchange C, GRS-0214 tiers, GRS-0206 Rive.
+
 ## Item → ticket map
 
 1→0173 · 2→0174 · 3→0176 · 4→0177 · 5→0178 · 6→0179/0175 · 7→0180/0201/ADR-0046 · 8→0179 ·
