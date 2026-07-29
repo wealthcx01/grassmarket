@@ -107,8 +107,7 @@ def find_candidates(repo: Repository, principal: Principal) -> list[Candidate]:
                     state=entry.state.value,
                     coverage=entry.coverage,
                     reason=(
-                        f"duplicate of the {ordered[0].provenance.value} record "
-                        f"for this subject"
+                        f"duplicate of the {ordered[0].provenance.value} record for this subject"
                     ),
                 )
             )
@@ -128,6 +127,14 @@ def main() -> int:
         "--execute",
         action="store_true",
         help="Actually delete. Without this the script only reports.",
+    )
+    parser.add_argument(
+        "--discard-scoring-runs",
+        action="store_true",
+        help=(
+            "Also remove FINALISED demo/sandbox records together with their scoring runs. "
+            "Production records are never touched, with or without this flag (ADR-0047)."
+        ),
     )
     args = parser.parse_args()
 
@@ -152,30 +159,40 @@ def main() -> int:
         for candidate in candidates:
             print(candidate.describe())
 
-        # A finalised record carries an immutable scoring run (#6), so it is NOT deletable here
-        # however cluttered it looks. Splitting the list is the honest thing: the operator sees
-        # what this script can clear and what needs a decision it should not be making.
-        deletable = [c for c in candidates if c.state != "finalised"]
-        needs_decision = [c for c in candidates if c.state == "finalised"]
+        # Two things this script will not decide for you, so the list is split rather than acted
+        # on wholesale. A PRODUCTION record is never deletable, whatever it looks like — retiring
+        # real client work is a founder decision. A FINALISED record carries a scoring run, and
+        # runs are append-only (#6); discarding one needs the operator to say so explicitly with
+        # --discard-scoring-runs, which ADR-0047 confines to demo and sandbox records.
+        deletable: list[Candidate] = []
+        needs_decision: list[tuple[Candidate, str]] = []
+        for candidate in candidates:
+            if candidate.provenance == RecordProvenance.PRODUCTION.value:
+                needs_decision.append((candidate, "production record — never deleted here"))
+            elif candidate.state == "finalised" and not args.discard_scoring_runs:
+                needs_decision.append(
+                    (candidate, "finalised — re-run with --discard-scoring-runs to remove it")
+                )
+            else:
+                deletable.append(candidate)
 
         if needs_decision:
-            print(
-                f"\n{len(needs_decision)} of these are FINALISED and carry immutable scoring "
-                f"runs. This script will not delete them; retiring a locked record is a founder "
-                f"decision, not a cleanup step."
-            )
+            print(f"\n{len(needs_decision)} record(s) this script will NOT delete:")
+            for candidate, why in needs_decision:
+                print(f"  {candidate.subject:<28} {candidate.assessment_id}  → {why}")
 
         if not args.execute:
-            print(
-                f"\nReport only. Re-run with --execute to delete the "
-                f"{len(deletable)} unfinalised record(s)."
-            )
+            print(f"\nReport only. Re-run with --execute to delete the {len(deletable)} record(s).")
             return 0
 
         for candidate in deletable:
-            repo.delete_assessment(principal, candidate.assessment_id)
+            repo.delete_assessment(
+                principal,
+                candidate.assessment_id,
+                discard_scoring_runs=args.discard_scoring_runs,
+            )
         session.commit()
-        print(f"\nDeleted {len(deletable)} record(s); left {len(needs_decision)} finalised.")
+        print(f"\nDeleted {len(deletable)} record(s); left {len(needs_decision)} for a decision.")
         return 0
     except Exception:
         session.rollback()

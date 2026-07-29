@@ -2482,9 +2482,7 @@ class Repository:
     def get_deliverable(self, principal: Principal, deliverable_id: UUID) -> Deliverable:
         return self._to_deliverable(self._require_deliverable(principal, deliverable_id))
 
-    def list_deliverables_for_consultant(
-        self, principal: Principal
-    ) -> list[DeliverableIndexRow]:
+    def list_deliverables_for_consultant(self, principal: Principal) -> list[DeliverableIndexRow]:
         """The advisor's OWN deliverables index (GRS-0186), newest-generated first. One query
         joining the deliverable to its engagement (title, prospect) and prospect (company name),
         filtered strictly to `principal`'s rows — self-only even for an admin (mirrors the
@@ -2798,15 +2796,29 @@ class Repository:
     def get_assessment(self, principal: Principal, assessment_id: UUID) -> Assessment:
         return self._to_assessment(self._require_assessment(principal, assessment_id))
 
-    def delete_assessment(self, principal: Principal, assessment_id: UUID) -> None:
+    def delete_assessment(
+        self,
+        principal: Principal,
+        assessment_id: UUID,
+        *,
+        discard_scoring_runs: bool = False,
+    ) -> None:
         """Remove ONE assessment the caller owns, named by id (GRS-0177 staging cleanup).
 
-        Two guards, both deliberate. A **production** record is never deletable through here: the
+        Two guards, both deliberate.
+
+        A **production** record is never deletable through here, and no argument relaxes that: the
         cleanup this exists for is about demo and sandbox clutter, and a tool that could remove
-        real client work is a worse problem than the clutter. And a record with a **finalised
-        scoring run** is refused, because runs are immutable and append-only (#6) — deleting the
-        assessment would either orphan the run or destroy it, and neither is this method's call to
-        make. A finalised non-production record is reported to an operator, not silently erased.
+        real client work is a worse problem than the clutter.
+
+        A record carrying a **scoring run** is refused by default, because runs are immutable and
+        append-only (#6) — deleting the assessment would either orphan the run or destroy it.
+        `discard_scoring_runs=True` is the caller stating, in the call itself, that this record's
+        runs are seeded illustration rather than an audit trail, and that they should go with it.
+        Combined with the production guard above that flag can only ever reach a demo or sandbox
+        record: watermarked, never client-facing, excluded from the benchmark population. See
+        ADR-0047 for why that carve-out does not weaken #6. The default is still refusal, so no
+        caller discards a run without saying so.
 
         There is no bulk or wildcard form. Every deletion names one id.
         """
@@ -2825,22 +2837,36 @@ class Repository:
             .scalars()
             .all()
         )
-        if row.state == AssessmentState.FINALISED.value or runs:
+        if (row.state == AssessmentState.FINALISED.value or runs) and not discard_scoring_runs:
             raise ConflictError(
                 f"Assessment {assessment_id} is finalised or carries {len(runs)} immutable "
-                f"scoring run(s). Retire the record instead of deleting it."
+                f"scoring run(s). Retire the record instead of deleting it, or — for a demo or "
+                f"sandbox record whose runs are seeded illustration — call with "
+                f"discard_scoring_runs=True."
             )
+
         # Children first, so no FK is left dangling.
         self._session.execute(
-            delete(ModuleRatingDraftORM).where(
-                ModuleRatingDraftORM.assessment_id == assessment_id
-            )
+            delete(ModuleRatingDraftORM).where(ModuleRatingDraftORM.assessment_id == assessment_id)
         )
         self._session.execute(
-            delete(CommitteeDecisionORM).where(
-                CommitteeDecisionORM.assessment_id == assessment_id
-            )
+            delete(CommitteeDecisionORM).where(CommitteeDecisionORM.assessment_id == assessment_id)
         )
+        # Three tables point at a scoring run by id rather than at the assessment, so removing the
+        # runs without them would leave rows referring to a run that no longer exists. Orphaned
+        # rows are exactly the silent-inconsistency failure mode #3 exists to prevent, so they go
+        # in the same transaction. Only reachable for a non-production record (guard above).
+        run_ids = [run.id for run in runs]
+        if run_ids:
+            self._session.execute(
+                delete(AINarrativeORM).where(AINarrativeORM.scoring_run_id.in_(run_ids))
+            )
+            self._session.execute(
+                delete(PredictionORM).where(PredictionORM.scoring_run_id.in_(run_ids))
+            )
+            self._session.execute(
+                delete(DeliverableORM).where(DeliverableORM.scoring_run_id.in_(run_ids))
+            )
         self._session.execute(
             delete(ScoringRunORM).where(ScoringRunORM.assessment_id == assessment_id)
         )
