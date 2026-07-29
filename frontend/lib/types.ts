@@ -170,6 +170,8 @@ export interface Assessment {
   entity_id?: string | null;
   state: AssessmentState;
   provenance: RecordProvenance;
+  /** When the advisor last asked the founder to review this (GRS-0188). Null until submitted. */
+  review_requested_at?: string | null;
   document: AssessmentDocument;
   finalised_at?: string | null;
   scoring_run_id?: string | null;
@@ -1110,6 +1112,36 @@ export interface CommitteeReviewSummary {
   assessment_id: string;
   subject: string;
   pending_count: number;
+}
+
+// --- Founder review gate (GRS-0188, ADR-0041) --------------------------------------------
+// An approval names the sha256 of the document version it cleared. The gate compares that to the
+// document's CURRENT hash, so editing re-opens review by arithmetic rather than by a status field.
+
+export interface FounderApproval {
+  id: string;
+  owner_consultant_id: string;
+  assessment_id: string;
+  document_hash: string;
+  approved_by_consultant_id: string;
+  approved_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FounderReviewQueueEntry {
+  id: string;
+  owner_consultant_id: string;
+  assessment_id: string;
+  subject: string;
+  advisor_name: string;
+  advisor_email: string;
+  requested_at: string;
+  document_hash: string;
+  /** True when this was signed off and then edited: the founder is re-reading, not reading. */
+  previously_approved: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 // --- Dual rating (Methodology §9, GRS-0062) ----------------------------------------------

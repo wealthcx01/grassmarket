@@ -1,6 +1,6 @@
 # ADR-0041 — Founder review gate: a single named reviewer replaces peer governance
 
-- **Status:** Proposed (2026-07-23). Founder-directed (feedback 23/07/2026, items 23–24);
+- **Status:** Accepted (2026-07-23). Founder-directed (feedback 23/07/2026, items 23–24);
   ratifies with GRS-0188.
 - **Deciders:** Founder (governance model), Engineering (implementation).
 - **Normative source:** Methodology §8/§9 (amended by v1.6 with this ADR), ADR-0010

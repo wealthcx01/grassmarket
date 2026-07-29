@@ -266,9 +266,9 @@ def test_signoff_must_come_from_a_certified_lead(
 
 
 def test_uncertified_lead_cannot_finalise_a_frontier_assessment(
-    client, admin: SeededConsultant, alice: SeededConsultant
+    client, admin: SeededConsultant, alice: SeededConsultant, founder: SeededConsultant
 ) -> None:
-    aid = frontier_assessment_ready_to_finalise(client, alice)  # alice is Trained
+    aid = frontier_assessment_ready_to_finalise(client, alice, founder)  # alice is Trained
     resp = client.post(f"/assessments/{aid}/finalise", headers=auth_header(alice))
     assert resp.status_code == 409
     assert "Certified Lead must lead" in resp.json()["detail"]
@@ -276,10 +276,10 @@ def test_uncertified_lead_cannot_finalise_a_frontier_assessment(
 
 
 def test_a_certified_lead_can_finalise_a_frontier_assessment(
-    client, admin: SeededConsultant
+    client, admin: SeededConsultant, founder: SeededConsultant
 ) -> None:
     lead = seed_consultant_at_level(client, AssessorLevel.CERTIFIED_LEAD)
-    aid = frontier_assessment_ready_to_finalise(client, lead)
+    aid = frontier_assessment_ready_to_finalise(client, lead, founder)
     resp = client.post(f"/assessments/{aid}/finalise", headers=auth_header(lead))
     assert resp.status_code == 200
     assert resp.json()["state"] == "finalised"
@@ -289,9 +289,9 @@ def test_a_certified_lead_can_finalise_a_frontier_assessment(
 
 
 def test_admin_can_override_the_certification_gate_with_a_recorded_reason(
-    client, admin: SeededConsultant, alice: SeededConsultant
+    client, admin: SeededConsultant, alice: SeededConsultant, founder: SeededConsultant
 ) -> None:
-    aid = frontier_assessment_ready_to_finalise(client, alice)
+    aid = frontier_assessment_ready_to_finalise(client, alice, founder)
     # No reason → refused even for an admin (no silent bypass).
     assert (
         client.post(f"/assessments/{aid}/finalise", headers=auth_header(admin)).status_code == 409

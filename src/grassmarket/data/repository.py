@@ -3070,8 +3070,16 @@ class Repository:
             resource_id=assessment_id,
             now=finalised_at,
         )
-        # GRS-0131: real participation auto-counts toward the ladder — no honour-system admin POST.
-        self._auto_credit_participation(row, finalised_at)
+        # GRS-0131 derived certification evidence from peer participation: a shadow credit for each
+        # co-rater, an observed-lead credit for the lead. With dual rating retired (ADR-0041) there
+        # are no co-raters, so the shadow half now derives nothing and the observed-lead half would
+        # award "observed" credit with nobody observing. Awarding evidence for something that did
+        # not happen is worse than awarding none, so the call is removed here.
+        #
+        # `_auto_credit_participation` stays below, dormant with its unit test, so re-mounting peer
+        # rating restores this in one line. Evidence is recorded meanwhile through
+        # `log_shadow_assessment`, `log_observed_lead`, and the audited OVERRIDE path — all of which
+        # need a human to assert that the thing happened.
         self._session.flush()
         return self._to_assessment(row)
 
@@ -3155,6 +3163,7 @@ class Repository:
             state=AssessmentState(row.state),
             document=AssessmentDocument.model_validate_json(row.document_json),
             provenance=RecordProvenance(row.provenance),
+            review_requested_at=row.review_requested_at,
             finalised_at=row.finalised_at,
             scoring_run_id=row.scoring_run_id,
             engine_version=row.engine_version,
@@ -5117,11 +5126,9 @@ class Repository:
         )
         research_prospect = pick_research_prospect(self._own_prospects(principal.consultant_id))
 
-        # GRS-0128: fold the governance + Academy surfaces into the one hub, reusing existing reads.
-        rating_assignments = self.list_my_rating_assignments(principal)
-        committee_reviews = (
-            self.list_assessments_for_committee(principal) if principal.is_committee else []
-        )
+        # GRS-0128 folded the Academy into the one hub. The peer-governance reads that used to sit
+        # here (rating assignments, the committee queue) went with ADR-0041: nobody is blocked on a
+        # peer any more, so nothing about them belongs in an advisor's bench.
         academy_title = self._next_academy_course_title(principal)
 
         items = assemble_queue(
@@ -5130,13 +5137,6 @@ class Repository:
             due_drills=due_drills,
             arena_scenario=arena_scenario,
             research_prospect=research_prospect,
-            pending_rating_count=len(rating_assignments),
-            pending_rating_subject=rating_assignments[0][1] if rating_assignments else None,
-            pending_rating_ref=(
-                rating_assignments[0][0].assessment_id if rating_assignments else None
-            ),
-            committee_review_count=len(committee_reviews),
-            committee_ref=committee_reviews[0].id if committee_reviews else None,
             academy_course_title=academy_title,
         )
         return BenchQueue(

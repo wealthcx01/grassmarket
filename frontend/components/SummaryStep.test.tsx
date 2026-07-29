@@ -17,15 +17,11 @@ import type {
   RecordProvenance,
 } from "@/lib/types";
 
-// The governance panels fetch on mount; this suite is about WHICH of them render, not their
-// internals, so they are stubbed to identifiable markers.
-vi.mock("@/components/DualRatingPanel", () => ({
-  DualRatingPanel: () => <div data-testid="dual-rating">Dual rating panel</div>,
-}));
-vi.mock("@/components/CommitteeReviewPanel", () => ({
-  CommitteeReviewPanel: () => (
-    <div data-testid="committee">8 awaiting sign-off before this assessment can be finalised</div>
-  ),
+// The review panel fetches on mount; this suite is about WHICH surface renders, not its internals,
+// so it is stubbed to an identifiable marker. Dual rating and the committee were retired under
+// ADR-0041 (GRS-0188) and no longer render anywhere.
+vi.mock("@/components/FounderReviewStatus", () => ({
+  FounderReviewStatus: () => <div data-testid="founder-review">Founder review status</div>,
 }));
 vi.mock("@/components/DeliverablePreviewButton", () => ({
   DeliverablePreviewButton: () => <div>Preview deliverable</div>,
@@ -90,7 +86,7 @@ const DOCUMENT = {
   widgets: [],
 } as unknown as AssessmentDocument;
 
-function renderStep(over: { readOnly?: boolean; provenance?: RecordProvenance } = {}) {
+function renderStep(over: { readOnly?: boolean; provenance?: RecordProvenance; reviewRequestedAt?: string | null } = {}) {
   return render(
     <SummaryStep
       registry={REGISTRY}
@@ -106,6 +102,7 @@ function renderStep(over: { readOnly?: boolean; provenance?: RecordProvenance } 
       onFinalise={() => {}}
       finalising={false}
       provenance={over.provenance ?? "production"}
+      reviewRequestedAt={over.reviewRequestedAt ?? null}
       onPreviewInSandbox={() => {}}
       previewingSandbox={false}
       clientUsable
@@ -139,8 +136,7 @@ describe("SummaryStep (GRS-0182)", () => {
       expect(screen.getByText(/Finalised on the production path/)).toBeTruthy();
       // The bug: a locked assessment rendering "awaiting sign-off".
       expect(screen.queryByText(/awaiting sign-off/i)).toBeNull();
-      expect(screen.queryByTestId("committee")).toBeNull();
-      expect(screen.queryByTestId("dual-rating")).toBeNull();
+      expect(screen.queryByTestId("founder-review")).toBeNull();
     });
 
     it("a finalised sandbox record says it was self-approved and watermarked", () => {
@@ -150,11 +146,16 @@ describe("SummaryStep (GRS-0182)", () => {
       expect(screen.queryByText(/awaiting sign-off/i)).toBeNull();
     });
 
-    it("a draft still shows the live governance workflow, which is correct there", () => {
-      renderStep({ readOnly: false });
-      expect(screen.getByTestId("dual-rating")).toBeTruthy();
-      expect(screen.getByTestId("committee")).toBeTruthy();
+    it("a production draft shows the founder review prompt, which is correct there", () => {
+      renderStep({ readOnly: false, provenance: "production" });
+      expect(screen.getByTestId("founder-review")).toBeTruthy();
       expect(screen.queryByText("Governance record")).toBeNull();
+    });
+
+    it("a sandbox draft shows the record instead, because it needs nobody (ADR-0029)", () => {
+      renderStep({ readOnly: false, provenance: "sandbox" });
+      expect(screen.queryByTestId("founder-review")).toBeNull();
+      expect(screen.getByText("Governance record")).toBeTruthy();
     });
   });
 

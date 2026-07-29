@@ -52,6 +52,7 @@ from grassmarket.data.repository import (
 )
 from grassmarket.entities import active_entity_registry
 from grassmarket.web.dependencies import get_current_principal, get_repository
+from grassmarket.web.retired import retired_route
 from grassmarket.workbench.certification import requires_certified_lead
 
 router = APIRouter(prefix="/assessments", tags=["assessments"])
@@ -181,7 +182,11 @@ class RatingRequestSummary(BaseModel):
 
 
 # Declared BEFORE `/{assessment_id}` so "rating-requests" isn't parsed as an assessment UUID.
-@router.get("/rating-requests", response_model=list[RatingRequestSummary])
+@router.get(
+    "/rating-requests",
+    response_model=list[RatingRequestSummary],
+    dependencies=[Depends(retired_route)],
+)
 def my_rating_requests(
     principal: Principal = Depends(get_current_principal),
     repo: Repository = Depends(get_repository),
@@ -477,7 +482,11 @@ def assign_rater(
         raise _conflict(exc) from exc
 
 
-@router.get("/{assessment_id}/modules/{module_key}/my-rating", response_model=ModuleRatingDraft)
+@router.get(
+    "/{assessment_id}/modules/{module_key}/my-rating",
+    response_model=ModuleRatingDraft,
+    dependencies=[Depends(retired_route)],
+)
 def get_my_module_rating(
     assessment_id: UUID,
     module_key: str,
@@ -491,7 +500,11 @@ def get_my_module_rating(
         raise _not_found(exc) from exc
 
 
-@router.put("/{assessment_id}/modules/{module_key}/my-rating", response_model=ModuleRatingDraft)
+@router.put(
+    "/{assessment_id}/modules/{module_key}/my-rating",
+    response_model=ModuleRatingDraft,
+    dependencies=[Depends(retired_route)],
+)
 def update_my_module_rating(
     assessment_id: UUID,
     module_key: str,
@@ -529,7 +542,11 @@ def submit_my_module_rating(
         raise _conflict(exc) from exc
 
 
-@router.get("/{assessment_id}/modules/{module_key}/ratings", response_model=list[ModuleRatingDraft])
+@router.get(
+    "/{assessment_id}/modules/{module_key}/ratings",
+    response_model=list[ModuleRatingDraft],
+    dependencies=[Depends(retired_route)],
+)
 def list_module_ratings(
     assessment_id: UUID,
     module_key: str,
@@ -544,7 +561,11 @@ def list_module_ratings(
         raise _not_found(exc) from exc
 
 
-@router.post("/{assessment_id}/modules/{module_key}/consensus", response_model=Assessment)
+@router.post(
+    "/{assessment_id}/modules/{module_key}/consensus",
+    response_model=Assessment,
+    dependencies=[Depends(retired_route)],
+)
 def resolve_module_consensus(
     assessment_id: UUID,
     module_key: str,

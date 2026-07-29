@@ -29,7 +29,6 @@ const CONCEPT_IDS = [
   "scoring-powers",
   "seven-powers",
   "reading-outputs",
-  "calibration",
   "mistakes",
 ];
 
@@ -107,7 +106,7 @@ describe("GuidePage (GRS-0175)", () => {
     readingOutputs.remove();
     // Anything after reading-outputs is downstream of the definitions, so only look upstream.
     const before = Array.from(clone.querySelectorAll("article > section"));
-    const upstream = before.slice(0, before.findIndex((s) => s.id === "calibration"));
+    const upstream = before.slice(0, before.findIndex((s) => s.id === "mistakes"));
     const text = upstream.map((s) => s.textContent ?? "").join(" ");
     expect(text).not.toMatch(/P(10|50|90)/);
   });

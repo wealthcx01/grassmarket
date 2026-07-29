@@ -340,6 +340,7 @@ export function WizardClient({ id }: { id: string }) {
     onFinalise,
     finalising,
     provenance: assessment.provenance,
+    reviewRequestedAt: assessment.review_requested_at ?? null,
     onPreviewInSandbox: previewInSandbox,
     previewingSandbox: cloningSandbox,
     clientUsable,

@@ -42,7 +42,7 @@ const GROW: ReadonlyArray<Section> = [
     title: "Workbench",
     href: "/workbench",
     kicker: "Certification & practice",
-    blurb: "Certification ladder, practice arena, power drills, calibration, and the bench queue.",
+    blurb: "Certification ladder, practice arena, power drills, and the bench queue.",
   },
   {
     title: "My Earnings",

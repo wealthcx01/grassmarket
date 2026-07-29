@@ -292,36 +292,43 @@ def test_conversion_rate_is_zero_with_no_prospects() -> None:
     assert summary.arena_trend == ()
 
 
-# --- GRS-0128: governance + Academy folded into the one hub -------------------------------
-def test_hub_folds_rating_committee_and_academy_in_priority_order() -> None:
-    aid = uuid4()
+# --- GRS-0128: the one hub, minus the peer governance retired by ADR-0041 ------------------
+def test_hub_folds_academy_in_priority_order() -> None:
     queue = assemble_queue(
         cert_record=_record(AssessorLevel.TRAINED),
         next_coursework=_coursework_module(),
         due_drills=[_drill("t", due=_NOW)],
         arena_scenario=_scenario(),
         research_prospect=_prospect(PipelineStage.PROSPECT),
-        pending_rating_count=2,
-        pending_rating_subject="Meridian Securities",
-        pending_rating_ref=aid,
-        committee_review_count=1,
-        committee_ref=uuid4(),
         academy_course_title="Sales Egoist",
     )
-    # Governance first (others are blocked on it), then certification, then Academy, then the rest.
+    # Certification first, then Academy, then the rest. Rating requests and committee reviews used
+    # to head this list because other people were blocked on them; nobody is blocked on a peer any
+    # more (ADR-0041), and the founder's queue is its own surface.
     assert [i.kind for i in queue] == [
-        BenchItemKind.RATING_REQUEST,
-        BenchItemKind.COMMITTEE,
         BenchItemKind.CERTIFICATION,
         BenchItemKind.ACADEMY,
         BenchItemKind.DRILL,
         BenchItemKind.ARENA,
         BenchItemKind.RESEARCH,
     ]
-    assert [i.priority for i in queue] == list(range(1, 8))
-    assert queue[0].ref_id == aid
-    assert "Meridian Securities" in queue[0].detail
-    assert queue[3].title == "Continue the Academy: Sales Egoist"
+    assert [i.priority for i in queue] == list(range(1, 6))
+    assert queue[1].title == "Continue the Academy: Sales Egoist"
+
+
+def test_the_hub_never_carries_a_retired_governance_item() -> None:
+    """ADR-0041: the kinds stay in the contract, dormant, but nothing produces one."""
+    queue = assemble_queue(
+        cert_record=_record(AssessorLevel.TRAINED),
+        next_coursework=_coursework_module(),
+        due_drills=[_drill("t", due=_NOW)],
+        arena_scenario=_scenario(),
+        research_prospect=_prospect(PipelineStage.PROSPECT),
+        academy_course_title="Sales Egoist",
+    )
+    kinds = {i.kind for i in queue}
+    assert BenchItemKind.RATING_REQUEST not in kinds
+    assert BenchItemKind.COMMITTEE not in kinds
 
 
 def test_hub_items_absent_when_nothing_pending() -> None:

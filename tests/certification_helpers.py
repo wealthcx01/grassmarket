@@ -9,14 +9,13 @@ from __future__ import annotations
 
 from uuid import uuid4
 
-from bcap_contracts.common import AssessorLevel, ConsultantTier, MaturityLevel, Role
+from bcap_contracts.common import AssessorLevel, ConsultantTier, Role
 from bcap_contracts.registry import load_registry
 
 from grassmarket.auth.security import create_access_token, hash_password
 from grassmarket.data.repository import Principal, Repository
-from tests.committee_helpers import approve_committee_queue
 from tests.conftest import SeededConsultant, auth_header
-from tests.dual_rating_helpers import reach_consensus
+from tests.founder_review_helpers import submit_and_approve
 
 _REGISTRY = load_registry()
 _MODULE = "APP_SERVER"
@@ -87,13 +86,13 @@ def _frontier_document() -> dict:
     }
 
 
-def frontier_assessment_ready_to_finalise(client, owner: SeededConsultant) -> str:
-    """A Frontier-bearing assessment owned by `owner`, already through dual-rating consensus and
-    Rating Committee sign-off (§8) — ready to finalise but for the certification floor (§9)."""
+def frontier_assessment_ready_to_finalise(
+    client, owner: SeededConsultant, founder: SeededConsultant
+) -> str:
+    """A Frontier-bearing assessment owned by `owner`, already signed off by the founder
+    (ADR-0041) — ready to finalise but for the certification floor (§9). The certification gate is
+    the one being tested, so everything ahead of it has to be clear."""
     aid = client.post("/assessments", json={}, headers=auth_header(owner)).json()["id"]
     client.put(f"/assessments/{aid}", json=_frontier_document(), headers=auth_header(owner))
-    reach_consensus(
-        client, aid, owner, _MODULE, [(s, MaturityLevel.FRONTIER) for s in _APP_SERVER_SUBS]
-    )
-    approve_committee_queue(client, aid, owner)
+    submit_and_approve(client, aid, owner, founder)
     return aid
