@@ -64,6 +64,7 @@ from bcap_contracts.entities import (
 )
 from bcap_contracts.extraction import Extraction, FieldProvenance
 from bcap_contracts.fees import RecoveryFeeAttribution
+from bcap_contracts.founder_review import FounderApproval, FounderReviewQueueEntry
 from bcap_contracts.influencer import (
     InfluencerMap,
     InfluencerMapProvenance,
@@ -149,6 +150,8 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "CommitteeItem": CommitteeItem,
     "CommitteeDecision": CommitteeDecision,
     "CommitteeQueueEntry": CommitteeQueueEntry,
+    "FounderApproval": FounderApproval,
+    "FounderReviewQueueEntry": FounderReviewQueueEntry,
     "CalibrationSession": CalibrationSession,
     "CalibrationRating": CalibrationRating,
     "CalibrationResult": CalibrationResult,

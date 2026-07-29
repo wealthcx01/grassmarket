@@ -976,6 +976,37 @@ class CommitteeDecisionORM(Base):
     )
 
 
+class FounderApprovalORM(Base):
+    """The founder's sign-off on ONE version of ONE assessment document (GRS-0188, ADR-0041).
+
+    Append-only. There is no status column and no update path: an approval is a fact about a
+    document hash. Editing the document changes the hash, the approval stops matching, and the
+    record returns to the review queue. ``owner_consultant_id`` is the advisor whose work is being
+    cleared (the scoping column, as everywhere else); ``approved_by_consultant_id`` is the founder.
+    """
+
+    __tablename__ = "founder_approvals"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    assessment_id: Mapped[UUID] = mapped_column(
+        ForeignKey("assessments.id"), index=True, nullable=False
+    )
+    # Lowercase sha256 hex of the assessment document as stored at approval time. Server-computed;
+    # never accepted from a caller.
+    document_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    approved_by_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), nullable=False
+    )
+    approved_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
 class ModuleRatingDraftORM(Base):
     """One rater's independent, blind rating of one module's subcomponents (GRS-0020, Methodology
     §9 dual rating). ``owner_consultant_id`` is the rater. The (assessment, module, rater) triple is
@@ -1075,6 +1106,13 @@ class AssessmentORM(Base):
     # Record provenance (ADR-0029): production (default) vs demo/sandbox. Immutable after creation.
     provenance: Mapped[str] = mapped_column(String(16), default="production", nullable=False)
     document_json: Mapped[str] = mapped_column(Text, nullable=False)
+
+    # When the advisor last asked the founder to review this document (GRS-0188, ADR-0041). Null
+    # until they submit. The other half of the handshake is a `founder_approvals` row; the gate
+    # compares that row's hash to the document's current hash, so nothing here needs a status.
+    review_requested_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     finalised_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     scoring_run_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)

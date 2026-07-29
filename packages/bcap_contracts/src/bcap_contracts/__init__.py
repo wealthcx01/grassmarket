@@ -97,6 +97,10 @@ from bcap_contracts.extraction import (
     ExtractionStatus,
     FieldProvenance,
 )
+from bcap_contracts.founder_review import (
+    FounderApproval,
+    FounderReviewQueueEntry,
+)
 from bcap_contracts.learning import (
     CertificationCredit,
     CertificationProgress,
@@ -207,6 +211,8 @@ __all__ = [
     "CommitteeDecision",
     "CommitteeDecisionStatus",
     "CommitteeQueueEntry",
+    "FounderApproval",
+    "FounderReviewQueueEntry",
     "CalibrationSession",
     "CalibrationRating",
     "CalibrationResult",

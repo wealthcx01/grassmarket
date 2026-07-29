@@ -29,6 +29,7 @@ class AuditEventType(StrEnum):
     DELIVERABLE_GENERATED = "deliverable_generated"
     DELIVERABLE_DOWNLOADED = "deliverable_downloaded"
     COMMITTEE_DECISION = "committee_decision"
+    FOUNDER_APPROVAL = "founder_approval"  # ADR-0041: the founder signed off a document version
     CERTIFICATION_OVERRIDE = "certification_override"
     COMMISSION_RECORDED = "commission_recorded"
     GDPR_EXPORT = "gdpr_export"

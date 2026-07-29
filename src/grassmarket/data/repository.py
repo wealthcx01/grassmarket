@@ -118,6 +118,10 @@ from bcap_contracts.fees import (
     RecoveryFeeConfig,
     load_recovery_fee_config,
 )
+from bcap_contracts.founder_review import (
+    FounderApproval,
+    FounderReviewQueueEntry,
+)
 from bcap_contracts.learning import (
     CertificationCredit,
     ContentCompletion,
@@ -175,6 +179,7 @@ from grassmarket.data.models import (
     EngagementORM,
     ExtractionORM,
     FieldProvenanceORM,
+    FounderApprovalORM,
     GeneratedQuizORM,
     InvitationORM,
     LearningModuleORM,
@@ -406,6 +411,11 @@ class Principal:
 
     consultant_id: UUID
     role: Role
+    # The founder review gate (ADR-0041). Derived at token mint from the configured reviewer
+    # email rather than stored as a role, so rotating the reviewer is an env change plus a
+    # re-login and never a migration. Defaults to False so every existing construction of a
+    # Principal is unaffected and no caller acquires the claim by accident.
+    is_founder: bool = False
 
     @property
     def is_admin(self) -> bool:
@@ -3128,6 +3138,151 @@ class Repository:
             methodology_version=row.methodology_version,
             coefficient_version=row.coefficient_version,
             uncertainty_version=row.uncertainty_version,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    # --------------------------------------------------- founder review gate (GRS-0188, ADR-0041)
+    # The network is one founder and a handful of advisors. Peer rating and committee sign-off were
+    # built for a scale it has not reached; the founder signs what goes out instead. The whole
+    # mechanism is a hash comparison: an approval names the document version it cleared, and it
+    # clears the gate only while that is still the current version. Editing re-opens review by
+    # arithmetic rather than by a state machine, so there is no way to be approved-but-changed.
+
+    @staticmethod
+    def _document_hash(row: AssessmentORM) -> str:
+        """sha256 of the stored document. Computed here from what is in the database, never taken
+        from a caller: an approval that could name its own hash would approve nothing."""
+        return hashlib.sha256(row.document_json.encode("utf-8")).hexdigest()
+
+    def request_founder_review(self, principal: Principal, assessment_id: UUID) -> Assessment:
+        """The advisor asks the founder to review this document. Idempotent: asking again just
+        moves the timestamp, which is what "I've made changes, please look again" means."""
+        row = self._require_assessment(principal, assessment_id)
+        if row.state == AssessmentState.FINALISED.value:
+            raise ConflictError(
+                f"Assessment {assessment_id} is already finalised; there is nothing left to review."
+            )
+        row.review_requested_at = datetime.now(UTC)
+        self._session.flush()
+        return self._to_assessment(row)
+
+    def record_founder_approval(self, principal: Principal, assessment_id: UUID) -> FounderApproval:
+        """The founder signs off the document as it stands right now.
+
+        Only the founder may call this. Not an admin, and not the advisor who owns the record:
+        the point of the gate is that one named person signs what leaves the building, so an
+        admin bypass would quietly reintroduce self-approval (#8)."""
+        if not principal.is_founder:
+            raise ScopeViolationError(
+                "Only the founder reviewer may approve a document for release (ADR-0041)."
+            )
+        row = self._session.get(AssessmentORM, assessment_id)
+        if row is None:
+            raise NotFoundError(f"Assessment {assessment_id} not found.")
+        if row.state == AssessmentState.FINALISED.value:
+            raise ConflictError(
+                f"Assessment {assessment_id} is already finalised; approval would change nothing."
+            )
+        now = datetime.now(UTC)
+        approval = FounderApprovalORM(
+            owner_consultant_id=row.owner_consultant_id,
+            assessment_id=assessment_id,
+            document_hash=self._document_hash(row),
+            approved_by_consultant_id=principal.consultant_id,
+            approved_at=now,
+        )
+        self._session.add(approval)
+        self._session.flush()
+        self.record_audit(
+            actor_consultant_id=principal.consultant_id,
+            event_type=AuditEventType.FOUNDER_APPROVAL,
+            now=now,
+            resource_type="assessment",
+            resource_id=assessment_id,
+            detail=f"Approved document {approval.document_hash[:12]} for release.",
+        )
+        return self._to_founder_approval(approval)
+
+    def current_founder_approval(self, assessment_id: UUID) -> FounderApproval | None:
+        """The newest approval that still matches the document, or None.
+
+        Unscoped by design: this is the gate itself, called from the finalise and deliverable
+        paths where the caller's access has already been established. It reveals nothing a caller
+        could not already see about a record they hold."""
+        row = self._session.get(AssessmentORM, assessment_id)
+        if row is None:
+            raise NotFoundError(f"Assessment {assessment_id} not found.")
+        current = self._document_hash(row)
+        stmt = (
+            select(FounderApprovalORM)
+            .where(
+                FounderApprovalORM.assessment_id == assessment_id,
+                FounderApprovalORM.document_hash == current,
+            )
+            .order_by(FounderApprovalORM.approved_at.desc())
+        )
+        approval = self._session.execute(stmt).scalars().first()
+        return self._to_founder_approval(approval) if approval is not None else None
+
+    def list_founder_review_queue(self, principal: Principal) -> list[FounderReviewQueueEntry]:
+        """Everything waiting on the founder, oldest request first.
+
+        Production records only. A demo or sandbox record self-approves under ADR-0029 and has no
+        client on the other end, so putting one in this queue would waste the founder's attention
+        on work that is not going anywhere."""
+        if not (principal.is_founder or principal.is_admin):
+            raise ScopeViolationError("Only the founder reviewer may read the review queue.")
+        stmt = (
+            select(AssessmentORM)
+            .where(
+                AssessmentORM.review_requested_at.is_not(None),
+                AssessmentORM.state != AssessmentState.FINALISED.value,
+                AssessmentORM.provenance == RecordProvenance.PRODUCTION.value,
+            )
+            .order_by(AssessmentORM.review_requested_at)
+        )
+        entries: list[FounderReviewQueueEntry] = []
+        for row in self._session.execute(stmt).scalars().all():
+            current = self._document_hash(row)
+            approvals = (
+                self._session.execute(
+                    select(FounderApprovalORM).where(FounderApprovalORM.assessment_id == row.id)
+                )
+                .scalars()
+                .all()
+            )
+            if any(a.document_hash == current for a in approvals):
+                continue  # already signed at this version — not waiting on anyone
+            advisor = self._require_consultant(row.owner_consultant_id)
+            entries.append(
+                FounderReviewQueueEntry(
+                    id=row.id,
+                    owner_consultant_id=row.owner_consultant_id,
+                    assessment_id=row.id,
+                    subject=row.subject,
+                    advisor_name=advisor.full_name,
+                    advisor_email=advisor.email,
+                    requested_at=row.review_requested_at,
+                    document_hash=current,
+                    # An approval at some OTHER hash means this was signed and then edited. Saying
+                    # so is the difference between "read this" and "read what changed".
+                    previously_approved=bool(approvals),
+                    created_at=row.created_at,
+                    updated_at=row.updated_at,
+                )
+            )
+        return entries
+
+    @staticmethod
+    def _to_founder_approval(row: FounderApprovalORM) -> FounderApproval:
+        return FounderApproval(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            assessment_id=row.assessment_id,
+            document_hash=row.document_hash,
+            approved_by_consultant_id=row.approved_by_consultant_id,
+            approved_at=row.approved_at,
             created_at=row.created_at,
             updated_at=row.updated_at,
         )
