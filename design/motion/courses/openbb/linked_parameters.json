@@ -120,7 +120,7 @@
       },
       {
         "type": "text",
-        "name": "FieldValue",
+        "name": "FieldValueA",
         "x": 480,
         "y": 186,
         "origin_x": 0.5,
@@ -129,17 +129,17 @@
         "children": [
           {
             "type": "text_style",
-            "name": "FieldValueStyle",
+            "name": "FieldValueAStyle",
             "font_asset": "Display",
             "font_size": 30,
             "children": [
               {
                 "type": "fill",
-                "name": "FieldValueStyleFill",
+                "name": "FieldValueAStyleFill",
                 "children": [
                   {
                     "type": "solid_color",
-                    "name": "FieldValueStyleCol",
+                    "name": "FieldValueAStyleCol",
                     "color": "#EDF2EE"
                   }
                 ]
@@ -148,9 +148,45 @@
           },
           {
             "type": "text_value_run",
-            "name": "FieldValueRun",
-            "style": "FieldValueStyle",
+            "name": "FieldValueARun",
+            "style": "FieldValueAStyle",
             "text": "LSEG"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "FieldValueB",
+        "x": 480,
+        "y": 186,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FieldValueBStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FieldValueBStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FieldValueBStyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FieldValueBRun",
+            "style": "FieldValueBStyle",
+            "text": "NDAQ"
           }
         ]
       },
@@ -693,6 +729,379 @@
                 "type": "solid_color",
                 "name": "BgSolid",
                 "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "animations": [
+      {
+        "name": "propagate",
+        "fps": 60,
+        "duration": 168,
+        "loop_type": "loop",
+        "interpolators": [
+          {
+            "name": "ease_in_out",
+            "x1": 0.42,
+            "y1": 0.0,
+            "x2": 0.58,
+            "y2": 1.0
+          }
+        ],
+        "keyframes": [
+          {
+            "object": "FieldValueA",
+            "property": "opacity",
+            "frames": [
+              {
+                "frame": 0,
+                "value": 1.0,
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 12,
+                "value": 1.0,
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 26,
+                "value": 0.0,
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 140,
+                "value": 0.0,
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 158,
+                "value": 1.0
+              }
+            ]
+          },
+          {
+            "object": "FieldValueB",
+            "property": "opacity",
+            "frames": [
+              {
+                "frame": 0,
+                "value": 0.0,
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 12,
+                "value": 0.0,
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 26,
+                "value": 1.0,
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 140,
+                "value": 1.0,
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 158,
+                "value": 0.0
+              }
+            ]
+          },
+          {
+            "object": "Field",
+            "property": "scale_x",
+            "frames": [
+              {
+                "frame": 26,
+                "value": 1.0,
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 36,
+                "value": 1.03,
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 50,
+                "value": 1.0
+              }
+            ]
+          },
+          {
+            "object": "Field",
+            "property": "scale_y",
+            "frames": [
+              {
+                "frame": 26,
+                "value": 1.0,
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 36,
+                "value": 1.03,
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 50,
+                "value": 1.0
+              }
+            ]
+          },
+          {
+            "object": "FeedSolid",
+            "property": "color",
+            "frames": [
+              {
+                "frame": 30,
+                "value": "#1A3B26",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 42,
+                "value": "#7FD4A0",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 72,
+                "value": "#1A3B26"
+              }
+            ]
+          },
+          {
+            "object": "BusSolid",
+            "property": "color",
+            "frames": [
+              {
+                "frame": 42,
+                "value": "#1A3B26",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 56,
+                "value": "#7FD4A0",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 86,
+                "value": "#1A3B26"
+              }
+            ]
+          },
+          {
+            "object": "D1StemSolid",
+            "property": "color",
+            "frames": [
+              {
+                "frame": 54,
+                "value": "#1A3B26",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 66,
+                "value": "#7FD4A0",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 94,
+                "value": "#1A3B26"
+              }
+            ]
+          },
+          {
+            "object": "D1HeadCol",
+            "property": "color",
+            "frames": [
+              {
+                "frame": 54,
+                "value": "#1A3B26",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 66,
+                "value": "#7FD4A0",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 94,
+                "value": "#1A3B26"
+              }
+            ]
+          },
+          {
+            "object": "W1BoxSolid",
+            "property": "color",
+            "frames": [
+              {
+                "frame": 62,
+                "value": "#F7F5EF",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 80,
+                "value": "#E4EBE5",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 116,
+                "value": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "object": "D0StemSolid",
+            "property": "color",
+            "frames": [
+              {
+                "frame": 60,
+                "value": "#1A3B26",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 72,
+                "value": "#7FD4A0",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 100,
+                "value": "#1A3B26"
+              }
+            ]
+          },
+          {
+            "object": "D0HeadCol",
+            "property": "color",
+            "frames": [
+              {
+                "frame": 60,
+                "value": "#1A3B26",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 72,
+                "value": "#7FD4A0",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 100,
+                "value": "#1A3B26"
+              }
+            ]
+          },
+          {
+            "object": "W0BoxSolid",
+            "property": "color",
+            "frames": [
+              {
+                "frame": 68,
+                "value": "#F7F5EF",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 86,
+                "value": "#E4EBE5",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 122,
+                "value": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "object": "D2StemSolid",
+            "property": "color",
+            "frames": [
+              {
+                "frame": 60,
+                "value": "#1A3B26",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 72,
+                "value": "#7FD4A0",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 100,
+                "value": "#1A3B26"
+              }
+            ]
+          },
+          {
+            "object": "D2HeadCol",
+            "property": "color",
+            "frames": [
+              {
+                "frame": 60,
+                "value": "#1A3B26",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 72,
+                "value": "#7FD4A0",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 100,
+                "value": "#1A3B26"
+              }
+            ]
+          },
+          {
+            "object": "W2BoxSolid",
+            "property": "color",
+            "frames": [
+              {
+                "frame": 68,
+                "value": "#F7F5EF",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 86,
+                "value": "#E4EBE5",
+                "interpolation": "cubic",
+                "interpolator": "ease_in_out"
+              },
+              {
+                "frame": 122,
+                "value": "#F7F5EF"
               }
             ]
           }

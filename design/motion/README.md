@@ -38,9 +38,32 @@ seven diagrams shipped their first render with arrowheads hidden behind the boxe
 **A font asset's `source` must resolve inside the project owning the scene**, which is why Inter is
 vendored here rather than referenced from the toolchain.
 
+## Animation
+
+`linked_parameters` is animated; the rest are static, and a static diagram is the right default.
+Motion is for a diagram whose subject IS movement — here, one field changing and three widgets
+following it, which is the demo an advisor gives.
+
+Two format rules shaped how it is built:
+
+- **Text content is not animatable.** Only `font_size`, `line_height`, `letter_spacing` and the
+  transform properties are. So the ticker changing is a cross-fade between two text runs stacked at
+  the same position, not an edit.
+- **`stroke.thickness` is not animatable either.** The signal travelling down the wire is a colour
+  change on filled rectangles, which is why `line()` builds a filled rectangle rather than a
+  stroked path.
+
+Everything eases. Linear interpolation is the giveaway of a diagram animated by a machine rather
+than designed, and avoiding it costs one field.
+
 ## What the check does and does not prove
 
 `render.sh` fails a blank frame or an implausibly low colour count. That catches a scene that drew
 nothing. It does **not** catch a scene that drew the wrong thing: the first AGPL render ran its
 right-hand box off the artboard and into its neighbour, and passed every check. The committed
 stills exist so a human can see that in review.
+
+For an animated scene it also samples six frames across the loop and **fails if they are
+byte-identical**, which is the real check for "the animation is not animating". Distinct colour
+counts are the documented false negative: they can stay identical while the picture changes, and
+stay identical while it does not. Rendering is deterministic, so hashes are stable.

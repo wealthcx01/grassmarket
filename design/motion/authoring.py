@@ -210,19 +210,58 @@ def stack(*layers: dict | list[dict]) -> list[dict]:
     return out
 
 
-def scene(name: str, width: float, height: float, children: list[dict]) -> dict:
+def keys(obj: str, prop: str, *frames: tuple[int, float | str], ease: bool = True) -> dict:
+    """Keyframes for one property of one object, by object NAME.
+
+    Everything eases by default. Linear interpolation is the giveaway of a diagram that was
+    animated by a machine rather than designed, and the cost of avoiding it is one field.
+    """
+    out = []
+    for i, (frame, value) in enumerate(frames):
+        kf: dict = {"frame": frame, "value": value}
+        # The last keyframe holds; interpolation describes the segment leaving a frame.
+        if ease and i < len(frames) - 1:
+            kf["interpolation"] = "cubic"
+            kf["interpolator"] = EASE
+        out.append(kf)
+    return {"object": obj, "property": prop, "frames": out}
+
+
+EASE = "ease_in_out"
+EASE_DEF = {"name": EASE, "x1": 0.42, "y1": 0.0, "x2": 0.58, "y2": 1.0}
+
+
+def animation(name: str, duration: int, keyframes: list[dict], *, fps: int = 60) -> dict:
     return {
-        "scene_format_version": 1,
-        "artboard": {
-            "name": name,
-            "width": width,
-            "height": height,
-            "children": [
-                {"type": "font_asset", "name": FONT, "source": FONT_SOURCE},
-                *children,
-            ],
-        },
+        "name": name,
+        "fps": fps,
+        "duration": duration,
+        "loop_type": "loop",
+        "interpolators": [EASE_DEF],
+        "keyframes": keyframes,
     }
+
+
+def scene(
+    name: str,
+    width: float,
+    height: float,
+    children: list[dict],
+    *,
+    animations: list[dict] | None = None,
+) -> dict:
+    artboard: dict = {
+        "name": name,
+        "width": width,
+        "height": height,
+        "children": [
+            {"type": "font_asset", "name": FONT, "source": FONT_SOURCE},
+            *children,
+        ],
+    }
+    if animations:
+        artboard["animations"] = animations
+    return {"scene_format_version": 1, "artboard": artboard}
 
 
 def write(spec: dict, path: Path) -> Path:

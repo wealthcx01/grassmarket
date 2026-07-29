@@ -27,9 +27,11 @@ from authoring import (  # noqa: E402
     RULE,
     SIGNAL,
     WARN,
+    animation,
     arrow_down,
     arrow_right,
     card,
+    keys,
     line,
     scene,
     stack,
@@ -197,8 +199,18 @@ def widget_anatomy() -> dict:
 
 
 def linked_parameters() -> dict:
-    """The demo the advisor actually gives. One field moves, three widgets follow. This is the one
-    worth animating later; as a still it still carries the point."""
+    """The demo the advisor actually gives, and the one diagram here that genuinely wants motion:
+    the point is not that three widgets exist, it is that ONE field moves them.
+
+    Two constraints shaped this. Text content is not animatable, so the ticker changing is a
+    cross-fade between two runs rather than an edit. And a stroke's thickness is not animatable
+    either, so the signal travelling down the wire is a colour change on filled rectangles rather
+    than a drawn line. Both are the format's rules, not preferences.
+
+    The loop is 168 frames at 60fps, 2.8 seconds. It reads: the ticker changes, the wire lights up,
+    the widgets follow, everything settles, and the ticker quietly resets so the loop does not
+    snap.
+    """
     widgets = [
         ("Price chart", 200),
         ("Fundamentals", 480),
@@ -211,6 +223,40 @@ def linked_parameters() -> dict:
     arrows: list[dict] = []
     for i, (_, x) in enumerate(widgets):
         arrows.extend(arrow_down(f"D{i}", x, 288, 46, GREEN))
+
+    # The wire at rest is the accent green; lit, it is the brighter signal green. Going brighter
+    # rather than changing hue keeps a colour-blind reader with the same information.
+    REST, LIT = GREEN, SIGNAL
+
+    kf: list[dict] = [
+        # The ticker changes. This is the cause; everything below is the effect.
+        keys("FieldValueA", "opacity", (0, 1.0), (12, 1.0), (26, 0.0), (140, 0.0), (158, 1.0)),
+        keys("FieldValueB", "opacity", (0, 0.0), (12, 0.0), (26, 1.0), (140, 1.0), (158, 0.0)),
+        # The field acknowledges the change with a small pulse. Small: a diagram that bounces is
+        # a diagram nobody trusts.
+        keys("Field", "scale_x", (26, 1.0), (36, 1.03), (50, 1.0)),
+        keys("Field", "scale_y", (26, 1.0), (36, 1.03), (50, 1.0)),
+        # The signal travels: down the feed, out along the bus, then down each arrow.
+        keys("FeedSolid", "color", (30, REST), (42, LIT), (72, REST)),
+        keys("BusSolid", "color", (42, REST), (56, LIT), (86, REST)),
+    ]
+    # The three branches light in a slight stagger, so the eye reads a direction rather than a
+    # simultaneous flash. Centre first, because that is where the bus was struck.
+    for i, delay in ((1, 0), (0, 6), (2, 6)):
+        t = 54 + delay
+        kf.append(keys(f"D{i}StemSolid", "color", (t, REST), (t + 12, LIT), (t + 40, REST)))
+        kf.append(keys(f"D{i}HeadCol", "color", (t, REST), (t + 12, LIT), (t + 40, REST)))
+        # And the widget itself acknowledges it. Tint, not a flash.
+        kf.append(
+            keys(
+                f"W{i}BoxSolid",
+                "color",
+                (t + 8, PAPER),
+                (t + 26, GREEN_TINT),
+                (t + 62, PAPER),
+            )
+        )
+
     return scene(
         "LinkedParameters",
         960,
@@ -226,13 +272,13 @@ def linked_parameters() -> dict:
                 MUTED,
             ),
             text("FieldLabel", 480, 152, "ticker", 15, ON_GREEN_MUTED),
-            text("FieldValue", 480, 186, "LSEG", 30, ON_GREEN),
+            # Two runs stacked, cross-faded. Text content cannot be keyframed.
+            text("FieldValueA", 480, 186, "LSEG", 30, ON_GREEN),
+            text("FieldValueB", 480, 186, "NDAQ", 30, ON_GREEN),
             *labels,
             *boxes,
-            # The stem from the field down to the bus. Its absence in the first render left the
-            # ticker box floating, which read as three widgets that happen to be near a box.
-            line("Feed", 480, 251, 2.5, 74, GREEN),
-            line("Bus", 480, 288, 560, 2.5, GREEN),
+            line("Feed", 480, 251, 2.5, 74, REST),
+            line("Bus", 480, 288, 560, 2.5, REST),
             *arrows,
             card("Field", 480, 172, 260, 84, GREEN),
             text(
@@ -245,6 +291,7 @@ def linked_parameters() -> dict:
             ),
             card("Bg", 480, 235, 960, 470, PAPER, radius=0),
         ),
+        animations=[animation("propagate", 168, kf)],
     )
 
 
