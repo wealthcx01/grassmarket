@@ -14,10 +14,11 @@ opens. Every factual claim carries a `SourceRef` to OpenBB's own documentation, 
 July 2026. Where a slide states a version, a price or a limit, it cites the page it came from,
 because the failure this rebuild corrects was content summarised from memory.
 
-**This course is incomplete and the depth check says so.** `SECTIONS_AUTHORED` lists what exists;
-`SECTIONS_PLANNED` lists what does not. The course does not pass `assert_meets_standard` until all
-eight are written, which is deliberate: the previous attempt shipped a renderer with no content and
-still read as progress.
+All eight sections are written (2026-07-29). `SECTIONS_AUTHORED` lists them and `SECTIONS_PLANNED`
+is empty. While it was not empty a test asserted the course was unfinished, so it could never read
+as done; that test has been deleted now that it is, which is what its own failure message asked
+for. The point of the mechanism was that the previous attempt shipped a renderer with no content
+and still read as progress.
 """
 
 from __future__ import annotations
@@ -88,6 +89,11 @@ BLOG_MARKETPLACE = SourceRef(
     title="Introducing the OpenBB App Marketplace",
     url="https://openbb.co/blog/introducing-the-openbb-app-marketplace/",
     kind=SourceRefKind.BLOG,
+)
+LICENCE = SourceRef(
+    title="OpenBB ODP licence (AGPLv3), on GitHub",
+    url="https://github.com/OpenBB-finance/OpenBB/blob/develop/LICENSE",
+    kind=SourceRefKind.REPO,
 )
 REPO = SourceRef(
     title="OpenBB on GitHub",
@@ -1918,9 +1924,1054 @@ def section_5() -> CourseModule:
     )
 
 
+# --- Section 6 — The data, and the licensing that decides whether a deal is possible ------
+
+_S6_BODY = (
+    "By the end of this lesson you can answer the two questions that kill OpenBB deals late: what "
+    "data does a client actually get, and what are we allowed to build on the open-source code. "
+    "This is the least glamorous section in the course and it saves you the most wasted time, "
+    "because both questions are cheap to answer in month one and expensive to discover in month "
+    "four."
+)
+
+_SECTION_6_SLIDES: tuple[Slide, ...] = (
+    _s(
+        0,
+        SlideKind.CONCEPT,
+        "The sentence to memorise",
+        "OpenBB is a way to work with data. It is not a way to get data you are not licensed for. "
+        "Every difficult conversation in this section is a variation on somebody hoping the second "
+        "half of that sentence is not true.",
+        refs=(DOCS_WORKSPACE,),
+    ),
+    _s(
+        1,
+        SlideKind.CONCEPT,
+        "What comes in the box",
+        "OpenBB documents access to more than 350 datasets across roughly a dozen data vendors, "
+        "surfaced through hundreds of widgets. Quote that as approximate and cite it. A precise "
+        "number you cannot source is worse in a meeting than an honest range.",
+        refs=(DOCS_PLATFORM_INSTALLER,),
+    ),
+    _s(
+        2,
+        SlideKind.CONCEPT,
+        "Free providers versus keyed providers",
+        "Some providers need no API key, which is why `yfinance` was the right first call in "
+        "section 2. Most useful ones need a key, and that key represents a contract the client "
+        "already has or will need. OpenBB does not supply it.",
+        refs=(DOCS_QUICKSTART,),
+    ),
+    _s(
+        3,
+        SlideKind.CONCEPT,
+        "The client's existing vendors are the opportunity",
+        "A firm paying for a market data vendor already holds the entitlement. Bringing it into "
+        "OpenBB is a consolidation conversation, not a procurement one, and consolidation "
+        "conversations move far faster because no new contract is required.",
+        refs=(DOCS_WORKSPACE,),
+    ),
+    _s(
+        4,
+        SlideKind.WALKTHROUGH,
+        "Find out what they already pay for",
+        "Before any technical conversation, ask which data vendors they hold. Write the list down. "
+        "That list determines whether the first build is a two-week job or a two-quarter one, and "
+        "asking early makes you look like someone who has done this before.",
+    ),
+    _s(
+        5,
+        SlideKind.CONCEPT,
+        "Their own data is a first-class source",
+        "A widget's data source can be a feed, a database, the organisation's own custom data, "
+        "or "
+        "a static file. Their internal book, their positions, their research notes: all valid "
+        "sources. This is usually where the real value sits, and it is not a data purchase at all.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        6,
+        SlideKind.CONCEPT,
+        "The provenance problem, restated for a client",
+        "OpenBB picks a provider alphabetically when you do not name one, and skips any whose key "
+        "is missing. In a regulated firm that means a number can come from a different source "
+        "between two runs. Raise it unprompted; it is the kind of honesty that wins technical "
+        "buyers.",
+        refs=(DOCS_QUICKSTART,),
+    ),
+    _s(
+        7,
+        SlideKind.CONCEPT,
+        "The metadata layer is your answer",
+        "Every widget carries source attribution in its metadata. When a compliance officer asks "
+        "where a number came from, the answer is in the product rather than in a spreadsheet "
+        "somebody maintains. Point at this rather than describing it.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        8,
+        SlideKind.CONCEPT,
+        "Two products, two licensing worlds",
+        "This is the distinction that matters most in this section. The open-source Open Data "
+        "Platform is licensed one way. OpenBB Workspace is a commercial product licensed another. "
+        "Conflating them is how an advisor promises something the client cannot legally do.",
+        refs=(LICENCE, DOCS_WORKSPACE),
+    ),
+    _s(
+        9,
+        SlideKind.CONCEPT,
+        "The Open Data Platform is AGPLv3",
+        "The GitHub repository states the licence as AGPLv3. That is a strong copyleft licence, "
+        "and "
+        "its network clause is the part that surprises people: offering modified software over a "
+        "network can trigger source disclosure obligations.",
+        refs=(LICENCE, REPO),
+    ),
+    _s(
+        10,
+        SlideKind.CONCEPT,
+        "Why AGPL matters to a bank or a broker",
+        "A firm that forks the open-source platform, modifies it, and serves it to its own clients "
+        "over a network may be obliged to publish those modifications. Most financial firms will "
+        "not accept that. This is a real objection and it deserves a real answer.",
+        refs=(LICENCE,),
+    ),
+    _s(
+        11,
+        SlideKind.CONCEPT,
+        "The answer: commercial licensing exists",
+        "OpenBB separates the open-source ODP from the commercial Workspace product precisely so "
+        "an enterprise has a route that is not AGPL. When a client raises copyleft, the response "
+        "is that this is what the commercial arrangement is for.",
+        refs=(REPO, DOCS_WORKSPACE),
+    ),
+    _s(
+        12,
+        SlideKind.CONCEPT,
+        "Where white-labelling actually happens",
+        "In Workspace, not by forking the open-source platform. Branding, custom apps, custom "
+        "widgets and the firm's own data behind them are Workspace capabilities. An advisor who "
+        "suggests forking the AGPL code to white-label has created a legal problem.",
+        refs=(DOCS_APPS, DOCS_WIDGETS, LICENCE),
+    ),
+    _s(
+        13,
+        SlideKind.WALKTHROUGH,
+        "Read the licence line for yourself",
+        "Open the repository and find the licence. Thirty seconds. You will be asked about it by "
+        'someone technical, and "I have read it" is a materially different answer from "I '
+        'believe it is open source".',
+        refs=(LICENCE, REPO),
+    ),
+    _s(
+        14,
+        SlideKind.CONCEPT,
+        "Deployment is the other half of the question",
+        '"Can our data leave our environment?" is a different question from licensing and is '
+        "usually the one that decides an enterprise deal. OpenBB documents several routes in, "
+        "including Enterprise and a platform installer, which is where that conversation goes.",
+        refs=(
+            DOCS_WORKSPACE,
+            DOCS_PLATFORM_INSTALLER,
+        ),
+    ),
+    _s(
+        15,
+        SlideKind.CONCEPT,
+        "The local platform, and the port again",
+        "A locally-running platform API on `http://localhost:6900` is how a firm keeps a data "
+        "layer "
+        "inside its own environment while using Workspace on top. Knowing that this shape exists "
+        "is often enough to keep a conversation alive past the first objection.",
+        refs=(DOCS_PLATFORM_INSTALLER,),
+    ),
+    _s(
+        16,
+        SlideKind.EXAMPLE,
+        "The conversation that goes wrong",
+        "An advisor says the platform is open source, the client's architect hears \"we can fork "
+        'it and build our client portal on it", and four months later legal finds AGPL. The deal '
+        "does not just stall, it costs you the relationship.",
+        refs=(LICENCE,),
+    ),
+    _s(
+        17,
+        SlideKind.EXAMPLE,
+        "The same conversation, done properly",
+        '"The data platform is AGPLv3, so if you are planning to modify it and serve it to your '
+        "own clients, that needs a commercial arrangement rather than the open-source licence. "
+        'Workspace is the supported route for that. Shall I get you the specifics?"',
+        refs=(LICENCE, DOCS_WORKSPACE),
+    ),
+    _s(
+        18,
+        SlideKind.CONCEPT,
+        "What you must never do",
+        "Never advise on licensing. State the licence, state that a commercial route exists, and "
+        "route the specifics to OpenBB and to the client's own counsel. You are a distributor, "
+        "not their lawyer, and the difference protects both of you.",
+        refs=(LICENCE,),
+    ),
+    _s(
+        19,
+        SlideKind.CONCEPT,
+        "Export as a lock-in answer",
+        "Widgets export to CSV, JSON and Excel. Lock-in is a quiet objection almost nobody voices "
+        "directly, and demonstrating an export answers it in five seconds without anyone having to "
+        "admit they were worried.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        20,
+        SlideKind.EXAMPLE,
+        "A qualification question that saves a quarter",
+        '"If this works, would you be putting it in front of your own clients, or is it internal '
+        'to the desk?" The answer tells you immediately whether you are in a Workspace '
+        "conversation or a licensing one, and it costs you nothing to ask in the first meeting.",
+    ),
+    _s(
+        21,
+        SlideKind.CHECKPOINT,
+        "Write the licensing answer in your own words",
+        "Two or three sentences you could say out loud to a client's architect without notes. Get "
+        "it right now, calmly, rather than improvising it under pressure in a room where somebody "
+        "technical is listening carefully.",
+        checkpoint='Write your two-to-three sentence answer to "is this open source, and can we '
+        'build on it?" and keep it with your sixty-second explanation from section 1.',
+    ),
+    _s(
+        22,
+        SlideKind.CHECKPOINT,
+        "List one target's data vendors",
+        "Take one of your three named targets and find out, or make your best documented guess at, "
+        "which market data vendors they hold. Note how you found out. This is the research that "
+        "makes a first meeting land.",
+        checkpoint="Write down the data vendors you believe one named target holds, and how you "
+        "established it.",
+    ),
+    _s(
+        23,
+        SlideKind.CONCEPT,
+        "What the next section does",
+        "You now know what the product does and what it is allowed to do. Next is who actually "
+        "buys "
+        "it: which segment, which person in the room, and what has to have happened for them to be "
+        "looking at all.",
+    ),
+)
+
+SECTION_6_TEST = SectionTest(
+    questions=(
+        TestQuestion(
+            prompt="What licence is the open-source Open Data Platform under?",
+            options=("MIT", "Apache 2.0", "AGPLv3", "Proprietary"),
+            answer_index=2,
+            explanation=(
+                "The GitHub repository states AGPLv3. Its network clause is the part that "
+                "surprises people, and it is a real objection for any firm serving clients."
+            ),
+        ),
+        TestQuestion(
+            prompt=(
+                "A client wants to fork the open-source platform and serve it to their own "
+                "clients. What do you say?"
+            ),
+            options=(
+                "Go ahead, it is open source",
+                "That may trigger AGPL source-disclosure obligations; a commercial arrangement "
+                "is the supported route, and I will get you the specifics",
+                "It is not technically possible",
+                "You need to ask your own lawyer, I cannot comment",
+            ),
+            answer_index=1,
+            explanation=(
+                "State the licence, state that a commercial route exists, and route the specifics "
+                "to OpenBB and their counsel. Never advise on licensing yourself."
+            ),
+        ),
+        TestQuestion(
+            prompt="Where does white-labelling actually happen?",
+            options=(
+                "By forking the open-source platform",
+                "In Workspace, through branding, custom apps and custom widgets",
+                "It is not supported",
+                "Through the App Marketplace only",
+            ),
+            answer_index=1,
+            explanation=(
+                "An advisor who suggests forking the AGPL code to white-label has created a legal "
+                "problem rather than closed a deal."
+            ),
+        ),
+        TestQuestion(
+            prompt="Does OpenBB give a client data they are not licensed for?",
+            options=(
+                "Yes, that is the point",
+                "No. It is a way to work with data, not a way to get data you are not licensed for",
+                "Only public data",
+                "Only in Enterprise",
+            ),
+            answer_index=1,
+            explanation=(
+                "Every difficult conversation in this area is somebody hoping that is not true. "
+                "Saying it early stops a deal dying on an expectation you set."
+            ),
+        ),
+        TestQuestion(
+            prompt="Why is a client's existing vendor list the first thing to ask about?",
+            options=(
+                "To estimate their budget",
+                "It turns the deal into a consolidation conversation rather than a procurement "
+                "one, which moves far faster",
+                "To check they can afford it",
+                "It is required for the install",
+            ),
+            answer_index=1,
+            explanation=(
+                "Existing entitlements need no new contract. That list decides whether the first "
+                "build is a two-week job or a two-quarter one."
+            ),
+        ),
+        TestQuestion(
+            prompt="How do you answer an unspoken lock-in worry?",
+            options=(
+                "Explain the contract terms",
+                "Demonstrate an export to CSV or Excel, which answers it without anyone "
+                "admitting they were worried",
+                "Offer a discount",
+                "Point at the open-source licence",
+            ),
+            answer_index=1,
+            explanation=(
+                "Lock-in is a quiet objection almost nobody voices. Showing the export takes five "
+                "seconds and removes it."
+            ),
+        ),
+    ),
+)
+
+
+def section_6() -> CourseModule:
+    """Section 6: the data, and the licensing that decides whether a deal is possible."""
+    return CourseModule(
+        id=_id("module", "the-data"),
+        title="The data, and the licensing that decides whether a deal is possible",
+        order=5,
+        lessons=(
+            Lesson(
+                id=_id("lesson", "the-data"),
+                title="What the client gets, and what we are allowed to build",
+                body=_S6_BODY,
+                order=0,
+                slides=_SECTION_6_SLIDES,
+                drill_topics=("product:openbb:licensing",),
+                measurement=(
+                    'You can answer "is this open source, and can we build on it?" in two or '
+                    "three sentences without notes, and you know one target's data vendors."
+                ),
+            ),
+        ),
+        section_test=SECTION_6_TEST,
+    )
+
+
+# --- Section 7 — Who buys it, in which segment, and what triggers the purchase ------------
+
+_S7_BODY = (
+    "By the end of this lesson you can look at a firm in our registry and say, with reasons, "
+    "whether OpenBB is a real conversation there, who in the building would care, and what has to "
+    "have happened for them to be looking at all. Qualification is the highest-leverage skill in "
+    "this course, because the cost of a bad opportunity is not the meeting, it is the quarter."
+)
+
+_SECTION_7_SLIDES: tuple[Slide, ...] = (
+    _s(
+        0,
+        SlideKind.CONCEPT,
+        "Sell to the trigger, not to the product",
+        "Nobody buys a workspace. They buy the end of a specific irritation. Your job in "
+        "qualification is to find the irritation and check it is expensive enough that somebody is "
+        "already complaining about it upward.",
+    ),
+    _s(
+        1,
+        SlideKind.CONCEPT,
+        "The five segments we assess",
+        "Retail brokerage, wealth manager, exchange, bank, information vendor. OpenBB has a "
+        "plausible story in all five, which is exactly why you must not treat them as one market. "
+        "The trigger is different in each, and so is the person who feels it.",
+    ),
+    _s(
+        2,
+        SlideKind.CONCEPT,
+        "Retail brokerage: the trigger is research cost",
+        "A research desk assembling the same view every morning from four vendors is paying "
+        "analyst salary for clerical work. The person who feels it is the head of research. The "
+        "person who funds it is whoever owns the research budget, and they are often not the same.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        3,
+        SlideKind.CONCEPT,
+        "Wealth manager: the trigger is consistency",
+        "Fifty advisers giving fifty slightly different house views is a supervision problem "
+        "before "
+        "it is a data problem. The buyer is often compliance-adjacent, and the winning "
+        "demonstration is a shared dashboard rather than a clever widget.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        4,
+        SlideKind.CONCEPT,
+        "Exchange: the trigger is product insight",
+        "An exchange's data product managers need to see how their own feeds are used and how "
+        "they "
+        "compare. Their own data plus public reference data is a narrow, fast build, and it opens "
+        "a second conversation about publishing an app themselves.",
+        refs=(BLOG_MARKETPLACE,),
+    ),
+    _s(
+        5,
+        SlideKind.CONCEPT,
+        "Bank: the trigger is consolidation and governance",
+        "Banks have every vendor and no single view, plus an AI governance problem they are "
+        "already "
+        "being asked about internally. Grounded answers over their own data is the phrase that "
+        "gets you a second meeting here.",
+        refs=(DOCS_WORKSPACE,),
+    ),
+    _s(
+        6,
+        SlideKind.CONCEPT,
+        "Information vendor: the trigger is distribution",
+        "A data business does not need another way to look at data. It needs its data in front of "
+        "more people, which makes the App Marketplace the conversation rather than Workspace "
+        "seats. This is a genuinely different sale and worth recognising early.",
+        refs=(BLOG_MARKETPLACE,),
+    ),
+    _s(
+        7,
+        SlideKind.CONCEPT,
+        "The four people you will meet",
+        "The analyst who feels the pain. The engineer who will judge whether it is real. The "
+        "budget "
+        "holder who does not care about either. And the compliance or risk voice who can stop it. "
+        "You need all four, and you will usually be introduced to one.",
+    ),
+    _s(
+        8,
+        SlideKind.CONCEPT,
+        "The analyst",
+        "They want their morning back. Show them the linked parameter and the agent question. They "
+        "will not sign anything, but without them nothing happens, and they are the cheapest "
+        "person in the building to get excited.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        9,
+        SlideKind.CONCEPT,
+        "The engineer",
+        "They will ask about deployment, data residency, the licence and whether it can reach "
+        "internal systems. Sections 2 and 6 exist for this person. Being straight with them about "
+        "AGPL is worth more than any feature you could name.",
+        refs=(LICENCE, DOCS_PLATFORM_INSTALLER),
+    ),
+    _s(
+        10,
+        SlideKind.CONCEPT,
+        "The budget holder",
+        "They want a number and a comparison to what they already spend. Seat reduction only where "
+        "the client has told you a seat does something OpenBB genuinely does. Never invent the "
+        "saving; an unfounded number is remembered longer than a good demo.",
+        refs=(SITE_WORKSPACE,),
+    ),
+    _s(
+        11,
+        SlideKind.CONCEPT,
+        "The compliance voice",
+        "They want to know where a number came from and what an AI agent is allowed to see. Source "
+        "attribution in the widget metadata and grounding in the firm's own data are your two "
+        "answers, and both are demonstrable rather than assertable.",
+        refs=(DOCS_WIDGETS, DOCS_WORKSPACE),
+    ),
+    _s(
+        12,
+        SlideKind.WALKTHROUGH,
+        "Score your three targets",
+        "For each of the three firms you named in section 1, write the trigger you believe is "
+        "real, "
+        "the person who feels it, and one piece of evidence. If you cannot name evidence, you have "
+        "a guess rather than an opportunity, and it is better to know that now.",
+    ),
+    _s(
+        13,
+        SlideKind.CONCEPT,
+        "Where the assessment does this work for you",
+        "A Platform Power assessment surfaces a weak research or data module, or a customer "
+        "proposition gap, and the client has already agreed with the finding. Starting from that "
+        "is a completely different conversation from arriving with a product.",
+    ),
+    _s(
+        14,
+        SlideKind.EXAMPLE,
+        "Opening from an assessment finding",
+        '"Your infrastructure review flagged research tooling as the weakest module, and you '
+        "agreed. The specific thing behind that score was your analysts rebuilding the same view "
+        'each morning. I want to show you what that looks like solved."',
+    ),
+    _s(
+        15,
+        SlideKind.EXAMPLE,
+        "Opening cold, without an assessment",
+        '"You have data from three vendors and your own book. Who assembles the morning view, and '
+        'how long does it take them?" A question, not a pitch. The answer tells you whether to '
+        "continue and gives you the number you will quote back later.",
+    ),
+    _s(
+        16,
+        SlideKind.CONCEPT,
+        "Disqualify early and say so",
+        "A firm with one vendor, no internal data and no AI pressure is not an OpenBB opportunity. "
+        "Saying so costs you a meeting and buys you a reputation. Advisors who never disqualify "
+        "end the quarter busy and empty.",
+    ),
+    _s(
+        17,
+        SlideKind.EXAMPLE,
+        "Three signals it is real",
+        "Somebody has already complained upward about the problem. There is a named person whose "
+        "job would change. And there is a date something has to be ready by. Two of three is "
+        "workable; one of three is a conversation, not a deal.",
+    ),
+    _s(
+        18,
+        SlideKind.EXAMPLE,
+        "Three signals it is not",
+        "Everyone is enthusiastic and nobody owns it. The problem is described in the abstract "
+        'rather than with a number. And the only pressure is that a competitor has "something '
+        'with AI". That last one is the most seductive and the least real.',
+    ),
+    _s(
+        19,
+        SlideKind.CONCEPT,
+        "Using the registry properly",
+        "Our GTM registry holds targets and named contacts by segment. Use it to find the analyst "
+        "or the data lead rather than starting at the top, because the person who feels the pain "
+        "will introduce you far more effectively than a cold approach to the budget holder.",
+    ),
+    _s(
+        20,
+        SlideKind.CHECKPOINT,
+        "Qualify your three, honestly",
+        "Score each of your three targets against the three signals. You are looking for one to be "
+        "genuinely strong rather than three to be plausible, and being honest with yourself here "
+        "is worth more than any technique later in this course.",
+        checkpoint="Score your three targets against the three signals, and write which one you "
+        "would actually spend a quarter on and why.",
+    ),
+    _s(
+        21,
+        SlideKind.CHECKPOINT,
+        "Name the four people at your best target",
+        "Analyst, engineer, budget holder, compliance voice. Names where you can get them, roles "
+        "where you cannot. The gaps in that list are your next fortnight of work.",
+        checkpoint="Write the four roles at your strongest target, with names where you have them "
+        "and a plan for the ones you do not.",
+    ),
+    _s(
+        22,
+        SlideKind.CONCEPT,
+        "What the next section does",
+        "You know who buys and why. The last section is the sell itself: the first meeting, the "
+        "objections you will actually hear, the pricing conversation, and what a good outcome "
+        "looks "
+        "like at each stage.",
+    ),
+)
+
+SECTION_7_TEST = SectionTest(
+    questions=(
+        TestQuestion(
+            prompt="What is the trigger in a wealth manager?",
+            options=(
+                "Research cost",
+                "Consistency and supervision: fifty advisers giving fifty slightly different "
+                "house views",
+                "Product insight",
+                "Distribution",
+            ),
+            answer_index=1,
+            explanation=(
+                "It is a supervision problem before it is a data problem, and the winning demo "
+                "is a "
+                "shared dashboard rather than a clever widget."
+            ),
+        ),
+        TestQuestion(
+            prompt="An information vendor is interested. What are you probably selling?",
+            options=(
+                "Workspace seats",
+                "Distribution, through the App Marketplace — a genuinely different sale",
+                "The open-source platform",
+                "A consolidation project",
+            ),
+            answer_index=1,
+            explanation=(
+                "A data business does not need another way to look at data. It needs its data in "
+                "front of more people. Recognising this early saves a wasted quarter."
+            ),
+        ),
+        TestQuestion(
+            prompt="Which four people do you need?",
+            options=(
+                "CEO, CTO, CFO, COO",
+                "The analyst who feels the pain, the engineer who judges it, the budget holder, "
+                "and the compliance voice",
+                "Whoever answers the phone",
+                "The head of research only",
+            ),
+            answer_index=1,
+            explanation=(
+                "You need all four and will usually be introduced to one. The compliance voice can "
+                "stop it, and the analyst is the cheapest person to get excited."
+            ),
+        ),
+        TestQuestion(
+            prompt="Which is the LEAST real buying signal?",
+            options=(
+                "Somebody has complained upward about the problem",
+                "A competitor has 'something with AI'",
+                "There is a named person whose job would change",
+                "There is a date something must be ready by",
+            ),
+            answer_index=1,
+            explanation=(
+                "It is the most seductive signal and the least real. Enthusiasm without ownership "
+                "ends a quarter busy and empty."
+            ),
+        ),
+        TestQuestion(
+            prompt="Where should seat-reduction savings come from?",
+            options=(
+                "A standard percentage",
+                "Only where the client has told you a seat does something OpenBB genuinely does",
+                "The published price list",
+                "Whatever makes the business case work",
+            ),
+            answer_index=1,
+            explanation=(
+                "An invented number is remembered far longer than a good demo. Never invent the "
+                "saving."
+            ),
+        ),
+        TestQuestion(
+            prompt="Why is opening from an assessment finding stronger than opening cold?",
+            options=(
+                "It is faster",
+                "The client has already agreed with the finding, so you are not arguing about "
+                "whether the problem exists",
+                "It avoids the engineer",
+                "It sets the price",
+            ),
+            answer_index=1,
+            explanation=(
+                "Starting from something they agreed with is a completely different conversation "
+                "from arriving with a product."
+            ),
+        ),
+    ),
+)
+
+
+def section_7() -> CourseModule:
+    """Section 7: who buys it, in which segment, and what triggers the purchase."""
+    return CourseModule(
+        id=_id("module", "who-buys-and-why"),
+        title="Who buys it, and what has to have happened first",
+        order=6,
+        lessons=(
+            Lesson(
+                id=_id("lesson", "who-buys-and-why"),
+                title="Qualification: the segment, the person, and the trigger",
+                body=_S7_BODY,
+                order=0,
+                slides=_SECTION_7_SLIDES,
+                drill_topics=("product:openbb:qualification",),
+                measurement=(
+                    "You can score a target against the three buying signals and name the four "
+                    "people you need, with evidence rather than a guess."
+                ),
+            ),
+        ),
+        section_test=SECTION_7_TEST,
+    )
+
+
+# --- Section 8 — How and when to sell it --------------------------------------------------
+
+_S8_BODY = (
+    "By the end of this lesson you can run the whole sale: the first meeting, the demo, the "
+    "objections you will actually hear, the pricing conversation, and what a good outcome looks "
+    "like at each stage. This is the clause of the founder's standard that says an advisor should "
+    "know exactly how and when to sell it, and it is the section the rest of the course exists to "
+    "make possible."
+)
+
+_SECTION_8_SLIDES: tuple[Slide, ...] = (
+    _s(
+        0,
+        SlideKind.CONCEPT,
+        "When to sell it, in one line",
+        "When a firm has data in more than one place, somebody expensive assembling it by hand, "
+        "and "
+        "a reason this year to care about AI governance. Two of those three is a conversation. All "
+        "three is a deal.",
+        refs=(DOCS_WORKSPACE,),
+    ),
+    _s(
+        1,
+        SlideKind.CONCEPT,
+        "When not to sell it",
+        "One vendor, no internal data, no AI pressure. Or a firm whose actual problem is an order "
+        "management system, a risk engine or a book of record. Recommending OpenBB into either is "
+        "how an advisor loses the right to recommend anything.",
+    ),
+    _s(
+        2,
+        SlideKind.CONCEPT,
+        "The shape of the sale",
+        "First meeting to find the irritation. Demo on something recognisably theirs. Technical "
+        "conversation about deployment and licence. Scoped pilot on their own data. Then pricing. "
+        "Skipping straight to pricing is the most common way this stalls.",
+    ),
+    _s(
+        3,
+        SlideKind.WALKTHROUGH,
+        "The first meeting: ask, do not present",
+        "Open with the question from section 7: who assembles the morning view, and how long does "
+        "it take. Then be quiet. The number they give you is the number you will quote back for "
+        "the rest of the deal, and you only get it by not talking.",
+    ),
+    _s(
+        4,
+        SlideKind.CONCEPT,
+        "What to listen for",
+        "A named person. A time cost. A recent incident. Any of the three gives you something "
+        "concrete to build the demo around. Vague enthusiasm gives you nothing, however pleasant "
+        "the meeting felt afterwards.",
+    ),
+    _s(
+        5,
+        SlideKind.WALKTHROUGH,
+        "The demo: change one field",
+        "Open the dashboard you built for their job. Change the ticker to their firm. Let the "
+        "linked "
+        "widgets move. That is the demo. Everything after it is answering questions rather than "
+        "presenting.",
+        refs=(DOCS_WIDGETS, DOCS_DASHBOARDS),
+    ),
+    _s(
+        6,
+        SlideKind.WALKTHROUGH,
+        "Then ask the agent one question",
+        "One question that needs two of the widgets at once. Not a summary, not a price. Something "
+        "an analyst in that room would actually want to know, ideally something they mentioned in "
+        "the first meeting.",
+        refs=(DOCS_WORKSPACE,),
+    ),
+    _s(
+        7,
+        SlideKind.CONCEPT,
+        "Then stop",
+        "Do not tour the widget library. Do not open settings. A prospect remembers one thing from "
+        "a demo, and you want it to be that one field moving the whole view. Silence after it is a "
+        "technique, not an accident.",
+    ),
+    _s(
+        8,
+        SlideKind.CONCEPT,
+        "Objection: we already have Bloomberg",
+        'Do not compete. "It does not replace it. It is a place to work with data you already pay '
+        "for, including your own, with an AI layer that answers from that rather than from the "
+        'internet." Declining the comparison makes you more credible.',
+        refs=(SITE_WORKSPACE, DOCS_WORKSPACE),
+    ),
+    _s(
+        9,
+        SlideKind.CONCEPT,
+        "Objection: our data cannot leave our environment",
+        "This is a real question and often the one that decides the deal. OpenBB documents several "
+        "deployment routes including Enterprise and a local platform installer, so the honest "
+        "answer is that this is a solved shape and you will get them the specifics.",
+        refs=(DOCS_PLATFORM_INSTALLER, DOCS_WORKSPACE),
+    ),
+    _s(
+        10,
+        SlideKind.CONCEPT,
+        "Objection: is this open source, can we just build it ourselves",
+        "The Open Data Platform is AGPLv3. If they intend to modify it and serve it to their own "
+        "clients, that needs a commercial arrangement. Say the licence name, say the route exists, "
+        "and route the specifics onward. Never advise.",
+        refs=(LICENCE,),
+    ),
+    _s(
+        11,
+        SlideKind.CONCEPT,
+        "Objection: what happens to our data with the AI",
+        "The agent reads widget metadata to query the right datasets, so it answers from what is "
+        "on "
+        "the dashboard. Say grounded, demonstrate source attribution in the metadata, and offer "
+        "the "
+        "compliance voice a session of their own.",
+        refs=(DOCS_WORKSPACE, DOCS_WIDGETS),
+    ),
+    _s(
+        12,
+        SlideKind.CONCEPT,
+        "Objection: we would be locked in",
+        "Rarely said out loud. Export a widget to Excel in front of them without making a speech "
+        "about it. Five seconds, objection gone, and nobody had to admit they were worried.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        13,
+        SlideKind.CONCEPT,
+        "Objection: nobody here will use it",
+        "The most honest objection on the list and the one most worth taking seriously. Answer it "
+        "with the shared dashboard and Export apps.json: adoption is a standardisation question, "
+        "not an enthusiasm question.",
+        refs=(DOCS_DASHBOARDS, DOCS_APPS),
+    ),
+    _s(
+        14,
+        SlideKind.CONCEPT,
+        "The pilot is the real close",
+        "A scoped pilot on their own data, with one named analyst and a date, is worth more than "
+        "any proposal. It converts an argument about whether it would work into an observation of "
+        "whether it did.",
+    ),
+    _s(
+        15,
+        SlideKind.WALKTHROUGH,
+        "Scope the pilot narrowly",
+        "One workflow, one team, one dataset of theirs, one date. Resist every attempt to widen "
+        "it. "
+        "A pilot that tries to prove everything proves nothing and takes a quarter to fail.",
+    ),
+    _s(
+        16,
+        SlideKind.CONCEPT,
+        "Pricing: what you can and cannot say",
+        "Pricing is a scoped quote from OpenBB, not a number you carry. What you can do is frame "
+        "the comparison: what they spend now on the assembling, the seats and the duplication. "
+        "Never quote a figure you have not been given.",
+        refs=(SITE_WORKSPACE,),
+    ),
+    _s(
+        17,
+        SlideKind.CONCEPT,
+        "Where your commission comes from",
+        "The Academy commission lesson resolves the live rate from the current schedule rather "
+        "than "
+        "being written here, so it is right rather than remembered. Read it before a pricing "
+        "conversation, not after.",
+    ),
+    _s(
+        18,
+        SlideKind.EXAMPLE,
+        "A good outcome at each stage",
+        "First meeting: a number and a name. Demo: a question you could not answer. Technical: an "
+        "introduction to the engineer. Pilot: a date. Anything vaguer than that at any stage means "
+        "you are one stage behind where you think you are.",
+    ),
+    _s(
+        19,
+        SlideKind.EXAMPLE,
+        "The deal that dies quietly",
+        "Everyone enjoyed the demo, nobody owns the problem, and the follow-up email goes "
+        "unanswered for three weeks. It died at the first meeting, when you presented instead of "
+        "asking. Recognising that early is worth more than a rescue attempt.",
+    ),
+    _s(
+        20,
+        SlideKind.EXAMPLE,
+        "Where the assessment does the selling",
+        "A Platform Power engagement that flagged research tooling has already established the "
+        "problem and got the client to agree with it. Your job is then to show the solved version, "
+        "which is a far shorter distance to travel.",
+    ),
+    _s(
+        21,
+        SlideKind.CHECKPOINT,
+        "Say the sixty seconds again",
+        "Record your sixty-second explanation of OpenBB, as you did in section 1, and compare the "
+        "two. The difference between them is what this course was for, and it is worth seeing "
+        "rather than assuming.",
+        checkpoint="Record your sixty-second explanation again and compare it with the version you "
+        "kept from section 1. Note what changed.",
+    ),
+    _s(
+        22,
+        SlideKind.CHECKPOINT,
+        "Write the first meeting for your best target",
+        "Your opening question, the demo you will show, the two objections you expect from that "
+        "specific firm, and the outcome you want. One page. This is the artefact you take into the "
+        "room next week.",
+        checkpoint="Write a one-page first-meeting plan for your strongest target: opening "
+        "question, demo, expected objections, and the outcome you want.",
+    ),
+    _s(
+        23,
+        SlideKind.CHECKPOINT,
+        "Book it",
+        "The course ends here and the work does not. You have the product installed, two "
+        "dashboards, a qualified target and a meeting plan. The only remaining step is the one "
+        "nobody can do for you.",
+        checkpoint="Book, or write the outreach for, a first meeting with your strongest target.",
+    ),
+    _s(
+        24,
+        SlideKind.CONCEPT,
+        "What you should be able to do now",
+        "Explain OpenBB in sixty seconds. Install it and pull data. Build two dashboards for "
+        "different jobs. Answer the licensing question without notes. Qualify a target against "
+        "three signals. Run a first meeting and a demo. That was the whole standard.",
+    ),
+)
+
+SECTION_8_TEST = SectionTest(
+    questions=(
+        TestQuestion(
+            prompt="When is OpenBB a real opportunity?",
+            options=(
+                "Whenever a firm has data",
+                "Data in more than one place, somebody expensive assembling it by hand, and a "
+                "reason this year to care about AI governance",
+                "When they are unhappy with Bloomberg",
+                "When they have budget",
+            ),
+            answer_index=1,
+            explanation=(
+                "Two of those three is a conversation. All three is a deal. Anything less is a "
+                "meeting you will enjoy and a quarter you will lose."
+            ),
+        ),
+        TestQuestion(
+            prompt="What is the demo?",
+            options=(
+                "A tour of the widget library",
+                "Open the dashboard for their job, change the ticker to their firm, and let the "
+                "linked widgets move",
+                "The App Marketplace",
+                "Building a dashboard live",
+            ),
+            answer_index=1,
+            explanation=(
+                "A prospect remembers one thing. Make it the field that moves the whole view, then "
+                "stop talking."
+            ),
+        ),
+        TestQuestion(
+            prompt=(
+                "A prospect asks whether they could just build it themselves on the "
+                "open-source code."
+            ),
+            options=(
+                "Yes, it is open source",
+                "The platform is AGPLv3; modifying it and serving it to their own clients needs "
+                "a commercial arrangement, and I will get the specifics",
+                "No, that is not allowed",
+                "Only with Enterprise",
+            ),
+            answer_index=1,
+            explanation=(
+                "Name the licence, say the route exists, route the specifics onward. You are a "
+                "distributor, not their lawyer."
+            ),
+        ),
+        TestQuestion(
+            prompt="What actually closes the deal?",
+            options=(
+                "A proposal",
+                "A scoped pilot on their own data, with one named analyst and a date",
+                "The pricing conversation",
+                "A second demo",
+            ),
+            answer_index=1,
+            explanation=(
+                "It converts an argument about whether it would work into an observation of "
+                "whether it did. Scope it narrowly or it proves nothing."
+            ),
+        ),
+        TestQuestion(
+            prompt="What is a good outcome from a first meeting?",
+            options=(
+                "They liked it",
+                "A number and a name",
+                "A follow-up scheduled",
+                "A request for pricing",
+            ),
+            answer_index=1,
+            explanation=(
+                "Anything vaguer means you are a stage behind where you think you are. The number "
+                "is what you quote back for the rest of the deal."
+            ),
+        ),
+        TestQuestion(
+            prompt="Can you quote a price?",
+            options=(
+                "Yes, from the price list",
+                "No. Pricing is a scoped quote from OpenBB; you frame the comparison against "
+                "what they spend now",
+                "Only for Enterprise",
+                "Only after the pilot",
+            ),
+            answer_index=1,
+            explanation=(
+                "Never quote a figure you have not been given. An invented number outlives a good "
+                "demo in a client's memory."
+            ),
+        ),
+    ),
+)
+
+
+def section_8() -> CourseModule:
+    """Section 8: how and when to sell it."""
+    return CourseModule(
+        id=_id("module", "how-and-when-to-sell"),
+        title="How and when to sell it",
+        order=7,
+        lessons=(
+            Lesson(
+                id=_id("lesson", "how-and-when-to-sell"),
+                title="The first meeting, the demo, the objections, and the close",
+                body=_S8_BODY,
+                order=0,
+                slides=_SECTION_8_SLIDES,
+                drill_topics=("product:openbb:sell-motion",),
+                measurement=(
+                    "You have a one-page first-meeting plan for a qualified target, and you have "
+                    "booked or written the outreach for that meeting."
+                ),
+            ),
+        ),
+        section_test=SECTION_8_TEST,
+    )
+
+
 def rebuilt_sections() -> tuple[CourseModule, ...]:
     """The sections rebuilt to the GRS-0215 standard, in order. Grows as GRS-0216 progresses."""
-    return (section_1(), section_2(), section_3(), section_4(), section_5())
+    return (
+        section_1(),
+        section_2(),
+        section_3(),
+        section_4(),
+        section_5(),
+        section_6(),
+        section_7(),
+        section_8(),
+    )
 
 
 # Sections written so far, and sections still to write. The depth check fails while anything is in
@@ -1931,9 +2982,10 @@ SECTIONS_AUTHORED: tuple[str, ...] = (
     "sign-up-and-orientation",
     "first-workspace",
     "second-workspace",
-)
-SECTIONS_PLANNED: tuple[str, ...] = (
     "the-data",
     "who-buys-and-why",
     "how-and-when-to-sell",
 )
+# All eight are written. The tuple stays, empty, because the test that guards it reads it
+# and because the next course to be rebuilt will start from this file as its pattern.
+SECTIONS_PLANNED: tuple[str, ...] = ()

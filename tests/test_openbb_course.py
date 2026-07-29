@@ -177,14 +177,11 @@ def test_the_install_section_shows_the_commands_an_advisor_actually_runs() -> No
         assert command in text, f"the install section never shows {command!r}"
 
 
-def test_the_course_is_not_finished_and_says_so() -> None:
-    """Six sections are unwritten. This test fails the day someone writes the last one, and that
-    failure is the signal to delete it rather than a problem to work around."""
-    assert SECTIONS_PLANNED, (
-        "Every OpenBB section is now authored. Fold them into rebuilt_sections(), empty "
-        "SECTIONS_PLANNED, and delete this test — the course is finished."
-    )
-    assert len(SECTIONS_AUTHORED) == len(rebuilt_sections())
+def test_the_course_is_finished() -> None:
+    """This replaces test_the_course_is_not_finished_and_says_so, which failed while any section
+    was unwritten and told whoever wrote the last one to delete it. All eight are written."""
+    assert not SECTIONS_PLANNED
+    assert len(SECTIONS_AUTHORED) == len(rebuilt_sections()) == 8
 
 
 def test_the_plan_covers_every_clause_of_the_founders_outcome() -> None:
