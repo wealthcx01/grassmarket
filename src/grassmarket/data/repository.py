@@ -3277,6 +3277,13 @@ class Repository:
             )
             if any(a.document_hash == current for a in approvals):
                 continue  # already signed at this version — not waiting on anyone
+            requested_at = row.review_requested_at
+            if requested_at is None:  # pragma: no cover - the query filters these out
+                # The query says is_not(None), so reaching here means the filter and this loop
+                # have drifted apart. Refuse rather than invent a request time (#3).
+                raise ConflictError(
+                    f"Assessment {row.id} is in the review queue with no request time."
+                )
             advisor = self._require_consultant(row.owner_consultant_id)
             entries.append(
                 FounderReviewQueueEntry(
@@ -3286,7 +3293,7 @@ class Repository:
                     subject=row.subject,
                     advisor_name=advisor.full_name,
                     advisor_email=advisor.email,
-                    requested_at=row.review_requested_at,
+                    requested_at=requested_at,
                     document_hash=current,
                     # An approval at some OTHER hash means this was signed and then edited. Saying
                     # so is the difference between "read this" and "read what changed".
