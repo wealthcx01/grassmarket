@@ -1,0 +1,587 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "DashboardToApp",
+    "width": 960,
+    "height": 420,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 480,
+        "y": 44,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 28,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "From your dashboard to the desk's standard"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 480,
+        "y": 78,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "One person's work becomes everyone's, without rebuilding it."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "S0Name",
+        "x": 168,
+        "y": 226,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "S0NameStyle",
+            "font_asset": "Display",
+            "font_size": 20,
+            "children": [
+              {
+                "type": "fill",
+                "name": "S0NameStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "S0NameStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "S0NameRun",
+            "style": "S0NameStyle",
+            "text": "Dashboard"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "S0Detail",
+        "x": 168,
+        "y": 258,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "S0DetailStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "S0DetailStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "S0DetailStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "S0DetailRun",
+            "style": "S0DetailStyle",
+            "text": "you configured a blank canvas"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "S1Name",
+        "x": 480,
+        "y": 226,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "S1NameStyle",
+            "font_asset": "Display",
+            "font_size": 20,
+            "children": [
+              {
+                "type": "fill",
+                "name": "S1NameStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "S1NameStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "S1NameRun",
+            "style": "S1NameStyle",
+            "text": "Export apps.json"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "S1Detail",
+        "x": 480,
+        "y": 258,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "S1DetailStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "S1DetailStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "S1DetailStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "S1DetailRun",
+            "style": "S1DetailStyle",
+            "text": "the configuration, as a file"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "S2Name",
+        "x": 792,
+        "y": 226,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "S2NameStyle",
+            "font_asset": "Display",
+            "font_size": 20,
+            "children": [
+              {
+                "type": "fill",
+                "name": "S2NameStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "S2NameStyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "S2NameRun",
+            "style": "S2NameStyle",
+            "text": "App"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "S2Detail",
+        "x": 792,
+        "y": 258,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "S2DetailStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "S2DetailStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "S2DetailStyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "S2DetailRun",
+            "style": "S2DetailStyle",
+            "text": "curated widgets, an agent, prompts"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "A1Head",
+        "x": 344.0,
+        "y": 240,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "A1HeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "A1HeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "A1HeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "A1Stem",
+        "x": 324,
+        "y": 240,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "A1StemPath",
+            "width": 31.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "A1StemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "A1StemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "A2Head",
+        "x": 656.0,
+        "y": 240,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "A2HeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "A2HeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "A2HeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "A2Stem",
+        "x": 636,
+        "y": 240,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "A2StemPath",
+            "width": 31.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "A2StemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "A2StemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "S0Box",
+        "x": 168,
+        "y": 240,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "S0BoxPath",
+            "width": 268,
+            "height": 130,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "S0BoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "S0BoxSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "S0BoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "S0BoxStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "S1Box",
+        "x": 480,
+        "y": 240,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "S1BoxPath",
+            "width": 268,
+            "height": 130,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "S1BoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "S1BoxSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "S1BoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "S1BoxStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "S2Box",
+        "x": 792,
+        "y": 240,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "S2BoxPath",
+            "width": 268,
+            "height": 130,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "S2BoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "S2BoxSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 480,
+        "y": 368,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "Sharing is the commercial hinge. Most business cases lean on it, not on a widget."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 480,
+        "y": 210,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 960,
+            "height": 420,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

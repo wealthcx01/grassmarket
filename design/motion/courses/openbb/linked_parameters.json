@@ -1,0 +1,703 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "LinkedParameters",
+    "width": 960,
+    "height": 470,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 480,
+        "y": 44,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "One field moves everything"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 480,
+        "y": 78,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "Widgets that share a parameter name update together. This is the demo."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "FieldLabel",
+        "x": 480,
+        "y": 152,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FieldLabelStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FieldLabelStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FieldLabelStyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FieldLabelRun",
+            "style": "FieldLabelStyle",
+            "text": "ticker"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "FieldValue",
+        "x": 480,
+        "y": 186,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FieldValueStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FieldValueStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FieldValueStyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FieldValueRun",
+            "style": "FieldValueStyle",
+            "text": "LSEG"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "W0",
+        "x": 200,
+        "y": 372,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "W0Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "W0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "W0StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "W0Run",
+            "style": "W0Style",
+            "text": "Price chart"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "W1",
+        "x": 480,
+        "y": 372,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "W1Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "W1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "W1StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "W1Run",
+            "style": "W1Style",
+            "text": "Fundamentals"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "W2",
+        "x": 760,
+        "y": 372,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "W2Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "W2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "W2StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "W2Run",
+            "style": "W2Style",
+            "text": "News and filings"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "W0Box",
+        "x": 200,
+        "y": 372,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "W0BoxPath",
+            "width": 240,
+            "height": 96,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "W0BoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "W0BoxSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "W0BoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "W0BoxStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "W1Box",
+        "x": 480,
+        "y": 372,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "W1BoxPath",
+            "width": 240,
+            "height": 96,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "W1BoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "W1BoxSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "W1BoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "W1BoxStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "W2Box",
+        "x": 760,
+        "y": 372,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "W2BoxPath",
+            "width": 240,
+            "height": 96,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "W2BoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "W2BoxSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "W2BoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "W2BoxStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Feed",
+        "x": 480,
+        "y": 251,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "FeedPath",
+            "width": 2.5,
+            "height": 74,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "FeedFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "FeedSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bus",
+        "x": 480,
+        "y": 288,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BusPath",
+            "width": 560,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BusFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BusSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "D0Head",
+        "x": 200,
+        "y": 311.0,
+        "rotation": 3.14159,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "D0HeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "D0HeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "D0HeadCol",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "D0Stem",
+        "x": 200,
+        "y": 288,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "D0StemPath",
+            "width": 2.5,
+            "height": 37.0,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "D0StemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "D0StemSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "D1Head",
+        "x": 480,
+        "y": 311.0,
+        "rotation": 3.14159,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "D1HeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "D1HeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "D1HeadCol",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "D1Stem",
+        "x": 480,
+        "y": 288,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "D1StemPath",
+            "width": 2.5,
+            "height": 37.0,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "D1StemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "D1StemSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "D2Head",
+        "x": 760,
+        "y": 311.0,
+        "rotation": 3.14159,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "D2HeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "D2HeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "D2HeadCol",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "D2Stem",
+        "x": 760,
+        "y": 288,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "D2StemPath",
+            "width": 2.5,
+            "height": 37.0,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "D2StemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "D2StemSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Field",
+        "x": 480,
+        "y": 172,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "FieldPath",
+            "width": 260,
+            "height": 84,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "FieldFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "FieldSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 480,
+        "y": 442,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "A prospect does not care that you have three widgets. They care about this."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 480,
+        "y": 235,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 960,
+            "height": 470,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

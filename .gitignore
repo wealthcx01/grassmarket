@@ -49,3 +49,7 @@ local.db
 
 # Railway
 .railway/
+
+# The motion build output IS reviewable source, not build litter: the .riv is what ships and the
+# rendered still is how a diagram change shows up in a pull request as something a human can see.
+!design/motion/build/
