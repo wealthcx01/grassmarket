@@ -21,6 +21,7 @@ from grassmarket.data.repository import EngagementLinkError, Repository
 from tests.committee_helpers import approve_committee_queue
 from tests.conftest import SeededConsultant, auth_header
 from tests.dual_rating_helpers import reach_consensus
+from tests.founder_review_helpers import submit_and_approve
 from tests.test_assessment_lifecycle import _body, _scoreable_partial_doc
 
 # The legal stage path from Prospect to Contracted (GRS-0011 transition graph).
@@ -51,25 +52,17 @@ def _contracted_prospect_http(client, owner: SeededConsultant) -> str:
     return pid
 
 
-def _finalised_assessment_http(client, owner: SeededConsultant) -> str:
-    """A finalised assessment via the API. The partial doc's one assessed subcomponent
-    (APP_SERVER_SECURITY_COMPLIANCE) must pass dual rating → consensus before finalisation is
-    allowed (Methodology §9, GRS-0020) — a self-seeded second rater supplies the second opinion."""
+def _finalised_assessment_http(client, owner: SeededConsultant, founder: SeededConsultant) -> str:
+    """A finalised assessment via the API. A production record needs the founder's sign-off on the
+    current document before it can finalise (ADR-0041, GRS-0188); this replaces the dual-rating and
+    committee steps that used to stand here."""
     aid = client.post("/assessments", json={"subject": "S"}, headers=auth_header(owner)).json()[
         "id"
     ]
     client.put(
         f"/assessments/{aid}", json=_body(_scoreable_partial_doc()), headers=auth_header(owner)
     )
-    reach_consensus(
-        client,
-        aid,
-        owner,
-        "APP_SERVER",
-        [("APP_SERVER_SECURITY_COMPLIANCE", MaturityLevel.ADVANCED)],
-    )
-    # High-stakes ratings (the triad rates above None) need committee sign-off first (§8, GRS-0021).
-    approve_committee_queue(client, aid, owner)
+    submit_and_approve(client, aid, owner, founder)
     resp = client.post(f"/assessments/{aid}/finalise", headers=auth_header(owner))
     assert resp.status_code == 200, resp.text
     return aid
@@ -137,9 +130,11 @@ def test_comms_log_round_trips_in_chronological_order(
 
 
 # ----------------------------------------------------- HTTP surface + scoping
-def test_http_create_links_finalised_assessment(client, alice: SeededConsultant) -> None:
+def test_http_create_links_finalised_assessment(
+    client, alice: SeededConsultant, founder: SeededConsultant
+) -> None:
     pid = _contracted_prospect_http(client, alice)
-    aid = _finalised_assessment_http(client, alice)
+    aid = _finalised_assessment_http(client, alice, founder)
     resp = client.post(
         "/engagements",
         json={"prospect_id": pid, "title": "Delivery", "assessment_ids": [aid]},
@@ -173,13 +168,15 @@ def test_http_refuses_cross_owner_prospect(
     assert resp.status_code == 404
 
 
-def test_http_link_assessment_to_existing_engagement(client, alice: SeededConsultant) -> None:
+def test_http_link_assessment_to_existing_engagement(
+    client, alice: SeededConsultant, founder: SeededConsultant
+) -> None:
     # The GRS-0039 loop: open an engagement with NO assessment, then link a finalised one later.
     pid = _contracted_prospect_http(client, alice)
     eid = client.post(
         "/engagements", json={"prospect_id": pid, "title": "Delivery"}, headers=auth_header(alice)
     ).json()["id"]
-    aid = _finalised_assessment_http(client, alice)
+    aid = _finalised_assessment_http(client, alice, founder)
     resp = client.post(
         f"/engagements/{eid}/assessments",
         json={"assessment_id": aid},
@@ -206,12 +203,14 @@ def test_http_link_refuses_unfinalised_assessment(client, alice: SeededConsultan
     assert resp.status_code == 409
 
 
-def test_http_link_refuses_duplicate(client, alice: SeededConsultant) -> None:
+def test_http_link_refuses_duplicate(
+    client, alice: SeededConsultant, founder: SeededConsultant
+) -> None:
     pid = _contracted_prospect_http(client, alice)
     eid = client.post(
         "/engagements", json={"prospect_id": pid, "title": "E"}, headers=auth_header(alice)
     ).json()["id"]
-    aid = _finalised_assessment_http(client, alice)
+    aid = _finalised_assessment_http(client, alice, founder)
     first = client.post(
         f"/engagements/{eid}/assessments", json={"assessment_id": aid}, headers=auth_header(alice)
     )
@@ -223,13 +222,13 @@ def test_http_link_refuses_duplicate(client, alice: SeededConsultant) -> None:
 
 
 def test_http_link_cross_owner_engagement_refused(
-    client, alice: SeededConsultant, bob: SeededConsultant
+    client, alice: SeededConsultant, bob: SeededConsultant, founder: SeededConsultant
 ) -> None:
     pid = _contracted_prospect_http(client, alice)
     eid = client.post(
         "/engagements", json={"prospect_id": pid, "title": "E"}, headers=auth_header(alice)
     ).json()["id"]
-    aid = _finalised_assessment_http(client, bob)  # bob's own finalised assessment
+    aid = _finalised_assessment_http(client, bob, founder)  # bob's own finalised assessment
     # Bob cannot link to Alice's engagement — 404, no existence leak.
     resp = client.post(
         f"/engagements/{eid}/assessments", json={"assessment_id": aid}, headers=auth_header(bob)

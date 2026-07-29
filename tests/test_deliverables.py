@@ -229,9 +229,9 @@ def test_methods_appendix_states_elicitation_under_client_usable_set() -> None:
 
 
 # ------------------------------------------------------- HTTP (generate / list / download / scope)
-def _engagement_with_finalised(client, owner: SeededConsultant) -> str:
+def _engagement_with_finalised(client, owner: SeededConsultant, founder: SeededConsultant) -> str:
     pid = _contracted_prospect_http(client, owner)
-    aid = _finalised_assessment_http(client, owner)
+    aid = _finalised_assessment_http(client, owner, founder)
     return client.post(
         "/engagements",
         json={"prospect_id": pid, "title": "Delivery", "assessment_ids": [aid]},
@@ -239,8 +239,10 @@ def _engagement_with_finalised(client, owner: SeededConsultant) -> str:
     ).json()["id"]
 
 
-def test_http_generate_internal_draft(client, alice: SeededConsultant) -> None:
-    eid = _engagement_with_finalised(client, alice)
+def test_http_generate_internal_draft(
+    client, alice: SeededConsultant, founder: SeededConsultant
+) -> None:
+    eid = _engagement_with_finalised(client, alice, founder)
     resp = client.post(
         f"/engagements/{eid}/deliverables",
         json={"client_facing": False},
@@ -253,8 +255,10 @@ def test_http_generate_internal_draft(client, alice: SeededConsultant) -> None:
     assert body["coefficient_version"] == "v1-draft-pending-elicitation"
 
 
-def test_http_generate_client_facing_refused_on_draft(client, alice: SeededConsultant) -> None:
-    eid = _engagement_with_finalised(client, alice)
+def test_http_generate_client_facing_refused_on_draft(
+    client, alice: SeededConsultant, founder: SeededConsultant
+) -> None:
+    eid = _engagement_with_finalised(client, alice, founder)
     resp = client.post(
         f"/engagements/{eid}/deliverables", json={"client_facing": True}, headers=auth_header(alice)
     )
@@ -276,8 +280,10 @@ def test_http_generate_without_finalised_assessment_refused(
     assert resp.status_code == 409
 
 
-def test_http_download_regenerates_docx(client, alice: SeededConsultant) -> None:
-    eid = _engagement_with_finalised(client, alice)
+def test_http_download_regenerates_docx(
+    client, alice: SeededConsultant, founder: SeededConsultant
+) -> None:
+    eid = _engagement_with_finalised(client, alice, founder)
     did = client.post(
         f"/engagements/{eid}/deliverables",
         json={"client_facing": False},
@@ -289,8 +295,10 @@ def test_http_download_regenerates_docx(client, alice: SeededConsultant) -> None
     assert resp.content[:2] == b"PK"  # a real .docx (zip)
 
 
-def test_http_deliverables_scoped(client, alice: SeededConsultant, bob: SeededConsultant) -> None:
-    eid = _engagement_with_finalised(client, alice)
+def test_http_deliverables_scoped(
+    client, alice: SeededConsultant, bob: SeededConsultant, founder: SeededConsultant
+) -> None:
+    eid = _engagement_with_finalised(client, alice, founder)
     did = client.post(
         f"/engagements/{eid}/deliverables",
         json={"client_facing": False},
@@ -318,10 +326,12 @@ def test_http_deliverables_scoped(client, alice: SeededConsultant, bob: SeededCo
 # --- Assessment-level deliverable preview (GRS-0154) — no engagement needed --------------
 
 
-def test_http_preview_finalised_assessment_returns_docx(client, alice: SeededConsultant) -> None:
+def test_http_preview_finalised_assessment_returns_docx(
+    client, alice: SeededConsultant, founder: SeededConsultant
+) -> None:
     # The solo/sandbox "see the real deliverable" path: a finalised assessment previews its own
     # watermarked, internal-only deliverable without an engagement (mock-advisor: Priya/Elena).
-    aid = _finalised_assessment_http(client, alice)
+    aid = _finalised_assessment_http(client, alice, founder)
     url = f"/assessments/{aid}/deliverable-preview"
     resp = client.get(url, headers=auth_header(alice))
     assert resp.status_code == 200, resp.text
@@ -340,9 +350,9 @@ def test_http_preview_unfinalised_assessment_refused(client, alice: SeededConsul
 
 
 def test_http_preview_is_owner_scoped(
-    client, alice: SeededConsultant, bob: SeededConsultant
+    client, alice: SeededConsultant, bob: SeededConsultant, founder: SeededConsultant
 ) -> None:
-    aid = _finalised_assessment_http(client, alice)
+    aid = _finalised_assessment_http(client, alice, founder)
     resp = client.get(f"/assessments/{aid}/deliverable-preview", headers=auth_header(bob))
     assert resp.status_code == 404  # another consultant cannot preview alice's assessment
 
@@ -447,7 +457,7 @@ def test_http_deliverables_index_empty_for_new_advisor(client, alice) -> None:
     assert resp.status_code == 200 and resp.json() == []
 
 
-def test_portfolio_row_linked_prospect_id(client, alice) -> None:
+def test_portfolio_row_linked_prospect_id(client, alice, founder: SeededConsultant) -> None:
     """The portfolio row links to the client record only when the assessment is linked to an
     engagement (GRS-0186); an unlinked assessment stays None."""
     from tests.conftest import auth_header
@@ -463,7 +473,7 @@ def test_portfolio_row_linked_prospect_id(client, alice) -> None:
     ).json()["id"]
     # A linked one: finalise it, then open an engagement referencing it.
     pid = _contracted_prospect_http(client, alice)
-    linked_id = _finalised_assessment_http(client, alice)
+    linked_id = _finalised_assessment_http(client, alice, founder)
     eng = client.post(
         "/engagements",
         json={"prospect_id": pid, "title": "Linked engagement", "assessment_ids": [linked_id]},

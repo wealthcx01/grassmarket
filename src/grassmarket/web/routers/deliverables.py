@@ -44,6 +44,7 @@ from grassmarket.data.repository import (
 from grassmarket.deliverables.gate import (
     ClientUsabilityError,
     CommitteePendingError,
+    FounderApprovalPendingError,
     UnapprovedNarrativeError,
     assert_narratives_approved,
 )
@@ -106,6 +107,7 @@ def _render(
     generated_on: date,
     narratives: Sequence[AINarrative] = (),
     committee_decisions: Sequence[CommitteeDecision] = (),
+    founder_approval: object | None = None,
 ) -> RenderedDeliverable:
     # Build the deliverable against the SAME (registry view, coefficient set) the assessment was
     # scored under (GRS-0148e). A wealth/exchange run's modules and metrics are profile-specific
@@ -128,6 +130,7 @@ def _render(
         client_facing=client_facing,
         narratives=narratives,
         committee_decisions=committee_decisions,
+        founder_approval=founder_approval,
         reported_c=c_index_of(document, registry),
     )
 
@@ -154,6 +157,10 @@ def generate_deliverable(
     now = datetime.now(UTC)
     try:
         committee_decisions = repo.list_committee_decisions(principal, record.assessment_id)
+        # ADR-0041: the client-pack gate is the founder's sign-off on THIS version of the
+        # document. None means either never approved or edited since, and both are the same
+        # refusal — what matters is whether the version reaching a client is the one they read.
+        founder_approval = repo.current_founder_approval(record.assessment_id)
         rendered = _render(
             record,
             subject,
@@ -163,8 +170,9 @@ def generate_deliverable(
             client_facing=payload.client_facing,
             generated_on=now.date(),
             committee_decisions=committee_decisions,
+            founder_approval=founder_approval,
         )
-    except (ClientUsabilityError, CommitteePendingError) as exc:
+    except (ClientUsabilityError, CommitteePendingError, FounderApprovalPendingError) as exc:
         # The controlling gates: a client-facing pack on a non-client-usable set, or one whose
         # high-stakes ratings still lack committee sign-off (§8), is refused.
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
@@ -251,6 +259,10 @@ def download_deliverable(
     generated_on = (deliverable.generated_at or datetime.now(UTC)).date()
     try:
         committee_decisions = repo.list_committee_decisions(principal, record.assessment_id)
+        # ADR-0041: the client-pack gate is the founder's sign-off on THIS version of the
+        # document. None means either never approved or edited since, and both are the same
+        # refusal — what matters is whether the version reaching a client is the one they read.
+        founder_approval = repo.current_founder_approval(record.assessment_id)
         rendered = _render(
             record,
             subject,
@@ -261,8 +273,9 @@ def download_deliverable(
             generated_on=generated_on,
             narratives=narratives,
             committee_decisions=committee_decisions,
+            founder_approval=founder_approval,
         )
-    except (ClientUsabilityError, CommitteePendingError) as exc:
+    except (ClientUsabilityError, CommitteePendingError, FounderApprovalPendingError) as exc:
         # Defense in depth — refuse on download if the set is no longer client-usable OR a
         # high-stakes rating still lacks committee sign-off (§8).
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
@@ -308,6 +321,10 @@ def preview_assessment_deliverable(
     now = datetime.now(UTC)
     try:
         committee_decisions = repo.list_committee_decisions(principal, record.assessment_id)
+        # ADR-0041: the client-pack gate is the founder's sign-off on THIS version of the
+        # document. None means either never approved or edited since, and both are the same
+        # refusal — what matters is whether the version reaching a client is the one they read.
+        founder_approval = repo.current_founder_approval(record.assessment_id)
         rendered = _render(
             record,
             assessment.subject,
@@ -317,8 +334,9 @@ def preview_assessment_deliverable(
             client_facing=False,  # a preview is internal + watermarked, never client-facing
             generated_on=now.date(),
             committee_decisions=committee_decisions,
+            founder_approval=founder_approval,
         )
-    except (ClientUsabilityError, CommitteePendingError) as exc:
+    except (ClientUsabilityError, CommitteePendingError, FounderApprovalPendingError) as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
     except UnsupportedDeliverableTypeError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc

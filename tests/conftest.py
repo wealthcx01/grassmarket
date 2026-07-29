@@ -123,6 +123,13 @@ def admin(session_factory: sessionmaker[Session], settings: Settings) -> SeededC
 
 
 @pytest.fixture
+def founder(session_factory: sessionmaker[Session], settings: Settings) -> SeededConsultant:
+    """The founder reviewer (ADR-0041). Seeded at the CONFIGURED email, because that is exactly how
+    the claim is derived — a founder fixture with any other address would not be one."""
+    return _seed(session_factory, settings, email=settings.founder_reviewer_email)
+
+
+@pytest.fixture
 def app(settings: Settings, engine: Engine) -> FastAPI:
     return create_app(settings=settings, engine=engine)
 
