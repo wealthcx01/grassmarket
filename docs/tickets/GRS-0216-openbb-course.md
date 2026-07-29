@@ -20,8 +20,8 @@ Academy plan is not worth building.
 
 ## Scope
 
-Built on the section-and-slide structure GRS-0215 defines. Eight sections, each 20 to 40 slides,
-each ending in a test the learner passes before the next opens.
+Built on the section-and-slide structure GRS-0215 defines. Eight sections. Each lesson inside them is 20 to 40 slides;
+each section ends in a test the learner passes before the next opens.
 
 1. **What OpenBB is and why it exists.** The problem it solves, who built it, where it sits against
    Bloomberg, Refinitiv and the retail tools. The commercial shape: open source core, Terminal Pro,
@@ -52,7 +52,7 @@ source, it does not go in the course.
 
 ## Test plan
 
-1. The GRS-0215 content-depth tests, run against this course: slide counts per section, a test at
+1. The GRS-0215 content-depth tests, run against this course: slide counts per lesson, a test at
    the end of every section, at least one `SourceRef` per lesson, minimum lesson length.
 2. Link integrity at build time for every doc, blog and video link.
 3. Progression: section N+1 locked until section N's test is passed.

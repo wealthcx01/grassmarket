@@ -1,0 +1,66 @@
+{
+  "additionalProperties": false,
+  "description": "One advisor's attempt at one section test (GRS-0215). Append-only: a retake is a new row, so\nthe record shows how many goes it took rather than only the last answer.",
+  "properties": {
+    "attempted_at": {
+      "format": "date-time",
+      "title": "Attempted At",
+      "type": "string"
+    },
+    "course_id": {
+      "format": "uuid",
+      "title": "Course Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "module_id": {
+      "format": "uuid",
+      "title": "Module Id",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "passed": {
+      "title": "Passed",
+      "type": "boolean"
+    },
+    "score": {
+      "description": "Fraction correct.",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Score",
+      "type": "number"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "course_id",
+    "module_id",
+    "score",
+    "passed",
+    "attempted_at"
+  ],
+  "title": "SectionTestAttempt",
+  "type": "object"
+}

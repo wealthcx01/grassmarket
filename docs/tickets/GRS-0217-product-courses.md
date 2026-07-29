@@ -14,8 +14,7 @@ each can be reviewed on its own merits rather than as part of a wall.
 
 ## Scope
 
-One PR per product family. Each course follows the GRS-0215 structure: sections of 20 to 40 slides,
-a test between sections, at least one `SourceRef` per lesson, assets in the design system, a
+One PR per product family. Each course follows the GRS-0215 structure: sections of lessons, each lesson 20 to 40 slides, a test between sections, at least one `SourceRef` per lesson, assets in the design system, a
 downloadable deck.
 
 Each course must answer the same five questions, because that is what an advisor needs in a room:

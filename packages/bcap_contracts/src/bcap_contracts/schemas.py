@@ -82,6 +82,9 @@ from bcap_contracts.learning import (
     LearningModule,
     LessonAsset,
     LessonCompletion,
+    SectionTest,
+    SectionTestAttempt,
+    Slide,
     SourceRef,
 )
 from bcap_contracts.meetings import MeetingTranscript
@@ -163,6 +166,9 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "DrillCard": DrillCard,
     "SourceRef": SourceRef,
     "LessonAsset": LessonAsset,
+    "Slide": Slide,
+    "SectionTest": SectionTest,
+    "SectionTestAttempt": SectionTestAttempt,
     "LearningModule": LearningModule,
     "ContentCompletion": ContentCompletion,
     "GeneratedQuiz": GeneratedQuiz,

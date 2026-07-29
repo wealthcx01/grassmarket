@@ -11,7 +11,7 @@
     },
     "CourseModule": {
       "additionalProperties": false,
-      "description": "An ordered group of lessons within a course.",
+      "description": "An ordered group of lessons within a course — a SECTION, in the founder's language.\n\n`section_test` is the gate: the learner passes it before the next section opens (GRS-0215).\nOptional at the contract so a legacy course still validates, required by the depth tests for\nany course claiming to meet the standard.",
       "properties": {
         "id": {
           "format": "uuid",
@@ -30,6 +30,17 @@
           "minimum": 0,
           "title": "Order",
           "type": "integer"
+        },
+        "section_test": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SectionTest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "title": {
           "minLength": 1,
@@ -87,7 +98,7 @@
     },
     "Lesson": {
       "additionalProperties": false,
-      "description": "One teaching unit inside a module: a markdown body, an optional video, and links to the\nspaced-repetition drill topics it reinforces. An AI-authored lesson (`author == AI`) is not\n``approved`` until a human signs off — the approver is then recorded (ADR-0009).",
+      "description": "One teaching unit inside a module: a markdown body, an optional video, and links to the\nspaced-repetition drill topics it reinforces. An AI-authored lesson (`author == AI`) is not\n``approved`` until a human signs off — the approver is then recorded (ADR-0009).\n\n`slides` is where the teaching now lives (GRS-0215). `body` remains the lesson's opening — what\nthis lesson is for and what the advisor will be able to do at the end — and is no longer\nexpected to carry the content on its own. Existing courses with no slides still validate; the\ndepth tests, not the contract, are what refuse a thin course, so a legacy course can be read\nwhile it waits to be rebuilt.",
       "properties": {
         "approved": {
           "default": true,
@@ -206,6 +217,15 @@
           "title": "References",
           "type": "array"
         },
+        "slides": {
+          "default": [],
+          "description": "The lesson's slides, in order (GRS-0215).",
+          "items": {
+            "$ref": "#/$defs/Slide"
+          },
+          "title": "Slides",
+          "type": "array"
+        },
         "title": {
           "minLength": 1,
           "title": "Title",
@@ -271,6 +291,109 @@
       "title": "LessonAuthor",
       "type": "string"
     },
+    "SectionTest": {
+      "additionalProperties": false,
+      "description": "The test a learner passes before the next section opens (GRS-0215).\n\n`pass_mark` is a fraction of questions correct. It is declared per test rather than fixed\nglobally so a heavier section can demand more, and it is validated here rather than assumed by\nthe marker.",
+      "properties": {
+        "pass_mark": {
+          "default": 0.8,
+          "exclusiveMinimum": 0.0,
+          "maximum": 1.0,
+          "title": "Pass Mark",
+          "type": "number"
+        },
+        "questions": {
+          "items": {
+            "$ref": "#/$defs/TestQuestion"
+          },
+          "minItems": 1,
+          "title": "Questions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "questions"
+      ],
+      "title": "SectionTest",
+      "type": "object"
+    },
+    "Slide": {
+      "additionalProperties": false,
+      "description": "One slide of a lesson (GRS-0215).\n\nThe founder's standard, in their words: \"A lesson is 20-40 slides of interactive detail with a\ntest before the next section.\" A slide is the unit of that. It is deliberately small — one\nidea, one step, or one worked example — because the failure being corrected was lessons that\nwere a paragraph pretending to be a lesson.\n\n`body` is markdown. `asset` is an inline SVG, for the same immutability reason `LessonAsset`\nis: a published version that pointed at external storage would not actually be published.",
+      "properties": {
+        "asset": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LessonAsset"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "body": {
+          "description": "Slide content, markdown.",
+          "minLength": 1,
+          "title": "Body",
+          "type": "string"
+        },
+        "checkpoint_prompt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "What the advisor must actually do and confirm (CHECKPOINT slides only).",
+          "title": "Checkpoint Prompt"
+        },
+        "kind": {
+          "$ref": "#/$defs/SlideKind",
+          "default": "concept"
+        },
+        "order": {
+          "minimum": 0,
+          "title": "Order",
+          "type": "integer"
+        },
+        "references": {
+          "default": [],
+          "description": "Sources for THIS slide. A claim with no source does not belong on a slide.",
+          "items": {
+            "$ref": "#/$defs/SourceRef"
+          },
+          "title": "References",
+          "type": "array"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "order",
+        "title",
+        "body"
+      ],
+      "title": "Slide",
+      "type": "object"
+    },
+    "SlideKind": {
+      "description": "What a slide is for. The renderer styles by this, and the depth tests count by it: a lesson\nthat is 30 slides of prose and no doing is not the lesson the founder asked for.",
+      "enum": [
+        "concept",
+        "walkthrough",
+        "example",
+        "checkpoint"
+      ],
+      "title": "SlideKind",
+      "type": "string"
+    },
     "SourceRef": {
       "additionalProperties": false,
       "description": "A cited public source on a lesson (GRS-0190).\n\n`url` is https-only at the CONTRACT, not merely in the renderer: schema validation refuses\n`http://` and non-URL strings, so a downgraded or javascript: link cannot reach a published\ncourse version in the first place. The renderer's own check is then a second line rather than\nthe only one.",
@@ -307,6 +430,43 @@
       ],
       "title": "SourceRefKind",
       "type": "string"
+    },
+    "TestQuestion": {
+      "additionalProperties": false,
+      "description": "One question on a section test (GRS-0215). Multiple choice with exactly one right answer:\na section gate has to be markable without a human in the loop, and a free-text answer is not.",
+      "properties": {
+        "answer_index": {
+          "minimum": 0,
+          "title": "Answer Index",
+          "type": "integer"
+        },
+        "explanation": {
+          "minLength": 1,
+          "title": "Explanation",
+          "type": "string"
+        },
+        "options": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 2,
+          "title": "Options",
+          "type": "array"
+        },
+        "prompt": {
+          "minLength": 1,
+          "title": "Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "prompt",
+        "options",
+        "answer_index",
+        "explanation"
+      ],
+      "title": "TestQuestion",
+      "type": "object"
     }
   },
   "additionalProperties": false,

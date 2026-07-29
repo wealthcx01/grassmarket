@@ -29,11 +29,12 @@ The founder also gave a concrete standard, which is the only sensible acceptance
 
 ## Scope
 
-1. **Course structure, per course.** Each product course is built as sections; each section is
-   20 to 40 interactive slides; each section ends in a test the learner must pass before the next
-   section opens. This is the shape GRS-0190's renderer already supports and nobody used.
-2. **The depth tests, written here and run by every course ticket.** Minimum slides per section, a
-   test at the end of every section, at least one `SourceRef` per lesson, a minimum lesson length.
+1. **Course structure, per course.** Each product course is built as sections; a section is a group of
+   lessons; each LESSON is 20 to 40 interactive slides; each section ends in a test the learner
+   must pass before the next section opens. The founder's words were "a lesson is 20-40 slides of
+   interactive detail with a test before the next section", and the unit matters: pitching it at
+   the section rather than the lesson would have let a three-paragraph lesson through again. This is the shape GRS-0190's renderer already supports and nobody used.
+2. **The depth tests, written here and run by every course ticket.** Minimum slides per LESSON, a test at the end of every section, at least one `SourceRef` per lesson, a minimum lesson length.
    These have to exist before the content tickets start, or "thin" stays a matter of opinion.
 3. **The content sourcing rule**, applied by GRS-0216 to GRS-0218:
    - the product's own documentation, deep-linked per lesson rather than linked once at the top,
