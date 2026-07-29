@@ -851,16 +851,382 @@ def section_2() -> CourseModule:
     )
 
 
+# --- Section 3 — Sign up to Workspace and find your way around ----------------------------
+
+_S3_BODY = (
+    "By the end of this lesson you have an OpenBB Workspace account, you have opened it, and you "
+    "can find the four things that matter without hunting: the widget library, a dashboard, an "
+    "app, and the agent. This is the product a client buys, so being fluent in the first ninety "
+    "seconds of it is worth more to you than any amount of feature knowledge."
+)
+
+_SECTION_3_SLIDES: tuple[Slide, ...] = (
+    _s(
+        0,
+        SlideKind.CONCEPT,
+        "Where Workspace lives",
+        "Workspace runs in the browser at pro.openbb.co. OpenBB's own documentation points you "
+        "there to explore its capabilities and the app gallery. This is the thing you demo. The "
+        "package you installed in the last section is not.",
+        refs=(DOCS_WORKSPACE,),
+    ),
+    _s(
+        1,
+        SlideKind.WALKTHROUGH,
+        "Create your account",
+        "Go to pro.openbb.co and sign up. Use your @bruntsfield.capital address rather than a "
+        "personal one: you will be showing this screen to clients, and an account in your own name "
+        "at the firm is part of looking like a professional rather than a hobbyist.",
+        refs=(DOCS_WORKSPACE,),
+    ),
+    _s(
+        2,
+        SlideKind.CONCEPT,
+        "The tiers, and which one you are in",
+        "OpenBB documents several ways in: the PWA, Enterprise, Lite, and the Platform Installer. "
+        "You will almost certainly start on the free tier. Know which one you are demonstrating "
+        'from, because a client asking "can I do that?" is really asking "is that in the tier '
+        'you are quoting me?"',
+        refs=(DOCS_WORKSPACE,),
+    ),
+    _s(
+        3,
+        SlideKind.WALKTHROUGH,
+        "Open the widget library",
+        "Click the search field top left, or press `Cmd+K` on a Mac or `Ctrl+K` on Windows. That "
+        "keyboard shortcut is the single most useful thing to know in a demo: it makes you look "
+        "like someone who uses the product rather than someone reading a script.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        4,
+        SlideKind.CONCEPT,
+        "What a widget actually contains",
+        "OpenBB describes a widget as more than a chart or a table: it is a data container built "
+        "to "
+        "answer a specific analytical question. Four parts. A data source, a metadata layer, a "
+        "visual presentation, and parameters. Learn those four and every widget in the library "
+        "stops being a mystery.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        5,
+        SlideKind.CONCEPT,
+        "The data source",
+        "Where the information comes from: a feed, a database, the organisation's own custom data, "
+        "or a static file. That last one matters more than it looks. A client with a spreadsheet "
+        "nobody can get out of email has a widget-shaped problem.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        6,
+        SlideKind.CONCEPT,
+        "The metadata layer",
+        "Title, description, category, sub-category and source attribution. Source attribution is "
+        "the one to point at in a regulated firm: the widget carries where its number came from, "
+        "which is the provenance question you met in the last section, answered in the product.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        7,
+        SlideKind.CONCEPT,
+        "The visual layer",
+        "Tables, charts, PDFs or custom views. PDFs being first-class is worth noticing: a "
+        "research "
+        "note and a price series can sit on the same dashboard, which is exactly the "
+        "structured-and-unstructured story from section 1 made concrete.",
+        refs=(DOCS_WIDGETS, DOCS_WORKSPACE),
+    ),
+    _s(
+        8,
+        SlideKind.CONCEPT,
+        "Parameters, and why they are the demo moment",
+        "Parameters are the interactive part: date ranges, ticker selection and so on. When "
+        "widgets "
+        "share a parameter name, changing a ticker or a date range in one automatically updates "
+        "every linked widget. Watching a whole dashboard move from one field is the moment a "
+        "prospect leans in.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        9,
+        SlideKind.CONCEPT,
+        "Widget controls you get for free",
+        "Universal controls include refresh settings, export to CSV, JSON and Excel, and view "
+        "toggles. Export matters commercially: an analyst who can get the data out is far less "
+        "afraid of being locked in, and lock-in fear is a common quiet objection.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        10,
+        SlideKind.CONCEPT,
+        "Table widgets",
+        "Tables offer column sorting, filtering and grouping, and generate Excel Add-in formulas "
+        "automatically. If your client lives in Excel, and many wealth managers do, that automatic "
+        "formula generation is a more persuasive detail than anything about AI.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        11,
+        SlideKind.CONCEPT,
+        "Chart widgets",
+        "Charts are TradingView-based, with technical indicator overlays and adjustable "
+        "timeframes. "
+        "Naming TradingView is useful in a room: it is a product almost every prospect has already "
+        "used, so it answers the unspoken question about whether the charting is any good.",
+        refs=(DOCS_WIDGETS,),
+    ),
+    _s(
+        12,
+        SlideKind.WALKTHROUGH,
+        "Create your first dashboard",
+        "Click the `+` button in the sidebar to create a new dashboard, and give it a descriptive "
+        'name. Name it after a real use case rather than "test" — you will keep this one, and '
+        "you will show it to someone.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        13,
+        SlideKind.WALKTHROUGH,
+        "Put something on it",
+        "Click Add Widget, or right-click to reach the context menu. Then drag and drop widgets "
+        "where you want them, resizing and arranging so the important data is emphasised. Spend a "
+        "minute on the arrangement; a cramped dashboard demos badly.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        14,
+        SlideKind.CONCEPT,
+        "Organising a dashboard that grew",
+        "A navigation bar widget lets you separate widgets into categories, which is the answer "
+        "when a dashboard has outgrown one screen. You can also disable grouping from the "
+        "right-click menu when the automatic behaviour is not what you want.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        15,
+        SlideKind.CONCEPT,
+        "Managing dashboards",
+        "The ellipsis menu next to each dashboard in the sidebar gives you Rename, Move to "
+        "folders, "
+        "Duplicate and Open in new window. Duplicate is the one you will use most: build a good "
+        "dashboard once, then clone it per client.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        16,
+        SlideKind.CONCEPT,
+        "Sharing, and why it is the commercial hinge",
+        "Share sits in the same ellipsis menu and is how you collaborate with team members. This "
+        "is "
+        "where a single analyst's work becomes the desk's. Almost every business case you write "
+        "will lean on this rather than on any individual widget.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        17,
+        SlideKind.CONCEPT,
+        "Exporting a dashboard as configuration",
+        "Right-click and choose Export apps.json to export the dashboard configuration. This is "
+        "how "
+        'a dashboard becomes an app, and it is the answer to "can we standardise this across the '
+        'team?" — which is a buying question, not a technical one.',
+        refs=(DOCS_DASHBOARDS, DOCS_APPS),
+    ),
+    _s(
+        18,
+        SlideKind.CONCEPT,
+        "Refreshing data",
+        "Refresh data updates every widget with the latest information. Know where it is before a "
+        "demo. Stale numbers on screen while you talk about real-time workflows is an avoidable "
+        "way to lose the room.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+    _s(
+        19,
+        SlideKind.CONCEPT,
+        "The agent, and the word to use",
+        "The AI agent reads the metadata from your widgets to query the right datasets, and can "
+        "watch dashboards for anomalies. The word to use with a compliance-minded buyer is "
+        "grounded: it answers from what is on the dashboard, not from what a model remembers.",
+        refs=(DOCS_WORKSPACE,),
+    ),
+    _s(
+        20,
+        SlideKind.EXAMPLE,
+        "Ninety seconds that works",
+        "Open a dashboard. Press `Cmd+K`, add a widget, change one parameter and let the linked "
+        "widgets move. Ask the agent a question about what is on screen. Stop. That sequence "
+        "demonstrates the whole product and leaves them asking the next question.",
+        refs=(DOCS_WIDGETS, DOCS_DASHBOARDS),
+    ),
+    _s(
+        21,
+        SlideKind.EXAMPLE,
+        "What not to do in a first demo",
+        "Do not tour the widget library. Do not open settings. Do not explain the difference "
+        "between the package and Workspace unless asked. A prospect remembers one thing from a "
+        "first demo, so choose which one it is going to be before you start.",
+    ),
+    _s(
+        22,
+        SlideKind.CHECKPOINT,
+        "Account created",
+        "You need a real account for the next two sections, both of which are you building things. "
+        "Do this now rather than reading ahead.",
+        checkpoint="Create your OpenBB Workspace account at pro.openbb.co using your "
+        "@bruntsfield.capital address, and confirm you can sign in.",
+    ),
+    _s(
+        23,
+        SlideKind.CHECKPOINT,
+        "Find four things without help",
+        "Open the widget library with the keyboard shortcut, create an empty dashboard, open the "
+        "ellipsis menu, and locate the agent. No documentation. If any of the four takes more than "
+        "a few seconds, do it twice more now.",
+        checkpoint="Time yourself finding the widget library, a new dashboard, the ellipsis menu "
+        "and the agent. Note anything that took you longer than ten seconds.",
+    ),
+    _s(
+        24,
+        SlideKind.CONCEPT,
+        "What the next section does",
+        "You have an account and you know where things are. Next you build a real workspace for "
+        "one "
+        "of the three targets you named in section 1, which is the first time in this course you "
+        "make something you could actually show a client.",
+        refs=(DOCS_DASHBOARDS,),
+    ),
+)
+
+SECTION_3_TEST = SectionTest(
+    questions=(
+        TestQuestion(
+            prompt="What opens the widget library?",
+            options=(
+                "The settings menu",
+                "The search field top left, or Cmd+K / Ctrl+K",
+                "Right-click on the sidebar",
+                "The agent",
+            ),
+            answer_index=1,
+            explanation=(
+                "The keyboard shortcut is the single most useful thing to know in a demo. It makes "
+                "you look like someone who uses the product rather than reads about it."
+            ),
+        ),
+        TestQuestion(
+            prompt="What are the four parts of a widget?",
+            options=(
+                "Chart, table, PDF, export",
+                "Data source, metadata layer, visual presentation, parameters",
+                "Title, data, agent, share link",
+                "Source, licence, refresh, owner",
+            ),
+            answer_index=1,
+            explanation=(
+                "OpenBB describes a widget as a data container built to answer a specific "
+                "analytical question, made of those four parts. Learn them and the library stops "
+                "being a mystery."
+            ),
+        ),
+        TestQuestion(
+            prompt="Two widgets share a parameter name. What happens when you change it in one?",
+            options=(
+                "Nothing, each widget is independent",
+                "Every linked widget updates automatically",
+                "The dashboard reloads",
+                "You are asked to confirm",
+            ),
+            answer_index=1,
+            explanation=(
+                "Shared parameter names link widgets. Watching a whole dashboard move from one "
+                "field is the moment a prospect leans in, so it is the thing to demo."
+            ),
+        ),
+        TestQuestion(
+            prompt="Where do you find Share, Rename and Duplicate for a dashboard?",
+            options=(
+                "The agent panel",
+                "The ellipsis menu next to the dashboard in the sidebar",
+                "The widget library",
+                "Export apps.json",
+            ),
+            answer_index=1,
+            explanation=(
+                "Sharing is the commercial hinge: it is how one analyst's work becomes the desk's, "
+                "and most business cases lean on it rather than on any individual widget."
+            ),
+        ),
+        TestQuestion(
+            prompt="Why does automatic Excel formula generation on table widgets matter?",
+            options=(
+                "It is required for export",
+                "Many buyers, wealth managers especially, live in Excel, so it can persuade"
+                " more than the AI story",
+                "It replaces the agent",
+                "It is only available in Enterprise",
+            ),
+            answer_index=1,
+            explanation=(
+                "Meeting a client where they already work is usually more persuasive than asking "
+                "them to move. Know your buyer's actual daily tool."
+            ),
+        ),
+        TestQuestion(
+            prompt=(
+                "A prospect asks whether the team can standardise a dashboard you just built. "
+                "What is the mechanism?"
+            ),
+            options=(
+                "Share it read-only",
+                "Right-click and Export apps.json, which is how a dashboard becomes an app",
+                "Duplicate it for each person",
+                "It is not possible",
+            ),
+            answer_index=1,
+            explanation=(
+                "Exporting the configuration turns a dashboard into an app. The question is a "
+                "buying question dressed as a technical one, so answer it as one."
+            ),
+        ),
+    ),
+)
+
+
+def section_3() -> CourseModule:
+    """Section 3: sign up to Workspace and find your way around."""
+    return CourseModule(
+        id=_id("module", "sign-up-and-orientation"),
+        title="Sign up to Workspace and find your way around",
+        order=2,
+        lessons=(
+            Lesson(
+                id=_id("lesson", "sign-up-and-orientation"),
+                title="Your Workspace account, and the four things that matter",
+                body=_S3_BODY,
+                order=0,
+                slides=_SECTION_3_SLIDES,
+                drill_topics=("product:openbb:workspace",),
+                measurement=(
+                    "You have a Workspace account and can reach the widget library, a new "
+                    "dashboard, the ellipsis menu and the agent without looking anything up."
+                ),
+            ),
+        ),
+        section_test=SECTION_3_TEST,
+    )
+
+
 def rebuilt_sections() -> tuple[CourseModule, ...]:
     """The sections rebuilt to the GRS-0215 standard, in order. Grows as GRS-0216 progresses."""
-    return (section_1(), section_2())
+    return (section_1(), section_2(), section_3())
 
 
 # Sections written so far, and sections still to write. The depth check fails while anything is in
 # SECTIONS_PLANNED, so this course cannot read as finished until it is.
-SECTIONS_AUTHORED: tuple[str, ...] = ("what-it-is", "install")
+SECTIONS_AUTHORED: tuple[str, ...] = ("what-it-is", "install", "sign-up-and-orientation")
 SECTIONS_PLANNED: tuple[str, ...] = (
-    "sign-up-and-orientation",
     "first-workspace",
     "second-workspace",
     "the-data",
