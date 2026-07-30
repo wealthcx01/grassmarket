@@ -1,6 +1,7 @@
 # GRS-0215 — Rebuild the courses as courses, not paragraphs
 
-**Status:** Planned (2026-07-26, staging review item 14; 23/07 item 20). **Priority:** HIGHEST.
+**Status:** In review (2026-07-30, PR #220 — the reader landed in GRS-0226; a downloadable
+deck export, scope item 4, is still unbuilt). **Priority:** HIGHEST.
 **Loop:** founder-feedback remediation, Wave 4. **Replaces the content half of GRS-0191.**
 
 **This ticket owns the course architecture and the depth standard.** The courses themselves are

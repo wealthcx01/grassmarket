@@ -7,6 +7,95 @@ ticket's status and appends "What shipped" when its PR lands.
 landed (GRS-0035–0065), plus an estate-reconciliation + guided-consulting track (GRS-0066–). The
 authoritative sequencing narrative is `NEXT-STEPS-2026-07.md` (the binder); this file is just the index.
 
+> **Index freshness (2026-07-30).** This file had drifted: it stopped at GRS-0163 while three
+> further programmes — the two-estimator fix, the 2026-07-23 founder-feedback wave, and the
+> 2026-07-26 staging-review wave — took the range to GRS-0226. The section immediately below closes
+> that gap. Everything from GRS-0173 onward carries the **open-PRs-never-merge holding rule**: work
+> lands on its own branch with a PR and is collected on an integration branch for the founder, so
+> "In review" here means "built, gated, and waiting on the founder", not "half-done".
+
+## The two-estimator fix (GRS-0164–0172, 2026-07-22) — all shipped
+
+From `reports/staging-rerun-2026-07-22.md`: two different estimators were quoting two different
+scores for the same assessment. ADR-0040 made the deterministic composite the one number every
+surface quotes.
+
+| Ticket | Title | Status |
+|---|---|---|
+| GRS-0164 | Surface the Customer-Proposition index (C) alongside V | Done |
+| GRS-0165 | Wizard density part 2: C collapse + segmented rating control | Done |
+| GRS-0166 | Finalised assessment: wizard rail quotes the locked score | Done |
+| GRS-0167 | One-number rule: every surface quotes the deterministic score (ADR-0040) | Done |
+| GRS-0168 | Portfolio coverage measured against the assessment's own profile view | Done |
+| GRS-0169 | Sell-from-report: segment-scope the catalogue and the gap matcher | Done |
+| GRS-0170 | Powers step: unrated ≠ "None", un-rate affordance, one-click chips | Done |
+| GRS-0171 | Two-step finalise confirmation | Done |
+| GRS-0172 | Trust-polish sweep | Done |
+
+## Founder-feedback wave (GRS-0173–0204, 2026-07-23) — built, in review
+
+| Ticket | Title | Status |
+|---|---|---|
+| GRS-0173 | Workspace domain SSO — @bruntsfield.capital sign-in (ADR-0044) | In review, PR #206 |
+| GRS-0174 | Voice & style guide + application copy sweep | In review, PR #201 |
+| GRS-0175 | Guide & Primer rewrite (/help merged into /guide) | In review, PR #208 |
+| GRS-0176 | Vertical Kanban for the pipeline | In review, PR #205 |
+| GRS-0177 | Portfolio clarity: dedupe, explain, clean | In review, PRs #214/#218 — **the staging cleanup script has not been run** (needs deploy access) |
+| GRS-0178 | New-assessment creation form redesign | In review, PR #215 (stacked on 0177) |
+| GRS-0179 | `docs/ATLAS-Scoring-Explained.md` — the maths, in English | In review, PR #204 |
+| GRS-0180 | 7 Powers mathematics adaptation — normative document | In review, PR #203 |
+| GRS-0181 | Wizard pagination: smaller pages per module | In review, PR #216 (stacked on 0182) |
+| GRS-0182 | Summary & Interpretation repair (double-V removed) | In review, PR #213 |
+| GRS-0183 | Remove ConnectTrade from the catalogue | In review, PR #202 |
+| GRS-0184 | Scenario workspace v2 | Planned |
+| GRS-0185 | Brandfetch variant segment scoping | In review, PR #217 |
+| GRS-0186 | Global navigation + Deliverables reachability | In review, PR #207 |
+| GRS-0187 | Consulting commissions on the Earnings page (Stream B) | In review, PR #217 |
+| GRS-0188 | The founder review gate (ADR-0041) | In review, PR #219 — retires peer governance; callers repaired |
+| GRS-0189 | Rebuild the deliverables to the story architecture | Planned |
+| GRS-0190 | Rich lesson renderer + content contracts (ADR-0043) | In review, PR #212 |
+| GRS-0191 | Academy content depth program (the 100x) | Superseded — content half became GRS-0215+ |
+| GRS-0192 | Content freshness watcher | Planned |
+| GRS-0193 | Import the GTM contact databases (ADR-0045) | In review, PR #209 |
+| GRS-0194 | LSEG influencer maps via bcap-lseg | In review, PR #211 (stacked on 0193) |
+| GRS-0195 | Agentic GTM research spike | Closed — recommendation is BUILD THIN, PR #210 |
+| GRS-0196 | Practice Arena v2: an AI client to practise against | Planned |
+| GRS-0197 | Gmail + Google Calendar integration | Planned |
+| GRS-0198 | Pipeline linkage: assessment & deliverable milestones | Planned |
+| GRS-0199 | Bench honesty + Opportunity Radar wiring | Planned |
+| GRS-0200 | LSEG influencer dataset: first network-wide pull | Done — dataset produced |
+| GRS-0201 | Wizard Powers step: embed the Helmer adaptation | Planned |
+| GRS-0202–0204 | Outreach contract / sequencer / send path | Draft, not scheduled (from the 0195 spike) |
+
+## Staging-review wave (GRS-0205–0226, 2026-07-26 onward)
+
+From the 2026-07-26 staging review. Wave 4 (the course rebuild) is the part that has landed.
+
+| Ticket | Title | Status |
+|---|---|---|
+| GRS-0205 | Rewrite every string in the app, not just the reviewed screens | Planned |
+| GRS-0206 | Rive as the diagram and motion system (ADR-0049) | Planned — rewritten 2026-07-29 after reading the repo |
+| GRS-0207 | Outreach and CRM platform: decide, then build thin | Planned |
+| GRS-0208 | One clean demo account + a founder admin who can act as any advisor | Planned |
+| GRS-0209 | The Operating Model dropdown still does not line up | Planned |
+| GRS-0210 | Smart search must know the firms an advisor will type | Planned |
+| GRS-0211 | The client deliverable, rebuilt: what it says | Planned |
+| GRS-0212 | Customer Proposition for exchanges: research, model, ship | Planned |
+| GRS-0213 | Scenarios an advisor can drive, with a narrative assistant | Planned |
+| GRS-0214 | What the client gets free vs on engagement | Planned |
+| **GRS-0215** | **Rebuild the courses as courses, not paragraphs** — the depth standard | **In review, PR #220** (deck export still unbuilt) |
+| **GRS-0216** | **The OpenBB course** — 196 slides, eight sections | **In review, PR #220** |
+| GRS-0217 | The remaining product courses, to the same standard | Planned — **next up** |
+| GRS-0218 | The Sales Egoist course | Blocked on source material |
+| GRS-0219 | The client report as a Bruntsfield-branded PDF | Planned |
+| GRS-0220 | The client report as an interactive web page, read tracking | Planned |
+| GRS-0221 | Stage 6 layout: the panels that fight each other | Planned |
+| GRS-0222 | The narrative assistant: drafting against real scored data | Planned |
+| GRS-0223 | "All the scores seem surprisingly similar": find out why | Planned |
+| GRS-0224 | Repository coverage for the dormant peer-governance code | Planned (arose from 0188) |
+| **GRS-0225** | **Diagrams for the courses, authored not decorated** — nine scenes | **In review, PR #220** |
+| **GRS-0226** | **The slide reader and the section gate** — makes 0215/0216/0225 visible | **In review, PR #220** |
+
 ## Demo-readiness program (GRS-0158–0163, 2026-07-21) — get the studio performant enough to show advisor hires
 
 From the staging deep-dive + brokerage end-to-end run (`reports/product-confidence-staging-2026-07-20.md`,

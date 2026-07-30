@@ -1,6 +1,6 @@
 # GRS-0226 — The slide reader and the section gate
 
-**Status:** In progress (2026-07-30). **Priority:** HIGHEST. **Loop:** founder-feedback
+**Status:** In review (2026-07-30, PR #220). **Priority:** HIGHEST. **Loop:** founder-feedback
 remediation, Wave 4. **Depends on:** GRS-0215 (the slide + section-test contracts), GRS-0216 (the
 196 slides), GRS-0225 (the nine diagrams).
 

@@ -1,6 +1,7 @@
 # GRS-0216 — The OpenBB course, built to the founder's standard
 
-**Status:** Planned (2026-07-26, staging review item 14; 23/07 item 20). **Priority:** HIGHEST.
+**Status:** In review (2026-07-30, PR #220 — 196 slides, eight sections, and since GRS-0226
+an advisor can actually read them). **Priority:** HIGHEST.
 **Loop:** founder-feedback remediation, Wave 4. **Depends on:** GRS-0215 (course architecture),
 GRS-0190 (renderer, shipped).
 
