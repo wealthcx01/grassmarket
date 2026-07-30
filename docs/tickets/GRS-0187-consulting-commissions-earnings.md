@@ -1,6 +1,7 @@
 # GRS-0187 — Consulting commissions on the Earnings page
 
-**Status:** Planned (2026-07-23, founder feedback item 26). **Priority:** MED.
+**Status:** In review (2026-07-26) — carrot contract, builder, endpoint, Stream-B card and
+statement section shipped; PR open. (2026-07-23, founder feedback item 26.) **Priority:** MED.
 **Loop:** founder-feedback remediation, Wave 1.
 
 ## Why
