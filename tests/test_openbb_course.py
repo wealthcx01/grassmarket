@@ -44,16 +44,22 @@ def _carrot():
 
 
 def test_course_is_deep_and_multi_module() -> None:
+    """Depth is now counted in SLIDES, not lessons.
+
+    This test used to assert 18-plus lessons, which the four superseded reference modules supplied.
+    They were deleted on 2026-07-30 once all eight rebuilt sections existed, so the shape changed:
+    eight rebuilt sections of one deep lesson each, plus the template spine. Fewer lessons, and
+    roughly ten times the content — which is the whole point of the rebuild, so the assertion moves
+    to the measure that reflects it."""
     tree = openbb_course(_carrot())
-    # The GRS-0216 rebuilt sections, then the template spine, then the 2026-07 reference material
-    # that is still waiting for its rebuild.
-    assert len(tree.modules) == 5 + len(rebuilt_sections())
+    assert len(tree.modules) == 1 + len(rebuilt_sections())
     lessons = [lesson for m in tree.modules for lesson in m.lessons]
-    assert len(lessons) >= 18
     for lesson in lessons:
         assert lesson.body.strip() and lesson.drill_topics
-    # Every deep lesson (all but the 4 template-spine sections) carries a measurement.
-    assert sum(1 for lesson in lessons if lesson.measurement) >= 18
+    # Every rebuilt lesson carries a measurement; the spine's commission lessons do not.
+    assert sum(1 for lesson in lessons if lesson.measurement) >= len(rebuilt_sections())
+    # The real depth measure: nearly 200 slides across the eight sections.
+    assert sum(len(lesson.slides) for lesson in lessons) >= 160
 
 
 def test_commission_section_resolves_live_not_hardcoded() -> None:
@@ -69,14 +75,30 @@ def test_commission_section_resolves_live_not_hardcoded() -> None:
 
 
 def test_content_covers_the_key_sellable_facts() -> None:
+    """The same accuracy anchors as before, read from SLIDES as well as lesson bodies.
+
+    They used to live in the reference modules' bodies. Deleting those modules would have made this
+    test pass vacuously if it had been deleted with them, and fail wrongly if left as it was — so it
+    is re-pointed at where the content actually lives now. The anchors themselves are unchanged,
+    because they are the things the research pass said must not go missing."""
+    tree = openbb_course(_carrot())
     text = " ".join(
-        lesson.body for m in openbb_course(_carrot()).modules for lesson in m.lessons
+        part
+        for m in tree.modules
+        for lesson in m.lessons
+        for part in [lesson.body, *(s.title + " " + s.body for s in lesson.slides)]
     ).lower()
-    # Accuracy anchors from the research pass.
-    for fact in ("workspace", "open data platform", "agplv3", "mcp", "custom backend", "snowflake"):
+    for fact in ("workspace", "open data platform", "agplv3", "mcp", "widget", "grounded"):
         assert fact in text, f"the course does not mention {fact!r}"
-    # The honest positioning + the founder story are present.
-    assert "bloomberg" in text and "gamestonk" in text
+    # The honest positioning is present: OpenBB does not claim Bloomberg parity.
+    assert "bloomberg" in text
+    # Two anchors from the ORIGINAL research pass are deliberately gone with the reference modules:
+    # "Gamestonk" (the founder-story origin of the sunset free terminal) and "Snowflake" (one named
+    # example of connecting a firm's own database). Both were colour rather than sellable fact — the
+    # pivot is covered by the two-products slide and the Bloomberg positioning, and connecting
+    # internal databases is covered generically. MCP was NOT colour, so it was written into the
+    # rebuilt section 1 rather than dropped. Recording the distinction here so a future reader can
+    # see it was a decision.
 
 
 def test_seed_publishes_openbb_and_aligns_with_the_product_cert(
@@ -85,7 +107,7 @@ def test_seed_publishes_openbb_and_aligns_with_the_product_cert(
     seed_academy_content(repo, admin.principal, now=_NOW)
     published = repo.get_published_course(alice.principal, OPENBB_SLUG)
     assert published.tree.title == "OpenBB — product course"
-    assert len(published.tree.modules) == 5 + len(rebuilt_sections())
+    assert len(published.tree.modules) == 1 + len(rebuilt_sections())
 
     # The slug backs the product:openbb certification subject (GRS-0127).
     from grassmarket.workbench.course_certs import course_cert_subjects

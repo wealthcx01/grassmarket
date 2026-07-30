@@ -49,21 +49,28 @@ def _carrot():
 
 
 def _expected_module_count() -> int:
-    """Rebuilt sections + the canonical product spine + the four retained reference modules.
+    """Rebuilt sections plus the canonical product spine. That is all there is now.
 
-    Derived rather than hard-coded: this used to assert 5, and GRS-0217 adding rebuilt sections
-    broke it. A count computed from the parts stays true as the rebuild lands section by section,
-    and still fails if a module goes missing."""
-    return len(rebuilt_sections()) + 1 + 4
+    Derived rather than hard-coded: this asserted 5 before the rebuild, then rebuilt + 1 + 4 while
+    the four superseded reference modules were still carried, and now rebuilt + 1 since they were
+    deleted on 2026-07-30. Computing it from the parts is what made each of those transitions a
+    one-line change instead of a hunt."""
+    return len(rebuilt_sections()) + 1
 
 
 def test_course_is_deep_and_multi_module() -> None:
+    """Depth is counted in SLIDES, not lessons.
+
+    This asserted 18-plus lessons, which the four superseded reference modules supplied. Deleting
+    them changed the shape: eight rebuilt sections of one deep lesson each, plus the spine. Far
+    fewer lessons, roughly ten times the content — which is the point of the rebuild, so the
+    assertion moves to the measure that reflects it."""
     tree = benzinga_course(_carrot())
     assert len(tree.modules) == _expected_module_count()
     lessons = [lesson for m in tree.modules for lesson in m.lessons]
-    assert len(lessons) >= 18
     for lesson in lessons:
         assert lesson.body.strip() and lesson.drill_topics
+    assert sum(len(lesson.slides) for lesson in lessons) == 192
 
 
 def test_commission_resolves_live_the_advisor_share() -> None:
@@ -80,8 +87,20 @@ def test_commission_resolves_live_the_advisor_share() -> None:
 
 
 def test_content_covers_the_key_facts_and_caveats() -> None:
-    text = " ".join(lesson.body for m in benzinga_course(_carrot()).modules for lesson in m.lessons)
-    lower = text.lower()
+    """The same anchors as before, read from SLIDES as well as lesson bodies.
+
+    They used to live in the reference modules' bodies. Deleting those modules would have made this
+    test fail wrongly if left as it was, and pass vacuously if deleted with them — so it is
+    re-pointed at where the content lives now. The anchors are unchanged, because they are the
+    things the original research pass said must not go missing, and "Raznick" was written into the
+    rebuilt company-history slide rather than allowed to disappear."""
+    tree = benzinga_course(_carrot())
+    lower = " ".join(
+        part
+        for m in tree.modules
+        for lesson in m.lessons
+        for part in [lesson.body, *(s.title + " " + s.body for s in lesson.slides)]
+    ).lower()
     for fact in ("wiim", "analyst rating", "unusual options", "redistribution", "raznick"):
         assert fact in lower, f"the course does not mention {fact!r}"
     # Honest positioning + attribution discipline are present.

@@ -63,11 +63,38 @@ lines an advisor never crosses: price, timeline, redistribution, attribution.
    had reached a slide body, a walkthrough instruction, a test question, the diagram and its alt
    text before I recounted the sheet. The fix is the parity test, not the corrected numbers.
 
-**One consequence worth stating rather than leaving implicit.** Because the rebuilt sections come
-first and the gate runs in reading order, the retained reference material sits behind all eight new
-section tests. That material was kept so the course would not be thinner during the rebuild. Now
-that the rebuild is finished it is genuinely superseded, and GRS-0217's remaining work should
-consider deleting it rather than leaving four locked modules at the end of a finished course.
+## The superseded reference modules are deleted (founder decision, 2026-07-30)
+
+Flagged rather than done unilaterally, then decided: **delete them**, from both finished courses.
+
+Four modules each, roughly 300 lines in Benzinga and 370 in OpenBB — 755 lines of the
+paragraph-lessons the founder called basic. They were kept while each rebuild was in flight so the
+course would not be thinner in the meantime. Once all eight sections existed that reason expired, and
+because the rebuilt sections come first and the gate runs in reading order they had become four
+*locked* modules of superseded content sitting at the end of a finished course. Both
+`*_course.py` files are now assembly only: the spec for the template spine, and the ordering.
+
+**Two things checked rather than assumed before deleting:**
+
+1. **Completion and certification.** `is_course_complete` is a subset check (`approved <= completed`)
+   over the *current* published tree, so historical completion rows pointing at removed lesson ids
+   are harmless extras, and the required set only shrinks. Lesson ids are not reused.
+2. **Content coverage.** The reference modules carried research anchors, and deleting them silently
+   dropped some. Verified per anchor, and the split was a decision:
+   - **MCP was not colour.** The Workspace MCP endpoint — the firm's existing agents (Claude Code,
+     Cursor, Codex) working over governed data with permissions and lineage — is the sharpest
+     enterprise hook OpenBB has. Written into rebuilt section 1 rather than dropped.
+   - **Raznick** likewise: the founder's name went into the rebuilt company-history slide.
+   - **Gamestonk** and **Snowflake** were colour and are gone. The pivot is covered by the
+     two-products slide and the Bloomberg positioning; connecting an internal database is covered
+     generically. `test_content_covers_the_key_sellable_facts` records which is which so a future
+     reader can see it was judged rather than lost.
+
+Both fact-coverage tests are re-pointed at slides as well as lesson bodies — left as they were they
+would have failed wrongly, and deleted with the modules they would have passed vacuously.
+
+A tighter join-artefact scan run over both courses while doing this found one more lost space
+(`"reportedly around$300 million"`), now fixed. Zero remain across all sixteen sections.
 
 ## Why
 

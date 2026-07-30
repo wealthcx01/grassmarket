@@ -2,6 +2,14 @@
 
 **Status:** In review (2026-07-30, PR #220 — 196 slides, eight sections, and since GRS-0226
 an advisor can actually read them). **Priority:** HIGHEST.
+
+> **The four "superseded reference" modules are deleted** (2026-07-30, founder decision recorded in
+> GRS-0217, done there because both finished courses carried the same four). They were the 2026-07
+> paragraph-lessons kept so this course would not be thinner mid-rebuild; once all eight sections
+> existed they were locked, superseded modules at the end of a finished course. **MCP** was rescued
+> into rebuilt section 1 first, because the Workspace MCP endpoint is the sharpest enterprise hook
+> in the product and existed nowhere else in the rebuild. "Gamestonk" and "Snowflake" went with them
+> as colour — see `test_content_covers_the_key_sellable_facts` for which is which.
 **Loop:** founder-feedback remediation, Wave 4. **Depends on:** GRS-0215 (course architecture),
 GRS-0190 (renderer, shipped).
 

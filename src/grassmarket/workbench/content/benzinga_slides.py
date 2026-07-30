@@ -312,11 +312,11 @@ _SECTION_1_SLIDES: tuple[Slide, ...] = (
         9,
         SlideKind.CONCEPT,
         "Where the company came from, carefully",
-        "Benzinga was founded in Detroit around 2009 to 2010 — public sources disagree on the "
-        "year, so do not state one. It was acquired by Beringer Capital; the reported figure is "
-        "roughly $300 million and the actual terms were undisclosed. If a prospect asks, "
-        '"reportedly around'
-        '$300 million, terms were not disclosed" is the honest answer and it is enough.',
+        "Benzinga was founded in Detroit by Jason Raznick around 2009 to 2010 — public sources "
+        "disagree on the year, so do not state one. It was acquired by Beringer Capital; the "
+        "reported figure is roughly $300 million and the actual terms were undisclosed. If a "
+        'prospect asks, "reportedly around $300 million, terms were not disclosed" is the honest '
+        "answer and it is enough.",
     ),
     _s(
         10,
