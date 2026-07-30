@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/pipeline","note":"open pipeline"},
-  {"do":"click","target":"text:London Stock Exchange Group","note":"open prospect detail"},
-  {"do":"read"},
-  {"do":"shot","name":"lseg_detail"},
-  {"do":"select","target":"label:Move stage","value":"workshop_scheduled","note":"advance stage"},
-  {"do":"read"},
-  {"do":"shot","name":"lseg_after_stage"}
-]

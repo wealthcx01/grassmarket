@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments"},
-  {"do":"fill","target":"form input[type=\"text\"]","value":"LSEG"},
-  {"do":"select","target":"label:Operating model","value":"exchange"},
-  {"do":"click","target":"text:Sandbox preview"},
-  {"do":"click","target":"text:Create & open"},
-  {"do":"read"},
-  {"do":"shot","name":"08-wizard-open"}
-]

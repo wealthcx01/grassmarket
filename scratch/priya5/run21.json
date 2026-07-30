@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/prospects/9c945345-cc19-4ea1-8ec4-3c5cfdaeaf84","waitfor":"LSEG"},
-  {"do":"fill","target":"placeholder:Engagement title","value":"LSEG Platform Power diagnostic"},
-  {"do":"click","target":"text:Open engagement"},
-  {"do":"read"},
-  {"do":"click","target":"text:LSEG Platform Power diagnostic"},
-  {"do":"read"},
-  {"do":"shot","name":"32-engagement-page","full":true}
-]

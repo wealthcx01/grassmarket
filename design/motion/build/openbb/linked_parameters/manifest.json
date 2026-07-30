@@ -1,0 +1,59 @@
+{
+  "source": "/home/dev/projects/grassmarket/design/motion/build/openbb/linked_parameters.riv",
+  "artboard": "LinkedParameters",
+  "animation": "propagate",
+  "state_machine": null,
+  "available_animations": [
+    "propagate"
+  ],
+  "available_state_machines": [],
+  "width": 960,
+  "height": 470,
+  "scale": 2,
+  "fps": 60.0,
+  "frames": [
+    {
+      "index": 0,
+      "seconds": 0.0,
+      "filename": "frame_00000.png",
+      "distinct_colors": 986,
+      "blank": false
+    },
+    {
+      "index": 33,
+      "seconds": 0.55,
+      "filename": "frame_00033.png",
+      "distinct_colors": 1024,
+      "blank": false
+    },
+    {
+      "index": 67,
+      "seconds": 1.1166666666666667,
+      "filename": "frame_00067.png",
+      "distinct_colors": 1215,
+      "blank": false
+    },
+    {
+      "index": 92,
+      "seconds": 1.5333333333333334,
+      "filename": "frame_00092.png",
+      "distinct_colors": 1523,
+      "blank": false
+    },
+    {
+      "index": 117,
+      "seconds": 1.95,
+      "filename": "frame_00117.png",
+      "distinct_colors": 1147,
+      "blank": false
+    },
+    {
+      "index": 151,
+      "seconds": 2.5166666666666666,
+      "filename": "frame_00151.png",
+      "distinct_colors": 1199,
+      "blank": false
+    }
+  ],
+  "contact_sheet": null
+}

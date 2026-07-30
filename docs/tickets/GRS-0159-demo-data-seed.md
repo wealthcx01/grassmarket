@@ -11,7 +11,7 @@ advisor hires.
 To show the studio to potential advisor hires it must be populated on demand. The staging run built a
 faithful end-to-end for Revolut + Hargreaves Lansdown (pipeline → finalised sandbox assessment →
 deliverables → engagement → recorded product commissions → £49,500 earnings). That was driven by ad-hoc
-scripts (`scratch/stage/brokerage_e2e.py`, `earnings_e2e.py`). Make it a first-class, repeatable seed.
+scripts (`tools/staging-e2e/brokerage_e2e.py`, `earnings_e2e.py`). Make it a first-class, repeatable seed.
 
 ## Scope
 

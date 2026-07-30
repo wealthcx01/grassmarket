@@ -1,7 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/50173b3c-7143-4ff0-9b95-b19d57c666dc","note":"wizard"},
-  {"do":"click","target":"text:6. Summary & Interpretation"},
-  {"do":"click","target":"text:Finalise"},
-  {"do":"shot","name":"finalise"},
-  {"do":"read"}
-]

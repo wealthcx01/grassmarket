@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/f558706d-27c1-4790-b1f8-1eb79267aefc","waitfor":"RBC Brewin Dolphin"},
-  {"do":"click","target":"text:6. Summary & Interpretation"},
-  {"do":"click","target":"button:has-text(\"Finalise\")","note":"click the finalise button proper"},
-  {"do":"shot","name":"30-finalise-clicked"},
-  {"do":"read"},
-  {"do":"waittext","value":"final"},
-  {"do":"shot","name":"31-finalise-dialog"}
-]

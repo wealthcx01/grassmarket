@@ -1,0 +1,1067 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "TheSale",
+    "width": 960,
+    "height": 380,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 480,
+        "y": 44,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 27,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "The shape of the sale, and what good looks like"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 480,
+        "y": 78,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "The pilot is the close. Pricing is not a stage you can skip to."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P0Name",
+        "x": 128,
+        "y": 170,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P0NameStyle",
+            "font_asset": "Display",
+            "font_size": 18,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P0NameStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P0NameStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "P0NameRun",
+            "style": "P0NameStyle",
+            "text": "First meeting"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P0O1",
+        "x": 128,
+        "y": 226,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P0O1Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P0O1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P0O1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "P0O1Run",
+            "style": "P0O1Style",
+            "text": "a number"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P0O2",
+        "x": 128,
+        "y": 246,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P0O2Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P0O2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P0O2StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "P0O2Run",
+            "style": "P0O2Style",
+            "text": "and a name"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P1Name",
+        "x": 304,
+        "y": 170,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P1NameStyle",
+            "font_asset": "Display",
+            "font_size": 18,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P1NameStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P1NameStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "P1NameRun",
+            "style": "P1NameStyle",
+            "text": "Demo"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P1O1",
+        "x": 304,
+        "y": 226,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P1O1Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P1O1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P1O1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "P1O1Run",
+            "style": "P1O1Style",
+            "text": "a question you"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P1O2",
+        "x": 304,
+        "y": 246,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P1O2Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P1O2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P1O2StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "P1O2Run",
+            "style": "P1O2Style",
+            "text": "could not answer"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P2Name",
+        "x": 480,
+        "y": 170,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P2NameStyle",
+            "font_asset": "Display",
+            "font_size": 18,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P2NameStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P2NameStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "P2NameRun",
+            "style": "P2NameStyle",
+            "text": "Technical"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P2O1",
+        "x": 480,
+        "y": 226,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P2O1Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P2O1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P2O1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "P2O1Run",
+            "style": "P2O1Style",
+            "text": "an introduction"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P2O2",
+        "x": 480,
+        "y": 246,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P2O2Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P2O2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P2O2StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "P2O2Run",
+            "style": "P2O2Style",
+            "text": "to the engineer"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P3Name",
+        "x": 656,
+        "y": 170,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P3NameStyle",
+            "font_asset": "Display",
+            "font_size": 18,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P3NameStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P3NameStyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "P3NameRun",
+            "style": "P3NameStyle",
+            "text": "Pilot"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P3O1",
+        "x": 656,
+        "y": 226,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P3O1Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P3O1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P3O1StyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "P3O1Run",
+            "style": "P3O1Style",
+            "text": "a date"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P4Name",
+        "x": 832,
+        "y": 170,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P4NameStyle",
+            "font_asset": "Display",
+            "font_size": 18,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P4NameStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P4NameStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "P4NameRun",
+            "style": "P4NameStyle",
+            "text": "Price"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P4O1",
+        "x": 832,
+        "y": 226,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P4O1Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P4O1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P4O1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "P4O1Run",
+            "style": "P4O1Style",
+            "text": "a scoped quote"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P4O2",
+        "x": 832,
+        "y": 246,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P4O2Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P4O2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P4O2StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "P4O2Run",
+            "style": "P4O2Style",
+            "text": "from OpenBB"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "S1Head",
+        "x": 226.0,
+        "y": 206,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "S1HeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "S1HeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "S1HeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "S1Stem",
+        "x": 216,
+        "y": 206,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "S1StemPath",
+            "width": 11.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "S1StemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "S1StemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "S2Head",
+        "x": 402.0,
+        "y": 206,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "S2HeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "S2HeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "S2HeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "S2Stem",
+        "x": 392,
+        "y": 206,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "S2StemPath",
+            "width": 11.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "S2StemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "S2StemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "S3Head",
+        "x": 578.0,
+        "y": 206,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "S3HeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "S3HeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "S3HeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "S3Stem",
+        "x": 568,
+        "y": 206,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "S3StemPath",
+            "width": 11.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "S3StemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "S3StemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "S4Head",
+        "x": 754.0,
+        "y": 206,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "S4HeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "S4HeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "S4HeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "S4Stem",
+        "x": 744,
+        "y": 206,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "S4StemPath",
+            "width": 11.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "S4StemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "S4StemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "P0Box",
+        "x": 128,
+        "y": 206,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "P0BoxPath",
+            "width": 156,
+            "height": 126,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "P0BoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "P0BoxSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "P0BoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "P0BoxStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "P1Box",
+        "x": 304,
+        "y": 206,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "P1BoxPath",
+            "width": 156,
+            "height": 126,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "P1BoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "P1BoxSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "P1BoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "P1BoxStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "P2Box",
+        "x": 480,
+        "y": 206,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "P2BoxPath",
+            "width": 156,
+            "height": 126,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "P2BoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "P2BoxSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "P2BoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "P2BoxStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "P3Box",
+        "x": 656,
+        "y": 206,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "P3BoxPath",
+            "width": 156,
+            "height": 126,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "P3BoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "P3BoxSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "P4Box",
+        "x": 832,
+        "y": 206,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "P4BoxPath",
+            "width": 156,
+            "height": 126,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "P4BoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "P4BoxSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "P4BoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "P4BoxStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 480,
+        "y": 330,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "Anything vaguer at any stage means you are one stage behind where you think."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 480,
+        "y": 190,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 960,
+            "height": 380,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

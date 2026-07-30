@@ -1,7 +1,0 @@
-[
-  {"do":"goto","url":"/academy","note":"academy"},
-  {"do":"click","target":"text:Sales Egoist"},
-  {"do":"waittext","value":"lesson"},
-  {"do":"shot","name":"course"},
-  {"do":"read"}
-]

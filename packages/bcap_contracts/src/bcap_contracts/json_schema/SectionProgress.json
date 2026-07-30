@@ -1,0 +1,60 @@
+{
+  "additionalProperties": false,
+  "description": "One advisor's standing on one section of a course (GRS-0226).\n\nThe unlock rule lives here — on the server — rather than being re-derived in the reader, so\n\"section N+1 opens when N is passed\" is stated once. It is a teaching gate, not a security\nboundary: a published course is org-wide readable and the tree carries its own answers to the\nbrowser. What this guarantees is that the *record* of passing is server-marked and append-only.",
+  "properties": {
+    "attempts": {
+      "minimum": 0,
+      "title": "Attempts",
+      "type": "integer"
+    },
+    "best_score": {
+      "anyOf": [
+        {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Best fraction correct so far; None if untried.",
+      "title": "Best Score"
+    },
+    "has_test": {
+      "description": "False for a legacy section with no test; never gates.",
+      "title": "Has Test",
+      "type": "boolean"
+    },
+    "module_id": {
+      "format": "uuid",
+      "title": "Module Id",
+      "type": "string"
+    },
+    "order": {
+      "minimum": 0,
+      "title": "Order",
+      "type": "integer"
+    },
+    "passed": {
+      "title": "Passed",
+      "type": "boolean"
+    },
+    "unlocked": {
+      "description": "The advisor may open this section's lessons.",
+      "title": "Unlocked",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "module_id",
+    "order",
+    "has_test",
+    "unlocked",
+    "passed",
+    "attempts"
+  ],
+  "title": "SectionProgress",
+  "type": "object"
+}

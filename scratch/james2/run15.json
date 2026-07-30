@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/pipeline","note":"pipeline"},
-  {"do":"click","target":"text:Brewin Dolphin"},
-  {"do":"read"},
-  {"do":"shot","name":"prospect-detail"},
-  {"do":"goto","url":"/assessments/68dd8d67-cdb7-4216-a559-6a96d9f711f8","note":"finalised sandbox"},
-  {"do":"click","target":"text:Deliverable"},
-  {"do":"read"}
-]

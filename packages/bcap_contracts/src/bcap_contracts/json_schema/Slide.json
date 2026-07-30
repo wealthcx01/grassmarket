@@ -1,0 +1,145 @@
+{
+  "$defs": {
+    "LessonAsset": {
+      "additionalProperties": false,
+      "description": "An interpretive diagram on a lesson (GRS-0190).\n\nAssets are inline SVG strings held in the content itself, not files. A published\n`CourseVersion` is an immutable snapshot, and a snapshot that pointed at external asset storage\nwould not actually be immutable: the file behind it could change or vanish. Raster images are\ndeliberately out of contract; a photograph belongs behind a `SourceRef`.",
+      "properties": {
+        "alt": {
+          "description": "Text alternative. Required, never derived.",
+          "minLength": 1,
+          "title": "Alt",
+          "type": "string"
+        },
+        "caption": {
+          "minLength": 1,
+          "title": "Caption",
+          "type": "string"
+        },
+        "svg": {
+          "minLength": 1,
+          "title": "Svg",
+          "type": "string"
+        }
+      },
+      "required": [
+        "caption",
+        "alt",
+        "svg"
+      ],
+      "title": "LessonAsset",
+      "type": "object"
+    },
+    "SlideKind": {
+      "description": "What a slide is for. The renderer styles by this, and the depth tests count by it: a lesson\nthat is 30 slides of prose and no doing is not the lesson the founder asked for.",
+      "enum": [
+        "concept",
+        "walkthrough",
+        "example",
+        "checkpoint"
+      ],
+      "title": "SlideKind",
+      "type": "string"
+    },
+    "SourceRef": {
+      "additionalProperties": false,
+      "description": "A cited public source on a lesson (GRS-0190).\n\n`url` is https-only at the CONTRACT, not merely in the renderer: schema validation refuses\n`http://` and non-URL strings, so a downgraded or javascript: link cannot reach a published\ncourse version in the first place. The renderer's own check is then a second line rather than\nthe only one.",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/SourceRefKind"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "url": {
+          "pattern": "^https://",
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "url",
+        "kind"
+      ],
+      "title": "SourceRef",
+      "type": "object"
+    },
+    "SourceRefKind": {
+      "description": "What kind of thing a lesson reference points at, so the reader can label the link card.",
+      "enum": [
+        "docs",
+        "video",
+        "blog",
+        "repo"
+      ],
+      "title": "SourceRefKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One slide of a lesson (GRS-0215).\n\nThe founder's standard, in their words: \"A lesson is 20-40 slides of interactive detail with a\ntest before the next section.\" A slide is the unit of that. It is deliberately small — one\nidea, one step, or one worked example — because the failure being corrected was lessons that\nwere a paragraph pretending to be a lesson.\n\n`body` is markdown. `asset` is an inline SVG, for the same immutability reason `LessonAsset`\nis: a published version that pointed at external storage would not actually be published.",
+  "properties": {
+    "asset": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/LessonAsset"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "body": {
+      "description": "Slide content, markdown.",
+      "minLength": 1,
+      "title": "Body",
+      "type": "string"
+    },
+    "checkpoint_prompt": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "What the advisor must actually do and confirm (CHECKPOINT slides only).",
+      "title": "Checkpoint Prompt"
+    },
+    "kind": {
+      "$ref": "#/$defs/SlideKind",
+      "default": "concept"
+    },
+    "order": {
+      "minimum": 0,
+      "title": "Order",
+      "type": "integer"
+    },
+    "references": {
+      "default": [],
+      "description": "Sources for THIS slide. A claim with no source does not belong on a slide.",
+      "items": {
+        "$ref": "#/$defs/SourceRef"
+      },
+      "title": "References",
+      "type": "array"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    }
+  },
+  "required": [
+    "order",
+    "title",
+    "body"
+  ],
+  "title": "Slide",
+  "type": "object"
+}

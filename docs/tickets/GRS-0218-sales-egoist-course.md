@@ -29,7 +29,7 @@ exactly the failure being complained about.
 
 ## Scope, once unblocked
 
-GRS-0215 structure: sections of 20 to 40 slides, a test between sections, sources cited per lesson.
+GRS-0215 structure: sections of lessons, each lesson 20 to 40 slides, a test between sections, sources cited per lesson.
 
 1. **The idea itself**, from the source rather than from a summary of it. What the Sales Egoist
    framing claims, where it came from, and what it argues against.

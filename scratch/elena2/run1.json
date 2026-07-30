@@ -1,7 +1,0 @@
-[
-  {"do":"goto","url":"/","note":"land on dashboard"},
-  {"do":"read"},
-  {"do":"goto","url":"/assessments","note":"portfolio / assessments"},
-  {"do":"read"},
-  {"do":"shot","name":"assessments"}
-]

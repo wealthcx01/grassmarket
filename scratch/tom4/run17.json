@@ -1,7 +1,0 @@
-[
-  {"do":"goto","url":"/engagements","note":"engagements"},
-  {"do":"click","target":"text:SJP Platform Power engagement"},
-  {"do":"read"},
-  {"do":"shot","name":"engagement-detail"},
-  {"do":"read"}
-]

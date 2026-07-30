@@ -1,6 +1,0 @@
-[
-  {"do":"goto","url":"/workbench","note":"workbench"},
-  {"do":"click","target":"text:Open the Academy"},
-  {"do":"read"},
-  {"do":"shot","name":"academy-real"}
-]

@@ -1,8 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio page"},
-  {"do":"read"},
-  {"do":"shot","name":"t06-assessments"},
-  {"do":"click","target":"text:New assessment","note":"start wizard"},
-  {"do":"read"},
-  {"do":"shot","name":"t07-new-assessment"}
-]

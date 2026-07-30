@@ -1,7 +1,0 @@
-[
-  {"do":"goto","url":"/engagements/7cc58a54-e9b8-4b20-8b93-ae984ab6d9cf"},
-  {"do":"select","target":"select:has(option:text-is('Deutsche Börse'))","value":"bde5bfc9-9ecf-499d-83db-acc530e81fb9"},
-  {"do":"read"},
-  {"do":"click","target":"button:text-is('Link')"},
-  {"do":"read"}
-]

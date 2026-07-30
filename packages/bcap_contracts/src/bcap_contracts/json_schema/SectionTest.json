@@ -1,0 +1,65 @@
+{
+  "$defs": {
+    "TestQuestion": {
+      "additionalProperties": false,
+      "description": "One question on a section test (GRS-0215). Multiple choice with exactly one right answer:\na section gate has to be markable without a human in the loop, and a free-text answer is not.",
+      "properties": {
+        "answer_index": {
+          "minimum": 0,
+          "title": "Answer Index",
+          "type": "integer"
+        },
+        "explanation": {
+          "minLength": 1,
+          "title": "Explanation",
+          "type": "string"
+        },
+        "options": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 2,
+          "title": "Options",
+          "type": "array"
+        },
+        "prompt": {
+          "minLength": 1,
+          "title": "Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "prompt",
+        "options",
+        "answer_index",
+        "explanation"
+      ],
+      "title": "TestQuestion",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The test a learner passes before the next section opens (GRS-0215).\n\n`pass_mark` is a fraction of questions correct. It is declared per test rather than fixed\nglobally so a heavier section can demand more, and it is validated here rather than assumed by\nthe marker.",
+  "properties": {
+    "pass_mark": {
+      "default": 0.8,
+      "exclusiveMinimum": 0.0,
+      "maximum": 1.0,
+      "title": "Pass Mark",
+      "type": "number"
+    },
+    "questions": {
+      "items": {
+        "$ref": "#/$defs/TestQuestion"
+      },
+      "minItems": 1,
+      "title": "Questions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "questions"
+  ],
+  "title": "SectionTest",
+  "type": "object"
+}

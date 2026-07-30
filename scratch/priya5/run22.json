@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/engagements/e1cd786e-5396-4cc0-b5bf-d4f07288b12d","waitfor":"ENGAGEMENT"},
-  {"do":"select","target":"xpath=(//select)[1]","value":"LSEG"},
-  {"do":"click","target":"text:Link"},
-  {"do":"read"},
-  {"do":"click","target":"text:Generate"},
-  {"do":"read"},
-  {"do":"shot","name":"33-deliverable-gen","full":true}
-]

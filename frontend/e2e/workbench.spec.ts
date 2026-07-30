@@ -39,11 +39,21 @@ test.describe("GRS-0027 — Workbench", () => {
     await expect(page.getByText("Trained")).toBeVisible();
   });
 
-  test("an ordinary consultant does not see the Committee tab", async ({ page }) => {
-    // The seeded advisor is a plain consultant — role gating mirrors the API (committee is 403 there).
+  test("the advisor gets the four tabs, and no retired governance tab", async ({ page }) => {
+    // ADR-0041 (GRS-0188): peer governance is retired, so Committee and Calibration are gone for
+    // everyone — not role-gated. Founder review is absent because the seeded advisor is not the
+    // founder reviewer; the Workbench asks the server rather than deciding that in the browser.
     await login(page);
     await page.goto("/workbench");
     await expect(page.getByRole("tab", { name: "Bench" })).toBeVisible();
-    await expect(page.getByRole("tab", { name: "Committee" })).toHaveCount(0);
+    await expect(page.getByRole("tab")).toHaveText([
+      "Bench",
+      "Certification",
+      "Learning & Drills",
+      "Practice Arena",
+    ]);
+    for (const gone of ["Committee", "Calibration", "Rating requests", "Founder review"]) {
+      await expect(page.getByRole("tab", { name: gone })).toHaveCount(0);
+    }
   });
 });

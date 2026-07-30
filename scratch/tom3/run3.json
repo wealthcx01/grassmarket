@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/cfc53762-0581-4523-bca3-bd9ef1b352b0","note":"reopen wizard"},
-  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
-  {"do":"read"},
-  {"do":"shot","name":"infra-deepdive"},
-  {"do":"click","target":"text:2. Business Metrics"},
-  {"do":"read"},
-  {"do":"shot","name":"biz-metrics"}
-]

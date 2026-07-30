@@ -1,0 +1,878 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "SegmentTriggers",
+    "width": 960,
+    "height": 500,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 480,
+        "y": 44,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "Sell to the trigger, not to the product"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "HSeg",
+        "x": 176,
+        "y": 104,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "HSegStyle",
+            "font_asset": "Display",
+            "font_size": 13,
+            "children": [
+              {
+                "type": "fill",
+                "name": "HSegStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "HSegStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "HSegRun",
+            "style": "HSegStyle",
+            "text": "SEGMENT"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "HTrig",
+        "x": 500,
+        "y": 104,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "HTrigStyle",
+            "font_asset": "Display",
+            "font_size": 13,
+            "children": [
+              {
+                "type": "fill",
+                "name": "HTrigStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "HTrigStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "HTrigRun",
+            "style": "HTrigStyle",
+            "text": "WHAT OPENS IT"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "HWho",
+        "x": 806,
+        "y": 104,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "HWhoStyle",
+            "font_asset": "Display",
+            "font_size": 13,
+            "children": [
+              {
+                "type": "fill",
+                "name": "HWhoStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "HWhoStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "HWhoRun",
+            "style": "HWhoStyle",
+            "text": "WHO FEELS IT"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T0Seg",
+        "x": 176,
+        "y": 150,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T0SegStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T0SegStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T0SegStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "T0SegRun",
+            "style": "T0SegStyle",
+            "text": "Retail brokerage"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T0Trig",
+        "x": 500,
+        "y": 150,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T0TrigStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T0TrigStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T0TrigStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "T0TrigRun",
+            "style": "T0TrigStyle",
+            "text": "research cost"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T0Who",
+        "x": 806,
+        "y": 150,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T0WhoStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T0WhoStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T0WhoStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "T0WhoRun",
+            "style": "T0WhoStyle",
+            "text": "head of research"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T1Seg",
+        "x": 176,
+        "y": 214,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T1SegStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T1SegStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T1SegStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "T1SegRun",
+            "style": "T1SegStyle",
+            "text": "Wealth manager"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T1Trig",
+        "x": 500,
+        "y": 214,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T1TrigStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T1TrigStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T1TrigStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "T1TrigRun",
+            "style": "T1TrigStyle",
+            "text": "consistency and supervision"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T1Who",
+        "x": 806,
+        "y": 214,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T1WhoStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T1WhoStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T1WhoStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "T1WhoRun",
+            "style": "T1WhoStyle",
+            "text": "compliance-adjacent"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T2Seg",
+        "x": 176,
+        "y": 278,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T2SegStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T2SegStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T2SegStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "T2SegRun",
+            "style": "T2SegStyle",
+            "text": "Exchange"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T2Trig",
+        "x": 500,
+        "y": 278,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T2TrigStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T2TrigStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T2TrigStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "T2TrigRun",
+            "style": "T2TrigStyle",
+            "text": "product insight on their own feeds"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T2Who",
+        "x": 806,
+        "y": 278,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T2WhoStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T2WhoStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T2WhoStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "T2WhoRun",
+            "style": "T2WhoStyle",
+            "text": "data product manager"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T3Seg",
+        "x": 176,
+        "y": 342,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T3SegStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T3SegStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T3SegStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "T3SegRun",
+            "style": "T3SegStyle",
+            "text": "Bank"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T3Trig",
+        "x": 500,
+        "y": 342,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T3TrigStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T3TrigStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T3TrigStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "T3TrigRun",
+            "style": "T3TrigStyle",
+            "text": "consolidation and AI governance"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T3Who",
+        "x": 806,
+        "y": 342,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T3WhoStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T3WhoStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T3WhoStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "T3WhoRun",
+            "style": "T3WhoStyle",
+            "text": "the architect"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T4Seg",
+        "x": 176,
+        "y": 406,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T4SegStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T4SegStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T4SegStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "T4SegRun",
+            "style": "T4SegStyle",
+            "text": "Information vendor"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T4Trig",
+        "x": 500,
+        "y": 406,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T4TrigStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T4TrigStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T4TrigStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "T4TrigRun",
+            "style": "T4TrigStyle",
+            "text": "distribution, not consumption"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T4Who",
+        "x": 806,
+        "y": 406,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T4WhoStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T4WhoStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T4WhoStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "T4WhoRun",
+            "style": "T4WhoStyle",
+            "text": "commercial lead"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "HeadRule",
+        "x": 480,
+        "y": 122,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "HeadRulePath",
+            "width": 880,
+            "height": 2,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "HeadRuleFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "HeadRuleSolid",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "T0Row",
+        "x": 480,
+        "y": 150,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "T0RowPath",
+            "width": 880,
+            "height": 52,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "T0RowFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "T0RowSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "T2Row",
+        "x": 480,
+        "y": 278,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "T2RowPath",
+            "width": 880,
+            "height": 52,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "T2RowFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "T2RowSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "T4Row",
+        "x": 480,
+        "y": 406,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "T4RowPath",
+            "width": 880,
+            "height": 52,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "T4RowFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "T4RowSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 480,
+        "y": 462,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "Nobody buys a workspace. They buy the end of one specific irritation."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 480,
+        "y": 250,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 960,
+            "height": 500,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

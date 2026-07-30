@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","waitfor":"Your Portfolio"},
-  {"do":"fill","target":"placeholder:Type to find","value":"Deutsche Börse"},
-  {"do":"read"},
-  {"do":"click","target":"text:Exchange / market infrastructure"},
-  {"do":"click","target":"text:Create & open"},
-  {"do":"read"},
-  {"do":"shot","name":"wizard-start"}
-]

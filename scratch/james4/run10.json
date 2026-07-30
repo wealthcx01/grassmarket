@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/profile","note":"profile"},
-  {"do":"fill","target":"label:Current password","value":"definitely-wrong-000"},
-  {"do":"fill","target":"label:New password","value":"BrandNewPass-2026"},
-  {"do":"fill","target":"label:Confirm new password","value":"BrandNewPass-2026"},
-  {"do":"click","target":"role:button:Update password"},
-  {"do":"read"},
-  {"do":"shot","name":"pw-wrong-current"}
-]

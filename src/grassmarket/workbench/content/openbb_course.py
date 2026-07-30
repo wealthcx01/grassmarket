@@ -24,6 +24,7 @@ from uuid import NAMESPACE_URL, UUID, uuid5
 from bcap_contracts.commissions import ProductCommissionCarrot
 from bcap_contracts.learning import CourseModule, CourseTree, Lesson, LessonAuthor
 
+from grassmarket.workbench.content.openbb_slides import rebuilt_sections
 from grassmarket.workbench.content.product_course import ProductCourseSpec, build_product_course
 
 OPENBB_PRODUCT_ID = "openbb"
@@ -487,30 +488,42 @@ def openbb_course(carrot: ProductCommissionCarrot) -> CourseTree:
     base = build_product_course(
         spec, carrot, _TEMPLATE_CHECKS
     )  # 1 module (4 canonical sections incl. live commission)
-    deep = (
-        CourseModule(
-            id=_id("module", "what-it-is"),
-            title="What OpenBB actually is",
-            order=1,
-            lessons=_lessons(_WHAT_IT_IS, 0),
-        ),
-        CourseModule(
-            id=_id("module", "use-cases"),
-            title="Use cases you can sell for",
-            order=2,
-            lessons=_lessons(_USE_CASES, 0),
-        ),
-        CourseModule(
-            id=_id("module", "white-label-build"),
-            title="The white-label & build angle",
-            order=3,
-            lessons=_lessons(_WHITE_LABEL, 0),
-        ),
-        CourseModule(
-            id=_id("module", "conviction"),
-            title="Conviction & the founder thesis",
-            order=4,
-            lessons=_lessons(_CONVICTION, 0),
-        ),
+
+    # The GRS-0216 rebuild. These sections are written to the GRS-0215 depth standard: a lesson of
+    # 20 to 40 slides and a test the advisor passes before the next section opens. They come FIRST,
+    # because they are the course now.
+    rebuilt = rebuilt_sections()
+
+    # The 2026-07 material, kept until its replacement is written rather than deleted first. It is
+    # retitled so nobody mistakes it for the rebuild: these are the paragraph-lessons the founder
+    # called basic, and they stay only so the course is not thinner in the meantime.
+    legacy_titles = {
+        "what-it-is": "Reference (pending rebuild): what OpenBB actually is",
+        "use-cases": "Reference (pending rebuild): use cases you can sell for",
+        "white-label-build": "Reference (pending rebuild): the white-label and build angle",
+        "conviction": "Reference (pending rebuild): conviction and the founder thesis",
+    }
+    legacy_specs = (
+        ("what-it-is", _WHAT_IT_IS),
+        ("use-cases", _USE_CASES),
+        ("white-label-build", _WHITE_LABEL),
+        ("conviction", _CONVICTION),
     )
-    return base.model_copy(update={"modules": base.modules + deep})
+    legacy = tuple(
+        CourseModule(
+            id=_id("module", key),
+            title=legacy_titles[key],
+            order=0,  # renumbered below, with everything else
+            lessons=_lessons(entries, 0),
+        )
+        for key, entries in legacy_specs
+    )
+
+    # Three sources, one sequence. Each numbered itself from zero, which put the canonical product
+    # module on the same `order` as the first rebuilt section. The unlock rule reads `order`, so
+    # that duplicate opened section 2 to an advisor who had passed nothing — the gate was reading a
+    # tie. Reading order is the only authority on section number, so it is applied here, once, to
+    # the assembled tree rather than guessed at by each source.
+    assembled = rebuilt + base.modules + legacy
+    numbered = tuple(m.model_copy(update={"order": i}) for i, m in enumerate(assembled))
+    return base.model_copy(update={"modules": numbered})

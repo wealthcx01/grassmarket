@@ -1,6 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/464ab7ec-45bc-4b1c-97b2-cea508677a25","note":"exchange wizard"},
-  {"do":"click","target":"text:5. Customer Proposition"},
-  {"do":"read"},
-  {"do":"shot","name":"customer-proposition"}
-]

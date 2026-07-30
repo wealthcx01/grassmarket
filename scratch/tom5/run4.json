@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio"},
-  {"do":"fill","target":"placeholder:Type to find the company in the registry, or enter any name to keep it manual","value":"St. James's Place (SJP Wealth)"},
-  {"do":"click","target":"text:Wealth / investment management"},
-  {"do":"shot","name":"newform"},
-  {"do":"click","target":"text:Create & open"},
-  {"do":"shot","name":"wizard-open"},
-  {"do":"read"}
-]

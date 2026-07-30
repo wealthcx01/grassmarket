@@ -1,8 +1,0 @@
-[
-  {"do":"goto","url":"/workbench/academy/sales-egoist"},
-  {"do":"waittext","value":"The Zero-Sum Pipeline"},
-  {"do":"fill","target":":nth-match(textarea, 1)","value":"Because the pipeline is zero-sum: any conversation I do not advance, a competitor advances instead. Passivity is therefore a transfer of position, not a neutral state. The Egoist owns a dated next step on every live account so no deal decays by default."},
-  {"do":"click","target":":nth-match(button:has-text('Reveal model answer'), 1)"},
-  {"do":"read"},
-  {"do":"shot","name":"39-academy-check","full":true}
-]

@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/workbench","note":"workbench"},
-  {"do":"click","target":"text:Open the Academy","note":"follow academy link"},
-  {"do":"read"},
-  {"do":"shot","name":"academy_real"},
-  {"do":"click","target":"text:Sales Egoist","note":"open a course"},
-  {"do":"read"},
-  {"do":"shot","name":"course"}
-]

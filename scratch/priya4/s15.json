@@ -1,8 +1,0 @@
-[
-  {"do":"goto","url":"/engagements","note":"engagements"},
-  {"do":"shot","name":"engagements"},
-  {"do":"read"},
-  {"do":"goto","url":"/earnings","waitfor":"Earnings"},
-  {"do":"shot","name":"earnings"},
-  {"do":"read"}
-]

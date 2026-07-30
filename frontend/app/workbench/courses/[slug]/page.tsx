@@ -296,6 +296,9 @@ function ModuleEditor({
       video_ref: lessonVideo.trim() || null,
       references: lessonReferences,
       assets: [],
+      // This editor authors a body lesson; slide authoring is not built (GRS-0215 scope item 4).
+      // An empty list is the honest value — the reader falls back to `body` when there are none.
+      slides: [],
       drill_topics: [],
       measurement: null,
       // A human lesson is inherently approved; an AI lesson starts unapproved and is gated.

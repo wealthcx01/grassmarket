@@ -1,8 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/b8cb1fa8-b952-4625-954b-d579453571f4","waitfor":"Deutsche Börse"},
-  {"do":"click","target":"text:2. Business Metrics"},
-  {"do":"fill","target":"placeholder:value","value":"1"},
-  {"do":"click","target":"text:6. Summary & Interpretation"},
-  {"do":"click","target":"text:Refresh"},
-  {"do":"read"}
-]

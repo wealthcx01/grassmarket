@@ -1,6 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio"},
-  {"do":"click","target":"text:SJP Sandbox Deliv2"},
-  {"do":"shot","name":"finalised-open"},
-  {"do":"read"}
-]

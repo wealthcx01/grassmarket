@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments"},
-  {"do":"click","target":"input[type=\"checkbox\"]"},
-  {"do":"shot","name":"32-sbx-check"},
-  {"do":"fill","target":"input[type=\"text\"]","value":"Robinhood SBX"},
-  {"do":"click","target":"text:Create & open"},
-  {"do":"read","note":"sandbox wizard url + badge"},
-  {"do":"shot","name":"33-sbx-wizard"}
-]

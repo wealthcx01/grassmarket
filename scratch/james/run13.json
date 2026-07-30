@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/deliverables","note":"deliverables"},
-  {"do":"read"},
-  {"do":"shot","name":"deliverables"},
-  {"do":"goto","url":"/assessments/fe7d771b-c8fe-4261-877a-c3f72fcd6da1","note":"wizard"},
-  {"do":"click","target":"text:6. Summary & Interpretation"},
-  {"do":"read"},
-  {"do":"shot","name":"summary-tab"}
-]

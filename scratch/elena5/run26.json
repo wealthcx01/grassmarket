@@ -1,6 +1,0 @@
-[
-  {"do":"goto","url":"/engagements/7cc58a54-e9b8-4b20-8b93-ae984ab6d9cf"},
-  {"do":"select","target":":nth-match(select, 1)","value":"Deutsche Börse"},
-  {"do":"click","target":"text:Link"},
-  {"do":"read"}
-]

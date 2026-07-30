@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/b6fd32d9-90eb-4040-8699-a599949edf8b","note":"locked assessment"},
-  {"do":"click","target":"text:7. Scenarios"},
-  {"do":"read"},
-  {"do":"shot","name":"t54-scenarios-locked"},
-  {"do":"click","target":"text:+ Add scenario"},
-  {"do":"read"},
-  {"do":"shot","name":"t55-scenario-add"}
-]

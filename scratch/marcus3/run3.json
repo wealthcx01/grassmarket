@@ -1,8 +1,0 @@
-[
-  {"do":"goto","url":"/profile","note":"profile page"},
-  {"do":"read"},
-  {"do":"goto","url":"/settings","note":"settings page"},
-  {"do":"read"},
-  {"do":"goto","url":"/help","note":"help"},
-  {"do":"read"}
-]

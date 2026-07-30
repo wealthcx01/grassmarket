@@ -1,8 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio — Segment column"},
-  {"do":"read","note":"segment shows Retail brokerage + C column"},
-  {"do":"shot","name":"pol-01-portfolio","full":true},
-  {"do":"goto","url":"/earnings","waitfor":"Earnings","note":"earnings — Attribution column"},
-  {"do":"read","note":"attribution shows product names"},
-  {"do":"shot","name":"pol-02-earnings","full":true}
-]

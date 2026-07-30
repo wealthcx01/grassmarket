@@ -1,7 +1,0 @@
-[
-  {"do":"goto","url":"/prospects/d014f647-26cc-4768-a47c-1abca24752b1","note":"full record"},
-  {"do":"fill","target":"input[placeholder='Engagement title']","value":"SJP Platform Power diagnostic"},
-  {"do":"click","target":"text:Open engagement"},
-  {"do":"read"},
-  {"do":"shot","name":"t30-engagement-open"}
-]

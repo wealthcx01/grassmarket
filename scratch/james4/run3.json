@@ -1,6 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio"},
-  {"do":"click","target":"text:RBC Brewin Dolphin"},
-  {"do":"read"},
-  {"do":"shot","name":"wizard1"}
-]

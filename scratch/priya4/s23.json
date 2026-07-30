@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio"},
-  {"do":"click","target":"text:LSEG Sandbox Exchange Test"},
-  {"do":"shot","name":"sandbox_open"},
-  {"do":"read"},
-  {"do":"click","target":"text:6. Summary"},
-  {"do":"shot","name":"sandbox_summary"},
-  {"do":"read"}
-]

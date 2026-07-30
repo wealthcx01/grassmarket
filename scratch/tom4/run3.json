@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio"},
-  {"do":"select","target":"label:Operating model","value":"wealth"},
-  {"do":"fill","target":"input[type=text]","value":"SJP Wealth Test"},
-  {"do":"click","target":"role:button:Create & open"},
-  {"do":"waittext","value":"Business"},
-  {"do":"read"},
-  {"do":"shot","name":"wizard-open"}
-]

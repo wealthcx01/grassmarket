@@ -1,7 +1,0 @@
-[
-  {"do":"goto","url":"/workbench","note":"workbench"},
-  {"do":"click","target":"text:Learning & Drills"},
-  {"do":"waittext","value":"Drill"},
-  {"do":"shot","name":"drills"},
-  {"do":"read"}
-]

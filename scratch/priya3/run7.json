@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio"},
-  {"do":"click","target":"text:Sandbox preview — finalise solo & see the real deliverable (watermarked)"},
-  {"do":"read"},
-  {"do":"shot","name":"sandbox_click"},
-  {"do":"goto","url":"/earnings","note":"earnings"},
-  {"do":"read"},
-  {"do":"shot","name":"earnings"}
-]

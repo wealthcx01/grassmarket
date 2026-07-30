@@ -1,7 +1,0 @@
-[
-  {"do":"goto","url":"/workbench/academy/sales-egoist","note":"course"},
-  {"do":"fill","target":"placeholder:Answer from memory before revealing — that’s what makes it stick.","value":"Because a rival advances if you do not; the Egoist owns the next dated step of every live account."},
-  {"do":"click","target":"text:Reveal model answer"},
-  {"do":"shot","name":"check_revealed"},
-  {"do":"read"}
-]

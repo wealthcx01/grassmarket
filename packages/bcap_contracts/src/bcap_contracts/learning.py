@@ -205,7 +205,13 @@ class LessonAuthor(StrEnum):
 class Lesson(BaseModel):
     """One teaching unit inside a module: a markdown body, an optional video, and links to the
     spaced-repetition drill topics it reinforces. An AI-authored lesson (`author == AI`) is not
-    ``approved`` until a human signs off — the approver is then recorded (ADR-0009)."""
+    ``approved`` until a human signs off — the approver is then recorded (ADR-0009).
+
+    `slides` is where the teaching now lives (GRS-0215). `body` remains the lesson's opening — what
+    this lesson is for and what the advisor will be able to do at the end — and is no longer
+    expected to carry the content on its own. Existing courses with no slides still validate; the
+    depth tests, not the contract, are what refuse a thin course, so a legacy course can be read
+    while it waits to be rebuilt."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -220,6 +226,9 @@ class Lesson(BaseModel):
     )
     assets: tuple[LessonAsset, ...] = Field(
         default=(), description="Inline SVG diagrams rendered with the lesson body (GRS-0190)."
+    )
+    slides: tuple[Slide, ...] = Field(
+        default=(), description="The lesson's slides, in order (GRS-0215)."
     )
     drill_topics: tuple[str, ...] = Field(
         default=(), description="Existing DrillCard topics this lesson reinforces (e.g. 'power:…')."
@@ -257,8 +266,96 @@ class Lesson(BaseModel):
         return self
 
 
+class SlideKind(StrEnum):
+    """What a slide is for. The renderer styles by this, and the depth tests count by it: a lesson
+    that is 30 slides of prose and no doing is not the lesson the founder asked for."""
+
+    CONCEPT = "concept"  # explains something
+    WALKTHROUGH = "walkthrough"  # the advisor follows steps, usually with a command or a click path
+    EXAMPLE = "example"  # a worked case, ideally a real firm from the registry
+    CHECKPOINT = "checkpoint"  # the advisor produces something and confirms they did
+
+
+class Slide(BaseModel):
+    """One slide of a lesson (GRS-0215).
+
+    The founder's standard, in their words: "A lesson is 20-40 slides of interactive detail with a
+    test before the next section." A slide is the unit of that. It is deliberately small — one
+    idea, one step, or one worked example — because the failure being corrected was lessons that
+    were a paragraph pretending to be a lesson.
+
+    `body` is markdown. `asset` is an inline SVG, for the same immutability reason `LessonAsset`
+    is: a published version that pointed at external storage would not actually be published.
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    order: int = Field(ge=0)
+    kind: SlideKind = SlideKind.CONCEPT
+    title: str = Field(min_length=1)
+    body: str = Field(min_length=1, description="Slide content, markdown.")
+    asset: LessonAsset | None = None
+    references: tuple[SourceRef, ...] = Field(
+        default=(),
+        description="Sources for THIS slide. A claim with no source does not belong on a slide.",
+    )
+    # A CHECKPOINT slide asks the advisor to do something and confirm it. Anything else leaves this
+    # None; a checkpoint without it is refused below, because a checkpoint you cannot complete is
+    # just a slide with an imperative mood.
+    checkpoint_prompt: str | None = Field(
+        default=None,
+        description="What the advisor must actually do and confirm (CHECKPOINT slides only).",
+    )
+
+    @model_validator(mode="after")
+    def _checkpoint_has_a_prompt(self) -> Slide:
+        if self.kind is SlideKind.CHECKPOINT and not (self.checkpoint_prompt or "").strip():
+            raise ValueError("A checkpoint slide must say what the advisor has to do.")
+        if self.kind is not SlideKind.CHECKPOINT and self.checkpoint_prompt is not None:
+            raise ValueError("Only a checkpoint slide carries a checkpoint prompt.")
+        return self
+
+
+class TestQuestion(BaseModel):
+    """One question on a section test (GRS-0215). Multiple choice with exactly one right answer:
+    a section gate has to be markable without a human in the loop, and a free-text answer is not."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    prompt: str = Field(min_length=1)
+    options: tuple[str, ...] = Field(min_length=2)
+    answer_index: int = Field(ge=0)
+    # Shown after the learner answers, right or wrong. A test that only says "wrong" teaches
+    # nothing, and this gate exists to teach rather than to filter.
+    explanation: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _answer_is_in_range(self) -> TestQuestion:
+        if self.answer_index >= len(self.options):
+            raise ValueError("answer_index points past the end of the options.")
+        return self
+
+
+class SectionTest(BaseModel):
+    """The test a learner passes before the next section opens (GRS-0215).
+
+    `pass_mark` is a fraction of questions correct. It is declared per test rather than fixed
+    globally so a heavier section can demand more, and it is validated here rather than assumed by
+    the marker.
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    questions: tuple[TestQuestion, ...] = Field(min_length=1)
+    pass_mark: float = Field(default=0.8, gt=0.0, le=1.0)
+
+
 class CourseModule(BaseModel):
-    """An ordered group of lessons within a course."""
+    """An ordered group of lessons within a course — a SECTION, in the founder's language.
+
+    `section_test` is the gate: the learner passes it before the next section opens (GRS-0215).
+    Optional at the contract so a legacy course still validates, required by the depth tests for
+    any course claiming to meet the standard."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -266,6 +363,7 @@ class CourseModule(BaseModel):
     title: str = Field(min_length=1)
     order: int = Field(ge=0)
     lessons: tuple[Lesson, ...] = ()
+    section_test: SectionTest | None = None
 
 
 class CourseTree(BaseModel):
@@ -311,6 +409,41 @@ class CourseVersion(BaseModel):
     tree: CourseTree
     published_by_consultant_id: UUID
     published_at: datetime
+
+
+class SectionTestAttempt(OwnedResource):
+    """One advisor's attempt at one section test (GRS-0215). Append-only: a retake is a new row, so
+    the record shows how many goes it took rather than only the last answer."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    course_id: UUID
+    module_id: UUID
+    score: float = Field(ge=0.0, le=1.0, description="Fraction correct.")
+    passed: bool
+    attempted_at: datetime
+
+
+class SectionProgress(BaseModel):
+    """One advisor's standing on one section of a course (GRS-0226).
+
+    The unlock rule lives here — on the server — rather than being re-derived in the reader, so
+    "section N+1 opens when N is passed" is stated once. It is a teaching gate, not a security
+    boundary: a published course is org-wide readable and the tree carries its own answers to the
+    browser. What this guarantees is that the *record* of passing is server-marked and append-only.
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    module_id: UUID
+    order: int = Field(ge=0)
+    has_test: bool = Field(description="False for a legacy section with no test; never gates.")
+    unlocked: bool = Field(description="The advisor may open this section's lessons.")
+    passed: bool
+    best_score: float | None = Field(
+        default=None, ge=0.0, le=1.0, description="Best fraction correct so far; None if untried."
+    )
+    attempts: int = Field(ge=0)
 
 
 class LessonCompletion(OwnedResource):

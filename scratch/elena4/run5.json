@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/24ee60a9-42b3-4d55-8932-b24f0762950a","note":"wizard"},
-  {"do":"click","target":"text:3. Powers"},
-  {"do":"read"},
-  {"do":"shot","name":"powers"},
-  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
-  {"do":"read"},
-  {"do":"shot","name":"infra"}
-]

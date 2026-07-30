@@ -1,6 +1,0 @@
-[
-  {"do":"goto","url":"/workbench/academy","note":"academy"},
-  {"do":"click","target":"text:Sales Egoist","note":"open first course"},
-  {"do":"read"},
-  {"do":"shot","name":"course"}
-]

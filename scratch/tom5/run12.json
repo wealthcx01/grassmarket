@@ -1,8 +1,0 @@
-[
-  {"do":"goto","url":"/engagements/a58805de-23b6-48e3-b3e8-5e315040ddb9","note":"engagement","waitfor":"Deliverables"},
-  {"do":"select","target":"label:Document","value":"Executive Summary"},
-  {"do":"select","target":"label:Audience","value":"Internal draft"},
-  {"do":"click","target":"text:Generate"},
-  {"do":"shot","name":"internal-generated"},
-  {"do":"read"}
-]

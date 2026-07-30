@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments"},
-  {"do":"fill","target":"input[type=\"text\"]","value":"Robinhood"},
-  {"do":"select","target":"label:Operating model","value":"retail_brokerage"},
-  {"do":"click","target":"text:Create & open"},
-  {"do":"read","note":"wizard opens?"},
-  {"do":"shot","name":"08-wizard"},
-  {"do":"read"}
-]

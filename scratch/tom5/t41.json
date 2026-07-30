@@ -1,7 +1,0 @@
-[
-  {"do":"goto","url":"/workbench/academy/sales-egoist","note":"course"},
-  {"do":"fill","target":"textarea >> nth=0","value":"Because the pipeline is zero-sum: any conversation I fail to advance, a competitor advances instead. The Egoist therefore owns a dated next step on every live account so no deal drifts by default."},
-  {"do":"click","target":"button:text-is('Reveal model answer') >> nth=0"},
-  {"do":"read"},
-  {"do":"shot","name":"t52-check-revealed"}
-]

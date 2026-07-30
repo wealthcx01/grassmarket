@@ -48,13 +48,6 @@ from grassmarket.web.app import create_app  # noqa: E402
 
 DEMO_EMAIL = "advisor@bruntsfieldcapital.com"
 DEMO_PASSWORD = "grassmarket-demo"  # pragma: allowlist secret  (local dev seed only)
-# A second rater — dual rating is mandatory before an assessment can finalise (Methodology §9,
-# GRS-0020). The demo advisor leads; this consultant supplies the independent second opinion.
-REVIEWER_EMAIL = "reviewer@bruntsfieldcapital.com"
-# A committee member (peer sign-off on high-stakes ratings, §8) — never the lead.
-COMMITTEE_EMAIL = "committee@bruntsfieldcapital.com"
-_DUAL_MODULE = "APP_SERVER"
-_DUAL_SUB = "APP_SERVER_SECURITY_COMPLIANCE"
 _TO_CONTRACTED = (
     PipelineStage.WORKSHOP_SCHEDULED,
     PipelineStage.WORKSHOP_DELIVERED,
@@ -154,15 +147,6 @@ def _headers(settings, stored) -> dict:
     return {"Authorization": f"Bearer {token}"}
 
 
-def _rating_body(level: MaturityLevel) -> dict:
-    return {
-        "module_key": _DUAL_MODULE,
-        "subcomponent_key": _DUAL_SUB,
-        "level": level.value,
-        "evidence_grade": EvidenceGrade.E3_ARTIFACT.value,
-    }
-
-
 def main() -> None:
     settings = get_settings()
     engine = make_engine(settings.database_url)
@@ -172,8 +156,14 @@ def main() -> None:
     stored = _ensure_consultant(
         session_factory, email=DEMO_EMAIL, full_name="Demo Advisor", password=DEMO_PASSWORD
     )
-    reviewer = _ensure_consultant(
-        session_factory, email=REVIEWER_EMAIL, full_name="Demo Reviewer", password=None
+    # The founder reviewer (ADR-0041). Identity is derived per request from the token's email
+    # against `founder_reviewer_email` — not a role and not a column — so the seed only has to
+    # create a consultant under that address for the gate to recognise them.
+    founder = _ensure_consultant(
+        session_factory,
+        email=settings.founder_reviewer_email,
+        full_name="Demo Founder",
+        password=None,
     )
     # An admin seeds the Academy catalog content (authoring is admin-gated, ADR-0028).
     admin = _ensure_consultant(
@@ -185,7 +175,7 @@ def main() -> None:
     )
     _seed_academy(session_factory, admin)
     headers = _headers(settings, stored)
-    reviewer_headers = _headers(settings, reviewer)
+    founder_headers = _headers(settings, founder)
 
     client = TestClient(create_app(settings=settings, engine=engine))
 
@@ -204,50 +194,19 @@ def main() -> None:
         headers=headers,
     )
 
-    # Dual rating → consensus for the one assessed subcomponent, before finalising (Methodology §9).
-    for rater_id in (stored.id, reviewer.id):
-        client.post(
-            f"/assessments/{aid}/modules/{_DUAL_MODULE}/raters",
-            json={"rater_consultant_id": str(rater_id)},
-            headers=headers,  # the lead assigns
+    # The founder review gate (ADR-0041, GRS-0188): a production record cannot finalise until the
+    # founder has approved the version in front of them. This replaced the dual-rating consensus
+    # and Rating Committee steps that used to sit here — both now answer 410 Gone, which is how
+    # this seed broke: it kept calling them and read the refusal body as a queue.
+    submitted = client.post(f"/assessments/{aid}/submit-for-review", headers=headers)
+    if submitted.status_code != 200:
+        raise SystemExit(
+            f"Seed failed to submit for founder review: {submitted.status_code} {submitted.text}"
         )
-    for rater_headers in (headers, reviewer_headers):
-        client.put(
-            f"/assessments/{aid}/modules/{_DUAL_MODULE}/my-rating",
-            json={"ratings": [_rating_body(MaturityLevel.ADVANCED)]},
-            headers=rater_headers,
-        )
-        client.post(
-            f"/assessments/{aid}/modules/{_DUAL_MODULE}/my-rating/submit", headers=rater_headers
-        )
-    client.post(
-        f"/assessments/{aid}/modules/{_DUAL_MODULE}/consensus",
-        json={"resolved": [_rating_body(MaturityLevel.ADVANCED)]},
-        headers=headers,
-    )
-
-    # Rating Committee sign-off on the high-stakes triad ratings before finalising (§8, GRS-0021).
-    # A committee member (never the lead — peer challenge) approves every item on the queue.
-    committee = _ensure_consultant(
-        session_factory,
-        email=COMMITTEE_EMAIL,
-        full_name="Demo Committee",
-        password=None,
-        role=Role.COMMITTEE_MEMBER,
-    )
-    committee_headers = _headers(settings, committee)
-    for entry in client.get(f"/assessments/{aid}/committee", headers=headers).json():
-        item = entry["item"]
-        client.post(
-            f"/assessments/{aid}/committee/decide",
-            json={
-                "item_type": item["item_type"],
-                "item_key": item["item_key"],
-                "rating": item["rating"],
-                "status": "approved",
-                "rationale": "Reviewed against the moat-duration rubric; the rating holds (demo).",
-            },
-            headers=committee_headers,
+    approved = client.post(f"/assessments/{aid}/founder-approval", headers=founder_headers)
+    if approved.status_code != 201:
+        raise SystemExit(
+            f"Seed failed to record founder approval: {approved.status_code} {approved.text}"
         )
 
     finalised = client.post(f"/assessments/{aid}/finalise", headers=headers)

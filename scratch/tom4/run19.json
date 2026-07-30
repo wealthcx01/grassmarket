@@ -1,8 +1,0 @@
-[
-  {"do":"goto","url":"/engagements/a58805de-23b6-48e3-b3e8-5e315040ddb9","note":"engagement"},
-  {"do":"select","target":"select >> nth=0","value":"SJP Sandbox Deliv2"},
-  {"do":"click","target":"role:button:Link"},
-  {"do":"goto","url":"/engagements/a58805de-23b6-48e3-b3e8-5e315040ddb9","note":"reload"},
-  {"do":"read"},
-  {"do":"shot","name":"after-link"}
-]

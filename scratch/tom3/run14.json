@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio"},
-  {"do":"click","target":"text:SANDBOX — NON-PRODUCTION, NOT CLIENT-FACING"},
-  {"do":"read"},
-  {"do":"shot","name":"sandbox-open"},
-  {"do":"goto","url":"/engagements","note":"engagements"},
-  {"do":"read"},
-  {"do":"shot","name":"engagements"}
-]

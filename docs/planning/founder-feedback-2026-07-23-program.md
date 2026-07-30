@@ -98,7 +98,7 @@ New tickets from that review:
 | Review item | Ticket |
 |---|---|
 | 1, 2, 3 — all copy still reads as AI | GRS-0205 (supersedes the sweep half of GRS-0174) |
-| 4 — Rive CLI for wizard and pipeline | GRS-0206 (ADR-0049) |
+| 4 — Rive CLI for wizard and pipeline | GRS-0206 (ADR-0049) · GRS-0225 course diagrams |
 | 5 — email, CRM, AI prospecting platform | GRS-0207 (ADR-0048; reopens GRS-0195) |
 | 6 — demo account + founder admin acting-as | GRS-0208 |
 | 7 — Operating Model dropdown still misaligned | GRS-0209 (bug, follows GRS-0178) |
@@ -114,6 +114,14 @@ Also raised on 23/07 and not previously ticketed on its own:
 | Review item | Ticket |
 |---|---|
 | 6 (second half) — "all the scores seem surprisingly similar" | GRS-0223 score-dispersion investigation |
+
+**A correction worth recording (2026-07-29).** GRS-0206 was first written as a spike asking whether
+Rive earns its weight, on the assumption that Rive means an editor, a designer and a runtime adopted
+on faith. That was written without reading the repository the founder linked.
+`George-RD/rive-rs-cli` exists specifically so an agent can author animations programmatically: JSON
+scene spec in, real `.riv` out, rendered through the actual Rive runtime to verify, MIT licensed.
+The ticket is rewritten and GRS-0225 added for course diagrams. The lesson is the general one: read
+the thing the founder linked before writing the ticket about it.
 
 **Why the splits.** The founder asked for comprehensive coverage, more than one ticket per
 complaint where a complaint has more than one thing wrong with it. The three biggest items were

@@ -1,6 +1,6 @@
 """The repeatable brokerage-showcase demo seed (GRS-0159).
 
-Promotes the 2026-07-21 staging end-to-end run (`scratch/stage/brokerage_e2e.py` +
+Promotes the 2026-07-21 staging end-to-end run (`tools/staging-e2e/brokerage_e2e.py` +
 `earnings_e2e.py`) to a first-class, reviewable, versioned seed: for each showcase brokerage it
 builds the pipeline chain (prospect → Contracted), a COMPLETE review-grounded assessment (all nine
 infrastructure modules, all seven powers, business metrics, and the full C-index customer

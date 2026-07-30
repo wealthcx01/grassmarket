@@ -1,6 +1,0 @@
-[
-  {"do":"goto","url":"/pipeline","note":"pipeline"},
-  {"do":"click","target":"role:button:Contracted"},
-  {"do":"read"},
-  {"do":"shot","name":"contracted_detail"}
-]

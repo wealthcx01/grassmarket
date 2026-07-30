@@ -23,9 +23,11 @@ from bcap_contracts.learning import (
     LearningKind,
     LearningModule,
     LessonCompletion,
+    SectionProgress,
+    SectionTestAttempt,
 )
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from grassmarket.data.repository import (
     ConflictError,
@@ -425,6 +427,53 @@ def list_lesson_completions(
     progress (org-wide course, own progress). 404 if the course was never published."""
     try:
         return repo.list_lesson_completions(principal, slug)
+    except NotFoundError as exc:
+        raise _not_found("Published course") from exc
+
+
+class SectionTestSubmission(BaseModel):
+    """The options the advisor chose, in question order. The score is never sent by the client —
+    the server marks against the published tree (GRS-0226)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    answers: list[int] = Field(min_length=1)
+
+
+@router.post(
+    "/courses/{slug}/sections/{module_id}/test",
+    response_model=SectionTestAttempt,
+    status_code=status.HTTP_201_CREATED,
+)
+def attempt_section_test(
+    slug: str,
+    module_id: UUID,
+    payload: SectionTestSubmission,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> SectionTestAttempt:
+    """Sit one section's test. Append-only: a retake creates a new attempt rather than replacing
+    the last one, so the record shows how many goes it took."""
+    try:
+        return repo.record_section_test_attempt(
+            principal, slug, module_id, payload.answers, now=datetime.now(UTC)
+        )
+    except NotFoundError as exc:
+        raise _not_found("Section test") from exc
+    except ConflictError as exc:
+        raise _conflict(exc) from exc
+
+
+@router.get("/courses/{slug}/section-progress", response_model=list[SectionProgress])
+def section_progress(
+    slug: str,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> list[SectionProgress]:
+    """The caller's standing on every section: unlocked, passed, best score, attempts. The unlock
+    rule is computed server-side so the reader renders it rather than re-deriving it."""
+    try:
+        return repo.section_progress(principal, slug)
     except NotFoundError as exc:
         raise _not_found("Published course") from exc
 

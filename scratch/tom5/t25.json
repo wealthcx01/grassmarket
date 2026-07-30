@@ -1,7 +1,0 @@
-[
-  {"do":"goto","url":"/pipeline","note":"board"},
-  {"do":"click","target":"text:St. James's Place","note":"open detail"},
-  {"do":"click","target":"text:Open full record","note":"full prospect record"},
-  {"do":"read"},
-  {"do":"shot","name":"t28-full-record"}
-]

@@ -1,8 +1,0 @@
-[
-  {"do":"goto","url":"/engagements/a58805de-23b6-48e3-b3e8-5e315040ddb9","note":"engagement","waitfor":"Deliverables"},
-  {"do":"click","target":"text:Download"},
-  {"do":"read"},
-  {"do":"goto","url":"/earnings","waitfor":"Earnings"},
-  {"do":"shot","name":"earnings"},
-  {"do":"read"}
-]

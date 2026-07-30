@@ -66,6 +66,12 @@ target-version = "py312"
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "W"]
 
+# One generated file, one rule. `openbb_diagrams.py` is written by `design/motion/svg_export.py`
+# and holds one SVG element per line; wrapping those would make a diagram's diff unreadable, which
+# is the whole reason it is emitted element-per-line. Nothing else is exempt.
+[tool.ruff.lint.per-file-ignores]
+"src/grassmarket/workbench/content/openbb_diagrams.py" = ["E501"]
+
 # FastAPI's dependency-injection idiom puts calls (Depends/Security/…) in argument defaults; they
 # are immutable sentinels by design, so B008 does not apply. (SD3 has no FastAPI; this is the one
 # additive rule for a web app.)

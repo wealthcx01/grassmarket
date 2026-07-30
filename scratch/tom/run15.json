@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/prospects/4aefa47b-44d9-4208-a8ea-a56f03d8ef27","note":"full record"},
-  {"do":"click","target":"role:button:Workshop Delivered"},
-  {"do":"click","target":"role:button:Qualified"},
-  {"do":"click","target":"role:button:Scoped"},
-  {"do":"click","target":"role:button:Contracted"},
-  {"do":"read"},
-  {"do":"shot","name":"contracted-record"}
-]

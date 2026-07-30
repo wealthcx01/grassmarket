@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio"},
-  {"do":"click","target":"text:Repro2"},
-  {"do":"read"},
-  {"do":"shot","name":"repro2-open"},
-  {"do":"click","target":"text:6. Summary"},
-  {"do":"read"},
-  {"do":"shot","name":"repro2-summary"}
-]

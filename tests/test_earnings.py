@@ -121,9 +121,7 @@ def _v7_kwargs() -> dict:
         version="test-v7",
         currency=Currency.GBP,
         products={
-            "openbb": ProductRate(
-                name="OpenBB", yr1_bps=1500, yr2_bps=1000, window_months=24
-            )
+            "openbb": ProductRate(name="OpenBB", yr1_bps=1500, yr2_bps=1000, window_months=24)
         },
         consultancy={
             DeliveryType.BRUNTSFIELD_LED: {
@@ -234,9 +232,7 @@ def test_recovery_window_boundaries() -> None:
 # --- Stream-B rate card (GRS-0187) --------------------------------------------------------
 
 
-def test_consultancy_commissions_endpoint_lists_the_matrix(
-    client, alice: SeededConsultant
-) -> None:
+def test_consultancy_commissions_endpoint_lists_the_matrix(client, alice: SeededConsultant) -> None:
     response = client.get("/earnings/consultancy-commissions", headers=auth_header(alice))
     assert response.status_code == 200, response.text
     rows = response.json()

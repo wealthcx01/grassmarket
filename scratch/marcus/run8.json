@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/08a4b9cc-ad8d-4ec2-8954-90eea684ba16","note":"reopen wizard"},
-  {"do":"click","target":"text:2. Business Metrics","note":"metrics tab"},
-  {"do":"read"},
-  {"do":"shot","name":"metrics"},
-  {"do":"click","target":"text:3. Powers","note":"powers tab"},
-  {"do":"read"},
-  {"do":"shot","name":"powers"}
-]

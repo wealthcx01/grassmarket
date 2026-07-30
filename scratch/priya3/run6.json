@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/54add278-f810-4b70-b339-03ec8bed4b4e","note":"open wizard"},
-  {"do":"click","target":"text:3. Powers"},
-  {"do":"read"},
-  {"do":"shot","name":"powers"},
-  {"do":"select","target":"label:Scale Economies","value":"Advanced"},
-  {"do":"read"},
-  {"do":"shot","name":"powers_after"}
-]

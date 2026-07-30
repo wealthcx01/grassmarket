@@ -1,0 +1,755 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "WidgetAnatomy",
+    "width": 960,
+    "height": 500,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 480,
+        "y": 44,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "What a widget is made of"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 480,
+        "y": 78,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "OpenBB calls it a data container built to answer one analytical question."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R0Name",
+        "x": 300,
+        "y": 167,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R0NameStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R0NameStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R0NameStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R0NameRun",
+            "style": "R0NameStyle",
+            "text": "Data source"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R0Detail",
+        "x": 300,
+        "y": 193,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R0DetailStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R0DetailStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R0DetailStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R0DetailRun",
+            "style": "R0DetailStyle",
+            "text": "a feed, a database, their own data, a static file"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R1Name",
+        "x": 300,
+        "y": 237,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R1NameStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R1NameStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R1NameStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R1NameRun",
+            "style": "R1NameStyle",
+            "text": "Metadata layer"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R1Detail",
+        "x": 300,
+        "y": 263,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R1DetailStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R1DetailStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R1DetailStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R1DetailRun",
+            "style": "R1DetailStyle",
+            "text": "title, category, and the source attribution"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R2Name",
+        "x": 300,
+        "y": 307,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R2NameStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R2NameStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R2NameStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R2NameRun",
+            "style": "R2NameStyle",
+            "text": "Visual layer"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R2Detail",
+        "x": 300,
+        "y": 333,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R2DetailStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R2DetailStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R2DetailStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R2DetailRun",
+            "style": "R2DetailStyle",
+            "text": "table, chart, PDF, or a custom view"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R3Name",
+        "x": 300,
+        "y": 377,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R3NameStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R3NameStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R3NameStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R3NameRun",
+            "style": "R3NameStyle",
+            "text": "Parameters"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R3Detail",
+        "x": 300,
+        "y": 403,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R3DetailStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R3DetailStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R3DetailStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R3DetailRun",
+            "style": "R3DetailStyle",
+            "text": "the interactive part: ticker, date range"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Callout1",
+        "x": 730,
+        "y": 250,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Callout1Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Callout1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Callout1StyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Callout1Run",
+            "style": "Callout1Style",
+            "text": "This is your answer"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Callout2",
+        "x": 730,
+        "y": 278,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Callout2Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Callout2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Callout2StyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Callout2Run",
+            "style": "Callout2Style",
+            "text": "when compliance asks"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Callout3",
+        "x": 730,
+        "y": 300,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Callout3Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Callout3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Callout3StyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Callout3Run",
+            "style": "Callout3Style",
+            "text": "where a number came from."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "R0Box",
+        "x": 300,
+        "y": 178,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "R0BoxPath",
+            "width": 470,
+            "height": 58,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "R0BoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "R0BoxSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "R0BoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "R0BoxStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "R1Box",
+        "x": 300,
+        "y": 248,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "R1BoxPath",
+            "width": 470,
+            "height": 58,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "R1BoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "R1BoxSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "R1BoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "R1BoxStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "R2Box",
+        "x": 300,
+        "y": 318,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "R2BoxPath",
+            "width": 470,
+            "height": 58,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "R2BoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "R2BoxSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "R2BoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "R2BoxStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "R3Box",
+        "x": 300,
+        "y": 388,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "R3BoxPath",
+            "width": 470,
+            "height": 58,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "R3BoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "R3BoxSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "R3BoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "R3BoxStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Callout",
+        "x": 730,
+        "y": 276,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CalloutPath",
+            "width": 300,
+            "height": 108,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CalloutFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CalloutSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "ToCalloutHead",
+        "x": 575.0,
+        "y": 248,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "ToCalloutHeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "ToCalloutHeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "ToCalloutHeadCol",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "ToCalloutStem",
+        "x": 545,
+        "y": 248,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "ToCalloutStemPath",
+            "width": 51.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "ToCalloutStemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "ToCalloutStemSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 480,
+        "y": 250,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 960,
+            "height": 500,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
