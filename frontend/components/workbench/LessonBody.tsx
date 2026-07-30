@@ -77,7 +77,11 @@ function renderSvgNode(node: SvgNode, key: string): ReactNode {
   );
 }
 
-function Asset({ asset }: { asset: LessonAsset }) {
+/**
+ * One sanitised inline-SVG diagram with its caption. Exported because the slide reader
+ * (GRS-0226) renders the same asset shape — a second copy would be a second sanitiser policy.
+ */
+export function LessonAssetFigure({ asset }: { asset: LessonAsset }) {
   const tree = sanitizeSvg(asset.svg);
   if (tree === null) {
     // Loud, not silent. A stripped-and-rendered diagram would look fine and be wrong.
@@ -122,7 +126,7 @@ export function LessonBody({
       {renderMarkdown(body)}
       {videoRef ? <Video videoRef={videoRef} /> : null}
       {assets.map((asset, i) => (
-        <Asset key={`${i}:${asset.caption}`} asset={asset} />
+        <LessonAssetFigure key={`${i}:${asset.caption}`} asset={asset} />
       ))}
       <LessonReferences references={references} />
     </div>

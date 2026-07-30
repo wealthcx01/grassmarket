@@ -21,6 +21,7 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
+    Index,
     Integer,
     LargeBinary,
     String,
@@ -830,6 +831,28 @@ class LessonCompletionORM(Base):
 
     __table_args__ = (
         UniqueConstraint("owner_consultant_id", "lesson_id", name="uq_lesson_completion"),
+    )
+
+
+class SectionTestAttemptORM(Base):
+    """One advisor's attempt at one section's test (GRS-0215, wired in GRS-0226) — the gate that
+    opens the next section. Append-only: a retake is a new row, never an update, so the record
+    shows how many goes it took. Scoped by ``owner_consultant_id`` (the advisor)."""
+
+    __tablename__ = "section_test_attempts"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(ForeignKey("consultants.id"), nullable=False)
+    course_id: Mapped[UUID] = mapped_column(ForeignKey("courses.id"), nullable=False)
+    # The section's id within the published tree — modules live in the version JSON, not a table.
+    module_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    score: Mapped[float] = mapped_column(Float, nullable=False)
+    passed: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    attempted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+    __table_args__ = (
+        Index("ix_section_test_attempts_owner_course", "owner_consultant_id", "course_id"),
     )
 
 

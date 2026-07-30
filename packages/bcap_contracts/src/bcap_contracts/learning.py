@@ -424,6 +424,28 @@ class SectionTestAttempt(OwnedResource):
     attempted_at: datetime
 
 
+class SectionProgress(BaseModel):
+    """One advisor's standing on one section of a course (GRS-0226).
+
+    The unlock rule lives here — on the server — rather than being re-derived in the reader, so
+    "section N+1 opens when N is passed" is stated once. It is a teaching gate, not a security
+    boundary: a published course is org-wide readable and the tree carries its own answers to the
+    browser. What this guarantees is that the *record* of passing is server-marked and append-only.
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    module_id: UUID
+    order: int = Field(ge=0)
+    has_test: bool = Field(description="False for a legacy section with no test; never gates.")
+    unlocked: bool = Field(description="The advisor may open this section's lessons.")
+    passed: bool
+    best_score: float | None = Field(
+        default=None, ge=0.0, le=1.0, description="Best fraction correct so far; None if untried."
+    )
+    attempts: int = Field(ge=0)
+
+
 class LessonCompletion(OwnedResource):
     """One advisor's completion of a single lesson (GRS-0121). Completing every approved lesson of a
     COURSEWORK-credit course grants the coursework credit via the existing certification path."""

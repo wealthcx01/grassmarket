@@ -42,6 +42,8 @@ import type {
   CourseTree,
   CourseVersion,
   LessonCompletion,
+  SectionProgress,
+  SectionTestAttempt,
   CertificationCredit,
   Deliverable,
   DeliverableIndexRow,
@@ -1098,6 +1100,29 @@ export const api = {
     return request<LessonCompletion>(`/workbench/courses/${slug}/lessons/${lessonId}/complete`, {
       method: "POST",
       headers: authHeaders(),
+      signal,
+    });
+  },
+
+  sectionProgress(slug: string, signal?: AbortSignal): Promise<SectionProgress[]> {
+    return request<SectionProgress[]>(`/workbench/courses/${slug}/section-progress`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  /** Sit a section's test. The server marks it — the client sends choices, never a score. */
+  attemptSectionTest(
+    slug: string,
+    moduleId: string,
+    answers: number[],
+    signal?: AbortSignal,
+  ): Promise<SectionTestAttempt> {
+    return request<SectionTestAttempt>(`/workbench/courses/${slug}/sections/${moduleId}/test`, {
+      method: "POST",
+      headers: { ...authHeaders(), "Content-Type": "application/json" },
+      body: JSON.stringify({ answers }),
       signal,
     });
   },

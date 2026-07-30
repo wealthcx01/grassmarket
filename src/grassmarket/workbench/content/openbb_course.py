@@ -509,14 +509,21 @@ def openbb_course(carrot: ProductCommissionCarrot) -> CourseTree:
         ("white-label-build", _WHITE_LABEL),
         ("conviction", _CONVICTION),
     )
-    start = len(base.modules) + len(rebuilt)
     legacy = tuple(
         CourseModule(
             id=_id("module", key),
             title=legacy_titles[key],
-            order=start + i,
+            order=0,  # renumbered below, with everything else
             lessons=_lessons(entries, 0),
         )
-        for i, (key, entries) in enumerate(legacy_specs)
+        for key, entries in legacy_specs
     )
-    return base.model_copy(update={"modules": rebuilt + base.modules + legacy})
+
+    # Three sources, one sequence. Each numbered itself from zero, which put the canonical product
+    # module on the same `order` as the first rebuilt section. The unlock rule reads `order`, so
+    # that duplicate opened section 2 to an advisor who had passed nothing — the gate was reading a
+    # tie. Reading order is the only authority on section number, so it is applied here, once, to
+    # the assembled tree rather than guessed at by each source.
+    assembled = rebuilt + base.modules + legacy
+    numbered = tuple(m.model_copy(update={"order": i}) for i, m in enumerate(assembled))
+    return base.model_copy(update={"modules": numbered})

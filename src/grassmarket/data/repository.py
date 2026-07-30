@@ -136,6 +136,8 @@ from bcap_contracts.learning import (
     LessonCompletion,
     QuizQuestion,
     QuizStatus,
+    SectionProgress,
+    SectionTestAttempt,
 )
 from bcap_contracts.meetings import MediaKind, MeetingTranscript
 from bcap_contracts.money import Currency, Money
@@ -195,6 +197,7 @@ from grassmarket.data.models import (
     RegistryContactORM,
     RegistryTargetORM,
     ScoringRunORM,
+    SectionTestAttemptORM,
     WorkshopORM,
 )
 from grassmarket.earnings.commission import (
@@ -4580,6 +4583,7 @@ class Repository:
                 "Cannot publish — these AI-authored lessons need approval first (ADR-0009): "
                 + ", ".join(blockers)
             )
+        self._refuse_duplicate_section_order(slug, tree)
         version = row.latest_version + 1
         snapshot = CourseVersionORM(
             course_id=row.id,
@@ -4593,6 +4597,31 @@ class Repository:
         self._session.add_all([snapshot, row])
         self._session.flush()
         return self._to_course_version(snapshot)
+
+    @staticmethod
+    def _refuse_duplicate_section_order(slug: str, tree: CourseTree) -> None:
+        """A course whose sections share an `order` cannot be published.
+
+        `section_progress` walks the sections in `order` to decide what is unlocked, so two
+        sections holding the same number make the gate ambiguous: whichever the sort happened to
+        put second inherits the first's standing and opens without being earned. That is the
+        unlock rule quietly failing open, which is exactly what a gate must never do — so it is
+        refused here, at the one point every tree passes through, rather than sorted around."""
+        seen: dict[int, str] = {}
+        collisions: list[str] = []
+        for module in tree.modules:
+            if module.order in seen:
+                collisions.append(
+                    f"section {module.order} is claimed by both {seen[module.order]!r} "
+                    f"and {module.title!r}"
+                )
+            else:
+                seen[module.order] = module.title
+        if collisions:
+            raise ConflictError(
+                f"Cannot publish '{slug}' — its sections do not have distinct order numbers, so "
+                "the unlock gate would be ambiguous: " + "; ".join(collisions)
+            )
 
     def _latest_published_row(self, course_id: UUID) -> CourseVersionORM | None:
         return (
@@ -4743,6 +4772,127 @@ class Repository:
             .order_by(LessonCompletionORM.completed_at)
         ).scalars()
         return [self._to_lesson_completion(r) for r in rows]
+
+    def record_section_test_attempt(
+        self,
+        principal: Principal,
+        slug: str,
+        module_id: UUID,
+        answers: Sequence[int],
+        *,
+        now: datetime,
+    ) -> SectionTestAttempt:
+        """Mark one attempt at one section's test and record it (GRS-0226).
+
+        The caller sends the options they chose; the score is computed here from the PUBLISHED
+        tree. A client never asserts its own result. Append-only — a retake is a new row, so the
+        record shows how many goes it took.
+
+        Fail loud: a wrong number of answers is refused rather than padded or truncated, because
+        either would silently mark a question the advisor never saw."""
+        published = self.get_published_course(principal, slug)  # 404 if never published
+        course = self._get_course_row(slug)
+        module = next((m for m in published.tree.modules if m.id == module_id), None)
+        if module is None:
+            raise NotFoundError(f"Section {module_id} is not in the published course '{slug}'.")
+        test = module.section_test
+        if test is None:
+            raise NotFoundError(f"Section {module.title!r} has no test to attempt.")
+        if len(answers) != len(test.questions):
+            raise ConflictError(
+                f"This test has {len(test.questions)} question(s) and {len(answers)} answer(s) "
+                "were sent; answer every question."
+            )
+        # A locked section's test cannot be sat. The reader already hides it, but the rule belongs
+        # here too: the attempt record is the auditable one, and a row showing section 5 passed
+        # before section 1 was opened would describe a progression that never happened.
+        standing = next(
+            (p for p in self.section_progress(principal, slug) if p.module_id == module_id), None
+        )
+        if standing is not None and not standing.unlocked:
+            raise ConflictError(
+                f"Section {module.title!r} is locked — pass the previous section's test first."
+            )
+        correct = sum(
+            1 for q, a in zip(test.questions, answers, strict=True) if a == q.answer_index
+        )
+        score = correct / len(test.questions)
+        attempt = SectionTestAttemptORM(
+            owner_consultant_id=principal.consultant_id,
+            course_id=course.id,
+            module_id=module_id,
+            score=score,
+            passed=score >= test.pass_mark,
+            attempted_at=now,
+        )
+        self._session.add(attempt)
+        self._session.flush()
+        return self._to_section_test_attempt(attempt)
+
+    def list_section_test_attempts(
+        self, principal: Principal, slug: str
+    ) -> list[SectionTestAttempt]:
+        """The caller's OWN attempts on one published course, oldest first. Owner-scoped: the
+        course is org-wide readable, a colleague's attempts are not."""
+        self.get_published_course(principal, slug)  # 404 if never published
+        course = self._get_course_row(slug)
+        rows = self._session.execute(
+            select(SectionTestAttemptORM)
+            .where(
+                SectionTestAttemptORM.owner_consultant_id == principal.consultant_id,
+                SectionTestAttemptORM.course_id == course.id,
+            )
+            .order_by(SectionTestAttemptORM.attempted_at)
+        ).scalars()
+        return [self._to_section_test_attempt(r) for r in rows]
+
+    def section_progress(self, principal: Principal, slug: str) -> list[SectionProgress]:
+        """The caller's standing on every section of a published course, in section order.
+
+        The unlock rule is stated here and nowhere else: the first section is always open, and a
+        later one opens when the section before it has been passed. A section with no test never
+        gates — a legacy course must stay readable — so it opens whatever came before it."""
+        published = self.get_published_course(principal, slug)  # 404 if never published
+        attempts = self.list_section_test_attempts(principal, slug)
+        by_module: dict[UUID, list[SectionTestAttempt]] = {}
+        for attempt in attempts:
+            by_module.setdefault(attempt.module_id, []).append(attempt)
+
+        progress: list[SectionProgress] = []
+        previous_clears = True  # nothing precedes the first section, so it is open
+        for module in sorted(published.tree.modules, key=lambda m: m.order):
+            mine = by_module.get(module.id, [])
+            passed = any(a.passed for a in mine)
+            has_test = module.section_test is not None
+            progress.append(
+                SectionProgress(
+                    module_id=module.id,
+                    order=module.order,
+                    has_test=has_test,
+                    unlocked=previous_clears,
+                    passed=passed,
+                    best_score=max((a.score for a in mine), default=None),
+                    attempts=len(mine),
+                )
+            )
+            # An untested section cannot gate what follows it; a tested one does.
+            previous_clears = previous_clears and (passed or not has_test)
+        return progress
+
+    @staticmethod
+    def _to_section_test_attempt(row: SectionTestAttemptORM) -> SectionTestAttempt:
+        return SectionTestAttempt(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            course_id=row.course_id,
+            module_id=row.module_id,
+            score=row.score,
+            passed=row.passed,
+            attempted_at=row.attempted_at,
+            # Append-only — an attempt is never mutated, so updated == created.
+            created_at=row.created_at,
+            updated_at=row.created_at,
+        )
 
     @staticmethod
     def _to_course(row: CourseORM) -> Course:

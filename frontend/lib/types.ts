@@ -896,6 +896,67 @@ export interface LessonAsset {
   svg: string;
 }
 
+/**
+ * What a slide is for (GRS-0215). The reader styles by this and the depth tests count by it: a
+ * lesson that is 30 slides of prose and no doing is not the lesson the founder asked for.
+ */
+export type SlideKind = "concept" | "walkthrough" | "example" | "checkpoint";
+
+/**
+ * One slide of a lesson (GRS-0215). Deliberately small — one idea, one step, or one worked
+ * example. `body` is markdown; `asset` is an inline SVG for the same immutability reason
+ * `LessonAsset` is. Only a CHECKPOINT slide carries a `checkpoint_prompt`.
+ */
+export interface Slide {
+  order: number;
+  kind: SlideKind;
+  title: string;
+  body: string;
+  asset?: LessonAsset | null;
+  references: SourceRef[];
+  checkpoint_prompt?: string | null;
+}
+
+/** One multiple-choice question on a section test (GRS-0215). Exactly one right answer. */
+export interface TestQuestion {
+  prompt: string;
+  options: string[];
+  answer_index: number;
+  /** Shown after the learner answers, right or wrong — this gate teaches rather than filters. */
+  explanation: string;
+}
+
+/** The test a learner passes before the next section opens. `pass_mark` is a fraction. */
+export interface SectionTest {
+  questions: TestQuestion[];
+  pass_mark: number;
+}
+
+/** One recorded attempt at a section test (GRS-0226). Append-only: a retake is a new row. */
+export interface SectionTestAttempt {
+  id: string;
+  owner_consultant_id: string;
+  course_id: string;
+  module_id: string;
+  score: number;
+  passed: boolean;
+  attempted_at: string;
+}
+
+/**
+ * The advisor's standing on one section (GRS-0226). `unlocked` is computed server-side so the
+ * rule "section N+1 opens when N is passed" is stated once, not re-derived in the reader.
+ */
+export interface SectionProgress {
+  module_id: string;
+  order: number;
+  has_test: boolean;
+  unlocked: boolean;
+  passed: boolean;
+  best_score?: number | null;
+  attempts: number;
+}
+
 export interface Lesson {
   id: string;
   title: string;
@@ -905,6 +966,8 @@ export interface Lesson {
   video_ref?: string | null;
   references: SourceRef[];
   assets: LessonAsset[];
+  /** The lesson's slides, in order (GRS-0215). Empty on a legacy course, which still renders. */
+  slides: Slide[];
   drill_topics: string[];
   measurement?: string | null;
   check_question?: string | null;
@@ -919,6 +982,8 @@ export interface CourseModule {
   title: string;
   order: number;
   lessons: Lesson[];
+  /** The gate a learner passes before the next section opens. Null on a legacy section. */
+  section_test?: SectionTest | null;
 }
 
 export interface CourseTree {

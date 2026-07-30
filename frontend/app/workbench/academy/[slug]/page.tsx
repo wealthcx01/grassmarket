@@ -12,8 +12,10 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { LessonBody } from "@/components/workbench/LessonBody";
+import { SectionTestCard } from "@/components/workbench/SectionTestCard";
+import { SlideDeck } from "@/components/workbench/SlideDeck";
 import { ApiError, api, clearToken, getToken } from "@/lib/api";
-import type { CourseVersion, Lesson } from "@/lib/types";
+import type { CourseVersion, Lesson, SectionProgress } from "@/lib/types";
 
 function LessonCard({
   lesson,
@@ -57,12 +59,15 @@ function LessonCard({
         ) : null}
       </div>
       <div style={{ marginTop: "0.5rem", color: "var(--color-ink)" }}>
+        {/* `body` is the lesson's opening — what it is for. Since GRS-0215 the teaching lives in
+            the slides, so both render; a legacy lesson has no slides and reads exactly as before. */}
         <LessonBody
           body={lesson.body}
           videoRef={lesson.video_ref}
           references={lesson.references}
           assets={lesson.assets}
         />
+        <SlideDeck slides={lesson.slides ?? []} label={lesson.title} />
       </div>
       {lesson.measurement ? (
         <p style={{ margin: "0.6rem 0 0", fontSize: "0.78rem", color: "var(--color-ink-muted)", borderLeft: "2px solid var(--color-border)", paddingLeft: "0.6rem" }}>
@@ -149,6 +154,7 @@ export default function AcademyReaderPage() {
   const router = useRouter();
   const slug = useParams<{ slug: string }>().slug;
   const [course, setCourse] = useState<CourseVersion | null>(null);
+  const [progress, setProgress] = useState<SectionProgress[]>([]);
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -156,10 +162,15 @@ export default function AcademyReaderPage() {
 
   const load = useCallback(
     (signal?: AbortSignal) =>
-      Promise.all([api.getPublishedCourse(slug, signal), api.listLessonCompletions(slug, signal)])
-        .then(([v, comps]) => {
+      Promise.all([
+        api.getPublishedCourse(slug, signal),
+        api.listLessonCompletions(slug, signal),
+        api.sectionProgress(slug, signal),
+      ])
+        .then(([v, comps, prog]) => {
           setCourse(v);
           setCompleted(new Set(comps.map((c) => c.lesson_id)));
+          setProgress(prog);
         })
         .catch((err: unknown) => {
           if (err instanceof ApiError && err.status === 0 && err.aborted) return;
@@ -194,6 +205,13 @@ export default function AcademyReaderPage() {
   const total = lessons.length;
   const doneCount = lessons.filter((l) => completed.has(l.id)).length;
   const pct = total ? Math.round((doneCount / total) * 100) : 0;
+
+  // A course is "gated" when it actually has section tests. A legacy course has none, and
+  // reporting "0 / 0 sections passed" on one would be worse than the lesson count it replaces.
+  const gatedSections = progress.filter((p) => p.has_test).length;
+  const sectionsPassed = progress.filter((p) => p.has_test && p.passed).length;
+  const gated = gatedSections > 0;
+  const headlinePct = gated ? Math.round((sectionsPassed / gatedSections) * 100) : pct;
 
   async function complete(lessonId: string) {
     setBusyId(lessonId);
@@ -245,15 +263,26 @@ export default function AcademyReaderPage() {
             <p style={{ margin: "0.4rem 0 0", color: "var(--color-ink-muted)" }}>{course.tree.summary}</p>
           </header>
 
-          {/* Progress */}
+          {/* Progress. On a gated course the headline number is sections PASSED, not lessons
+              scrolled past (GRS-0215 §6) — reading is not the same as having learned it. Lessons
+              read stay visible underneath, because they are still what tells you where you are. */}
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", color: "var(--color-ink-muted)", marginBottom: "0.25rem" }}>
-              <span className="mono">{doneCount} / {total} lessons</span>
-              <span className="mono">{pct}%</span>
+              <span className="mono">
+                {gated
+                  ? `${sectionsPassed} / ${gatedSections} sections passed`
+                  : `${doneCount} / ${total} lessons`}
+              </span>
+              <span className="mono">{headlinePct}%</span>
             </div>
             <div style={{ height: "0.4rem", background: "var(--color-border)", borderRadius: "999px", overflow: "hidden" }}>
-              <div style={{ width: `${pct}%`, height: "100%", background: "var(--color-accent)", transition: "width 0.2s" }} />
+              <div style={{ width: `${headlinePct}%`, height: "100%", background: "var(--color-accent)", transition: "width 0.2s" }} />
             </div>
+            {gated ? (
+              <p style={{ margin: "0.3rem 0 0", fontSize: "0.68rem", color: "var(--color-ink-faint)" }}>
+                {doneCount} of {total} lessons read.
+              </p>
+            ) : null}
           </div>
 
           {error ? (
@@ -263,24 +292,73 @@ export default function AcademyReaderPage() {
           {course.tree.modules.map((module) => {
             // Global lesson index so numbering runs across the whole course, not per-module.
             const startIdx = lessons.findIndex((l) => l.id === module.lessons[0]?.id);
+            const standing = progress.find((p) => p.module_id === module.id);
+            // Absent progress (a legacy course the endpoint knows nothing about) reads as open.
+            // Locking a section because a fetch returned nothing would hide content over a bug.
+            const unlocked = standing?.unlocked ?? true;
             return (
               <section key={module.id} style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-                <h2 style={{ margin: "0.4rem 0 0", fontSize: "1.15rem", fontFamily: "var(--font-serif)" }}>{module.title}</h2>
-                {module.lessons.map((lesson, i) => (
-                  <LessonCard
-                    key={lesson.id}
-                    lesson={lesson}
-                    index={startIdx + i}
-                    done={completed.has(lesson.id)}
-                    busy={busyId === lesson.id}
-                    onComplete={() => complete(lesson.id)}
+                <h2 style={{ margin: "0.4rem 0 0", fontSize: "1.15rem", fontFamily: "var(--font-serif)" }}>
+                  {module.title}
+                  {standing?.passed ? (
+                    <span className="mono" style={{ marginLeft: "0.5rem", fontSize: "0.62rem", fontWeight: 600, color: "var(--color-accent)" }}>
+                      ✓ PASSED
+                    </span>
+                  ) : null}
+                </h2>
+                {unlocked ? (
+                  module.lessons.map((lesson, i) => (
+                    <LessonCard
+                      key={lesson.id}
+                      lesson={lesson}
+                      index={startIdx + i}
+                      done={completed.has(lesson.id)}
+                      busy={busyId === lesson.id}
+                      onComplete={() => complete(lesson.id)}
+                    />
+                  ))
+                ) : (
+                  <p
+                    style={{
+                      margin: 0,
+                      padding: "0.8rem 1rem",
+                      border: "1px dashed var(--color-border)",
+                      borderRadius: "var(--radius)",
+                      fontSize: "0.85rem",
+                      color: "var(--color-ink-muted)",
+                    }}
+                  >
+                    Locked. Pass the test at the end of the previous section to open this one.
+                  </p>
+                )}
+                {unlocked && module.section_test ? (
+                  <SectionTestCard
+                    slug={slug}
+                    moduleId={module.id}
+                    test={module.section_test}
+                    sectionTitle={module.title}
+                    passed={standing?.passed ?? false}
+                    bestScore={standing?.best_score}
+                    attempts={standing?.attempts ?? 0}
+                    onPassed={() => {
+                      // Re-read rather than assume: the server owns the unlock rule, and a
+                      // failure here has to say so or the next section silently stays shut.
+                      api
+                        .sectionProgress(slug)
+                        .then(setProgress)
+                        .catch(() =>
+                          setError("Passed, but the section list did not refresh. Reload the page."),
+                        );
+                    }}
                   />
-                ))}
+                ) : null}
               </section>
             );
           })}
 
-          {doneCount === total && total > 0 ? (
+          {/* On a gated course, "finished" means every section test passed — not every lesson
+              scrolled. Reporting completion for reading alone is the claim GRS-0215 removed. */}
+          {(gated ? sectionsPassed === gatedSections : doneCount === total && total > 0) ? (
             <section
               role="status"
               style={{
@@ -294,7 +372,9 @@ export default function AcademyReaderPage() {
               }}
             >
               <p style={{ margin: 0, color: "var(--color-accent)", fontWeight: 600, fontSize: "0.9rem" }}>
-                ✓ You’ve read every lesson in this course.
+                {gated
+                  ? "✓ You’ve passed every section of this course."
+                  : "✓ You’ve read every lesson in this course."}
               </p>
               <p style={{ margin: 0, fontSize: "0.82rem", color: "var(--color-ink-muted)" }}>
                 Reading is step one — the skill sticks when you use it. Next:
