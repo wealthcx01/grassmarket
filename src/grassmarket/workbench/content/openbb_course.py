@@ -509,9 +509,14 @@ def openbb_course(carrot: ProductCommissionCarrot) -> CourseTree:
         ("white-label-build", _WHITE_LABEL),
         ("conviction", _CONVICTION),
     )
+    # `reference-` prefix, NOT the bare key. The rebuilt sections derive their ids from the same
+    # namespace and `rebuilt_sections()` also has a "what-it-is" section, so the bare key produced
+    # the SAME uuid5 for two modules in one published tree. The section gate keys its attempt
+    # records by module id, so a duplicate meant passing rebuilt section 1 also marked the reference
+    # module passed, and the reader matched whichever the sort happened to reach first.
     legacy = tuple(
         CourseModule(
-            id=_id("module", key),
+            id=_id("module", f"reference-{key}"),
             title=legacy_titles[key],
             order=0,  # renumbered below, with everything else
             lessons=_lessons(entries, 0),

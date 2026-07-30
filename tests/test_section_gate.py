@@ -292,3 +292,43 @@ def test_a_locked_section_cannot_be_sat_at_all(
         alice.principal, OPENBB_SLUG, sections[1].id, _right_answers(sections[1]), now=_NOW
     )
     assert second.passed is True
+
+
+def test_the_seeded_course_gives_every_section_its_own_id(
+    repo: Repository, admin: SeededConsultant, alice: SeededConsultant
+) -> None:
+    """Sibling of the ordering case, and the same root cause: a tree assembled from several sources
+    derives ids by hashing a key, and two sources used the same key. The rebuilt "what-it-is"
+    section and the retained reference module of the same name produced one uuid5 between them, so
+    passing the rebuilt section also marked the reference module passed."""
+    seed_academy_content(repo, admin.principal, now=_NOW)
+    sections = _sections(repo, alice.principal)
+    ids = [s.id for s in sections]
+
+    assert len(set(ids)) == len(ids), "two sections share a module id"
+    # And the gate agrees: one row per section, never one row counted twice.
+    progress = repo.section_progress(alice.principal, OPENBB_SLUG)
+    assert len(progress) == len(sections)
+    assert len({p.module_id for p in progress}) == len(progress)
+
+
+def test_publishing_refuses_a_course_whose_sections_share_an_id(
+    repo: Repository, admin: SeededConsultant
+) -> None:
+    seed_academy_content(repo, admin.principal, now=_NOW)
+    tree = repo.get_published_course(admin.principal, OPENBB_SLUG).tree
+    ordered = sorted(tree.modules, key=lambda m: m.order)
+    clashing = tree.model_copy(
+        update={
+            "modules": (
+                ordered[0],
+                ordered[1].model_copy(update={"id": ordered[0].id}),
+                *ordered[2:],
+            )
+        }
+    )
+    repo.save_course_draft(admin.principal, OPENBB_SLUG, clashing)
+
+    with pytest.raises(ConflictError) as exc:
+        repo.publish_course(admin.principal, OPENBB_SLUG, now=_NOW)
+    assert "share an id" in str(exc.value)

@@ -24,6 +24,7 @@ from uuid import NAMESPACE_URL, UUID, uuid5
 from bcap_contracts.commissions import ProductCommissionCarrot
 from bcap_contracts.learning import CourseModule, CourseTree, Lesson, LessonAuthor
 
+from grassmarket.workbench.content.benzinga_slides import rebuilt_sections
 from grassmarket.workbench.content.product_course import ProductCourseSpec, build_product_course
 
 BENZINGA_PRODUCT_ID = "benzinga"
@@ -401,30 +402,45 @@ def benzinga_course(carrot: ProductCommissionCarrot) -> CourseTree:
     base = build_product_course(
         spec, carrot, _TEMPLATE_CHECKS
     )  # spine incl. the live advisor commission (15%)
-    deep = (
+    # The GRS-0217 rebuild. Written to the GRS-0215 depth standard: a lesson of 20 to 40 slides and
+    # a test the advisor passes before the next section opens. These come FIRST, because they are
+    # the course now. Two of eight are written; `SECTIONS_PLANNED` in `benzinga_slides` lists the
+    # rest and a test fails while any remain, so this cannot read as finished before it is.
+    rebuilt = rebuilt_sections()
+
+    # The 2026-07 material, kept until its replacement is written rather than deleted first, and
+    # retitled so nobody mistakes it for the rebuild. `reference-` prefixes the id key because the
+    # rebuilt sections hash their ids from the same namespace and also have a "what-it-is" section:
+    # the bare key produced one uuid5 for two modules, and the section gate keys attempts by id.
+    reference = (
         CourseModule(
-            id=_id("module", "what-it-is"),
-            title="What Benzinga actually is",
-            order=1,
+            id=_id("module", "reference-what-it-is"),
+            title="Reference (pending rebuild): what Benzinga actually is",
+            order=0,  # renumbered below, with everything else
             lessons=_lessons(_WHAT_IT_IS),
         ),
         CourseModule(
-            id=_id("module", "use-cases"),
-            title="Use cases you can sell for",
-            order=2,
+            id=_id("module", "reference-use-cases"),
+            title="Reference (pending rebuild): use cases you can sell for",
+            order=0,
             lessons=_lessons(_USE_CASES),
         ),
         CourseModule(
-            id=_id("module", "commercial"),
-            title="The reseller & commercial angle",
-            order=3,
+            id=_id("module", "reference-commercial"),
+            title="Reference (pending rebuild): the reseller and commercial angle",
+            order=0,
             lessons=_lessons(_COMMERCIAL),
         ),
         CourseModule(
-            id=_id("module", "conviction"),
-            title="Conviction & the company",
-            order=4,
+            id=_id("module", "reference-conviction"),
+            title="Reference (pending rebuild): conviction and the company",
+            order=0,
             lessons=_lessons(_CONVICTION),
         ),
     )
-    return base.model_copy(update={"modules": base.modules + deep})
+
+    # One sequence, numbered once. Each source numbers itself from zero, and the unlock rule reads
+    # `order`, so reading order is applied here rather than guessed at per source (see GRS-0226).
+    assembled = rebuilt + base.modules + reference
+    numbered = tuple(m.model_copy(update={"order": i}) for i, m in enumerate(assembled))
+    return base.model_copy(update={"modules": numbered})
