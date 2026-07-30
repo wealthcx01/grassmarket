@@ -45,6 +45,7 @@ from bcap_contracts.certification import (
     CertificationRecord,
     CourseCertification,
 )
+from bcap_contracts.client_report import ClientReport, DeclaredFigure, ReportSection
 from bcap_contracts.commissions import (
     CommissionLine,
     ConsultancyCommissionCarrot,
@@ -116,6 +117,9 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "ModuleRatingDraft": ModuleRatingDraft,
     "LiveScore": LiveScore,
     "ScenarioComparison": ScenarioComparison,
+    "DeclaredFigure": DeclaredFigure,
+    "ReportSection": ReportSection,
+    "ClientReport": ClientReport,
     "RubricAnchor": RubricAnchor,
     "Registry": Registry,
     "Prospect": Prospect,

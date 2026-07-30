@@ -1,0 +1,38 @@
+{
+  "additionalProperties": false,
+  "description": "One number a section is allowed to state, and where it came from.\n\n`rendered` is the exact string the prose uses, so the check that follows compares like with\nlike; `source` names the field on the scoring run it was read from, so a reader (or GRS-0222)\ncan trace any number in the report back to the run that produced it.",
+  "properties": {
+    "key": {
+      "description": "Stable identifier, unique within the section.",
+      "minLength": 1,
+      "title": "Key",
+      "type": "string"
+    },
+    "label": {
+      "description": "What this figure is, in the reader's words.",
+      "minLength": 1,
+      "title": "Label",
+      "type": "string"
+    },
+    "rendered": {
+      "description": "Exactly as it appears in the prose, e.g. '£1.2m' or '61'.",
+      "minLength": 1,
+      "title": "Rendered",
+      "type": "string"
+    },
+    "source": {
+      "description": "Where it came from on the scoring run, e.g. 'run.platform_value.point'.",
+      "minLength": 1,
+      "title": "Source",
+      "type": "string"
+    }
+  },
+  "required": [
+    "key",
+    "label",
+    "rendered",
+    "source"
+  ],
+  "title": "DeclaredFigure",
+  "type": "object"
+}

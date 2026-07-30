@@ -79,7 +79,7 @@ From the 2026-07-26 staging review. Wave 4 (the course rebuild) is the part that
 | GRS-0208 | One clean demo account + a founder admin who can act as any advisor | Planned |
 | **GRS-0209** | **The Operating Model dropdown still does not line up** | **Fixed, in review** — measured on the rendered page: the select sat **23.4px** below the subject input at all three widths, now **0px**. Cause was `align-items: end` against a field that always renders a caption. Evidence in `docs/reviews/GRS-0209-form-alignment/` |
 | GRS-0210 | Smart search must know the firms an advisor will type | Planned |
-| GRS-0211 | The client deliverable, rebuilt: what it says | Planned |
+| **GRS-0211** | **The client deliverable, rebuilt: what it says** | **Content model built, in review** — `bcap_contracts.client_report` + its builder. Order validated, P10/P50/P90 refused outside the appendix, every figure declared with its run field, approval gate enforced. Prose is a gated input, never invented. **Not yet visible to the founder** — that needs GRS-0219 (PDF) and GRS-0220 (web) |
 | GRS-0212 | Customer Proposition for exchanges: research, model, ship | Planned |
 | GRS-0213 | Scenarios an advisor can drive, with a narrative assistant | Planned |
 | GRS-0214 | What the client gets free vs on engagement | Planned |

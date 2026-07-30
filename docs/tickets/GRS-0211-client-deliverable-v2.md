@@ -84,3 +84,42 @@ and the "recommended to sell" box scrolls underneath it.
 
 The founder reads the Deutsche Börse review and it tells the story of that business, with the maths
 in the appendix and every number traceable.
+
+## What shipped — the content model (scope items 1–5)
+
+`bcap_contracts.client_report` is the narrative spine, and `grassmarket.deliverables.client_report`
+builds it from a finalised run. The four rules are enforced by the model itself, not by a renderer,
+so neither rendition can opt out of one:
+
+1. **Order is the report.** `SECTION_ORDER` — business → advantage → constraint → actions → value →
+   appendix — is validated. A missing, repeated or out-of-order section does not construct. The
+   report opens with the business and the BUSINESS section declares no figures at all, which is the
+   structural answer to "it reads as a scorecard".
+2. **The maths is out of the reader's way.** `P10`/`P50`/`P90` are refused anywhere but the
+   appendix. The body says "our central estimate is X, and it could reasonably be between Y and Z".
+3. **Every figure is declared.** Each section declares the numbers its prose may state, each with
+   the run field it came from (`run.modules.APP_SERVER.q_m`). A number in prose that is not declared
+   raises — a build failure, not a proofreading problem, exactly as the ticket asked.
+4. **Nothing AI-drafted reaches a client unapproved.** An AI-drafted section must name its
+   narrative, and `assert_client_ready` refuses a report whose drafts are not in the approved set.
+
+**Prose is an input, not an invention.** "What this firm is and how it makes money" cannot be
+derived from a scoring run, so the builder takes it and refuses loudly when a section has none
+(`MissingReportProseError`). Fabricating it would be precisely the silent fallback non-negotiable #3
+forbids. GRS-0222 will draft that prose; ADR-0041 approves it.
+
+Two honesty behaviours are tested rather than assumed: an **unmodelled** V band declares no range at
+all (ADR-0008 — printing one would claim a tight estimate we do not have), and an unassessed module
+is **absent** from the appendix rather than zero-filled (D9).
+
+Scoring is untouched: the golden master is unchanged and still passes.
+
+### What this ticket does NOT make visible
+
+Per the founder's rule that "shipped" means they can see it working, this ticket on its own changes
+nothing the founder can open. It is the model both renditions consume; **GRS-0219 (branded PDF)** and
+**GRS-0220 (interactive web page)** are what put it in front of them, and the existing docx preview
+is still what the app serves until those land. Branding was named in the founder's complaint and
+belongs to those two tickets.
+
+Gate: ruff clean, pyright clean on both new modules, 37 new tests, golden master byte-identical.
