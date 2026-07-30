@@ -51,10 +51,10 @@ _DOING_KINDS = frozenset({SlideKind.WALKTHROUGH, SlideKind.EXAMPLE, SlideKind.CH
 # Courses that predate the standard, each with the ticket that rebuilds it. Listing them is the
 # point: an exemption nobody can see is how the last rebuild quietly did not happen.
 LEGACY_COURSES: dict[str, str] = {
-    # `product-benzinga` came off this list on 2026-07-30 when GRS-0217 finished its eight
-    # sections. Note what this register is and is not: nothing in `check_depth` reads it, so it
-    # never exempted anything mechanically. It is the visible-debt list, and the debt is paid.
-    "product-brandfetch": "GRS-0217",
+    # `product-benzinga` and `product-brandfetch` both came off this list on 2026-07-30 when
+    # GRS-0217 finished their eight sections each. Note what this register is and is not: nothing in
+    # `check_depth` reads it, so it never exempted anything mechanically. It is the visible-debt
+    # list, and two of the three debts on it are now paid.
     "sales-egoist": "GRS-0218",
     "sales-ops-playbook": "GRS-0217",
 }

@@ -1,9 +1,9 @@
 # GRS-0217 — The remaining product courses, to the same standard
 
-**Status:** In review (2026-07-30, PR #221) — **Benzinga complete, 8 of 8 sections.** Brandfetch
-and sales-ops-playbook still to do, one PR each. **Priority:** HIGH. **Loop:** founder-feedback
-remediation, Wave 4. **Depends on:** GRS-0215, GRS-0216 (sets the bar), GRS-0226 (the reader,
-without which none of it is visible).
+**Status:** In review (2026-07-30, PR #221) — **Benzinga and Brandfetch both complete, 8 of 8
+sections each.** `sales-ops-playbook` is the only course left. **Priority:** HIGH. **Loop:**
+founder-feedback remediation, Wave 4. **Depends on:** GRS-0215, GRS-0216 (sets the bar), GRS-0226
+(the reader, without which none of it is visible).
 
 ## Ordering decision (scope asks for this to be a decision, not an accident)
 
@@ -95,6 +95,60 @@ would have failed wrongly, and deleted with the modules they would have passed v
 
 A tighter join-artefact scan run over both courses while doing this found one more lost space
 (`"reportedly around$300 million"`), now fixed. Zero remain across all sixteen sections.
+
+## PR 2 — Brandfetch: complete
+
+Eight sections, **192 slides**, 48 test questions, 73 hands-on slides, one authored diagram per
+section. Same standard, same shape as Benzinga.
+
+**Organised around the founder's correction rather than around the product list.** GRS-0185 recorded
+that both variants carried identical fit stanzas and `profiles: [retail]`, so a retail report could
+recommend either — distribution suits retail brokerages, redistribution suits exchanges and
+information vendors. So section 2 *is* the boundary, sections 5 and 6 take one side each, and section
+8 makes the advisor qualify which side a deal is on before forecasting anything.
+
+| # | Section | Slides | Hands-on |
+|---|---|---|---|
+| 1 | What Brandfetch is, and who owns the logos | 24 | 9 |
+| 2 | The boundary: distribution or redistribution | 24 | 10 |
+| 3 | The four surfaces, and the order you meet them | 24 | 9 |
+| 4 | The identifier hook: ticker, ISIN, ETF, crypto | 24 | 9 |
+| 5 | Distribution: the retail brokerage | 24 | 9 |
+| 6 | Redistribution: the exchange and information vendor | 24 | 9 |
+| 7 | Licensing, trademark and the lines you do not cross | 24 | 9 |
+| 8 | How to sell it | 24 | 9 |
+
+The compliance discipline is carried in the content: section 1 makes the ownership disclosure a
+memorised sentence, section 7 gives the four things an advisor never decides, and section 4's
+identifier hook (ticker, ISIN, ETF, crypto rather than domain) is given its own section because it is
+the one fact that makes this structural rather than cosmetic for a financial platform.
+
+`who_owns_the_mark` deliberately appears in both section 1 and section 7 — early as a disclosure to
+make unprompted, and again where the detail lives. A slide says so, because repeating a drawing is
+usually padding and this is the exception.
+
+**No commission rate appears anywhere in the slides.** Both tiers resolve live from the Earnings
+schedule, and `test_no_commission_rate_is_written_into_the_slides` enforces it against the schedule's
+own figures. `_two_tier_commission_lesson` survived the reference-module deletion and moved onto the
+commission spine, because it is the one place a rate appears and it is computed rather than typed.
+
+`product-brandfetch` came off `depth.LEGACY_COURSES`, which now holds only the two sales courses.
+
+### Three false positives that shaped a test
+
+Writing the no-rate test took three attempts, and the path is worth recording because each failure
+was the test being wrong rather than the content:
+
+1. Forbidding percentages outright flagged Typeform's reported free-to-paid lift and the Enterprise
+   availability commitment — attributed vendor claims, not commission.
+2. Comparing against the schedule's own figures *still* flagged the Typeform lift, because
+   distribution's year-two rate is five per cent and the reported lift is five per cent. Same
+   characters, two unrelated facts.
+3. Including the bare bps integer flagged "free to roughly 500 thousand a month".
+
+The rule is now checked in context — a live rate figure is a violation only in a slide that is also
+talking about commission — with a negative test proving it still catches the real thing. A test
+authors work around is worse than no test.
 
 ## Why
 

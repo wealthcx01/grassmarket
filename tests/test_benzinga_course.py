@@ -220,11 +220,9 @@ def test_benzinga_is_no_longer_carried_as_legacy_debt() -> None:
     it, so it never exempted anything mechanically. Benzinga came off it when the rebuild finished.
     The courses still on it are the honest remaining debt, each with the ticket that clears it."""
     assert "product-benzinga" not in LEGACY_COURSES
-    assert set(LEGACY_COURSES) == {
-        "product-brandfetch",
-        "sales-egoist",
-        "sales-ops-playbook",
-    }
+    # `product-brandfetch` left too, on the same day and for the same reason (GRS-0217 finished it).
+    # What is left is the honest remaining debt, each with the ticket that clears it.
+    assert set(LEGACY_COURSES) == {"sales-egoist", "sales-ops-playbook"}
 
 
 def test_the_rebuilt_sections_have_distinct_ids_and_contiguous_orders() -> None:
