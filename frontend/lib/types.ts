@@ -256,6 +256,12 @@ export interface LiveScore {
   // C is scoreable. Never summed into V (that is v1.4 / GRS-0086).
   c?: number | null;
   module_qm: Record<string, IndexBand>;
+  // The DETERMINISTIC q_m per module (ADR-0040): the quoted module scores, with `module_qm` the
+  // modelled range around them. Only modules that actually scored appear — a Not Assessed module
+  // is absent rather than zero-filled (D9). Source for the dispersion figure (GRS-0227).
+  // Optional because a payload cached before GRS-0227 shipped genuinely will not carry it, and the
+  // honest render for "we don't know the spread" is to show nothing rather than to infer one.
+  module_qm_point?: Record<string, number>;
   triad_economic?: StrengthRating | null;
   triad_perceived?: StrengthRating | null;
   triad_defence?: StrengthRating | null;

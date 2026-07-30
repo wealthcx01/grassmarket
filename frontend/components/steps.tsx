@@ -13,6 +13,7 @@ import { FounderReviewStatus } from "@/components/FounderReviewStatus";
 import { GuidancePanel } from "@/components/GuidancePanel";
 import { RatingControl } from "@/components/RatingControl";
 import { StrengthControl } from "@/components/StrengthControl";
+import { dispersionSentence, moduleDispersion } from "@/lib/dispersion";
 import * as doc from "@/lib/doc";
 import { POWER_GUIDANCE } from "@/lib/powerGuidance";
 import type {
@@ -1376,36 +1377,62 @@ function Interpretation({
   // coverage we caveat the bottleneck rather than issue a confident "go fix this" that could point at
   // the one module nobody assessed.
   const lowCoverage = live.coverage != null && live.coverage < 0.5;
+  // How uneven the firm is (GRS-0227). Two firms with the same V and very different module spreads
+  // are different firms; before this they read identically. Where the spread is wide the bottleneck
+  // leads the card, because that is the finding an advisor scopes against — but never at low
+  // coverage, where the weakest module may simply be the one nobody has looked at yet.
+  const dispersion = moduleDispersion(live);
+  const leadWithBottleneck = dispersion != null && dispersion.uneven && !lowCoverage;
+
+  const rangeBullet = (
+    <li key="range">
+      <strong>The range matters more than the single number.</strong> Platform Value is{" "}
+      <strong style={{ color: "var(--color-ink)" }}>{pct(vPoint)}</strong>, with a likely range of{" "}
+      <strong style={{ color: "var(--color-ink)" }}>{pct(vLow)} to {pct(vHigh)}</strong>{" "}
+      (overall uncertainty {live.overall_uncertainty}). Quote the range to a technical audience, because the single number on its own overstates how precise the assessment is.
+    </li>
+  );
+
+  const bottleneckBullet = bottleneck ? (
+    <li key="bottleneck">
+      <strong>The bottleneck.</strong>{" "}
+      <strong style={{ color: "var(--color-ink)" }}>{moduleLabels[bottleneck[0]] ?? bottleneck[0]}</strong>{" "}
+      is the current weakest link at <strong style={{ color: "var(--color-ink)" }}>{pct(bottleneck[1].p50)}</strong>
+      {lowCoverage ? (
+        <>
+          . At only{" "}
+          <strong style={{ color: "var(--color-ink)" }}>{pct(live.coverage as number)}%</strong> coverage this is
+          still provisional, because a module can rank weakest simply because it has not been assessed yet. Assess more before
+          you act on it.
+        </>
+      ) : (
+        <>
+          , and it caps the whole score. The fastest improvement comes from fixing the weakest critical part rather than the
+          parts that are already strong.
+        </>
+      )}
+    </li>
+  ) : null;
+
+  // The spread itself: a range over the modules, stated as what it is. Deliberately no band and no
+  // "high/medium/low" label — that would be a new scored dimension without a methodology version.
+  const dispersionBullet = dispersion ? (
+    <li key="dispersion" data-testid="module-dispersion">
+      <strong>How even the firm is.</strong> Across the{" "}
+      <strong style={{ color: "var(--color-ink)" }}>{dispersion.assessed}</strong> assessed module
+      {dispersion.assessed === 1 ? "" : "s"} the scores run from{" "}
+      <strong style={{ color: "var(--color-ink)" }}>{pct(dispersion.low)} to {pct(dispersion.high)}</strong>.{" "}
+      {dispersionSentence(dispersion, moduleLabels[dispersion.weakestKey] ?? dispersion.weakestKey)}
+    </li>
+  ) : null;
+
   return (
     <Card>
       <h3 style={{ margin: "0 0 0.6rem", fontSize: "1rem" }}>What this means</h3>
       <ul style={{ margin: 0, paddingLeft: "1.15rem", fontSize: "0.86rem", lineHeight: 1.6, color: "var(--color-ink-muted)" }}>
-        <li>
-          <strong>The range matters more than the single number.</strong> Platform Value is{" "}
-          <strong style={{ color: "var(--color-ink)" }}>{pct(vPoint)}</strong>, with a likely range of{" "}
-          <strong style={{ color: "var(--color-ink)" }}>{pct(vLow)} to {pct(vHigh)}</strong>{" "}
-          (overall uncertainty {live.overall_uncertainty}). Quote the range to a technical audience, because the single number on its own overstates how precise the assessment is.
-        </li>
-        {bottleneck ? (
-          <li>
-            <strong>The bottleneck.</strong>{" "}
-            <strong style={{ color: "var(--color-ink)" }}>{moduleLabels[bottleneck[0]] ?? bottleneck[0]}</strong>{" "}
-            is the current weakest link at <strong style={{ color: "var(--color-ink)" }}>{pct(bottleneck[1].p50)}</strong>
-            {lowCoverage ? (
-              <>
-                . At only{" "}
-                <strong style={{ color: "var(--color-ink)" }}>{pct(live.coverage as number)}%</strong> coverage this is
-                still provisional, because a module can rank weakest simply because it has not been assessed yet. Assess more before
-                you act on it.
-              </>
-            ) : (
-              <>
-                , and it caps the whole score. The fastest improvement comes from fixing the weakest critical part rather than the
-                parts that are already strong.
-              </>
-            )}
-          </li>
-        ) : null}
+        {leadWithBottleneck
+          ? [bottleneckBullet, dispersionBullet, rangeBullet]
+          : [rangeBullet, dispersionBullet, bottleneckBullet]}
         <li>
           <strong>The band communicates, the score prioritises.</strong> The module band (Basic to Frontier) is the rating you
           put in front of a client. The underlying score, which is more precise, is what decides{" "}

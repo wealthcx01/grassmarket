@@ -765,6 +765,11 @@ class LiveScore(BaseModel):
     # scoreable (a rated C subcomponent in a critical-for-C module), independent of V-scoreability.
     c: Score | None = None
     module_qm: dict[str, IndexBand] = Field(default_factory=dict)
+    # The DETERMINISTIC q_m per module, on the same one-number rule as v_point above (ADR-0040):
+    # these are the quoted module scores, and the bands in `module_qm` are the modelled range
+    # around them. Keyed only by modules that actually scored — a Not Assessed module has no q_m
+    # and appears here not at all (D9), exactly as it contributes nothing to L.
+    module_qm_point: dict[str, float] = Field(default_factory=dict)
     # Derived Platform Power triad — ordinal out (ADR-0002), never a decimal to the client.
     triad_economic: StrengthRating | None = None
     triad_perceived: StrengthRating | None = None

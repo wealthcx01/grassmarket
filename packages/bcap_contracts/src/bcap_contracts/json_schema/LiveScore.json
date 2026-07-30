@@ -167,6 +167,13 @@
       "title": "Module Qm",
       "type": "object"
     },
+    "module_qm_point": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "title": "Module Qm Point",
+      "type": "object"
+    },
     "module_weights": {
       "additionalProperties": {
         "type": "number"

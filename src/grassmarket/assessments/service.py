@@ -360,6 +360,11 @@ def live_score(
         l_point=composite.l_index,
         c=c,
         module_qm={k: _band(v) for k, v in unc.module_qm.items()},
+        # Deterministic module scores (ADR-0040) — what the dispersion figure on the summary is
+        # built from (GRS-0227). Unscored modules are omitted rather than defaulted (D9).
+        module_qm_point={
+            module.key: module.q_m for module in art.result.modules if module.q_m is not None
+        },
         triad_economic=_triad_rating(triad.economic_value.rating),
         triad_perceived=_triad_rating(triad.perceived_value.rating),
         triad_defence=_triad_rating(triad.defence_value.rating),

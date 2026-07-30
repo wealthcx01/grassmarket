@@ -8,6 +8,7 @@
 import { BandDisplay } from "@/components/BandDisplay";
 import { LockedScore } from "@/components/LockedScore";
 import { toDisplay } from "@/lib/band";
+import { moduleDispersion } from "@/lib/dispersion";
 import { humanizeKey, summarizeBlocking } from "@/lib/labels";
 import type { BrokeragePortfolioEntry, IndexBand, LiveScore } from "@/lib/types";
 
@@ -79,6 +80,7 @@ export function LiveScorePanel({
             <BandDisplay label="Power (P)" band={score.p} point={score.p_point} />
           </div>
 
+          <Spread score={score} />
           <Bottleneck score={score} moduleLabels={moduleLabels} />
           <ModuleBreakdown score={score} moduleLabels={moduleLabels} />
           {/* The table invites recomputation, so disclose the full formula (staging rerun, Elena:
@@ -136,6 +138,30 @@ function sortedModules(score: LiveScore): Array<[string, IndexBand, number]> {
   return Object.entries(score.module_qm)
     .map(([k, band]) => [k, band, toDisplay(band.p50)] as [string, IndexBand, number])
     .sort((a, b) => a[2] - b[2]);
+}
+
+/** The module range beside the score (GRS-0227): how uneven this firm is, in the panel an advisor
+ *  actually works in. Rendered as a range and a clause — never a band, a label or a second score,
+ *  and set in muted type below the four headline numbers so it cannot be mistaken for one. */
+function Spread({ score }: { score: LiveScore }) {
+  const d = moduleDispersion(score);
+  if (!d || d.assessed < 2) return null;
+  return (
+    <p
+      data-testid="live-module-spread"
+      style={{ margin: 0, fontSize: "0.72rem", color: "var(--color-ink-muted)", lineHeight: 1.5 }}
+    >
+      Modules run{" "}
+      <span className="mono" style={{ color: "var(--color-ink)" }}>
+        {(d.low * 100).toFixed(0)}–{(d.high * 100).toFixed(0)}
+      </span>{" "}
+      {d.spread === 0
+        ? "— every assessed module is at the same level, so there is no single weak spot to attack."
+        : d.uneven
+          ? "— more than a full rubric level apart, so this is an uneven firm with a specific weak spot rather than an average one."
+          : "— within one rubric level of each other, so the firm is evenly built and the headline moves only by lifting everything."}
+    </p>
+  );
 }
 
 function Bottleneck({ score, moduleLabels }: { score: LiveScore; moduleLabels?: Record<string, string> }) {

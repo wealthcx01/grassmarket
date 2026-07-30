@@ -1,7 +1,7 @@
 # GRS-0227 — Surface the dispersion beside the score
 
-**Status:** Planned (2026-07-30, arising from GRS-0223). **Priority:** HIGH. **Loop:**
-founder-feedback remediation, Wave 1. **Depends on:** GRS-0223 (the measurement that motivates it).
+**Status:** Built, in review (2026-07-30). **Priority:** HIGH. **Loop:** founder-feedback
+remediation, Wave 1. **Depends on:** GRS-0223 (the measurement that motivates it).
 
 ## Why
 
@@ -59,3 +59,44 @@ maths, only surfacing.
 Two firms with the same headline score no longer look like the same firm, and an advisor opening a
 mid-range report can see immediately whether it is mid-range because everything is mediocre or
 because one thing is broken.
+
+## What was built
+
+**The measurement that justified it, taken on the real demo data.** The three showcase firms span
+0.058 of V and 0.448 / 0.600 / 0.542 of module `q_m`. Hargreaves reads mid-range at V 0.572 with a
+module sitting exactly on the rubric floor (0.200); Revolut reads 0.605 and bottoms out at 0.375.
+That gap between the two numbers is the whole argument, and it is pinned in
+`tests/test_module_dispersion.py` so the feature cannot outlive its evidence.
+
+1. **`module_qm_point` on the live payload** — the deterministic `q_m` per module (ADR-0040), keyed
+   only by modules that actually scored. Not the Monte Carlo bands: an unassessed module carries a
+   modelled band and no point, so a band-derived range would invent a weak spot nobody measured
+   (D9). Worth recording that the obvious reason for this field is not the real one — at module
+   level the MC median lands exactly on the deterministic point, because a fully rated module has
+   no rating uncertainty to draw over. The drift is at the composite. The reason to read points is
+   **coverage**, not drift.
+2. **`frontend/lib/dispersion.ts`** — the range, the weakest module, and the sentence. No band, no
+   label, no high/medium/low gate, per scope item 4.
+3. **The summary card and the live panel** both state the range and what it means. Where the spread
+   is wide the bottleneck **leads** the card (scope item 3) — but never below half coverage, where
+   the weakest module may simply be the one nobody has assessed yet (the GRS-0145 caveat).
+
+**The threshold is one full rubric step (0.3), not an invented percentile.** `MaturityLevel.
+score_index` places the levels at 0.2 / 0.5 / 0.8 / 1.0, so the widest adjacent step is 0.3. Below
+it every module sits within a single rubric level of every other and calling the firm uneven would
+be reading noise; at or above it the modules are genuinely at different maturity levels. That is a
+fact about the scale rather than a choice about the data.
+
+### On scope item 4
+
+A binary `uneven` flag does exist internally, because scope item 2 requires a tight spread to get
+the *opposite* sentence and that needs a threshold. It is used only to choose wording and bullet
+order and is never rendered as a label; both test files assert no rating word reaches the screen.
+
+### Test plan, as delivered
+
+Every item is covered. The headline test — same V, different spread, must render differently — is
+asserted twice: on the helper (`lib/dispersion.test.ts`) and on rendered output
+(`components/LiveScorePanel.dispersion.test.tsx`), because the ticket's acceptance is a claim about
+what is on screen. Assessed-only (D9), zero-spread, and the single-module case (which renders
+nothing rather than claiming a perfectly even firm) are each covered. No change to the scoring path.
