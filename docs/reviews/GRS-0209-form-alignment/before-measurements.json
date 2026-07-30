@@ -1,0 +1,65 @@
+{
+  "1280": {
+    "formAlignItems": "end",
+    "input": {
+      "top": 299.7,
+      "bottom": 340.5,
+      "height": 40.9
+    },
+    "select": {
+      "top": 323.1,
+      "bottom": 364,
+      "height": 40.9
+    },
+    "button": {
+      "top": 328.1,
+      "bottom": 364,
+      "height": 35.9
+    },
+    "inputVsSelectTopDelta": 23.4,
+    "selectVsInputHeightDelta": 0,
+    "buttonVsSelectTopDelta": 5
+  },
+  "1440": {
+    "formAlignItems": "end",
+    "input": {
+      "top": 299.7,
+      "bottom": 340.5,
+      "height": 40.9
+    },
+    "select": {
+      "top": 323.1,
+      "bottom": 364,
+      "height": 40.9
+    },
+    "button": {
+      "top": 328.1,
+      "bottom": 364,
+      "height": 35.9
+    },
+    "inputVsSelectTopDelta": 23.4,
+    "selectVsInputHeightDelta": 0,
+    "buttonVsSelectTopDelta": 5
+  },
+  "1920": {
+    "formAlignItems": "end",
+    "input": {
+      "top": 299.7,
+      "bottom": 340.5,
+      "height": 40.9
+    },
+    "select": {
+      "top": 323.1,
+      "bottom": 364,
+      "height": 40.9
+    },
+    "button": {
+      "top": 328.1,
+      "bottom": 364,
+      "height": 35.9
+    },
+    "inputVsSelectTopDelta": 23.4,
+    "selectVsInputHeightDelta": 0,
+    "buttonVsSelectTopDelta": 5
+  }
+}

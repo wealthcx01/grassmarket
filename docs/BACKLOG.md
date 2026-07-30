@@ -77,7 +77,7 @@ From the 2026-07-26 staging review. Wave 4 (the course rebuild) is the part that
 | GRS-0206 | Rive as the diagram and motion system (ADR-0049) | Planned — rewritten 2026-07-29 after reading the repo |
 | GRS-0207 | Outreach and CRM platform: decide, then build thin | Planned |
 | GRS-0208 | One clean demo account + a founder admin who can act as any advisor | Planned |
-| GRS-0209 | The Operating Model dropdown still does not line up | Planned |
+| **GRS-0209** | **The Operating Model dropdown still does not line up** | **Fixed, in review** — measured on the rendered page: the select sat **23.4px** below the subject input at all three widths, now **0px**. Cause was `align-items: end` against a field that always renders a caption. Evidence in `docs/reviews/GRS-0209-form-alignment/` |
 | GRS-0210 | Smart search must know the firms an advisor will type | Planned |
 | GRS-0211 | The client deliverable, rebuilt: what it says | Planned |
 | GRS-0212 | Customer Proposition for exchanges: research, model, ship | Planned |

@@ -55,13 +55,12 @@
   --topbar-height: 3.75rem;
   --content-max: 64rem; /* comfortable measure — content centres, never sprawls */
   --content-narrow: 46rem; /* prose / single-column forms */
+  /* The height a text input and a native select both reach on their own at the shared control
+     padding and font-size, measured on the rendered page (GRS-0209). Used as a minimum, so it
+     resizes nothing that already meets it — see .form-create-assessment .field-control. */
+  --field-control-height: 2.55rem;
 
   /* ---- Radius — restrained, editorial ---- */
-  /* The one height every form control resolves to (GRS-0209). A native <select> computes ~2px
-     taller than an <input> at identical padding, font-size and border — its intrinsic content
-     height, which no test comparing style DECLARATIONS can see. Pinning both to one token is what
-     makes the pair line up, and 2.35rem is the <input>'s own natural height, so nothing resizes. */
-  --field-control-height: 2.35rem;
   --radius: 7px; /* controls, buttons */
   --radius-sm: 5px;
   --radius-lg: 10px; /* cards, panels */
@@ -473,25 +472,28 @@ button {
   }
 }
 
-/* New-assessment form (GRS-0178). Subject, operating model, and the button on one baseline; the
-   practice-copy option on its own full-width row beneath. Below 40rem the columns stack, because
-   three side-by-side fields on a phone are three cramped fields. */
+/* New-assessment form (GRS-0209, correcting GRS-0178). Subject, operating model, and the button on
+   one baseline; the practice-copy option on its own full-width row beneath. Below 40rem the columns
+   stack, because three side-by-side fields on a phone are three cramped fields.
+
+   START, not END. Measured on the unfixed form (Chromium, 1280/1440/1920, all three identical), the
+   Operating Model select sat 23.4px below the subject input. Aligning cells on their BOTTOM was the
+   cause: the subject cell always renders a caption under its input, so the caption's height pushed
+   that input up out of line. Aligning on the top makes the label rows share a baseline, so the
+   controls beneath them do too, and a caption can no longer move the control above it. */
 .form-create-assessment {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
   gap: 0.75rem;
-  /* START, not END (GRS-0209). Aligning on the cell BOTTOM meant the subject field — which always
-     renders a caption under its input ("✓ Linked to…" / the unlinked hint) — sat 17.6px higher
-     than the Operating Model select, because the caption is part of that cell's height. Aligning
-     on the top makes the label rows share a baseline, so the controls beneath them do too, and a
-     field that grows a caption can no longer shove its own control out of line. */
   align-items: start;
 }
 
-/* Every control in the row resolves to the same height, so the pair cannot drift apart when a
-   field is added (GRS-0209 scope item 3). */
+/* The height the text input and the select already resolve to on their own at the shared padding
+   and font-size (measured: 40.9px). Declared as a MIN so neither of them is resized by it — it
+   exists because the submit button carries .btn's own padding and comes out 35.9px, and because a
+   control added later should not be able to sit shorter than the row without anyone noticing. */
 .form-create-assessment .field-control {
-  height: var(--field-control-height);
+  min-height: var(--field-control-height);
 }
 @media (max-width: 40rem) {
   .form-create-assessment {

@@ -179,6 +179,46 @@ describe("Portfolio page (GRS-0177)", () => {
     });
   });
 
+  describe("every cell goes through the same field wrapper (GRS-0209)", () => {
+    // The tests above passed while the form was visibly wrong: measured on the rendered page, the
+    // Operating Model select sat 23.4px below the subject input, because the grid aligned cells on
+    // their bottom and the subject field's caption pushed its input up. jsdom cannot see that, so
+    // what is locked here is the structure the fix relies on. The pixels are proved by the
+    // before/after screenshots on the PR.
+    it("wraps all three cells — including the button — in a .form-field", async () => {
+      const { container } = await renderPage([entry("p", "Monzo", "production")]);
+      const form = container.querySelector("form.form-create-assessment") as HTMLElement;
+      // Three field cells on row 1; the practice-copy option is its own full-width row.
+      const fields = form.querySelectorAll(":scope > .form-field");
+      expect(fields.length).toBe(3);
+      // The button is inside one of them rather than sitting bare in the grid — that is what
+      // reserves its label row, instead of nudging it down with a computed margin.
+      const submit = screen.getByRole("button", { name: /Create and open/ });
+      expect(Array.from(fields).some((f) => f.contains(submit))).toBe(true);
+    });
+
+    it("does not let the spacer label rename the submit button", async () => {
+      // The button's cell reserves an empty label row so it lines up with the labelled controls.
+      // If that cell is a <label>, the button — a labelable element — is renamed by it and gets
+      // announced as blank. This asserts the button still carries its own name.
+      await renderPage([entry("p", "Monzo", "production")]);
+      const submit = screen.getByRole("button", { name: /Create and open/ });
+      expect(submit.closest("label")).toBeNull();
+    });
+
+    it("gives every control the shared control-height class", async () => {
+      const { container } = await renderPage([entry("p", "Monzo", "production")]);
+      const form = container.querySelector("form.form-create-assessment") as HTMLElement;
+      for (const selector of ['input[type="text"]', "select", 'button[type="submit"]']) {
+        const control = form.querySelector(selector) as HTMLElement;
+        expect(control, `${selector} is missing from the form`).toBeTruthy();
+        expect(control.classList.contains("field-control"), `${selector} lacks field-control`).toBe(
+          true
+        );
+      }
+    });
+  });
+
   describe("the rest of the table is unchanged", () => {
     it("still shows segment, coverage and the locked score", async () => {
       const { container } = await renderPage([entry("p", "Monzo", "production")]);
