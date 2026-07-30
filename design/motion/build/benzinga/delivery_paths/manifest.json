@@ -1,0 +1,24 @@
+{
+  "source": "/home/dev/projects/grassmarket/design/motion/build/benzinga/delivery_paths.riv",
+  "artboard": "DeliveryPaths",
+  "animation": null,
+  "state_machine": null,
+  "available_animations": [],
+  "available_state_machines": [
+    "Auto Generated State Machine"
+  ],
+  "width": 960,
+  "height": 500,
+  "scale": 2,
+  "fps": 60.0,
+  "frames": [
+    {
+      "index": 0,
+      "seconds": 0.0,
+      "filename": "frame_00000.png",
+      "distinct_colors": 1825,
+      "blank": false
+    }
+  ],
+  "contact_sheet": null
+}

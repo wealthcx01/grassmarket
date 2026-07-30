@@ -314,23 +314,46 @@ def export(scene_path: Path, out_path: Path) -> Path:
 # immutable snapshot, so the content has to BE the string rather than point at a file that could
 # change or fail to ship in a wheel. `tests/test_course_diagrams.py` regenerates and compares, so
 # the module cannot drift from the scenes it came from.
-CONTENT_MODULE = (
-    Path(__file__).resolve().parents[2] / "src/grassmarket/workbench/content/openbb_diagrams.py"
-)
+CONTENT_DIR = Path(__file__).resolve().parents[2] / "src/grassmarket/workbench/content"
 
-_HEADER = '''"""OpenBB course diagrams as inline SVG (GRS-0225). GENERATED — DO NOT EDIT.
+# The proper name of each course, for the generated module's docstring. A course with no entry is
+# refused rather than given a title guessed from its directory name: these modules are read by
+# people, and "Sales_ops_playbook course diagrams" is the kind of detail that says nobody looked.
+COURSE_TITLES: dict[str, str] = {
+    "openbb": "OpenBB",
+    "benzinga": "Benzinga",
+    "brandfetch": "Brandfetch",
+    "sales_ops": "Sales Operations Playbook",
+}
+
+
+def content_module_path(course: str) -> Path:
+    """The generated module for one course's diagrams."""
+    return CONTENT_DIR / f"{course}_diagrams.py"
+
+
+def _header(course: str) -> str:
+    """The generated module's docstring. Names the course, its scene directory and its slides
+    module, so the file says where to make a change rather than only where not to."""
+    if course not in COURSE_TITLES:
+        raise KeyError(
+            f"No display title registered for course {course!r}. Add it to COURSE_TITLES — a "
+            "generated module nobody can read is not a generated module."
+        )
+    title = COURSE_TITLES[course]
+    return f'''"""{title} course diagrams as inline SVG (GRS-0225). GENERATED — DO NOT EDIT.
 
 Regenerate with `uv run python design/motion/svg_export.py`. The source is the SceneSpec JSON under
-`design/motion/courses/openbb/`; edit that, not this. `tests/test_course_diagrams.py` fails if this
-file and those scenes disagree.
+`design/motion/courses/{course}/`; edit that, not this. `tests/test_course_diagrams.py` fails if
+this file and those scenes disagree.
 
 Captions and alt text are NOT here: they are authored prose and live beside the slide they explain,
-in `openbb_slides.py`. Only the drawing is generated.
+in `{course}_slides.py`. Only the drawing is generated.
 """
 
 from __future__ import annotations
 
-SVG: dict[str, str] = {
+SVG: dict[str, str] = {{
 '''
 
 
@@ -351,30 +374,43 @@ def _literal(text: str) -> str:
     return '"' + text.replace('"', '\\"') + '"'
 
 
-def write_content_module(course: str = "openbb") -> Path:
-    """Write the generated SVG constants the course content imports."""
-    here = Path(__file__).parent
+def scene_dir(course: str) -> Path:
+    return Path(__file__).parent / "courses" / course
+
+
+def courses() -> list[str]:
+    """Every course with at least one authored scene, in a stable order."""
+    return sorted(p.name for p in (Path(__file__).parent / "courses").iterdir() if p.is_dir())
+
+
+def write_content_module(course: str) -> Path:
+    """Write the generated SVG constants one course's content imports."""
     entries = []
-    for scene in sorted((here / "courses" / course).glob("*.json")):
+    for scene in sorted(scene_dir(course).glob("*.json")):
         parts = scene_svg_parts(json.loads(scene.read_text()))
         # Implicit concatenation joins the lines with no separator, so the string at runtime is
         # byte-for-byte the document `export()` writes.
         lines = "\n".join(f"        {_literal(part)}" for part in parts)
         entries.append(f'    "{scene.stem}": (\n{lines}\n    ),\n')
-    CONTENT_MODULE.write_text(_HEADER + "".join(entries) + "}\n")
-    return CONTENT_MODULE
+    out = content_module_path(course)
+    out.write_text(_header(course) + "".join(entries) + "}\n")
+    return out
 
 
 def main() -> None:
     here = Path(__file__).parent
-    count = 0
-    for scene in sorted(here.glob("courses/*/*.json")):
-        course = scene.parent.name
-        out = export(scene, here / "build" / course / f"{scene.stem}.svg")
-        print(f"{course}/{scene.stem}  {out.stat().st_size:>6} bytes")
-        count += 1
-    module = write_content_module()
-    print(f"{count} diagrams exported to SVG → {module.relative_to(Path.cwd())}")
+    total = 0
+    for course in courses():
+        count = 0
+        for scene in sorted(scene_dir(course).glob("*.json")):
+            out = export(scene, here / "build" / course / f"{scene.stem}.svg")
+            print(f"{course}/{scene.stem}  {out.stat().st_size:>6} bytes")
+            count += 1
+        module = write_content_module(course)
+        rel = module.relative_to(Path.cwd()) if module.is_relative_to(Path.cwd()) else module
+        print(f"  {count} diagram(s) → {rel}")
+        total += count
+    print(f"{total} diagrams exported across {len(courses())} course(s).")
 
 
 if __name__ == "__main__":

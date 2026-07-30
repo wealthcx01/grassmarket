@@ -66,11 +66,13 @@ target-version = "py312"
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "W"]
 
-# One generated file, one rule. `openbb_diagrams.py` is written by `design/motion/svg_export.py`
-# and holds one SVG element per line; wrapping those would make a diagram's diff unreadable, which
-# is the whole reason it is emitted element-per-line. Nothing else is exempt.
+# One generated family, one rule. `*_diagrams.py` under `workbench/content` is written by
+# `design/motion/svg_export.py` and holds one SVG element per line; wrapping those would make a
+# diagram's diff unreadable, which is the whole reason it is emitted element-per-line. The glob
+# covers a course per file (openbb, benzinga, ...) rather than needing an entry per course, which
+# is the kind of edit that gets forgotten. Nothing hand-written is exempt.
 [tool.ruff.lint.per-file-ignores]
-"src/grassmarket/workbench/content/openbb_diagrams.py" = ["E501"]
+"src/grassmarket/workbench/content/*_diagrams.py" = ["E501"]
 
 # FastAPI's dependency-injection idiom puts calls (Depends/Security/…) in argument defaults; they
 # are immutable sentinels by design, so B008 does not apply. (SD3 has no FastAPI; this is the one

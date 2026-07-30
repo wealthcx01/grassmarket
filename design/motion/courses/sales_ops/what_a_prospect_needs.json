@@ -1,0 +1,599 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "WhatAProspectNeeds",
+    "width": 1000,
+    "height": 460,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 500,
+        "y": 46,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "A prospect record, or a business card"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 500,
+        "y": 82,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "Anyone fills in the top two. The bottom three are the deal."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "NameL",
+        "x": 330,
+        "y": 158,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "NameLStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "NameLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "NameLStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "NameLRun",
+            "style": "NameLStyle",
+            "text": "company and contact"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "SectorL",
+        "x": 330,
+        "y": 202,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SectorLStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SectorLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SectorLStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SectorLRun",
+            "style": "SectorLStyle",
+            "text": "sector"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "PainL",
+        "x": 330,
+        "y": 246,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "PainLStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "PainLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "PainLStyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "PainLRun",
+            "style": "PainLStyle",
+            "text": "the growth pain, verbatim"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "PainRow",
+        "x": 330,
+        "y": 246,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "PainRowPath",
+            "width": 400,
+            "height": 36,
+            "corner_radius": 6,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "PainRowFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "PainRowSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "SourceL",
+        "x": 330,
+        "y": 290,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SourceLStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SourceLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SourceLStyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SourceLRun",
+            "style": "SourceLStyle",
+            "text": "who sourced it"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "SourceRow",
+        "x": 330,
+        "y": 290,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "SourceRowPath",
+            "width": 400,
+            "height": 36,
+            "corner_radius": 6,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "SourceRowFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "SourceRowSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "NextL",
+        "x": 330,
+        "y": 334,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "NextLStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "NextLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "NextLStyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "NextLRun",
+            "style": "NextLStyle",
+            "text": "a dated next step"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "NextRow",
+        "x": 330,
+        "y": 334,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "NextRowPath",
+            "width": 400,
+            "height": 36,
+            "corner_radius": 6,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "NextRowFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "NextRowSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "RecordCard",
+        "x": 330,
+        "y": 246,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "RecordCardPath",
+            "width": 460,
+            "height": 240,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "RecordCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RecordCardSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "RecordCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RecordCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Why1",
+        "x": 800,
+        "y": 208,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Why1Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Why1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Why1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Why1Run",
+            "style": "Why1Style",
+            "text": "no pain,"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Why2",
+        "x": 800,
+        "y": 232,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Why2Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Why2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Why2StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Why2Run",
+            "style": "Why2Style",
+            "text": "no reason to meet"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Why3",
+        "x": 800,
+        "y": 288,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Why3Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Why3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Why3StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Why3Run",
+            "style": "Why3Style",
+            "text": "sourcing decides"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Why4",
+        "x": 800,
+        "y": 312,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Why4Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Why4StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Why4StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Why4Run",
+            "style": "Why4Style",
+            "text": "your rate later"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 500,
+        "y": 418,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#A3502A"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "Log who sourced it on day one. Nobody can reconstruct it in month nine."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 500,
+        "y": 230,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 1000,
+            "height": 460,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

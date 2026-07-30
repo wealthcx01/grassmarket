@@ -235,7 +235,12 @@ _SECTION_1_SLIDES: tuple[Slide, ...] = (
         'OpenBB\'s agents "leverage the metadata from your widgets to query the right datasets" '
         "and can watch dashboards for anomalies while holding context across several sources. The "
         "word that matters to a compliance-minded buyer is **grounded**: the answer comes from "
-        "their data, not from a model's memory of the internet.",
+        "their data, not from a model's memory of the internet.\n\n"
+        "Workspace also exposes an **MCP** endpoint, so agents the firm already uses — Claude "
+        "Code, Cursor, Codex — can work over that same governed data with permissions and lineage "
+        "enforced. That is the sharpest enterprise hook in the product: agents are already loose "
+        "inside the firm, and this is the argument for them running somewhere governed rather than "
+        "somewhere nobody can audit.",
         refs=(DOCS_WORKSPACE,),
     ),
     _s(

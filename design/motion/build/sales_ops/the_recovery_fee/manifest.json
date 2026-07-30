@@ -1,0 +1,24 @@
+{
+  "source": "/home/dev/projects/grassmarket/design/motion/build/sales_ops/the_recovery_fee.riv",
+  "artboard": "TheRecoveryFee",
+  "animation": null,
+  "state_machine": null,
+  "available_animations": [],
+  "available_state_machines": [
+    "Auto Generated State Machine"
+  ],
+  "width": 1020,
+  "height": 460,
+  "scale": 2,
+  "fps": 60.0,
+  "frames": [
+    {
+      "index": 0,
+      "seconds": 0.0,
+      "filename": "frame_00000.png",
+      "distinct_colors": 1359,
+      "blank": false
+    }
+  ],
+  "contact_sheet": null
+}

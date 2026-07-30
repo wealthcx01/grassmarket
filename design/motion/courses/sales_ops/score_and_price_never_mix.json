@@ -1,0 +1,648 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "ScoreAndPriceNeverMix",
+    "width": 1180,
+    "height": 480,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 590,
+        "y": 46,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "Two numbers, and a wall between them"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "HeadL",
+        "x": 320,
+        "y": 130,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "HeadLStyle",
+            "font_asset": "Display",
+            "font_size": 18,
+            "children": [
+              {
+                "type": "fill",
+                "name": "HeadLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "HeadLStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "HeadLRun",
+            "style": "HeadLStyle",
+            "text": "THE SCORE"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "HeadR",
+        "x": 860,
+        "y": 130,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "HeadRStyle",
+            "font_asset": "Display",
+            "font_size": 18,
+            "children": [
+              {
+                "type": "fill",
+                "name": "HeadRStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "HeadRStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "HeadRRun",
+            "style": "HeadRStyle",
+            "text": "THE VALUE BRIDGE"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "L0",
+        "x": 320,
+        "y": 186,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "L0Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "L0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "L0StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "L0Run",
+            "style": "L0Style",
+            "text": "how weak the moat is"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R0",
+        "x": 860,
+        "y": 186,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R0Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R0StyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R0Run",
+            "style": "R0Style",
+            "text": "what fixing it is worth"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "L1",
+        "x": 320,
+        "y": 254,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "L1Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "L1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "L1StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "L1Run",
+            "style": "L1Style",
+            "text": "score points"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R1",
+        "x": 860,
+        "y": 254,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R1Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R1StyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R1Run",
+            "style": "R1Style",
+            "text": "pounds, traceable to an assumption"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "L2",
+        "x": 320,
+        "y": 322,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "L2Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "L2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "L2StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "L2Run",
+            "style": "L2Style",
+            "text": "how bad is this?"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R2",
+        "x": 860,
+        "y": 322,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R2Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R2StyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R2Run",
+            "style": "R2Style",
+            "text": "what is it worth doing?"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Row186",
+        "x": 90,
+        "y": 186,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Row186Style",
+            "font_asset": "Display",
+            "font_size": 11,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Row186StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Row186StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.2
+          },
+          {
+            "type": "text_value_run",
+            "name": "Row186Run",
+            "style": "Row186Style",
+            "text": "MEASURES"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Row254",
+        "x": 90,
+        "y": 254,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Row254Style",
+            "font_asset": "Display",
+            "font_size": 11,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Row254StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Row254StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.2
+          },
+          {
+            "type": "text_value_run",
+            "name": "Row254Run",
+            "style": "Row254Style",
+            "text": "UNIT"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Row322",
+        "x": 90,
+        "y": 322,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Row322Style",
+            "font_asset": "Display",
+            "font_size": 11,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Row322StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Row322StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.2
+          },
+          {
+            "type": "text_value_run",
+            "name": "Row322Run",
+            "style": "Row322Style",
+            "text": "ANSWERS"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "RightPanel",
+        "x": 860,
+        "y": 254,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "RightPanelPath",
+            "width": 440,
+            "height": 230,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "RightPanelFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RightPanelSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "LeftPanel",
+        "x": 320,
+        "y": 254,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "LeftPanelPath",
+            "width": 440,
+            "height": 230,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "LeftPanelFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LeftPanelSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "LeftPanelStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LeftPanelStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Wall",
+        "x": 590,
+        "y": 254,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "WallPath",
+            "width": 4,
+            "height": 270,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "WallFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "WallSolid",
+                "color": "#1A1A18"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "WallLabel",
+        "x": 590,
+        "y": 396,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "WallLabelStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "WallLabelStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "WallLabelStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "WallLabelRun",
+            "style": "WallLabelStyle",
+            "text": "never one equation"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Warn",
+        "x": 590,
+        "y": 440,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "WarnStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "WarnStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "WarnStyleCol",
+                    "color": "#A3502A"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "WarnRun",
+            "style": "WarnStyle",
+            "text": "Dividing a score into pounds invents a number the methodology refuses to produce."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 590,
+        "y": 240,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 1180,
+            "height": 480,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,695 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "QualifyOrNurture",
+    "width": 1000,
+    "height": 460,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 500,
+        "y": 46,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "Every workshop ends in one of two states"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Q",
+        "x": 500,
+        "y": 128,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "QStyle",
+            "font_asset": "Display",
+            "font_size": 21,
+            "children": [
+              {
+                "type": "fill",
+                "name": "QStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "QStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "QRun",
+            "style": "QStyle",
+            "text": "Is there a real, addressable bottleneck?"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "QBox",
+        "x": 500,
+        "y": 128,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "QBoxPath",
+            "width": 540,
+            "height": 58,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "QBoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "QBoxSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "QBoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "QBoxStrokeCol",
+                "color": "#1A1A18"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "YesL",
+        "x": 300,
+        "y": 184,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "YesLStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "YesLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "YesLStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "YesLRun",
+            "style": "YesLStyle",
+            "text": "Yes"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "NoL",
+        "x": 700,
+        "y": 184,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "NoLStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "NoLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "NoLStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "NoLRun",
+            "style": "NoLStyle",
+            "text": "No"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LeftT",
+        "x": 270,
+        "y": 248,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LeftTStyle",
+            "font_asset": "Display",
+            "font_size": 20,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LeftTStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LeftTStyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LeftTRun",
+            "style": "LeftTStyle",
+            "text": "Qualified"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LeftB",
+        "x": 270,
+        "y": 282,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LeftBStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LeftBStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LeftBStyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LeftBRun",
+            "style": "LeftBStyle",
+            "text": "advance, with the"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LeftB2",
+        "x": 270,
+        "y": 304,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LeftB2Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LeftB2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LeftB2StyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LeftB2Run",
+            "style": "LeftB2Style",
+            "text": "finding recorded"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RightT",
+        "x": 730,
+        "y": 248,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RightTStyle",
+            "font_asset": "Display",
+            "font_size": 20,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RightTStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RightTStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RightTRun",
+            "style": "RightTStyle",
+            "text": "Nurture"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RightB",
+        "x": 730,
+        "y": 282,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RightBStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RightBStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RightBStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RightBRun",
+            "style": "RightBStyle",
+            "text": "say so honestly, with"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RightB2",
+        "x": 730,
+        "y": 304,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RightB2Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RightB2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RightB2StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RightB2Run",
+            "style": "RightB2Style",
+            "text": "a dated reason to return"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "LeftBox",
+        "x": 270,
+        "y": 276,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "LeftBoxPath",
+            "width": 320,
+            "height": 116,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "LeftBoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LeftBoxSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "RightBox",
+        "x": 730,
+        "y": 276,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "RightBoxPath",
+            "width": 320,
+            "height": 116,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "RightBoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RightBoxSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "RightBoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RightBoxStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "DownLHead",
+        "x": 270,
+        "y": 192.0,
+        "rotation": 3.14159,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "DownLHeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "DownLHeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DownLHeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "DownLStem",
+        "x": 270,
+        "y": 172,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "DownLStemPath",
+            "width": 2.5,
+            "height": 31.0,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "DownLStemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DownLStemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "DownRHead",
+        "x": 730,
+        "y": 192.0,
+        "rotation": 3.14159,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "DownRHeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "DownRHeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DownRHeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "DownRStem",
+        "x": 730,
+        "y": 172,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "DownRStemPath",
+            "width": 2.5,
+            "height": 31.0,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "DownRStemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DownRStemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Warn",
+        "x": 500,
+        "y": 382,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "WarnStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "WarnStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "WarnStyleCol",
+                    "color": "#A3502A"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "WarnRun",
+            "style": "WarnStyle",
+            "text": "Left at Delivered is not a third answer. It is nobody having decided."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 500,
+        "y": 424,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "\"It went well\" is not a qualification. A named bottleneck is."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 500,
+        "y": 230,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 1000,
+            "height": 460,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

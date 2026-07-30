@@ -1,0 +1,747 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "FourSurfaces",
+    "width": 960,
+    "height": 470,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 480,
+        "y": 44,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "Land free, expand into the paid data"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 480,
+        "y": 78,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "Height is commitment, not price."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LogoT",
+        "x": 150,
+        "y": 332,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LogoTStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LogoTStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LogoTStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LogoTRun",
+            "style": "LogoTStyle",
+            "text": "Logo Link"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LogoW",
+        "x": 150,
+        "y": 358,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LogoWStyle",
+            "font_asset": "Display",
+            "font_size": 13,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LogoWStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LogoWStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LogoWRun",
+            "style": "LogoWStyle",
+            "text": "an image URL"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LogoTier",
+        "x": 150,
+        "y": 398,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LogoTierStyle",
+            "font_asset": "Display",
+            "font_size": 13,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LogoTierStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LogoTierStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LogoTierRun",
+            "style": "LogoTierStyle",
+            "text": "free tier"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "LogoCard",
+        "x": 150,
+        "y": 337.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "LogoCardPath",
+            "width": 196,
+            "height": 70,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "LogoCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LogoCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "LogoCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LogoCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "SearchT",
+        "x": 370,
+        "y": 292,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SearchTStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SearchTStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SearchTStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SearchTRun",
+            "style": "SearchTStyle",
+            "text": "Brand Search"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "SearchW",
+        "x": 370,
+        "y": 318,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SearchWStyle",
+            "font_asset": "Display",
+            "font_size": 13,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SearchWStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SearchWStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SearchWRun",
+            "style": "SearchWStyle",
+            "text": "a type-ahead"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "SearchTier",
+        "x": 370,
+        "y": 398,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SearchTierStyle",
+            "font_asset": "Display",
+            "font_size": 13,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SearchTierStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SearchTierStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SearchTierRun",
+            "style": "SearchTierStyle",
+            "text": "free tier"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "SearchCard",
+        "x": 370,
+        "y": 317.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "SearchCardPath",
+            "width": 196,
+            "height": 110,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "SearchCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "SearchCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "SearchCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "SearchCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "BrandT",
+        "x": 590,
+        "y": 242,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "BrandTStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "BrandTStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "BrandTStyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "BrandTRun",
+            "style": "BrandTStyle",
+            "text": "Brand API"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "BrandW",
+        "x": 590,
+        "y": 268,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "BrandWStyle",
+            "font_asset": "Display",
+            "font_size": 13,
+            "children": [
+              {
+                "type": "fill",
+                "name": "BrandWStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "BrandWStyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "BrandWRun",
+            "style": "BrandWStyle",
+            "text": "identity by ticker"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "BrandTier",
+        "x": 590,
+        "y": 398,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "BrandTierStyle",
+            "font_asset": "Display",
+            "font_size": 13,
+            "children": [
+              {
+                "type": "fill",
+                "name": "BrandTierStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "BrandTierStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "BrandTierRun",
+            "style": "BrandTierStyle",
+            "text": "paid"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "BrandCard",
+        "x": 590,
+        "y": 292.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BrandCardPath",
+            "width": 196,
+            "height": 160,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BrandCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BrandCardSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "TxnT",
+        "x": 810,
+        "y": 192,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TxnTStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TxnTStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TxnTStyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TxnTRun",
+            "style": "TxnTStyle",
+            "text": "Transaction API"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "TxnW",
+        "x": 810,
+        "y": 218,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TxnWStyle",
+            "font_asset": "Display",
+            "font_size": 13,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TxnWStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TxnWStyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TxnWRun",
+            "style": "TxnWStyle",
+            "text": "messy descriptors"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "TxnTier",
+        "x": 810,
+        "y": 398,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TxnTierStyle",
+            "font_asset": "Display",
+            "font_size": 13,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TxnTierStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TxnTierStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TxnTierRun",
+            "style": "TxnTierStyle",
+            "text": "enterprise"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "TxnCard",
+        "x": 810,
+        "y": 267.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "TxnCardPath",
+            "width": 196,
+            "height": 210,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "TxnCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "TxnCardSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Base",
+        "x": 480,
+        "y": 372,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BasePath",
+            "width": 860,
+            "height": 2,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BaseFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BaseSolid",
+                "color": "#1A1A18"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 480,
+        "y": 430,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "Demo the free surface. Sell the paid one. They are not the same conversation."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 480,
+        "y": 235,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 960,
+            "height": 470,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,7 +1,213 @@
 # GRS-0217 — The remaining product courses, to the same standard
 
-**Status:** Planned (2026-07-26, staging review item 14; 23/07 item 20). **Priority:** HIGH.
-**Loop:** founder-feedback remediation, Wave 4. **Depends on:** GRS-0215, GRS-0216 (sets the bar).
+**Status:** In review (2026-07-30, PR #221) — **COMPLETE. All three remaining courses rebuilt:
+Benzinga, Brandfetch and the Sales Operations Playbook, 8 of 8 sections each.** **Priority:** HIGH.
+**Loop:** founder-feedback remediation, Wave 4. **Depends on:** GRS-0215, GRS-0216 (sets the bar),
+GRS-0226 (the reader, without which none of it is visible).
+
+## Ordering decision (scope asks for this to be a decision, not an accident)
+
+By year-one advisor share from `commissions.yaml`: **Benzinga 1500 bps**, Brandfetch distribution
+750, Brandfetch redistribution 375. Benzinga ties OpenBB at the top and is the only remaining
+product with a committed structured source of truth, so it went first. Brandfetch follows, and it
+must teach the distribution / redistribution split as two products for two segments (GRS-0185),
+because that is the specific thing the founder found us conflating. `sales-ops-playbook` is last.
+
+## PR 1 — Benzinga: complete
+
+Eight sections, **192 slides**, 48 test questions, 69 hands-on slides, one authored diagram per
+section. Every section gates on a 6-question test at an 80% pass mark. The whole course meets the
+GRS-0215 depth standard.
+
+| # | Section | Slides | Hands-on |
+|---|---|---|---|
+| 1 | What Benzinga is, and what it is not | 24 | 9 |
+| 2 | The catalogue, in four families | 24 | 10 |
+| 3 | How it arrives, and what that costs to build | 24 | 9 |
+| 4 | The content layer: what a user reads | 24 | 8 |
+| 5 | The event layer: what a user plans around | 24 | 7 |
+| 6 | The signal layer: what a desk trades on | 24 | 8 |
+| 7 | Who buys which family, and what triggers it | 24 | 9 |
+| 8 | How to sell it | 24 | 9 |
+
+Grounded in `data/gtm/sources/benzinga-product-catalog.xlsx` — 32 products across four families
+(8 / 11 / 9 / 4) with delivery method, coverage universe, history depth, daily volume, key fields and
+differentiators per product. Those counts are now asserted against the spreadsheet by
+`test_the_family_counts_match_the_committed_catalogue`, and the slides are asserted to quote the same
+numbers.
+
+`SECTIONS_PLANNED` is empty, `test_the_course_is_not_finished_and_says_so` has been deleted as its
+own failure message asked, and `product-benzinga` has come off `depth.LEGACY_COURSES`. Worth noting
+what that register is: nothing in `check_depth` reads it, so it never exempted anything mechanically
+— it is the visible-debt list, and this debt is paid.
+
+**The honesty discipline is carried in the content, not in a preamble.** Section 1 drills the three
+things Benzinga is not. Section 4 makes the advisor say the AI provenance of Bulls Say Bears Say out
+loud. Section 5 states the earnings accuracy figure precisely *and* forbids stretching it across the
+other ten calendars. Section 6 is built around the alpha caveat and includes a slide asking the
+advisor to rewrite their sentence if it contains the word "predicts". Section 8 ends on the four
+lines an advisor never crosses: price, timeline, redistribution, attribution.
+
+### Three defects fixed on the way through
+
+1. **The diagram toolchain could only hold one course.** `svg_export.py` hardcoded OpenBB in three
+   places, including a `course=` parameter that `write_content_module` then ignored — so generating
+   a second course would have silently overwritten `openbb_diagrams.py`.
+2. **The OpenBB course had two sections sharing a module id.** The rebuilt "what-it-is" section and
+   the retained reference module of the same name hashed to one uuid5 from the same namespace. The
+   GRS-0226 section gate keys attempt records by module id, so passing the rebuilt section also
+   marked the reference module passed. Fixed with a `reference-` key prefix, and `publish_course`
+   now refuses duplicate section ids as well as duplicate orders. This was a live defect in what
+   PR #220 shipped.
+3. **I had two family counts backwards.** Content and Alternative Data were swapped, and the error
+   had reached a slide body, a walkthrough instruction, a test question, the diagram and its alt
+   text before I recounted the sheet. The fix is the parity test, not the corrected numbers.
+
+## The superseded reference modules are deleted (founder decision, 2026-07-30)
+
+Flagged rather than done unilaterally, then decided: **delete them**, from both finished courses.
+
+Four modules each, roughly 300 lines in Benzinga and 370 in OpenBB — 755 lines of the
+paragraph-lessons the founder called basic. They were kept while each rebuild was in flight so the
+course would not be thinner in the meantime. Once all eight sections existed that reason expired, and
+because the rebuilt sections come first and the gate runs in reading order they had become four
+*locked* modules of superseded content sitting at the end of a finished course. Both
+`*_course.py` files are now assembly only: the spec for the template spine, and the ordering.
+
+**Two things checked rather than assumed before deleting:**
+
+1. **Completion and certification.** `is_course_complete` is a subset check (`approved <= completed`)
+   over the *current* published tree, so historical completion rows pointing at removed lesson ids
+   are harmless extras, and the required set only shrinks. Lesson ids are not reused.
+2. **Content coverage.** The reference modules carried research anchors, and deleting them silently
+   dropped some. Verified per anchor, and the split was a decision:
+   - **MCP was not colour.** The Workspace MCP endpoint — the firm's existing agents (Claude Code,
+     Cursor, Codex) working over governed data with permissions and lineage — is the sharpest
+     enterprise hook OpenBB has. Written into rebuilt section 1 rather than dropped.
+   - **Raznick** likewise: the founder's name went into the rebuilt company-history slide.
+   - **Gamestonk** and **Snowflake** were colour and are gone. The pivot is covered by the
+     two-products slide and the Bloomberg positioning; connecting an internal database is covered
+     generically. `test_content_covers_the_key_sellable_facts` records which is which so a future
+     reader can see it was judged rather than lost.
+
+Both fact-coverage tests are re-pointed at slides as well as lesson bodies — left as they were they
+would have failed wrongly, and deleted with the modules they would have passed vacuously.
+
+A tighter join-artefact scan run over both courses while doing this found one more lost space
+(`"reportedly around$300 million"`), now fixed. Zero remain across all sixteen sections.
+
+## PR 2 — Brandfetch: complete
+
+Eight sections, **192 slides**, 48 test questions, 73 hands-on slides, one authored diagram per
+section. Same standard, same shape as Benzinga.
+
+**Organised around the founder's correction rather than around the product list.** GRS-0185 recorded
+that both variants carried identical fit stanzas and `profiles: [retail]`, so a retail report could
+recommend either — distribution suits retail brokerages, redistribution suits exchanges and
+information vendors. So section 2 *is* the boundary, sections 5 and 6 take one side each, and section
+8 makes the advisor qualify which side a deal is on before forecasting anything.
+
+| # | Section | Slides | Hands-on |
+|---|---|---|---|
+| 1 | What Brandfetch is, and who owns the logos | 24 | 9 |
+| 2 | The boundary: distribution or redistribution | 24 | 10 |
+| 3 | The four surfaces, and the order you meet them | 24 | 9 |
+| 4 | The identifier hook: ticker, ISIN, ETF, crypto | 24 | 9 |
+| 5 | Distribution: the retail brokerage | 24 | 9 |
+| 6 | Redistribution: the exchange and information vendor | 24 | 9 |
+| 7 | Licensing, trademark and the lines you do not cross | 24 | 9 |
+| 8 | How to sell it | 24 | 9 |
+
+The compliance discipline is carried in the content: section 1 makes the ownership disclosure a
+memorised sentence, section 7 gives the four things an advisor never decides, and section 4's
+identifier hook (ticker, ISIN, ETF, crypto rather than domain) is given its own section because it is
+the one fact that makes this structural rather than cosmetic for a financial platform.
+
+`who_owns_the_mark` deliberately appears in both section 1 and section 7 — early as a disclosure to
+make unprompted, and again where the detail lives. A slide says so, because repeating a drawing is
+usually padding and this is the exception.
+
+**No commission rate appears anywhere in the slides.** Both tiers resolve live from the Earnings
+schedule, and `test_no_commission_rate_is_written_into_the_slides` enforces it against the schedule's
+own figures. `_two_tier_commission_lesson` survived the reference-module deletion and moved onto the
+commission spine, because it is the one place a rate appears and it is computed rather than typed.
+
+`product-brandfetch` came off `depth.LEGACY_COURSES`, which now holds only the two sales courses.
+
+### Three false positives that shaped a test
+
+Writing the no-rate test took three attempts, and the path is worth recording because each failure
+was the test being wrong rather than the content:
+
+1. Forbidding percentages outright flagged Typeform's reported free-to-paid lift and the Enterprise
+   availability commitment — attributed vendor claims, not commission.
+2. Comparing against the schedule's own figures *still* flagged the Typeform lift, because
+   distribution's year-two rate is five per cent and the reported lift is five per cent. Same
+   characters, two unrelated facts.
+3. Including the bare bps integer flagged "free to roughly 500 thousand a month".
+
+The rule is now checked in context — a live rate figure is a violation only in a slide that is also
+talking about commission — with a negative test proving it still catches the real thing. A test
+authors work around is worse than no test.
+
+## PR 3 — the Sales Operations Playbook: complete
+
+Eight sections, **192 slides**, 48 test questions, 72 hands-on slides, one authored diagram per
+section. The only rebuilt course that is not about a product, which makes it the strongest evidence
+the depth standard is about depth rather than about product courses — the tests are the other three
+courses' tests, unchanged.
+
+**Its source of truth is the codebase**, which makes it the most checkable course in the Academy.
+Every stage is a real `PipelineStage`, the streams are the real `CommissionStream` members, the
+recovery fee is the real `CommissionKind.WORKSHOP_RECOVERY_FEE`, and the Stream B rate axes are the
+real `DeliveryType` and `SourcingAttribution`. `test_cross_references_every_forward_pipeline_stage`
+derives its expectations from the enum, so adding a stage breaks the test rather than silently
+leaving a gap in the course.
+
+| # | Section | Slides | Hands-on |
+|---|---|---|---|
+| 1 | The motion, stage by stage | 24 | 9 |
+| 2 | Prospect: open the account properly | 24 | 9 |
+| 3 | The workshop: the advancing action | 24 | 9 |
+| 4 | Qualified or Nurture: the honest fork | 24 | 9 |
+| 5 | Scoped: price the lever, never the score | 24 | 9 |
+| 6 | Contracted: the two streams | 24 | 9 |
+| 7 | Active to Delivered: one timeline | 24 | 9 |
+| 8 | Closed, Nurture, and the recovery fee | 24 | 9 |
+
+**Section 5 carries the most consequential rule in the Academy.** Non-negotiable #7 and ADR-0002:
+score-points and currency never appear in one equation, and the contracts enforce it —
+`ValueBridge.total_lever_npv` sums Money and Money only, and a bridge citing an assumption outside
+its register refuses to construct. The section names the specific temptation (treating the score gap
+as a fraction of enterprise value), gives the two sentences said separately, and explains why the
+wall protects the *score* rather than the price: the moment a score is used as a multiplier it stops
+being a measurement. `score_and_price_never_mix` draws it as two columns with a labelled wall.
+
+Two other sections carry weight the old four-lesson version could not. **Section 4** treats "left at
+Workshop Delivered" as the pipeline's real failure mode — not a third answer, but nobody having
+decided — and makes an honest Nurture a correct professional outcome. **Section 8** covers the
+workshop recovery fee, where the default outcome is the wrong one: nobody decides to abandon the
+fee, the window simply closes while everyone is busy.
+
+No commission figure appears in any slide; `test_no_commission_rate_is_written_into_the_slides`
+enforces it against the schedule's own consultancy cells, in context.
+
+`sales-ops-playbook` came off `depth.LEGACY_COURSES`, which now holds **one** entry: `sales-egoist`,
+blocked on source material under GRS-0218.
+
+### Two defects the diagrams caught, and a repair to shipped work
+
+1. `the_ten_stages` shortened `workshop_scheduled` to "workshop" and `workshop_delivered` to
+   "delivered", putting two boxes reading "delivered" on one path — under a subtitle claiming these
+   were the CRM's own names rather than a paraphrase. Compound names now get two lines.
+2. `two_streams` printed the rate axes as two columns of labels, which read as two unrelated lists.
+   The whole idea is that the rate is a **cell**, so it is now an actual two-by-two.
+
+And a repair to already-committed work: the re-wrapping helper used while authoring merged a
+caption's last words into the alt text of **five Brandfetch diagrams** (commit `5ff8de0`), because
+caption and alt are adjacent string arguments. Fixed, and
+`test_captions_and_alt_text_did_not_bleed_into_each_other` now catches it — a caption ends in a full
+stop and alt text starts with a capital, which is invisible in a diff and obvious in one assertion.
 
 ## Why
 

@@ -4584,6 +4584,7 @@ class Repository:
                 + ", ".join(blockers)
             )
         self._refuse_duplicate_section_order(slug, tree)
+        self._refuse_duplicate_section_id(slug, tree)
         version = row.latest_version + 1
         snapshot = CourseVersionORM(
             course_id=row.id,
@@ -4621,6 +4622,30 @@ class Repository:
             raise ConflictError(
                 f"Cannot publish '{slug}' — its sections do not have distinct order numbers, so "
                 "the unlock gate would be ambiguous: " + "; ".join(collisions)
+            )
+
+    @staticmethod
+    def _refuse_duplicate_section_id(slug: str, tree: CourseTree) -> None:
+        """A course with two sections sharing a module id cannot be published.
+
+        Sibling rule to the order check, and found the same way: a course tree assembled from more
+        than one source derives its ids by hashing a key, and two sources using the same key produce
+        the same id. `record_section_test_attempt` and `section_progress` both key by module id, so
+        a duplicate makes one advisor's attempt count for two sections and makes the reader match
+        whichever the sort reached first. An id is the record's identity; it cannot be shared."""
+        seen: dict[UUID, str] = {}
+        collisions: list[str] = []
+        for module in tree.modules:
+            if module.id in seen:
+                collisions.append(
+                    f"{module.id} is claimed by both {seen[module.id]!r} and {module.title!r}"
+                )
+            else:
+                seen[module.id] = module.title
+        if collisions:
+            raise ConflictError(
+                f"Cannot publish '{slug}' — two or more sections share an id, so an attempt "
+                "recorded against one would count for both: " + "; ".join(collisions)
             )
 
     def _latest_published_row(self, course_id: UUID) -> CourseVersionORM | None:

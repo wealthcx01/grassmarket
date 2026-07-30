@@ -1,0 +1,865 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "DeliveryPaths",
+    "width": 960,
+    "height": 500,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 480,
+        "y": 44,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "How the data actually arrives"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 480,
+        "y": 78,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "Three delivery methods. Each one is a different build for the client."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "ColA",
+        "x": 176,
+        "y": 116,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "ColAStyle",
+            "font_asset": "Display",
+            "font_size": 12,
+            "children": [
+              {
+                "type": "fill",
+                "name": "ColAStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "ColAStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "ColARun",
+            "style": "ColAStyle",
+            "text": "BENZINGA OFFERS"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "ColB",
+        "x": 720,
+        "y": 116,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "ColBStyle",
+            "font_asset": "Display",
+            "font_size": 12,
+            "children": [
+              {
+                "type": "fill",
+                "name": "ColBStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "ColBStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "ColBRun",
+            "style": "ColBStyle",
+            "text": "CLIENT MUST HAVE"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RestHow",
+        "x": 176,
+        "y": 154,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RestHowStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RestHowStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RestHowStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RestHowRun",
+            "style": "RestHowStyle",
+            "text": "REST (pull)"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RestWhat",
+        "x": 176,
+        "y": 182,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RestWhatStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RestWhatStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RestWhatStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RestWhatRun",
+            "style": "RestWhatStyle",
+            "text": "you ask, on your schedule"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RestCost",
+        "x": 720,
+        "y": 168,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RestCostStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RestCostStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RestCostStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RestCostRun",
+            "style": "RestCostStyle",
+            "text": "a scheduled job"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "RestCard",
+        "x": 176,
+        "y": 168,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "RestCardPath",
+            "width": 280,
+            "height": 78,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "RestCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RestCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "RestCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RestCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "RestArrowHead",
+        "x": 593.0,
+        "y": 168,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "RestArrowHeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "RestArrowHeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RestArrowHeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "RestArrowStem",
+        "x": 468,
+        "y": 168,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "RestArrowStemPath",
+            "width": 241.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "RestArrowStemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RestArrowStemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "StreamHow",
+        "x": 176,
+        "y": 256,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "StreamHowStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "StreamHowStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "StreamHowStyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "StreamHowRun",
+            "style": "StreamHowStyle",
+            "text": "TCP (push)"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "StreamWhat",
+        "x": 176,
+        "y": 284,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "StreamWhatStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "StreamWhatStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "StreamWhatStyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "StreamWhatRun",
+            "style": "StreamWhatStyle",
+            "text": "it arrives, as it happens"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "StreamCost",
+        "x": 720,
+        "y": 270,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "StreamCostStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "StreamCostStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "StreamCostStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "StreamCostRun",
+            "style": "StreamCostStyle",
+            "text": "an always-on consumer"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "StreamCard",
+        "x": 176,
+        "y": 270,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "StreamCardPath",
+            "width": 280,
+            "height": 78,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "StreamCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "StreamCardSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "StreamCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "StreamCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "StreamArrowHead",
+        "x": 593.0,
+        "y": 270,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "StreamArrowHeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "StreamArrowHeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "StreamArrowHeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "StreamArrowStem",
+        "x": 468,
+        "y": 270,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "StreamArrowStemPath",
+            "width": 241.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "StreamArrowStemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "StreamArrowStemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "FileHow",
+        "x": 176,
+        "y": 358,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FileHowStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FileHowStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FileHowStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FileHowRun",
+            "style": "FileHowStyle",
+            "text": "FTP / S3"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "FileWhat",
+        "x": 176,
+        "y": 386,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FileWhatStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FileWhatStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FileWhatStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FileWhatRun",
+            "style": "FileWhatStyle",
+            "text": "a file lands, in buckets"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "FileCost",
+        "x": 720,
+        "y": 372,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FileCostStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FileCostStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FileCostStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FileCostRun",
+            "style": "FileCostStyle",
+            "text": "somewhere to put it"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "FileCard",
+        "x": 176,
+        "y": 372,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "FileCardPath",
+            "width": 280,
+            "height": 78,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "FileCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "FileCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "FileCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "FileCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "FileArrowHead",
+        "x": 593.0,
+        "y": 372,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "FileArrowHeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "FileArrowHeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "FileArrowHeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "FileArrowStem",
+        "x": 468,
+        "y": 372,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "FileArrowStemPath",
+            "width": 241.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "FileArrowStemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "FileArrowStemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Rule",
+        "x": 480,
+        "y": 438,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "RulePath",
+            "width": 700,
+            "height": 1,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "RuleFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RuleSolid",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 480,
+        "y": 468,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#A3502A"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "Ask which one they can consume before you promise a timeline."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 480,
+        "y": 250,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 960,
+            "height": 500,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,695 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "TheRecoveryFee",
+    "width": 1020,
+    "height": 460,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 510,
+        "y": 46,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "A workshop delivered, and no contract"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Q",
+        "x": 510,
+        "y": 122,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "QStyle",
+            "font_asset": "Display",
+            "font_size": 20,
+            "children": [
+              {
+                "type": "fill",
+                "name": "QStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "QStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "QRun",
+            "style": "QStyle",
+            "text": "The attribution window closes."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "QBox",
+        "x": 510,
+        "y": 122,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "QBoxPath",
+            "width": 440,
+            "height": 54,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "QBoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "QBoxSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "QBoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "QBoxStrokeCol",
+                "color": "#1A1A18"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "BadL",
+        "x": 372,
+        "y": 176,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "BadLStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "BadLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "BadLStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "BadLRun",
+            "style": "BadLStyle",
+            "text": "do nothing"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "GoodL",
+        "x": 632,
+        "y": 176,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "GoodLStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "GoodLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "GoodLStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "GoodLRun",
+            "style": "GoodLStyle",
+            "text": "resolve it"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "BadT",
+        "x": 280,
+        "y": 244,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "BadTStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "BadTStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "BadTStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "BadTRun",
+            "style": "BadTStyle",
+            "text": "Written off"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "BadB",
+        "x": 280,
+        "y": 278,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "BadBStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "BadBStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "BadBStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "BadBRun",
+            "style": "BadBStyle",
+            "text": "the effort is gone and"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "BadB2",
+        "x": 280,
+        "y": 300,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "BadB2Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "BadB2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "BadB2StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "BadB2Run",
+            "style": "BadB2Style",
+            "text": "the lead goes cold"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "GoodT",
+        "x": 740,
+        "y": 244,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "GoodTStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "GoodTStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "GoodTStyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "GoodTRun",
+            "style": "GoodTStyle",
+            "text": "Recovery fee"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "GoodB",
+        "x": 740,
+        "y": 278,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "GoodBStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "GoodBStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "GoodBStyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "GoodBRun",
+            "style": "GoodBStyle",
+            "text": "the workshop effort is"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "GoodB2",
+        "x": 740,
+        "y": 300,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "GoodB2Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "GoodB2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "GoodB2StyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "GoodB2Run",
+            "style": "GoodB2Style",
+            "text": "recovered, deal to Nurture"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "BadBox",
+        "x": 280,
+        "y": 272,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BadBoxPath",
+            "width": 340,
+            "height": 120,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BadBoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BadBoxSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "BadBoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BadBoxStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "GoodBox",
+        "x": 740,
+        "y": 272,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "GoodBoxPath",
+            "width": 340,
+            "height": 120,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "GoodBoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "GoodBoxSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "DownBadHead",
+        "x": 280,
+        "y": 184.0,
+        "rotation": 3.14159,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "DownBadHeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "DownBadHeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DownBadHeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "DownBadStem",
+        "x": 280,
+        "y": 164,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "DownBadStemPath",
+            "width": 2.5,
+            "height": 31.0,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "DownBadStemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DownBadStemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "DownGoodHead",
+        "x": 720,
+        "y": 184.0,
+        "rotation": 3.14159,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "DownGoodHeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "DownGoodHeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DownGoodHeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "DownGoodStem",
+        "x": 720,
+        "y": 164,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "DownGoodStemPath",
+            "width": 2.5,
+            "height": 31.0,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "DownGoodStemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DownGoodStemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Warn",
+        "x": 510,
+        "y": 382,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "WarnStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "WarnStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "WarnStyleCol",
+                    "color": "#A3502A"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "WarnRun",
+            "style": "WarnStyle",
+            "text": "Written off is the default. It is what happens when nobody does anything."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 510,
+        "y": 424,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "A scored moat that was not ready today is a warm lead in two quarters."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 510,
+        "y": 230,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 1020,
+            "height": 460,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
