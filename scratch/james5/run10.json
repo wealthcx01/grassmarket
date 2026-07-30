@@ -1,7 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio"},
-  {"do":"click","target":"text:Brewin Dolphin Wealth SANDBOX — NON-PRODUCTION, NOT CLIENT-FACING"},
-  {"do":"waittext","value":"Interpretation"},
-  {"do":"shot","name":"sandbox-open"},
-  {"do":"read"}
-]

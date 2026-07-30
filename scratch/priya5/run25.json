@@ -1,7 +1,0 @@
-[
-  {"do":"goto","url":"/workbench/academy/sales-egoist","waitfor":"Zero-Sum"},
-  {"do":"fill","target":"placeholder:Answer from memory before revealing","value":"Because the pipeline is zero-sum: any account you fail to advance, a competitor advances. The Egoist therefore owns a dated next step on every live account."},
-  {"do":"click","target":"text:Reveal model answer"},
-  {"do":"read"},
-  {"do":"shot","name":"37-check-yourself"}
-]

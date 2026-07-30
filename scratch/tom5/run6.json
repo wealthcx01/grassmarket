@@ -1,6 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/1cdc06da-e18f-4ced-a5c5-970d154ce1fc","note":"wizard"},
-  {"do":"click","target":"text:2. Business Metrics"},
-  {"do":"shot","name":"bizmetrics"},
-  {"do":"read"}
-]

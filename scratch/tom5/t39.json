@@ -1,8 +1,0 @@
-[
-  {"do":"goto","url":"/workbench","note":"workbench"},
-  {"do":"read"},
-  {"do":"shot","name":"t48-workbench"},
-  {"do":"goto","url":"/workbench/academy","note":"academy"},
-  {"do":"read"},
-  {"do":"shot","name":"t49-academy"}
-]

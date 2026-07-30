@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio"},
-  {"do":"fill","target":"input","value":"St. James's Place (Wealth)"},
-  {"do":"select","target":"label:Operating model","value":"wealth"},
-  {"do":"shot","name":"assessments-wealth-selected"},
-  {"do":"click","target":"text:Create & open","note":"create assessment"},
-  {"do":"read"},
-  {"do":"shot","name":"wizard-start"}
-]

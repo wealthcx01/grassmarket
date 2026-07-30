@@ -1,8 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio"},
-  {"do":"click","target":"text:Sandbox preview","note":"try solo finalise / preview deliverable"},
-  {"do":"read"},
-  {"do":"shot","name":"sandbox1"},
-  {"do":"read"},
-  {"do":"shot","name":"sandbox2"}
-]

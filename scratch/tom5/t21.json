@@ -1,6 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/b6fd32d9-90eb-4040-8699-a599949edf8b","note":"open wizard"},
-  {"do":"click","target":"text:6. Summary & Interpretation"},
-  {"do":"read"},
-  {"do":"shot","name":"t22-summary","full":true}
-]

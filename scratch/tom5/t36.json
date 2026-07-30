@@ -1,7 +1,0 @@
-[
-  {"do":"goto","url":"/engagements/4e855092-880d-45e2-a160-7df72b9afcbf","note":"engagement"},
-  {"do":"click","target":"input[type=radio] >> nth=1","note":"client-facing radio"},
-  {"do":"click","target":"button:text-is('Review & generate')"},
-  {"do":"read"},
-  {"do":"shot","name":"t45-review-generate","full":true}
-]

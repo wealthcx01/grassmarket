@@ -1,8 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio"},
-  {"do":"fill","target":"input","value":"LSEG Priya Cold"},
-  {"do":"select","target":"select","value":"exchange"},
-  {"do":"click","target":"text:Create & open"},
-  {"do":"shot","name":"wizard_start"},
-  {"do":"read"}
-]

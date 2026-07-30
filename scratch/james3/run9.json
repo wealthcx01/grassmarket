@@ -1,6 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio"},
-  {"do":"click","target":"text:59.4"},
-  {"do":"read"},
-  {"do":"shot","name":"sandbox-open"}
-]

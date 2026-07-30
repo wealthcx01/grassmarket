@@ -1,7 +1,0 @@
-[
-  {"do":"goto","url":"/workbench","waitfor":"","note":"workbench"},
-  {"do":"click","target":"text:Practice Arena","note":"arena tab"},
-  {"do":"click","target":"text:Practise","note":"start a scenario"},
-  {"do":"read"},
-  {"do":"shot","name":"arena_session"}
-]

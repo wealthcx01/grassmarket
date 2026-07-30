@@ -1,6 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/c4e183bc-19af-4fb8-980b-04fbc56a4917","note":"open assessment"},
-  {"do":"click","target":"text:3. Powers"},
-  {"do":"read"},
-  {"do":"shot","name":"powers-tab"}
-]

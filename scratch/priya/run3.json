@@ -1,8 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio"},
-  {"do":"fill","target":"placeholder:Type to find the company in the registry, or enter any name to keep it manual.","value":"London Stock Exchange Group"},
-  {"do":"click","target":"text:Exchange / market infrastructure","note":"pick operating model"},
-  {"do":"click","target":"text:Create & open","note":"create assessment"},
-  {"do":"read"},
-  {"do":"shot","name":"wizard_start"}
-]

@@ -1,7 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/344c6333-707b-4a8e-bb30-3e1738d534c7","note":"open sandbox"},
-  {"do":"click","target":"text:3. Powers"},
-  {"do":"select","target":"select >> nth=0","value":"Established"},
-  {"do":"select","target":"select >> nth=2","value":"Established"},
-  {"do":"read"}
-]

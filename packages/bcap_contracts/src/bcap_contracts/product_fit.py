@@ -80,8 +80,7 @@ def load_product_fit() -> ProductFitMap:
     unknown_products = set(fit_map.products) - catalogue
     if unknown_products:
         raise ProductFitError(
-            f"product_fit.yaml names products not in commissions.yaml: "
-            f"{sorted(unknown_products)}."
+            f"product_fit.yaml names products not in commissions.yaml: {sorted(unknown_products)}."
         )
     missing_products = catalogue - set(fit_map.products)
     if missing_products:

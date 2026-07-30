@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/24ee60a9-42b3-4d55-8932-b24f0762950a","note":"wizard"},
-  {"do":"click","target":"text:2. Business Metrics"},
-  {"do":"read"},
-  {"do":"shot","name":"metrics"},
-  {"do":"click","target":"text:5. Customer Proposition"},
-  {"do":"read"},
-  {"do":"shot","name":"custprop"}
-]

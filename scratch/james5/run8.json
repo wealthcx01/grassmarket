@@ -1,8 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/a9812bf4-1d99-4144-a924-139df37336ba","note":"wizard"},
-  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
-  {"do":"click","target":"role:button:Guidance"},
-  {"do":"waittext","value":"Basic"},
-  {"do":"shot","name":"guidance2"},
-  {"do":"read"}
-]

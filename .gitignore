@@ -53,3 +53,7 @@ local.db
 # The motion build output IS reviewable source, not build litter: the .riv is what ships and the
 # rendered still is how a diagram change shows up in a pull request as something a human can see.
 !design/motion/build/
+
+# Throwaway probe scripts, run artefacts and screenshots. These were committed once
+# (GRS-0177) and cost the repo 75MB and every ruff run; the reusable parts now live in tools/.
+scratch/

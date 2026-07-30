@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/08a4b9cc-ad8d-4ec2-8954-90eea684ba16","note":"wizard"},
-  {"do":"click","target":"text:2. Business Metrics","note":"metrics tab"},
-  {"do":"fill","target":"input[type=number]","value":"-999999","note":"negative junk into first metric"},
-  {"do":"read"},
-  {"do":"shot","name":"negmetric"},
-  {"do":"click","target":"text:6. Summary & Interpretation","note":"check score reacts"},
-  {"do":"read"}
-]

@@ -1,7 +1,0 @@
-[
-  {"do":"goto","url":"/workbench/academy/sales-egoist","note":"course"},
-  {"do":"fill","target":"placeholder:Answer from memory before revealing — that’s what makes it stick.","value":"Passivity cedes the next step to a rival; the Egoist owns a dated next action on every live account."},
-  {"do":"click","target":"text:Reveal model answer"},
-  {"do":"read"},
-  {"do":"shot","name":"check_revealed"}
-]

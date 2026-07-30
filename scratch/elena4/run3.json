@@ -1,8 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio"},
-  {"do":"select","target":"select","value":"exchange"},
-  {"do":"fill","target":"input","value":"Deutsche Börse AG"},
-  {"do":"click","target":"text:Create & open"},
-  {"do":"read"},
-  {"do":"shot","name":"wizard-open"}
-]

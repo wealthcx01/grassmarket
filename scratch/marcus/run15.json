@@ -1,6 +1,0 @@
-[
-  {"do":"goto","url":"/prospects/c08d3127-5f83-41e2-acb1-c951d5df998b","note":"full record"},
-  {"do":"click","target":"text:Schedule workshop","note":"open schedule form"},
-  {"do":"read"},
-  {"do":"shot","name":"schedule"}
-]

@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/engagements/a58805de-23b6-48e3-b3e8-5e315040ddb9","note":"engagement"},
-  {"do":"select","target":"select >> nth=0","value":"Platform Power Report"},
-  {"do":"click","target":"input[type=radio] >> nth=1"},
-  {"do":"click","target":"role:button:Generate"},
-  {"do":"read"},
-  {"do":"shot","name":"deliverable-made"},
-  {"do":"read"}
-]

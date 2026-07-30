@@ -1,6 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/f04a3afa-65eb-4671-9287-b3b37d2b4ea3"},
-  {"do":"click","target":"text:2. Business Metrics"},
-  {"do":"read","note":"what metric fields exist"},
-  {"do":"shot","name":"09-metrics-blank"}
-]

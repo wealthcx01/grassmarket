@@ -1,8 +1,0 @@
-[
-  {"do":"goto","url":"/assessments","note":"portfolio"},
-  {"do":"fill","target":"placeholder:Search a company — e.g. Revolut, Monzo, Interactive Brokers","value":"St. James's Place"},
-  {"do":"click","target":"text:Create & open"},
-  {"do":"read"},
-  {"do":"shot","name":"wizard-start"},
-  {"do":"read"}
-]

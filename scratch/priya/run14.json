@@ -1,7 +1,0 @@
-[
-  {"do":"goto","url":"/prospects/991047aa-827a-4a18-ba3b-348447320655","note":"full record"},
-  {"do":"click","target":"text:Open engagement","note":"create engagement"},
-  {"do":"read"},
-  {"do":"shot","name":"engagement_open"},
-  {"do":"read"}
-]

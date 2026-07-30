@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/cfc53762-0581-4523-bca3-bd9ef1b352b0","note":"reopen"},
-  {"do":"click","target":"text:6. Summary & Interpretation"},
-  {"do":"read"},
-  {"do":"shot","name":"summary"},
-  {"do":"click","target":"text:5. Customer Proposition"},
-  {"do":"read"},
-  {"do":"shot","name":"custprop"}
-]

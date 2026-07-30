@@ -1,8 +1,0 @@
-[
-  {"do":"goto","url":"/prospects/4aefa47b-44d9-4208-a8ea-a56f03d8ef27","note":"full record"},
-  {"do":"fill","target":"placeholder:Engagement title","value":"SJP Platform Power engagement"},
-  {"do":"click","target":"text:Open engagement"},
-  {"do":"read"},
-  {"do":"shot","name":"engagement-open"},
-  {"do":"read"}
-]

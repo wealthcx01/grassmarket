@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/eb83b2c3-d33a-4719-8c0e-65ed2c0b0c90","note":"repro2"},
-  {"do":"click","target":"text:5. Customer Proposition"},
-  {"do":"read"},
-  {"do":"shot","name":"repro2-cindex"},
-  {"do":"click","target":"text:1. Overview"},
-  {"do":"read"},
-  {"do":"shot","name":"repro2-overview"}
-]

@@ -29,7 +29,10 @@ def test_live_points_are_the_deterministic_composite() -> None:
     doc = showcase_document(HARGREAVES_LANSDOWN)
     registry, coefficients = profile_scoring_context(profile_key_of(doc))
     live = live_score(
-        doc, coefficients, registry, active_uncertainty_model(profile_key_of(doc)),
+        doc,
+        coefficients,
+        registry,
+        active_uncertainty_model(profile_key_of(doc)),
         random.Random(1),
     )
     det = deterministic_result(doc, coefficients, registry).composite

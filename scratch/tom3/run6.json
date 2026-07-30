@@ -1,9 +1,0 @@
-[
-  {"do":"goto","url":"/assessments/cfc53762-0581-4523-bca3-bd9ef1b352b0","note":"reopen"},
-  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
-  {"do":"select","target":"select >> nth=0","value":"Advanced"},
-  {"do":"select","target":"select >> nth=1","value":"Developing"},
-  {"do":"select","target":"select >> nth=2","value":"Advanced"},
-  {"do":"select","target":"select >> nth=3","value":"Basic"},
-  {"do":"read"}
-]
