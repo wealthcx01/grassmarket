@@ -48,6 +48,7 @@ from grassmarket.web.routers import (
     predictions,
     prospects,
     registry,
+    report_links,
     transcripts,
     workbench,
     workshops,
@@ -117,6 +118,9 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
     app.include_router(guidance.router)
     app.include_router(registry.router)
     app.include_router(consultants.router)
+    app.include_router(report_links.router)
+    # Public: no auth dependency. The token in the path is the credential (GRS-0220).
+    app.include_router(report_links.public_router)
     _register_exception_handlers(app)
     return app
 

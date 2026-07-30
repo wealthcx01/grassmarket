@@ -1,0 +1,93 @@
+{
+  "additionalProperties": false,
+  "description": "One shareable link to one deliverable's client report.\n\nScoped to exactly one deliverable and carrying no session: possessing the token grants sight of\nthat report and nothing else. There is no widening from here to a client portal — that is\nexplicitly out of scope, and the model's shape is what keeps it out.",
+  "properties": {
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "deliverable_id": {
+      "format": "uuid",
+      "title": "Deliverable Id",
+      "type": "string"
+    },
+    "engagement_id": {
+      "format": "uuid",
+      "title": "Engagement Id",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "last_viewed_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Last Viewed At"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "recipient_label": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Recipient Label",
+      "type": "string"
+    },
+    "revoked_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Revoked At"
+    },
+    "token_hash": {
+      "maxLength": 64,
+      "minLength": 64,
+      "title": "Token Hash",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "deliverable_id",
+    "engagement_id",
+    "token_hash",
+    "recipient_label",
+    "expires_at"
+  ],
+  "title": "ClientReportLink",
+  "type": "object"
+}

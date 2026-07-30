@@ -1149,3 +1149,66 @@ class AssessmentORM(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_now, onupdate=_now
     )
+
+
+class ClientReportLinkORM(Base):
+    """One shareable link to one deliverable's client report (GRS-0220).
+
+    Only the token's SHA-256 is stored — the plaintext is returned once, at creation, and is
+    unrecoverable afterwards. A leaked backup therefore yields no working links, which is the same
+    reason a password column stores a hash. `token_hash` is unique and indexed because resolving a
+    link is a hash lookup on every public request.
+
+    Scoped by ``owner_consultant_id`` like every other resource: an advisor sees only the links they
+    issued (non-negotiable #9).
+    """
+
+    __tablename__ = "client_report_links"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    deliverable_id: Mapped[UUID] = mapped_column(
+        ForeignKey("deliverables.id"), index=True, nullable=False
+    )
+    engagement_id: Mapped[UUID] = mapped_column(ForeignKey("engagements.id"), nullable=False)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
+    recipient_label: Mapped[str] = mapped_column(String(200), nullable=False)
+    # The assembled ClientReport + its figure data, snapshotted at issue. A shared link shows what
+    # was SHARED: re-rendering from live data would silently change a document a client has already
+    # read and may have quoted back, which is the same immutability discipline scoring runs carry
+    # (non-negotiable #6).
+    report_json: Mapped[str] = mapped_column(Text, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    # Set once, never cleared: un-revoking would let a link the advisor told a client was dead come
+    # back to life. A new link is the way back.
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_viewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
+class ReportReadEventORM(Base):
+    """One section of one shared report, seen for a measured time (GRS-0220).
+
+    Append-only, and deliberately narrow: link, section, dwell, when. No IP, no user agent, no
+    fingerprint, no third party. The page tells the reader that the sender can see which sections
+    were opened, and this table is the whole of what that notice has to be true about.
+    """
+
+    __tablename__ = "report_read_events"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    link_id: Mapped[UUID] = mapped_column(
+        ForeignKey("client_report_links.id"), index=True, nullable=False
+    )
+    section: Mapped[str] = mapped_column(String(40), nullable=False)
+    dwell_ms: Mapped[int] = mapped_column(Integer, nullable=False)
+    occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+    __table_args__ = (Index("ix_report_read_events_link_section", "link_id", "section"),)

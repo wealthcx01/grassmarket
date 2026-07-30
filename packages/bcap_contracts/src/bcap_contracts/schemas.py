@@ -97,6 +97,12 @@ from bcap_contracts.predictions import BenchmarkRow, CBenchmarkRow, Prediction
 from bcap_contracts.product_fit import ProductFitMap, SellOpportunities, SellOpportunity
 from bcap_contracts.provenance import WeightProvenanceRecord
 from bcap_contracts.registry import Registry
+from bcap_contracts.report_links import (
+    ClientReportLink,
+    ReportReadEvent,
+    ReportReadReport,
+    SectionReadSummary,
+)
 from bcap_contracts.rubric import RubricAnchor
 from bcap_contracts.value import ScenarioComparison
 from bcap_contracts.wizard import WizardSuggestion, WizardSuggestions
@@ -120,6 +126,10 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "DeclaredFigure": DeclaredFigure,
     "ReportSection": ReportSection,
     "ClientReport": ClientReport,
+    "ClientReportLink": ClientReportLink,
+    "ReportReadEvent": ReportReadEvent,
+    "SectionReadSummary": SectionReadSummary,
+    "ReportReadReport": ReportReadReport,
     "RubricAnchor": RubricAnchor,
     "Registry": Registry,
     "Prospect": Prospect,

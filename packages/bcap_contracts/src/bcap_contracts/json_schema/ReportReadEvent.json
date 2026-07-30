@@ -1,0 +1,54 @@
+{
+  "$defs": {
+    "ReportSectionKind": {
+      "description": "The sections of a client report, in the order they are read.\n\nThe body opens with the business and closes with what acting is worth; the appendix carries\nevery number the body refers to. `SECTION_ORDER` below is normative.",
+      "enum": [
+        "business",
+        "advantage",
+        "constraint",
+        "actions",
+        "value",
+        "appendix"
+      ],
+      "title": "ReportSectionKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One section of one shared report, seen for a measured time.\n\nDeliberately narrow. Section and dwell are what let an advisor prepare for a follow-up call;\nanything more would be surveillance the page's own notice does not admit to.",
+  "properties": {
+    "dwell_ms": {
+      "maximum": 21600000,
+      "minimum": 0,
+      "title": "Dwell Ms",
+      "type": "integer"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "link_id": {
+      "format": "uuid",
+      "title": "Link Id",
+      "type": "string"
+    },
+    "occurred_at": {
+      "format": "date-time",
+      "title": "Occurred At",
+      "type": "string"
+    },
+    "section": {
+      "$ref": "#/$defs/ReportSectionKind"
+    }
+  },
+  "required": [
+    "id",
+    "link_id",
+    "section",
+    "dwell_ms",
+    "occurred_at"
+  ],
+  "title": "ReportReadEvent",
+  "type": "object"
+}

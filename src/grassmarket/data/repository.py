@@ -59,6 +59,7 @@ from bcap_contracts.certification import (
     CertificationRecord,
     CourseCertification,
 )
+from bcap_contracts.client_report import SECTION_ORDER, ReportSectionKind
 from bcap_contracts.commissions import (
     CommissionKind,
     CommissionLine,
@@ -150,6 +151,12 @@ from bcap_contracts.predictions import (
     Prediction,
     PredictionOutcome,
 )
+from bcap_contracts.report_links import (
+    ClientReportLink,
+    ReportReadEvent,
+    ReportReadReport,
+    SectionReadSummary,
+)
 from sqlalchemy import Text, delete, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -168,6 +175,7 @@ from grassmarket.data.models import (
     CBenchmarkRowORM,
     CertificationEventORM,
     CertificationRecordORM,
+    ClientReportLinkORM,
     CommissionLineORM,
     CommitteeDecisionORM,
     CommsLogEntryORM,
@@ -196,6 +204,7 @@ from grassmarket.data.models import (
     RefreshTokenORM,
     RegistryContactORM,
     RegistryTargetORM,
+    ReportReadEventORM,
     ScoringRunORM,
     SectionTestAttemptORM,
     WorkshopORM,
@@ -5547,4 +5556,151 @@ class Repository:
             channel=CommsChannel(row.channel),
             author_consultant_id=row.author_consultant_id,
             body=row.body,
+        )
+
+    # --- Shared client-report links + read tracking (GRS-0220) ----------------------------
+
+    def _to_report_link(self, row: ClientReportLinkORM) -> ClientReportLink:
+        return ClientReportLink(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+            deliverable_id=row.deliverable_id,
+            engagement_id=row.engagement_id,
+            token_hash=row.token_hash,
+            recipient_label=row.recipient_label,
+            expires_at=row.expires_at,
+            revoked_at=row.revoked_at,
+            last_viewed_at=row.last_viewed_at,
+        )
+
+    def create_report_link(
+        self,
+        principal: Principal,
+        *,
+        deliverable_id: UUID,
+        token_hash: str,
+        recipient_label: str,
+        report_json: str,
+        expires_at: datetime,
+    ) -> ClientReportLink:
+        """Issue a link for one of the principal's OWN deliverables.
+
+        The scope check is on the deliverable, not the link: issuing a link is the act of sharing
+        that deliverable, so an advisor who cannot see it cannot share it either.
+        """
+        deliverable = self._require_deliverable(principal, deliverable_id)
+        row = ClientReportLinkORM(
+            owner_consultant_id=principal.consultant_id,
+            deliverable_id=deliverable_id,
+            engagement_id=deliverable.engagement_id,
+            token_hash=token_hash,
+            recipient_label=recipient_label,
+            report_json=report_json,
+            expires_at=expires_at,
+        )
+        self._session.add(row)
+        self._session.flush()
+        return self._to_report_link(row)
+
+    def list_report_links(
+        self, principal: Principal, deliverable_id: UUID
+    ) -> list[ClientReportLink]:
+        self._require_deliverable(principal, deliverable_id)  # scope check on the parent
+        stmt = (
+            select(ClientReportLinkORM)
+            .where(ClientReportLinkORM.deliverable_id == deliverable_id)
+            .where(ClientReportLinkORM.owner_consultant_id == principal.consultant_id)
+            .order_by(ClientReportLinkORM.created_at.desc())
+        )
+        return [self._to_report_link(r) for r in self._session.execute(stmt).scalars().all()]
+
+    def revoke_report_link(
+        self, principal: Principal, link_id: UUID, *, at: datetime
+    ) -> ClientReportLink:
+        """Revoke immediately. Idempotent: re-revoking keeps the ORIGINAL timestamp, because when
+        the advisor cut the client off is a fact about the first revocation, not the last click."""
+        row = self._session.get(ClientReportLinkORM, link_id)
+        if row is None:
+            raise NotFoundError(f"Report link {link_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        if row.revoked_at is None:
+            row.revoked_at = at
+            self._session.flush()
+        return self._to_report_link(row)
+
+    def resolve_report_link_by_token_hash(self, token_hash: str) -> ClientReportLink | None:
+        """Look a link up by token hash — the PUBLIC path, so it takes no principal.
+
+        This is the one repository method with no scoping, and deliberately so: the token IS the
+        credential, and the reader has no account to be scoped by. It returns the link whatever its
+        state; the caller decides usability, so an expired and a revoked link are indistinguishable
+        to anyone probing from outside.
+        """
+        stmt = select(ClientReportLinkORM).where(ClientReportLinkORM.token_hash == token_hash)
+        row = self._session.execute(stmt).scalar_one_or_none()
+        return self._to_report_link(row) if row is not None else None
+
+    def report_snapshot_for_link(self, link_id: UUID) -> str:
+        """The report JSON captured when the link was issued. Public path; no principal."""
+        row = self._session.get(ClientReportLinkORM, link_id)
+        if row is None:
+            raise NotFoundError(f"Report link {link_id} not found.")
+        return row.report_json
+
+    def touch_report_link(self, link_id: UUID, *, at: datetime) -> None:
+        """Record that the link was opened. Public path; no principal."""
+        row = self._session.get(ClientReportLinkORM, link_id)
+        if row is None:
+            raise NotFoundError(f"Report link {link_id} not found.")
+        row.last_viewed_at = at
+        self._session.flush()
+
+    def record_read_event(
+        self, *, link_id: UUID, section: str, dwell_ms: int, occurred_at: datetime
+    ) -> ReportReadEvent:
+        """Append one read event. Public path; no principal — the token already authorised it."""
+        row = ReportReadEventORM(
+            link_id=link_id, section=section, dwell_ms=dwell_ms, occurred_at=occurred_at
+        )
+        self._session.add(row)
+        self._session.flush()
+        return ReportReadEvent(
+            id=row.id,
+            link_id=row.link_id,
+            section=ReportSectionKind(row.section),
+            dwell_ms=row.dwell_ms,
+            occurred_at=row.occurred_at,
+        )
+
+    def read_summary_for_link(self, principal: Principal, link_id: UUID) -> ReportReadReport:
+        """What the advisor sees: per-section views and total dwell for one of their own links."""
+        link_row = self._session.get(ClientReportLinkORM, link_id)
+        if link_row is None:
+            raise NotFoundError(f"Report link {link_id} not found.")
+        self._assert_can_access(principal, link_row.owner_consultant_id)
+
+        stmt = select(ReportReadEventORM).where(ReportReadEventORM.link_id == link_id)
+        events = list(self._session.execute(stmt).scalars().all())
+
+        summaries: list[SectionReadSummary] = []
+        for kind in SECTION_ORDER:
+            for_section = [e for e in events if e.section == kind.value]
+            moments = sorted(e.occurred_at for e in for_section)
+            summaries.append(
+                SectionReadSummary(
+                    section=kind,
+                    views=len(for_section),
+                    total_dwell_ms=sum(e.dwell_ms for e in for_section),
+                    first_viewed_at=moments[0] if moments else None,
+                    last_viewed_at=moments[-1] if moments else None,
+                )
+            )
+        link = self._to_report_link(link_row)
+        return ReportReadReport(
+            link_id=link.id,
+            recipient_label=link.recipient_label,
+            state=link.state(now=datetime.now(UTC)),
+            sections=summaries,
         )

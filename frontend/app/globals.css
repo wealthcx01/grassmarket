@@ -500,3 +500,141 @@ button {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ---------- Shared client report (GRS-0220) ----------
+   The client-facing page. Same design system as the app and the PDF, but this is the one surface a
+   NON-advisor sees, so it is deliberately plainer: one column, generous measure, nothing to click
+   except the appendix disclosure. Responsive down to a phone, because the founder's acceptance test
+   is reading it on one. */
+.shared-report-shell {
+  max-width: var(--content-narrow);
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+}
+.shared-report-head {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 1.1rem;
+  margin-bottom: 1.25rem;
+}
+.shared-report-head h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.9rem, 6vw, 2.6rem);
+  margin: 0.35rem 0 0.2rem;
+  line-height: 1.15;
+}
+.shared-report-sub {
+  margin: 0;
+  color: var(--color-ink-muted);
+}
+/* Not dismissible, and stated before any event is sent. */
+.shared-report-notice {
+  background: var(--color-accent-tint);
+  border: 1px solid var(--color-accent-tint-border);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.8rem;
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+  margin: 0 0 1.75rem;
+}
+.shared-section {
+  margin-bottom: 2.25rem;
+}
+.shared-section h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  margin: 0 0 0.5rem;
+}
+.shared-section p {
+  font-family: var(--font-serif);
+  font-size: 1.02rem;
+  line-height: 1.62;
+  margin: 0 0 0.75rem;
+}
+.shared-figure {
+  margin: 1.25rem 0 0;
+}
+.shared-figure figcaption {
+  font-size: 0.82rem;
+  color: var(--color-ink-muted);
+  margin-top: 0.4rem;
+}
+/* The figure's numbers as text beside the bars: the chart is never the only way to read a value. */
+.shared-figure-key {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 0.15rem 1rem;
+  font-size: 0.85rem;
+}
+.shared-figure-key li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-bottom: 1px dotted var(--color-border);
+  padding: 0.15rem 0;
+}
+.shared-figure-key b {
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+/* Disclosed, not deleted — a native <details> so it is keyboard- and screen-reader-correct. */
+.shared-appendix {
+  border-top: 1px solid var(--color-border-strong);
+  padding-top: 1.1rem;
+  margin-top: 2.5rem;
+}
+.shared-appendix > summary {
+  cursor: pointer;
+  font-weight: 500;
+  padding: 0.35rem 0;
+}
+.shared-appendix > summary span {
+  color: var(--color-ink-muted);
+  font-weight: 400;
+}
+.shared-appendix p {
+  font-family: var(--font-serif);
+  line-height: 1.6;
+}
+.shared-figures-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+  margin-top: 1rem;
+}
+.shared-figures-table caption {
+  text-align: left;
+  color: var(--color-ink-muted);
+  padding-bottom: 0.4rem;
+}
+.shared-figures-table th,
+.shared-figures-table td {
+  text-align: left;
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+.shared-figures-table thead th {
+  background: var(--color-paper-sunken);
+}
+.shared-figures-table .mono {
+  font-family: var(--font-mono);
+  word-break: break-word;
+}
+.shared-report-foot {
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+  font-size: 0.78rem;
+  color: var(--color-ink-muted);
+}
+.shared-report-missing {
+  text-align: center;
+  padding: 4rem 0;
+}
+.shared-report-missing h1 {
+  font-family: var(--font-serif);
+  margin: 0.4rem 0 0.6rem;
+}

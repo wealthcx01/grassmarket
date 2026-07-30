@@ -56,3 +56,44 @@ call. That last part changes how an advisor prepares for a meeting.
 
 The founder sends themselves a link for the Deutsche Börse review, reads it on a phone, and can
 then see from the advisor side which sections were opened.
+
+## What shipped
+
+The link, the public page, and disclosed read tracking. Stacked on GRS-0219.
+
+**Scope items 1, 2, 4, 5, 6, 7 are in.** Signed per-client links (`/r/<token>`), the same content
+model as the PDF, the appendix behind a native `<details>`, per-section read tracking with a visible
+notice, design-system styling that is responsive and keyboard-navigable, and immediate revocation.
+
+**The link is the credential, so it is treated like one.** Only the token's SHA-256 is stored; the
+plaintext is returned once at creation and is unrecoverable. Unknown, expired and revoked tokens all
+return the *same* 404 body, so the endpoint cannot be used to discover which links exist or to learn
+that one was withdrawn. Expiry is capped at 180 days and an over-long request is **refused, not
+silently clamped** — an advisor who asked for a year and got six months without being told would
+believe the wrong thing about their client's access.
+
+**A design decision the ticket did not specify: the shared page serves a SNAPSHOT.** The assembled
+report is stored on the link at issue. Re-rendering from live data would silently change a document
+a client has already read and may have quoted back — the same immutability discipline scoring runs
+carry (non-negotiable #6).
+
+**A bug worth recording:** SQLite returns naive datetimes and Postgres returns aware ones, so the
+expiry comparison raised `TypeError` under the test suite. A security control that "works" by
+crashing the request is not a control, so timestamps are normalised to UTC before comparison.
+
+**Tracking is narrow by construction.** Section and dwell only — no IP, no user agent, no
+fingerprint, no third party. Dwell is batched on section exit (an interval would count time spent on
+another tab) and capped at six hours, so a tab left open overnight cannot tell an advisor the client
+studied the appendix all night. A failed event never surfaces to the reader.
+
+**Scope item 3 is partially done.** Figures are live SVG with per-bar text values and an aria-label
+carrying every number — but they are bar charts, not the interactive radar with hover-to-explain the
+ticket describes. The Rive path (GRS-0206) is unbuilt, and plain SVG is named in the ticket as an
+acceptable answer; richer interaction is a follow-up.
+
+**Not yet wired to the advisor's UI.** The API to issue, list and revoke links and to read the
+per-section summary all exist and are tested, but no button in the app calls them, so the founder
+cannot yet send themselves a link from the Deliverables page. That is the remaining last mile for
+the acceptance test, and it is the same gap GRS-0219 has.
+
+Gate: 24 backend tests, 7 vitest, ruff/pyright/tsc/ESLint clean.
