@@ -1,8 +1,58 @@
 # GRS-0223 — "All the scores seem surprisingly similar": find out why
 
-**Status:** Planned (2026-07-23 item 6, restated 2026-07-26). **Priority:** HIGH.
-**Loop:** founder-feedback remediation, Wave 1. **Relates to:** GRS-0179 (the maths document),
-GRS-0086 (four-index v1.4, gated).
+**Status:** In review (2026-07-30, PR pending) — **measured, answered, no engine change
+recommended.** **Priority:** HIGH. **Loop:** founder-feedback remediation, Wave 1.
+**Relates to:** GRS-0179 (the maths document), GRS-0086 (four-index v1.4, gated).
+**Produced:** `docs/analysis/score-dispersion-2026-07.md` + `tests/test_score_dispersion.py`.
+**Spun out:** GRS-0227 (surface dispersion beside the score — the one recommendation buildable now).
+
+## The answer
+
+**The engine is not compressing anything. Aggregation is.**
+
+- Fed extremes the engine produces extremes: V spans **0.185–1.000**, i.e. 0.815 of the nominal
+  range. That rules out the ticket's first two hypotheses — the bottleneck term and over-even
+  weights — as the cause. Neither stops an extreme firm scoring at an extreme.
+- The mechanism is measurable. Varying only *how internally consistent a firm is*, with the engine
+  and coefficients untouched, moves sd(V) from **0.057 to 0.153 — a 2.7x range**. V averages nine
+  modules, seven powers and four metrics; a mixed firm is pulled to the middle by construction.
+- A hypothesis worth killing: the three real firms *look* like their components cancel. Under random
+  sampling sd(V) actual / sd(V) if independent = **1.002**. The apparent cancellation is noise in a
+  sample of three, not structure.
+
+**Two amplifiers, one of them large and addressable:**
+
+1. **The rubric is used at about a third of its width.** 92.6% of module ratings across the three
+   showcase specs are Developing or Advanced (score indices 0.5 and 0.8) — a 0.3-wide band inside a
+   0.8-wide scale. Drawing from all four levels instead widens sd(V) by **2.06x**. This is the
+   ticket's fourth hypothesis and the largest thing anybody can actually fix.
+2. **B saturates.** The business index hits 1.000 at roughly twice Revolut's metrics and all three
+   real firms sit at 0.767–0.983. B carries theta_B = 0.3 of V and barely discriminates among firms
+   of real size; widening the metric range 100x moved sd(V) only 0.0614 to 0.0631.
+
+A structural note rather than an amplifier: `MaturityLevel.score_index` floors at **0.2**, so no
+q_m and no L can fall below 0.2. The bottom fifth of the nominal range is unreachable by
+construction — a scale choice, not a bug, but the explainer must say so or every low score is
+misread.
+
+## Recommendation: no engine change, and no recalibration
+
+Nothing measured shows the maths misbehaving. Widening the output distribution by moving
+coefficients would be fitting the scale to the marketing rather than to the method, and per
+non-negotiable #2 it would need an ADR and a methodology version anyway. This analysis does not
+justify one.
+
+Three things that would help, in order of value:
+
+1. **Fix the rubric usage, not the maths** (2.06x, largest effect). Basic and Frontier are each used
+   3.7% of the time. Either the anchors make the ends unreachable or assessors avoid them — both
+   answerable by reading the anchors and running a calibration exercise. **Founder-scoped.**
+2. **Revisit the B metric interpolation ceiling.** A third of V's weight saturates above roughly
+   £40bn AUA-equivalent. Either the upper anchors are too low for the firms we assess, or B should
+   carry less weight. Both are methodology questions. **Founder-scoped.**
+3. **Report dispersion beside the score.** A V of 0.57 built from modules spanning 0.20–0.80 is a
+   different firm from a V of 0.57 built from modules all at 0.55, and today both display
+   identically. The engine already computes every q_m. **Buildable now — spun out as GRS-0227.**
 
 ## Why
 
