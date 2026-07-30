@@ -1,8 +1,8 @@
 """OpenBB course diagrams as inline SVG (GRS-0225). GENERATED — DO NOT EDIT.
 
 Regenerate with `uv run python design/motion/svg_export.py`. The source is the SceneSpec JSON under
-`design/motion/courses/openbb/`; edit that, not this. `tests/test_course_diagrams.py` fails if this
-file and those scenes disagree.
+`design/motion/courses/openbb/`; edit that, not this. `tests/test_course_diagrams.py` fails if
+this file and those scenes disagree.
 
 Captions and alt text are NOT here: they are authored prose and live beside the slide they explain,
 in `openbb_slides.py`. Only the drawing is generated.

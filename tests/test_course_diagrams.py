@@ -21,12 +21,32 @@ from pathlib import Path
 
 import pytest
 
-from grassmarket.workbench.content.openbb_diagrams import SVG
 from grassmarket.workbench.content.openbb_slides import rebuilt_sections
 
 ROOT = Path(__file__).resolve().parents[1]
-SCENES = sorted((ROOT / "design/motion/courses/openbb").glob("*.json"))
-BUILD = ROOT / "design/motion/build/openbb"
+COURSES_DIR = ROOT / "design/motion/courses"
+
+# Every course with authored scenes, discovered rather than listed: a second course whose diagrams
+# nothing checked would be exactly the drift this suite exists to catch. GRS-0217 adds Benzinga.
+COURSE_NAMES = sorted(p.name for p in COURSES_DIR.iterdir() if p.is_dir())
+
+
+def _svg_for(course: str) -> dict[str, str]:
+    """The generated `SVG` dict for one course, imported by name."""
+    module = importlib.import_module(f"grassmarket.workbench.content.{course}_diagrams")
+    return module.SVG
+
+
+# (course, scene path) for every authored diagram in the repo.
+SCENES = [
+    (course, scene)
+    for course in COURSE_NAMES
+    for scene in sorted((COURSES_DIR / course).glob("*.json"))
+]
+
+
+def _build_dir(course: str) -> Path:
+    return ROOT / "design/motion/build" / course
 
 
 def _svg_export():
@@ -47,10 +67,11 @@ svg_export = _svg_export()
 def test_there_are_scenes_to_check() -> None:
     """A glob that silently matched nothing would make every test below vacuously pass."""
     assert len(SCENES) >= 9
+    assert COURSE_NAMES, "no course scene directories found at all"
 
 
-@pytest.mark.parametrize("scene", SCENES, ids=lambda p: p.stem)
-def test_every_scene_exports(scene: Path) -> None:
+@pytest.mark.parametrize(("course", "scene"), SCENES, ids=lambda v: getattr(v, "stem", v))
+def test_every_scene_exports(course: str, scene: Path) -> None:
     svg = svg_export.scene_to_svg(json.loads(scene.read_text()))
     assert svg.startswith('<svg xmlns="http://www.w3.org/2000/svg"')
     assert svg.endswith("</svg>")
@@ -58,27 +79,29 @@ def test_every_scene_exports(scene: Path) -> None:
     assert svg.count("<") > 10
 
 
-@pytest.mark.parametrize("scene", SCENES, ids=lambda p: p.stem)
-def test_the_generated_module_has_not_drifted(scene: Path) -> None:
+@pytest.mark.parametrize(("course", "scene"), SCENES, ids=lambda v: getattr(v, "stem", v))
+def test_the_generated_module_has_not_drifted(course: str, scene: Path) -> None:
     """The content module is generated, so the failure mode is editing a scene and shipping the old
     drawing. Regenerate with `uv run python design/motion/svg_export.py`."""
-    assert scene.stem in SVG, f"{scene.stem} has no entry in openbb_diagrams.SVG"
-    assert SVG[scene.stem] == svg_export.scene_to_svg(json.loads(scene.read_text()))
+    svg = _svg_for(course)
+    assert scene.stem in svg, f"{scene.stem} has no entry in {course}_diagrams.SVG"
+    assert svg[scene.stem] == svg_export.scene_to_svg(json.loads(scene.read_text()))
 
 
-@pytest.mark.parametrize("scene", SCENES, ids=lambda p: p.stem)
-def test_the_committed_svg_matches_too(scene: Path) -> None:
-    committed = BUILD / f"{scene.stem}.svg"
+@pytest.mark.parametrize(("course", "scene"), SCENES, ids=lambda v: getattr(v, "stem", v))
+def test_the_committed_svg_matches_too(course: str, scene: Path) -> None:
+    committed = _build_dir(course) / f"{scene.stem}.svg"
     assert committed.exists(), f"{committed} is missing; run design/motion/svg_export.py"
-    assert committed.read_text().strip() == SVG[scene.stem]
+    assert committed.read_text().strip() == _svg_for(course)[scene.stem]
 
 
-@pytest.mark.parametrize("scene", SCENES, ids=lambda p: p.stem)
-def test_the_riv_and_the_still_are_committed_beside_the_source(scene: Path) -> None:
+@pytest.mark.parametrize(("course", "scene"), SCENES, ids=lambda v: getattr(v, "stem", v))
+def test_the_riv_and_the_still_are_committed_beside_the_source(course: str, scene: Path) -> None:
     """A binary whose source is not beside it is not reviewable, and a diagram with no still cannot
     be checked by eye in a PR."""
-    assert (BUILD / f"{scene.stem}.riv").exists()
-    assert (BUILD / scene.stem / "frame_00000.png").exists()
+    build = _build_dir(course)
+    assert (build / f"{scene.stem}.riv").exists()
+    assert (build / scene.stem / "frame_00000.png").exists()
 
 
 # --- The sanitiser's allowlist -------------------------------------------------------------
@@ -115,11 +138,12 @@ _ALLOWED_ATTRIBUTES = {
 }
 
 
-@pytest.mark.parametrize("name", sorted(SVG), ids=str)
-def test_the_svg_only_uses_constructs_the_sanitiser_accepts(name: str) -> None:
+@pytest.mark.parametrize(("course", "scene"), SCENES, ids=lambda v: getattr(v, "stem", v))
+def test_the_svg_only_uses_constructs_the_sanitiser_accepts(course: str, scene: Path) -> None:
     import re
 
-    svg = SVG[name]
+    name = scene.stem
+    svg = _svg_for(course)[name]
     elements = set(re.findall(r"<\s*/?\s*([a-zA-Z][a-zA-Z0-9-]*)", svg))
     assert elements <= _ALLOWED_ELEMENTS, f"{name}: {elements - _ALLOWED_ELEMENTS}"
 
@@ -243,10 +267,11 @@ def test_paint_order_is_inverted_so_the_background_ends_up_at_the_back() -> None
     """Rive paints the FIRST declared sibling on top; SVG paints the LAST. Every scene declares its
     background card last, so an emitter that did not invert would produce one flat rectangle of
     paper — and would still render, validate and look like nothing had broken."""
-    for name, scene in ((p.stem, json.loads(p.read_text())) for p in SCENES):
+    for course, path in SCENES:
+        name, scene = path.stem, json.loads(path.read_text())
         children = [c for c in scene["artboard"]["children"] if c["type"] != "font_asset"]
         assert children[-1]["name"] == "Bg", f"{name} does not end with its background"
-        svg = SVG[name]
+        svg = _svg_for(course)[name]
         # The background is the first thing drawn in the SVG, immediately after the root tag.
         first_element = svg.index("<g", 1)
         assert svg.index('fill="#F7F5EF"') < svg.index("<text"), name
@@ -265,7 +290,7 @@ def test_the_still_is_the_animation_at_frame_zero_not_the_authored_values() -> N
     assert tracks[("FieldValueA", "opacity")][0]["value"] == 1.0
     assert tracks[("FieldValueB", "opacity")][0]["value"] == 0.0
 
-    svg = SVG["linked_parameters"]
+    svg = _svg_for("openbb")["linked_parameters"]
     # Exactly one of the two stacked runs is hidden, and it is the one frame 0 says is hidden.
     assert svg.count('opacity="0"') == 1
     hidden = svg[svg.index('opacity="0"') : svg.index("</text>", svg.index('opacity="0"'))]
@@ -287,7 +312,7 @@ def test_every_openbb_section_carries_at_least_one_diagram() -> None:
 def test_every_diagram_in_the_course_is_a_real_generated_one() -> None:
     """A hand-written SVG pasted into the content would not be regenerable, and would drift the
     moment the scene changed."""
-    known = set(SVG.values())
+    known = set(_svg_for("openbb").values())
     for module in rebuilt_sections():
         for lesson in module.lessons:
             for slide in lesson.slides:
@@ -304,5 +329,5 @@ def test_every_scene_is_used_by_the_course() -> None:
         for slide in lesson.slides
         if slide.asset
     }
-    unused = sorted(name for name, svg in SVG.items() if svg not in used)
+    unused = sorted(name for name, svg in _svg_for("openbb").items() if svg not in used)
     assert not unused, f"authored but not on any slide: {unused}"
