@@ -1,0 +1,12 @@
+[
+  {"do":"goto","url":"/assessments/b6fd32d9-90eb-4040-8699-a599949edf8b","note":"open wizard"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"select","target":"select >> nth=0","value":"established"},
+  {"do":"select","target":"select >> nth=1","value":"E3"},
+  {"do":"select","target":"select >> nth=2","value":"emerging"},
+  {"do":"select","target":"select >> nth=3","value":"E3"},
+  {"do":"fill","target":"input[placeholder^='evidence'] >> nth=0","value":"c.£190bn AUM, per-unit admin cost advantage from scale, public accounts"},
+  {"do":"fill","target":"input[placeholder^='evidence'] >> nth=1","value":"Challenger platforms (e.g. Transact, AJ Bell) reaching scale; barrier eroding"},
+  {"do":"read"},
+  {"do":"shot","name":"t15-power1"}
+]

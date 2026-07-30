@@ -1,0 +1,11 @@
+[
+  {"do":"goto","url":"/engagements/7fd44b59-8290-4d11-b578-6f3faf9eab8b","note":"engagement"},
+  {"do":"select","target":"label:Deliverable type","value":"executive_summary"},
+  {"do":"click","target":"role:button:Generate","note":"generate exec summary (default audience)"},
+  {"do":"read","note":"after generate — did a deliverable appear?"},
+  {"do":"shot","name":"d03-after-generate","full":true},
+  {"do":"select","target":"label:Deliverable type","value":"platform_power_report"},
+  {"do":"click","target":"role:button:Generate","note":"generate platform power report"},
+  {"do":"read","note":"after 2nd generate"},
+  {"do":"shot","name":"d04-after-generate2","full":true}
+]

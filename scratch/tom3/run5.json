@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments/cfc53762-0581-4523-bca3-bd9ef1b352b0","note":"reopen"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"select","target":"label:Client portal experience","value":"Advanced"},
+  {"do":"select","target":"label:Digital onboarding & account opening","value":"Developing"},
+  {"do":"select","target":"label:Financial-planning tools","value":"Advanced"},
+  {"do":"read"},
+  {"do":"shot","name":"infra-rated"}
+]

@@ -1,0 +1,6 @@
+[
+  {"do":"goto","url":"/assessments/cfc53762-0581-4523-bca3-bd9ef1b352b0","note":"reopen"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"read"},
+  {"do":"shot","name":"powers"}
+]

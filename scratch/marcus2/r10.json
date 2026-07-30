@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/workbench","waitfor":"","note":"workbench"},
+  {"do":"click","target":"text:Practice Arena","note":"click arena nav"},
+  {"do":"read"},
+  {"do":"shot","name":"arena"},
+  {"do":"goto","url":"/workbench","waitfor":"","note":"back"},
+  {"do":"click","target":"text:Calibration","note":"click calibration"},
+  {"do":"read"}
+]

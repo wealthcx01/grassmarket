@@ -1,0 +1,15 @@
+[
+  {"do":"goto","url":"/pipeline"},
+  {"do":"click","target":"text:Robinhood"},
+  {"do":"select","target":"label:Move stage","value":"closed","note":"illegal jump Prospect->Closed"},
+  {"do":"read"},
+  {"do":"select","target":"label:Move stage","value":"delivered","note":"terminal->Delivered"},
+  {"do":"read"},
+  {"do":"select","target":"label:Move stage","value":"prospect","note":"rewind to start"},
+  {"do":"read"},
+  {"do":"goto","url":"/assessments"},
+  {"do":"fill","target":"placeholder:Type to find the company in the registry, or enter any name to keep it manual.","value":"Robinhood"},
+  {"do":"click","target":"text:Create & open"},
+  {"do":"read","note":"wizard first page"},
+  {"do":"shot","name":"07-wizard-open"}
+]

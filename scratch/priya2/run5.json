@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments/7c27b831-85fc-431d-aea8-023952524397","note":"open wizard"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"fill","target":"placeholder:value","value":"-1000000","note":"negative AUA - should be rejected"},
+  {"do":"select","target":"placeholder:confidence…","value":"audited"},
+  {"do":"read"},
+  {"do":"shot","name":"neg-aua"}
+]

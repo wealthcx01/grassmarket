@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/guide","note":"guide"},
+  {"do":"shot","name":"guide"},
+  {"do":"goto","url":"/help","note":"help"},
+  {"do":"goto","url":"/profile","note":"profile"},
+  {"do":"goto","url":"/settings","note":"settings"},
+  {"do":"goto","url":"/engagements","note":"engagements"}
+]

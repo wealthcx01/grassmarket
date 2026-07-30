@@ -1,0 +1,7 @@
+[
+  {"do":"goto","url":"/workbench/academy/sales-egoist","note":"course"},
+  {"do":"fill","target":"textarea","value":"A passive conversation is a loss because a rival advances instead; the Egoist owns the next dated step of every live account."},
+  {"do":"click","target":"text:Reveal model answer"},
+  {"do":"shot","name":"model-answer"},
+  {"do":"read"}
+]

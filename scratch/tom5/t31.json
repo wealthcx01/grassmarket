@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/engagements/4e855092-880d-45e2-a160-7df72b9afcbf","note":"engagement"},
+  {"do":"select","target":"select >> nth=0","value":"b6fd32d9-90eb-4040-8699-a599949edf8b"},
+  {"do":"shot","name":"t36-preLink"},
+  {"do":"click","target":"button:text-is('Link')"},
+  {"do":"waittext","value":"Finalised"},
+  {"do":"read"},
+  {"do":"shot","name":"t37-postLink"}
+]

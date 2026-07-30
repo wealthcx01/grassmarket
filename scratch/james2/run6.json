@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments/68dd8d67-cdb7-4216-a559-6a96d9f711f8","note":"sandbox wizard"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"click","target":"button:has-text('Established') >> nth=0"},
+  {"do":"click","target":"button:has-text('Established') >> nth=1"},
+  {"do":"click","target":"text:6. Summary & Interpretation"},
+  {"do":"read"}
+]

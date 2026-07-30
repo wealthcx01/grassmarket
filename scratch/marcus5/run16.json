@@ -1,0 +1,16 @@
+[
+  {"do":"goto","url":"/assessments/f04a3afa-65eb-4671-9287-b3b37d2b4ea3"},
+  {"do":"click","target":"text:5. Customer Proposition"},
+  {"do":"click","target":":nth-match(button:text-is(\"Frontier\"), 1)","note":"Onboarding speed Frontier"},
+  {"do":"click","target":":nth-match(button:text-is(\"Advanced\"), 2)","note":"KYC Advanced"},
+  {"do":"click","target":":nth-match(button:text-is(\"Frontier\"), 3)","note":"Funding Frontier"},
+  {"do":"click","target":":nth-match(button:text-is(\"Developing\"), 4)","note":"Guidance Developing"},
+  {"do":"click","target":":nth-match(button:text-is(\"Advanced\"), 5)","note":"Layout Advanced"},
+  {"do":"click","target":":nth-match(button:text-is(\"Frontier\"), 6)","note":"Visual Frontier"},
+  {"do":"click","target":":nth-match(button:text-is(\"Developing\"), 9)","note":"Order types Developing"},
+  {"do":"click","target":":nth-match(button:text-is(\"Advanced\"), 10)","note":"Execution flow Advanced"},
+  {"do":"click","target":":nth-match(button:text-is(\"Basic\"), 11)","note":"Fee transparency Basic - PFOF"},
+  {"do":"click","target":":nth-match(button:text-is(\"Advanced\"), 12)","note":"Realtime confirm Advanced"},
+  {"do":"read","note":"C score on rail?"},
+  {"do":"shot","name":"22-c-rated"}
+]

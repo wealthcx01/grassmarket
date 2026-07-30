@@ -1,0 +1,15 @@
+[
+  {"do":"goto","url":"/assessments/71759c0d-ec1d-40fa-9c82-24c9e9297691","waitfor":"LSEG"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"fill","target":"input:below(:text-is(\"Average daily volume (ADV)\"))","value":"1200000"},
+  {"do":"select","target":"select:below(:text-is(\"Average daily volume (ADV)\"))","value":"management_reported"},
+  {"do":"fill","target":"input:below(:text-is(\"Index & market-data revenue\"))","value":"7000"},
+  {"do":"select","target":"select:below(:text-is(\"Index & market-data revenue\"))","value":"audited"},
+  {"do":"fill","target":"input:below(:text-is(\"EBITDA / operating margin\"))","value":"48"},
+  {"do":"select","target":"select:below(:text-is(\"EBITDA / operating margin\"))","value":"audited"},
+  {"do":"fill","target":"input:below(:text-is(\"Recurring / subscription revenue share\"))","value":"72"},
+  {"do":"fill","target":"input:below(:text-is(\"Net revenue growth (YoY)\"))","value":"8"},
+  {"do":"fill","target":"input:below(:text-is(\"IPOs / listings won\"))","value":"25"},
+  {"do":"read"},
+  {"do":"shot","name":"12-metrics-filled"}
+]

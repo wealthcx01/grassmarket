@@ -1,0 +1,12 @@
+[
+  {"do":"goto","url":"/workbench/practice","waitfor":"","note":"practice arena"},
+  {"do":"read"},
+  {"do":"goto","url":"/guide","waitfor":"","note":"guide"},
+  {"do":"read"},
+  {"do":"goto","url":"/help","waitfor":"","note":"help"},
+  {"do":"read"},
+  {"do":"goto","url":"/settings","waitfor":"","note":"settings"},
+  {"do":"read"},
+  {"do":"goto","url":"/profile","waitfor":"","note":"profile"},
+  {"do":"read"}
+]

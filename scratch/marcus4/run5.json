@@ -1,0 +1,6 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"click","target":"text:Robinhood"},
+  {"do":"read"},
+  {"do":"shot","name":"wizard-metrics"}
+]

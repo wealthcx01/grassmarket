@@ -1,0 +1,14 @@
+[
+  {"do":"goto","url":"/assessments/f04a3afa-65eb-4671-9287-b3b37d2b4ea3"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"fill","target":":nth-match(input[placeholder^=\"value\"], 1)","value":"-5000000000","note":"negative AUA"},
+  {"do":"read"},
+  {"do":"fill","target":":nth-match(input[placeholder^=\"value\"], 2)","value":"0","note":"zero active clients"},
+  {"do":"fill","target":":nth-match(input[placeholder^=\"value\"], 3)","value":"999999999999999","note":"absurd revenue"},
+  {"do":"fill","target":":nth-match(input[placeholder^=\"value\"], 5)","value":"1234567890","note":"10-digit percent gross margin"},
+  {"do":"read"},
+  {"do":"shot","name":"10-metrics-hostile"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"read","note":"powers step"},
+  {"do":"shot","name":"11-powers"}
+]

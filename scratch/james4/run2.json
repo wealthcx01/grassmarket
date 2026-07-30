@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"fill","target":"placeholder:Type to find the company in the registry, or enter any name to keep it manual.","value":"RBC Brewin Dolphin"},
+  {"do":"click","target":"text:Wealth / investment management"},
+  {"do":"click","target":"text:Create & open"},
+  {"do":"read"},
+  {"do":"shot","name":"wizard-open"}
+]

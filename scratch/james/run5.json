@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments/fe7d771b-c8fe-4261-877a-c3f72fcd6da1","note":"open wizard"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"read"},
+  {"do":"shot","name":"powers-tab"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"read"},
+  {"do":"shot","name":"infra-tab"}
+]

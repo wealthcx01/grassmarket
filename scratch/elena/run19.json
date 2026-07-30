@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/pipeline","note":"pipeline"},
+  {"do":"fill","target":"placeholder:New prospect","value":"Deutsche Börse"},
+  {"do":"click","target":"text:Add prospect"},
+  {"do":"waittext","value":"Deutsche Börse"},
+  {"do":"click","target":"text:Deutsche Börse"},
+  {"do":"read"},
+  {"do":"shot","name":"prospect-detail"}
+]

@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/workbench/academy"},
+  {"do":"read"},
+  {"do":"shot","name":"37-academy"},
+  {"do":"click","target":":nth-match(main a, 1)"},
+  {"do":"read"},
+  {"do":"shot","name":"38-academy-course","full":true}
+]

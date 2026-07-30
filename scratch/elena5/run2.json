@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio list"},
+  {"do":"read"},
+  {"do":"shot","name":"03-portfolio"},
+  {"do":"goto","url":"/assessments/new","note":"try new assessment route"},
+  {"do":"read"},
+  {"do":"shot","name":"04-new-assessment"}
+]

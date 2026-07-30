@@ -11,12 +11,28 @@ const LABEL: Partial<Record<RecordProvenance, string>> = {
   demo: "Demo: illustrative only",
 };
 
+/**
+ * The badge is a warning; on its own it does not say what the record IS (GRS-0177). The founder
+ * read a portfolio of them and could not tell why the same company appeared twice, so each badge
+ * now carries the plain explanation on hover as well as the shorthand on its face.
+ */
+const EXPLANATION: Partial<Record<RecordProvenance, string>> = {
+  sandbox:
+    "Your own private practice copy of an assessment. You can finalise it on your own, with no " +
+    "second rater and no committee, so you can see a real deliverable draft. Its outputs are " +
+    "watermarked and it can never reach a client.",
+  demo:
+    "A seeded illustrative record, here so the studio has something to show. It is not real " +
+    "client work and its numbers describe nobody's actual platform.",
+};
+
 export function ProvenanceBadge({ provenance }: { provenance: RecordProvenance }) {
   const label = LABEL[provenance];
   if (!label) return null;
   return (
     <span
       role="status"
+      title={EXPLANATION[provenance]}
       style={{
         display: "inline-flex",
         alignItems: "center",

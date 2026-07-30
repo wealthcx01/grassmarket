@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments/f04a3afa-65eb-4671-9287-b3b37d2b4ea3"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"read"},
+  {"do":"shot","name":"16-infra"},
+  {"do":"click","target":"text:Order & Execution Management"},
+  {"do":"read","note":"module expanded?"},
+  {"do":"shot","name":"17-infra-oem"}
+]

@@ -1,0 +1,217 @@
+<title>Platform Power Reports — Revolut & Hargreaves Lansdown (Demo)</title>
+<style>
+  :root{
+    --paper:#F7F5EF; --paper-2:#FFFFFF; --ink:#1C1E1A; --ink-2:#4A4E45;
+    --line:#E2DED3; --green:#1A3B26; --green-2:#2E5A3E; --gold:#9A7B3F;
+    --good:#2E5A3E; --warn:#9A7B3F; --bad:#8A3B2E;
+    --chip:#EEEBE1; --shadow:0 1px 2px rgba(28,30,26,.06),0 8px 24px rgba(28,30,26,.05);
+    --serif:"Source Serif 4",Georgia,"Iowan Old Style",serif;
+    --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --paper:#15171400; --paper:#131512; --paper-2:#1B1E19; --ink:#ECEAE1; --ink-2:#A9ACA1;
+    --line:#2C2F29; --green:#8FBF9E; --green-2:#B7D7C0; --gold:#CBA968;
+    --good:#8FBF9E; --warn:#CBA968; --bad:#D98A78; --chip:#23261F;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+  }}
+  :root[data-theme="light"]{
+    --paper:#F7F5EF; --paper-2:#FFFFFF; --ink:#1C1E1A; --ink-2:#4A4E45; --line:#E2DED3;
+    --green:#1A3B26; --green-2:#2E5A3E; --gold:#9A7B3F; --good:#2E5A3E; --warn:#9A7B3F; --bad:#8A3B2E; --chip:#EEEBE1;
+    --shadow:0 1px 2px rgba(28,30,26,.06),0 8px 24px rgba(28,30,26,.05);
+  }
+  :root[data-theme="dark"]{
+    --paper:#131512; --paper-2:#1B1E19; --ink:#ECEAE1; --ink-2:#A9ACA1; --line:#2C2F29;
+    --green:#8FBF9E; --green-2:#B7D7C0; --gold:#CBA968; --good:#8FBF9E; --warn:#CBA968; --bad:#D98A78; --chip:#23261F;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;
+    -webkit-font-smoothing:antialiased;font-size:16px}
+  .wrap{max-width:940px;margin:0 auto;padding:clamp(24px,5vw,64px) clamp(18px,4vw,40px)}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--green-2)}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(30px,5vw,46px);line-height:1.05;margin:.35em 0 .2em;
+    text-wrap:balance;letter-spacing:-.01em}
+  h2{font-family:var(--serif);font-weight:600;font-size:clamp(22px,3.4vw,30px);margin:0;letter-spacing:-.01em}
+  h3{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);margin:0 0 12px}
+  p{color:var(--ink-2);max-width:66ch}
+  a{color:var(--green-2)}
+  .lede{font-size:18px;max-width:64ch}
+  .rule{height:1px;background:var(--line);border:0;margin:40px 0}
+  /* provenance banner */
+  .banner{background:var(--paper-2);border:1px solid var(--line);border-left:3px solid var(--gold);
+    border-radius:12px;padding:20px 22px;box-shadow:var(--shadow);margin-top:28px}
+  .banner h3{color:var(--gold)}
+  .banner ul{margin:0;padding-left:18px;color:var(--ink-2);font-size:14.5px}
+  .banner li{margin:6px 0}
+  .banner b{color:var(--ink)}
+  /* company card */
+  .co{background:var(--paper-2);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
+    padding:clamp(20px,3vw,34px);margin-top:28px}
+  .co-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 16px;
+    border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:22px}
+  .co-head .seg{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+  .watermark{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--bad);border:1px solid color-mix(in srgb,var(--bad) 40%,var(--line));border-radius:999px;padding:3px 9px}
+  /* stat tiles */
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:8px}
+  @media(max-width:620px){.tiles{grid-template-columns:repeat(2,1fr)}}
+  .tile{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .tile.hero{grid-column:span 1;background:var(--green);border-color:var(--green)}
+  .tile.hero .k,.tile.hero .rng{color:color-mix(in srgb,#fff 82%,var(--green))}
+  :root[data-theme="dark"] .tile.hero{background:color-mix(in srgb,var(--green) 22%,var(--paper-2))}
+  :root[data-theme="dark"] .tile.hero .k{color:var(--green-2)}
+  @media (prefers-color-scheme:dark){.tile.hero{background:color-mix(in srgb,var(--green) 22%,var(--paper-2))}.tile.hero .k{color:var(--green-2)}.tile.hero .rng{color:var(--ink-2)}}
+  .tile .lab{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);margin-bottom:6px}
+  .tile.hero .lab{color:color-mix(in srgb,#fff 70%,var(--green))}
+  .tile .k{font-family:var(--serif);font-size:30px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
+  .tile .rng{font-family:var(--mono);font-size:11px;color:var(--ink-2);margin-top:5px}
+  .caption{font-family:var(--mono);font-size:11px;color:var(--ink-2);margin:2px 0 22px}
+  /* triad + modules */
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  @media(max-width:680px){.row{grid-template-columns:1fr}}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font-family:var(--mono);font-size:12px;background:var(--chip);border:1px solid var(--line);border-radius:8px;padding:7px 11px;color:var(--ink)}
+  .chip b{color:var(--green-2)}
+  .mods{display:flex;flex-direction:column;gap:7px}
+  .mod{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;gap:12px}
+  .mod .nm{color:var(--ink-2)}
+  .lvl{font-family:var(--mono);font-size:11px;letter-spacing:.04em;padding:2px 8px;border-radius:6px;white-space:nowrap}
+  .l-Frontier{background:color-mix(in srgb,var(--good) 20%,transparent);color:var(--good)}
+  .l-Advanced{background:color-mix(in srgb,var(--good) 12%,transparent);color:var(--good)}
+  .l-Developing{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+  .l-Basic{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+  /* sell panel */
+  .sell{margin-top:24px;background:color-mix(in srgb,var(--green) 6%,var(--paper));border:1px solid color-mix(in srgb,var(--green) 22%,var(--line));border-radius:12px;padding:18px 20px}
+  :root[data-theme="dark"] .sell{background:color-mix(in srgb,var(--green) 10%,var(--paper))}
+  .sell h3{color:var(--green-2)}
+  .deal{display:grid;grid-template-columns:auto 1fr auto;gap:6px 14px;align-items:baseline;padding:9px 0;border-top:1px dashed var(--line)}
+  .deal:first-of-type{border-top:0}
+  .deal .pr{font-family:var(--mono);font-weight:600;color:var(--ink);font-size:14px}
+  .deal .gap{color:var(--ink-2);font-size:13.5px}
+  .deal .fee{font-family:var(--mono);color:var(--green-2);font-size:13px;font-variant-numeric:tabular-nums;text-align:right}
+  .experimental{font-size:12px;color:var(--ink-2);margin-top:12px;font-style:italic}
+  .foot{margin-top:44px;padding-top:22px;border-top:1px solid var(--line);font-size:14px;color:var(--ink-2)}
+  .foot code{font-family:var(--mono);font-size:12.5px;background:var(--chip);padding:2px 6px;border-radius:5px;color:var(--ink)}
+  .verify{display:flex;gap:10px;align-items:flex-start;background:color-mix(in srgb,var(--good) 8%,var(--paper-2));
+    border:1px solid color-mix(in srgb,var(--good) 24%,var(--line));border-radius:10px;padding:14px 16px;margin-top:18px;font-size:14px}
+  .verify .dot{width:9px;height:9px;border-radius:50%;background:var(--good);margin-top:6px;flex:none}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Bruntsfield Advisor Studio · Internal Demo</div>
+  <h1>Platform Power Reports</h1>
+  <p class="lede">Two brokerages — <b style="color:var(--ink)">Revolut</b> and <b style="color:var(--ink)">Hargreaves&nbsp;Lansdown</b> — assessed end-to-end through the studio, from pipeline to a finalised, scored report. This is what the advisor and the client would see.</p>
+
+  <div class="verify">
+    <span class="dot"></span>
+    <div><b style="color:var(--ink)">Verified engine-computed, not fabricated.</b> Every score here was reproduced in a clean-room recompute of the locked inputs using the ATLAS engine — Revolut recomputed to 60.49, HL to 57.17, matching the studio's portfolio scores exactly. What the build agent supplied was the <i>input ratings</i> (read from the public brokerage reviews, as an advisor would enter them); every score, report, and commission below was produced by the deployed system.</div>
+  </div>
+
+  <div class="banner">
+    <h3>Read this first — what this is and isn't</h3>
+    <ul>
+      <li><b>Simulated, not a real engagement.</b> Inputs were authored from public app reviews of these firms — not a Bruntsfield assessment of the actual company.</li>
+      <li><b>Sandbox &amp; watermarked.</b> Both finalised in sandbox mode: self-approved, <b>not client-facing</b>, every page stamped <i>“DRAFT — not client-usable.”</i></li>
+      <li><b>Coefficients are draft.</b> The weights are <code style="font-family:var(--mono);font-size:12px">v1-draft-pending-elicitation</code> (placeholder, review due Dec 2026). Treat the numbers as <b>directional</b>, not final.</li>
+      <li><b>One known inconsistency.</b> The portfolio list shows the <b>deterministic</b> V (60.5 / 57.2); the report headline shows the <b>Monte-Carlo median</b> V (58.8 / 56.5). Two legitimate numbers, two surfaces — being reconciled (ticketed).</li>
+      <li><b>Customer-Proposition (C) not scored.</b> Under retail draft coefficients C is unweighted, so the 39 C-inputs entered were stored but returned no C index.</li>
+    </ul>
+  </div>
+
+  <!-- ============ REVOLUT ============ -->
+  <section class="co">
+    <div class="co-head">
+      <div><h2>Revolut</h2><div class="seg">Retail brokerage · Neobank super-app · 100% coverage · Low uncertainty</div></div>
+      <span class="watermark">Draft · Sandbox</span>
+    </div>
+    <div class="tiles">
+      <div class="tile hero"><div class="lab">V · Platform Value</div><div class="k">58.8</div><div class="rng">56.1–61.1</div></div>
+      <div class="tile"><div class="lab">B · Business</div><div class="k">89.1</div><div class="rng">81.5–92.8</div></div>
+      <div class="tile"><div class="lab">P · Powers</div><div class="k">38.6</div><div class="rng">32.9–38.6</div></div>
+      <div class="tile"><div class="lab">L · Infrastructure</div><div class="k">53.6</div><div class="rng">51.3–56.4</div></div>
+    </div>
+    <div class="caption">Deterministic V (portfolio) 60.5 · report headline is the P50 median. Ranges are P10–P90 (Methodology §7).</div>
+    <div class="row">
+      <div>
+        <h3>Powers triad — the words a client sees</h3>
+        <div class="chips">
+          <span class="chip">Economic <b>Wide</b></span>
+          <span class="chip">Perceived <b>Established</b></span>
+          <span class="chip">Defence <b>Emerging</b></span>
+        </div>
+        <p style="font-size:13.5px;margin-top:14px">Strong economics and brand; a thinner competitive moat — a fast-moving super-app whose defensibility is still building.</p>
+      </div>
+      <div>
+        <h3>Module maturity — where it's strong</h3>
+        <div class="mods">
+          <div class="mod"><span class="nm">Front End</span><span class="lvl l-Frontier">Frontier</span></div>
+          <div class="mod"><span class="nm">Application Server</span><span class="lvl l-Frontier">Frontier</span></div>
+          <div class="mod"><span class="nm">Orchestration</span><span class="lvl l-Frontier">Frontier</span></div>
+          <div class="mod"><span class="nm">Back Office</span><span class="lvl l-Frontier">Frontier</span></div>
+          <div class="mod"><span class="nm">Market Data</span><span class="lvl l-Advanced">Advanced</span></div>
+          <div class="mod"><span class="nm">Order &amp; Execution Mgmt</span><span class="lvl l-Developing">Developing</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="sell">
+      <h3>What you could sell against this report</h3>
+      <div class="deal"><span class="pr">OpenBB</span><span class="gap">closes the research &amp; market-data tooling gap (equity research is thin)</span><span class="fee">£15,000 / yr1</span></div>
+      <div class="deal"><span class="pr">Benzinga</span><span class="gap">news &amp; earnings depth for the light equity content layer</span><span class="fee">£15,000 / yr1</span></div>
+      <div class="deal"><span class="pr">ConnectTrade</span><span class="gap">order-type coverage — the one Developing module (no stop-limit / OCO)</span><span class="fee">£15,000 / yr1</span></div>
+      <p class="experimental">This panel is illustrative — the studio does <b>not</b> yet generate product recommendations from a report. Ticketed as a feature to build (see plan).</p>
+    </div>
+  </section>
+
+  <!-- ============ HARGREAVES LANSDOWN ============ -->
+  <section class="co">
+    <div class="co-head">
+      <div><h2>Hargreaves Lansdown</h2><div class="seg">Retail / D2C wealth · £155bn AUA · 100% coverage · Low uncertainty</div></div>
+      <span class="watermark">Draft · Sandbox</span>
+    </div>
+    <div class="tiles">
+      <div class="tile hero"><div class="lab">V · Platform Value</div><div class="k">56.5</div><div class="rng">54.8–57.8</div></div>
+      <div class="tile"><div class="lab">B · Business</div><div class="k">98.1</div><div class="rng">96.3–99.8</div></div>
+      <div class="tile"><div class="lab">P · Powers</div><div class="k">31.4</div><div class="rng">25.7–31.4</div></div>
+      <div class="tile"><div class="lab">L · Infrastructure</div><div class="k">45.0</div><div class="rng">42.8–47.0</div></div>
+    </div>
+    <div class="caption">Deterministic V (portfolio) 57.2 · report headline is the P50 median. Highest B of the set — the UK's #1 platform by scale.</div>
+    <div class="row">
+      <div>
+        <h3>Powers triad — the words a client sees</h3>
+        <div class="chips">
+          <span class="chip">Economic <b>Wide</b></span>
+          <span class="chip">Perceived <b>Established</b></span>
+          <span class="chip">Defence <b>Emerging</b></span>
+        </div>
+        <p style="font-size:13.5px;margin-top:14px">Dominant scale and brand (tax-wrapper switching costs), but a conservative platform — the moat is incumbency, not innovation.</p>
+      </div>
+      <div>
+        <h3>Module maturity — strong, and the one risk</h3>
+        <div class="mods">
+          <div class="mod"><span class="nm">Client Management System</span><span class="lvl l-Frontier">Frontier</span></div>
+          <div class="mod"><span class="nm">Back Office</span><span class="lvl l-Frontier">Frontier</span></div>
+          <div class="mod"><span class="nm">Application Server</span><span class="lvl l-Frontier">Frontier</span></div>
+          <div class="mod"><span class="nm">Front End</span><span class="lvl l-Advanced">Advanced</span></div>
+          <div class="mod"><span class="nm">Market Data</span><span class="lvl l-Advanced">Advanced</span></div>
+          <div class="mod"><span class="nm">Order &amp; Execution Mgmt</span><span class="lvl l-Basic">Basic</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="sell">
+      <h3>What you could sell against this report</h3>
+      <div class="deal"><span class="pr">ConnectTrade</span><span class="gap">the standout gap — OEMS rated Basic (no options, no fractional, thin order types)</span><span class="fee">£15,000 / yr1</span></div>
+      <div class="deal"><span class="pr">OpenBB</span><span class="gap">modern screeners/tooling to complement already-strong research</span><span class="fee">£15,000 / yr1</span></div>
+      <div class="deal"><span class="pr">Brandfetch</span><span class="gap">lower fit — brand is already a core strength</span><span class="fee">£7,500 / yr1</span></div>
+      <p class="experimental">This panel is illustrative — the studio does <b>not</b> yet generate product recommendations from a report. Ticketed as a feature to build (see plan).</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <h3 style="margin-bottom:10px">Explore the live studio</h3>
+    <p>Both reports, the pipeline, the full 7-step assessment wizard, the Academy, and the £49,500 earnings run are live on the isolated staging stack — click through them yourself:</p>
+    <p style="margin:8px 0">Studio: <code>grassmarket-web-staging.up.railway.app</code> &nbsp;·&nbsp; login <code>advisor@bruntsfieldcapital.com</code> / <code>grassmarket-demo</code></p>
+    <p style="font-size:13px">To scroll the wizard: <b style="color:var(--ink)">Your Portfolio → open “Revolut” → tabs 1–7</b> (Overview · Business Metrics · Powers · Infrastructure · Customer Proposition · Summary · Scenarios). The Infrastructure step is the dense one — that density is the headline UX fix in the plan.</p>
+    <p style="font-size:12px;margin-top:16px;color:var(--ink-2)">Engine 0.1.0 · Methodology 1.1 · Coefficients v1-draft-pending-elicitation · Generated from the deployed system, 2026-07-21.</p>
+  </div>
+</div>

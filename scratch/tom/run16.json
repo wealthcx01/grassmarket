@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/prospects/4aefa47b-44d9-4208-a8ea-a56f03d8ef27","note":"full record"},
+  {"do":"select","target":"select","value":"workshop_delivered"},
+  {"do":"select","target":"select","value":"qualified"},
+  {"do":"select","target":"select","value":"scoped"},
+  {"do":"select","target":"select","value":"contracted"},
+  {"do":"read"},
+  {"do":"shot","name":"contracted-record"}
+]

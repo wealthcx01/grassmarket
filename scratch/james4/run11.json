@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"click","target":"text:SANDBOX"},
+  {"do":"read"},
+  {"do":"shot","name":"sandbox-open"},
+  {"do":"click","target":"text:6. Summary & Interpretation"},
+  {"do":"read"},
+  {"do":"shot","name":"sandbox-summary"}
+]

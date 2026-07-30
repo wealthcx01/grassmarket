@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments/08a4b9cc-ad8d-4ec2-8954-90eea684ba16","note":"wizard"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"fill","target":"css:input[value='-5000']","value":"999999999999999999"},
+  {"do":"read"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"read"},
+  {"do":"shot","name":"powers"}
+]

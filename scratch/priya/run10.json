@@ -1,0 +1,11 @@
+[
+  {"do":"goto","url":"/engagements","note":"engagements"},
+  {"do":"read"},
+  {"do":"shot","name":"engagements"},
+  {"do":"goto","url":"/guide","note":"guide"},
+  {"do":"read"},
+  {"do":"shot","name":"guide"},
+  {"do":"goto","url":"/deliverables","note":"deliverables direct"},
+  {"do":"read"},
+  {"do":"shot","name":"deliverables"}
+]

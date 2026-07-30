@@ -1,0 +1,12 @@
+import { chromium } from "/home/dev/projects/grassmarket/frontend/node_modules/playwright-core/index.js";
+const EXE = "/home/dev/.cache/ms-playwright/chromium-1228/chrome-linux64/chrome";
+const BASE = "https://grassmarket-web-staging.up.railway.app";
+const b = await chromium.launch({ executablePath: EXE, headless: true });
+const p = await (await b.newContext()).newPage();
+await p.goto(`${BASE}/login`,{waitUntil:"domcontentloaded"}); await p.locator("#email").waitFor(); await p.waitForTimeout(1200);
+await p.locator("#email").type("advisor@bruntsfieldcapital.com"); await p.locator("#password").type("grassmarket-demo");
+await p.waitForTimeout(300); await p.getByRole("button",{name:"Sign in"}).click(); await p.waitForURL(/\/$/,{timeout:15000}).catch(()=>{});
+await p.goto(`${BASE}/engagements/7fd44b59-8290-4d11-b578-6f3faf9eab8b`,{waitUntil:"domcontentloaded"}); await p.waitForTimeout(1800);
+const ctl = await p.$$eval("select,button", els => els.map(e => ({tag:e.tagName, txt:(e.innerText||"").slice(0,30), aria:e.getAttribute("aria-label")||"", opts: e.tagName==="SELECT"? [...e.options].map(o=>o.value+"="+o.text):undefined})));
+console.log(JSON.stringify(ctl,null,1));
+await b.close();

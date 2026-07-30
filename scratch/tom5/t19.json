@@ -1,0 +1,18 @@
+[
+  {"do":"goto","url":"/assessments/b6fd32d9-90eb-4040-8699-a599949edf8b","note":"open wizard"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"click","target":"text:Collapse all"},
+  {"do":"click","target":"text:Custody, Settlement & CASS","note":"expand module 6"},
+  {"do":"click","target":"button:text-is('Advanced') >> nth=0","note":"CASS controls"},
+  {"do":"click","target":"button:text-is('Advanced') >> nth=1","note":"settlement"},
+  {"do":"click","target":"button:text-is('Advanced') >> nth=2","note":"corporate actions"},
+  {"do":"click","target":"button:text-is('Advanced') >> nth=3","note":"client money"},
+  {"do":"click","target":"text:Custody, Settlement & CASS","note":"collapse module 6"},
+  {"do":"click","target":"text:Portfolio Management & Dealing","note":"expand module 7"},
+  {"do":"click","target":"button:text-is('Developing') >> nth=0","note":"MPS"},
+  {"do":"click","target":"button:text-is('Developing') >> nth=1","note":"rebalancing"},
+  {"do":"click","target":"button:text-is('Developing') >> nth=2","note":"best execution"},
+  {"do":"click","target":"button:text-is('Developing') >> nth=3","note":"discretionary controls"},
+  {"do":"read"},
+  {"do":"shot","name":"t20-infra-complete","full":true}
+]

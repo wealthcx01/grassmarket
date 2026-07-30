@@ -1,0 +1,13 @@
+[
+  {"do":"goto","url":"/pipeline"},
+  {"do":"click","target":"text:Deutsche Börse"},
+  {"do":"waittext","value":"Win probability"},
+  {"do":"click","target":":nth-match(button:text-is('Qualified'), 1)"},
+  {"do":"read"},
+  {"do":"click","target":":nth-match(button:text-is('Contracted'), 1)"},
+  {"do":"read"},
+  {"do":"shot","name":"22-contracted"},
+  {"do":"goto","url":"/engagements"},
+  {"do":"read"},
+  {"do":"shot","name":"23-engagements2"}
+]

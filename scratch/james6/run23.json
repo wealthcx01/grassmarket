@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/engagements/3f87b95b-d378-457a-b10a-2a3ba2786b02","waitfor":"ENGAGEMENT"},
+  {"do":"select","target":":nth-match(select, 1)","value":"f558706d-27c1-4790-b1f8-1eb79267aefc"},
+  {"do":"click","target":"button:text-is(\"Link\")"},
+  {"do":"read"},
+  {"do":"click","target":"button:text-is(\"Generate\")","note":"defaults: Exec Summary, Internal draft"},
+  {"do":"read"},
+  {"do":"shot","name":"39-generated"}
+]

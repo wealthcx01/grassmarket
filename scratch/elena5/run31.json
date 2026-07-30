@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/engagements/7cc58a54-e9b8-4b20-8b93-ae984ab6d9cf"},
+  {"do":"click","target":"text:Client-facing"},
+  {"do":"click","target":"button:text-is('Generate')"},
+  {"do":"read"},
+  {"do":"shot","name":"35-clientfacing-radio","full":true},
+  {"do":"goto","url":"/earnings","waitfor":"Earnings"},
+  {"do":"read"},
+  {"do":"shot","name":"36-earnings","full":true}
+]

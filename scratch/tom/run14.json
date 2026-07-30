@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/pipeline","note":"pipeline"},
+  {"do":"click","target":"text:St. James's Place"},
+  {"do":"select","target":"label:Move stage","value":"contracted"},
+  {"do":"read"},
+  {"do":"click","target":"text:Open full record"},
+  {"do":"read"},
+  {"do":"shot","name":"full-record"}
+]

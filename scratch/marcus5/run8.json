@@ -1,0 +1,13 @@
+[
+  {"do":"goto","url":"/assessments/f04a3afa-65eb-4671-9287-b3b37d2b4ea3"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"waittext","value":"Gross Margin can't","note":"does a range error exist for absurd percent?"},
+  {"do":"read"},
+  {"do":"fill","target":":nth-match(input[placeholder^=\"value\"], 1)","value":"80000000000","note":"fix AUA realistic"},
+  {"do":"fill","target":":nth-match(input[placeholder^=\"value\"], 2)","value":"24000000","note":"active clients"},
+  {"do":"fill","target":":nth-match(input[placeholder^=\"value\"], 3)","value":"2300000000","note":"net revenue"},
+  {"do":"fill","target":":nth-match(input[placeholder^=\"value\"], 4)","value":"90","note":"ARPU"},
+  {"do":"fill","target":":nth-match(input[placeholder^=\"value\"], 5)","value":"85","note":"gross margin sane"},
+  {"do":"read"},
+  {"do":"shot","name":"12-metrics-fixed"}
+]

@@ -1,0 +1,7 @@
+[
+  {"do":"goto","url":"/workbench/academy/sales-egoist","note":"course"},
+  {"do":"shot","name":"course-full"},
+  {"do":"click","target":"text:The Zero-Sum Pipeline"},
+  {"do":"shot","name":"lesson-open"},
+  {"do":"read"}
+]

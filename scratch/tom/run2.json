@@ -1,0 +1,11 @@
+[
+  {"do":"goto","url":"/pipeline","note":"pipeline"},
+  {"do":"click","target":"text:Add prospect","note":"reveal add form"},
+  {"do":"read"},
+  {"do":"shot","name":"add-prospect-form"},
+  {"do":"fill","target":"placeholder:New prospect — company name","value":"St. James's Place"},
+  {"do":"read"},
+  {"do":"click","target":"text:Add prospect"},
+  {"do":"read"},
+  {"do":"shot","name":"after-add"}
+]

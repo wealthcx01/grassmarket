@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/workbench","waitfor":"","note":"workbench home"},
+  {"do":"read"},
+  {"do":"goto","url":"/workbench/academy/sales-egoist","waitfor":"","note":"open a course"},
+  {"do":"read"},
+  {"do":"goto","url":"/workbench/academy/does-not-exist-course","waitfor":"","note":"bad course id"},
+  {"do":"read"},
+  {"do":"shot","name":"workbench"}
+]

@@ -1,0 +1,21 @@
+[
+  {"do":"goto","url":"/assessments/b8cb1fa8-b952-4625-954b-d579453571f4","waitfor":"Deutsche Börse"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"fill","target":"placeholder:value","value":"250000000000"},
+  {"do":"select","target":"select >> nth=0","value":"audited"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"select","target":"select >> nth=0","value":"Advanced"},
+  {"do":"select","target":"select >> nth=1","value":"Advanced"},
+  {"do":"select","target":"select >> nth=2","value":"Advanced"},
+  {"do":"select","target":"select >> nth=3","value":"Advanced"},
+  {"do":"select","target":"select >> nth=4","value":"Advanced"},
+  {"do":"select","target":"select >> nth=5","value":"Advanced"},
+  {"do":"select","target":"select >> nth=6","value":"Advanced"},
+  {"do":"select","target":"select >> nth=7","value":"Advanced"},
+  {"do":"select","target":"select >> nth=8","value":"Advanced"},
+  {"do":"select","target":"select >> nth=9","value":"Advanced"},
+  {"do":"select","target":"select >> nth=10","value":"Advanced"},
+  {"do":"select","target":"select >> nth=11","value":"Advanced"},
+  {"do":"select","target":"select >> nth=12","value":"Advanced"},
+  {"do":"read"}
+]

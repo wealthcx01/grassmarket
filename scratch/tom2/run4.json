@@ -1,0 +1,12 @@
+[
+  {"do":"goto","url":"/assessments/1fce9b57-199d-4ce8-aa26-5e0ba47f822c","note":"open wizard"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"read"},
+  {"do":"shot","name":"tab-metrics"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"read"},
+  {"do":"shot","name":"tab-powers"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"read"},
+  {"do":"shot","name":"tab-infra"}
+]

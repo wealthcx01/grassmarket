@@ -1,0 +1,20 @@
+[
+  {"do":"read","note":"dashboard after login"},
+  {"do":"shot","name":"rv-01-dashboard","full":true},
+  {"do":"goto","url":"/pipeline","note":"pipeline — 4 brokerages contracted"},
+  {"do":"shot","name":"rv-02-pipeline","full":true},
+  {"do":"goto","url":"/assessments","note":"PORTFOLIO — V + C columns (the new feature)"},
+  {"do":"read","note":"confirm V and C both render"},
+  {"do":"shot","name":"rv-03-portfolio-VC","full":true},
+  {"do":"goto","url":"/assessments/1c7e4e2c-fd19-449d-af7c-90e5bd995859","note":"open Revolut finalised assessment"},
+  {"do":"read","note":"finalised assessment view / score"},
+  {"do":"shot","name":"rv-04-assessment","full":true},
+  {"do":"goto","url":"/engagements/97cf26a5-1687-4c89-91ad-838e47680dc8","note":"Revolut engagement + deliverables"},
+  {"do":"read","note":"deliverables present + downloadable"},
+  {"do":"shot","name":"rv-05-engagement","full":true},
+  {"do":"goto","url":"/earnings","waitfor":"Earnings","note":"earnings £49,500"},
+  {"do":"shot","name":"rv-06-earnings","full":true},
+  {"do":"goto","url":"/workbench/academy","waitfor":"Academy","note":"Academy — 5 courses"},
+  {"do":"read","note":"courses present"},
+  {"do":"shot","name":"rv-07-academy","full":true}
+]

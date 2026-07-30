@@ -1,0 +1,5 @@
+[
+  {"do":"goto","url":"/earnings","waitfor":"Earnings","note":"earnings page"},
+  {"do":"read"},
+  {"do":"shot","name":"t47-earnings","full":true}
+]

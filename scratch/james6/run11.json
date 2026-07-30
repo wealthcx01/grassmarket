@@ -1,0 +1,15 @@
+[
+  {"do":"goto","url":"/assessments/f558706d-27c1-4790-b1f8-1eb79267aefc","waitfor":"RBC Brewin Dolphin"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"select","target":":nth-match(select, 1)","value":"established","note":"Scale benefit"},
+  {"do":"select","target":":nth-match(select, 2)","value":"E3","note":"Scale benefit grade"},
+  {"do":"select","target":":nth-match(select, 3)","value":"emerging","note":"Scale barrier"},
+  {"do":"select","target":":nth-match(select, 4)","value":"E2","note":"Scale barrier grade"},
+  {"do":"fill","target":":nth-match(input[placeholder^=\"evidence\"], 1)","value":"c.£59bn AUM spreads platform, research and compliance cost; mid-tier rivals run higher cost/income."},
+  {"do":"select","target":":nth-match(select, 5)","value":"none","note":"Network benefit"},
+  {"do":"select","target":":nth-match(select, 7)","value":"none","note":"Network barrier"},
+  {"do":"select","target":":nth-match(select, 9)","value":"none","note":"CP benefit"},
+  {"do":"select","target":":nth-match(select, 11)","value":"none","note":"CP barrier"},
+  {"do":"read"},
+  {"do":"shot","name":"23-powers-a"}
+]

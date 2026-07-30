@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/pipeline","note":"back to board"},
+  {"do":"click","target":"text:St. James's Place","note":"open prospect detail"},
+  {"do":"read"},
+  {"do":"shot","name":"t04-prospect-detail"},
+  {"do":"select","target":"label:Move stage","value":"workshop_scheduled"},
+  {"do":"waittext","value":"Workshop Scheduled"},
+  {"do":"read"},
+  {"do":"shot","name":"t05-stage-moved"}
+]

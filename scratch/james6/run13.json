@@ -1,0 +1,15 @@
+[
+  {"do":"goto","url":"/assessments/f558706d-27c1-4790-b1f8-1eb79267aefc","waitfor":"RBC Brewin Dolphin"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"select","target":":nth-match(select, 3)","value":"Emerging","note":"Scale barrier"},
+  {"do":"select","target":":nth-match(select, 4)","value":"E2"},
+  {"do":"select","target":":nth-match(select, 5)","value":"None","note":"Network benefit"},
+  {"do":"select","target":":nth-match(select, 7)","value":"None","note":"Network barrier"},
+  {"do":"select","target":":nth-match(select, 9)","value":"None","note":"CP benefit"},
+  {"do":"select","target":":nth-match(select, 11)","value":"None","note":"CP barrier"},
+  {"do":"select","target":":nth-match(select, 13)","value":"Established","note":"card4 benefit"},
+  {"do":"select","target":":nth-match(select, 14)","value":"E2"},
+  {"do":"select","target":":nth-match(select, 15)","value":"Established","note":"card4 barrier"},
+  {"do":"select","target":":nth-match(select, 16)","value":"E2"},
+  {"do":"read"}
+]

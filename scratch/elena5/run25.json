@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/engagements/7cc58a54-e9b8-4b20-8b93-ae984ab6d9cf"},
+  {"do":"select","target":":nth-match(select, 1)","value":"bde5bfc9-9ecf-499d-83db-acc530e81fb9"},
+  {"do":"click","target":"text:Link"},
+  {"do":"read"},
+  {"do":"click","target":"text:Generate"},
+  {"do":"read"},
+  {"do":"shot","name":"30-deliverable-1","full":true}
+]

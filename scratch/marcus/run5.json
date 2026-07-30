@@ -1,0 +1,11 @@
+[
+  {"do":"goto","url":"/pipeline","note":"open pipeline"},
+  {"do":"select","target":"select","value":"closed","note":"jump first card straight from Prospect to Closed"},
+  {"do":"read"},
+  {"do":"shot","name":"jumpclosed2"},
+  {"do":"select","target":"select","value":"prospect","note":"move it back to Prospect - backward move"},
+  {"do":"read"},
+  {"do":"click","target":"text:Robinhood","note":"try open prospect detail"},
+  {"do":"read"},
+  {"do":"shot","name":"detail"}
+]

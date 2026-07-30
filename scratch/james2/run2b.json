@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"fill","target":"css:input","value":"Brewin Dolphin Wealth Test"},
+  {"do":"select","target":"label:Operating model","value":"wealth"},
+  {"do":"shot","name":"assess-form2"},
+  {"do":"click","target":"role:button:Create & open"},
+  {"do":"read"},
+  {"do":"shot","name":"wizard-open"}
+]

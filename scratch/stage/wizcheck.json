@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments/1c7e4e2c-fd19-449d-af7c-90e5bd995859","note":"open Revolut finalised assessment"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive","note":"infra step"},
+  {"do":"read","note":"collapsed modules?"},
+  {"do":"shot","name":"wiz-01-infra-collapsed","full":true},
+  {"do":"click","target":"text:Front End","note":"expand Front End module"},
+  {"do":"shot","name":"wiz-02-infra-expanded","full":true}
+]

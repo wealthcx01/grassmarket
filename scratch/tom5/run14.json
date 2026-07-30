@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/engagements/a58805de-23b6-48e3-b3e8-5e315040ddb9","note":"engagement","waitfor":"Deliverables"},
+  {"do":"select","target":"select","value":"Executive Summary"},
+  {"do":"click","target":"role:radio:Client-facing"},
+  {"do":"click","target":"role:button:Generate"},
+  {"do":"shot","name":"clientfacing-gen"},
+  {"do":"read"}
+]

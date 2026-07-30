@@ -1,0 +1,12 @@
+[
+  {"do":"goto","url":"/","note":"land on dashboard"},
+  {"do":"read"},
+  {"do":"shot","name":"dashboard"},
+  {"do":"goto","url":"/pipeline","note":"open pipeline board"},
+  {"do":"read"},
+  {"do":"shot","name":"pipeline"},
+  {"do":"fill","target":"placeholder:New prospect — company name","value":"London Stock Exchange Group"},
+  {"do":"click","target":"text:Add prospect"},
+  {"do":"read"},
+  {"do":"shot","name":"pipeline_after_add"}
+]

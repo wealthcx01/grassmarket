@@ -1,0 +1,13 @@
+[
+  {"do":"goto","url":"/assessments/bde5bfc9-9ecf-499d-83db-acc530e81fb9"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"select","target":":nth-match(select, 1)","value":"Wide"},
+  {"do":"select","target":":nth-match(select, 3)","value":"Established"},
+  {"do":"select","target":":nth-match(select, 5)","value":"Wide"},
+  {"do":"select","target":":nth-match(select, 7)","value":"Wide"},
+  {"do":"select","target":":nth-match(select, 9)","value":"None"},
+  {"do":"select","target":":nth-match(select, 11)","value":"None"},
+  {"do":"select","target":":nth-match(select, 13)","value":"Established"},
+  {"do":"select","target":":nth-match(select, 15)","value":"Established"},
+  {"do":"read"}
+]

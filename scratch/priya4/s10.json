@@ -1,0 +1,7 @@
+[
+  {"do":"goto","url":"/assessments/50173b3c-7143-4ff0-9b95-b19d57c666dc","note":"wizard"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"select","target":"select >> nth=0","value":"Established"},
+  {"do":"select","target":"select >> nth=2","value":"Established"},
+  {"do":"read"}
+]

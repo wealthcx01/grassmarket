@@ -1,0 +1,16 @@
+[
+  {"do":"goto","url":"/assessments"},
+  {"do":"click","target":"text:RBC Brewin Dolphin"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"read"},
+  {"do":"shot","name":"16-metrics"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"read"},
+  {"do":"shot","name":"17-powers"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"read"},
+  {"do":"shot","name":"18-infra"},
+  {"do":"click","target":"text:5. Customer Proposition"},
+  {"do":"read"},
+  {"do":"shot","name":"19-custprop"}
+]

@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/workbench/academy","waitfor":"Academy"},
+  {"do":"click","target":"text:Sales Egoist"},
+  {"do":"read"},
+  {"do":"shot","name":"47-sales-egoist"},
+  {"do":"click","target":"text:Start"},
+  {"do":"read"},
+  {"do":"shot","name":"48-lesson1"}
+]

@@ -1,0 +1,13 @@
+[
+  {"do":"goto","url":"/pipeline","note":"open pipeline"},
+  {"do":"click","target":"text:Add prospect","note":"click add with empty field"},
+  {"do":"read"},
+  {"do":"fill","target":"placeholder:New prospect — company name","value":"   "},
+  {"do":"click","target":"text:Add prospect","note":"whitespace only"},
+  {"do":"read"},
+  {"do":"fill","target":"placeholder:New prospect — company name","value":"Robinhood"},
+  {"do":"click","target":"text:Add prospect","note":"duplicate name"},
+  {"do":"click","target":"text:Add prospect","note":"double click same"},
+  {"do":"read"},
+  {"do":"shot","name":"pipeline_after_dupes"}
+]

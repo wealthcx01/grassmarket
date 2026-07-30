@@ -1,0 +1,12 @@
+[
+  {"do":"goto","url":"/assessments/71759c0d-ec1d-40fa-9c82-24c9e9297691","waitfor":"LSEG"},
+  {"do":"click","target":"text:6. Summary & Interpretation"},
+  {"do":"click","target":"text:Download preview (.docx)"},
+  {"do":"read"},
+  {"do":"goto","url":"/workbench","waitfor":"Workbench"},
+  {"do":"read"},
+  {"do":"shot","name":"34-workbench","full":true},
+  {"do":"goto","url":"/workbench/academy"},
+  {"do":"read"},
+  {"do":"shot","name":"35-academy","full":true}
+]

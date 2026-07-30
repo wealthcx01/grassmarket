@@ -1,0 +1,21 @@
+[
+  {"do":"goto","url":"/assessments/bde5bfc9-9ecf-499d-83db-acc530e81fb9","note":"open wizard"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"click","target":":nth-match(button:has-text('Wide'), 1)","note":"Scale benefit Wide"},
+  {"do":"click","target":":nth-match(button:has-text('E3'), 1)","note":"Scale benefit grade E3"},
+  {"do":"click","target":":nth-match(button:has-text('Established'), 2)","note":"Scale barrier Established"},
+  {"do":"click","target":":nth-match(button:has-text('E3'), 2)","note":"Scale barrier grade E3"},
+  {"do":"click","target":":nth-match(button:has-text('Wide'), 3)","note":"Network benefit Wide"},
+  {"do":"click","target":":nth-match(button:has-text('E4'), 3)","note":"Network benefit grade E4"},
+  {"do":"click","target":":nth-match(button:has-text('Wide'), 4)","note":"Network barrier Wide"},
+  {"do":"click","target":":nth-match(button:has-text('E3'), 4)","note":"Network barrier grade E3"},
+  {"do":"click","target":":nth-match(button:has-text('None'), 5)","note":"CP benefit None"},
+  {"do":"click","target":":nth-match(button:has-text('E2'), 5)","note":"CP benefit grade E2"},
+  {"do":"click","target":":nth-match(button:has-text('None'), 6)","note":"CP barrier None"},
+  {"do":"click","target":":nth-match(button:has-text('E2'), 6)","note":"CP barrier grade E2"},
+  {"do":"click","target":":nth-match(button:has-text('Established'), 7)","note":"P4 benefit Established"},
+  {"do":"click","target":":nth-match(button:has-text('E3'), 7)","note":"P4 benefit grade"},
+  {"do":"click","target":":nth-match(button:has-text('Established'), 8)","note":"P4 barrier Established"},
+  {"do":"click","target":":nth-match(button:has-text('E3'), 8)","note":"P4 barrier grade"},
+  {"do":"read"}
+]

@@ -1,0 +1,12 @@
+[
+  {"do":"goto","url":"/deliverables","note":"guess route"},
+  {"do":"read"},
+  {"do":"goto","url":"/foo","note":"garbage route"},
+  {"do":"read"},
+  {"do":"shot","name":"foo404"},
+  {"do":"goto","url":"/prospects/nonexistent-id-123","note":"bad prospect id"},
+  {"do":"read"},
+  {"do":"goto","url":"/assessments/bad-id-xyz","note":"bad assessment id"},
+  {"do":"read"},
+  {"do":"shot","name":"badassess"}
+]

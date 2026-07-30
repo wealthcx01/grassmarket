@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/","note":"dashboard"},
+  {"do":"shot","name":"dashboard"},
+  {"do":"goto","url":"/pipeline","note":"pipeline board"},
+  {"do":"shot","name":"pipeline"},
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"read"},
+  {"do":"goto","url":"/earnings","note":"earnings"},
+  {"do":"read"}
+]

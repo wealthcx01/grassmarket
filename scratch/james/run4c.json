@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"fill","target":"input[type=\"text\"]","value":"Brewin Dolphin"},
+  {"do":"select","target":"select","value":"retail"},
+  {"do":"click","target":"text:Create & open"},
+  {"do":"read"},
+  {"do":"shot","name":"wizard-start"}
+]

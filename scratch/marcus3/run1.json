@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/","note":"land on dashboard"},
+  {"do":"read"},
+  {"do":"goto","url":"/deliverables","note":"bad route test"},
+  {"do":"goto","url":"/academy","note":"academy route"},
+  {"do":"goto","url":"/foo","note":"garbage route"},
+  {"do":"goto","url":"/engagements/bad-id","note":"bad engagement id"},
+  {"do":"goto","url":"/prospects/junk","note":"bad prospect"},
+  {"do":"goto","url":"/assessments/bad-id","note":"bad assessment id"}
+]

@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"select","target":"label:Operating model","value":"wealth"},
+  {"do":"fill","target":"input[type=text]","value":"SJP Sandbox Deliv"},
+  {"do":"click","target":"role:button:Sandbox preview — finalise solo & see the real deliverable (watermarked)"},
+  {"do":"read"},
+  {"do":"shot","name":"sandbox-created"}
+]

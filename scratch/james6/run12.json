@@ -1,0 +1,8 @@
+[
+  {"do":"goto","url":"/assessments/f558706d-27c1-4790-b1f8-1eb79267aefc","waitfor":"RBC Brewin Dolphin"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"select","target":":nth-match(select, 1)","value":"Established","note":"try capitalised"},
+  {"do":"select","target":":nth-match(select, 1)","value":"2","note":"try numeric"},
+  {"do":"select","target":":nth-match(select, 1)","value":"3","note":"try numeric 3"},
+  {"do":"read"}
+]

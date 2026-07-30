@@ -1,0 +1,14 @@
+[
+  {"do":"goto","url":"/assessments/f558706d-27c1-4790-b1f8-1eb79267aefc","waitfor":"RBC Brewin Dolphin"},
+  {"do":"click","target":"text:3. Powers"},
+  {"do":"select","target":":nth-match(select, 17)","value":"Established","note":"Branding benefit"},
+  {"do":"select","target":":nth-match(select, 18)","value":"E3"},
+  {"do":"select","target":":nth-match(select, 19)","value":"Established","note":"Branding barrier"},
+  {"do":"select","target":":nth-match(select, 20)","value":"E2"},
+  {"do":"select","target":":nth-match(select, 21)","value":"Emerging","note":"Cornered Resource benefit"},
+  {"do":"select","target":":nth-match(select, 23)","value":"Emerging","note":"Cornered Resource barrier"},
+  {"do":"select","target":":nth-match(select, 25)","value":"Emerging","note":"Process benefit"},
+  {"do":"select","target":":nth-match(select, 27)","value":"None","note":"Process barrier"},
+  {"do":"read"},
+  {"do":"shot","name":"24-powers-done"}
+]

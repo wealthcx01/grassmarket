@@ -1,0 +1,12 @@
+[
+  {"do":"goto","url":"/assessments/02f49194-f7ca-4691-a0df-4cd9de515992","note":"wizard"},
+  {"do":"click","target":"text:2. Business Metrics"},
+  {"do":"read"},
+  {"do":"shot","name":"metrics"},
+  {"do":"click","target":"text:4. Infrastructure Deep Dive"},
+  {"do":"read"},
+  {"do":"shot","name":"infra"},
+  {"do":"click","target":"text:5. Customer Proposition"},
+  {"do":"read"},
+  {"do":"shot","name":"custprop"}
+]

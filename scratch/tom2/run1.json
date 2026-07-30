@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/","note":"land on dashboard"},
+  {"do":"read"},
+  {"do":"shot","name":"dashboard"},
+  {"do":"goto","url":"/pipeline","note":"open pipeline"},
+  {"do":"read"},
+  {"do":"goto","url":"/assessments","note":"open portfolio/assessments"},
+  {"do":"read"},
+  {"do":"shot","name":"assessments"}
+]

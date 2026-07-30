@@ -1,0 +1,10 @@
+[
+  {"do":"goto","url":"/engagements/3f87b95b-d378-457a-b10a-2a3ba2786b02","waitfor":"ENGAGEMENT"},
+  {"do":"select","target":":nth-match(select, 2)","value":"client_facing","note":"try audience client-facing"},
+  {"do":"click","target":"button:text-is(\"Generate\")"},
+  {"do":"read"},
+  {"do":"shot","name":"40-clientfacing-attempt"},
+  {"do":"click","target":"text:Review AI","note":"open the AI review surface"},
+  {"do":"read"},
+  {"do":"shot","name":"41-review-ai"}
+]

@@ -1,0 +1,9 @@
+[
+  {"do":"goto","url":"/assessments","note":"portfolio"},
+  {"do":"fill","target":"input[type=text]","value":"SJP Wealth Cold5"},
+  {"do":"select","target":"select","value":"wealth"},
+  {"do":"shot","name":"newform2"},
+  {"do":"click","target":"role:button:Create & open"},
+  {"do":"shot","name":"wizard-open"},
+  {"do":"read"}
+]
