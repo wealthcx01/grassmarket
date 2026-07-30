@@ -1,47 +1,54 @@
 # GRS-0217 — The remaining product courses, to the same standard
 
-**Status:** In progress (2026-07-30) — Benzinga is PR 1 of n, opened at 2 of 8 sections.
-**Priority:** HIGH. **Loop:** founder-feedback remediation, Wave 4. **Depends on:** GRS-0215,
-GRS-0216 (sets the bar), GRS-0226 (the reader, without which none of it is visible).
+**Status:** In review (2026-07-30, PR #221) — **Benzinga complete, 8 of 8 sections.** Brandfetch
+and sales-ops-playbook still to do, one PR each. **Priority:** HIGH. **Loop:** founder-feedback
+remediation, Wave 4. **Depends on:** GRS-0215, GRS-0216 (sets the bar), GRS-0226 (the reader,
+without which none of it is visible).
 
 ## Ordering decision (scope asks for this to be a decision, not an accident)
 
 By year-one advisor share from `commissions.yaml`: **Benzinga 1500 bps**, Brandfetch distribution
 750, Brandfetch redistribution 375. Benzinga ties OpenBB at the top and is the only remaining
-product with a committed structured source of truth, so it goes first. Brandfetch follows, and it
+product with a committed structured source of truth, so it went first. Brandfetch follows, and it
 must teach the distribution / redistribution split as two products for two segments (GRS-0185),
 because that is the specific thing the founder found us conflating. `sales-ops-playbook` is last.
 
-## Progress
+## PR 1 — Benzinga: complete
 
-**PR 1 — Benzinga, sections 1 and 2 of 8.**
+Eight sections, **192 slides**, 48 test questions, 69 hands-on slides, one authored diagram per
+section. Every section gates on a 6-question test at an 80% pass mark. The whole course meets the
+GRS-0215 depth standard.
 
-Written: "What Benzinga is, and what it is not" (24 slides, 9 hands-on) and "The catalogue, in four
-families" (24 slides, 10 hands-on). Both meet the full GRS-0215 standard, each carries a diagram, and
-each gates on a 6-question test.
+| # | Section | Slides | Hands-on |
+|---|---|---|---|
+| 1 | What Benzinga is, and what it is not | 24 | 9 |
+| 2 | The catalogue, in four families | 24 | 10 |
+| 3 | How it arrives, and what that costs to build | 24 | 9 |
+| 4 | The content layer: what a user reads | 24 | 8 |
+| 5 | The event layer: what a user plans around | 24 | 7 |
+| 6 | The signal layer: what a desk trades on | 24 | 8 |
+| 7 | Who buys which family, and what triggers it | 24 | 9 |
+| 8 | How to sell it | 24 | 9 |
 
-Grounded in `data/gtm/sources/benzinga-product-catalog.xlsx` — 32 products, four families, with
-delivery method, coverage universe, history depth, daily volume and differentiators per product. The
-counts (9 / 11 / 8 / 4) and every product claim come from that sheet.
+Grounded in `data/gtm/sources/benzinga-product-catalog.xlsx` — 32 products across four families
+(8 / 11 / 9 / 4) with delivery method, coverage universe, history depth, daily volume, key fields and
+differentiators per product. Those counts are now asserted against the spreadsheet by
+`test_the_family_counts_match_the_committed_catalogue`, and the slides are asserted to quote the same
+numbers.
 
-Eight diagrams authored for all eight planned sections, generated and rendered with the real
-toolchain. `SECTIONS_PLANNED` lists the six sections still to write and
-`test_the_course_is_not_finished_and_says_so` fails while it is non-empty, so this cannot read as
-done before it is. `product-benzinga` stays in `LEGACY_COURSES` until then, and the rebuilt subtree
-is held to the full standard meanwhile.
+`SECTIONS_PLANNED` is empty, `test_the_course_is_not_finished_and_says_so` has been deleted as its
+own failure message asked, and `product-benzinga` has come off `depth.LEGACY_COURSES`. Worth noting
+what that register is: nothing in `check_depth` reads it, so it never exempted anything mechanically
+— it is the visible-debt list, and this debt is paid.
 
-Still to write: how it arrives (delivery), the content layer, the event layer, the signal layer, who
-buys which family, how to sell it.
+**The honesty discipline is carried in the content, not in a preamble.** Section 1 drills the three
+things Benzinga is not. Section 4 makes the advisor say the AI provenance of Bulls Say Bears Say out
+loud. Section 5 states the earnings accuracy figure precisely *and* forbids stretching it across the
+other ten calendars. Section 6 is built around the alpha caveat and includes a slide asking the
+advisor to rewrite their sentence if it contains the word "predicts". Section 8 ends on the four
+lines an advisor never crosses: price, timeline, redistribution, attribution.
 
-**One consequence worth stating rather than leaving implicit.** Because the rebuilt sections come
-first and the gate runs in reading order, the retained reference material now sits behind the two new
-section tests. That material was kept so the course would not be thinner during the rebuild, and it
-is now reachable only after an advisor passes sections 1 and 2. That is judged the right trade —
-the reference modules are the paragraph-lessons the founder called basic, and gating the weaker
-content behind the stronger content is not a loss — but it is a real behaviour change, not a
-side effect nobody noticed.
-
-### Two defects fixed on the way through
+### Three defects fixed on the way through
 
 1. **The diagram toolchain could only hold one course.** `svg_export.py` hardcoded OpenBB in three
    places, including a `course=` parameter that `write_content_module` then ignored — so generating
@@ -52,6 +59,15 @@ side effect nobody noticed.
    marked the reference module passed. Fixed with a `reference-` key prefix, and `publish_course`
    now refuses duplicate section ids as well as duplicate orders. This was a live defect in what
    PR #220 shipped.
+3. **I had two family counts backwards.** Content and Alternative Data were swapped, and the error
+   had reached a slide body, a walkthrough instruction, a test question, the diagram and its alt
+   text before I recounted the sheet. The fix is the parity test, not the corrected numbers.
+
+**One consequence worth stating rather than leaving implicit.** Because the rebuilt sections come
+first and the gate runs in reading order, the retained reference material sits behind all eight new
+section tests. That material was kept so the course would not be thinner during the rebuild. Now
+that the rebuild is finished it is genuinely superseded, and GRS-0217's remaining work should
+consider deleting it rather than leaving four locked modules at the end of a finished course.
 
 ## Why
 

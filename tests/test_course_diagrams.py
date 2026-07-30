@@ -21,8 +21,6 @@ from pathlib import Path
 
 import pytest
 
-from grassmarket.workbench.content.openbb_slides import rebuilt_sections
-
 ROOT = Path(__file__).resolve().parents[1]
 COURSES_DIR = ROOT / "design/motion/courses"
 
@@ -419,34 +417,47 @@ def test_the_still_is_the_animation_at_frame_zero_not_the_authored_values() -> N
 # --- The diagrams are actually in the course ------------------------------------------------
 
 
-def test_every_openbb_section_carries_at_least_one_diagram() -> None:
+# Each rebuilt course's sections, keyed by the course whose scenes they use. Discovered per course
+# rather than importing one module, so the checks below travel to every rebuilt course instead of
+# quietly staying about OpenBB — which is the whole claim GRS-0217 is testing.
+def _rebuilt_sections_for(course: str):
+    module = importlib.import_module(f"grassmarket.workbench.content.{course}_slides")
+    return module.rebuilt_sections()
+
+
+@pytest.mark.parametrize("course", COURSE_NAMES)
+def test_every_section_carries_at_least_one_diagram(course: str) -> None:
     """The depth standard enforces this for any course; this is the one that would have caught the
     original gap, where nine diagrams existed on disk and no advisor could see one."""
-    for module in rebuilt_sections():
+    for module in _rebuilt_sections_for(course):
         for lesson in module.lessons:
             assets = [s.asset for s in lesson.slides if s.asset]
-            assert assets, f"{module.title}: no diagram on any slide"
+            assert assets, f"{course}: {module.title}: no diagram on any slide"
 
 
-def test_every_diagram_in_the_course_is_a_real_generated_one() -> None:
+@pytest.mark.parametrize("course", COURSE_NAMES)
+def test_every_diagram_in_the_course_is_a_real_generated_one(course: str) -> None:
     """A hand-written SVG pasted into the content would not be regenerable, and would drift the
     moment the scene changed."""
-    known = set(_svg_for("openbb").values())
-    for module in rebuilt_sections():
+    known = set(_svg_for(course).values())
+    for module in _rebuilt_sections_for(course):
         for lesson in module.lessons:
             for slide in lesson.slides:
                 if slide.asset:
-                    assert slide.asset.svg in known, f"{slide.title}: SVG is not from a scene"
+                    assert slide.asset.svg in known, (
+                        f"{course}: {slide.title}: SVG is not from a scene"
+                    )
 
 
-def test_every_scene_is_used_by_the_course() -> None:
-    """An authored diagram nobody sees is the failure this ticket exists to fix, one level up."""
+@pytest.mark.parametrize("course", COURSE_NAMES)
+def test_every_scene_is_used_by_the_course(course: str) -> None:
+    """An authored diagram nobody sees is the failure GRS-0226 exists to fix, one level up."""
     used = {
         slide.asset.svg
-        for module in rebuilt_sections()
+        for module in _rebuilt_sections_for(course)
         for lesson in module.lessons
         for slide in lesson.slides
         if slide.asset
     }
-    unused = sorted(name for name, svg in _svg_for("openbb").items() if svg not in used)
-    assert not unused, f"authored but not on any slide: {unused}"
+    unused = sorted(name for name, svg in _svg_for(course).items() if svg not in used)
+    assert not unused, f"{course}: authored but not on any slide: {unused}"

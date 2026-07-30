@@ -85,7 +85,7 @@ From the 2026-07-26 staging review. Wave 4 (the course rebuild) is the part that
 | GRS-0214 | What the client gets free vs on engagement | Planned |
 | **GRS-0215** | **Rebuild the courses as courses, not paragraphs** — the depth standard | **In review, PR #220** (deck export still unbuilt) |
 | **GRS-0216** | **The OpenBB course** — 196 slides, eight sections | **In review, PR #220** |
-| **GRS-0217** | **The remaining product courses, to the same standard** | **In progress** — Benzinga PR 1 of n, opened at 2 of 8 sections. Order set by commission: Benzinga (1500 bps) → Brandfetch (750/375) → sales-ops-playbook |
+| **GRS-0217** | **The remaining product courses, to the same standard** | **In review, PR #221** — Benzinga COMPLETE (8/8 sections, 192 slides). Brandfetch and sales-ops-playbook remain, one PR each. Order set by commission: Benzinga (1500 bps) → Brandfetch (750/375) → sales-ops-playbook |
 | GRS-0218 | The Sales Egoist course | Blocked on source material |
 | GRS-0219 | The client report as a Bruntsfield-branded PDF | Planned |
 | GRS-0220 | The client report as an interactive web page, read tracking | Planned |

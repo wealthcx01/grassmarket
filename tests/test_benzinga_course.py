@@ -173,27 +173,39 @@ def test_every_test_question_teaches_rather_than_only_marking() -> None:
             assert 0 <= question.answer_index < len(question.options)
 
 
-def test_the_course_is_not_finished_and_says_so() -> None:
-    """Delete this test the day `SECTIONS_PLANNED` empties, and not before.
+def test_the_rebuild_is_complete() -> None:
+    """This replaced `test_the_course_is_not_finished_and_says_so`, which failed while
+    `SECTIONS_PLANNED` was non-empty and whose failure message asked to be deleted the day it
+    emptied. That day was 2026-07-30, so it was.
 
-    It exists because GRS-0191 shipped a renderer with no content and still read as progress. Two
-    sections out of eight is the same trap at a smaller scale: real work, genuinely done, that a
-    reader could easily mistake for a finished course.
-    """
-    assert SECTIONS_PLANNED, (
-        "SECTIONS_PLANNED is empty, so the Benzinga rebuild is complete. Remove 'product-benzinga' "
-        "from depth.LEGACY_COURSES, assert the whole tree against the standard, and delete this "
-        "test — that is what its own failure is asking for."
-    )
-    assert len(SECTIONS_AUTHORED) == len(rebuilt_sections())
-    assert not set(SECTIONS_AUTHORED) & set(SECTIONS_PLANNED)
+    What remains is the assertion in the other direction: eight sections, and nothing still listed
+    as planned. The mechanism existed because GRS-0191 shipped a renderer with no content and still
+    read as progress; the honest end state is a check that the content is all there."""
+    assert SECTIONS_PLANNED == ()
+    assert len(SECTIONS_AUTHORED) == 8
+    assert len(rebuilt_sections()) == 8
+    assert [m.title for m in rebuilt_sections()] == [
+        "What Benzinga is, and what it is not",
+        "The catalogue, in four families",
+        "How it arrives, and what that costs to build",
+        "The content layer: what a user reads",
+        "The event layer: what a user plans around",
+        "The signal layer: what a desk trades on",
+        "Who buys which family, and what triggers it",
+        "How to sell it",
+    ]
 
 
-def test_the_legacy_exemption_is_still_recorded() -> None:
-    """While the rebuild is partial the assembled tree still holds reference modules with no test,
-    so the course stays exempt from the whole-tree check. An exemption nobody can see is how the
-    last rebuild quietly did not happen, so it lives in LEGACY_COURSES with the clearing ticket."""
-    assert LEGACY_COURSES.get("product-benzinga") == "GRS-0217"
+def test_benzinga_is_no_longer_carried_as_legacy_debt() -> None:
+    """`LEGACY_COURSES` is a visible-debt register, not a switch — nothing in `check_depth` reads
+    it, so it never exempted anything mechanically. Benzinga came off it when the rebuild finished.
+    The courses still on it are the honest remaining debt, each with the ticket that clears it."""
+    assert "product-benzinga" not in LEGACY_COURSES
+    assert set(LEGACY_COURSES) == {
+        "product-brandfetch",
+        "sales-egoist",
+        "sales-ops-playbook",
+    }
 
 
 def test_the_rebuilt_sections_have_distinct_ids_and_contiguous_orders() -> None:

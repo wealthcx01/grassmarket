@@ -494,14 +494,16 @@ def openbb_course(carrot: ProductCommissionCarrot) -> CourseTree:
     # because they are the course now.
     rebuilt = rebuilt_sections()
 
-    # The 2026-07 material, kept until its replacement is written rather than deleted first. It is
-    # retitled so nobody mistakes it for the rebuild: these are the paragraph-lessons the founder
-    # called basic, and they stay only so the course is not thinner in the meantime.
+    # The 2026-07 material. Kept during the rebuild so the course would not be thinner in the
+    # meantime, and now SUPERSEDED rather than pending: all eight replacement sections are written.
+    # The titles were changed from "pending rebuild" on 2026-07-30 because that had stopped being
+    # true, and a label that outlives its own truth is the kind of small dishonesty this rebuild is
+    # about. Deleting these four is its own decision (GRS-0217 records it for both courses).
     legacy_titles = {
-        "what-it-is": "Reference (pending rebuild): what OpenBB actually is",
-        "use-cases": "Reference (pending rebuild): use cases you can sell for",
-        "white-label-build": "Reference (pending rebuild): the white-label and build angle",
-        "conviction": "Reference (pending rebuild): conviction and the founder thesis",
+        "what-it-is": "Superseded reference: what OpenBB actually is",
+        "use-cases": "Superseded reference: use cases you can sell for",
+        "white-label-build": "Superseded reference: the white-label and build angle",
+        "conviction": "Superseded reference: conviction and the founder thesis",
     }
     legacy_specs = (
         ("what-it-is", _WHAT_IT_IS),

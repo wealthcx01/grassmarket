@@ -404,36 +404,41 @@ def benzinga_course(carrot: ProductCommissionCarrot) -> CourseTree:
     )  # spine incl. the live advisor commission (15%)
     # The GRS-0217 rebuild. Written to the GRS-0215 depth standard: a lesson of 20 to 40 slides and
     # a test the advisor passes before the next section opens. These come FIRST, because they are
-    # the course now. Two of eight are written; `SECTIONS_PLANNED` in `benzinga_slides` lists the
-    # rest and a test fails while any remain, so this cannot read as finished before it is.
+    # the course now. All eight sections are written (2026-07-30): 192 slides, 48 test questions,
+    # one diagram per section, every product claim traceable to the committed catalogue.
     rebuilt = rebuilt_sections()
 
-    # The 2026-07 material, kept until its replacement is written rather than deleted first, and
-    # retitled so nobody mistakes it for the rebuild. `reference-` prefixes the id key because the
-    # rebuilt sections hash their ids from the same namespace and also have a "what-it-is" section:
-    # the bare key produced one uuid5 for two modules, and the section gate keys attempts by id.
+    # The 2026-07 material. It was kept during the rebuild so the course would not be thinner in
+    # the meantime, and it is now SUPERSEDED rather than pending: all eight replacement sections are
+    # written. The titles say so — "pending rebuild" stopped being true on 2026-07-30 and a label
+    # that outlives its own truth is exactly the kind of small dishonesty this rebuild is about.
+    # Deleting these four is its own decision, recorded in the GRS-0217 ticket.
+    #
+    # `reference-` prefixes the id key because the rebuilt sections hash their ids from the same
+    # namespace and also have a "what-it-is" section: the bare key produced one uuid5 for two
+    # modules, and the section gate keys attempt records by id.
     reference = (
         CourseModule(
             id=_id("module", "reference-what-it-is"),
-            title="Reference (pending rebuild): what Benzinga actually is",
+            title="Superseded reference: what Benzinga actually is",
             order=0,  # renumbered below, with everything else
             lessons=_lessons(_WHAT_IT_IS),
         ),
         CourseModule(
             id=_id("module", "reference-use-cases"),
-            title="Reference (pending rebuild): use cases you can sell for",
+            title="Superseded reference: use cases you can sell for",
             order=0,
             lessons=_lessons(_USE_CASES),
         ),
         CourseModule(
             id=_id("module", "reference-commercial"),
-            title="Reference (pending rebuild): the reseller and commercial angle",
+            title="Superseded reference: the reseller and commercial angle",
             order=0,
             lessons=_lessons(_COMMERCIAL),
         ),
         CourseModule(
             id=_id("module", "reference-conviction"),
-            title="Reference (pending rebuild): conviction and the company",
+            title="Superseded reference: conviction and the company",
             order=0,
             lessons=_lessons(_CONVICTION),
         ),
