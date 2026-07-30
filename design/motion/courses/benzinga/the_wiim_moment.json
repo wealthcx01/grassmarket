@@ -1,0 +1,629 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "WiimMoment",
+    "width": 960,
+    "height": 440,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 480,
+        "y": 44,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "The same screen, one sentence apart"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LeftLabel",
+        "x": 256,
+        "y": 92,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LeftLabelStyle",
+            "font_asset": "Display",
+            "font_size": 12,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LeftLabelStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LeftLabelStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.6
+          },
+          {
+            "type": "text_value_run",
+            "name": "LeftLabelRun",
+            "style": "LeftLabelStyle",
+            "text": "WITHOUT"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RightLabel",
+        "x": 704,
+        "y": 92,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RightLabelStyle",
+            "font_asset": "Display",
+            "font_size": 12,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RightLabelStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RightLabelStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.6
+          },
+          {
+            "type": "text_value_run",
+            "name": "RightLabelRun",
+            "style": "RightLabelStyle",
+            "text": "WITH"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LeftTicker",
+        "x": 256,
+        "y": 152,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LeftTickerStyle",
+            "font_asset": "Display",
+            "font_size": 20,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LeftTickerStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LeftTickerStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LeftTickerRun",
+            "style": "LeftTickerStyle",
+            "text": "ACME"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LeftMove",
+        "x": 256,
+        "y": 196,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LeftMoveStyle",
+            "font_asset": "Display",
+            "font_size": 34,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LeftMoveStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LeftMoveStyleCol",
+                    "color": "#A3502A"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LeftMoveRun",
+            "style": "LeftMoveStyle",
+            "text": "-6.2%"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LeftGap1",
+        "x": 256,
+        "y": 250,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LeftGap1Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LeftGap1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LeftGap1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LeftGap1Run",
+            "style": "LeftGap1Style",
+            "text": "The user does not know"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LeftGap2",
+        "x": 256,
+        "y": 274,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LeftGap2Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LeftGap2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LeftGap2StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LeftGap2Run",
+            "style": "LeftGap2Style",
+            "text": "if this is a catastrophe"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LeftGap3",
+        "x": 256,
+        "y": 298,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LeftGap3Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LeftGap3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LeftGap3StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LeftGap3Run",
+            "style": "LeftGap3Style",
+            "text": "or a dividend."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RightTicker",
+        "x": 704,
+        "y": 152,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RightTickerStyle",
+            "font_asset": "Display",
+            "font_size": 20,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RightTickerStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RightTickerStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RightTickerRun",
+            "style": "RightTickerStyle",
+            "text": "ACME"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RightMove",
+        "x": 704,
+        "y": 196,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RightMoveStyle",
+            "font_asset": "Display",
+            "font_size": 34,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RightMoveStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RightMoveStyleCol",
+                    "color": "#A3502A"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RightMoveRun",
+            "style": "RightMoveStyle",
+            "text": "-6.2%"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RightWiim1",
+        "x": 704,
+        "y": 248,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RightWiim1Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RightWiim1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RightWiim1StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RightWiim1Run",
+            "style": "RightWiim1Style",
+            "text": "Trading lower after the"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RightWiim2",
+        "x": 704,
+        "y": 272,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RightWiim2Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RightWiim2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RightWiim2StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RightWiim2Run",
+            "style": "RightWiim2Style",
+            "text": "company cut full-year"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RightWiim3",
+        "x": 704,
+        "y": 296,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RightWiim3Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RightWiim3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RightWiim3StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RightWiim3Run",
+            "style": "RightWiim3Style",
+            "text": "guidance."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "LeftCard",
+        "x": 256,
+        "y": 232,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "LeftCardPath",
+            "width": 380,
+            "height": 216,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "LeftCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LeftCardSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "LeftCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LeftCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "RightCard",
+        "x": 704,
+        "y": 232,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "RightCardPath",
+            "width": 380,
+            "height": 216,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "RightCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RightCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "RightCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RightCardStrokeCol",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 480,
+        "y": 396,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "One human-written sentence. It is why this family is bought."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 480,
+        "y": 220,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 960,
+            "height": 440,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

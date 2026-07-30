@@ -1,0 +1,959 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "AttentionBeforeVolume",
+    "width": 940,
+    "height": 470,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 470,
+        "y": 44,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "Attention arrives before volume"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 470,
+        "y": 78,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "First-party page views, in 10-minute buckets, from an owned audience."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LagLabel",
+        "x": 470,
+        "y": 130,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LagLabelStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LagLabelStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LagLabelStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LagLabelRun",
+            "style": "LagLabelStyle",
+            "text": "views peak here, trading peaks later"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "LagHead",
+        "x": 551.0,
+        "y": 160,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "LagHeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "LagHeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LagHeadCol",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "LagStem",
+        "x": 470.0,
+        "y": 160,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "LagStemPath",
+            "width": 153.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "LagStemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LagStemSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "AttLabel",
+        "x": 126,
+        "y": 244,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "AttLabelStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "AttLabelStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "AttLabelStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "AttLabelRun",
+            "style": "AttLabelStyle",
+            "text": "ticker views"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "VolLabel",
+        "x": 126,
+        "y": 348,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "VolLabelStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "VolLabelStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "VolLabelStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "VolLabelRun",
+            "style": "VolLabelStyle",
+            "text": "traded volume"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Att0",
+        "x": 227,
+        "y": 287.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Att0Path",
+            "width": 26,
+            "height": 12,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Att0Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Att0Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Att1",
+        "x": 281,
+        "y": 278.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Att1Path",
+            "width": 26,
+            "height": 30,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Att1Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Att1Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Att2",
+        "x": 335,
+        "y": 266.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Att2Path",
+            "width": 26,
+            "height": 54,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Att2Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Att2Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Att3",
+        "x": 389,
+        "y": 255.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Att3Path",
+            "width": 26,
+            "height": 76,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Att3Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Att3Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Att4",
+        "x": 443,
+        "y": 260.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Att4Path",
+            "width": 26,
+            "height": 66,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Att4Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Att4Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Att5",
+        "x": 497,
+        "y": 269.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Att5Path",
+            "width": 26,
+            "height": 48,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Att5Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Att5Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Att6",
+        "x": 551,
+        "y": 276.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Att6Path",
+            "width": 26,
+            "height": 34,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Att6Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Att6Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Att7",
+        "x": 605,
+        "y": 281.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Att7Path",
+            "width": 26,
+            "height": 24,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Att7Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Att7Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Att8",
+        "x": 659,
+        "y": 284.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Att8Path",
+            "width": 26,
+            "height": 18,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Att8Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Att8Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Att9",
+        "x": 713,
+        "y": 287.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Att9Path",
+            "width": 26,
+            "height": 12,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Att9Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Att9Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Vol0",
+        "x": 227,
+        "y": 301.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Vol0Path",
+            "width": 26,
+            "height": 8,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Vol0Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Vol0Solid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Vol1",
+        "x": 281,
+        "y": 303.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Vol1Path",
+            "width": 26,
+            "height": 12,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Vol1Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Vol1Solid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Vol2",
+        "x": 335,
+        "y": 305.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Vol2Path",
+            "width": 26,
+            "height": 16,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Vol2Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Vol2Solid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Vol3",
+        "x": 389,
+        "y": 310.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Vol3Path",
+            "width": 26,
+            "height": 26,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Vol3Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Vol3Solid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Vol4",
+        "x": 443,
+        "y": 318.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Vol4Path",
+            "width": 26,
+            "height": 42,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Vol4Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Vol4Solid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Vol5",
+        "x": 497,
+        "y": 328.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Vol5Path",
+            "width": 26,
+            "height": 62,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Vol5Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Vol5Solid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Vol6",
+        "x": 551,
+        "y": 336.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Vol6Path",
+            "width": 26,
+            "height": 78,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Vol6Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Vol6Solid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Vol7",
+        "x": 605,
+        "y": 329.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Vol7Path",
+            "width": 26,
+            "height": 64,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Vol7Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Vol7Solid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Vol8",
+        "x": 659,
+        "y": 319.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Vol8Path",
+            "width": 26,
+            "height": 44,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Vol8Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Vol8Solid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Vol9",
+        "x": 713,
+        "y": 311.0,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Vol9Path",
+            "width": 26,
+            "height": 28,
+            "corner_radius": 3,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Vol9Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Vol9Solid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "PeakAtt",
+        "x": 389,
+        "y": 268,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "PeakAttPath",
+            "width": 2,
+            "height": 200,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "PeakAttFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "PeakAttSolid",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "PeakVol",
+        "x": 551,
+        "y": 268,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "PeakVolPath",
+            "width": 2,
+            "height": 200,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "PeakVolFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "PeakVolSolid",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Base",
+        "x": 470,
+        "y": 295,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BasePath",
+            "width": 552,
+            "height": 2,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BaseFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BaseSolid",
+                "color": "#1A1A18"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 470,
+        "y": 434,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "Anyone can sell you the volume. Almost nobody can sell you the gap."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 470,
+        "y": 235,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 940,
+            "height": 470,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,851 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "FourFamilies",
+    "width": 960,
+    "height": 380,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 480,
+        "y": 44,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "32 products, four families"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 480,
+        "y": 76,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "Qualify the family in the room. Never recite the product list."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "NewswireCount",
+        "x": 152,
+        "y": 138,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "NewswireCountStyle",
+            "font_asset": "Display",
+            "font_size": 40,
+            "children": [
+              {
+                "type": "fill",
+                "name": "NewswireCountStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "NewswireCountStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "NewswireCountRun",
+            "style": "NewswireCountStyle",
+            "text": "9"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "NewswireName",
+        "x": 152,
+        "y": 190,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "NewswireNameStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "NewswireNameStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "NewswireNameStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "NewswireNameRun",
+            "style": "NewswireNameStyle",
+            "text": "Newswire"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "NewswireName2",
+        "x": 152,
+        "y": 214,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "NewswireName2Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "NewswireName2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "NewswireName2StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "NewswireName2Run",
+            "style": "NewswireName2Style",
+            "text": "& Content"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "NewswireJob",
+        "x": 152,
+        "y": 262,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "NewswireJobStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "NewswireJobStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "NewswireJobStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "NewswireJobRun",
+            "style": "NewswireJobStyle",
+            "text": "what a user READS"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "NewswireCard",
+        "x": 152,
+        "y": 196,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "NewswireCardPath",
+            "width": 196,
+            "height": 176,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "NewswireCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "NewswireCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "NewswireCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "NewswireCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "CalendarCount",
+        "x": 372,
+        "y": 138,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "CalendarCountStyle",
+            "font_asset": "Display",
+            "font_size": 40,
+            "children": [
+              {
+                "type": "fill",
+                "name": "CalendarCountStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "CalendarCountStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "CalendarCountRun",
+            "style": "CalendarCountStyle",
+            "text": "11"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "CalendarName",
+        "x": 372,
+        "y": 190,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "CalendarNameStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "CalendarNameStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "CalendarNameStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "CalendarNameRun",
+            "style": "CalendarNameStyle",
+            "text": "Calendar"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "CalendarJob",
+        "x": 372,
+        "y": 262,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "CalendarJobStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "CalendarJobStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "CalendarJobStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "CalendarJobRun",
+            "style": "CalendarJobStyle",
+            "text": "what a user PLANS around"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CalendarCard",
+        "x": 372,
+        "y": 196,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CalendarCardPath",
+            "width": 196,
+            "height": 176,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CalendarCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CalendarCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "CalendarCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CalendarCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "AlternativeCount",
+        "x": 592,
+        "y": 138,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "AlternativeCountStyle",
+            "font_asset": "Display",
+            "font_size": 40,
+            "children": [
+              {
+                "type": "fill",
+                "name": "AlternativeCountStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "AlternativeCountStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "AlternativeCountRun",
+            "style": "AlternativeCountStyle",
+            "text": "8"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "AlternativeName",
+        "x": 592,
+        "y": 190,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "AlternativeNameStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "AlternativeNameStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "AlternativeNameStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "AlternativeNameRun",
+            "style": "AlternativeNameStyle",
+            "text": "Alternative"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "AlternativeName2",
+        "x": 592,
+        "y": 214,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "AlternativeName2Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "AlternativeName2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "AlternativeName2StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "AlternativeName2Run",
+            "style": "AlternativeName2Style",
+            "text": "Data"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "AlternativeJob",
+        "x": 592,
+        "y": 262,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "AlternativeJobStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "AlternativeJobStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "AlternativeJobStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "AlternativeJobRun",
+            "style": "AlternativeJobStyle",
+            "text": "what a desk TRADES on"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "AlternativeCard",
+        "x": 592,
+        "y": 196,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "AlternativeCardPath",
+            "width": 196,
+            "height": 176,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "AlternativeCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "AlternativeCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "AlternativeCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "AlternativeCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "MarketCount",
+        "x": 812,
+        "y": 138,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "MarketCountStyle",
+            "font_asset": "Display",
+            "font_size": 40,
+            "children": [
+              {
+                "type": "fill",
+                "name": "MarketCountStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "MarketCountStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "MarketCountRun",
+            "style": "MarketCountStyle",
+            "text": "4"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "MarketName",
+        "x": 812,
+        "y": 190,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "MarketNameStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "MarketNameStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "MarketNameStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "MarketNameRun",
+            "style": "MarketNameStyle",
+            "text": "Market"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "MarketName2",
+        "x": 812,
+        "y": 214,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "MarketName2Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "MarketName2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "MarketName2StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "MarketName2Run",
+            "style": "MarketName2Style",
+            "text": "Data"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "MarketJob",
+        "x": 812,
+        "y": 262,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "MarketJobStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "MarketJobStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "MarketJobStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "MarketJobRun",
+            "style": "MarketJobStyle",
+            "text": "what a screen NEEDS"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "MarketCard",
+        "x": 812,
+        "y": 196,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "MarketCardPath",
+            "width": 196,
+            "height": 176,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "MarketCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "MarketCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "MarketCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "MarketCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 480,
+        "y": 340,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "Each family has its own buyer, budget and objection."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 480,
+        "y": 190,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 960,
+            "height": 380,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

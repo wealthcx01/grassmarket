@@ -1,0 +1,811 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "EventHorizon",
+    "width": 900,
+    "height": 390,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 450,
+        "y": 44,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "The calendars sell a tense"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 450,
+        "y": 78,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "Every other family says what happened. These say what is about to."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "EarnWhat",
+        "x": 150,
+        "y": 178,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "EarnWhatStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "EarnWhatStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "EarnWhatStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "EarnWhatRun",
+            "style": "EarnWhatStyle",
+            "text": "earnings"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "EarnWhen",
+        "x": 150,
+        "y": 204,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "EarnWhenStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "EarnWhenStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "EarnWhenStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "EarnWhenRun",
+            "style": "EarnWhenStyle",
+            "text": "tomorrow"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "EarnCard",
+        "x": 150,
+        "y": 190,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "EarnCardPath",
+            "width": 150,
+            "height": 74,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "EarnCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "EarnCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "EarnCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "EarnCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "EarnTick",
+        "x": 150,
+        "y": 253,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "EarnTickPath",
+            "width": 2,
+            "height": 38,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "EarnTickFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "EarnTickSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "DivWhat",
+        "x": 320,
+        "y": 178,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "DivWhatStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "DivWhatStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "DivWhatStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "DivWhatRun",
+            "style": "DivWhatStyle",
+            "text": "ex-dividend"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "DivWhen",
+        "x": 320,
+        "y": 204,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "DivWhenStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "DivWhenStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "DivWhenStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "DivWhenRun",
+            "style": "DivWhenStyle",
+            "text": "in 3 days"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "DivCard",
+        "x": 320,
+        "y": 190,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "DivCardPath",
+            "width": 150,
+            "height": 74,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "DivCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DivCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "DivCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DivCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "DivTick",
+        "x": 320,
+        "y": 253,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "DivTickPath",
+            "width": 2,
+            "height": 38,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "DivTickFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DivTickSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "FdaWhat",
+        "x": 490,
+        "y": 178,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FdaWhatStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FdaWhatStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FdaWhatStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FdaWhatRun",
+            "style": "FdaWhatStyle",
+            "text": "PDUFA date"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "FdaWhen",
+        "x": 490,
+        "y": 204,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FdaWhenStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FdaWhenStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FdaWhenStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FdaWhenRun",
+            "style": "FdaWhenStyle",
+            "text": "in 2 weeks"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "FdaCard",
+        "x": 490,
+        "y": 190,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "FdaCardPath",
+            "width": 150,
+            "height": 74,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "FdaCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "FdaCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "FdaCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "FdaCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "FdaTick",
+        "x": 490,
+        "y": 253,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "FdaTickPath",
+            "width": 2,
+            "height": 38,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "FdaTickFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "FdaTickSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LockWhat",
+        "x": 660,
+        "y": 178,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LockWhatStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LockWhatStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LockWhatStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LockWhatRun",
+            "style": "LockWhatStyle",
+            "text": "lockup expiry"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LockWhen",
+        "x": 660,
+        "y": 204,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LockWhenStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LockWhenStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LockWhenStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LockWhenRun",
+            "style": "LockWhenStyle",
+            "text": "in 90 days"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "LockCard",
+        "x": 660,
+        "y": 190,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "LockCardPath",
+            "width": 150,
+            "height": 74,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "LockCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LockCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "LockCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LockCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "LockTick",
+        "x": 660,
+        "y": 253,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "LockTickPath",
+            "width": 2,
+            "height": 38,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "LockTickFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LockTickSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Axis",
+        "x": 450,
+        "y": 272,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "AxisPath",
+            "width": 700,
+            "height": 2,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "AxisFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "AxisSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Now",
+        "x": 104,
+        "y": 302,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "NowStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "NowStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "NowStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "NowRun",
+            "style": "NowStyle",
+            "text": "today"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Later",
+        "x": 796,
+        "y": 302,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LaterStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LaterStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LaterStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LaterRun",
+            "style": "LaterStyle",
+            "text": "forward"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 450,
+        "y": 350,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "A platform with no forward calendar is a rear-view mirror."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 450,
+        "y": 195,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 900,
+            "height": 390,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

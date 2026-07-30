@@ -1,0 +1,1067 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "WhoBuysWhat",
+    "width": 860,
+    "height": 450,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 430,
+        "y": 44,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "Who buys which family"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 430,
+        "y": 78,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "Filled means a real fit, not a maybe."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RowContent",
+        "x": 130,
+        "y": 176,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RowContentStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RowContentStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RowContentStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RowContentRun",
+            "style": "RowContentStyle",
+            "text": "Content"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CellContentRetail",
+        "x": 250,
+        "y": 176,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CellContentRetailPath",
+            "width": 96,
+            "height": 34,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CellContentRetailFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellContentRetailSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CellContentWealth",
+        "x": 400,
+        "y": 176,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CellContentWealthPath",
+            "width": 96,
+            "height": 34,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CellContentWealthFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellContentWealthSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CellContentQuant",
+        "x": 550,
+        "y": 176,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CellContentQuantPath",
+            "width": 96,
+            "height": 34,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CellContentQuantFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellContentQuantSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "CellContentQuantStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellContentQuantStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CellContentMedia",
+        "x": 700,
+        "y": 176,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CellContentMediaPath",
+            "width": 96,
+            "height": 34,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CellContentMediaFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellContentMediaSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RowCalendar",
+        "x": 130,
+        "y": 226,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RowCalendarStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RowCalendarStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RowCalendarStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RowCalendarRun",
+            "style": "RowCalendarStyle",
+            "text": "Calendar"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CellCalendarRetail",
+        "x": 250,
+        "y": 226,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CellCalendarRetailPath",
+            "width": 96,
+            "height": 34,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CellCalendarRetailFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellCalendarRetailSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CellCalendarWealth",
+        "x": 400,
+        "y": 226,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CellCalendarWealthPath",
+            "width": 96,
+            "height": 34,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CellCalendarWealthFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellCalendarWealthSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CellCalendarQuant",
+        "x": 550,
+        "y": 226,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CellCalendarQuantPath",
+            "width": 96,
+            "height": 34,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CellCalendarQuantFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellCalendarQuantSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "CellCalendarQuantStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellCalendarQuantStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CellCalendarMedia",
+        "x": 700,
+        "y": 226,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CellCalendarMediaPath",
+            "width": 96,
+            "height": 34,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CellCalendarMediaFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellCalendarMediaSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RowAltdata",
+        "x": 130,
+        "y": 276,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RowAltdataStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RowAltdataStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RowAltdataStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RowAltdataRun",
+            "style": "RowAltdataStyle",
+            "text": "Alt data"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CellAltdataRetail",
+        "x": 250,
+        "y": 276,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CellAltdataRetailPath",
+            "width": 96,
+            "height": 34,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CellAltdataRetailFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellAltdataRetailSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CellAltdataWealth",
+        "x": 400,
+        "y": 276,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CellAltdataWealthPath",
+            "width": 96,
+            "height": 34,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CellAltdataWealthFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellAltdataWealthSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "CellAltdataWealthStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellAltdataWealthStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CellAltdataQuant",
+        "x": 550,
+        "y": 276,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CellAltdataQuantPath",
+            "width": 96,
+            "height": 34,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CellAltdataQuantFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellAltdataQuantSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CellAltdataMedia",
+        "x": 700,
+        "y": 276,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CellAltdataMediaPath",
+            "width": 96,
+            "height": 34,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CellAltdataMediaFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellAltdataMediaSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "CellAltdataMediaStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellAltdataMediaStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RowMarketdata",
+        "x": 130,
+        "y": 326,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RowMarketdataStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RowMarketdataStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RowMarketdataStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RowMarketdataRun",
+            "style": "RowMarketdataStyle",
+            "text": "Market data"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CellMarketdataRetail",
+        "x": 250,
+        "y": 326,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CellMarketdataRetailPath",
+            "width": 96,
+            "height": 34,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CellMarketdataRetailFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellMarketdataRetailSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CellMarketdataWealth",
+        "x": 400,
+        "y": 326,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CellMarketdataWealthPath",
+            "width": 96,
+            "height": 34,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CellMarketdataWealthFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellMarketdataWealthSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CellMarketdataQuant",
+        "x": 550,
+        "y": 326,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CellMarketdataQuantPath",
+            "width": 96,
+            "height": 34,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CellMarketdataQuantFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellMarketdataQuantSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "CellMarketdataQuantStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellMarketdataQuantStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CellMarketdataMedia",
+        "x": 700,
+        "y": 326,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CellMarketdataMediaPath",
+            "width": 96,
+            "height": 34,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CellMarketdataMediaFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellMarketdataMediaSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "CellMarketdataMediaStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CellMarketdataMediaStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "ColRetail",
+        "x": 250,
+        "y": 116,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "ColRetailStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "ColRetailStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "ColRetailStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "ColRetailRun",
+            "style": "ColRetailStyle",
+            "text": "Retail"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "ColRetailb",
+        "x": 250,
+        "y": 138,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "ColRetailbStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "ColRetailbStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "ColRetailbStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "ColRetailbRun",
+            "style": "ColRetailbStyle",
+            "text": "brokerage"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "ColWealth",
+        "x": 400,
+        "y": 116,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "ColWealthStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "ColWealthStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "ColWealthStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "ColWealthRun",
+            "style": "ColWealthStyle",
+            "text": "Wealth"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "ColWealthb",
+        "x": 400,
+        "y": 138,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "ColWealthbStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "ColWealthbStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "ColWealthbStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "ColWealthbRun",
+            "style": "ColWealthbStyle",
+            "text": "platform"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "ColQuant",
+        "x": 550,
+        "y": 116,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "ColQuantStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "ColQuantStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "ColQuantStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "ColQuantRun",
+            "style": "ColQuantStyle",
+            "text": "Quant"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "ColQuantb",
+        "x": 550,
+        "y": 138,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "ColQuantbStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "ColQuantbStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "ColQuantbStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "ColQuantbRun",
+            "style": "ColQuantbStyle",
+            "text": "fund"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "ColMedia",
+        "x": 700,
+        "y": 116,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "ColMediaStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "ColMediaStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "ColMediaStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "ColMediaRun",
+            "style": "ColMediaStyle",
+            "text": "Media"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 430,
+        "y": 400,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "Only a retail brokerage plausibly buys all four. Everyone else is narrower."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 430,
+        "y": 225,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 860,
+            "height": 450,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
