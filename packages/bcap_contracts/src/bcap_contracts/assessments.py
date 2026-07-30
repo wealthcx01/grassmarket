@@ -632,6 +632,11 @@ class Assessment(OwnedResource):
     # Record provenance (ADR-0029): production (default, full gate) vs demo/sandbox
     # (self-approvable, watermarked, non-promotable). Set at creation, immutable thereafter.
     provenance: RecordProvenance = RecordProvenance.PRODUCTION
+    # When the advisor last asked the founder to review this document (GRS-0188, ADR-0041). Null
+    # until they submit. Whether an approval currently CLEARS the document is a separate question
+    # answered by the founder-approval endpoint, because it depends on the document's hash rather
+    # than on any field here.
+    review_requested_at: datetime | None = None
     finalised_at: datetime | None = None
     scoring_run_id: UUID | None = None
     # Version stamps recorded at finalisation (null while editable).

@@ -85,7 +85,13 @@ def get_current_principal(
             detail=f"Invalid token: {exc}",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
-    return Principal(consultant_id=UUID(claims.sub), role=claims.role)
+    # The founder claim (ADR-0041) is derived here from the configured reviewer email rather than
+    # read from the token. Deriving it per request means rotating GM_FOUNDER_REVIEWER_EMAIL takes
+    # effect on the next call instead of waiting for every issued token to expire, and there is no
+    # new claim that could be forged or go stale. Compared case-insensitively because email
+    # local-part case is not identity.
+    is_founder = claims.email.strip().lower() == settings.founder_reviewer_email.strip().lower()
+    return Principal(consultant_id=UUID(claims.sub), role=claims.role, is_founder=is_founder)
 
 
 # Convenience aliases used unmodified by the deferred router; falls back to get_settings if the

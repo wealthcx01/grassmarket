@@ -75,11 +75,13 @@ def test_build_scoreable_document_matches_live_registry(client, alice: SeededCon
 
 
 def test_full_engagement_lifecycle_finalise_and_deliverable(
-    client, alice: SeededConsultant
+    client, alice: SeededConsultant, founder: SeededConsultant
 ) -> None:
     """The ticket's synthetic engagement end-to-end: created -> assessed -> finalised -> deliverable
     generated + downloaded. This is what the live smoke script cannot do solo (governance-gated)."""
-    eid = _engagement_with_finalised(client, alice)  # contracted prospect + finalised assessment
+    eid = _engagement_with_finalised(
+        client, alice, founder
+    )  # contracted prospect + finalised assessment
     created = client.post(
         f"/engagements/{eid}/deliverables",
         json={"client_facing": False},

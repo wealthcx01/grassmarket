@@ -209,10 +209,10 @@ def test_appendix_labels_ai_drafted_and_renders_approval_trail() -> None:
 
 
 # ---------------------------------------------------------------- HTTP + persistence
-def _deliverable_id(client, owner: SeededConsultant) -> str:
+def _deliverable_id(client, owner: SeededConsultant, founder: SeededConsultant) -> str:
     from tests.test_deliverables import _engagement_with_finalised
 
-    eid = _engagement_with_finalised(client, owner)
+    eid = _engagement_with_finalised(client, owner, founder)
     return client.post(
         f"/engagements/{eid}/deliverables",
         json={"client_facing": False},
@@ -284,11 +284,11 @@ def senior_admin(session_factory, settings) -> SeededConsultant:
 
 
 def test_http_senior_governance_reviewer_approves_junior_narrative(
-    client, alice: SeededConsultant, senior_admin: SeededConsultant
+    client, alice: SeededConsultant, senior_admin: SeededConsultant, founder: SeededConsultant
 ) -> None:
     # alice is a Venture Associate; a Consultant-tier governance reviewer signs off her draft across
     # ownership — the reachable senior path (not a dead-end).
-    did = _deliverable_id(client, alice)
+    did = _deliverable_id(client, alice, founder)
     nid = client.post(
         f"/deliverables/{did}/narratives",
         json={"sections": ["recommendation"]},
@@ -301,8 +301,10 @@ def test_http_senior_governance_reviewer_approves_junior_narrative(
     assert body["approved_by_consultant_id"] == str(senior_admin.stored.id)
 
 
-def test_http_double_approval_is_conflict_not_500(client, senior: SeededConsultant) -> None:
-    did = _deliverable_id(client, senior)
+def test_http_double_approval_is_conflict_not_500(
+    client, senior: SeededConsultant, founder: SeededConsultant
+) -> None:
+    did = _deliverable_id(client, senior, founder)
     nid = client.post(
         f"/deliverables/{did}/narratives",
         json={"sections": ["interpretation"]},
@@ -319,8 +321,10 @@ def test_http_double_approval_is_conflict_not_500(client, senior: SeededConsulta
     )
 
 
-def test_http_empty_final_text_rejected(client, senior: SeededConsultant) -> None:
-    did = _deliverable_id(client, senior)
+def test_http_empty_final_text_rejected(
+    client, senior: SeededConsultant, founder: SeededConsultant
+) -> None:
+    did = _deliverable_id(client, senior, founder)
     nid = client.post(
         f"/deliverables/{did}/narratives",
         json={"sections": ["commentary"]},
@@ -332,8 +336,10 @@ def test_http_empty_final_text_rejected(client, senior: SeededConsultant) -> Non
     assert resp.status_code == 422  # an approved section is never blank
 
 
-def test_http_propose_drafts_all_sections(client, senior: SeededConsultant) -> None:
-    did = _deliverable_id(client, senior)
+def test_http_propose_drafts_all_sections(
+    client, senior: SeededConsultant, founder: SeededConsultant
+) -> None:
+    did = _deliverable_id(client, senior, founder)
     resp = client.post(f"/deliverables/{did}/narratives", json={}, headers=auth_header(senior))
     assert resp.status_code == 201
     body = resp.json()
@@ -342,8 +348,10 @@ def test_http_propose_drafts_all_sections(client, senior: SeededConsultant) -> N
     assert all(n["drafter_version"] == DRAFTER_VERSION for n in body)
 
 
-def test_http_senior_can_self_approve_with_trail(client, senior: SeededConsultant) -> None:
-    did = _deliverable_id(client, senior)
+def test_http_senior_can_self_approve_with_trail(
+    client, senior: SeededConsultant, founder: SeededConsultant
+) -> None:
+    did = _deliverable_id(client, senior, founder)
     proposed = client.post(
         f"/deliverables/{did}/narratives",
         json={"sections": ["interpretation"]},
@@ -363,9 +371,11 @@ def test_http_senior_can_self_approve_with_trail(client, senior: SeededConsultan
     assert approved["edit_summary"] and approved["edit_summary"] != "approved without edits"
 
 
-def test_http_junior_self_approval_refused(client, alice: SeededConsultant) -> None:
+def test_http_junior_self_approval_refused(
+    client, alice: SeededConsultant, founder: SeededConsultant
+) -> None:
     # alice is a Venture Associate — she cannot sign off her own AI draft (the quality gate).
-    did = _deliverable_id(client, alice)
+    did = _deliverable_id(client, alice, founder)
     proposed = client.post(
         f"/deliverables/{did}/narratives",
         json={"sections": ["commentary"]},
@@ -376,9 +386,9 @@ def test_http_junior_self_approval_refused(client, alice: SeededConsultant) -> N
 
 
 def test_http_client_download_refused_with_unapproved_narrative(
-    client, senior: SeededConsultant
+    client, senior: SeededConsultant, founder: SeededConsultant
 ) -> None:
-    did = _deliverable_id(client, senior)
+    did = _deliverable_id(client, senior, founder)
     client.post(
         f"/deliverables/{did}/narratives",
         json={"sections": ["interpretation"]},
@@ -397,10 +407,10 @@ def test_http_client_download_refused_with_unapproved_narrative(
 
 
 def test_http_internal_download_renders_narrative_appendix(
-    client, senior: SeededConsultant
+    client, senior: SeededConsultant, founder: SeededConsultant
 ) -> None:
     # The proposed narrative actually appears in the regenerated (internal) .docx, labelled.
-    did = _deliverable_id(client, senior)
+    did = _deliverable_id(client, senior, founder)
     client.post(
         f"/deliverables/{did}/narratives",
         json={"sections": ["interpretation"]},
@@ -415,8 +425,10 @@ def test_http_internal_download_renders_narrative_appendix(
     assert "not client-usable until approved" in text  # proposed, not yet approved
 
 
-def test_http_narratives_scoped(client, senior: SeededConsultant, bob: SeededConsultant) -> None:
-    did = _deliverable_id(client, senior)
+def test_http_narratives_scoped(
+    client, senior: SeededConsultant, bob: SeededConsultant, founder: SeededConsultant
+) -> None:
+    did = _deliverable_id(client, senior, founder)
     nid = client.post(
         f"/deliverables/{did}/narratives",
         json={"sections": ["interpretation"]},
@@ -443,12 +455,12 @@ def test_http_narratives_scoped(client, senior: SeededConsultant, bob: SeededCon
 
 
 def test_http_senior_tier_alone_does_not_cross_ownership(
-    client, alice: SeededConsultant, senior: SeededConsultant
+    client, alice: SeededConsultant, senior: SeededConsultant, founder: SeededConsultant
 ) -> None:
     # `senior` is Consultant-tier but NOT a governance role. The ADR-0009 guarantee: senior tier
     # ALONE never widens scope — only the governance (ADMIN/committee) role does. So `senior` cannot
     # even reach alice's narrative to approve it (404), unlike the ADMIN in the governance test.
-    did = _deliverable_id(client, alice)
+    did = _deliverable_id(client, alice, founder)
     nid = client.post(
         f"/deliverables/{did}/narratives",
         json={"sections": ["interpretation"]},
@@ -463,7 +475,10 @@ def test_approved_narrative_renders_into_client_pack() -> None:
     # APPROVED, the pack renders in CLIENT mode (no watermark) and carries the approved words, the
     # approver id, and the approval timestamp — the actual product promise, end-to-end through the
     # gate + builder wiring (HTTP can't reach CLIENT mode: the router hardcodes the draft set).
-    from tests.committee_helpers import approved_decisions_for
+    from datetime import datetime
+    from uuid import uuid4
+
+    from bcap_contracts.founder_review import FounderApproval
 
     coeffs = _client_usable_set()
     # A client pack needs a client-usable uncertainty model too (GRS-0033 §7 gate).
@@ -480,7 +495,19 @@ def test_approved_narrative_renders_into_client_pack() -> None:
         generated_on=date(2026, 7, 13),
         client_facing=True,
         narratives=[approved],
-        committee_decisions=approved_decisions_for(art.result),
+        # The founder gate is exercised end to end in tests/test_founder_review.py. Here the pack
+        # is being asked to render, so it is handed an approval that matches rather than a
+        # committee decision set (ADR-0041 replaced the latter on this path).
+        founder_approval=FounderApproval(
+            id=uuid4(),
+            owner_consultant_id=uuid4(),
+            assessment_id=uuid4(),
+            document_hash="a" * 64,
+            approved_by_consultant_id=uuid4(),
+            approved_at=datetime(2026, 7, 13, 9, 0, tzinfo=UTC),
+            created_at=datetime(2026, 7, 13, 9, 0, tzinfo=UTC),
+            updated_at=datetime(2026, 7, 13, 9, 0, tzinfo=UTC),
+        ),
     )
     assert rendered.mode is DeliverableMode.CLIENT
     doc = Document(BytesIO(rendered.docx_bytes))

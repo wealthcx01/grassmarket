@@ -32,9 +32,12 @@ from grassmarket.data.repository import (
     ScopeViolationError,
 )
 from grassmarket.web.dependencies import get_current_principal, get_repository
+from grassmarket.web.retired import retired_route
 from grassmarket.workbench.calibration import CalibrationStatsError
 
-router = APIRouter(prefix="/calibration", tags=["calibration"])
+router = APIRouter(
+    prefix="/calibration", tags=["calibration"], dependencies=[Depends(retired_route)]
+)
 
 
 class CreateSessionRequest(BaseModel):

@@ -2,9 +2,15 @@
 
 /**
  * The Workbench (GRS-0027, PRD §6) — one coherent surface over the Loop 5 APIs: the bench-time
- * dashboard, certification, learning + drills, the practice arena, calibration, and (members only)
- * the rating committee. Role gating here mirrors the API's JWT claims exactly — the Committee tab is
- * mounted only for a committee member or admin, the same gate the server enforces.
+ * dashboard, certification, learning + drills, and the practice arena.
+ *
+ * Calibration, rating requests and the Rating Committee were retired here under ADR-0041. They were
+ * built for a network larger than this one; the founder signs what goes out instead. Their panels
+ * and routes are dormant rather than deleted, so the decision is reversible.
+ *
+ * The Founder review tab is mounted by ASKING the server: if the queue answers, the caller is the
+ * reviewer. That keeps one authority for who the founder is, rather than baking a second copy of
+ * their identity into the frontend build.
  */
 
 import { useEffect, useMemo, useState } from "react";
@@ -12,21 +18,13 @@ import Link from "next/link";
 
 import { getSession } from "@/lib/session";
 import { BenchDashboard } from "@/components/workbench/BenchDashboard";
-import { CalibrationPanel } from "@/components/workbench/CalibrationPanel";
 import { CertificationPanel } from "@/components/workbench/CertificationPanel";
-import { CommitteePanel } from "@/components/workbench/CommitteePanel";
+import { FounderReviewPanel } from "@/components/workbench/FounderReviewPanel";
 import { LearningDrillsPanel } from "@/components/workbench/LearningDrillsPanel";
 import { ArenaPanel } from "@/components/workbench/ArenaPanel";
-import { RatingRequestsPanel } from "@/components/workbench/RatingRequestsPanel";
+import { api } from "@/lib/api";
 
-type TabKey =
-  | "bench"
-  | "certification"
-  | "learning"
-  | "arena"
-  | "calibration"
-  | "requests"
-  | "committee";
+type TabKey = "bench" | "certification" | "learning" | "arena" | "founder-review";
 
 export function WorkbenchClient() {
   // The session comes from localStorage, which the server can't read — reading it during render
@@ -35,18 +33,30 @@ export function WorkbenchClient() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const session = useMemo(() => (mounted ? getSession() : null), [mounted]);
+
+  // Ask the server whether this caller is the founder reviewer, rather than deriving it here. A
+  // 403 is the expected answer for everyone else and is not an error worth surfacing.
+  const [isReviewer, setIsReviewer] = useState(false);
+  useEffect(() => {
+    if (!mounted || !session) return;
+    const ctrl = new AbortController();
+    api
+      .founderReviewQueue(ctrl.signal)
+      .then(() => setIsReviewer(true))
+      .catch(() => undefined);
+    return () => ctrl.abort();
+  }, [mounted, session]);
+
   const tabs = useMemo(() => {
     const base: { key: TabKey; label: string }[] = [
       { key: "bench", label: "Bench" },
       { key: "certification", label: "Certification" },
       { key: "learning", label: "Learning & Drills" },
       { key: "arena", label: "Practice Arena" },
-      { key: "calibration", label: "Calibration" },
-      { key: "requests", label: "Rating requests" },
     ];
-    if (session?.isCommittee) base.push({ key: "committee", label: "Committee" });
+    if (isReviewer) base.push({ key: "founder-review", label: "Founder review" });
     return base;
-  }, [session]);
+  }, [isReviewer]);
   const [tab, setTab] = useState<TabKey>("bench");
 
   // Stable placeholder for the server render and the first client paint (matches, no #418).
@@ -96,9 +106,7 @@ export function WorkbenchClient() {
         {tab === "certification" && <CertificationPanel advisorId={session.consultantId} />}
         {tab === "learning" && <LearningDrillsPanel />}
         {tab === "arena" && <ArenaPanel />}
-        {tab === "calibration" && <CalibrationPanel />}
-        {tab === "requests" && <RatingRequestsPanel />}
-        {tab === "committee" && session.isCommittee && <CommitteePanel />}
+        {tab === "founder-review" && isReviewer && <FounderReviewPanel />}
       </div>
     </div>
   );

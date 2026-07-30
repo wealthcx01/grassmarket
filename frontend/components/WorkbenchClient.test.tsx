@@ -32,6 +32,9 @@ vi.mock("@/lib/api", async (importActual) => {
       ...actual.api,
       benchQueue: vi.fn().mockResolvedValue(queue),
       performance: vi.fn().mockResolvedValue(perf),
+      // The Founder review tab is mounted by ASKING the server, so the gate under test here is
+      // whether this call succeeds — not a claim read from the token.
+      founderReviewQueue: vi.fn().mockRejectedValue(new Error("403")),
     },
   };
 });
@@ -51,26 +54,52 @@ function session(over: Partial<Session> = {}): Session {
   };
 }
 
-describe("WorkbenchClient — role gating (GRS-0027)", () => {
-  beforeEach(() => vi.clearAllMocks());
+describe("WorkbenchClient — tabs and gating (GRS-0027, ADR-0041)", () => {
+  // clearAllMocks resets calls but NOT implementations, so a resolved queue set by one test would
+  // leak into the next and quietly hand it a founder tab. Re-arm the refusal each time.
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    const { api } = await import("@/lib/api");
+    (api.founderReviewQueue as unknown as ReturnType<typeof vi.fn>).mockRejectedValue(
+      new Error("403"),
+    );
+  });
 
-  it("hides the Committee tab from an ordinary consultant", async () => {
+  it("shows an ordinary consultant four tabs and no founder review", async () => {
     mockedSession.mockReturnValue(session());
     render(<WorkbenchClient />);
     expect(await screen.findByRole("tab", { name: "Bench" })).toBeTruthy();
-    expect(screen.queryByRole("tab", { name: "Committee" })).toBeNull();
+    expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual([
+      "Bench",
+      "Certification",
+      "Learning & Drills",
+      "Practice Arena",
+    ]);
+    expect(screen.queryByRole("tab", { name: "Founder review" })).toBeNull();
   });
 
-  it("shows the Committee tab to a committee member", async () => {
-    mockedSession.mockReturnValue(session({ role: "committee_member", isCommittee: true }));
+  it("mounts Founder review when the server answers the queue", async () => {
+    mockedSession.mockReturnValue(session({ email: "john@bruntsfield.capital" }));
+    const { api } = await import("@/lib/api");
+    (api.founderReviewQueue as unknown as ReturnType<typeof vi.fn>).mockResolvedValue([]);
     render(<WorkbenchClient />);
-    expect(await screen.findByRole("tab", { name: "Committee" })).toBeTruthy();
+    expect(await screen.findByRole("tab", { name: "Founder review" })).toBeTruthy();
   });
 
-  it("shows the Committee tab to an admin", async () => {
+  it("does not mount Founder review for an admin who is not the reviewer", async () => {
+    mockedSession.mockReturnValue(session({ role: "admin", isAdmin: true }));
+    render(<WorkbenchClient />);
+    expect(await screen.findByRole("tab", { name: "Bench" })).toBeTruthy();
+    expect(screen.queryByRole("tab", { name: "Founder review" })).toBeNull();
+  });
+
+  it("carries no retired governance tab", async () => {
     mockedSession.mockReturnValue(session({ role: "admin", isAdmin: true, isCommittee: true }));
     render(<WorkbenchClient />);
-    expect(await screen.findByRole("tab", { name: "Committee" })).toBeTruthy();
+    await screen.findByRole("tab", { name: "Bench" });
+    for (const gone of ["Committee", "Calibration", "Rating requests"]) {
+      expect(screen.queryByRole("tab", { name: gone })).toBeNull();
+    }
   });
 
   it("prompts sign-in when there is no session", () => {

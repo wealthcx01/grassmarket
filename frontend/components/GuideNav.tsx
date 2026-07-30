@@ -1,6 +1,6 @@
 /**
  * Guide navigation shell (GRS-0134). The primer has grown long (GRS-0092–0097 + the Academy/
- * calibration sections), so a single scroll stops working. This adds a table of contents that jumps
+ * sections), so a single scroll stops working. This adds a table of contents that jumps
  * to any section and tracks the one in view — a sticky rail on wide viewports, a burger drawer on
  * narrow ones. Pure client island over the server-rendered guide; it only needs the section anchors.
  */
@@ -21,7 +21,6 @@ export const GUIDE_SECTIONS: ReadonlyArray<{ id: string; label: string }> = [
   { id: "scoring-powers", label: "Scoring the Powers" },
   { id: "seven-powers", label: "The seven Powers" },
   { id: "reading-outputs", label: "Reading the outputs" },
-  { id: "calibration", label: "Calibration" },
   { id: "mistakes", label: "Mistakes to avoid" },
   { id: "scoring-explained", label: "Scoring, in full" },
   { id: "working-the-app", label: "Working the app" },

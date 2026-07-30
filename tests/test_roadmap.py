@@ -390,7 +390,10 @@ def test_service_gate_refuses_client_pack_on_draft_set() -> None:
 
 
 def test_service_allows_client_pack_on_client_usable_set() -> None:
-    from tests.committee_helpers import approved_decisions_for
+    from datetime import UTC, datetime
+    from uuid import uuid4
+
+    from bcap_contracts.founder_review import FounderApproval
 
     ctx = _context()
     coeffs = _client_usable_set()
@@ -405,7 +408,17 @@ def test_service_allows_client_pack_on_client_usable_set() -> None:
         subject="Meridian",
         generated_on=date(2026, 7, 13),
         client_facing=True,
-        committee_decisions=approved_decisions_for(art.result),
+        # ADR-0041: the client-pack gate is a current founder approval, not committee sign-off.
+        founder_approval=FounderApproval(
+            id=uuid4(),
+            owner_consultant_id=uuid4(),
+            assessment_id=uuid4(),
+            document_hash="a" * 64,
+            approved_by_consultant_id=uuid4(),
+            approved_at=datetime(2026, 7, 13, 9, 0, tzinfo=UTC),
+            created_at=datetime(2026, 7, 13, 9, 0, tzinfo=UTC),
+            updated_at=datetime(2026, 7, 13, 9, 0, tzinfo=UTC),
+        ),
     )
     assert rendered.mode is DeliverableMode.CLIENT
     assert rendered.docx_bytes[:2] == b"PK"

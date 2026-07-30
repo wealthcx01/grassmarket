@@ -70,6 +70,16 @@ class Settings(BaseSettings):
     # Upload guard (GRS-0029): reject media larger than this before scanning/transcribing.
     max_upload_bytes: int = Field(default=25 * 1024 * 1024, validation_alias="GM_MAX_UPLOAD_BYTES")
 
+    # The founder review gate (ADR-0041). Every client-facing draft is approved by this person;
+    # peer rating, committee sign-off and calibration are dormant. Config rather than a role or a
+    # DB column, so rotating the reviewer is an env change with no migration. The claim is derived
+    # per request from the token's email, not minted into the token, so a rotation takes effect
+    # immediately instead of waiting for everyone's tokens to expire.
+    founder_reviewer_email: str = Field(
+        default="john@bruntsfield.capital",
+        validation_alias=AliasChoices("GM_FOUNDER_REVIEWER_EMAIL", "FOUNDER_REVIEWER_EMAIL"),
+    )
+
     invite_ttl_hours: int = Field(default=168, validation_alias="GM_INVITE_TTL_HOURS")
     # The canonical advisory-app origin — the OAuth callback redirects here, and it is always CORS-
     # allowed. Back-compat: GM_FRONTEND_ORIGIN still works unchanged.

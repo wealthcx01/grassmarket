@@ -263,9 +263,28 @@ def test_charts_are_byte_deterministic() -> None:
 
 
 # ----------------------------------------------------------- service dispatcher + gate
-def _render(dtype: DeliverableType, *, client_facing: bool, coeffs=None, model=None):
-    from tests.committee_helpers import approved_decisions_for
+def _a_current_founder_approval():
+    """A matching approval, so a render test exercises the RENDERER rather than the gate. The gate
+    itself is tested end to end in tests/test_founder_review.py (ADR-0041)."""
+    from datetime import UTC, datetime
+    from uuid import uuid4
 
+    from bcap_contracts.founder_review import FounderApproval
+
+    at = datetime(2026, 7, 13, 9, 0, tzinfo=UTC)
+    return FounderApproval(
+        id=uuid4(),
+        owner_consultant_id=uuid4(),
+        assessment_id=uuid4(),
+        document_hash="a" * 64,
+        approved_by_consultant_id=uuid4(),
+        approved_at=at,
+        created_at=at,
+        updated_at=at,
+    )
+
+
+def _render(dtype: DeliverableType, *, client_facing: bool, coeffs=None, model=None):
     coeffs = coeffs or draft_v1_coefficient_set(_REGISTRY)
     model = model or _MODEL
     art = compute_score(_doc(graded=True), coeffs, _REGISTRY, model, random.Random(1))
@@ -279,7 +298,7 @@ def _render(dtype: DeliverableType, *, client_facing: bool, coeffs=None, model=N
         subject="Meridian",
         generated_on=date(2026, 7, 13),
         client_facing=client_facing,
-        committee_decisions=approved_decisions_for(art.result),
+        founder_approval=_a_current_founder_approval(),
     )
 
 
@@ -349,14 +368,16 @@ def test_dispatcher_refuses_client_pack_on_draft_uncertainty_model() -> None:
 
 
 # ----------------------------------------------------------- HTTP (generate by type)
-def _engagement(client, owner: SeededConsultant) -> str:
+def _engagement(client, owner: SeededConsultant, founder: SeededConsultant) -> str:
     from tests.test_deliverables import _engagement_with_finalised
 
-    return _engagement_with_finalised(client, owner)
+    return _engagement_with_finalised(client, owner, founder)
 
 
-def test_http_generate_each_type_and_download(client, alice: SeededConsultant) -> None:
-    eid = _engagement(client, alice)
+def test_http_generate_each_type_and_download(
+    client, alice: SeededConsultant, founder: SeededConsultant
+) -> None:
+    eid = _engagement(client, alice, founder)
     for value in (
         "executive_summary",
         "platform_power_report",
@@ -377,8 +398,10 @@ def test_http_generate_each_type_and_download(client, alice: SeededConsultant) -
         assert dl.content[:2] == b"PK"
 
 
-def test_http_generate_non_single_run_types_refused(client, alice: SeededConsultant) -> None:
-    eid = _engagement(client, alice)
+def test_http_generate_non_single_run_types_refused(
+    client, alice: SeededConsultant, founder: SeededConsultant
+) -> None:
+    eid = _engagement(client, alice, founder)
     # Both types with their own render path are refused at generate (422), not 500 or silently.
     for value in ("modernisation_roadmap", "score_evolution"):
         resp = client.post(

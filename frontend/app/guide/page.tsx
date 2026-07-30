@@ -262,34 +262,30 @@ const WALKTHROUGHS: ReadonlyArray<Walkthrough> = [
   },
   {
     id: "consensus",
-    kicker: "Consensus and sign-off",
-    title: "Reach consensus, then sign off",
-    lead: "Two governance gates stand between a scored assessment and a finalised one, and you clear both from the Summary step. A rating made by one person alone is a draft rather than a deliverable, so every rated subcomponent needs a genuine second opinion and every high-stakes rating needs peer sign-off.",
+    kicker: "Review and sign-off",
+    title: "Send it to John, then finalise",
+    lead: "One gate stands between a scored assessment and a finalised one. Nothing goes to a client that John has not read and signed off. You handle this from the Summary step, and it usually takes one message and a day.",
     href: { label: "Open assessments", to: "/assessments" },
     steps: [
       {
-        do: "On the Summary step, the dual-rating and consensus panel lists each module that still needs a second opinion. Assign a co-rater by their email address.",
-        then: "You are added as the first rater automatically.",
+        do: "When you are happy with the assessment, press Send to John for review on the Summary step.",
+        then: "It appears on his review queue in the Workbench, with your name and the date you sent it.",
       },
       {
-        do: "Submit your own rating, then let your co-rater rate independently. They find the request under Workbench, then Rating requests, and they rate without seeing your answers.",
-        then: "Rating blind is what makes the second opinion genuinely independent rather than a confirmation of yours.",
+        do: "Wait for the approval. The Summary step shows where it stands, so you do not need to chase.",
+        then: "Once he approves, the step says so and gives you the date he signed it.",
       },
       {
-        do: "Once both ratings are in, press Resolve consensus. If you agreed it clears, and if you differed you record a dissent note.",
-        then: "The module then reads as agreed, and that blocker on finalising lifts.",
+        do: "Finalise and lock. From there you can generate a client deliverable.",
       },
       {
-        do: "Below it, the Rating Committee sign-off panel shows every high-stakes rating. You can see the status of your own, but you can never sign it off yourself.",
-        then: "A committee member approves or rejects each one with a rationale that is recorded against it.",
-      },
-      {
-        do: "When every module is agreed and every high-stakes item is approved, Finalise and lock succeeds, and only then can you generate a client deliverable.",
+        do: "If you change anything after the approval, send it again.",
+        then: "An approval covers the version it was given for. Editing after sign-off means John has not seen what you are now proposing to send, so the approval stops applying and the record goes back on his queue.",
       },
     ],
     note: {
       tone: "info",
-      text: "You never sign off your own high-stakes ratings, and a solo rating never becomes a deliverable. These are enforced by the platform rather than left to convention, so an attempt to skip either gate is refused with a plain-English reason.",
+      text: "This is enforced by the platform, not left to convention. Finalising a production assessment without a current approval is refused, and so is generating a client pack from one. Both refusals say why in plain English.",
     },
   },
   {
@@ -338,7 +334,7 @@ const WALKTHROUGHS: ReadonlyArray<Walkthrough> = [
     ],
     note: {
       tone: "info",
-      text: "A client-facing pack is released only when the assessment used coefficients ratified for client use, every AI section has been approved, and any high-stakes rating carries committee sign-off. If a gate is unmet, generation is refused and the reason is stated in plain English.",
+      text: "A client-facing pack is released only when the assessment used coefficients ratified for client use, every AI section has been approved, and John has signed off the current version of the document. If a gate is unmet, generation is refused and the reason is stated in plain English.",
     },
   },
   {
@@ -359,7 +355,7 @@ const WALKTHROUGHS: ReadonlyArray<Walkthrough> = [
     id: "workbench",
     kicker: "Workbench",
     title: "Sharpen your practice",
-    lead: "Certification, the practice arena, power drills, and calibration sit together in the Workbench. This is how you earn the assessor level that unlocks high-stakes ratings, and how you keep it.",
+    lead: "Certification, the practice arena and power drills sit together in the Workbench. This is how you earn the assessor level that unlocks high-stakes ratings, and how you keep it.",
     href: { label: "Open the workbench", to: "/workbench" },
     steps: [
       { do: "Work the certification ladder, and clear your next action from the bench queue." },
@@ -858,27 +854,6 @@ export default function GuidePage() {
               diligence.
             </p>
           </div>
-        </div>
-      </section>
-
-      {/* What calibration is (GRS-0130) */}
-      <section id="calibration">
-        <SectionTitle kicker="Staying aligned">What a calibration session is</SectionTitle>
-        <div className="card" style={{ padding: "1.15rem 1.3rem", display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-          <p style={{ margin: 0, color: "var(--color-ink-muted)", fontSize: "0.95rem", lineHeight: 1.6 }}>
-            A <strong>calibration session</strong> is how assessors stay aligned, so that the same
-            evidence earns the same rating whoever scores it. A facilitator poses a set of shared
-            vignettes, which are short and real assessment situations drawn from the Academy courses
-            rather than generic filler, and every participant rates them <em>blind</em>, without seeing
-            anyone else&rsquo;s answers.
-          </p>
-          <p style={{ margin: 0, color: "var(--color-ink-muted)", fontSize: "0.95rem", lineHeight: 1.6 }}>
-            When the session closes, the ratings are revealed together and the spread between them is
-            measured. Where assessors diverged, the group discusses why and converges on what the rubric
-            intended. Calibration is a <strong>governance</strong> control and its result is recorded,
-            which is what separates it from the Practice Arena, where the AI-drafted feedback is a
-            training aid for you alone, clearly labelled as such and never recorded as an approval.
-          </p>
         </div>
       </section>
 

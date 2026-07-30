@@ -32,7 +32,6 @@ from pydantic import BaseModel
 
 from grassmarket.assessments import (
     compute_score,
-    consensus_blockers,
     evaluate_scenarios,
     live_score,
     module_rating_errors,
@@ -44,7 +43,6 @@ from grassmarket.atlas.active import (
     profile_key_of,
     profile_scoring_context,
 )
-from grassmarket.atlas.committee import committee_blockers, required_committee_items
 from grassmarket.data.repository import (
     ConflictError,
     NotFoundError,
@@ -54,6 +52,7 @@ from grassmarket.data.repository import (
 )
 from grassmarket.entities import active_entity_registry
 from grassmarket.web.dependencies import get_current_principal, get_repository
+from grassmarket.web.retired import retired_route
 from grassmarket.workbench.certification import requires_certified_lead
 
 router = APIRouter(prefix="/assessments", tags=["assessments"])
@@ -183,7 +182,11 @@ class RatingRequestSummary(BaseModel):
 
 
 # Declared BEFORE `/{assessment_id}` so "rating-requests" isn't parsed as an assessment UUID.
-@router.get("/rating-requests", response_model=list[RatingRequestSummary])
+@router.get(
+    "/rating-requests",
+    response_model=list[RatingRequestSummary],
+    dependencies=[Depends(retired_route)],
+)
 def my_rating_requests(
     principal: Principal = Depends(get_current_principal),
     repo: Repository = Depends(get_repository),
@@ -356,32 +359,26 @@ def finalise_assessment(
     # entirely unchanged for production records, so the AI-approval non-negotiable is intact.
     gated = assessment.provenance is RecordProvenance.PRODUCTION
 
-    # Dual-rating governance (Methodology §9): solo ratings are drafts, never deliverables.
-    governance = consensus_blockers(assessment.document) if gated else []
-    if governance:
+    # The founder review gate (ADR-0041, GRS-0188). This replaces the dual-rating consensus gate
+    # and the Rating Committee gate that used to sit here and below. The network is one founder and
+    # a handful of advisors: peer sign-off was built for a scale it has not reached, and the founder
+    # signs what goes out instead. Both retired gates remain in the codebase, dormant, so the
+    # decision is reversible when the network is bigger.
+    #
+    # A demo or sandbox record still self-approves (ADR-0029): it is watermarked, never
+    # client-facing, and has no client on the other end to protect.
+    if gated and repo.current_founder_approval(assessment_id) is None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Cannot finalise — dual-rating consensus incomplete: " + " ".join(governance),
+            detail=(
+                "Cannot finalise — awaiting founder approval (ADR-0041). Submit for review and "
+                "have the founder approve the current version of the document."
+            ),
         )
 
     art = compute_score(
         assessment.document, coefficients, registry, model, random.Random(_LIVE_SEED)
     )
-    # Rating Committee sign-off on high-stakes ratings (Methodology §8): power Established+, triad
-    # above None, module Frontier. Any awaiting sign-off blocks finalisation.
-    committee = (
-        committee_blockers(
-            required_committee_items(art.result),
-            repo.list_committee_decisions(principal, assessment_id),
-        )
-        if gated
-        else []
-    )
-    if committee:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Cannot finalise — Rating Committee sign-off incomplete: " + " ".join(committee),
-        )
     # Certification (Methodology §9): a Frontier module or Wide power requires a Certified Lead to
     # lead the assessment. An admin may override with a recorded reason (fail-loud, audited).
     cert_reasons = requires_certified_lead(art.result) if gated else []
@@ -485,7 +482,11 @@ def assign_rater(
         raise _conflict(exc) from exc
 
 
-@router.get("/{assessment_id}/modules/{module_key}/my-rating", response_model=ModuleRatingDraft)
+@router.get(
+    "/{assessment_id}/modules/{module_key}/my-rating",
+    response_model=ModuleRatingDraft,
+    dependencies=[Depends(retired_route)],
+)
 def get_my_module_rating(
     assessment_id: UUID,
     module_key: str,
@@ -499,7 +500,11 @@ def get_my_module_rating(
         raise _not_found(exc) from exc
 
 
-@router.put("/{assessment_id}/modules/{module_key}/my-rating", response_model=ModuleRatingDraft)
+@router.put(
+    "/{assessment_id}/modules/{module_key}/my-rating",
+    response_model=ModuleRatingDraft,
+    dependencies=[Depends(retired_route)],
+)
 def update_my_module_rating(
     assessment_id: UUID,
     module_key: str,
@@ -537,7 +542,11 @@ def submit_my_module_rating(
         raise _conflict(exc) from exc
 
 
-@router.get("/{assessment_id}/modules/{module_key}/ratings", response_model=list[ModuleRatingDraft])
+@router.get(
+    "/{assessment_id}/modules/{module_key}/ratings",
+    response_model=list[ModuleRatingDraft],
+    dependencies=[Depends(retired_route)],
+)
 def list_module_ratings(
     assessment_id: UUID,
     module_key: str,
@@ -552,7 +561,11 @@ def list_module_ratings(
         raise _not_found(exc) from exc
 
 
-@router.post("/{assessment_id}/modules/{module_key}/consensus", response_model=Assessment)
+@router.post(
+    "/{assessment_id}/modules/{module_key}/consensus",
+    response_model=Assessment,
+    dependencies=[Depends(retired_route)],
+)
 def resolve_module_consensus(
     assessment_id: UUID,
     module_key: str,

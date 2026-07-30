@@ -304,7 +304,8 @@ def test_a_finalised_record_is_refused_because_its_scoring_run_is_immutable(
 def test_a_production_record_is_refused_even_with_discard_scoring_runs(
     session_factory, engine, settings
 ) -> None:
-    """ADR-0047: the provenance guard is unconditional — no argument relaxes it."""
+    """ADR-0047: discard_scoring_runs does not open the production guard. Only the separate,
+    per-call delete_production_record flag does, and only for the founder or an admin."""
     from grassmarket.data.repository import ConflictError
 
     email = "cleanup-prod-flag@bruntsfieldcapital.com"
@@ -320,6 +321,64 @@ def test_a_production_record_is_refused_even_with_discard_scoring_runs(
         with pytest.raises(ConflictError, match="production record"):
             repo.delete_assessment(principal, production.id, discard_scoring_runs=True)
         assert repo.get_assessment(principal, production.id).subject == "Real Client"
+    finally:
+        session.close()
+
+
+def test_an_advisor_cannot_delete_their_own_production_record_even_asking_for_it(
+    session_factory, engine, settings
+) -> None:
+    """ADR-0047 amendment: the flag is necessary but not sufficient. Removing a production record
+    is the founder's call, so an ordinary advisor passing it is still refused."""
+    from grassmarket.data.repository import ScopeViolationError
+
+    email = "cleanup-prod-advisor@bruntsfieldcapital.com"
+    seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+    session = session_factory()
+    try:
+        repo = Repository(session)
+        owner = repo.get_consultant_by_email(email)
+        principal = Principal(consultant_id=owner.id, role=owner.role)
+        production = repo.create_assessment(
+            principal, subject="Real Client", provenance=RecordProvenance.PRODUCTION
+        )
+        with pytest.raises(ScopeViolationError, match="founder or an admin"):
+            repo.delete_assessment(principal, production.id, delete_production_record=True)
+        assert repo.get_assessment(principal, production.id).subject == "Real Client"
+    finally:
+        session.close()
+
+
+def test_the_founder_can_delete_a_named_production_record_and_it_is_audited(
+    session_factory, engine, settings
+) -> None:
+    """ADR-0047 amendment: the founder's escape hatch for a mis-clicked production record, and the
+    permanent trace it leaves. The audit log outlives the record it describes."""
+    from bcap_contracts.audit import AuditEventType
+
+    email = "cleanup-prod-founder@bruntsfieldcapital.com"
+    seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+    session = session_factory()
+    try:
+        repo = Repository(session)
+        owner = repo.get_consultant_by_email(email)
+        principal = Principal(consultant_id=owner.id, role=owner.role, is_founder=True)
+        stray = repo.create_assessment(
+            principal, subject="Mis-clicked Ltd", provenance=RecordProvenance.PRODUCTION
+        )
+        repo.delete_assessment(principal, stray.id, delete_production_record=True)
+        session.commit()
+
+        assert all(a.id != stray.id for a in repo.list_assessments(principal))
+        admin = Principal(consultant_id=owner.id, role=Role.ADMIN)
+        deletions = [
+            e
+            for e in repo.list_audit_events(admin)
+            if e.event_type is AuditEventType.ASSESSMENT_DELETED
+        ]
+        assert len(deletions) == 1
+        assert deletions[0].resource_id == stray.id
+        assert "Mis-clicked Ltd" in (deletions[0].detail or "")
     finally:
         session.close()
 

@@ -1,0 +1,82 @@
+{
+  "additionalProperties": false,
+  "description": "One row of the founder's review queue: an assessment awaiting sign-off, with enough context\nto open it. Computed, never stored — the queue is derived from requests and approvals.",
+  "properties": {
+    "advisor_email": {
+      "description": "How to reach them about it.",
+      "title": "Advisor Email",
+      "type": "string"
+    },
+    "advisor_name": {
+      "description": "The advisor who submitted it.",
+      "title": "Advisor Name",
+      "type": "string"
+    },
+    "assessment_id": {
+      "description": "The assessment awaiting review.",
+      "format": "uuid",
+      "title": "Assessment Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "document_hash": {
+      "description": "Current hash of the document to be approved.",
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Document Hash",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "previously_approved": {
+      "description": "True when this assessment carries an approval at an older hash, meaning it was signed off and then edited. The founder is re-reviewing, not reviewing.",
+      "title": "Previously Approved",
+      "type": "boolean"
+    },
+    "requested_at": {
+      "description": "When review was requested (UTC).",
+      "format": "date-time",
+      "title": "Requested At",
+      "type": "string"
+    },
+    "subject": {
+      "description": "The company being assessed.",
+      "title": "Subject",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "assessment_id",
+    "subject",
+    "advisor_name",
+    "advisor_email",
+    "requested_at",
+    "document_hash",
+    "previously_approved"
+  ],
+  "title": "FounderReviewQueueEntry",
+  "type": "object"
+}

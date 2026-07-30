@@ -8,9 +8,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { CommitteeReviewPanel } from "@/components/CommitteeReviewPanel";
 import { DiagnosticsPanel } from "@/components/Diagnostics";
-import { DualRatingPanel } from "@/components/DualRatingPanel";
+import { FounderReviewStatus } from "@/components/FounderReviewStatus";
 import { GuidancePanel } from "@/components/GuidancePanel";
 import { RatingControl } from "@/components/RatingControl";
 import { StrengthControl } from "@/components/StrengthControl";
@@ -51,9 +50,12 @@ export interface StepProps {
   refreshLive: () => void;
   onFinalise: () => void;
   finalising: boolean;
-  // Solo-path escape hatch (GRS-0148): a production record needs a co-rater + committee to finalise;
-  // a working-solo advisor can clone it to a self-approvable sandbox to see the real deliverable.
+  // Solo-path escape hatch (GRS-0148): a production record needs the founder's sign-off to
+  // finalise (ADR-0041); a working-solo advisor can clone it to a self-approvable sandbox to see
+  // the real deliverable without waiting on a review.
   provenance: RecordProvenance;
+  // When review was last requested (GRS-0188). Null until the advisor submits.
+  reviewRequestedAt: string | null;
   onPreviewInSandbox: () => void;
   previewingSandbox: boolean;
   // Whether the assessment's operating-model profile scores on a client-usable set (GRS-0156) —
@@ -1540,22 +1542,19 @@ export function SummaryStep(props: StepProps) {
         </Card>
       ) : null}
 
-      {/* Governance. On a DRAFT this is the live workflow that clears the finalise blockers (§9
-          dual rating + §8 committee). On a FINALISED record it is history, so it renders as a
-          record in the past tense and never as a call to action — a locked assessment showing
-          "awaiting sign-off" was the credibility bug this ticket fixes (GRS-0182). GRS-0188 later
-          retires the panels entirely; this makes their display truthful in the meantime. */}
-      {readOnly ? (
+      {/* Review. On a DRAFT this is the one thing standing between the advisor and finalisation
+          (ADR-0041): John reads it and signs it off. On a FINALISED record it is history, so it
+          renders in the past tense and never as a call to action — a locked assessment showing
+          "awaiting sign-off" was the credibility bug GRS-0182 fixed. A sandbox record needs
+          nobody (ADR-0029), so it gets the record, not the prompt. */}
+      {readOnly || props.provenance !== "production" ? (
         <GovernanceRecord provenance={props.provenance} />
       ) : (
-        <>
-          <DualRatingPanel
-            assessmentId={props.assessmentId}
-            moduleLabels={moduleLabels}
-            onChanged={props.refreshLive}
-          />
-          {live?.scoreable ? <CommitteeReviewPanel assessmentId={props.assessmentId} /> : null}
-        </>
+        <FounderReviewStatus
+          assessmentId={props.assessmentId}
+          reviewRequestedAt={props.reviewRequestedAt}
+          onChanged={props.refreshLive}
+        />
       )}
       {readOnly ? (
         <p style={{ color: "var(--color-accent)", fontWeight: 600 }}>

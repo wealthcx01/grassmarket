@@ -25,7 +25,8 @@ from grassmarket.atlas import AssessmentInputs, run_monte_carlo
 from grassmarket.atlas.results import AtlasResult
 from grassmarket.deliverables.builder import DeliverableContext, build_platform_power_report
 from grassmarket.deliverables.gate import (
-    assert_committee_approved,
+    assert_committee_approved,  # noqa: F401  # dormant under ADR-0041, kept for reversibility
+    assert_founder_approved,
     assert_uncertainty_client_usable,
     resolve_mode,
 )
@@ -108,6 +109,7 @@ def render_diagnostic_document(
     client_facing: bool,
     narratives: Sequence[AINarrative] = (),
     committee_decisions: Sequence[CommitteeDecision] = (),
+    founder_approval: object | None = None,
     reported_c: float | None = None,
 ) -> RenderedDeliverable:
     """Render one single-run Diagnostic-pack document. Enforces the client-usable AND committee
@@ -126,8 +128,10 @@ def render_diagnostic_document(
     mode = resolve_mode(coefficients, client_facing=client_facing)  # the gate — refuses first
     # The §7 twin: a client pack's ranges must come from elicited widths, not draft placeholders.
     assert_uncertainty_client_usable(model, client_facing=client_facing)
-    # High-stakes ratings need committee sign-off before a client pack (Methodology §8).
-    assert_committee_approved(stored_result, committee_decisions, client_facing=client_facing)
+    # The founder signs what reaches a client (ADR-0041). This replaces the Methodology §8
+    # committee gate that stood here; the committee assert stays in gate.py, dormant, so the
+    # decision is reversible when the network is bigger.
+    assert_founder_approved(founder_approval, client_facing=client_facing)
     uncertainty = run_monte_carlo(
         inputs, coefficients, registry, model, random.Random(DELIVERABLE_SEED)
     )
@@ -157,6 +161,7 @@ def render_platform_power_report(
     client_facing: bool,
     narratives: Sequence[AINarrative] = (),
     committee_decisions: Sequence[CommitteeDecision] = (),
+    founder_approval: object | None = None,
     reported_c: float | None = None,
 ) -> RenderedDeliverable:
     """Render the Platform Power Report (a thin wrapper over `render_diagnostic_document`). Approved
@@ -173,6 +178,7 @@ def render_platform_power_report(
         client_facing=client_facing,
         narratives=narratives,
         committee_decisions=committee_decisions,
+        founder_approval=founder_approval,
         reported_c=reported_c,
     )
 
@@ -189,6 +195,7 @@ def render_modernisation_roadmap(
     generated_on: date,
     client_facing: bool,
     committee_decisions: Sequence[CommitteeDecision] = (),
+    founder_approval: object | None = None,
 ) -> RenderedDeliverable:
     """Render the Modernisation Roadmap. Enforces the client-usable AND committee gates first (may
     raise `ClientUsabilityError` / `CommitteePendingError`) — a draft coefficient set or an
@@ -196,7 +203,7 @@ def render_modernisation_roadmap(
     — then builds the .docx from the upstream value-bridge + priority objects. Versions come from
     run's immutable stored result, so the document is reproducible."""
     mode = resolve_mode(coefficients, client_facing=client_facing)  # the gate — refuses first
-    assert_committee_approved(stored_result, committee_decisions, client_facing=client_facing)
+    assert_founder_approved(founder_approval, client_facing=client_facing)
     context = RoadmapContext(
         subject=subject,
         bridge=bridge,

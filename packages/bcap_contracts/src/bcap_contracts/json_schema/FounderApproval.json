@@ -1,0 +1,65 @@
+{
+  "additionalProperties": false,
+  "description": "The founder's sign-off on one version of one assessment document.\n\n`owner_consultant_id` is the advisor who owns the assessment, not the founder. Scoping stays\nthe advisor's: an approval is visible to the advisor whose work it clears, and to the founder\nthrough the review queue. `approved_by_consultant_id` is who signed.",
+  "properties": {
+    "approved_at": {
+      "description": "When the approval was recorded (UTC).",
+      "format": "date-time",
+      "title": "Approved At",
+      "type": "string"
+    },
+    "approved_by_consultant_id": {
+      "description": "The consultant who signed. Always the configured founder reviewer.",
+      "format": "uuid",
+      "title": "Approved By Consultant Id",
+      "type": "string"
+    },
+    "assessment_id": {
+      "description": "The assessment this approval clears.",
+      "format": "uuid",
+      "title": "Assessment Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "document_hash": {
+      "description": "Lowercase sha256 hex of the assessment document as stored at the moment of approval. Server-computed. An approval clears the gate only while this still equals the document's current hash, so any edit re-opens review.",
+      "maxLength": 64,
+      "minLength": 64,
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Document Hash",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "assessment_id",
+    "document_hash",
+    "approved_by_consultant_id",
+    "approved_at"
+  ],
+  "title": "FounderApproval",
+  "type": "object"
+}

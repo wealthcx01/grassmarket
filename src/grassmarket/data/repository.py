@@ -118,6 +118,10 @@ from bcap_contracts.fees import (
     RecoveryFeeConfig,
     load_recovery_fee_config,
 )
+from bcap_contracts.founder_review import (
+    FounderApproval,
+    FounderReviewQueueEntry,
+)
 from bcap_contracts.learning import (
     CertificationCredit,
     ContentCompletion,
@@ -175,6 +179,7 @@ from grassmarket.data.models import (
     EngagementORM,
     ExtractionORM,
     FieldProvenanceORM,
+    FounderApprovalORM,
     GeneratedQuizORM,
     InvitationORM,
     LearningModuleORM,
@@ -406,6 +411,11 @@ class Principal:
 
     consultant_id: UUID
     role: Role
+    # The founder review gate (ADR-0041). Derived at token mint from the configured reviewer
+    # email rather than stored as a role, so rotating the reviewer is an env change plus a
+    # re-login and never a migration. Defaults to False so every existing construction of a
+    # Principal is unaffected and no caller acquires the claim by accident.
+    is_founder: bool = False
 
     @property
     def is_admin(self) -> bool:
@@ -2802,30 +2812,37 @@ class Repository:
         assessment_id: UUID,
         *,
         discard_scoring_runs: bool = False,
+        delete_production_record: bool = False,
     ) -> None:
         """Remove ONE assessment the caller owns, named by id (GRS-0177 staging cleanup).
 
-        Two guards, both deliberate.
+        Three guards, each defaulting to refusal.
 
-        A **production** record is never deletable through here, and no argument relaxes that: the
-        cleanup this exists for is about demo and sandbox clutter, and a tool that could remove
-        real client work is a worse problem than the clutter.
+        A **production** record is refused unless the caller passes
+        `delete_production_record=True` AND is the founder or an admin. That combination is not a
+        convenience: it is a founder saying, about one named record, that it is a mis-click rather
+        than work. No criteria-based caller can reach it, because the flag is per call and the
+        method takes one id. Every such deletion writes an audit event naming the record. See the
+        2026-07-29 amendment to ADR-0047.
 
         A record carrying a **scoring run** is refused by default, because runs are immutable and
         append-only (#6) — deleting the assessment would either orphan the run or destroy it.
         `discard_scoring_runs=True` is the caller stating, in the call itself, that this record's
-        runs are seeded illustration rather than an audit trail, and that they should go with it.
-        Combined with the production guard above that flag can only ever reach a demo or sandbox
-        record: watermarked, never client-facing, excluded from the benchmark population. See
-        ADR-0047 for why that carve-out does not weaken #6. The default is still refusal, so no
-        caller discards a run without saying so.
+        runs should go with it. See ADR-0047 for why that carve-out does not weaken #6.
 
         There is no bulk or wildcard form. Every deletion names one id.
         """
         row = self._require_assessment(principal, assessment_id)
-        if row.provenance == RecordProvenance.PRODUCTION.value:
+        is_production = row.provenance == RecordProvenance.PRODUCTION.value
+        if is_production and not delete_production_record:
             raise ConflictError(
-                f"Assessment {assessment_id} is a production record and cannot be deleted here."
+                f"Assessment {assessment_id} is a production record and cannot be deleted here. "
+                f"Deleting one is a founder decision, taken per record: call with "
+                f"delete_production_record=True."
+            )
+        if is_production and not (principal.is_founder or principal.is_admin):
+            raise ScopeViolationError(
+                "Only the founder or an admin may delete a production record."
             )
         # Any stored run at all is the bar, not just a flagged one: runs are append-only, so a row
         # existing is exactly the thing that must not be destroyed. A finalised assessment always
@@ -2855,7 +2872,7 @@ class Repository:
         # Three tables point at a scoring run by id rather than at the assessment, so removing the
         # runs without them would leave rows referring to a run that no longer exists. Orphaned
         # rows are exactly the silent-inconsistency failure mode #3 exists to prevent, so they go
-        # in the same transaction. Only reachable for a non-production record (guard above).
+        # in the same transaction.
         run_ids = [run.id for run in runs]
         if run_ids:
             self._session.execute(
@@ -2870,8 +2887,24 @@ class Repository:
         self._session.execute(
             delete(ScoringRunORM).where(ScoringRunORM.assessment_id == assessment_id)
         )
+        subject = row.subject
         self._session.delete(row)
         self._session.flush()
+        if is_production:
+            # Removing a production record is the one deletion here that could ever have destroyed
+            # real work, so it leaves a permanent trace of who did it and to what. The audit log is
+            # append-only, so this survives the record it describes.
+            self.record_audit(
+                actor_consultant_id=principal.consultant_id,
+                event_type=AuditEventType.ASSESSMENT_DELETED,
+                now=datetime.now(UTC),
+                resource_type="assessment",
+                resource_id=assessment_id,
+                detail=(
+                    f"Deleted production record {subject!r} "
+                    f"({len(run_ids)} scoring run(s)) by founder decision."
+                ),
+            )
 
     def list_assessments(self, principal: Principal) -> list[Assessment]:
         stmt = select(AssessmentORM)
@@ -3037,8 +3070,16 @@ class Repository:
             resource_id=assessment_id,
             now=finalised_at,
         )
-        # GRS-0131: real participation auto-counts toward the ladder — no honour-system admin POST.
-        self._auto_credit_participation(row, finalised_at)
+        # GRS-0131 derived certification evidence from peer participation: a shadow credit for each
+        # co-rater, an observed-lead credit for the lead. With dual rating retired (ADR-0041) there
+        # are no co-raters, so the shadow half now derives nothing and the observed-lead half would
+        # award "observed" credit with nobody observing. Awarding evidence for something that did
+        # not happen is worse than awarding none, so the call is removed here.
+        #
+        # `_auto_credit_participation` stays below, dormant with its unit test, so re-mounting peer
+        # rating restores this in one line. Evidence is recorded meanwhile through
+        # `log_shadow_assessment`, `log_observed_lead`, and the audited OVERRIDE path — all of which
+        # need a human to assert that the thing happened.
         self._session.flush()
         return self._to_assessment(row)
 
@@ -3122,12 +3163,165 @@ class Repository:
             state=AssessmentState(row.state),
             document=AssessmentDocument.model_validate_json(row.document_json),
             provenance=RecordProvenance(row.provenance),
+            review_requested_at=row.review_requested_at,
             finalised_at=row.finalised_at,
             scoring_run_id=row.scoring_run_id,
             engine_version=row.engine_version,
             methodology_version=row.methodology_version,
             coefficient_version=row.coefficient_version,
             uncertainty_version=row.uncertainty_version,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
+
+    # --------------------------------------------------- founder review gate (GRS-0188, ADR-0041)
+    # The network is one founder and a handful of advisors. Peer rating and committee sign-off were
+    # built for a scale it has not reached; the founder signs what goes out instead. The whole
+    # mechanism is a hash comparison: an approval names the document version it cleared, and it
+    # clears the gate only while that is still the current version. Editing re-opens review by
+    # arithmetic rather than by a state machine, so there is no way to be approved-but-changed.
+
+    @staticmethod
+    def _document_hash(row: AssessmentORM) -> str:
+        """sha256 of the stored document. Computed here from what is in the database, never taken
+        from a caller: an approval that could name its own hash would approve nothing."""
+        return hashlib.sha256(row.document_json.encode("utf-8")).hexdigest()
+
+    def request_founder_review(self, principal: Principal, assessment_id: UUID) -> Assessment:
+        """The advisor asks the founder to review this document. Idempotent: asking again just
+        moves the timestamp, which is what "I've made changes, please look again" means."""
+        row = self._require_assessment(principal, assessment_id)
+        if row.state == AssessmentState.FINALISED.value:
+            raise ConflictError(
+                f"Assessment {assessment_id} is already finalised; there is nothing left to review."
+            )
+        row.review_requested_at = datetime.now(UTC)
+        self._session.flush()
+        return self._to_assessment(row)
+
+    def record_founder_approval(self, principal: Principal, assessment_id: UUID) -> FounderApproval:
+        """The founder signs off the document as it stands right now.
+
+        Only the founder may call this. Not an admin, and not the advisor who owns the record:
+        the point of the gate is that one named person signs what leaves the building, so an
+        admin bypass would quietly reintroduce self-approval (#8)."""
+        if not principal.is_founder:
+            raise ScopeViolationError(
+                "Only the founder reviewer may approve a document for release (ADR-0041)."
+            )
+        row = self._session.get(AssessmentORM, assessment_id)
+        if row is None:
+            raise NotFoundError(f"Assessment {assessment_id} not found.")
+        if row.state == AssessmentState.FINALISED.value:
+            raise ConflictError(
+                f"Assessment {assessment_id} is already finalised; approval would change nothing."
+            )
+        now = datetime.now(UTC)
+        approval = FounderApprovalORM(
+            owner_consultant_id=row.owner_consultant_id,
+            assessment_id=assessment_id,
+            document_hash=self._document_hash(row),
+            approved_by_consultant_id=principal.consultant_id,
+            approved_at=now,
+        )
+        self._session.add(approval)
+        self._session.flush()
+        self.record_audit(
+            actor_consultant_id=principal.consultant_id,
+            event_type=AuditEventType.FOUNDER_APPROVAL,
+            now=now,
+            resource_type="assessment",
+            resource_id=assessment_id,
+            detail=f"Approved document {approval.document_hash[:12]} for release.",
+        )
+        return self._to_founder_approval(approval)
+
+    def current_founder_approval(self, assessment_id: UUID) -> FounderApproval | None:
+        """The newest approval that still matches the document, or None.
+
+        Unscoped by design: this is the gate itself, called from the finalise and deliverable
+        paths where the caller's access has already been established. It reveals nothing a caller
+        could not already see about a record they hold."""
+        row = self._session.get(AssessmentORM, assessment_id)
+        if row is None:
+            raise NotFoundError(f"Assessment {assessment_id} not found.")
+        current = self._document_hash(row)
+        stmt = (
+            select(FounderApprovalORM)
+            .where(
+                FounderApprovalORM.assessment_id == assessment_id,
+                FounderApprovalORM.document_hash == current,
+            )
+            .order_by(FounderApprovalORM.approved_at.desc())
+        )
+        approval = self._session.execute(stmt).scalars().first()
+        return self._to_founder_approval(approval) if approval is not None else None
+
+    def list_founder_review_queue(self, principal: Principal) -> list[FounderReviewQueueEntry]:
+        """Everything waiting on the founder, oldest request first.
+
+        Production records only. A demo or sandbox record self-approves under ADR-0029 and has no
+        client on the other end, so putting one in this queue would waste the founder's attention
+        on work that is not going anywhere."""
+        if not (principal.is_founder or principal.is_admin):
+            raise ScopeViolationError("Only the founder reviewer may read the review queue.")
+        stmt = (
+            select(AssessmentORM)
+            .where(
+                AssessmentORM.review_requested_at.is_not(None),
+                AssessmentORM.state != AssessmentState.FINALISED.value,
+                AssessmentORM.provenance == RecordProvenance.PRODUCTION.value,
+            )
+            .order_by(AssessmentORM.review_requested_at)
+        )
+        entries: list[FounderReviewQueueEntry] = []
+        for row in self._session.execute(stmt).scalars().all():
+            current = self._document_hash(row)
+            approvals = (
+                self._session.execute(
+                    select(FounderApprovalORM).where(FounderApprovalORM.assessment_id == row.id)
+                )
+                .scalars()
+                .all()
+            )
+            if any(a.document_hash == current for a in approvals):
+                continue  # already signed at this version — not waiting on anyone
+            requested_at = row.review_requested_at
+            if requested_at is None:  # pragma: no cover - the query filters these out
+                # The query says is_not(None), so reaching here means the filter and this loop
+                # have drifted apart. Refuse rather than invent a request time (#3).
+                raise ConflictError(
+                    f"Assessment {row.id} is in the review queue with no request time."
+                )
+            advisor = self._require_consultant(row.owner_consultant_id)
+            entries.append(
+                FounderReviewQueueEntry(
+                    id=row.id,
+                    owner_consultant_id=row.owner_consultant_id,
+                    assessment_id=row.id,
+                    subject=row.subject,
+                    advisor_name=advisor.full_name,
+                    advisor_email=advisor.email,
+                    requested_at=requested_at,
+                    document_hash=current,
+                    # An approval at some OTHER hash means this was signed and then edited. Saying
+                    # so is the difference between "read this" and "read what changed".
+                    previously_approved=bool(approvals),
+                    created_at=row.created_at,
+                    updated_at=row.updated_at,
+                )
+            )
+        return entries
+
+    @staticmethod
+    def _to_founder_approval(row: FounderApprovalORM) -> FounderApproval:
+        return FounderApproval(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            assessment_id=row.assessment_id,
+            document_hash=row.document_hash,
+            approved_by_consultant_id=row.approved_by_consultant_id,
+            approved_at=row.approved_at,
             created_at=row.created_at,
             updated_at=row.updated_at,
         )
@@ -4932,11 +5126,9 @@ class Repository:
         )
         research_prospect = pick_research_prospect(self._own_prospects(principal.consultant_id))
 
-        # GRS-0128: fold the governance + Academy surfaces into the one hub, reusing existing reads.
-        rating_assignments = self.list_my_rating_assignments(principal)
-        committee_reviews = (
-            self.list_assessments_for_committee(principal) if principal.is_committee else []
-        )
+        # GRS-0128 folded the Academy into the one hub. The peer-governance reads that used to sit
+        # here (rating assignments, the committee queue) went with ADR-0041: nobody is blocked on a
+        # peer any more, so nothing about them belongs in an advisor's bench.
         academy_title = self._next_academy_course_title(principal)
 
         items = assemble_queue(
@@ -4945,13 +5137,6 @@ class Repository:
             due_drills=due_drills,
             arena_scenario=arena_scenario,
             research_prospect=research_prospect,
-            pending_rating_count=len(rating_assignments),
-            pending_rating_subject=rating_assignments[0][1] if rating_assignments else None,
-            pending_rating_ref=(
-                rating_assignments[0][0].assessment_id if rating_assignments else None
-            ),
-            committee_review_count=len(committee_reviews),
-            committee_ref=committee_reviews[0].id if committee_reviews else None,
             academy_course_title=academy_title,
         )
         return BenchQueue(

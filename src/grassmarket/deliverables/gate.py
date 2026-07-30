@@ -88,6 +88,32 @@ def assert_committee_approved(
         raise CommitteePendingError("Refusing a client-facing pack: " + " ".join(blockers))
 
 
+class FounderApprovalPendingError(Exception):
+    """A client-facing pack was requested for a document the founder has not signed off at its
+    current version (ADR-0041). Defence in depth: finalisation already gates on this, and the
+    client-pack layer refuses independently too, because a pack is what reaches a client."""
+
+
+def assert_founder_approved(approval: object | None, *, client_facing: bool) -> None:
+    """Refuse a client-facing pack without a current founder approval (ADR-0041, GRS-0188).
+
+    `approval` is `Repository.current_founder_approval(...)`, which returns None both when nothing
+    was ever approved and when the document has changed since it was. Those two cases are the same
+    refusal on purpose: what matters is whether the version about to reach a client is the version
+    the founder read.
+
+    Watermarked internal drafts are allowed through, exactly as they were under the committee gate
+    this replaces — they are not client-facing and say so on every page.
+    """
+    if not client_facing:
+        return
+    if approval is None:
+        raise FounderApprovalPendingError(
+            "Refusing a client-facing pack: the founder has not approved this version of the "
+            "document (ADR-0041). Submit it for review, or re-submit if it changed after approval."
+        )
+
+
 def assert_senior_approval(*, author_tier: ConsultantTier, approver_tier: ConsultantTier) -> None:
     """The quality-review gate (PRD §5): a narrative authored under a junior tier requires a
     senior (Consultant-tier) approver. A Consultant-tier author may self-approve."""

@@ -651,6 +651,19 @@
       "$ref": "#/$defs/RecordProvenance",
       "default": "production"
     },
+    "review_requested_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Review Requested At"
+    },
     "scoring_run_id": {
       "anyOf": [
         {

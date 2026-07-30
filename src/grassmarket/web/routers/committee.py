@@ -33,10 +33,13 @@ from grassmarket.data.repository import (
     ScopeViolationError,
 )
 from grassmarket.web.dependencies import get_current_principal, get_repository
+from grassmarket.web.retired import retired_route
 
-router = APIRouter(prefix="/assessments", tags=["committee"])
+router = APIRouter(prefix="/assessments", tags=["committee"], dependencies=[Depends(retired_route)])
 # The committee work-queue lives at /committee (not under a specific assessment).
-queue_router = APIRouter(prefix="/committee", tags=["committee"])
+queue_router = APIRouter(
+    prefix="/committee", tags=["committee"], dependencies=[Depends(retired_route)]
+)
 
 # Same fixed seed as the live-score / finalise paths so the derived high-stakes set is stable.
 _SEED = 20260706

@@ -10,6 +10,8 @@
  */
 
 import type {
+  FounderApproval,
+  FounderReviewQueueEntry,
   AINarrative,
   ArenaScenario,
   ArenaSession,
@@ -455,6 +457,42 @@ export const api = {
       method: "POST",
       headers: authHeaders(),
       body: JSON.stringify(decision),
+      signal,
+    });
+  },
+
+  // --- Founder review gate (GRS-0188, ADR-0041) ---
+  // The founder signs what goes out. An approval names the document version it cleared, so any
+  // edit re-opens review on its own; there is no "un-approve" call here because there is nothing
+  // to un-approve.
+  founderReviewQueue(signal?: AbortSignal): Promise<FounderReviewQueueEntry[]> {
+    return request<FounderReviewQueueEntry[]>(`/founder-review/queue`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  submitForFounderReview(id: string, signal?: AbortSignal): Promise<Assessment> {
+    return request<Assessment>(`/assessments/${id}/submit-for-review`, {
+      method: "POST",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  approveCurrentVersion(id: string, signal?: AbortSignal): Promise<FounderApproval> {
+    return request<FounderApproval>(`/assessments/${id}/founder-approval`, {
+      method: "POST",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  currentFounderApproval(id: string, signal?: AbortSignal): Promise<FounderApproval | null> {
+    return request<FounderApproval | null>(`/assessments/${id}/founder-approval`, {
+      method: "GET",
+      headers: authHeaders(),
       signal,
     });
   },
