@@ -1,6 +1,8 @@
 # GRS-0182 — Summary & Interpretation repair
 
-**Status:** Planned (2026-07-23, founder feedback item 10). **Priority:** HIGH.
+**Status:** In review (2026-07-26) — double-V removed, governance display made truthful for
+the finalised state, charts made responsive, rail breakpoint added; PR open.
+(2026-07-23, founder feedback item 10.) **Priority:** HIGH.
 **Loop:** founder-feedback remediation, Wave 1. Frontend only.
 
 ## Why

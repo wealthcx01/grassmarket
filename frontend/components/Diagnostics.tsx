@@ -39,6 +39,17 @@ function Panel({ title, hint, children }: { title: string; hint?: string; childr
   );
 }
 
+/**
+ * Long module names ("Customer Trading Experience") ran into the chart geometry and into each
+ * other (GRS-0182). Truncate what is DRAWN and keep the full name in a `<title>`, so the label
+ * stays readable and nothing is lost: a hover and a screen reader both still get the whole name.
+ */
+const MAX_LABEL = 14;
+
+function truncated(label: string): string {
+  return label.length > MAX_LABEL ? `${label.slice(0, MAX_LABEL - 1)}…` : label;
+}
+
 // --- q_m radar --------------------------------------------------------------------------
 
 function QmRadar({ live, labels }: { live: LiveScore; labels: Record<string, string> }) {
@@ -60,7 +71,16 @@ function QmRadar({ live, labels }: { live: LiveScore; labels: Record<string, str
 
   return (
     <div style={{ overflowX: "auto" }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label="Module maturity radar">
+      {/* The viewBox carries the geometry; width="100%" lets it shrink into a narrow rail or a
+          phone column instead of forcing a horizontal scrollbar (GRS-0182). */}
+      <svg
+        width="100%"
+        viewBox={`0 0 ${size} ${size}`}
+        preserveAspectRatio="xMidYMid meet"
+        style={{ maxWidth: size, height: "auto", display: "block" }}
+        role="img"
+        aria-label="Module maturity radar"
+      >
         {/* concentric reference rings */}
         {rings.map((ring) => (
           <polygon
@@ -91,7 +111,8 @@ function QmRadar({ live, labels }: { live: LiveScore; labels: Record<string, str
                 dominantBaseline="middle"
                 fill="var(--color-ink-muted)"
               >
-                {s.label}
+                <title>{s.label}</title>
+                {truncated(s.label)}
               </text>
             </g>
           );
@@ -123,7 +144,16 @@ function ValueWaterfall({ live }: { live: LiveScore }) {
 
   return (
     <div style={{ overflowX: "auto" }}>
-      <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Value composition waterfall">
+      {/* Same as the radar: the internal coordinate system stays in pixels, but the rendered size
+          follows the container so the bars never overflow their panel (GRS-0182). */}
+      <svg
+        width="100%"
+        viewBox={`0 0 ${width} ${height}`}
+        preserveAspectRatio="xMinYMin meet"
+        style={{ maxWidth: width, height: "auto", display: "block" }}
+        role="img"
+        aria-label="Value composition waterfall"
+      >
         {wf.steps.map((step, i) => {
           const y = i * (rowH + gap) + 4;
           const x0 = labelW + scale(step.cumulativeBefore);
@@ -131,7 +161,8 @@ function ValueWaterfall({ live }: { live: LiveScore }) {
           return (
             <g key={step.key}>
               <text x={0} y={y + rowH / 2} fontSize={10} dominantBaseline="middle" fill="var(--color-ink)">
-                {step.label}
+                <title>{step.label}</title>
+                {truncated(step.label)}
               </text>
               <text x={labelW - 8} y={y + rowH / 2} fontSize={8.5} textAnchor="end" dominantBaseline="middle" fill="var(--color-ink-faint)">
                 θ{step.theta.toFixed(2)}

@@ -12,7 +12,6 @@ import { CommitteeReviewPanel } from "@/components/CommitteeReviewPanel";
 import { DiagnosticsPanel } from "@/components/Diagnostics";
 import { DualRatingPanel } from "@/components/DualRatingPanel";
 import { GuidancePanel } from "@/components/GuidancePanel";
-import { LiveScorePanel } from "@/components/LiveScorePanel";
 import { RatingControl } from "@/components/RatingControl";
 import { StrengthControl } from "@/components/StrengthControl";
 import * as doc from "@/lib/doc";
@@ -1224,6 +1223,28 @@ function DeliverablePreviewButton({ assessmentId }: { assessmentId: string }) {
   );
 }
 
+/**
+ * What governance actually happened, stated as a fact about a locked record (GRS-0182).
+ *
+ * A finalised assessment has no governance work left to do, so this deliberately carries no
+ * button and no "awaiting" framing. The production and sandbox paths differ in what they
+ * required, and saying so is the honest thing: a sandbox record is self-approved and watermarked,
+ * and a reader should not have to infer that from its absence.
+ */
+function GovernanceRecord({ provenance }: { provenance: RecordProvenance }) {
+  const sandbox = provenance !== "production";
+  return (
+    <Card>
+      <h3 style={{ margin: "0 0 0.35rem", fontSize: "0.95rem" }}>Governance record</h3>
+      <p style={{ margin: 0, fontSize: "0.82rem", color: "var(--color-ink-muted)", lineHeight: 1.55 }}>
+        {sandbox
+          ? "Finalised on the sandbox path. You approved this yourself, with no second rater and no committee sign-off, and the record is permanently watermarked and never client-facing."
+          : "Finalised on the production path, so its inputs are locked. Dual-rating consensus and committee sign-off were recorded before the lock; a production score can feed client-facing work once the client-usability gates are met."}
+      </p>
+    </Card>
+  );
+}
+
 export function SummaryStep(props: StepProps) {
   const { live, readOnly, onFinalise, finalising } = props;
   // Two-step finalise (GRS-0171): the irreversible lock needs an explicit confirm that names the
@@ -1243,20 +1264,14 @@ export function SummaryStep(props: StepProps) {
           How the maths works
         </a>
       </p>
-      <LiveScorePanel
-        score={live}
-        loading={props.liveLoading}
-        error={props.liveError}
-        onRefresh={props.refreshLive}
-        moduleLabels={moduleLabels}
-        profileKey={props.document?.profile?.operating_model ?? "retail"}
-        clientUsable={props.clientUsable}
-        final={props.finalEntry}
-      />
       {/* A finalised assessment can preview its real deliverable here — no engagement needed
           (GRS-0154), so the solo/sandbox "see the real deliverable" promise actually pays off. */}
       {readOnly ? <DeliverablePreviewButton assessmentId={props.assessmentId} /> : null}
       {live ? <Interpretation live={live} moduleLabels={moduleLabels} final={props.finalEntry} /> : null}
+      {/* Diagnostic visuals (GRS-0070): radar, value waterfall, weighted module table. Placed
+          directly after the interpretation so the column reads headline (in the rail) → what it
+          means → how V builds up → module detail (GRS-0182). */}
+      <DiagnosticsPanel live={live} moduleLabels={moduleLabels} />
       {live?.c != null ? (
         <Card>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "1rem" }}>
@@ -1283,18 +1298,23 @@ export function SummaryStep(props: StepProps) {
         </Card>
       ) : null}
 
-      {/* Diagnostic visuals (GRS-0070): radar, value waterfall, weighted module table. */}
-      <DiagnosticsPanel live={live} moduleLabels={moduleLabels} />
-
-      {/* Governance (resolves the finalise blockers in-product): §9 dual rating + §8 committee. */}
-      {readOnly ? null : (
-        <DualRatingPanel
-          assessmentId={props.assessmentId}
-          moduleLabels={moduleLabels}
-          onChanged={props.refreshLive}
-        />
+      {/* Governance. On a DRAFT this is the live workflow that clears the finalise blockers (§9
+          dual rating + §8 committee). On a FINALISED record it is history, so it renders as a
+          record in the past tense and never as a call to action — a locked assessment showing
+          "awaiting sign-off" was the credibility bug this ticket fixes (GRS-0182). GRS-0188 later
+          retires the panels entirely; this makes their display truthful in the meantime. */}
+      {readOnly ? (
+        <GovernanceRecord provenance={props.provenance} />
+      ) : (
+        <>
+          <DualRatingPanel
+            assessmentId={props.assessmentId}
+            moduleLabels={moduleLabels}
+            onChanged={props.refreshLive}
+          />
+          {live?.scoreable ? <CommitteeReviewPanel assessmentId={props.assessmentId} /> : null}
+        </>
       )}
-      {live?.scoreable ? <CommitteeReviewPanel assessmentId={props.assessmentId} /> : null}
       {readOnly ? (
         <p style={{ color: "var(--color-accent)", fontWeight: 600 }}>
           This assessment is finalised — its inputs are locked.
