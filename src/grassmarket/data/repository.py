@@ -176,6 +176,7 @@ from grassmarket.data.models import (
     CertificationEventORM,
     CertificationRecordORM,
     ClientReportLinkORM,
+    ClientReportProseORM,
     CommissionLineORM,
     CommitteeDecisionORM,
     CommsLogEntryORM,
@@ -5704,3 +5705,35 @@ class Repository:
             state=link.state(now=datetime.now(UTC)),
             sections=summaries,
         )
+
+    # --- Client report prose (GRS-0211 wiring) ---------------------------------------------
+
+    def get_report_prose(self, principal: Principal, deliverable_id: UUID) -> str | None:
+        """The advisor's saved words for this deliverable's report, or None if unwritten."""
+        self._require_deliverable(principal, deliverable_id)
+        stmt = select(ClientReportProseORM).where(
+            ClientReportProseORM.deliverable_id == deliverable_id
+        )
+        row = self._session.execute(stmt).scalar_one_or_none()
+        return row.sections_json if row is not None else None
+
+    def save_report_prose(
+        self, principal: Principal, deliverable_id: UUID, *, sections_json: str
+    ) -> None:
+        """Upsert. A deliverable has one client report, so saving replaces rather than appends."""
+        self._require_deliverable(principal, deliverable_id)
+        stmt = select(ClientReportProseORM).where(
+            ClientReportProseORM.deliverable_id == deliverable_id
+        )
+        row = self._session.execute(stmt).scalar_one_or_none()
+        if row is None:
+            row = ClientReportProseORM(
+                owner_consultant_id=principal.consultant_id,
+                deliverable_id=deliverable_id,
+                sections_json=sections_json,
+            )
+            self._session.add(row)
+        else:
+            self._assert_can_access(principal, row.owner_consultant_id)
+            row.sections_json = sections_json
+        self._session.flush()

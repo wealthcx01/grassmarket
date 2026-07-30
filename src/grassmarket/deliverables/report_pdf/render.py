@@ -413,7 +413,11 @@ def _rendered_figures(figure_data: ReportFigureData) -> dict[str, bytes]:
     """Rasterise each figure ONCE. The document is built twice (see `render_client_report_pdf`) and
     a 300dpi radar is not something to draw twice for no reason."""
     rendered: dict[str, bytes] = {}
-    if figure_data.maturity.labels:
+    # A radar needs at least three axes to be a shape rather than a line. A firm assessed on one or
+    # two modules is a real case — early in an engagement it is the NORMAL case — so the radar is
+    # omitted rather than drawn, and certainly rather than padded with invented axes. The module
+    # breakdown below still carries every assessed module, so nothing is lost but the polygon.
+    if len(figure_data.maturity.labels) >= 3:
         rendered["maturity"] = figs.maturity_radar(
             labels=list(figure_data.maturity.labels), values=list(figure_data.maturity.values)
         )

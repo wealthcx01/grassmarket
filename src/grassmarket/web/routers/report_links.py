@@ -33,6 +33,7 @@ from grassmarket.deliverables.report_links import (
     resolve_expiry,
 )
 from grassmarket.web.dependencies import get_current_principal, get_repository
+from grassmarket.web.routers.client_report import assemble_for
 
 router = APIRouter(tags=["report-links"])
 public_router = APIRouter(tags=["shared-report"])
@@ -40,6 +41,13 @@ public_router = APIRouter(tags=["shared-report"])
 #: One body for every failure on the public path. An attacker learns nothing from the difference
 #: between "never existed", "expired" and "revoked", so there is no difference to read.
 _OPAQUE = "This report link is not available."
+
+#: Shown on the shared page, before any event is sent. Disclosure is the product requirement: the
+#: reader is told in plain words, not in a policy nobody opens.
+TRACKING_NOTICE = (
+    "Bruntsfield can see which sections of this report you open and how long you spend on them. "
+    "Nothing else about you is recorded."
+)
 
 
 def _opaque_404() -> HTTPException:
@@ -64,8 +72,6 @@ class CreateLinkRequest(BaseModel):
     recipient_label: str = Field(min_length=1, max_length=200)
     #: Days the link should live. Omitted → the 30-day default; over the cap → 422, never clamped.
     expires_in_days: int | None = Field(default=None, ge=1)
-    #: The assembled report and its figures, snapshotted at issue.
-    payload: SharedReportPayload
 
 
 class CreatedLinkResponse(BaseModel):
@@ -105,13 +111,36 @@ def create_link(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
         ) from exc
 
+    # Assembled HERE, not sent by the browser. The client report is a gated artefact; letting the
+    # page post its own version of one would put the content model's rules on the wrong side of the
+    # trust boundary. A report with unwritten sections raises the 409 that names them.
+    assembled, _ = assemble_for(repo, principal, deliverable_id)
+    snapshot = SharedReportPayload(
+        report=assembled.report,
+        figures={
+            "maturity": {
+                "labels": list(assembled.figures.maturity.labels),
+                "values": list(assembled.figures.maturity.values),
+            },
+            "value_buildup": {
+                "labels": list(assembled.figures.value_buildup.labels),
+                "values": list(assembled.figures.value_buildup.values),
+            },
+            "module_breakdown": {
+                "labels": list(assembled.figures.module_breakdown.labels),
+                "values": list(assembled.figures.module_breakdown.values),
+            },
+        },
+        tracking_notice=TRACKING_NOTICE,
+    )
+
     try:
         link = repo.create_report_link(
             principal,
             deliverable_id=deliverable_id,
             token_hash=hash_token(token),
             recipient_label=payload.recipient_label,
-            report_json=payload.payload.model_dump_json(),
+            report_json=snapshot.model_dump_json(),
             expires_at=expires_at,
         )
     except (NotFoundError, ScopeViolationError) as exc:

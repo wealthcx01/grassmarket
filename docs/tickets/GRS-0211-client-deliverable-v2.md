@@ -123,3 +123,11 @@ is still what the app serves until those land. Branding was named in the founder
 belongs to those two tickets.
 
 Gate: ruff clean, pyright clean on both new modules, 37 new tests, golden master byte-identical.
+
+## Wired up (2026-07-30)
+
+The gap this ticket flagged — "prose is an input and nothing stores it" — is closed. `ClientReportProseORM`
+holds the six sections per deliverable, `deliverables/client_report_service.py` assembles them with
+the finalised run, and `/deliverables/<id>/report` is where an advisor writes them. A report with
+unwritten sections refuses with a 409 naming them; prose the content model rejects (an undeclared
+number) returns a 422 carrying the model's own sentence.

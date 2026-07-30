@@ -1212,3 +1212,31 @@ class ReportReadEventORM(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
     __table_args__ = (Index("ix_report_read_events_link_section", "link_id", "section"),)
+
+
+class ClientReportProseORM(Base):
+    """The advisor's words for one deliverable's client report (GRS-0211, wired in GRS-0219/0220).
+
+    One row per deliverable holding all six sections as JSON. Prose is an INPUT to the content model
+    — "what this firm is and how it makes money" cannot be derived from a scoring run, and inventing
+    it is the fabrication non-negotiable #3 forbids — so it has to live somewhere, and this is it.
+
+    A single JSON column rather than a row per section: the six sections are written, reviewed and
+    saved as one document, and splitting them would buy nothing but joins.
+    """
+
+    __tablename__ = "client_report_prose"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    # Unique: a deliverable has exactly one client report, and saving is an upsert.
+    deliverable_id: Mapped[UUID] = mapped_column(
+        ForeignKey("deliverables.id"), unique=True, index=True, nullable=False
+    )
+    sections_json: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )

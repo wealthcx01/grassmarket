@@ -32,6 +32,7 @@ from grassmarket.web.routers import (
     bench,
     calibration,
     certification,
+    client_report,
     committee,
     compliance,
     consultants,
@@ -118,6 +119,7 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
     app.include_router(guidance.router)
     app.include_router(registry.router)
     app.include_router(consultants.router)
+    app.include_router(client_report.router)
     app.include_router(report_links.router)
     # Public: no auth dependency. The token in the path is the credential (GRS-0220).
     app.include_router(report_links.public_router)

@@ -9,13 +9,11 @@ that is tested" — is the test named `test_revocation_is_immediate`.
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
-from uuid import uuid4
 
 import pytest
 from bcap_contracts.client_report import SECTION_ORDER, ReportSectionKind
 from sqlalchemy import text
 
-from grassmarket.data.models import DeliverableORM, EngagementORM, ProspectORM
 from grassmarket.deliverables.report_links import (
     MAX_EXPIRY,
     ExpiryTooLongError,
@@ -25,68 +23,26 @@ from grassmarket.deliverables.report_links import (
     hash_token,
     resolve_expiry,
 )
+from tests.client_report_helpers import deliverable_with_run, written_prose
 from tests.conftest import SeededConsultant, auth_header
 
 
-def _payload() -> dict:
-    """A minimal valid SharedReportPayload — the content model validates it on the way in."""
-    sections = [
-        {
-            "kind": kind.value,
-            "heading": kind.value.title(),
-            "body": ["Prose with no numbers in it."],
-            "figures": [],
-            "tier": "engaged",
-            "ai_drafted": False,
-            "narrative_id": None,
-        }
-        for kind in SECTION_ORDER
-    ]
-    return {
-        "report": {
-            "subject": "Deutsche Börse",
-            "scoring_run_id": "11111111-2222-3333-4444-555555555555",
-            "methodology_version": "1.6",
-            "coefficient_version": "v1-elicited",
-            "sections": sections,
-        },
-        "figures": {"maturity": {"labels": ["Front End"], "values": [44.0]}},
-        "tracking_notice": "The sender can see which sections of this report you open.",
-    }
-
-
 @pytest.fixture
-def deliverable_id(alice: SeededConsultant, session_factory) -> str:
-    """A prospect → engagement → deliverable chain owned by alice.
+def deliverable_id(client, alice: SeededConsultant, founder: SeededConsultant) -> str:
+    """A deliverable bound to a REAL finalised run.
 
-    Built directly rather than through the HTTP routes: creating an engagement requires a CONTRACTED
-    prospect and a finalised assessment, and none of these tests are about the pipeline or about
-    scoring. They are about who may share a finished result, and for how long.
+    Issuing a link assembles the report server-side, so a bare deliverable row is no longer enough:
+    there has to be a run to quote. The prose is written too, because a report with unwritten
+    sections refuses to assemble — which is itself tested, in `test_client_report_wiring.py`.
     """
-    session = session_factory()
-    try:
-        prospect = ProspectORM(
-            id=uuid4(), owner_consultant_id=alice.stored.id, company_name="Meridian"
-        )
-        engagement = EngagementORM(
-            id=uuid4(),
-            owner_consultant_id=alice.stored.id,
-            prospect_id=prospect.id,
-            title="Q3 review",
-        )
-        deliverable = DeliverableORM(
-            id=uuid4(),
-            owner_consultant_id=alice.stored.id,
-            engagement_id=engagement.id,
-            type="platform_power_report",
-            title="Platform Power Report",
-            mode="client",
-        )
-        session.add_all([prospect, engagement, deliverable])
-        session.commit()
-        return str(deliverable.id)
-    finally:
-        session.close()
+    did = deliverable_with_run(client, alice, founder)
+    response = client.put(
+        f"/deliverables/{did}/report-prose",
+        json={"sections": written_prose()},
+        headers=auth_header(alice),
+    )
+    assert response.status_code == 200, response.text
+    return did
 
 
 def _instant(stamp: str) -> datetime:
@@ -96,7 +52,7 @@ def _instant(stamp: str) -> datetime:
 
 
 def _create_link(client, advisor: SeededConsultant, deliverable_id: str, **extra) -> dict:
-    body = {"recipient_label": "cfo@example.com", "payload": _payload(), **extra}
+    body = {"recipient_label": "cfo@example.com", **extra}
     response = client.post(
         f"/deliverables/{deliverable_id}/links", json=body, headers=auth_header(advisor)
     )
@@ -153,7 +109,7 @@ class TestThePublicSurfaceRevealsNothing:
         created = _create_link(client, alice, deliverable_id)
         response = client.get(f"/shared/report/{created['token']}")  # no auth header at all
         assert response.status_code == 200
-        assert response.json()["report"]["subject"] == "Deutsche Börse"
+        assert response.json()["report"]["subject"] == "Meridian"
 
 
 class TestRevocationAndExpiry:
@@ -213,7 +169,6 @@ class TestRevocationAndExpiry:
             json={
                 "recipient_label": "cfo@example.com",
                 "expires_in_days": MAX_EXPIRY.days + 1,
-                "payload": _payload(),
             },
             headers=auth_header(alice),
         )
@@ -243,7 +198,7 @@ class TestScoping:
     ) -> None:
         response = client.post(
             f"/deliverables/{deliverable_id}/links",
-            json={"recipient_label": "x@example.com", "payload": _payload()},
+            json={"recipient_label": "x@example.com"},
             headers=auth_header(bob),
         )
         assert response.status_code == 404
@@ -350,7 +305,7 @@ class TestTheSnapshot:
         created = _create_link(client, alice, deliverable_id)
         served = client.get(f"/shared/report/{created['token']}").json()
         assert [s["kind"] for s in served["report"]["sections"]] == [k.value for k in SECTION_ORDER]
-        assert served["figures"]["maturity"]["values"] == [44.0]
+        assert served["figures"]["maturity"]["labels"], "the radar series should be populated"
 
     def test_the_page_carries_its_tracking_notice(
         self, client, alice: SeededConsultant, deliverable_id: str
@@ -358,20 +313,21 @@ class TestTheSnapshot:
         # Disclosure is a product requirement: no covert tracking.
         created = _create_link(client, alice, deliverable_id)
         served = client.get(f"/shared/report/{created['token']}").json()
-        assert "see which sections" in served["tracking_notice"]
+        assert "which sections of this report you open" in served["tracking_notice"]
 
-    def test_an_invalid_report_cannot_be_shared(
-        self, client, alice: SeededConsultant, deliverable_id: str
+    def test_a_report_with_unwritten_sections_cannot_be_shared(
+        self, client, alice: SeededConsultant, founder: SeededConsultant
     ) -> None:
-        # The content model's rules apply on the way in, so a malformed report never becomes a link.
-        broken = _payload()
-        broken["report"]["sections"] = broken["report"]["sections"][:3]  # sections missing
+        # The report is assembled SERVER-side, so a half-written one cannot be shared by posting a
+        # hand-made payload — there is no payload to post.
+        bare = deliverable_with_run(client, alice, founder)
         response = client.post(
-            f"/deliverables/{deliverable_id}/links",
-            json={"recipient_label": "cfo@example.com", "payload": broken},
+            f"/deliverables/{bare}/links",
+            json={"recipient_label": "cfo@example.com"},
             headers=auth_header(alice),
         )
-        assert response.status_code == 422
+        assert response.status_code == 409
+        assert "has no prose yet" in response.json()["detail"]
 
 
 def test_report_section_kinds_round_trip() -> None:
