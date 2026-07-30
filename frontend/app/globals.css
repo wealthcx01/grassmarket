@@ -57,6 +57,11 @@
   --content-narrow: 46rem; /* prose / single-column forms */
 
   /* ---- Radius — restrained, editorial ---- */
+  /* The one height every form control resolves to (GRS-0209). A native <select> computes ~2px
+     taller than an <input> at identical padding, font-size and border — its intrinsic content
+     height, which no test comparing style DECLARATIONS can see. Pinning both to one token is what
+     makes the pair line up, and 2.35rem is the <input>'s own natural height, so nothing resizes. */
+  --field-control-height: 2.35rem;
   --radius: 7px; /* controls, buttons */
   --radius-sm: 5px;
   --radius-lg: 10px; /* cards, panels */
@@ -475,7 +480,18 @@ button {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
   gap: 0.75rem;
-  align-items: end;
+  /* START, not END (GRS-0209). Aligning on the cell BOTTOM meant the subject field — which always
+     renders a caption under its input ("✓ Linked to…" / the unlinked hint) — sat 17.6px higher
+     than the Operating Model select, because the caption is part of that cell's height. Aligning
+     on the top makes the label rows share a baseline, so the controls beneath them do too, and a
+     field that grows a caption can no longer shove its own control out of line. */
+  align-items: start;
+}
+
+/* Every control in the row resolves to the same height, so the pair cannot drift apart when a
+   field is added (GRS-0209 scope item 3). */
+.form-create-assessment .field-control {
+  height: var(--field-control-height);
 }
 @media (max-width: 40rem) {
   .form-create-assessment {
