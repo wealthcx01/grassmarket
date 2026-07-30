@@ -1,0 +1,24 @@
+{
+  "source": "/home/dev/projects/grassmarket/design/motion/build/sales_ops/the_ten_stages.riv",
+  "artboard": "TheTenStages",
+  "animation": null,
+  "state_machine": null,
+  "available_animations": [],
+  "available_state_machines": [
+    "Auto Generated State Machine"
+  ],
+  "width": 1280,
+  "height": 420,
+  "scale": 2,
+  "fps": 60.0,
+  "frames": [
+    {
+      "index": 0,
+      "seconds": 0.0,
+      "filename": "frame_00000.png",
+      "distinct_colors": 1466,
+      "blank": false
+    }
+  ],
+  "contact_sheet": null
+}

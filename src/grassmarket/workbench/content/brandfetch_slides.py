@@ -551,13 +551,14 @@ _SECTION_2_SLIDES: tuple[Slide, ...] = (
         refs=(TERMS,),
         asset=_diagram(
             "two_licences",
-            "Distribution and redistribution differ in licence, buyer and commission. One ",
-            "question separates them. A vertical boundary with two panels. On the left, "
-            "DISTRIBUTION: the data is shown inside the client's own product, under the standard "
-            "paid API, bought by retail brokerages. On the right, filled dark green, "
-            "REDISTRIBUTION: the data is passed on to their customers, under enterprise custom "
-            "licensing only, bought by exchanges and information vendors. A warning beneath reads: "
-            "the line is not publicly bright-lined, never decide it yourself.",
+            "Distribution and redistribution differ in licence, buyer and commission. One "
+            "question separates them.",
+            "A vertical boundary with two panels. On the left, DISTRIBUTION: the data is "
+            "shown inside the client's own product, under the standard paid API, bought by "
+            "retail brokerages. On the right, filled dark green, REDISTRIBUTION: the data is "
+            "passed on to their customers, under enterprise custom licensing only, bought by "
+            "exchanges and information vendors. A warning beneath reads: the line is not "
+            "publicly bright-lined, never decide it yourself.",
         ),
     ),
     _s(
@@ -921,12 +922,13 @@ _SECTION_3_SLIDES: tuple[Slide, ...] = (
         refs=(PRICING,),
         asset=_diagram(
             "four_surfaces",
-            "The four surfaces as a ladder. Height is commitment, and only the top two are ",
-            "revenue. Four rising bars. Logo Link, an image URL, free tier. Brand Search, a "
+            "The four surfaces as a ladder. Height is commitment, and only the top two are "
+            "revenue.",
+            "Four rising bars. Logo Link, an image URL, free tier. Brand Search, a "
             "type-ahead, free tier. Brand API, identity by ticker, paid, filled dark green. "
-            "Transaction API, messy descriptors, enterprise, also dark green and tallest. A line "
-            "beneath reads: demo the free surface, sell the paid one, they are not the same "
-            "conversation.",
+            "Transaction API, messy descriptors, enterprise, also dark green and tallest. A "
+            "line beneath reads: demo the free surface, sell the paid one, they are not the "
+            "same conversation.",
         ),
     ),
     _s(
@@ -1299,12 +1301,13 @@ _SECTION_4_SLIDES: tuple[Slide, ...] = (
         refs=(DOCS_BRAND_API,),
         asset=_diagram(
             "the_ticker_hook",
-            "Four different keys, one endpoint, one shape of answer. A generic logo API takes ",
-            "only the first. Four input cards on the left: a domain (nike.com), a stock ticker "
-            "(NKE), an ISIN (US6541061031) and a crypto symbol (BTC). Each has an arrow pointing "
-            "right into a single dark green panel: one brand identity, holding the logo in every "
-            "variant, colours and fonts, and firmographics. A line beneath reads: a generic logo "
-            "API takes a domain, and that is the wrong key for a holdings table.",
+            "Four different keys, one endpoint, one shape of answer. A generic logo API takes "
+            "only the first.",
+            "Four input cards on the left: a domain (nike.com), a stock ticker (NKE), an ISIN "
+            "(US6541061031) and a crypto symbol (BTC). Each has an arrow pointing right into "
+            "a single dark green panel: one brand identity, holding the logo in every "
+            "variant, colours and fonts, and firmographics. A line beneath reads: a generic "
+            "logo API takes a domain, and that is the wrong key for a holdings table.",
         ),
     ),
     _s(
@@ -2401,11 +2404,13 @@ _SECTION_7_SLIDES: tuple[Slide, ...] = (
         refs=(TERMS,),
         asset=_diagram(
             "who_owns_the_mark",
-            "The same diagram as section 1, back where the full detail lives. It is the one worth ",
-            "seeing twice. Three boxes in a row connected by arrows. The trademark owner owns the "
-            "mark. Brandfetch provides access to it. Your client, filled dark green, carries the "
-            "fair-use risk. A warning beneath reads: paying for access does not transfer anybody's "
-            "rights. A second line adds: say this before the compliance officer asks.",
+            "The same diagram as section 1, back where the full detail lives. It is the one "
+            "worth seeing twice.",
+            "Three boxes in a row connected by arrows. The trademark owner owns the mark. "
+            "Brandfetch provides access to it. Your client, filled dark green, carries the "
+            "fair-use risk. A warning beneath reads: paying for access does not transfer "
+            "anybody's rights. A second line adds: say this before the compliance officer "
+            "asks.",
         ),
     ),
     _s(
@@ -2766,12 +2771,13 @@ _SECTION_8_SLIDES: tuple[Slide, ...] = (
         "number, because the two tiers pay differently over different windows.",
         asset=_diagram(
             "qualify_before_you_forecast",
-            "The commission decision. Qualify first, then read the live rate — never the other ",
-            "way round. A decision box asking whether the data leaves the client's own product. A "
-            "No branch leads to distribution, the standard paid API. A Yes branch, filled dark "
-            "green, leads to redistribution, enterprise licensing. Beneath, in green: different "
-            "rate, different window, read yours off the Earnings page. A final line adds: never "
-            "from memory and never from a slide, the schedule is the only source.",
+            "The commission decision. Qualify first, then read the live rate — never the "
+            "other way round.",
+            "A decision box asking whether the data leaves the client's own product. A No "
+            "branch leads to distribution, the standard paid API. A Yes branch, filled dark "
+            "green, leads to redistribution, enterprise licensing. Beneath, in green: "
+            "different rate, different window, read yours off the Earnings page. A final line "
+            "adds: never from memory and never from a slide, the schedule is the only source.",
         ),
     ),
     _s(

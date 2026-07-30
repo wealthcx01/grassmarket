@@ -1,9 +1,9 @@
 # GRS-0217 — The remaining product courses, to the same standard
 
-**Status:** In review (2026-07-30, PR #221) — **Benzinga and Brandfetch both complete, 8 of 8
-sections each.** `sales-ops-playbook` is the only course left. **Priority:** HIGH. **Loop:**
-founder-feedback remediation, Wave 4. **Depends on:** GRS-0215, GRS-0216 (sets the bar), GRS-0226
-(the reader, without which none of it is visible).
+**Status:** In review (2026-07-30, PR #221) — **COMPLETE. All three remaining courses rebuilt:
+Benzinga, Brandfetch and the Sales Operations Playbook, 8 of 8 sections each.** **Priority:** HIGH.
+**Loop:** founder-feedback remediation, Wave 4. **Depends on:** GRS-0215, GRS-0216 (sets the bar),
+GRS-0226 (the reader, without which none of it is visible).
 
 ## Ordering decision (scope asks for this to be a decision, not an accident)
 
@@ -149,6 +149,65 @@ was the test being wrong rather than the content:
 The rule is now checked in context — a live rate figure is a violation only in a slide that is also
 talking about commission — with a negative test proving it still catches the real thing. A test
 authors work around is worse than no test.
+
+## PR 3 — the Sales Operations Playbook: complete
+
+Eight sections, **192 slides**, 48 test questions, 72 hands-on slides, one authored diagram per
+section. The only rebuilt course that is not about a product, which makes it the strongest evidence
+the depth standard is about depth rather than about product courses — the tests are the other three
+courses' tests, unchanged.
+
+**Its source of truth is the codebase**, which makes it the most checkable course in the Academy.
+Every stage is a real `PipelineStage`, the streams are the real `CommissionStream` members, the
+recovery fee is the real `CommissionKind.WORKSHOP_RECOVERY_FEE`, and the Stream B rate axes are the
+real `DeliveryType` and `SourcingAttribution`. `test_cross_references_every_forward_pipeline_stage`
+derives its expectations from the enum, so adding a stage breaks the test rather than silently
+leaving a gap in the course.
+
+| # | Section | Slides | Hands-on |
+|---|---|---|---|
+| 1 | The motion, stage by stage | 24 | 9 |
+| 2 | Prospect: open the account properly | 24 | 9 |
+| 3 | The workshop: the advancing action | 24 | 9 |
+| 4 | Qualified or Nurture: the honest fork | 24 | 9 |
+| 5 | Scoped: price the lever, never the score | 24 | 9 |
+| 6 | Contracted: the two streams | 24 | 9 |
+| 7 | Active to Delivered: one timeline | 24 | 9 |
+| 8 | Closed, Nurture, and the recovery fee | 24 | 9 |
+
+**Section 5 carries the most consequential rule in the Academy.** Non-negotiable #7 and ADR-0002:
+score-points and currency never appear in one equation, and the contracts enforce it —
+`ValueBridge.total_lever_npv` sums Money and Money only, and a bridge citing an assumption outside
+its register refuses to construct. The section names the specific temptation (treating the score gap
+as a fraction of enterprise value), gives the two sentences said separately, and explains why the
+wall protects the *score* rather than the price: the moment a score is used as a multiplier it stops
+being a measurement. `score_and_price_never_mix` draws it as two columns with a labelled wall.
+
+Two other sections carry weight the old four-lesson version could not. **Section 4** treats "left at
+Workshop Delivered" as the pipeline's real failure mode — not a third answer, but nobody having
+decided — and makes an honest Nurture a correct professional outcome. **Section 8** covers the
+workshop recovery fee, where the default outcome is the wrong one: nobody decides to abandon the
+fee, the window simply closes while everyone is busy.
+
+No commission figure appears in any slide; `test_no_commission_rate_is_written_into_the_slides`
+enforces it against the schedule's own consultancy cells, in context.
+
+`sales-ops-playbook` came off `depth.LEGACY_COURSES`, which now holds **one** entry: `sales-egoist`,
+blocked on source material under GRS-0218.
+
+### Two defects the diagrams caught, and a repair to shipped work
+
+1. `the_ten_stages` shortened `workshop_scheduled` to "workshop" and `workshop_delivered` to
+   "delivered", putting two boxes reading "delivered" on one path — under a subtitle claiming these
+   were the CRM's own names rather than a paraphrase. Compound names now get two lines.
+2. `two_streams` printed the rate axes as two columns of labels, which read as two unrelated lists.
+   The whole idea is that the rate is a **cell**, so it is now an actual two-by-two.
+
+And a repair to already-committed work: the re-wrapping helper used while authoring merged a
+caption's last words into the alt text of **five Brandfetch diagrams** (commit `5ff8de0`), because
+caption and alt are adjacent string arguments. Fixed, and
+`test_captions_and_alt_text_did_not_bleed_into_each_other` now catches it — a caption ends in a full
+stop and alt text starts with a capital, which is invisible in a diff and obvious in one assertion.
 
 ## Why
 

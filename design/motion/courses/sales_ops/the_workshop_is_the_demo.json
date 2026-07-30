@@ -1,0 +1,629 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "TheWorkshopIsTheDemo",
+    "width": 1000,
+    "height": 450,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 500,
+        "y": 46,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "Two meetings, one calendar entry"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "HeadL",
+        "x": 270,
+        "y": 112,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "HeadLStyle",
+            "font_asset": "Display",
+            "font_size": 12,
+            "children": [
+              {
+                "type": "fill",
+                "name": "HeadLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "HeadLStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.5
+          },
+          {
+            "type": "text_value_run",
+            "name": "HeadLRun",
+            "style": "HeadLStyle",
+            "text": "A COURTESY CALL"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "HeadR",
+        "x": 730,
+        "y": 112,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "HeadRStyle",
+            "font_asset": "Display",
+            "font_size": 12,
+            "children": [
+              {
+                "type": "fill",
+                "name": "HeadRStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "HeadRStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.5
+          },
+          {
+            "type": "text_value_run",
+            "name": "HeadRRun",
+            "style": "HeadRStyle",
+            "text": "AN ADVANCING ACTION"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "L1",
+        "x": 270,
+        "y": 172,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "L1Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "L1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "L1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "L1Run",
+            "style": "L1Style",
+            "text": "you describe the"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "L2",
+        "x": 270,
+        "y": 196,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "L2Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "L2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "L2StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "L2Run",
+            "style": "L2Style",
+            "text": "methodology"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "L3",
+        "x": 270,
+        "y": 244,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "L3Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "L3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "L3StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "L3Run",
+            "style": "L3Style",
+            "text": "they say it sounds"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "L4",
+        "x": 270,
+        "y": 268,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "L4Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "L4StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "L4StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "L4Run",
+            "style": "L4Style",
+            "text": "interesting"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "L5",
+        "x": 270,
+        "y": 316,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "L5Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "L5StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "L5StyleCol",
+                    "color": "#A3502A"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "L5Run",
+            "style": "L5Style",
+            "text": "no dated next step"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R1",
+        "x": 730,
+        "y": 172,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R1Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R1StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R1Run",
+            "style": "R1Style",
+            "text": "they watch their own"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R2",
+        "x": 730,
+        "y": 196,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R2Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R2StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R2Run",
+            "style": "R2Style",
+            "text": "moat get scored"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R3",
+        "x": 730,
+        "y": 244,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R3Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R3StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R3Run",
+            "style": "R3Style",
+            "text": "on their own numbers,"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R4",
+        "x": 730,
+        "y": 268,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R4Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R4StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R4StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R4Run",
+            "style": "R4Style",
+            "text": "in ninety minutes"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R5",
+        "x": 730,
+        "y": 316,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R5Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R5StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R5StyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R5Run",
+            "style": "R5Style",
+            "text": "a finding, and a date"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "LeftCard",
+        "x": 270,
+        "y": 244,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "LeftCardPath",
+            "width": 380,
+            "height": 220,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "LeftCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LeftCardSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "LeftCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LeftCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "RightCard",
+        "x": 730,
+        "y": 244,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "RightCardPath",
+            "width": 380,
+            "height": 220,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "RightCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RightCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "RightCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RightCardStrokeCol",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 500,
+        "y": 408,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "The workshop IS the demo. Book it off a pain you actually heard."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 500,
+        "y": 225,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 1000,
+            "height": 450,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

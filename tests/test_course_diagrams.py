@@ -627,6 +627,35 @@ def test_every_diagram_in_the_course_is_a_real_generated_one(course: str) -> Non
 
 
 @pytest.mark.parametrize("course", COURSE_NAMES)
+def test_captions_and_alt_text_did_not_bleed_into_each_other(course: str) -> None:
+    """A caption ends in a full stop and alt text starts with a capital. Both are ordinary prose
+    rules, and together they catch a specific accident that has happened twice.
+
+    Caption and alt are ADJACENT string arguments in the `_diagram(...)` call, so any tool that
+    re-wraps over-long string literals by pushing a word onto the following line will silently move
+    the caption's last words into the alt text. It reads as a caption that stops mid-sentence and an
+    alt that starts lower-case — invisible in a diff, obvious in one assertion. Five Brandfetch
+    diagrams shipped that way before this test existed.
+    """
+    module = importlib.import_module(f"grassmarket.workbench.content.{course}_slides")
+    for section in module.rebuilt_sections():
+        for lesson in section.lessons:
+            for slide in lesson.slides:
+                if not slide.asset:
+                    continue
+                caption, alt = slide.asset.caption.rstrip(), slide.asset.alt
+                where = f"{course} / {section.title!r} / {slide.title!r}"
+                assert caption.endswith((".", "!", "?")), (
+                    f"{where}: caption does not end in a full stop, which usually means its last "
+                    f"words were absorbed into the alt text: {caption!r}"
+                )
+                assert alt[:1].isupper(), (
+                    f"{where}: alt text starts lower-case, which usually means it begins with the "
+                    f"tail of the caption: {alt[:60]!r}"
+                )
+
+
+@pytest.mark.parametrize("course", COURSE_NAMES)
 def test_every_scene_is_used_by_the_course(course: str) -> None:
     """An authored diagram nobody sees is the failure GRS-0226 exists to fix, one level up."""
     used = {

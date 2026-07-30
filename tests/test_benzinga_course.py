@@ -222,7 +222,7 @@ def test_benzinga_is_no_longer_carried_as_legacy_debt() -> None:
     assert "product-benzinga" not in LEGACY_COURSES
     # `product-brandfetch` left too, on the same day and for the same reason (GRS-0217 finished it).
     # What is left is the honest remaining debt, each with the ticket that clears it.
-    assert set(LEGACY_COURSES) == {"sales-egoist", "sales-ops-playbook"}
+    assert set(LEGACY_COURSES) == {"sales-egoist"}
 
 
 def test_the_rebuilt_sections_have_distinct_ids_and_contiguous_orders() -> None:

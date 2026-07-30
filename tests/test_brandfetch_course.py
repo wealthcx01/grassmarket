@@ -195,7 +195,7 @@ def test_brandfetch_is_no_longer_carried_as_legacy_debt() -> None:
     """It came off the visible-debt register on 2026-07-30 with Benzinga. What is left on that list
     is the honest remaining debt: the two sales courses, each with its clearing ticket."""
     assert "product-brandfetch" not in LEGACY_COURSES
-    assert set(LEGACY_COURSES) == {"sales-egoist", "sales-ops-playbook"}
+    assert set(LEGACY_COURSES) == {"sales-egoist"}
 
 
 def test_the_rebuilt_sections_have_distinct_ids_and_contiguous_orders() -> None:

@@ -1,0 +1,621 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "OneTimeline",
+    "width": 1000,
+    "height": 450,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 500,
+        "y": 46,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "One account, one timeline"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "HeadL",
+        "x": 260,
+        "y": 118,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "HeadLStyle",
+            "font_asset": "Display",
+            "font_size": 11,
+            "children": [
+              {
+                "type": "fill",
+                "name": "HeadLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "HeadLStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.2
+          },
+          {
+            "type": "text_value_run",
+            "name": "HeadLRun",
+            "style": "HeadLStyle",
+            "text": "AN INBOX, A CHAT AND A NOTEBOOK"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "HeadR",
+        "x": 740,
+        "y": 118,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "HeadRStyle",
+            "font_asset": "Display",
+            "font_size": 11,
+            "children": [
+              {
+                "type": "fill",
+                "name": "HeadRStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "HeadRStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.2
+          },
+          {
+            "type": "text_value_run",
+            "name": "HeadRRun",
+            "style": "HeadRStyle",
+            "text": "THE ACCOUNT'S ACTIVITY LOG"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "SA",
+        "x": 168,
+        "y": 176,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "SAPath",
+            "width": 74,
+            "height": 22,
+            "corner_radius": 5,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "SAFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "SASolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "SB",
+        "x": 300,
+        "y": 214,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "SBPath",
+            "width": 74,
+            "height": 22,
+            "corner_radius": 5,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "SBFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "SBSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "SC",
+        "x": 210,
+        "y": 262,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "SCPath",
+            "width": 74,
+            "height": 22,
+            "corner_radius": 5,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "SCFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "SCSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "SD",
+        "x": 330,
+        "y": 296,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "SDPath",
+            "width": 74,
+            "height": 22,
+            "corner_radius": 5,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "SDFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "SDSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "SE",
+        "x": 180,
+        "y": 330,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "SEPath",
+            "width": 74,
+            "height": 22,
+            "corner_radius": 5,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "SEFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "SESolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "O0",
+        "x": 740,
+        "y": 176,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "O0Path",
+            "width": 240,
+            "height": 22,
+            "corner_radius": 5,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "O0Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "O0Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "O1",
+        "x": 740,
+        "y": 214,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "O1Path",
+            "width": 240,
+            "height": 22,
+            "corner_radius": 5,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "O1Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "O1Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "O2",
+        "x": 740,
+        "y": 252,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "O2Path",
+            "width": 240,
+            "height": 22,
+            "corner_radius": 5,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "O2Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "O2Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "O3",
+        "x": 740,
+        "y": 290,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "O3Path",
+            "width": 240,
+            "height": 22,
+            "corner_radius": 5,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "O3Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "O3Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "O4",
+        "x": 740,
+        "y": 328,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "O4Path",
+            "width": 240,
+            "height": 22,
+            "corner_radius": 5,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "O4Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "O4Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "LeftCard",
+        "x": 260,
+        "y": 252,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "LeftCardPath",
+            "width": 340,
+            "height": 220,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "LeftCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LeftCardSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "LeftCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LeftCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "RightCard",
+        "x": 740,
+        "y": 252,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "RightCardPath",
+            "width": 340,
+            "height": 220,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "RightCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RightCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "RightCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RightCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LNote",
+        "x": 260,
+        "y": 386,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LNoteStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LNoteStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LNoteStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LNoteRun",
+            "style": "LNoteStyle",
+            "text": "nobody can see the state"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RNote",
+        "x": 740,
+        "y": 386,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RNoteStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RNoteStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RNoteStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RNoteRun",
+            "style": "RNoteStyle",
+            "text": "anyone can, including you"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 500,
+        "y": 424,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "You will not remember this deal in three months. The log will."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 500,
+        "y": 225,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 1000,
+            "height": 450,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
