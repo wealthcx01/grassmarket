@@ -1,6 +1,6 @@
 {
-  "source": "/home/dev/projects/grassmarket/design/motion/build/benzinga/four_families.riv",
-  "artboard": "FourFamilies",
+  "source": "/home/dev/projects/grassmarket/design/motion/build/brandfetch/four_surfaces.riv",
+  "artboard": "FourSurfaces",
   "animation": null,
   "state_machine": null,
   "available_animations": [],
@@ -8,7 +8,7 @@
     "Auto Generated State Machine"
   ],
   "width": 960,
-  "height": 380,
+  "height": 470,
   "scale": 2,
   "fps": 60.0,
   "frames": [
@@ -16,7 +16,7 @@
       "index": 0,
       "seconds": 0.0,
       "filename": "frame_00000.png",
-      "distinct_colors": 1321,
+      "distinct_colors": 1741,
       "blank": false
     }
   ],

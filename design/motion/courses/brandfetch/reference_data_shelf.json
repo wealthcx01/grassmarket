@@ -1,0 +1,604 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "ReferenceDataShelf",
+    "width": 980,
+    "height": 440,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 490,
+        "y": 44,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "One more field on a record they already ship"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 490,
+        "y": 78,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "An exchange or vendor redistributes reference data every day."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Card1",
+        "x": 250,
+        "y": 128,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Card1Style",
+            "font_asset": "Display",
+            "font_size": 11,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Card1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Card1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.2
+          },
+          {
+            "type": "text_value_run",
+            "name": "Card1Run",
+            "style": "Card1Style",
+            "text": "THEIR REFERENCE RECORD"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "IsinL",
+        "x": 250,
+        "y": 168,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "IsinLStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "IsinLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "IsinLStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "IsinLRun",
+            "style": "IsinLStyle",
+            "text": "ISIN"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "NameL",
+        "x": 250,
+        "y": 206,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "NameLStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "NameLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "NameLStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "NameLRun",
+            "style": "NameLStyle",
+            "text": "legal name"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "SedolL",
+        "x": 250,
+        "y": 244,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SedolLStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SedolLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SedolLStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SedolLRun",
+            "style": "SedolLStyle",
+            "text": "SEDOL, MIC, currency"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "BrandL",
+        "x": 250,
+        "y": 282,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "BrandLStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "BrandLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "BrandLStyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "BrandLRun",
+            "style": "BrandLStyle",
+            "text": "brand identity"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "BrandRow",
+        "x": 250,
+        "y": 282,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BrandRowPath",
+            "width": 320,
+            "height": 32,
+            "corner_radius": 6,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BrandRowFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BrandRowSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "RecordCard",
+        "x": 250,
+        "y": 225,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "RecordCardPath",
+            "width": 360,
+            "height": 220,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "RecordCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RecordCardSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "RecordCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RecordCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "OutHead",
+        "x": 625.0,
+        "y": 225,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "OutHeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "OutHeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "OutHeadCol",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "OutStem",
+        "x": 560,
+        "y": 225,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "OutStemPath",
+            "width": 121.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "OutStemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "OutStemSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "CustT",
+        "x": 800,
+        "y": 200,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "CustTStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "CustTStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "CustTStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "CustTRun",
+            "style": "CustTStyle",
+            "text": "Their customers"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "CustA",
+        "x": 800,
+        "y": 240,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "CustAStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "CustAStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "CustAStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "CustARun",
+            "style": "CustAStyle",
+            "text": "the data leaves"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "CustB",
+        "x": 800,
+        "y": 264,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "CustBStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "CustBStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "CustBStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "CustBRun",
+            "style": "CustBStyle",
+            "text": "their building"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CustCard",
+        "x": 800,
+        "y": 225,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CustCardPath",
+            "width": 260,
+            "height": 160,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CustCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CustCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "CustCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CustCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Warn",
+        "x": 490,
+        "y": 398,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "WarnStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "WarnStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "WarnStyleCol",
+                    "color": "#A3502A"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "WarnRun",
+            "style": "WarnStyle",
+            "text": "That arrow is the licence question. It is why this tier exists."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 490,
+        "y": 220,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 980,
+            "height": 440,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

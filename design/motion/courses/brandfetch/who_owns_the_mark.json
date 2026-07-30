@@ -1,0 +1,695 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "WhoOwnsTheMark",
+    "width": 1000,
+    "height": 440,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 500,
+        "y": 46,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "Three parties, and the risk is not where they think"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "OwnT",
+        "x": 180,
+        "y": 178,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "OwnTStyle",
+            "font_asset": "Display",
+            "font_size": 18,
+            "children": [
+              {
+                "type": "fill",
+                "name": "OwnTStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "OwnTStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "OwnTRun",
+            "style": "OwnTStyle",
+            "text": "The trademark"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "OwnT2",
+        "x": 180,
+        "y": 202,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "OwnT2Style",
+            "font_asset": "Display",
+            "font_size": 18,
+            "children": [
+              {
+                "type": "fill",
+                "name": "OwnT2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "OwnT2StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "OwnT2Run",
+            "style": "OwnT2Style",
+            "text": "owner"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "OwnB",
+        "x": 180,
+        "y": 246,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "OwnBStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "OwnBStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "OwnBStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "OwnBRun",
+            "style": "OwnBStyle",
+            "text": "owns the mark"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "BfT",
+        "x": 500,
+        "y": 178,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "BfTStyle",
+            "font_asset": "Display",
+            "font_size": 18,
+            "children": [
+              {
+                "type": "fill",
+                "name": "BfTStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "BfTStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "BfTRun",
+            "style": "BfTStyle",
+            "text": "Brandfetch"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "BfB",
+        "x": 500,
+        "y": 224,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "BfBStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "BfBStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "BfBStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "BfBRun",
+            "style": "BfBStyle",
+            "text": "provides access"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "BfB2",
+        "x": 500,
+        "y": 248,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "BfB2Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "BfB2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "BfB2StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "BfB2Run",
+            "style": "BfB2Style",
+            "text": "to it"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "CliT",
+        "x": 820,
+        "y": 178,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "CliTStyle",
+            "font_asset": "Display",
+            "font_size": 18,
+            "children": [
+              {
+                "type": "fill",
+                "name": "CliTStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "CliTStyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "CliTRun",
+            "style": "CliTStyle",
+            "text": "Your client"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "CliB",
+        "x": 820,
+        "y": 224,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "CliBStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "CliBStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "CliBStyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "CliBRun",
+            "style": "CliBStyle",
+            "text": "carries the"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "CliB2",
+        "x": 820,
+        "y": 248,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "CliB2Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "CliB2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "CliB2StyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "CliB2Run",
+            "style": "CliB2Style",
+            "text": "fair-use risk"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "A1Head",
+        "x": 390.0,
+        "y": 212,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "A1HeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "A1HeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "A1HeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "A1Stem",
+        "x": 340,
+        "y": 212,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "A1StemPath",
+            "width": 91.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "A1StemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "A1StemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "A2Head",
+        "x": 710.0,
+        "y": 212,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "A2HeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "A2HeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "A2HeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "A2Stem",
+        "x": 660,
+        "y": 212,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "A2StemPath",
+            "width": 91.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "A2StemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "A2StemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "OwnCard",
+        "x": 180,
+        "y": 212,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "OwnCardPath",
+            "width": 260,
+            "height": 170,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "OwnCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "OwnCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "OwnCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "OwnCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "BfCard",
+        "x": 500,
+        "y": 212,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BfCardPath",
+            "width": 260,
+            "height": 170,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BfCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BfCardSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "BfCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BfCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CliCard",
+        "x": 820,
+        "y": 212,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CliCardPath",
+            "width": 260,
+            "height": 170,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CliCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CliCardSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Warn",
+        "x": 500,
+        "y": 348,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "WarnStyle",
+            "font_asset": "Display",
+            "font_size": 18,
+            "children": [
+              {
+                "type": "fill",
+                "name": "WarnStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "WarnStyleCol",
+                    "color": "#A3502A"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "WarnRun",
+            "style": "WarnStyle",
+            "text": "Paying for access does not transfer anybody's rights."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 500,
+        "y": 396,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "Say this before the compliance officer asks. It stays a short conversation."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 500,
+        "y": 220,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 1000,
+            "height": 440,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

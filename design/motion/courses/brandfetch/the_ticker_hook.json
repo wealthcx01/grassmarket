@@ -1,0 +1,995 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "TheTickerHook",
+    "width": 1000,
+    "height": 500,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 500,
+        "y": 44,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "Four keys, one endpoint"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 500,
+        "y": 78,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "Your client's records are keyed by ticker or ISIN, not by domain."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "DomL",
+        "x": 190,
+        "y": 138,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "DomLStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "DomLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "DomLStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "DomLRun",
+            "style": "DomLStyle",
+            "text": "a domain"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "DomE",
+        "x": 190,
+        "y": 160,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "DomEStyle",
+            "font_asset": "Display",
+            "font_size": 13,
+            "children": [
+              {
+                "type": "fill",
+                "name": "DomEStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "DomEStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "DomERun",
+            "style": "DomEStyle",
+            "text": "nike.com"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "DomCard",
+        "x": 190,
+        "y": 148,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "DomCardPath",
+            "width": 300,
+            "height": 62,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "DomCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DomCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "DomCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DomCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "DomArrowHead",
+        "x": 470.0,
+        "y": 148,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "DomArrowHeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "DomArrowHeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DomArrowHeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "DomArrowStem",
+        "x": 425,
+        "y": 148,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "DomArrowStemPath",
+            "width": 81.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "DomArrowStemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DomArrowStemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "TickL",
+        "x": 190,
+        "y": 212,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TickLStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TickLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TickLStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TickLRun",
+            "style": "TickLStyle",
+            "text": "a stock ticker"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "TickE",
+        "x": 190,
+        "y": 234,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TickEStyle",
+            "font_asset": "Display",
+            "font_size": 13,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TickEStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TickEStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TickERun",
+            "style": "TickEStyle",
+            "text": "NKE"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "TickCard",
+        "x": 190,
+        "y": 222,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "TickCardPath",
+            "width": 300,
+            "height": 62,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "TickCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "TickCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "TickCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "TickCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "TickArrowHead",
+        "x": 470.0,
+        "y": 222,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "TickArrowHeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "TickArrowHeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "TickArrowHeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "TickArrowStem",
+        "x": 425,
+        "y": 222,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "TickArrowStemPath",
+            "width": 81.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "TickArrowStemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "TickArrowStemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "IsinL",
+        "x": 190,
+        "y": 286,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "IsinLStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "IsinLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "IsinLStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "IsinLRun",
+            "style": "IsinLStyle",
+            "text": "an ISIN"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "IsinE",
+        "x": 190,
+        "y": 308,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "IsinEStyle",
+            "font_asset": "Display",
+            "font_size": 13,
+            "children": [
+              {
+                "type": "fill",
+                "name": "IsinEStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "IsinEStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "IsinERun",
+            "style": "IsinEStyle",
+            "text": "US6541061031"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "IsinCard",
+        "x": 190,
+        "y": 296,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "IsinCardPath",
+            "width": 300,
+            "height": 62,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "IsinCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "IsinCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "IsinCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "IsinCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "IsinArrowHead",
+        "x": 470.0,
+        "y": 296,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "IsinArrowHeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "IsinArrowHeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "IsinArrowHeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "IsinArrowStem",
+        "x": 425,
+        "y": 296,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "IsinArrowStemPath",
+            "width": 81.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "IsinArrowStemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "IsinArrowStemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "CryptoL",
+        "x": 190,
+        "y": 360,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "CryptoLStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "CryptoLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "CryptoLStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "CryptoLRun",
+            "style": "CryptoLStyle",
+            "text": "a crypto symbol"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "CryptoE",
+        "x": 190,
+        "y": 382,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "CryptoEStyle",
+            "font_asset": "Display",
+            "font_size": 13,
+            "children": [
+              {
+                "type": "fill",
+                "name": "CryptoEStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "CryptoEStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "CryptoERun",
+            "style": "CryptoEStyle",
+            "text": "BTC"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CryptoCard",
+        "x": 190,
+        "y": 370,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CryptoCardPath",
+            "width": 300,
+            "height": 62,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CryptoCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CryptoCardSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "CryptoCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CryptoCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CryptoArrowHead",
+        "x": 470.0,
+        "y": 370,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "CryptoArrowHeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CryptoArrowHeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CryptoArrowHeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "CryptoArrowStem",
+        "x": 425,
+        "y": 370,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "CryptoArrowStemPath",
+            "width": 81.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "CryptoArrowStemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "CryptoArrowStemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "OutT",
+        "x": 745,
+        "y": 210,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "OutTStyle",
+            "font_asset": "Display",
+            "font_size": 20,
+            "children": [
+              {
+                "type": "fill",
+                "name": "OutTStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "OutTStyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "OutTRun",
+            "style": "OutTStyle",
+            "text": "One brand identity"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Out1",
+        "x": 745,
+        "y": 248,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Out1Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Out1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Out1StyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Out1Run",
+            "style": "Out1Style",
+            "text": "logo in every variant"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Out2",
+        "x": 745,
+        "y": 272,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Out2Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Out2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Out2StyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Out2Run",
+            "style": "Out2Style",
+            "text": "colours and fonts"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Out3",
+        "x": 745,
+        "y": 296,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Out3Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Out3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Out3StyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Out3Run",
+            "style": "Out3Style",
+            "text": "firmographics"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "OutCard",
+        "x": 745,
+        "y": 259,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "OutCardPath",
+            "width": 330,
+            "height": 150,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "OutCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "OutCardSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 500,
+        "y": 452,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "A generic logo API takes a domain. That is the wrong key for a holdings table."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 500,
+        "y": 250,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 1000,
+            "height": 500,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

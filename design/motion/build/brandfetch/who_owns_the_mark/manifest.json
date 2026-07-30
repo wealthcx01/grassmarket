@@ -1,14 +1,14 @@
 {
-  "source": "/home/dev/projects/grassmarket/design/motion/build/benzinga/four_families.riv",
-  "artboard": "FourFamilies",
+  "source": "/home/dev/projects/grassmarket/design/motion/build/brandfetch/who_owns_the_mark.riv",
+  "artboard": "WhoOwnsTheMark",
   "animation": null,
   "state_machine": null,
   "available_animations": [],
   "available_state_machines": [
     "Auto Generated State Machine"
   ],
-  "width": 960,
-  "height": 380,
+  "width": 1000,
+  "height": 440,
   "scale": 2,
   "fps": 60.0,
   "frames": [
@@ -16,7 +16,7 @@
       "index": 0,
       "seconds": 0.0,
       "filename": "frame_00000.png",
-      "distinct_colors": 1321,
+      "distinct_colors": 1786,
       "blank": false
     }
   ],

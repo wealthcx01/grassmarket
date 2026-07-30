@@ -312,6 +312,183 @@ def test_the_font_subset_really_is_ascii_only() -> None:
     )
 
 
+# --- Text you can actually read ---------------------------------------------------------------
+
+# The palette splits into colours meant for the paper background and colours meant for the dark
+# Bottle Green card. Using an on-green colour on paper does not error, does not warn, and does not
+# look broken in the SVG source — it just renders text you cannot read. GRS-0217 shipped it twice
+# in one afternoon: a REDISTRIBUTION heading in near-white on paper (invisible) and a rule line in
+# the light "do this" green on paper (barely legible). Both were caught by eye, which is exactly
+# what should not be the last line of defence for something this mechanical.
+_PAPER_LIKE = {"#F7F5EF", "#E4EBE5"}  # PAPER, GREEN_TINT
+_ON_DARK_ONLY = {"#EDF2EE", "#B9C7BC", "#7FD4A0"}  # ON_GREEN, ON_GREEN_MUTED, SIGNAL
+_DARK_FILLS = {"#1A3B26"}  # GREEN
+
+
+def _rects_of(spec: dict) -> list[tuple[float, float, float, float, str]]:
+    """Every rectangle as (x0, y0, x1, y1, fill), in artboard coordinates."""
+    out = []
+
+    def walk(node: object, ox: float = 0.0, oy: float = 0.0) -> None:
+        if isinstance(node, dict):
+            if node.get("type") == "shape":
+                sx, sy = ox + node.get("x", 0), oy + node.get("y", 0)
+                geom = next(
+                    (c for c in node.get("children", []) if c.get("type") == "rectangle"), None
+                )
+                fill = next((c for c in node.get("children", []) if c.get("type") == "fill"), None)
+                if geom is not None and fill is not None:
+                    colour = (fill.get("children") or [{}])[0].get("color", "")
+                    w, h = geom.get("width", 0), geom.get("height", 0)
+                    out.append((sx - w / 2, sy - h / 2, sx + w / 2, sy + h / 2, colour))
+                for child in node.get("children", []):
+                    walk(child, sx, sy)
+                return
+            for value in node.values():
+                walk(value, ox, oy)
+        elif isinstance(node, list):
+            for value in node:
+                walk(value, ox, oy)
+
+    walk(spec["artboard"])
+    return out
+
+
+@pytest.mark.parametrize(("course", "scene"), SCENES, ids=lambda v: getattr(v, "stem", v))
+def test_on_green_text_actually_sits_on_green(course: str, scene: Path) -> None:
+    """An on-dark colour is only legible over a dark fill, so require one underneath it.
+
+    Approximate in one direction only: it checks that SOME dark card contains the text's anchor
+    point, not that the card is painted behind it in z-order. That is enough to catch the real
+    failure — a heading placed in the margin above its card, or a footer line on bare paper.
+    """
+    spec = json.loads(scene.read_text())
+    dark = [r for r in _rects_of(spec) if r[4] in _DARK_FILLS]
+    offenders: list[str] = []
+
+    def walk(node: object, ox: float = 0.0, oy: float = 0.0) -> None:
+        if isinstance(node, dict):
+            if node.get("type") == "text":
+                tx, ty = ox + node.get("x", 0), oy + node.get("y", 0)
+                style = next(
+                    (c for c in node.get("children", []) if c.get("type") == "text_style"), None
+                )
+                runs = (style or {}).get("children", [])
+                colour = ""
+                fill = next((c for c in node.get("children", []) if c.get("type") == "fill"), None)
+                if fill:
+                    colour = (fill.get("children") or [{}])[0].get("color", "")
+                body = " ".join(str(r.get("text", "")) for r in runs)
+                if colour in _ON_DARK_ONLY and not any(
+                    x0 <= tx <= x1 and y0 <= ty <= y1 for x0, y0, x1, y1, _ in dark
+                ):
+                    offenders.append(f"{body[:44]!r} ({colour}) at ({tx:.0f},{ty:.0f})")
+            for value in node.values():
+                walk(value, ox, oy)
+        elif isinstance(node, list):
+            for value in node:
+                walk(value, ox, oy)
+
+    walk(spec["artboard"])
+    assert not offenders, (
+        f"{scene.stem}: these use an on-dark colour with no dark card under them, so they render "
+        f"unreadable: {offenders}"
+    )
+
+
+def test_the_contrast_check_actually_catches_on_green_text_on_paper(tmp_path: Path) -> None:
+    """A negative case, because the check above passes on every real scene and a check that only
+    ever passes is indistinguishable from one that does nothing.
+
+    This is the precise shape of what shipped twice on 2026-07-30: a heading in ON_GREEN placed in
+    the margin ABOVE its green card rather than inside it, which renders as nothing at all.
+    """
+    scene = tmp_path / "broken.json"
+    scene.write_text(
+        json.dumps(
+            {
+                "scene_format_version": 1,
+                "artboard": {
+                    "name": "T",
+                    "width": 200,
+                    "height": 100,
+                    "children": [
+                        {
+                            "type": "text",
+                            "name": "Head",
+                            "x": 100,
+                            "y": 20,  # above the card, on bare paper
+                            "children": [
+                                {
+                                    "type": "text_style",
+                                    "name": "S",
+                                    "font_size": 18,
+                                    "children": [
+                                        {
+                                            "type": "text_value_run",
+                                            "name": "R",
+                                            "text": "REDISTRIBUTION",
+                                        }
+                                    ],
+                                },
+                                {
+                                    "type": "fill",
+                                    "name": "F",
+                                    "children": [
+                                        {"type": "solid_color", "name": "C", "color": "#EDF2EE"}
+                                    ],
+                                },
+                            ],
+                        },
+                        {
+                            "type": "shape",
+                            "name": "Card",
+                            "x": 100,
+                            "y": 70,
+                            "children": [
+                                {
+                                    "type": "rectangle",
+                                    "name": "R",
+                                    "width": 120,
+                                    "height": 40,
+                                },
+                                {
+                                    "type": "fill",
+                                    "name": "F",
+                                    "children": [
+                                        {"type": "solid_color", "name": "C", "color": "#1A3B26"}
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                },
+            }
+        )
+    )
+    with pytest.raises(AssertionError, match="on-dark colour with no dark card"):
+        test_on_green_text_actually_sits_on_green("brandfetch", scene)
+
+
+def test_the_palette_split_still_matches_the_authoring_module() -> None:
+    """The rule above is only worth anything if these hex values are still the palette. If a colour
+    is renamed or retuned in `authoring.py`, this fails and says to update the constants rather than
+    the check silently going blind."""
+    source = (ROOT / "design/motion/authoring.py").read_text()
+    for name, value in (
+        ("PAPER", "#F7F5EF"),
+        ("GREEN_TINT", "#E4EBE5"),
+        ("GREEN", "#1A3B26"),
+        ("ON_GREEN", "#EDF2EE"),
+        ("ON_GREEN_MUTED", "#B9C7BC"),
+        ("SIGNAL", "#7FD4A0"),
+    ):
+        assert f'{name} = "{value}"' in source, f"{name} is no longer {value} in authoring.py"
+    assert _PAPER_LIKE == {"#F7F5EF", "#E4EBE5"}
+    assert _ON_DARK_ONLY == {"#EDF2EE", "#B9C7BC", "#7FD4A0"}
+    assert _DARK_FILLS == {"#1A3B26"}
+
+
 # --- Nothing off the edge of the artboard ---------------------------------------------------
 
 

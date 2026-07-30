@@ -322,6 +322,7 @@ CONTENT_DIR = Path(__file__).resolve().parents[2] / "src/grassmarket/workbench/c
 COURSE_TITLES: dict[str, str] = {
     "openbb": "OpenBB",
     "benzinga": "Benzinga",
+    "brandfetch": "Brandfetch",
 }
 
 

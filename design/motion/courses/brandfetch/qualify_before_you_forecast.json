@@ -1,0 +1,623 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "QualifyBeforeYouForecast",
+    "width": 1000,
+    "height": 420,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 500,
+        "y": 46,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "Qualify the licence before you forecast"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Q",
+        "x": 500,
+        "y": 130,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "QStyle",
+            "font_asset": "Display",
+            "font_size": 21,
+            "children": [
+              {
+                "type": "fill",
+                "name": "QStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "QStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "QRun",
+            "style": "QStyle",
+            "text": "Does the data leave the client's own product?"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "QBox",
+        "x": 500,
+        "y": 130,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "QBoxPath",
+            "width": 560,
+            "height": 58,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "QBoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "QBoxSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "QBoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "QBoxStrokeCol",
+                "color": "#1A1A18"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "NoL",
+        "x": 300,
+        "y": 186,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "NoLStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "NoLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "NoLStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "NoLRun",
+            "style": "NoLStyle",
+            "text": "No"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "YesL",
+        "x": 700,
+        "y": 186,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "YesLStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "YesLStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "YesLStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "YesLRun",
+            "style": "YesLStyle",
+            "text": "Yes"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LeftT",
+        "x": 270,
+        "y": 246,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LeftTStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LeftTStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LeftTStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LeftTRun",
+            "style": "LeftTStyle",
+            "text": "Distribution"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LeftB",
+        "x": 270,
+        "y": 278,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LeftBStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LeftBStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LeftBStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "LeftBRun",
+            "style": "LeftBStyle",
+            "text": "standard paid API"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RightT",
+        "x": 730,
+        "y": 246,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RightTStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RightTStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RightTStyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RightTRun",
+            "style": "RightTStyle",
+            "text": "Redistribution"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RightB",
+        "x": 730,
+        "y": 278,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RightBStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RightBStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RightBStyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RightBRun",
+            "style": "RightBStyle",
+            "text": "enterprise licensing"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "LeftBox",
+        "x": 270,
+        "y": 262,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "LeftBoxPath",
+            "width": 300,
+            "height": 100,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "LeftBoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LeftBoxSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "LeftBoxStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LeftBoxStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "RightBox",
+        "x": 730,
+        "y": 262,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "RightBoxPath",
+            "width": 300,
+            "height": 100,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "RightBoxFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RightBoxSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "DownLHead",
+        "x": 270,
+        "y": 194.0,
+        "rotation": 3.14159,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "DownLHeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "DownLHeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DownLHeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "DownLStem",
+        "x": 270,
+        "y": 176,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "DownLStemPath",
+            "width": 2.5,
+            "height": 27.0,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "DownLStemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DownLStemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "DownRHead",
+        "x": 730,
+        "y": 194.0,
+        "rotation": 3.14159,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "DownRHeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "DownRHeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DownRHeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "DownRStem",
+        "x": 730,
+        "y": 176,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "DownRStemPath",
+            "width": 2.5,
+            "height": 27.0,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "DownRStemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "DownRStemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Rule",
+        "x": 500,
+        "y": 348,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RuleStyle",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RuleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RuleStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "RuleRun",
+            "style": "RuleStyle",
+            "text": "Different rate, different window. Read yours off the Earnings page."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 500,
+        "y": 390,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "Never from memory, and never from a slide: the schedule is the only source."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 500,
+        "y": 210,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 1000,
+            "height": 420,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
