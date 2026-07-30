@@ -114,7 +114,7 @@
             "type": "text_value_run",
             "name": "NewswireCountRun",
             "style": "NewswireCountStyle",
-            "text": "9"
+            "text": "8"
           }
         ]
       },
@@ -446,7 +446,7 @@
             "type": "text_value_run",
             "name": "AlternativeCountRun",
             "style": "AlternativeCountStyle",
-            "text": "8"
+            "text": "9"
           }
         ]
       },

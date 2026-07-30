@@ -593,8 +593,8 @@ _SECTION_2_SLIDES: tuple[Slide, ...] = (
         0,
         SlideKind.CONCEPT,
         "Four families, and the numbers matter",
-        "The catalogue bands its 32 products into four categories: **Newswire & Content** (9), "
-        "**Calendar** (11), **Alternative Data** (8) and **Market Data** (4). Calendar is the "
+        "The catalogue bands its 32 products into four categories: **Newswire & Content** (8), "
+        "**Calendar** (11), **Alternative Data** (9) and **Market Data** (4). Calendar is the "
         "biggest family and Market Data the smallest, which is the opposite of what most people "
         "assume about a company they think of as a news site.",
         refs=(CATALOGUE,),
@@ -602,8 +602,8 @@ _SECTION_2_SLIDES: tuple[Slide, ...] = (
             "four_families",
             "Thirty-two products become four ideas, each with one job.",
             "Four cards in a row, each showing a count and the job that family does. Newswire and "
-            "Content, nine products, what a user READS. Calendar, eleven products, what a user "
-            "PLANS around. Alternative Data, eight products, what a desk TRADES on. Market Data, "
+            "Content, eight products, what a user READS. Calendar, eleven products, what a user "
+            "PLANS around. Alternative Data, nine products, what a desk TRADES on. Market Data, "
             "four products, what a screen NEEDS. A line beneath reads: each family has its own "
             "buyer, budget and objection.",
         ),
@@ -632,7 +632,7 @@ _SECTION_2_SLIDES: tuple[Slide, ...] = (
         3,
         SlideKind.CONCEPT,
         "Family one: Newswire & Content, in outline",
-        "Nine products, all editorial or editorial-derived: the flagship US equities newsfeed, "
+        "Eight products, all editorial or editorial-derived: the flagship US equities newsfeed, "
         "aggregated press releases, the one-sentence Why Is It Moving feed, video news, AI-assisted"
         "bull and bear summaries, structured analyst-report insights, and two newer sector feeds "
         "covering prediction markets and private markets. Section 4 takes these one by one.",
@@ -652,7 +652,7 @@ _SECTION_2_SLIDES: tuple[Slide, ...] = (
         5,
         SlideKind.CONCEPT,
         "Family three: Alternative Data, in outline",
-        "Eight products, and the least homogeneous family. Options flow and block trades, insider "
+        "Nine products, and the least homogeneous family. Options flow and block trades, insider "
         "and congressional trades, short interest, and three audience-derived datasets built from "
         "Benzinga's own traffic. Highest price per product, narrowest buyer, and the family where "
         "you must be most careful about what you claim. Section 6.",
@@ -715,7 +715,7 @@ _SECTION_2_SLIDES: tuple[Slide, ...] = (
         SlideKind.WALKTHROUGH,
         "Sort the catalogue by category and count",
         "In the spreadsheet, group the rows by the Category column and confirm the four counts: "
-        "nine, eleven, eight, four. If your numbers differ, you have miscounted a banded header row"
+        "eight, eleven, nine, four. If your numbers differ, you have miscounted a banded header row"
         "as a product. Getting this right matters because you will quote these counts in meetings "
         "as shorthand for the shape of the offer.",
         refs=(CATALOGUE,),
@@ -847,9 +847,9 @@ SECTION_2_TEST = SectionTest(
         TestQuestion(
             prompt=("Which is the largest of the four product families?"),
             options=(
-                "Newswire & Content, with 9",
+                "Newswire & Content, with 8",
                 "Calendar, with 11",
-                "Alternative Data, with 8",
+                "Alternative Data, with 9",
                 "Market Data, with 4",
             ),
             answer_index=1,

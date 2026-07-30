@@ -8,8 +8,11 @@ certification.
 
 from __future__ import annotations
 
+from collections import Counter
 from datetime import UTC, datetime
+from pathlib import Path
 
+import pytest
 from bcap_contracts.commissions import load_commission_config
 from bcap_contracts.learning import CourseTree, SlideKind
 
@@ -248,3 +251,50 @@ def test_the_rebuilt_sections_are_reachable_through_the_gate(
     after = repo.section_progress(alice.principal, BENZINGA_SLUG)
     assert after[0].passed is True
     assert after[1].unlocked is True
+
+
+# --- The course's numbers against the source they came from -----------------------------------
+
+
+def test_the_family_counts_match_the_committed_catalogue() -> None:
+    """The course states four counts and a total, so those are checkable against the spreadsheet
+    they came from — and they should be, because I got two of them backwards on the first pass and
+    the error reached a slide, a test question and a diagram before anyone counted.
+
+    A claim that can be checked against a committed source belongs in a test, not in a proofread.
+    """
+    openpyxl = pytest.importorskip("openpyxl")
+    book = openpyxl.load_workbook(
+        Path(__file__).resolve().parents[1] / "data/gtm/sources/benzinga-product-catalog.xlsx",
+        data_only=True,
+    )
+    counts: Counter[str] = Counter()
+    for row in list(book["Full Catalog"].iter_rows(values_only=True))[1:]:
+        category, name = row[0], row[1]
+        # Banded category headers carry a marker glyph and no product name.
+        if not category or str(category).strip().startswith("▌") or name is None:
+            continue
+        counts[str(category).strip()] += 1
+
+    assert counts == {
+        "Newswire & Content": 8,
+        "Calendar": 11,
+        "Alternative Data": 9,
+        "Market Data": 4,
+    }
+    assert sum(counts.values()) == 32
+
+    # Every one of those numbers is quoted somewhere in the rebuilt slides, so assert the slides
+    # agree with the sheet rather than with my memory of it.
+    prose = " ".join(
+        part
+        for module in rebuilt_sections()
+        for lesson in module.lessons
+        for slide in lesson.slides
+        for part in (slide.title, slide.body)
+    )
+    assert "**Newswire & Content** (8)" in prose
+    assert "**Calendar** (11)" in prose
+    assert "**Alternative Data** (9)" in prose
+    assert "**Market Data** (4)" in prose
+    assert "32 products" in prose

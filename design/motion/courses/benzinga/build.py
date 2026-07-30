@@ -92,9 +92,9 @@ def four_families() -> dict:
     The counts are the real ones from the committed catalogue, so the drawing is also the fastest
     way to see that Calendar is the biggest family and Market Data the smallest."""
     families = [
-        ("Newswire", "& Content", "9", "what a user READS", 152),
+        ("Newswire", "& Content", "8", "what a user READS", 152),
         ("Calendar", "", "11", "what a user PLANS around", 372),
-        ("Alternative", "Data", "8", "what a desk TRADES on", 592),
+        ("Alternative", "Data", "9", "what a desk TRADES on", 592),
         ("Market", "Data", "4", "what a screen NEEDS", 812),
     ]
     layers: list = []

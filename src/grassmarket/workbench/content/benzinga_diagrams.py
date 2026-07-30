@@ -116,7 +116,7 @@ SVG: dict[str, str] = {
         '<text x="592" y="262" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="14" fill="#6E6A60" text-anchor="middle" dominant-baseline="central">what a desk TRADES on</text>'
         '<text x="592" y="214" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="19" fill="#1A1A18" text-anchor="middle" dominant-baseline="central">Data</text>'
         '<text x="592" y="190" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="19" fill="#1A1A18" text-anchor="middle" dominant-baseline="central">Alternative</text>'
-        '<text x="592" y="138" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="40" fill="#1A3B26" text-anchor="middle" dominant-baseline="central">8</text>'
+        '<text x="592" y="138" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="40" fill="#1A3B26" text-anchor="middle" dominant-baseline="central">9</text>'
         '<g transform="translate(372,196)"><rect x="-98" y="-88" width="196" height="176" rx="14" fill="#E4EBE5" stroke="#D8D3C7" stroke-width="2"/></g>'
         '<text x="372" y="262" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="14" fill="#6E6A60" text-anchor="middle" dominant-baseline="central">what a user PLANS around</text>'
         '<text x="372" y="190" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="19" fill="#1A1A18" text-anchor="middle" dominant-baseline="central">Calendar</text>'
@@ -125,7 +125,7 @@ SVG: dict[str, str] = {
         '<text x="152" y="262" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="14" fill="#6E6A60" text-anchor="middle" dominant-baseline="central">what a user READS</text>'
         '<text x="152" y="214" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="19" fill="#1A1A18" text-anchor="middle" dominant-baseline="central">&amp; Content</text>'
         '<text x="152" y="190" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="19" fill="#1A1A18" text-anchor="middle" dominant-baseline="central">Newswire</text>'
-        '<text x="152" y="138" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="40" fill="#1A3B26" text-anchor="middle" dominant-baseline="central">9</text>'
+        '<text x="152" y="138" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="40" fill="#1A3B26" text-anchor="middle" dominant-baseline="central">8</text>'
         '<text x="480" y="76" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="16" fill="#6E6A60" text-anchor="middle" dominant-baseline="central">Qualify the family in the room. Never recite the product list.</text>'
         '<text x="480" y="44" font-family="Inter, system-ui, sans-serif" font-weight="700" font-size="30" fill="#1A1A18" text-anchor="middle" dominant-baseline="central">32 products, four families</text>'
         "</svg>"
