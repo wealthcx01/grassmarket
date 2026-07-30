@@ -40,9 +40,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["owner_consultant_id"], ["consultants.id"]),
         sa.ForeignKeyConstraint(["approved_by_consultant_id"], ["consultants.id"]),
     )
-    op.create_index(
-        "ix_founder_approvals_assessment_id", "founder_approvals", ["assessment_id"]
-    )
+    op.create_index("ix_founder_approvals_assessment_id", "founder_approvals", ["assessment_id"])
     op.add_column(
         "assessments",
         sa.Column("review_requested_at", sa.DateTime(timezone=True), nullable=True),
