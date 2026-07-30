@@ -207,11 +207,13 @@ export default function BrokeragesPage() {
         </p>
       </section>
 
-      <form
-        onSubmit={onCreate}
-        style={{ display: "flex", gap: "0.5rem", alignItems: "flex-end", flexWrap: "wrap" }}
-      >
-        <label style={{ fontSize: "0.85rem", flex: "1 1 20rem" }}>
+      {/* A two-row grid (GRS-0178). The fields share one baseline because each is a block label
+          above its input, so `alignItems: end` lines them up on real content — the old flex row
+          did it with a magic-number paddingBottom on the checkbox, which is why the founder saw
+          the subject box and the Operating Model dropdown out of alignment. The breakpoint that
+          stacks the columns lives in globals.css, since inline styles cannot carry a media query. */}
+      <form onSubmit={onCreate} className="form-create-assessment">
+        <label style={{ fontSize: "0.85rem", minWidth: 0 }}>
           <span style={{ display: "block", marginBottom: "0.3rem", fontWeight: 500 }}>
             New assessment — subject company
           </span>
@@ -224,7 +226,7 @@ export default function BrokeragesPage() {
             }}
           />
         </label>
-        <label style={{ fontSize: "0.85rem", flex: "0 1 14rem" }}>
+        <label style={{ fontSize: "0.85rem", minWidth: 0 }}>
           <span style={{ display: "block", marginBottom: "0.3rem", fontWeight: 500 }}>
             Operating model
           </span>
@@ -252,13 +254,23 @@ export default function BrokeragesPage() {
         <button type="submit" className="btn btn-primary" disabled={creating || !subject.trim()}>
           {creating ? "Creating…" : "Create and open"}
         </button>
-        <label
-          title={SANDBOX_EXPLANATION}
-          style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", fontSize: "0.82rem", color: "var(--color-ink-muted)", paddingBottom: "0.55rem" }}
-        >
-          <input type="checkbox" checked={sandbox} onChange={(e) => setSandbox(e.target.checked)} />
-          Make this a private practice copy
-        </label>
+        {/* Row 2. The explanation is visible text, not only a tooltip: an advisor deciding
+            whether to tick this should not have to hover to find out what it does. */}
+        <div style={{ gridColumn: "1 / -1", display: "flex", gap: "0.55rem", alignItems: "flex-start" }}>
+          <input
+            id="sandbox-option"
+            type="checkbox"
+            checked={sandbox}
+            onChange={(e) => setSandbox(e.target.checked)}
+            style={{ marginTop: "0.2rem" }}
+          />
+          <label htmlFor="sandbox-option" style={{ fontSize: "0.82rem", lineHeight: 1.5 }}>
+            <span style={{ fontWeight: 500 }}>Make this a private practice copy</span>
+            <span style={{ display: "block", color: "var(--color-ink-muted)" }}>
+              {SANDBOX_EXPLANATION}
+            </span>
+          </label>
+        </div>
       </form>
 
       {error ? (
