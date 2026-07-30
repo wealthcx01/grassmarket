@@ -10,16 +10,48 @@ authoring.py                 shared palette, type scale and layout helpers
 courses/openbb/build.py      writes one JSON scene per diagram
 courses/openbb/*.json        the scene specs — this is the source, review these
 assets/fonts/                vendored Inter subset, SIL OFL 1.1, licence beside it
-build/                       generated .riv files and rendered stills, committed
+build/                       generated .riv, rendered stills and .svg, all committed
 render.sh                    generate + validate + render, and FAIL on a blank frame
+svg_export.py                the same scenes to SVG — this is what the course serves
 ```
+
+## Two renderers, one source
+
+A scene has three outputs and they all come from the JSON, never from each other:
+
+| Output | Made by | Used for |
+|---|---|---|
+| `.riv` | `rive-cli generate` | motion, and the runtime decision still open in GRS-0206 |
+| `frame_*.png` | `rive-cli render` | reviewing the drawing in a PR; deck assets |
+| `.svg` | `svg_export.py` | what the Academy actually serves, via `LessonAsset` |
+
+`rive-cli` has no vector output — `render` writes PNG and `SVGAsset` is an input type only — and
+`LessonAsset` refuses raster, so the SVG is emitted from the scene rather than converted from the
+`.riv`. See ADR-0049's 2026-07-29 amendment.
 
 ## Regenerating
 
 ```bash
-uv run python design/motion/courses/openbb/build.py
-RIVE_CLI=/path/to/rive-cli design/motion/render.sh
+uv run python design/motion/courses/openbb/build.py     # scenes
+RIVE_CLI=/path/to/rive-cli design/motion/render.sh      # .riv + stills
+uv run python design/motion/svg_export.py               # .svg + the content module
 ```
+
+The last one also rewrites `src/grassmarket/workbench/content/openbb_diagrams.py`, which is the
+generated module the course imports. `tests/test_course_diagrams.py` fails if it has drifted from
+the scenes, so forgetting this step is caught rather than shipped.
+
+## Checking the SVG against the Rive render
+
+The two renderers can disagree, so the still is the reference. Render the SVG in Chromium with the
+vendored font at the artboard size, then compare per-region ink coverage against `frame_00000.png`
+— downscale both to a coarse grid and compare cell luminance. As of 2026-07-29 all nine agree to
+within a mean absolute difference of 1.3/255, worst single region 42; the differences are text
+metrics, since Rive lays out text itself and a browser lays out SVG text. A structural comparison
+is the right one here — per-pixel would fail on antialiasing alone.
+
+This needs the toolchain and a browser, so it is a local gate. CI checks everything that does not:
+export, drift, the sanitiser allowlist, and the emitter's refusals.
 
 `rive-cli` has no published releases yet, so build it from source with `cargo build --release`.
 The Rust toolchain is a build-time dependency only; the product ships the output.

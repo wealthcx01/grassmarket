@@ -456,6 +456,135 @@ def the_sale() -> dict:
     )
 
 
+# --- 8. What runs where (section 2) --------------------------------------------------------
+
+
+def what_runs_where() -> dict:
+    """The misconception section 2 exists to correct, drawn once.
+
+    An advisor who has just run `pip install openbb` on their laptop very easily believes they have
+    installed the thing the client buys. They have not. Two boxes and the port between them is the
+    whole idea, and `localhost:6900` is on the drawing because it is the first thing to check when
+    a client's engineer says the connection is not working.
+    """
+    return scene(
+        "WhatRunsWhere",
+        960,
+        420,
+        stack(
+            text("Title", 480, 46, "What you install, and what a client buys", 28, INK),
+            text(
+                "Sub",
+                480,
+                80,
+                "Two different things, on two different machines.",
+                16,
+                MUTED,
+            ),
+            text("LeftHead", 256, 140, "Your machine", 20, INK),
+            text("LeftName", 256, 178, "the open-source package", 16, MUTED),
+            text("LeftCmd", 256, 210, "pip install openbb", 16, GREEN),
+            text("LeftApi", 256, 258, "platform API", 15, MUTED),
+            text("LeftPort", 256, 286, "localhost:6900", 16, GREEN),
+            text("RightHead", 704, 140, "Their browser", 20, ON_GREEN),
+            text("RightName", 704, 178, "OpenBB Workspace", 16, ON_GREEN_MUTED),
+            text("RightCmd", 704, 210, "pro.openbb.co", 16, SIGNAL),
+            text("RightWhat", 704, 258, "this is the commercial", 15, ON_GREEN_MUTED),
+            text("RightWhat2", 704, 286, "product", 15, ON_GREEN_MUTED),
+            text("Wire", 480, 218, "talks to", 14, MUTED),
+            *arrow_right("Link", 480, 244, 120, MUTED),
+            text(
+                "Foot",
+                480,
+                372,
+                "You install the left-hand box. The client pays for the right-hand one.",
+                17,
+                MUTED,
+            ),
+            card("LeftCard", 256, 220, 340, 210, PAPER, stroke=RULE),
+            card("RightCard", 704, 220, 340, 210, GREEN),
+            card("Bg", 480, 210, 960, 420, PAPER, radius=0),
+        ),
+    )
+
+
+# --- 9. Three jobs (section 5) -------------------------------------------------------------
+
+
+def three_jobs() -> dict:
+    """Why the second workspace is a different shape rather than a copy.
+
+    The teaching in section 5 is that the job decides the layout, so the drawing has to show three
+    layouts that are visibly not the same picture: many small panels for comparison, one watched
+    panel for monitoring, few and heavily labelled for reporting. The segment under each is the
+    part an advisor actually uses in qualification.
+    """
+    jobs = [
+        ("Comparison", 176, "several firms, side by side", "an exchange or a bank", 4),
+        ("Monitoring", 480, "one thing that changes", "a retail brokerage", 1),
+        ("Client reporting", 784, "read outside the room", "a wealth manager", 2),
+    ]
+    layers: list = []
+    for name, x, what, who, panels in jobs:
+        layers.append(text(f"{name}Head", x, 150, name, 19, INK))
+        layers.append(text(f"{name}What", x, 182, what, 15, MUTED))
+        layers.append(text(f"{name}Who", x, 330, who, 15, GREEN))
+        # The miniature layout under each heading is the point: the shapes differ before the words
+        # are read.
+        if panels == 4:
+            for i in range(4):
+                layers.append(
+                    card(
+                        f"{name}P{i}",
+                        x - 55 + (i % 2) * 110,
+                        238 + (i // 2) * 52,
+                        96,
+                        40,
+                        GREEN_TINT,
+                    )
+                )
+        elif panels == 1:
+            # Front first: the pulse is declared before the panel it sits on, or the panel paints
+            # over it and the monitoring cell renders as an empty box.
+            layers.append(card(f"{name}Pulse", x, 264, 60, 24, GREEN))
+            layers.append(card(f"{name}P0", x, 264, 206, 92, GREEN_TINT))
+        else:
+            # Fewer panels, each with a label line under it — "more labelling" is the whole
+            # difference between this layout and the other two.
+            layers.append(line(f"{name}Label0", x - 48, 256, 110, 2, RULE))
+            layers.append(line(f"{name}Label1", x - 48, 310, 110, 2, RULE))
+            layers.append(card(f"{name}P0", x, 232, 206, 40, GREEN_TINT))
+            layers.append(card(f"{name}P1", x, 286, 206, 40, GREEN_TINT))
+        layers.append(card(f"{name}Card", x, 250, 268, 230, PAPER, stroke=RULE))
+
+    return scene(
+        "ThreeJobs",
+        960,
+        420,
+        stack(
+            text("Title", 480, 46, "The job decides the shape", 28, INK),
+            text(
+                "Sub",
+                480,
+                80,
+                "A second workspace is not a copy of the first one.",
+                16,
+                MUTED,
+            ),
+            *layers,
+            text(
+                "Foot",
+                480,
+                388,
+                "Build the one your target's segment already needs.",
+                16,
+                MUTED,
+            ),
+            card("Bg", 480, 210, 960, 420, PAPER, radius=0),
+        ),
+    )
+
+
 DIAGRAMS = {
     "two_products": two_products,
     "agpl_decision": agpl_decision,
@@ -464,6 +593,8 @@ DIAGRAMS = {
     "dashboard_to_app": dashboard_to_app,
     "segment_triggers": segment_triggers,
     "the_sale": the_sale,
+    "what_runs_where": what_runs_where,
+    "three_jobs": three_jobs,
 }
 
 

@@ -14,6 +14,7 @@ from bcap_contracts.learning import (
     CourseModule,
     CourseTree,
     Lesson,
+    LessonAsset,
     SectionTest,
     Slide,
     SlideKind,
@@ -47,7 +48,20 @@ def _id(key: str):
     return uuid5(NAMESPACE_URL, f"grassmarket:test:depth:{key}")
 
 
-def _slides(n: int, *, doing: int = MIN_DOING_SLIDES_PER_LESSON) -> tuple[Slide, ...]:
+_DIAGRAM = LessonAsset(
+    caption="A diagram.",
+    alt=(
+        "A description long enough to be a real text alternative: two boxes, an arrow between "
+        "them, and a caption saying which one the client buys."
+    ),
+    svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><rect width="10" '
+    'height="10" fill="#1A3B26"/></svg>',
+)
+
+
+def _slides(
+    n: int, *, doing: int = MIN_DOING_SLIDES_PER_LESSON, asset: LessonAsset | None = _DIAGRAM
+) -> tuple[Slide, ...]:
     out = []
     for i in range(n):
         is_doing = i < doing
@@ -58,6 +72,8 @@ def _slides(n: int, *, doing: int = MIN_DOING_SLIDES_PER_LESSON) -> tuple[Slide,
                 title=f"Slide {i + 1}",
                 body=_BODY,
                 references=(_REF,) if i == 0 else (),
+                # One diagram on the lesson, on its first slide — the minimum the standard wants.
+                asset=asset if i == 0 else None,
             )
         )
     return tuple(out)
@@ -78,14 +94,20 @@ def _test(n: int = MIN_QUESTIONS_PER_SECTION_TEST) -> SectionTest:
 
 
 def _lesson(
-    *, slides: int = MIN_SLIDES_PER_LESSON, doing: int | None = None, body: str = _LESSON_BODY
+    *,
+    slides: int = MIN_SLIDES_PER_LESSON,
+    doing: int | None = None,
+    body: str = _LESSON_BODY,
+    asset: LessonAsset | None = _DIAGRAM,
 ) -> Lesson:
     return Lesson(
         id=_id(f"lesson-{slides}-{doing}-{len(body)}"),
         title="A lesson",
         body=body,
         order=0,
-        slides=_slides(slides, doing=MIN_DOING_SLIDES_PER_LESSON if doing is None else doing),
+        slides=_slides(
+            slides, doing=MIN_DOING_SLIDES_PER_LESSON if doing is None else doing, asset=asset
+        ),
     )
 
 
@@ -174,6 +196,23 @@ def test_a_bloated_lesson_is_refused_too() -> None:
     report = check_depth("product-test", _course(lessons=(_lesson(slides=60),)))
     assert not report.ok
     assert any("split it" in f for f in report.failures)
+
+
+def test_a_lesson_with_no_diagram_is_refused() -> None:
+    """GRS-0225. The OpenBB rebuild passed every other rule here with 196 slides and no drawing,
+    which is how a course meets a depth standard and is still a wall of text."""
+    report = check_depth("product-test", _course(lessons=(_lesson(asset=None),)))
+    assert not report.ok
+    assert any("has no diagram" in f for f in report.failures)
+
+
+def test_a_diagram_with_token_alt_text_is_refused() -> None:
+    """`LessonAsset` requires alt text, and "diagram" satisfies it. A screen-reader user should get
+    the content of the drawing, so the standard asks for a sentence."""
+    thin = LessonAsset(caption="A diagram.", alt="A diagram.", svg=_DIAGRAM.svg)
+    report = check_depth("product-test", _course(lessons=(_lesson(asset=thin),)))
+    assert not report.ok
+    assert any("alt text is under" in f for f in report.failures)
 
 
 def test_every_failure_is_reported_not_just_the_first() -> None:

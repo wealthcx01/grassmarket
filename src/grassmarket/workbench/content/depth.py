@@ -37,6 +37,15 @@ MIN_SLIDE_BODY_CHARS = 120
 # The lesson's opening still has to say what the lesson is for.
 MIN_LESSON_BODY_CHARS = 200
 
+# At least one diagram per lesson (GRS-0225). The OpenBB rebuild passed every rule above with 196
+# slides and not one drawing, which is how a course can meet a depth standard and still be a wall
+# of text. Several of its ideas were spatial and written down as sentences anyway.
+MIN_ASSETS_PER_LESSON = 1
+
+# Alt text is required by the `LessonAsset` contract, but "diagram" satisfies min_length=1. A
+# screen-reader user should get the content of the drawing, which takes a sentence at least.
+MIN_ASSET_ALT_CHARS = 80
+
 _DOING_KINDS = frozenset({SlideKind.WALKTHROUGH, SlideKind.EXAMPLE, SlideKind.CHECKPOINT})
 
 # Courses that predate the standard, each with the ticket that rebuilds it. Listing them is the
@@ -140,6 +149,21 @@ def _check_lesson(report: DepthReport, where: str, lesson) -> None:
             report.failures.append(
                 f"{label}, slide {slide.order + 1} ({slide.title!r}) is under "
                 f"{MIN_SLIDE_BODY_CHARS} characters"
+            )
+
+    # Diagrams live on slides; a lesson-level asset counts too, since GRS-0190 put them there first.
+    assets = [s.asset for s in lesson.slides if s.asset] + list(lesson.assets)
+    if n and len(assets) < MIN_ASSETS_PER_LESSON:
+        report.failures.append(
+            f"{label} has no diagram. At least {MIN_ASSETS_PER_LESSON} is the standard: if nothing "
+            f"in the lesson is worth drawing, the lesson is probably explaining something spatial "
+            f"in sentences. Author it in design/motion/courses/."
+        )
+    for asset in assets:
+        if len(asset.alt.strip()) < MIN_ASSET_ALT_CHARS:
+            report.failures.append(
+                f"{label} has a diagram whose alt text is under {MIN_ASSET_ALT_CHARS} characters "
+                f"({asset.caption!r}). Describe what the drawing shows, not that it is a drawing."
             )
 
 

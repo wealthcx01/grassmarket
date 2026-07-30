@@ -1,0 +1,875 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "ThreeJobs",
+    "width": 960,
+    "height": 420,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 480,
+        "y": 46,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 28,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "The job decides the shape"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 480,
+        "y": 80,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "A second workspace is not a copy of the first one."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "ComparisonHead",
+        "x": 176,
+        "y": 150,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "ComparisonHeadStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "ComparisonHeadStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "ComparisonHeadStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "ComparisonHeadRun",
+            "style": "ComparisonHeadStyle",
+            "text": "Comparison"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "ComparisonWhat",
+        "x": 176,
+        "y": 182,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "ComparisonWhatStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "ComparisonWhatStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "ComparisonWhatStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "ComparisonWhatRun",
+            "style": "ComparisonWhatStyle",
+            "text": "several firms, side by side"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "ComparisonWho",
+        "x": 176,
+        "y": 330,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "ComparisonWhoStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "ComparisonWhoStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "ComparisonWhoStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "ComparisonWhoRun",
+            "style": "ComparisonWhoStyle",
+            "text": "an exchange or a bank"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "ComparisonP0",
+        "x": 121,
+        "y": 238,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "ComparisonP0Path",
+            "width": 96,
+            "height": 40,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "ComparisonP0Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "ComparisonP0Solid",
+                "color": "#E4EBE5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "ComparisonP1",
+        "x": 231,
+        "y": 238,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "ComparisonP1Path",
+            "width": 96,
+            "height": 40,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "ComparisonP1Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "ComparisonP1Solid",
+                "color": "#E4EBE5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "ComparisonP2",
+        "x": 121,
+        "y": 290,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "ComparisonP2Path",
+            "width": 96,
+            "height": 40,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "ComparisonP2Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "ComparisonP2Solid",
+                "color": "#E4EBE5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "ComparisonP3",
+        "x": 231,
+        "y": 290,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "ComparisonP3Path",
+            "width": 96,
+            "height": 40,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "ComparisonP3Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "ComparisonP3Solid",
+                "color": "#E4EBE5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "ComparisonCard",
+        "x": 176,
+        "y": 250,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "ComparisonCardPath",
+            "width": 268,
+            "height": 230,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "ComparisonCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "ComparisonCardSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "ComparisonCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "ComparisonCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "MonitoringHead",
+        "x": 480,
+        "y": 150,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "MonitoringHeadStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "MonitoringHeadStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "MonitoringHeadStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "MonitoringHeadRun",
+            "style": "MonitoringHeadStyle",
+            "text": "Monitoring"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "MonitoringWhat",
+        "x": 480,
+        "y": 182,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "MonitoringWhatStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "MonitoringWhatStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "MonitoringWhatStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "MonitoringWhatRun",
+            "style": "MonitoringWhatStyle",
+            "text": "one thing that changes"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "MonitoringWho",
+        "x": 480,
+        "y": 330,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "MonitoringWhoStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "MonitoringWhoStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "MonitoringWhoStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "MonitoringWhoRun",
+            "style": "MonitoringWhoStyle",
+            "text": "a retail brokerage"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "MonitoringPulse",
+        "x": 480,
+        "y": 264,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "MonitoringPulsePath",
+            "width": 60,
+            "height": 24,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "MonitoringPulseFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "MonitoringPulseSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "MonitoringP0",
+        "x": 480,
+        "y": 264,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "MonitoringP0Path",
+            "width": 206,
+            "height": 92,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "MonitoringP0Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "MonitoringP0Solid",
+                "color": "#E4EBE5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "MonitoringCard",
+        "x": 480,
+        "y": 250,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "MonitoringCardPath",
+            "width": 268,
+            "height": 230,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "MonitoringCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "MonitoringCardSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "MonitoringCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "MonitoringCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Client reportingHead",
+        "x": 784,
+        "y": 150,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Client reportingHeadStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Client reportingHeadStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Client reportingHeadStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Client reportingHeadRun",
+            "style": "Client reportingHeadStyle",
+            "text": "Client reporting"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Client reportingWhat",
+        "x": 784,
+        "y": 182,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Client reportingWhatStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Client reportingWhatStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Client reportingWhatStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Client reportingWhatRun",
+            "style": "Client reportingWhatStyle",
+            "text": "read outside the room"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Client reportingWho",
+        "x": 784,
+        "y": 330,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Client reportingWhoStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Client reportingWhoStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Client reportingWhoStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Client reportingWhoRun",
+            "style": "Client reportingWhoStyle",
+            "text": "a wealth manager"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Client reportingLabel0",
+        "x": 736,
+        "y": 256,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Client reportingLabel0Path",
+            "width": 110,
+            "height": 2,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Client reportingLabel0Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Client reportingLabel0Solid",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Client reportingLabel1",
+        "x": 736,
+        "y": 310,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Client reportingLabel1Path",
+            "width": 110,
+            "height": 2,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Client reportingLabel1Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Client reportingLabel1Solid",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Client reportingP0",
+        "x": 784,
+        "y": 232,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Client reportingP0Path",
+            "width": 206,
+            "height": 40,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Client reportingP0Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Client reportingP0Solid",
+                "color": "#E4EBE5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Client reportingP1",
+        "x": 784,
+        "y": 286,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Client reportingP1Path",
+            "width": 206,
+            "height": 40,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Client reportingP1Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Client reportingP1Solid",
+                "color": "#E4EBE5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Client reportingCard",
+        "x": 784,
+        "y": 250,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Client reportingCardPath",
+            "width": 268,
+            "height": 230,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Client reportingCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Client reportingCardSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "Client reportingCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Client reportingCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 480,
+        "y": 388,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "Build the one your target's segment already needs."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 480,
+        "y": 210,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 960,
+            "height": 420,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

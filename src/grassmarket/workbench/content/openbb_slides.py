@@ -28,6 +28,7 @@ from uuid import NAMESPACE_URL, UUID, uuid5
 from bcap_contracts.learning import (
     CourseModule,
     Lesson,
+    LessonAsset,
     SectionTest,
     Slide,
     SlideKind,
@@ -35,6 +36,8 @@ from bcap_contracts.learning import (
     SourceRefKind,
     TestQuestion,
 )
+
+from grassmarket.workbench.content.openbb_diagrams import SVG
 
 _NS = "grassmarket:academy:product-openbb"
 
@@ -110,6 +113,7 @@ def _s(
     *,
     refs: tuple[SourceRef, ...] = (),
     checkpoint: str | None = None,
+    asset: LessonAsset | None = None,
 ) -> Slide:
     return Slide(
         order=order,
@@ -118,7 +122,19 @@ def _s(
         body=body,
         references=refs,
         checkpoint_prompt=checkpoint,
+        asset=asset,
     )
+
+
+def _diagram(key: str, caption: str, alt: str) -> LessonAsset:
+    """A course diagram (GRS-0225). The drawing is generated from the SceneSpec under
+    `design/motion/courses/openbb/`; the caption and the alt text are written here, beside the slide
+    they belong to, because they are prose and a generator has no business writing them.
+
+    `SVG[key]` raises on an unknown key rather than returning a placeholder — a slide that silently
+    lost its diagram would still render, and look finished.
+    """
+    return LessonAsset(caption=caption, alt=alt, svg=SVG[key])
 
 
 # --- Section 1 — What OpenBB is, and why that matters in a client meeting ------------------
@@ -152,6 +168,15 @@ _SECTION_1_SLIDES: tuple[Slide, ...] = (
         "conversation you have will be about Workspace. Almost every technical objection you hear "
         "will be about the package.",
         refs=(DOCS_WORKSPACE, DOCS_INSTALL),
+        asset=_diagram(
+            "two_products",
+            "Two products, one company — and only one of them is a commission conversation.",
+            "Two panels side by side. On the left, the Open Data Platform: open source, AGPLv3, "
+            "bought by nobody and installed by a quant with pip install openbb. On the right, "
+            "OpenBB Workspace: commercial, in the browser, used by an investment team, at "
+            "pro.openbb.co. A line beneath reads: almost every commission conversation is about "
+            "the right-hand box.",
+        ),
     ),
     _s(
         2,
@@ -508,6 +533,15 @@ _SECTION_2_SLIDES: tuple[Slide, ...] = (
         "fastest honest way to see OpenBB's data coverage with your own eyes, and because a "
         "technical buyer will ask whether you have used it.",
         refs=(DOCS_INSTALL, DOCS_WORKSPACE),
+        asset=_diagram(
+            "what_runs_where",
+            "What you install, and what a client buys. Different machines, different products.",
+            "Two boxes. On the left, your machine: the open-source package installed with pip "
+            "install openbb, and the platform API on localhost:6900. On the right, their browser: "
+            "OpenBB Workspace at pro.openbb.co, marked as the commercial product. An arrow runs "
+            "from left to right labelled 'talks to'. Beneath: you install the left-hand box, the "
+            "client pays for the right-hand one.",
+        ),
     ),
     _s(
         1,
@@ -914,6 +948,16 @@ _SECTION_3_SLIDES: tuple[Slide, ...] = (
         "visual presentation, and parameters. Learn those four and every widget in the library "
         "stops being a mystery.",
         refs=(DOCS_WIDGETS,),
+        asset=_diagram(
+            "widget_anatomy",
+            "The four parts of a widget. The metadata layer is the one compliance cares about.",
+            "One widget broken into four stacked parts: data source (a feed, a database, their "
+            "own data, a static file); metadata layer (title, category, and the source "
+            "attribution); visual layer (table, chart, PDF, or a custom view); and parameters (the "
+            "interactive part: ticker, date range). An arrow runs from the metadata layer to a "
+            "highlighted panel reading: this is your answer when compliance asks where a number "
+            "came from.",
+        ),
     ),
     _s(
         5,
@@ -953,6 +997,14 @@ _SECTION_3_SLIDES: tuple[Slide, ...] = (
         "every linked widget. Watching a whole dashboard move from one field is the moment a "
         "prospect leans in.",
         refs=(DOCS_WIDGETS,),
+        asset=_diagram(
+            "linked_parameters",
+            "One field moves everything. This is the demo, so practise it until it is boring.",
+            "A single ticker field at the top of a dashboard, holding a symbol. Three arrows fan "
+            "out from it down to three widgets: a price chart, fundamentals, and news and "
+            "filings. Changing the one field updates all three. A line beneath reads: a prospect "
+            "does not care that you have three widgets, they care about this.",
+        ),
     ),
     _s(
         9,
@@ -1405,6 +1457,14 @@ _SECTION_4_SLIDES: tuple[Slide, ...] = (
         "dashboard stops being one person's and becomes the desk's standard. It is also the "
         'honest answer to "how do we roll this out?"',
         refs=(DOCS_DASHBOARDS, DOCS_APPS),
+        asset=_diagram(
+            "dashboard_to_app",
+            "How one person's dashboard becomes the desk's standard.",
+            "A configured dashboard on the left — widgets a single analyst arranged — passing "
+            "through an Export apps.json step in the middle, and arriving on the right as an app "
+            "the whole desk opens. The point of the drawing is that the middle step is one "
+            "right-click, not a project.",
+        ),
     ),
     _s(
         19,
@@ -1604,6 +1664,15 @@ _SECTION_5_SLIDES: tuple[Slide, ...] = (
         "firms side by side. A client-reporting view that someone outside the desk will read. Each "
         "stresses a different part of the product.",
         refs=(DOCS_DASHBOARDS, DOCS_WORKSPACE),
+        asset=_diagram(
+            "three_jobs",
+            "The job decides the shape. Build the one your target's segment already needs.",
+            "Three miniature workspace layouts side by side, deliberately different shapes. "
+            "Comparison: four small panels in a grid, several firms side by side, suiting an "
+            "exchange or a bank. Monitoring: one large panel with a single highlighted element "
+            "that changes, suiting a retail brokerage. Client reporting: two panels, each with a "
+            "label line beneath it, read outside the room, suiting a wealth manager.",
+        ),
     ),
     _s(
         2,
@@ -2035,6 +2104,17 @@ _SECTION_6_SLIDES: tuple[Slide, ...] = (
         "over a network may be obliged to publish those modifications. Most financial firms will "
         "not accept that. This is a real objection and it deserves a real answer.",
         refs=(LICENCE,),
+        asset=_diagram(
+            "agpl_decision",
+            "Two questions decide the answer. Learn the shape of this, not a form of words.",
+            "A decision tree headed: can the client build on the open-source platform? The first "
+            "question is whether they are MODIFYING the platform. No leads to 'using it as "
+            "published' — no AGPL obligation to publish anything. Yes leads to a second question: "
+            "are they SERVING it to others over a network? No leads to 'internal use only' — "
+            "modify freely, the network clause is not triggered. Yes leads to 'source disclosure "
+            "bites' — this is what a commercial arrangement is for. Beneath, in warning colour: "
+            "name the licence, say the commercial route exists, never advise on it yourself.",
+        ),
     ),
     _s(
         11,
@@ -2292,6 +2372,16 @@ _SECTION_7_SLIDES: tuple[Slide, ...] = (
         "Nobody buys a workspace. They buy the end of a specific irritation. Your job in "
         "qualification is to find the irritation and check it is expensive enough that somebody is "
         "already complaining about it upward.",
+        asset=_diagram(
+            "segment_triggers",
+            "Five segments, five different irritations, five different people who feel it.",
+            "A table of the five segments we assess, what opens each, and who feels it. Retail "
+            "brokerage: research cost, felt by the head of research. Wealth manager: consistency "
+            "and supervision, felt by someone compliance-adjacent. Exchange: product insight on "
+            "their own feeds, felt by the data product manager. Bank: consolidation and AI "
+            "governance, felt by the architect. Information vendor: distribution rather than "
+            "consumption, felt by the commercial lead.",
+        ),
     ),
     _s(
         1,
@@ -2643,6 +2733,15 @@ _SECTION_8_SLIDES: tuple[Slide, ...] = (
         "First meeting to find the irritation. Demo on something recognisably theirs. Technical "
         "conversation about deployment and licence. Scoped pilot on their own data. Then pricing. "
         "Skipping straight to pricing is the most common way this stalls.",
+        asset=_diagram(
+            "the_sale",
+            "Five stages, and the one thing that tells you a stage actually closed.",
+            "Five stages left to right, with the good outcome under each. First meeting: a number "
+            "and a name. Demo: a question you could not answer. Technical: an introduction to the "
+            "engineer. Pilot, highlighted as the real close: a date. Price: a scoped quote from "
+            "OpenBB. Beneath: anything vaguer at any stage means you are one stage behind where "
+            "you think.",
+        ),
     ),
     _s(
         3,

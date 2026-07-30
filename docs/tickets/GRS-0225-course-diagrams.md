@@ -1,7 +1,12 @@
 # GRS-0225 — Diagrams for the courses, authored not decorated
 
-**Status:** Planned (2026-07-29). **Priority:** HIGH. **Loop:** founder-feedback remediation,
-Wave 4. **Depends on:** GRS-0206 (the Rive toolchain), GRS-0215 (the slide contract).
+**Status:** In review (2026-07-29, PR #220). **Priority:** HIGH. **Loop:** founder-feedback
+remediation, Wave 4. **Depends on:** GRS-0206 (the Rive toolchain), GRS-0215 (the slide contract).
+
+> **Not yet visible to an advisor.** The nine diagrams are on their slides and served by the API,
+> but the Academy reader renders `lesson.body` and `lesson.assets` only — `slides` is not in the
+> frontend types at all. So all 196 slides of GRS-0216, and these diagrams with them, are data
+> nobody can see. The slide reader is its own build and this ticket's acceptance depends on it.
 
 ## Why
 
@@ -65,6 +70,28 @@ was not before that tool existed.
    part that stops the next course from shipping 196 slides of prose again.
 4. Reduced-motion: the static frame renders and carries the same information.
 5. Standing gate: pytest, pyright, tsc, ESLint, per-file vitest.
+
+### What shipped against that plan
+
+1 and 2 need `rive-cli` and a Rust toolchain, which CI does not have. They are a **local** gate:
+`design/motion/render.sh` (generate → validate → render, refusing a blank frame) plus the SVG-vs-
+still comparison documented in `design/motion/README.md`. Saying so is better than a CI job that
+silently skips.
+
+In CI instead, `tests/test_course_diagrams.py` (55 cases) proves what does not need the toolchain:
+every scene exports; the generated content module and the committed `.svg` have not drifted from
+the scenes; the SVG uses only constructs `frontend/lib/svg.ts` accepts; the emitter refuses an
+unknown node, an unimplemented property, an unresolvable animated property and multi-line text; the
+paint order is inverted; and every scene is actually on a slide. `frontend/lib/courseDiagrams.test.ts`
+(28 cases) runs the real sanitiser over the real diagrams, because a rejected diagram renders as an
+error message rather than a drawing.
+
+3 shipped as `MIN_ASSETS_PER_LESSON` and `MIN_ASSET_ALT_CHARS` in `content/depth.py`, with two
+tests that watch a thin fixture be refused. It needed **two more diagrams** than this ticket
+listed: sections 2 and 5 had no spatial idea in the original seven, and a rule that two of eight
+sections fail is not a rule. `what_runs_where` (your machine and the package versus their browser
+and Workspace, with `localhost:6900` between them) and `three_jobs` (three miniature layouts,
+because the job decides the shape) are both ideas the prose was already trying to draw.
 
 ## Out of scope
 
