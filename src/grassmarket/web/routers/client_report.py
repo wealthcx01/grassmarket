@@ -20,6 +20,7 @@ from datetime import UTC, datetime
 from io import BytesIO
 from uuid import UUID
 
+from bcap_contracts.assessments import RecordProvenance
 from bcap_contracts.client_report import UnapprovedReportSectionError, assert_client_ready
 from bcap_contracts.deliverables import Deliverable, DeliverableMode
 from bcap_contracts.narratives import NarrativeStatus
@@ -85,7 +86,7 @@ def _not_found() -> HTTPException:
 
 def _context(
     repo: Repository, principal: Principal, deliverable_id: UUID
-) -> tuple[DeliverableContext, Deliverable, UUID]:
+) -> tuple[DeliverableContext, Deliverable, UUID, RecordProvenance]:
     """The DeliverableContext for a deliverable's finalised run, plus its subject and run id.
 
     Rebuilt from the STORED run rather than rescored, so the report quotes the immutable finalised
@@ -104,7 +105,8 @@ def _context(
 
     record = repo.get_scoring_run_record(principal, deliverable.scoring_run_id)
     subject = repo.get_prospect(principal, engagement.prospect_id).company_name
-    document = repo.get_assessment(principal, record.assessment_id).document
+    assessment = repo.get_assessment(principal, record.assessment_id)
+    document = assessment.document
     profile_key = profile_key_of(document)
 
     from grassmarket.atlas.active import profile_scoring_context
@@ -128,14 +130,20 @@ def _context(
         uncertainty_version=model.version,
         generated_on=(deliverable.generated_at or datetime.now(UTC)).date(),
     )
-    return context, deliverable, record.id
+    return context, deliverable, record.id, assessment.provenance
 
 
 def assemble_for(
     repo: Repository, principal: Principal, deliverable_id: UUID
-) -> tuple[AssembledReport, Deliverable]:
-    """Assemble a deliverable's report, or raise the 409 that names what is unwritten."""
-    context, deliverable, run_id = _context(repo, principal, deliverable_id)
+) -> tuple[AssembledReport, Deliverable, RecordProvenance]:
+    """Assemble a deliverable's report, or raise the 409 that names what is unwritten.
+
+    Returns the record's provenance alongside, because both renditions need it and neither can
+    derive it from what it already holds. `Deliverable.mode` is NOT a substitute: mode comes
+    from the coefficient set's `client_usable` flag, so a sandbox record scored on an activated
+    profile is mode=CLIENT (GRS-0229).
+    """
+    context, deliverable, run_id, provenance = _context(repo, principal, deliverable_id)
     sections_json = repo.get_report_prose(principal, deliverable_id)
     try:
         assembled = assemble(context, scoring_run_id=run_id, sections_json=sections_json)
@@ -164,7 +172,7 @@ def assemble_for(
     except UnapprovedReportSectionError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
 
-    return assembled, deliverable
+    return assembled, deliverable, provenance
 
 
 @router.get("/deliverables/{deliverable_id}/report-prose", response_model=ReportProseResponse)
@@ -210,7 +218,7 @@ def download_client_report(
     The watermark follows the deliverable's own mode, so an internal draft downloads stamped without
     the caller choosing to — a draft escaping unmarked is the failure that matters most (ADR-0029).
     """
-    assembled, deliverable = assemble_for(repo, principal, deliverable_id)
+    assembled, deliverable, provenance = assemble_for(repo, principal, deliverable_id)
     engagement = repo.get_engagement(principal, deliverable.engagement_id)
     consultant = repo.get_consultant_by_id(principal.consultant_id)
     prepared_by = consultant.full_name if consultant else "Bruntsfield Advisory Network"
@@ -222,7 +230,15 @@ def download_client_report(
             prepared_by=prepared_by,
             generated_on=(deliverable.generated_at or datetime.now(UTC)).date(),
             mode=deliverable.mode,
-            non_production=deliverable.mode is not DeliverableMode.CLIENT,
+            # Provenance, not mode. `mode is not CLIENT` was the original derivation and it is
+            # not the same question: mode comes from the coefficient set, so a SANDBOX record
+            # scored on an activated profile (wealth/exchange, client_usable=True) resolves to
+            # mode=CLIENT and rendered a demo report with NO non-production mark at all. Kept
+            # as an OR so a draft-internal production record still carries it (GRS-0229).
+            non_production=(
+                provenance is not RecordProvenance.PRODUCTION
+                or deliverable.mode is not DeliverableMode.CLIENT
+            ),
         ),
         figure_data=assembled.figures,
     )

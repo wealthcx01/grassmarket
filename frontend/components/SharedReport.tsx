@@ -36,7 +36,35 @@ export type SharedReportPayload = {
   };
   figures: Record<string, Figure>;
   tracking_notice: string;
+  /** Demo or sandbox provenance at issue — the numbers describe nobody's actual platform. */
+  non_production?: boolean;
+  /** The deliverable was DRAFT_INTERNAL at issue — not approved for client use. */
+  draft?: boolean;
 };
+
+/* The PDF's two marks, verbatim (`deliverables/gate.py:DRAFT_WATERMARK` and the second mark in
+   `report_pdf/render.py:_draw_watermark`). Reused rather than reworded so the two renditions of the
+   same record cannot tell a reader different things — GRS-0220's whole premise is one source, two
+   renditions, and this is the part of it that was missing. */
+const DRAFT_MARK = "DRAFT \u2014 not client-usable";
+const NON_PRODUCTION_MARK = "NON-PRODUCTION DATA";
+
+/** The banner text for a record's marks, or null when there is nothing to say. */
+export function reportMarkText(payload: {
+  non_production?: boolean;
+  draft?: boolean;
+}): string | null {
+  // `?? true` is the safe direction and it matches the backend's own default. A payload with no
+  // flags is a snapshot issued before GRS-0229, whose provenance nobody recorded — which is exactly
+  // the case where a reader should be told the numbers may not be production. Defaulting to false
+  // here would have let a legacy link render a clean, unmarked page.
+  const marks = [
+    (payload.draft ?? true) ? DRAFT_MARK : null,
+    (payload.non_production ?? true) ? NON_PRODUCTION_MARK : null,
+  ].filter(Boolean);
+  if (marks.length === 0) return null;
+  return `${marks.join("  \u00b7  ")} \u2014 this report does not describe a live platform`;
+}
 
 /** Reader-facing titles. Kept in step with `report_pdf.render.SECTION_TITLES`. */
 const SECTION_TITLES: Record<string, string> = {
@@ -190,11 +218,20 @@ export function SharedReport({
 }) {
   const observe = useSectionTracking(token, trackingEnabled);
   const { report, figures } = payload;
+  const mark = reportMarkText(payload);
   const body = report.sections.filter((s) => s.kind !== "appendix");
   const appendix = report.sections.find((s) => s.kind === "appendix");
 
   return (
     <article className="shared-report">
+      {/* Fixed, so it is on screen at every scroll position — the PDF repeats its watermark on
+          every page and a banner that scrolls away is not the same guarantee. role="alert" rather
+          than "note": this is the one thing on the page a reader must not miss. */}
+      {mark ? (
+        <p className="shared-report-mark" role="alert" data-testid="report-mark">
+          {mark}
+        </p>
+      ) : null}
       <header className="shared-report-head">
         <p className="eyebrow">Bruntsfield Advisory Network</p>
         <h1>{report.subject}</h1>

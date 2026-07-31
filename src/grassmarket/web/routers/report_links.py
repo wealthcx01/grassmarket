@@ -18,7 +18,9 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
+from bcap_contracts.assessments import RecordProvenance
 from bcap_contracts.client_report import ClientReport, ReportSectionKind
+from bcap_contracts.deliverables import DeliverableMode
 from bcap_contracts.report_links import ClientReportLink, ReportReadReport
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
@@ -66,6 +68,15 @@ class SharedReportPayload(BaseModel):
     figures: dict[str, dict[str, list]]
     #: Shown on the page. The reader is told, in plain words, that reads are visible to the sender.
     tracking_notice: str
+    # The two marks the PDF draws, carried IN the snapshot rather than derived when the page is
+    # served (GRS-0229). Stored at issue for the same reason the report is: a record reclassified
+    # later must not retroactively change what an already-issued link shows a reader. Defaulted so
+    # a link issued before this field existed deserialises — and defaulted to the SAFE value, which
+    # for a mark is "show it": a legacy snapshot whose provenance nobody recorded is exactly the
+    # case where the reader should be told the numbers may not be production.
+    non_production: bool = True
+    #: The deliverable was DRAFT_INTERNAL at issue — not approved for client use.
+    draft: bool = True
 
 
 class CreateLinkRequest(BaseModel):
@@ -114,7 +125,7 @@ def create_link(
     # Assembled HERE, not sent by the browser. The client report is a gated artefact; letting the
     # page post its own version of one would put the content model's rules on the wrong side of the
     # trust boundary. A report with unwritten sections raises the 409 that names them.
-    assembled, _ = assemble_for(repo, principal, deliverable_id)
+    assembled, deliverable, provenance = assemble_for(repo, principal, deliverable_id)
     snapshot = SharedReportPayload(
         report=assembled.report,
         figures={
@@ -132,6 +143,11 @@ def create_link(
             },
         },
         tracking_notice=TRACKING_NOTICE,
+        # Provenance, not mode — see the note on `assemble_for`. A sandbox record scored on an
+        # activated profile resolves to mode=CLIENT, so keying the mark on mode alone showed
+        # nothing on precisely the records that most need it.
+        non_production=provenance is not RecordProvenance.PRODUCTION,
+        draft=deliverable.mode is not DeliverableMode.CLIENT,
     )
 
     try:
