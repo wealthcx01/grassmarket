@@ -4,6 +4,33 @@ All notable changes to the shared contracts package. This package is the type sy
 Bruntsfield studios meet Holy Corner; keep it additive so consumers (grassmarket, fountainbridge)
 never break on an upgrade.
 
+## [0.2.0] — 2026-07-31
+
+### Added (FB-059 — the run outcomes a founder is actually shown)
+- `RunOutcome` gains **`opened-pr`**, **`blocked`** and **`awaiting-approval`**. The first cut had
+  three members, and the Foundry lane has six terminal states it must report. Mapping them onto
+  `progress | no-useful-work | error` meant "the lane could not get this past its own review", "the
+  lane finished and is waiting for your decision" and "the lane crashed" all arriving as `error` —
+  three different situations, three different things a founder should do, one word. That is the
+  silent failure fountainbridge's non-negotiable 10 exists to prevent, so the enum carries the
+  distinction instead of the consumer inventing it.
+- `RunReport.pr_url` — the pull request an `opened-pr` run produced. The lane already recorded it and
+  the contract had nowhere to put it.
+
+### Changed
+- `RunReport.outcome` is now optional (`RunOutcome | None`, default `None`), and `RunOutcome` is
+  documented as **terminal states only**. A run in flight has not ended and therefore has no outcome;
+  the previous shape forced one to be invented at the moment a run started. A model validator holds
+  the invariant both ways: `ended_at` and `outcome` are set together or neither is, so a record can
+  no longer read as finished-with-no-result or as permanently in flight.
+- `RunReport.error_detail` now also carries the reason for a `blocked` outcome, not only `error`. A
+  clean stop still owes the founder an explanation.
+
+**Consumer impact:** additive for anything reading a *finished* report — every previously valid
+record still validates and its `outcome` is still populated. Code that assumed `outcome` was
+non-null must handle the in-flight case; nothing in grassmarket reads `RunReport` today, and
+fountainbridge consumes it for the first time in FB-042.
+
 ## [0.1.0] — 2026-07-20
 
 ### Added (FB-002 — Foundry Studio entities, consumed by fountainbridge)

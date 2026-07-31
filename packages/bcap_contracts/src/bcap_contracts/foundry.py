@@ -19,7 +19,7 @@ from __future__ import annotations
 from datetime import datetime
 from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 
 # Consumer-account email domains that a founder's venture identity must never be. D3/D6: the
 # founder's studio login + agent send identity is a Bruntsfield-assigned account on the venture's
@@ -91,12 +91,41 @@ class RunTrigger(StrEnum):
 
 
 class RunOutcome(StrEnum):
-    """How a lane run ended. ``no-useful-work`` is a first-class outcome — the pre-check that
-    decides not to burn a session is a success, not a failure (Phase 2 scheduler)."""
+    """How a lane run ENDED — terminal states only; an in-flight run has ``outcome=None``.
+
+    ``no-useful-work`` is a first-class outcome: the pre-check that decides not to burn a session is
+    a success, not a failure (Phase 2 scheduler).
+
+    The three states past ``progress`` exist because collapsing them loses exactly what the
+    studio's surface is for. A founder blocked at 22:00 must see *why* (fountainbridge
+    non-negotiable 10), and "the lane could not get this past its own review", "the lane finished
+    and is waiting for your decision" and "the lane crashed" call for three different actions from
+    them. Only the last is an error; reporting the other two as one would be the silent failure the
+    rule forbids.
+    """
 
     PROGRESS = "progress"
+    """Work advanced, with nothing further required to record it."""
+
+    OPENED_PR = "opened-pr"
+    """Work advanced and produced a pull request for a human to review (see ``pr_url``)."""
+
     NO_USEFUL_WORK = "no-useful-work"
+    """Nothing was ready to work. A clean, expected outcome — the lane declined to spend a
+    session."""
+
+    BLOCKED = "blocked"
+    """The lane stopped and cannot proceed without a person: it exhausted its validation rounds,
+    hit its attempt cap, or reached a decision it refused to guess at. Not an error — a clean stop
+    with a reason, which belongs in ``error_detail``."""
+
+    AWAITING_APPROVAL = "awaiting-approval"
+    """The lane finished its work and something it prepared needs a human decision before it
+    happens — a high-blast-radius plan, or an external action proposed through the approval gate.
+    The work is done; the consequence is held."""
+
     ERROR = "error"
+    """The run failed. ``error_detail`` says how."""
 
 
 class ChangeClass(StrEnum):
@@ -307,7 +336,34 @@ class RunReport(BaseModel):
     tickets_touched: list[str] = Field(
         default_factory=list, description="Ids of tickets this run touched."
     )
-    outcome: RunOutcome
-    error_detail: str | None = Field(
-        default=None, description="Failure detail when outcome is 'error'; None otherwise."
+    outcome: RunOutcome | None = Field(
+        default=None,
+        description="How the run ended; None while it is still in flight (see ``ended_at``).",
     )
+    error_detail: str | None = Field(
+        default=None,
+        description=(
+            "Why, in plain language, for the outcomes that owe the founder a reason — 'error' and "
+            "'blocked'. None otherwise."
+        ),
+    )
+    pr_url: str | None = Field(
+        default=None,
+        description="The pull request this run opened, when outcome is 'opened-pr'.",
+    )
+
+    @model_validator(mode="after")
+    def _in_flight_is_consistent(self) -> RunReport:
+        """A run has ended, or it has an outcome — never one without the other.
+
+        The two fields are written at different moments by a shell supervisor, so they can drift.
+        A record with an outcome and no end time reads as permanently in-flight; one with an end
+        time and no outcome reads as finished with no result. Both are states a founder would be
+        shown and neither is true, so the model refuses them rather than letting the studio guess.
+        """
+        if (self.ended_at is None) != (self.outcome is None):
+            raise ValueError(
+                "ended_at and outcome must be set together: a run in flight has neither, "
+                "a finished run has both"
+            )
+        return self
