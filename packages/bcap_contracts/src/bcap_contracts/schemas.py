@@ -66,6 +66,14 @@ from bcap_contracts.entities import (
 from bcap_contracts.extraction import Extraction, FieldProvenance
 from bcap_contracts.fees import RecoveryFeeAttribution
 from bcap_contracts.founder_review import FounderApproval, FounderReviewQueueEntry
+from bcap_contracts.foundry import (
+    Approval,
+    Department,
+    Lane,
+    RunReport,
+    Ticket,
+    Venture,
+)
 from bcap_contracts.influencer import (
     InfluencerMap,
     InfluencerMapProvenance,
@@ -206,6 +214,13 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "AcceptInvitationRequest": AcceptInvitationRequest,
     "AuditEvent": AuditEvent,
     "PersonalDataExport": PersonalDataExport,
+    # Foundry Studio entities (FB-002) — rendered by fountainbridge.
+    "Venture": Venture,
+    "Lane": Lane,
+    "Ticket": Ticket,
+    "Approval": Approval,
+    "Department": Department,
+    "RunReport": RunReport,
 }
 
 _SCHEMA_DIR = Path(__file__).parent / "json_schema"
