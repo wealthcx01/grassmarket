@@ -475,7 +475,11 @@ export function LiveSummary({
 }) {
   const locked = final?.v_index != null ? final : null;
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", position: "sticky", top: "1rem" }}>
+    // NOT sticky (GRS-0221). Pinning this card while the "recommended to sell" panel below it in
+    // the SAME column kept scrolling is what made the two fight: the sell panel slid underneath the
+    // pinned score. The whole rail sticks as one block instead — see [data-wizard-rail] in
+    // globals.css, which also caps its height so a rail taller than the viewport stays reachable.
+    <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
       {/* The draft-profile caveat travels with the rail V (GRS-0152), gated on client-usability
           (GRS-0156) so an activated segment drops it. */}
       {(locked || (live?.scoreable && live.v)) ? (
@@ -496,7 +500,7 @@ export function LiveSummary({
           </p>
         </div>
       ) : (
-        <div className="card" style={{ padding: "0.85rem 1rem", position: "sticky", top: "1rem" }}>
+        <div className="card" style={{ padding: "0.85rem 1rem" }}>
           <p style={{ margin: 0, fontWeight: 600, fontSize: "0.82rem" }}>Live score</p>
           {live && live.blocking.length > 0 ? (
             <>

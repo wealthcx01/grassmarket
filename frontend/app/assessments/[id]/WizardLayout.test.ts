@@ -43,3 +43,57 @@ describe("wizard two-column layout (GRS-0182)", () => {
     expect(component).toContain("data-wizard-rail");
   });
 });
+
+/**
+ * GRS-0221: the founder reported the "recommended to sell" panel sliding underneath the pinned
+ * Platform Value card. Cause: the rail's FIRST CHILD was sticky while its siblings scrolled on in
+ * the same grid column. The rail now sticks as one block instead, so nothing shares a column with
+ * a pinned element.
+ *
+ * These are guards, not the proof. The proof is measured on the rendered page — 119px of overlap
+ * before, 0px after, at four viewports — in `docs/reviews/GRS-0221-stage6-layout/`. That split is
+ * deliberate and is the GRS-0209 lesson: a test comparing style declarations passed while the page
+ * was visibly wrong, because geometry is not declarations. What a unit test CAN do is catch the
+ * declaration going back, which is the regression that would silently undo the measured fix.
+ */
+describe("wizard rail stickiness (GRS-0221)", () => {
+  const component = read("app", "assessments", "[id]", "WizardClient.tsx");
+  const css = read("app", "globals.css");
+
+  it("gives no panel its own stickiness — only the rail container is pinned", () => {
+    // The exact regression: someone re-adds position:sticky to a card inside the rail, and it
+    // starts covering its siblings again.
+    expect(component).not.toMatch(/position:\s*["']sticky["']/);
+  });
+
+  it("sticks the rail container itself", () => {
+    const rule = css.slice(css.indexOf(".wizard-two-col [data-wizard-rail] {"));
+    expect(rule.slice(0, rule.indexOf("}"))).toMatch(/position:\s*sticky/);
+  });
+
+  it("caps the pinned rail's height and lets it scroll inside itself", () => {
+    // Without this a rail taller than the viewport pins its top and puts its bottom permanently
+    // out of reach — no scroll gesture can get there.
+    const rule = css.slice(css.indexOf(".wizard-two-col [data-wizard-rail] {"));
+    const body = rule.slice(0, rule.indexOf("}"));
+    expect(body).toMatch(/max-height:\s*calc\(100vh/);
+    expect(body).toMatch(/overflow-y:\s*auto/);
+  });
+
+  it("pins the rail clear of the sticky site header, not underneath it", () => {
+    // Measured: with top: 1rem the rail sat 44px behind the z-index-50 header, which ate the score
+    // card's own heading. The offset must be expressed against the header's height token so the
+    // two cannot drift apart.
+    const rule = css.slice(css.indexOf(".wizard-two-col [data-wizard-rail] {"));
+    const body = rule.slice(0, rule.indexOf("}"));
+    expect(body).toMatch(/top:\s*calc\(var\(--topbar-height\)/);
+    expect(body).toMatch(/max-height:\s*calc\(100vh\s*-\s*var\(--topbar-height\)/);
+  });
+
+  it("drops stickiness entirely on a short viewport", () => {
+    // A pinned block with its own scrollbar owning most of a 640px-tall screen is worse than one
+    // that simply scrolls with the page.
+    const shortVp = css.slice(css.indexOf("@media (max-height: 700px)"));
+    expect(shortVp).toMatch(/\[data-wizard-rail\][^}]*position:\s*static/);
+  });
+});
