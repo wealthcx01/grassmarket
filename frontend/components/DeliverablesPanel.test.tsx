@@ -101,10 +101,14 @@ describe("DeliverablesPanel (GRS-0019)", () => {
 
   it("surfaces the gate refusal message verbatim, not a status code", async () => {
     mocked.listDeliverables.mockResolvedValue([]);
+    // The exact sentence `resolve_mode` raises (deliverables/gate.py) — keep this fixture equal to
+    // the real message, or the test proves pass-through of a string the API can no longer send.
     mocked.generateDeliverable.mockRejectedValue(
       new ApiError(
         409,
-        "Refusing to generate a client-facing deliverable from coefficient set 'v1-draft-pending-elicitation' (client_usable=False).",
+        "This assessment's scores are still in draft (weights pending expert elicitation), so a " +
+          "client-facing deliverable can't be produced yet. Generate the internal, watermarked " +
+          "draft instead.",
         null,
       ),
     );
@@ -117,7 +121,8 @@ describe("DeliverablesPanel (GRS-0019)", () => {
     fireEvent.click(screen.getByRole("button", { name: "Generate client-facing document" }));
 
     const alert = await screen.findByRole("alert");
-    expect(alert.textContent).toContain("client_usable=False");
+    expect(alert.textContent).toContain("still in draft");
+    expect(alert.textContent).toContain("watermarked draft instead");
     expect(alert.textContent).not.toContain("409");
   });
 

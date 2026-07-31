@@ -94,6 +94,7 @@ From the 2026-07-26 staging review. Wave 4 (the course rebuild) is the part that
 | **GRS-0223** | **"All the scores seem surprisingly similar": find out why** | **Answered, in review** — the engine is not compressing (achievable V span 0.815); aggregation is, and the rubric is used at ~1/3 of its width. No engine change recommended. See `docs/analysis/score-dispersion-2026-07.md` |
 | GRS-0227 | Surface the dispersion beside the score | **Built, in review** — module range + one-line meaning on the summary and live panel; bottleneck leads where the spread is wide. New `module_qm_point` on the live payload (deterministic, assessed-only). No new dimension, no band, no rating gate |
 | GRS-0224 | Repository coverage for the dormant peer-governance code | Planned (arose from 0188) |
+| **GRS-0228** | **The E2E gate assertion tested a message we deliberately stopped sending** | **Done** — `CI / E2E` was red on `main` from 2026-07-22 to 2026-07-31. Not a broken gate: GRS-0163 rewrote the refusal copy into plain English and the spec still demanded the old `client_usable=False` jargon. Test-only fix; suite now 8/8. Follow-up worth doing: export the gate's copy as a shared constant so one sentence isn't hand-copied into three files |
 | **GRS-0225** | **Diagrams for the courses, authored not decorated** — nine scenes | **In review, PR #220** |
 | **GRS-0226** | **The slide reader and the section gate** — makes 0215/0216/0225 visible | **In review, PR #220** |
 

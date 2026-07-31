@@ -205,7 +205,7 @@ class TestTheContentsPage:
 
     def _long_report(self, report: ClientReport) -> ClientReport:
         """The same report with enough prose to cross the threshold."""
-        filler = ["A paragraph of a consultant's assessment prose, carrying no figures." ] * 22
+        filler = ["A paragraph of a consultant's assessment prose, carrying no figures."] * 22
         return report.model_copy(
             update={
                 "sections": [

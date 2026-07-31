@@ -58,10 +58,16 @@ test.describe("GRS-0019 slice 1 — deliverable library", () => {
     await page.getByRole("button", { name: "Generate client-facing document" }).click();
 
     // The client-usable gate refuses (draft coefficient set) — the human sees WHY, not a 409.
-    // Filter past Next.js's always-present empty #__next-route-announcer__ (also role="alert").
-    const alert = page.getByRole("alert").filter({ hasText: /client-usable|client_usable=False|Refusing/i });
+    // The wording is the gate's own message (`resolve_mode`, deliverables/gate.py), surfaced
+    // verbatim; GRS-0163 rewrote it from raw jargon ("client_usable=False") into plain English,
+    // so match on the shipped sentence. Filter past Next.js's always-present empty
+    // #__next-route-announcer__ (also role="alert").
+    const alert = page.getByRole("alert").filter({ hasText: /still in draft/i });
     await expect(alert).toBeVisible();
-    await expect(alert).toContainText(/client-usable|client_usable=False/i);
+    await expect(alert).toContainText(/can['’]t be produced yet/i);
+    // It must say what to do instead, and never leak a status code or an internal flag name.
+    await expect(alert).toContainText(/watermarked draft instead/i);
+    await expect(alert).not.toContainText(/409|client_usable=/i);
   });
 });
 

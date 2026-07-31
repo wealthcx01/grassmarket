@@ -40,12 +40,8 @@ def upgrade() -> None:
         # A deliverable has exactly one client report, so saving is an upsert, not an append.
         sa.UniqueConstraint("deliverable_id", name="uq_client_report_prose_deliverable"),
     )
-    op.create_index(
-        "ix_client_report_prose_owner", "client_report_prose", ["owner_consultant_id"]
-    )
-    op.create_index(
-        "ix_client_report_prose_deliverable", "client_report_prose", ["deliverable_id"]
-    )
+    op.create_index("ix_client_report_prose_owner", "client_report_prose", ["owner_consultant_id"])
+    op.create_index("ix_client_report_prose_deliverable", "client_report_prose", ["deliverable_id"])
 
 
 def downgrade() -> None:
