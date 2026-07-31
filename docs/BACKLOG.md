@@ -40,7 +40,7 @@ surface quotes.
 | GRS-0174 | Voice & style guide + application copy sweep | In review, PR #201 |
 | GRS-0175 | Guide & Primer rewrite (/help merged into /guide) | In review, PR #208 |
 | GRS-0176 | Vertical Kanban for the pipeline | In review, PR #205 |
-| GRS-0177 | Portfolio clarity: dedupe, explain, clean | In review, PRs #214/#218 — **the staging cleanup script has not been run** (needs deploy access) |
+| GRS-0177 | Portfolio clarity: dedupe, explain, clean | In review, PRs #214/#218 — portfolio cleanup verified run on staging 31/07 (portfolio is clean); **engagements still hold duplicate demo rows** → GRS-0241 |
 | GRS-0178 | New-assessment creation form redesign | In review, PR #215 (stacked on 0177) |
 | GRS-0179 | `docs/ATLAS-Scoring-Explained.md` — the maths, in English | In review, PR #204 |
 | GRS-0180 | 7 Powers mathematics adaptation — normative document | In review, PR #203 |
@@ -97,6 +97,35 @@ From the 2026-07-26 staging review. Wave 4 (the course rebuild) is the part that
 | **GRS-0228** | **The E2E gate assertion tested a message we deliberately stopped sending** | **Done** — `CI / E2E` was red on `main` from 2026-07-22 to 2026-07-31. Not a broken gate: GRS-0163 rewrote the refusal copy into plain English and the spec still demanded the old `client_usable=False` jargon. Test-only fix; suite now 8/8. Follow-up worth doing: export the gate's copy as a shared constant so one sentence isn't hand-copied into three files |
 | **GRS-0225** | **Diagrams for the courses, authored not decorated** — nine scenes | **In review, PR #220** |
 | **GRS-0226** | **The slide reader and the section gate** — makes 0215/0216/0225 visible | **In review, PR #220** |
+
+## First-time-user review wave (GRS-0229–0245, 2026-07-31)
+
+From the founder's 31/07 review ("I have tried to use each section of the studio … and none of it
+makes sense") plus the same-day critical staging review of the client-report wave. Two threads:
+**client-report hardening** (0229–0235, 0245) and **first-time-user coherence** (0236–0244).
+
+| Ticket | Title | Priority |
+|---|---|---|
+| GRS-0229 | The shared web report must carry the non-production mark | HIGHEST (bug) |
+| GRS-0230 | Report editor: feedback where you can see it, figures you can declare | HIGH (bug+UX) |
+| GRS-0231 | The report editor must name the client | MED-HIGH (bug) |
+| GRS-0232 | The appendix must not contradict the run | MED (bug) |
+| GRS-0233 | Web report figures: label the bars, keep the story's order | MED-HIGH (bug) |
+| GRS-0234 | PDF furniture: filename, subtitle, footer, precision | MED |
+| GRS-0235 | Read tracking an advisor can read | LOW-MED |
+| GRS-0236 | Demo deliverables ship with worked example reports | HIGH |
+| GRS-0237 | The engine white paper: "is this up to scratch?", answered | HIGH |
+| GRS-0238 | A Prospecting surface: browse the registry we imported | HIGH |
+| GRS-0239 | Lessons that teach before they test | MED-HIGH |
+| GRS-0240 | The earnings page explains how you get paid | MED-HIGH |
+| GRS-0241 | Engagements: a list you can read, a link you cannot cross-wire | MED-HIGH |
+| GRS-0242 | The Workbench stops leaking internals and contradicting itself | MED (bug) |
+| GRS-0243 | First-run orientation + the twice-flagged home copy | HIGH |
+| GRS-0244 | The Guide must describe the product that exists | MED (docs bug) |
+| GRS-0245 | Founder sign-off covers everything that reaches a client | HIGH (policy) |
+
+Suggested order: 0229 and 0245 first (client-trust breaches), then 0236/0243 (the first-run
+experience), then 0230/0231/0233 (report workflow), then the rest.
 
 ## Demo-readiness program (GRS-0158–0163, 2026-07-21) — get the studio performant enough to show advisor hires
 
