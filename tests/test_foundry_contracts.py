@@ -189,3 +189,98 @@ def test_run_report_no_useful_work_is_not_an_error() -> None:
     rr = _run_report()
     assert rr.outcome is RunOutcome.NO_USEFUL_WORK
     assert rr.error_detail is None
+
+
+# --- FB-059: the run outcomes a founder is actually shown ----------------------------------------
+# The first cut had three outcomes (progress / no-useful-work / error). The Foundry lane
+# distinguishes six states and the studio renders them differently, because "it could not get past
+# its own review", "it is waiting for your decision" and "it crashed" call for three different
+# actions from a founder. Collapsing them into `error` would be the silent failure fountainbridge's
+# non-negotiable 10 exists to prevent.
+
+
+def _report(**over: object) -> RunReport:
+    base = {
+        "lane_id": "sell",
+        "started_at": _now(),
+        "ended_at": _now(),
+        "trigger": RunTrigger.SCHEDULED,
+        "outcome": RunOutcome.PROGRESS,
+    }
+    base.update(over)
+    return RunReport(**base)  # type: ignore[arg-type]
+
+
+def test_every_lane_state_has_an_outcome_that_keeps_its_meaning() -> None:
+    """Each of the lane's terminal states maps to a distinct outcome — no two collapse together."""
+    outcomes = {
+        RunOutcome.PROGRESS,
+        RunOutcome.OPENED_PR,
+        RunOutcome.NO_USEFUL_WORK,
+        RunOutcome.BLOCKED,
+        RunOutcome.AWAITING_APPROVAL,
+        RunOutcome.ERROR,
+    }
+    assert len({o.value for o in outcomes}) == 6
+    for outcome in outcomes:
+        assert _report(outcome=outcome).outcome is outcome
+
+
+def test_blocked_is_not_an_error() -> None:
+    """A lane that stopped cleanly and wants a human is not a crash, and must not read as one."""
+    assert RunOutcome.BLOCKED is not RunOutcome.ERROR
+    blocked = _report(
+        outcome=RunOutcome.BLOCKED,
+        error_detail="Could not get this past its own review in 2 rounds; it needs a human.",
+    )
+    assert blocked.outcome is RunOutcome.BLOCKED
+    assert blocked.error_detail is not None  # blocked owes the founder a reason too
+
+
+def test_awaiting_approval_carries_finished_work_with_a_held_consequence() -> None:
+    report = _report(
+        outcome=RunOutcome.AWAITING_APPROVAL,
+        summary_md="Drafted the invitation and proposed the send for your approval.",
+    )
+    assert report.outcome is RunOutcome.AWAITING_APPROVAL
+    assert report.error_detail is None  # nothing went wrong
+
+
+def test_opened_pr_can_carry_the_pull_request_it_refers_to() -> None:
+    report = _report(
+        outcome=RunOutcome.OPENED_PR, pr_url="https://github.com/wealthcx01/arca/pull/12"
+    )
+    assert report.pr_url is not None
+
+
+def test_an_in_flight_run_has_neither_an_end_nor_an_outcome() -> None:
+    in_flight = RunReport(
+        lane_id="sell", started_at=_now(), trigger=RunTrigger.SCHEDULED, ended_at=None
+    )
+    assert in_flight.outcome is None
+    assert in_flight.ended_at is None
+
+
+def test_a_run_cannot_have_an_outcome_without_having_ended() -> None:
+    """Otherwise the studio shows a finished run as permanently in flight, or the reverse."""
+    with pytest.raises(ValidationError):
+        RunReport(
+            lane_id="sell",
+            started_at=_now(),
+            ended_at=None,
+            trigger=RunTrigger.SCHEDULED,
+            outcome=RunOutcome.PROGRESS,
+        )
+    with pytest.raises(ValidationError):
+        RunReport(
+            lane_id="sell",
+            started_at=_now(),
+            ended_at=_now(),
+            trigger=RunTrigger.SCHEDULED,
+            outcome=None,
+        )
+
+
+def test_in_flight_report_round_trips_both_ways() -> None:
+    report = RunReport(lane_id="sell", started_at=_now(), trigger=RunTrigger.SCHEDULED)
+    assert RunReport.model_validate(report.model_dump(mode="json")) == report

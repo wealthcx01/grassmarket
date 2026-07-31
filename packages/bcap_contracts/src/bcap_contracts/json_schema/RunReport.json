@@ -1,10 +1,13 @@
 {
   "$defs": {
     "RunOutcome": {
-      "description": "How a lane run ended. ``no-useful-work`` is a first-class outcome — the pre-check that\ndecides not to burn a session is a success, not a failure (Phase 2 scheduler).",
+      "description": "How a lane run ENDED — terminal states only; an in-flight run has ``outcome=None``.\n\n``no-useful-work`` is a first-class outcome: the pre-check that decides not to burn a session is\na success, not a failure (Phase 2 scheduler).\n\nThe three states past ``progress`` exist because collapsing them loses exactly what the\nstudio's surface is for. A founder blocked at 22:00 must see *why* (fountainbridge\nnon-negotiable 10), and \"the lane could not get this past its own review\", \"the lane finished\nand is waiting for your decision\" and \"the lane crashed\" call for three different actions from\nthem. Only the last is an error; reporting the other two as one would be the silent failure the\nrule forbids.",
       "enum": [
         "progress",
+        "opened-pr",
         "no-useful-work",
+        "blocked",
+        "awaiting-approval",
         "error"
       ],
       "title": "RunOutcome",
@@ -47,7 +50,7 @@
         }
       ],
       "default": null,
-      "description": "Failure detail when outcome is 'error'; None otherwise.",
+      "description": "Why, in plain language, for the outcomes that owe the founder a reason — 'error' and 'blocked'. None otherwise.",
       "title": "Error Detail"
     },
     "lane_id": {
@@ -57,7 +60,29 @@
       "type": "string"
     },
     "outcome": {
-      "$ref": "#/$defs/RunOutcome"
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RunOutcome"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "How the run ended; None while it is still in flight (see ``ended_at``)."
+    },
+    "pr_url": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The pull request this run opened, when outcome is 'opened-pr'.",
+      "title": "Pr Url"
     },
     "started_at": {
       "format": "date-time",
@@ -85,8 +110,7 @@
   "required": [
     "lane_id",
     "started_at",
-    "trigger",
-    "outcome"
+    "trigger"
   ],
   "title": "RunReport",
   "type": "object"
