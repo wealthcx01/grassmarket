@@ -21,8 +21,8 @@ from datetime import UTC, datetime, timedelta
 
 from bcap_contracts.report_links import ClientReportLink, LinkState
 
-#: 32 bytes of entropy — a token nobody guesses and nothing enumerates.
-_TOKEN_BYTES = 32
+#: 24 bytes → 48 hex characters → 192 bits. Far more than enough against guessing.
+_TOKEN_BYTES = 24
 
 #: What an advisor gets if they express no preference.
 DEFAULT_EXPIRY = timedelta(days=30)
@@ -57,8 +57,19 @@ def hash_token(token: str) -> str:
 
 
 def generate_token() -> str:
-    """A fresh, unguessable token. URL-safe so it can live in a path segment."""
-    return secrets.token_urlsafe(_TOKEN_BYTES)
+    """A fresh, unguessable token: 48 hex characters, no punctuation at all.
+
+    Hex rather than `token_urlsafe`, which was the first implementation and was WRONG in a way only
+    the real world shows. Its alphabet includes `_`, and a link is something a human pastes: into an
+    email, a chat message, a markdown note. A renderer that treats `_word_` as emphasis silently
+    eats the underscores, and the client is handed a URL that resolves to "this report is not
+    available" — indistinguishable, by design, from a revoked link. It happened on the first link
+    ever sent for review.
+
+    An alphabet of `[0-9a-f]` cannot be mangled by any formatter, survives a double-click select,
+    and can be read down a phone line. 192 bits of entropy costs nothing to keep.
+    """
+    return secrets.token_hex(_TOKEN_BYTES)
 
 
 def resolve_expiry(*, now: datetime, requested: timedelta | None) -> datetime:

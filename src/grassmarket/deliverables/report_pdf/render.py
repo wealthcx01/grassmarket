@@ -444,14 +444,38 @@ def render_client_report_pdf(
     The content model arrives validated (order, appendix-only maths, declared figures, approval), so
     nothing here re-checks it — this function is presentation only.
 
-    Built TWICE. The first pass records which page each section starts on; the second draws the
-    running heads from that map. Page furniture cannot know the future during a single pass, and a
-    running head that names the wrong section is worse than none.
+    Built in PASSES, because page furniture cannot know the future during a single pass and a
+    running head that names the wrong section is worse than none:
+
+    1. record which page each section starts on;
+    2. if the report is long enough to need a contents page, insert one — which pushes every
+       body page down by exactly one — and record again against that layout;
+    3. render, drawing the running heads and the contents entries from the final map.
+
+    A contents page is only produced beyond `CONTENTS_THRESHOLD_PAGES`. Below that it is furniture
+    for its own sake: a reader can see the whole shape by scrolling.
     """
     rendered = _rendered_figures(figure_data)
-    recording = _build_document(report, meta=meta, rendered=rendered, section_pages=None)
+
+    first = _build_document(report, meta=meta, rendered=rendered, section_pages=None)
+    wants_contents = first.page_count > tk.CONTENTS_THRESHOLD_PAGES
+
+    recording = first
+    if wants_contents:
+        # Re-record against the layout that HAS the contents page, so the numbers it prints are the
+        # numbers the reader will turn to. Recording against the shorter layout would print a
+        # contents that is wrong by exactly one page — the classic off-by-one nobody notices until
+        # a client follows it.
+        recording = _build_document(
+            report, meta=meta, rendered=rendered, section_pages=None, contents={}
+        )
+
     return _build_document(
-        report, meta=meta, rendered=rendered, section_pages=recording.recorded_sections
+        report,
+        meta=meta,
+        rendered=rendered,
+        section_pages=recording.recorded_sections,
+        contents=recording.recorded_sections if wants_contents else None,
     ).output
 
 
@@ -459,6 +483,34 @@ def render_client_report_pdf(
 class _BuildResult:
     output: bytes
     recorded_sections: dict[int, list[str]]
+    page_count: int
+
+
+def _contents_flowables(
+    contents: dict[int, list[str]], styles: dict[str, ParagraphStyle], width: float
+) -> list:
+    """A contents page built from the recorded section→page map (scope item 3)."""
+    rows = [
+        [Paragraph(title, styles["body"]), Paragraph(str(page), styles["key"])]
+        for page in sorted(contents)
+        for title in contents[page]
+    ]
+    if not rows:
+        return []
+    table = Table(rows, colWidths=[width * 0.86, width * 0.14], hAlign="LEFT")
+    table.setStyle(
+        TableStyle(
+            [
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+                ("TOPPADDING", (0, 0), (-1, -1), 3),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+                ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                ("LINEBELOW", (0, 0), (-1, -2), 0.25, tk.RULE),
+            ]
+        )
+    )
+    return [Paragraph("Contents", styles["section"]), Spacer(1, 6), table, PageBreak()]
 
 
 def _build_document(
@@ -467,6 +519,7 @@ def _build_document(
     meta: ReportMeta,
     rendered: dict[str, bytes],
     section_pages: dict[int, list[str]] | None,
+    contents: dict[int, list[str]] | None = None,
 ) -> _BuildResult:
     styles = _styles()
     buffer = BytesIO()
@@ -491,6 +544,11 @@ def _build_document(
     )
     story.append(NextPageTemplate("body"))
     story.append(PageBreak())
+
+    # Contents, when the report is long enough to need one. An empty dict means "reserve the page,
+    # we do not know the numbers yet" — the recording pass that measures the shifted layout.
+    if contents is not None:
+        story.extend(_contents_flowables(contents, styles, width) or [Spacer(1, 1), PageBreak()])
 
     # --- Narrative body ---------------------------------------------------------------
     body_sections = [s for s in report.sections if s.kind is not ReportSectionKind.APPENDIX]
@@ -559,4 +617,8 @@ def _build_document(
         story.append(_figures_table(appendix, styles, width))
 
     doc.build(story)
-    return _BuildResult(output=buffer.getvalue(), recorded_sections=doc.recorded_sections)
+    return _BuildResult(
+        output=buffer.getvalue(),
+        recorded_sections=doc.recorded_sections,
+        page_count=doc.page,
+    )

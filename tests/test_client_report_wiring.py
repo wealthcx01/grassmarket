@@ -171,6 +171,72 @@ class TestTheDownloadableReport:
         )
 
 
+class TestTheApprovalGateIsActuallyWired:
+    """Non-negotiable #8 on the path that reaches a client, not only in the model's own tests.
+
+    Every section is consultant-written today, so the gate passes trivially — which is exactly why
+    it needed wiring NOW. GRS-0222 will start drafting sections, and a gate added at that point is
+    a gate that was missing in between.
+    """
+
+    def test_the_download_path_calls_the_gate(
+        self, client, alice: SeededConsultant, deliverable: str, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        called: list[set] = []
+        import grassmarket.web.routers.client_report as module
+
+        real = module.assert_client_ready
+
+        def spy(report, *, approved_narrative_ids):
+            called.append(approved_narrative_ids)
+            return real(report, approved_narrative_ids=approved_narrative_ids)
+
+        monkeypatch.setattr(module, "assert_client_ready", spy)
+        _write_prose(client, alice, deliverable)
+        response = client.get(
+            f"/deliverables/{deliverable}/client-report.pdf", headers=auth_header(alice)
+        )
+        assert response.status_code == 200
+        assert called, "the client-facing download did not consult the approval gate"
+
+    def test_an_unapproved_ai_section_is_refused(
+        self, client, alice: SeededConsultant, deliverable: str, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        # Simulate what GRS-0222 will produce: a section marked AI-drafted whose narrative nobody
+        # approved. It must not reach a client.
+        from uuid import uuid4
+
+        import grassmarket.web.routers.client_report as module
+        from grassmarket.deliverables.client_report import SectionProse
+
+        real_assemble = module.assemble
+
+        def taint(context, *, scoring_run_id, sections_json):
+            assembled = real_assemble(
+                context, scoring_run_id=scoring_run_id, sections_json=sections_json
+            )
+            tainted = assembled.report.model_copy(
+                update={
+                    "sections": [
+                        s.model_copy(update={"ai_drafted": True, "narrative_id": uuid4()})
+                        if s.kind.value == "business"
+                        else s
+                        for s in assembled.report.sections
+                    ]
+                }
+            )
+            return type(assembled)(report=tainted, figures=assembled.figures)
+
+        monkeypatch.setattr(module, "assemble", taint)
+        _write_prose(client, alice, deliverable)
+        response = client.get(
+            f"/deliverables/{deliverable}/client-report.pdf", headers=auth_header(alice)
+        )
+        assert response.status_code == 409
+        assert "unapproved AI-drafted" in response.json()["detail"]
+        assert SectionProse  # keeps the import meaningful to a reader
+
+
 class TestTheLoopIsClosed:
     def test_write_share_and_read_end_to_end(
         self, client, alice: SeededConsultant, deliverable: str

@@ -97,3 +97,20 @@ cannot yet send themselves a link from the Deliverables page. That is the remain
 the acceptance test, and it is the same gap GRS-0219 has.
 
 Gate: 24 backend tests, 7 vitest, ruff/pyright/tsc/ESLint clean.
+
+
+## Correction, 2026-07-31 — the first link sent for review arrived broken
+
+Tokens were `secrets.token_urlsafe`, whose alphabet includes `-` and `_`. A link is something a
+human pastes, and a renderer that treats `_word_` as emphasis eats the underscores; the recipient
+gets a URL that resolves to "this report is not available" — which the public endpoint makes
+deliberately indistinguishable from a revoked link, so it is unbudgeable from the outside.
+
+Tokens are now 48 hex characters: 192 bits of entropy, no punctuation for a formatter to eat,
+survives a double-click select, and can be read down a phone line. Existing links keep working —
+resolution is a hash lookup and does not care about the alphabet.
+
+Also corrected: the client-facing routes never called `assert_client_ready`. Every section is
+consultant-written today, so the gate passed trivially — which is precisely why it needed wiring
+before GRS-0222 starts drafting. Non-negotiable #8 is now enforced on the path that reaches a
+client, with a test that fails if the call is removed.

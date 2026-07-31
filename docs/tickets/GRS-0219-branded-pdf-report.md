@@ -60,7 +60,8 @@ reading a word of it.
 `grassmarket.deliverables.report_pdf` renders a `ClientReport` (GRS-0211) to a branded PDF. Samples
 for review, both from the golden-master run: `docs/reviews/GRS-0219-client-report-pdf/`.
 
-**Scope items 1–6 are all in.** A real cover (wordmark, accent rule, client, engagement, date);
+**Scope items 1–6 are all in** (corrected 2026-07-31 — see below; item 3's contents page was
+claimed here before it existed). A real cover (wordmark, accent rule, client, engagement, date);
 typography set once as tokens in `report_pdf/tokens.py` mirroring `globals.css`; running heads,
 folios, and a ruled break into the appendix; figures at 300dpi; a figures table that repeats its
 header across page breaks; and a provenance footer carrying preparer, date, methodology and
@@ -92,3 +93,14 @@ and samples committed for the founder (4). 17 tests; ruff, pyright clean.
 
 **Still not visible in the app.** This renders a report; nothing yet calls it from a route. Wiring
 the download into the deliverables surface is the last mile and is not in this ticket's scope.
+
+
+## Correction, 2026-07-31
+
+This ticket previously claimed all six scope items were done. **The contents page (item 3) was not
+built.** `CONTENTS_THRESHOLD_PAGES = 8` existed in `report_pdf/tokens.py` and nothing read it — a
+constant that reads as evidence of a feature to anyone grepping for it, which is worse than an
+obvious gap. It is now implemented: the renderer takes a third pass when a report exceeds the
+threshold, so the page numbers are recorded against the layout that HAS the contents page rather
+than the one that does not. A test follows the appendix's printed page number to the page it
+actually lands on, because that off-by-one is the one nobody notices until a client follows it.

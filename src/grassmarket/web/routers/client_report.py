@@ -20,7 +20,9 @@ from datetime import UTC, datetime
 from io import BytesIO
 from uuid import UUID
 
+from bcap_contracts.client_report import UnapprovedReportSectionError, assert_client_ready
 from bcap_contracts.deliverables import Deliverable, DeliverableMode
+from bcap_contracts.narratives import NarrativeStatus
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, ValidationError
@@ -147,6 +149,21 @@ def assemble_for(
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=_first_message(exc)
         ) from exc
+    # Non-negotiable #8, enforced on the path that actually reaches a client rather than only in
+    # the content model's own tests. Today every section is consultant-written, so the approved set
+    # is empty and the check passes trivially — which is exactly why it has to be wired NOW. When
+    # GRS-0222 starts drafting sections, this is the line that stops an unapproved draft shipping,
+    # and a gate added later is a gate that was missing in between.
+    approved = {
+        n.id
+        for n in repo.list_narratives(principal, deliverable_id)
+        if n.status is NarrativeStatus.APPROVED
+    }
+    try:
+        assert_client_ready(assembled.report, approved_narrative_ids=approved)
+    except UnapprovedReportSectionError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+
     return assembled, deliverable
 
 

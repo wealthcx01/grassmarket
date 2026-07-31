@@ -189,6 +189,74 @@ class TestTheDocumentItProduces:
         assert rest  # the footer is present too
 
 
+class TestTheContentsPage:
+    """Scope item 3. It was DECLARED as a token and never built — `CONTENTS_THRESHOLD_PAGES` sat in
+    tokens.py looking like an implementation while the renderer ignored it, and the ticket claimed
+    all six scope items were done. These tests are what makes the claim true."""
+
+    def test_a_short_report_gets_no_contents_page(
+        self, report: ClientReport, figure_data: ReportFigureData
+    ) -> None:
+        # Below the threshold a contents page is furniture for its own sake.
+        pdf = render_client_report_pdf(report, meta=_meta(), figure_data=figure_data)
+        reader = pypdf.PdfReader(io.BytesIO(pdf))
+        assert len(reader.pages) <= tk.CONTENTS_THRESHOLD_PAGES
+        assert "Contents" not in _normalise(_text(pdf))
+
+    def _long_report(self, report: ClientReport) -> ClientReport:
+        """The same report with enough prose to cross the threshold."""
+        filler = ["A paragraph of a consultant's assessment prose, carrying no figures." ] * 22
+        return report.model_copy(
+            update={
+                "sections": [
+                    s.model_copy(update={"body": [*s.body, *filler]}) for s in report.sections
+                ]
+            }
+        )
+
+    def test_a_long_report_gets_a_contents_page(
+        self, report: ClientReport, figure_data: ReportFigureData
+    ) -> None:
+        pdf = render_client_report_pdf(
+            self._long_report(report), meta=_meta(), figure_data=figure_data
+        )
+        reader = pypdf.PdfReader(io.BytesIO(pdf))
+        assert len(reader.pages) > tk.CONTENTS_THRESHOLD_PAGES
+        contents_page = _normalise(reader.pages[1].extract_text() or "")
+        assert contents_page.startswith("Contents") or "Contents" in contents_page
+        # It lists the sections a reader would look for.
+        for title in ("The business", "What that is worth", "Technical appendix"):
+            assert title in contents_page, f"contents omits {title!r}"
+
+    def test_the_contents_page_numbers_point_at_the_right_pages(
+        self, report: ClientReport, figure_data: ReportFigureData
+    ) -> None:
+        """The off-by-one nobody notices until a client follows it.
+
+        Inserting the contents page pushes every body page down by one, so the numbers have to be
+        recorded against the layout that HAS the contents page, not the one that does not.
+        """
+        pdf = render_client_report_pdf(
+            self._long_report(report), meta=_meta(), figure_data=figure_data
+        )
+        reader = pypdf.PdfReader(io.BytesIO(pdf))
+        contents = _normalise(reader.pages[1].extract_text() or "")
+
+        match = re.search(r"Technical appendix\s+(\d+)", contents)
+        assert match, f"could not read the appendix's page number from: {contents[:200]}"
+        claimed = int(match.group(1))
+
+        actual = next(
+            i + 1
+            for i, page in enumerate(reader.pages)
+            if "Technical appendix" in _normalise(page.extract_text() or "")
+            and i > 1  # skip the contents page's own mention
+        )
+        assert claimed == actual, (
+            f"contents says the appendix is on page {claimed}; it is on page {actual}"
+        )
+
+
 class TestGoldenMaster:
     def test_the_extracted_text_matches_the_committed_fixture(
         self, report: ClientReport, figure_data: ReportFigureData

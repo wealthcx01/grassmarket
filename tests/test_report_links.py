@@ -76,6 +76,21 @@ class TestTheTokenIsTheCredential:
         assert len(tokens) == 200
         assert all(len(t) >= 40 for t in tokens)
 
+    def test_a_token_survives_being_pasted_anywhere(self) -> None:
+        """The first link ever sent for review arrived broken, and this is why.
+
+        `secrets.token_urlsafe` emits `-` and `_`. A link is something a human pastes — into an
+        email, a chat message, a markdown note — and a renderer that treats `_word_` as emphasis
+        eats the underscores. The client then gets a URL that resolves to "this report is not
+        available", which is indistinguishable (by design) from a revoked link. Hex cannot be
+        mangled by any formatter.
+        """
+        for token in (generate_token() for _ in range(50)):
+            assert token.isalnum(), f"{token} contains punctuation a formatter can eat"
+            assert (
+                token.islower() or token.isdigit() or all(c in "0123456789abcdef" for c in token)
+            ), f"{token} is not plain hex"
+
     def test_the_plaintext_is_returned_exactly_once(
         self, client, alice: SeededConsultant, deliverable_id: str
     ) -> None:
