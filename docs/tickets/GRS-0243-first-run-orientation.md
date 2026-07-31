@@ -70,3 +70,48 @@ string (GRS-0205); it makes each section teach itself at the moment of first con
 The founder logs into a fresh account, and within ten minutes — without opening the Guide — has
 seen a finished example report, knows what each nav item is for, and knows the one thing each
 section wants them to do next. And the sentence they complained about twice is gone.
+
+
+**PARTIAL.** Read this section before assuming the ticket is closed — three of its five scopes are
+still open, and the ticket stays open with them.
+
+## What shipped
+
+**Scope 1 — the flagged copy, and the mechanism that keeps it flagged.** Both sentences the founder
+quoted are rewritten. The hero no longer reads the navigation back to the reader; the primer banner
+states what reading it changes instead of asking a question whose answer is yes for everyone.
+
+The part that matters more than the rewrite: `frontend/lib/retiredCopy.ts` is a register of retired
+wording with the **reason** each was rejected, and `retiredCopy.test.ts` scans the app source and
+fails the build if any returns. Rewriting copy is easy; *keeping* it rewritten is what failed twice,
+because a sentence carries no record of having been objected to. The test was verified to fail by
+putting the old hero back — a register that cannot fail is decoration.
+
+**Scope 2 — one name per concept, partly.** "Learning & Drills" is now **Academy**, which the
+founder asked for on 23/07. The home card's kicker no longer introduces a third spelling of
+Portfolio on the first screen.
+
+**The route rename was considered and NOT done, deliberately.** The ticket recommends `/portfolio`
+with a redirect from `/assessments`. The wizard's deep links live at `/assessments/<id>`, so
+renaming only the list route would leave the list at `/portfolio` and every record under
+`/assessments/…` — which is a worse inconsistency than the one being fixed, and a bigger one to
+unpick later. Every user-visible name is now "Portfolio"; the URL is the one place the old word
+survives, and it is the place a first-time user is least likely to read. Renaming the whole
+hierarchy is a real change and deserves its own ticket rather than being smuggled into this one.
+
+**Scope 4 — the deliverables empty state, which the ticket named specifically.** It now teaches the
+chain: *assessment → finalise → engagement → deliverable → client report*, says why the page stays
+empty until an assessment is finalised and attached, and offers both ways forward — start one, or
+read a worked example (GRS-0236). Tested against the real page rather than a copy of its markup.
+
+## What is NOT built
+
+- **Scope 3 — home shows live state.** The five cards are still static links. No draft counts, no
+  "awaiting prose", no recent activity, no empty-state one-liners on the cards.
+- **Scope 5 — the ten-minute first-run checklist.** Not started. Needs a persisted, resumable,
+  dismissible state and four linked destinations.
+- **Scope 4, the rest.** Only Deliverables was rewritten. Engagements, Pipeline, Portfolio and the
+  Workbench still have their original thin or bare empty states.
+
+Those three are the larger half of this ticket and they are genuinely unbuilt. The ticket stays
+open.

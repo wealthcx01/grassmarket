@@ -25,7 +25,9 @@ const CLIENT_WORK: ReadonlyArray<Section> = [
     step: 2,
     title: "Your Portfolio",
     href: "/assessments",
-    kicker: "Portfolio · the Platform Power wizard",
+    // One name per concept (GRS-0243 scope 2). The kicker used to introduce a third
+    // spelling of the same thing on the first screen the user sees.
+    kicker: "Portfolio · assessments and the scoring wizard",
     blurb: "Your portfolio of assessments — segment, last score and status at a glance — and the wizard: business metrics, the 7 Powers, and the infrastructure deep dive, scored live with uncertainty bands.",
   },
   {
@@ -141,10 +143,11 @@ export default function DashboardPage() {
         </span>
         <span style={{ flex: 1 }}>
           <span style={{ display: "block", fontWeight: 600, fontFamily: "var(--font-serif)", fontSize: "1.05rem" }}>
-            New to Platform Power? Start with the primer
+            Read this before your first assessment
           </span>
           <span style={{ display: "block", color: "var(--color-ink-muted)", fontSize: "0.9rem", marginTop: "0.15rem" }}>
-            B · P · L · V, the four maturity levels, evidence grades, and the benefit-vs-barrier rule — in ten minutes.
+            What the four indices mean, how a maturity level is decided, and why a benefit without a
+            barrier is not a Power. Ten minutes, and the wizard stops being guesswork.
           </span>
         </span>
         <span aria-hidden className="mono" style={{ color: "var(--color-accent)", fontSize: "1.1rem" }}>

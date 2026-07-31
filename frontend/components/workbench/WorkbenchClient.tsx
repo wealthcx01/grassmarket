@@ -51,7 +51,10 @@ export function WorkbenchClient() {
     const base: { key: TabKey; label: string }[] = [
       { key: "bench", label: "Bench" },
       { key: "certification", label: "Certification" },
-      { key: "learning", label: "Learning & Drills" },
+      // The founder asked for "just the Academy" on 23/07 (GRS-0243 scope 2). "Learning &
+      // Drills" named the mechanism; the Academy is what the thing IS, and it is what every
+      // other surface already calls it.
+      { key: "learning", label: "Academy" },
       { key: "arena", label: "Practice Arena" },
     ];
     if (isReviewer) base.push({ key: "founder-review", label: "Founder review" });
