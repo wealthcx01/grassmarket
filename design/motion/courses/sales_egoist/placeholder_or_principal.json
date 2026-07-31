@@ -1,0 +1,617 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "PlaceholderOrPrincipal",
+    "width": 1120,
+    "height": 600,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 560,
+        "y": 48,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 28,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "The same five situations, answered two ways"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LeftHead",
+        "x": 300,
+        "y": 122,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LeftHeadStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LeftHeadStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LeftHeadStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.5
+          },
+          {
+            "type": "text_value_run",
+            "name": "LeftHeadRun",
+            "style": "LeftHeadStyle",
+            "text": "THE PLACEHOLDER"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RightHead",
+        "x": 820,
+        "y": 122,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RightHeadStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RightHeadStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RightHeadStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.5
+          },
+          {
+            "type": "text_value_run",
+            "name": "RightHeadRun",
+            "style": "RightHeadStyle",
+            "text": "THE PRINCIPAL"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "L0",
+        "x": 300,
+        "y": 196,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "L0Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "L0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "L0StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "L0Run",
+            "style": "L0Style",
+            "text": "Waits for inbound and RFPs"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R0",
+        "x": 820,
+        "y": 196,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R0Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R0StyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R0Run",
+            "style": "R0Style",
+            "text": "Engineers the reason to engage"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "L1",
+        "x": 300,
+        "y": 260,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "L1Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "L1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "L1StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "L1Run",
+            "style": "L1Style",
+            "text": "Hopes relationships mature"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R1",
+        "x": 820,
+        "y": 260,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R1Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R1StyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R1Run",
+            "style": "R1Style",
+            "text": "Turns trust into real leverage"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "L2",
+        "x": 300,
+        "y": 324,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "L2Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "L2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "L2StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "L2Run",
+            "style": "L2Style",
+            "text": "Reports activity"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R2",
+        "x": 820,
+        "y": 324,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R2Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R2StyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R2Run",
+            "style": "R2Style",
+            "text": "Reports territory taken"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "L3",
+        "x": 300,
+        "y": 388,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "L3Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "L3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "L3StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "L3Run",
+            "style": "L3Style",
+            "text": "Moves on the buyer's timeline"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R3",
+        "x": 820,
+        "y": 388,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R3Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R3StyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R3Run",
+            "style": "R3Style",
+            "text": "Sets the timeline"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "L4",
+        "x": 300,
+        "y": 452,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "L4Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "L4StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "L4StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "L4Run",
+            "style": "L4Style",
+            "text": "Is interchangeable"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "R4",
+        "x": 820,
+        "y": 452,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "R4Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "R4StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "R4StyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "R4Run",
+            "style": "R4Style",
+            "text": "Is irreplaceable"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 560,
+        "y": 548,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "A seller who waits becomes a placeholder. Interchangeable, and easily replaced."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "LeftCard",
+        "x": 300,
+        "y": 324,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "LeftCardPath",
+            "width": 460,
+            "height": 330,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "LeftCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LeftCardSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "LeftCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "LeftCardStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "RightCard",
+        "x": 820,
+        "y": 324,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "RightCardPath",
+            "width": 460,
+            "height": 330,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "RightCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "RightCardSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 560,
+        "y": 300,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 1120,
+            "height": 600,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

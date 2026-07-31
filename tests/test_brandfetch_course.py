@@ -193,9 +193,13 @@ def test_the_rebuild_is_complete() -> None:
 
 def test_brandfetch_is_no_longer_carried_as_legacy_debt() -> None:
     """It came off the visible-debt register on 2026-07-30 with Benzinga. What is left on that list
-    is the honest remaining debt: the two sales courses, each with its clearing ticket."""
+    is now nothing: GRS-0218 cleared the last entry on 2026-08-01."""
     assert "product-brandfetch" not in LEGACY_COURSES
-    assert set(LEGACY_COURSES) == {"sales-egoist"}
+    # GRS-0218 rebuilt Sales Egoist from the committed curriculum on 2026-08-01, which was
+    # the last entry. The register is now empty and stays in place: the next course
+    # authored starts unbuilt, and an exemption nobody can see is how the last rebuild
+    # quietly did not happen.
+    assert LEGACY_COURSES == {}
 
 
 def test_the_rebuilt_sections_have_distinct_ids_and_contiguous_orders() -> None:

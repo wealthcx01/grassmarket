@@ -1,0 +1,724 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "TheBattlefield",
+    "width": 1120,
+    "height": 500,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 560,
+        "y": 46,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 27,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "The dated catalysts an egoist works backwards from"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 560,
+        "y": 84,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "Budgets thaw when a board-level deadline forces them to."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "When0",
+        "x": 150,
+        "y": 214,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "When0Style",
+            "font_asset": "Display",
+            "font_size": 18,
+            "children": [
+              {
+                "type": "fill",
+                "name": "When0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "When0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "When0Run",
+            "style": "When0Style",
+            "text": "May 2024"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "What0_0",
+        "x": 150,
+        "y": 268,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "What0_0Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "What0_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "What0_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "What0_0Run",
+            "style": "What0_0Style",
+            "text": "US moves to T+1"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Dot0",
+        "x": 150,
+        "y": 320,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Dot0Path",
+            "width": 16,
+            "height": 16,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Dot0Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Dot0Solid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "When1",
+        "x": 390,
+        "y": 214,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "When1Style",
+            "font_asset": "Display",
+            "font_size": 18,
+            "children": [
+              {
+                "type": "fill",
+                "name": "When1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "When1StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "When1Run",
+            "style": "When1Style",
+            "text": "Aug 2026"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "What1_0",
+        "x": 390,
+        "y": 268,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "What1_0Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "What1_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "What1_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "What1_0Run",
+            "style": "What1_0Style",
+            "text": "EU AI Act obligations"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "What1_1",
+        "x": 390,
+        "y": 294,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "What1_1Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "What1_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "What1_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "What1_1Run",
+            "style": "What1_1Style",
+            "text": "begin to bite"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Dot1",
+        "x": 390,
+        "y": 320,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Dot1Path",
+            "width": 16,
+            "height": 16,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Dot1Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Dot1Solid",
+                "color": "#1A1A18"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "When2",
+        "x": 630,
+        "y": 214,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "When2Style",
+            "font_asset": "Display",
+            "font_size": 18,
+            "children": [
+              {
+                "type": "fill",
+                "name": "When2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "When2StyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "When2Run",
+            "style": "When2Style",
+            "text": "Dec 2026"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "What2_0",
+        "x": 630,
+        "y": 268,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "What2_0Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "What2_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "What2_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "What2_0Run",
+            "style": "What2_0Style",
+            "text": "T+0 allocations and"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "What2_1",
+        "x": 630,
+        "y": 294,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "What2_1Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "What2_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "What2_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "What2_1Run",
+            "style": "What2_1Style",
+            "text": "confirmations mandated"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Dot2",
+        "x": 630,
+        "y": 320,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Dot2Path",
+            "width": 16,
+            "height": 16,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Dot2Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Dot2Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "When3",
+        "x": 930,
+        "y": 214,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "When3Style",
+            "font_asset": "Display",
+            "font_size": 18,
+            "children": [
+              {
+                "type": "fill",
+                "name": "When3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "When3StyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "When3Run",
+            "style": "When3Style",
+            "text": "11 Oct 2027"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "What3_0",
+        "x": 930,
+        "y": 268,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "What3_0Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "What3_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "What3_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "What3_0Run",
+            "style": "What3_0Style",
+            "text": "UK, EU and Switzerland"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "What3_1",
+        "x": 930,
+        "y": 294,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "What3_1Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "What3_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "What3_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "What3_1Run",
+            "style": "What3_1Style",
+            "text": "move to T+1"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Dot3",
+        "x": 930,
+        "y": 320,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Dot3Path",
+            "width": 16,
+            "height": 16,
+            "corner_radius": 8,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Dot3Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Dot3Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Axis",
+        "x": 560,
+        "y": 320,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "AxisPath",
+            "width": 900,
+            "height": 3,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "AxisFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "AxisSolid",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Undated",
+        "x": 560,
+        "y": 410,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "UndatedStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "UndatedStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "UndatedStyleCol",
+                    "color": "#A3502A"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "UndatedRun",
+            "style": "UndatedStyle",
+            "text": "UNDATED, AND INEVITABLE"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "UndatedBody",
+        "x": 560,
+        "y": 448,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "UndatedBodyStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "UndatedBodyStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "UndatedBodyStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "UndatedBodyRun",
+            "style": "UndatedBodyStyle",
+            "text": "The incumbent outage in a bursty session. Position as though it is a when."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 560,
+        "y": 250,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 1120,
+            "height": 500,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

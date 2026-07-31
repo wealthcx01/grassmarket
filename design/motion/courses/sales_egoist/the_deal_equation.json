@@ -1,0 +1,1077 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "TheDealEquation",
+    "width": 1120,
+    "height": 600,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 560,
+        "y": 46,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 27,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "Win probability is five levers and one drag"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 560,
+        "y": 84,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "Every variable is a lever, not a given. Diagnose which term is dragging."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "RaiseLabel",
+        "x": 560,
+        "y": 140,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "RaiseLabelStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "RaiseLabelStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "RaiseLabelStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "RaiseLabelRun",
+            "style": "RaiseLabelStyle",
+            "text": "RAISES WIN PROBABILITY"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "U0",
+        "x": 200,
+        "y": 216,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "U0Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "U0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "U0StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "U0Run",
+            "style": "U0Style",
+            "text": "Trigger"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "UB0_0",
+        "x": 200,
+        "y": 254,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "UB0_0Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "UB0_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "UB0_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "UB0_0Run",
+            "style": "UB0_0Style",
+            "text": "the dated catalyst"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "UB0_1",
+        "x": 200,
+        "y": 278,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "UB0_1Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "UB0_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "UB0_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "UB0_1Run",
+            "style": "UB0_1Style",
+            "text": "you are riding"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "UCard0",
+        "x": 200,
+        "y": 240,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "UCard0Path",
+            "width": 164,
+            "height": 132,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "UCard0Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "UCard0Solid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "UCard0Stroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "UCard0StrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "U1",
+        "x": 380,
+        "y": 216,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "U1Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "U1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "U1StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "U1Run",
+            "style": "U1Style",
+            "text": "Reach"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "UB1_0",
+        "x": 380,
+        "y": 254,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "UB1_0Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "UB1_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "UB1_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "UB1_0Run",
+            "style": "UB1_0Style",
+            "text": "access to the"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "UB1_1",
+        "x": 380,
+        "y": 278,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "UB1_1Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "UB1_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "UB1_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "UB1_1Run",
+            "style": "UB1_1Style",
+            "text": "economic buyer"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "UCard1",
+        "x": 380,
+        "y": 240,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "UCard1Path",
+            "width": 164,
+            "height": 132,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "UCard1Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "UCard1Solid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "UCard1Stroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "UCard1StrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "U2",
+        "x": 560,
+        "y": 216,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "U2Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "U2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "U2StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "U2Run",
+            "style": "U2Style",
+            "text": "Insight"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "UB2_0",
+        "x": 560,
+        "y": 254,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "UB2_0Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "UB2_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "UB2_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "UB2_0Run",
+            "style": "UB2_0Style",
+            "text": "differentiation of"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "UB2_1",
+        "x": 560,
+        "y": 278,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "UB2_1Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "UB2_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "UB2_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "UB2_1Run",
+            "style": "UB2_1Style",
+            "text": "your thesis"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "UCard2",
+        "x": 560,
+        "y": 240,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "UCard2Path",
+            "width": 164,
+            "height": 132,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "UCard2Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "UCard2Solid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "UCard2Stroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "UCard2StrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "U3",
+        "x": 740,
+        "y": 216,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "U3Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "U3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "U3StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "U3Run",
+            "style": "U3Style",
+            "text": "Proof"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "UB3_0",
+        "x": 740,
+        "y": 254,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "UB3_0Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "UB3_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "UB3_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "UB3_0Run",
+            "style": "UB3_0Style",
+            "text": "fidelity of what"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "UB3_1",
+        "x": 740,
+        "y": 278,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "UB3_1Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "UB3_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "UB3_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "UB3_1Run",
+            "style": "UB3_1Style",
+            "text": "you can show"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "UCard3",
+        "x": 740,
+        "y": 240,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "UCard3Path",
+            "width": 164,
+            "height": 132,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "UCard3Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "UCard3Solid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "UCard3Stroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "UCard3StrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "U4",
+        "x": 920,
+        "y": 216,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "U4Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "U4StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "U4StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "U4Run",
+            "style": "U4Style",
+            "text": "Consensus"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "UB4_0",
+        "x": 920,
+        "y": 254,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "UB4_0Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "UB4_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "UB4_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "UB4_0Run",
+            "style": "UB4_0Style",
+            "text": "agreement across"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "UB4_1",
+        "x": 920,
+        "y": 278,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "UB4_1Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "UB4_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "UB4_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "UB4_1Run",
+            "style": "UB4_1Style",
+            "text": "the committee"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "UCard4",
+        "x": 920,
+        "y": 240,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "UCard4Path",
+            "width": 164,
+            "height": 132,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "UCard4Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "UCard4Solid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "UCard4Stroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "UCard4StrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "LowerLabel",
+        "x": 560,
+        "y": 356,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "LowerLabelStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "LowerLabelStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "LowerLabelStyleCol",
+                    "color": "#A3502A"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "LowerLabelRun",
+            "style": "LowerLabelStyle",
+            "text": "LOWERS IT"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Switch",
+        "x": 560,
+        "y": 412,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SwitchStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SwitchStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SwitchStyleCol",
+                    "color": "#A3502A"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SwitchRun",
+            "style": "SwitchStyle",
+            "text": "The incumbent's switching cost"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "SwitchBody",
+        "x": 560,
+        "y": 448,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SwitchBodyStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SwitchBodyStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SwitchBodyStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SwitchBodyRun",
+            "style": "SwitchBodyStyle",
+            "text": "Millions in cost, contracts in years. Absorb it and you have raised the odds."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "SwitchCard",
+        "x": 560,
+        "y": 424,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "SwitchCardPath",
+            "width": 620,
+            "height": 96,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "SwitchCardFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "SwitchCardSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "SwitchCardStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "SwitchCardStrokeCol",
+                "color": "#A3502A"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 560,
+        "y": 530,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "Doubling your reach rate does as much as doubling your win rate."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 560,
+        "y": 300,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 1120,
+            "height": 600,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

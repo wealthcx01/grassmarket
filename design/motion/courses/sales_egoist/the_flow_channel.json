@@ -1,0 +1,620 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "TheFlowChannel",
+    "width": 1400,
+    "height": 660,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 700,
+        "y": 46,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 27,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "Boredom, flow, anxiety: calibrate the room"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 700,
+        "y": 84,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "Peak performance sits where challenge meets skill. It is engineered, not awaited."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "YAxis",
+        "x": 96,
+        "y": 350,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "YAxisStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "YAxisStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "YAxisStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "YAxisRun",
+            "style": "YAxisStyle",
+            "text": "CHALLENGE"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "XAxis",
+        "x": 720,
+        "y": 596,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "XAxisStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "XAxisStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "XAxisStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "XAxisRun",
+            "style": "XAxisStyle",
+            "text": "SKILL"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Anxiety",
+        "x": 396,
+        "y": 206,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "AnxietyStyle",
+            "font_asset": "Display",
+            "font_size": 20,
+            "children": [
+              {
+                "type": "fill",
+                "name": "AnxietyStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "AnxietyStyleCol",
+                    "color": "#A3502A"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "AnxietyRun",
+            "style": "AnxietyStyle",
+            "text": "ANXIETY"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "AnxietyB",
+        "x": 396,
+        "y": 244,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "AnxietyBStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "AnxietyBStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "AnxietyBStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "AnxietyBRun",
+            "style": "AnxietyBStyle",
+            "text": "The Tier-1 procurement battle"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "AnxietyC",
+        "x": 396,
+        "y": 268,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "AnxietyCStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "AnxietyCStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "AnxietyCStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "AnxietyCRun",
+            "style": "AnxietyCStyle",
+            "text": "you sent a junior into."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "AnxietyD",
+        "x": 396,
+        "y": 292,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "AnxietyDStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "AnxietyDStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "AnxietyDStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "AnxietyDRun",
+            "style": "AnxietyDStyle",
+            "text": "Fear drives over-discounting."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Flow",
+        "x": 720,
+        "y": 352,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FlowStyle",
+            "font_asset": "Display",
+            "font_size": 22,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FlowStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FlowStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.6
+          },
+          {
+            "type": "text_value_run",
+            "name": "FlowRun",
+            "style": "FlowStyle",
+            "text": "FLOW"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "FlowB",
+        "x": 720,
+        "y": 388,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FlowBStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FlowBStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FlowBStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FlowBRun",
+            "style": "FlowBStyle",
+            "text": "Difficulty matched to the seller,"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "FlowC",
+        "x": 720,
+        "y": 412,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FlowCStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FlowCStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FlowCStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FlowCRun",
+            "style": "FlowCStyle",
+            "text": "with one demanding goal."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Boredom",
+        "x": 1046,
+        "y": 458,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "BoredomStyle",
+            "font_asset": "Display",
+            "font_size": 20,
+            "children": [
+              {
+                "type": "fill",
+                "name": "BoredomStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "BoredomStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "BoredomRun",
+            "style": "BoredomStyle",
+            "text": "BOREDOM"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "BoredomB",
+        "x": 1046,
+        "y": 496,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "BoredomBStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "BoredomBStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "BoredomBStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "BoredomBRun",
+            "style": "BoredomBStyle",
+            "text": "The trivial renewal given"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "BoredomC",
+        "x": 1046,
+        "y": 520,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "BoredomCStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "BoredomCStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "BoredomCStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "BoredomCRun",
+            "style": "BoredomCStyle",
+            "text": "to your best seller."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "FlowBand",
+        "x": 720,
+        "y": 380,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "FlowBandPath",
+            "width": 340,
+            "height": 130,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "FlowBandFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "FlowBandSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Plot",
+        "x": 720,
+        "y": 350,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "PlotPath",
+            "width": 1080,
+            "height": 420,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "PlotFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "PlotSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "PlotStroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "PlotStrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 700,
+        "y": 330,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 1400,
+            "height": 660,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

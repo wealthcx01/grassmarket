@@ -324,6 +324,7 @@ COURSE_TITLES: dict[str, str] = {
     "benzinga": "Benzinga",
     "brandfetch": "Brandfetch",
     "sales_ops": "Sales Operations Playbook",
+    "sales_egoist": "The Sales Egoist",
 }
 
 
