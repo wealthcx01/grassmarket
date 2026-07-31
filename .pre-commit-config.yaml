@@ -24,6 +24,10 @@ repos:
       - id: check-json
       - id: check-added-large-files
         args: [--maxkb=1024]
+        # data/reference holds founder-supplied source documents (7 Powers supplement,
+        # Sales Egoist packs) that legitimately exceed the cap. Scoped exclusion, not a
+        # global raise — everything else stays under 1MB.
+        exclude: ^data/reference/.*\.(pdf|pptx|docx)$
       - id: check-merge-conflict
       - id: detect-private-key   # first line of secret defence
 
