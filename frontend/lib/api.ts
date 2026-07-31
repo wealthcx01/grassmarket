@@ -493,6 +493,22 @@ export const api = {
       signal,
     });
   },
+  /** Sign off a client report's prose (GRS-0245). Separate from the assessment approval because it
+      is bound to a different hash — the words, not the scored document. */
+  approveReport(deliverableId: string, signal?: AbortSignal): Promise<FounderApproval> {
+    return request<FounderApproval>(`/deliverables/${deliverableId}/report-approval`, {
+      method: "POST",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+  submitReportForReview(deliverableId: string, signal?: AbortSignal): Promise<void> {
+    return request<void>(`/deliverables/${deliverableId}/submit-report-for-review`, {
+      method: "POST",
+      headers: authHeaders(),
+      signal,
+    });
+  },
 
   currentFounderApproval(id: string, signal?: AbortSignal): Promise<FounderApproval | null> {
     return request<FounderApproval | null>(`/assessments/${id}/founder-approval`, {

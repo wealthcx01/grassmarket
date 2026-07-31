@@ -45,6 +45,10 @@ from grassmarket.deliverables.client_report_service import (
     assemble,
     default_prose,
 )
+from grassmarket.deliverables.gate import (
+    ReportApprovalPendingError,
+    assert_report_founder_approved,
+)
 from grassmarket.deliverables.report_pdf import ReportMeta, render_client_report_pdf
 from grassmarket.web.dependencies import get_current_principal, get_repository
 
@@ -175,6 +179,30 @@ def assemble_for(
     return assembled, deliverable, provenance
 
 
+def assert_report_releasable(
+    repo: Repository, principal: Principal, deliverable_id: UUID, provenance: RecordProvenance
+) -> None:
+    """The founder gate on the CLIENT REPORT's prose (GRS-0245, ADR-0041).
+
+    Called by every path that puts the report in front of a client — the PDF download and the
+    share-link issue. It lives here, beside `assemble_for`, and both callers take it, because a
+    gate wired onto one of two equivalent paths is the failure this ticket exists to correct.
+    """
+    non_production = provenance is not RecordProvenance.PRODUCTION
+    approval = repo.current_report_approval(deliverable_id)
+    changed = repo.report_sections_changed_since_approval(principal, deliverable_id)
+    ever = repo.report_was_ever_approved(deliverable_id)
+    try:
+        assert_report_founder_approved(
+            approval,
+            non_production=non_production,
+            changed_sections=changed,
+            ever_approved=ever,
+        )
+    except ReportApprovalPendingError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+
+
 @router.get("/deliverables/{deliverable_id}/report-prose", response_model=ReportProseResponse)
 def get_report_prose(
     deliverable_id: UUID,
@@ -219,6 +247,10 @@ def download_client_report(
     the caller choosing to — a draft escaping unmarked is the failure that matters most (ADR-0029).
     """
     assembled, deliverable, provenance = assemble_for(repo, principal, deliverable_id)
+    # The founder signs what reaches a client (ADR-0041, GRS-0245). Before the PDF is built,
+    # not after: rendering a document the gate is about to refuse wastes the work and, more to
+    # the point, means the bytes existed.
+    assert_report_releasable(repo, principal, deliverable_id, provenance)
     engagement = repo.get_engagement(principal, deliverable.engagement_id)
     consultant = repo.get_consultant_by_id(principal.consultant_id)
     prepared_by = consultant.full_name if consultant else "Bruntsfield Advisory Network"

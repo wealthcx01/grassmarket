@@ -67,4 +67,20 @@ an approval scoped to the **report content** — `(deliverable_id, prose_hash)` 
 
 That is a new approval scope on `founder_approvals` (a nullable `deliverable_id` plus a content
 hash), the repository methods to read and write it, the two route gates, the refusal copy, and the
-queue entries. **Not yet built** — this document is scope 1 only.
+queue entries.
+
+## Built — the matrix after the change
+
+| Path | Production | Demo / sandbox |
+|---|---|---|
+| docx client pack | unchanged: founder approval of the **assessment** | self-approves |
+| client report PDF | **+ founder approval of the report's PROSE** | exempt, watermarked |
+| share link issue | **+ founder approval of the report's PROSE** | exempt, watermarked |
+
+Both client-report paths call one helper, `assert_report_releasable`, and a test spies on **both**
+call sites — because gating one of two equivalent routes is exactly how this gap arose.
+
+Non-production records stay exempt and stay watermarked. That is not a hole: they self-approve under
+ADR-0029, carry the GRS-0229 mark on every rendition, and have no client on the other end. The
+watermark is their gate, and putting them in the founder's queue would spend attention on work that
+is not going anywhere.

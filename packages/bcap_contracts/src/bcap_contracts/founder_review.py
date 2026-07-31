@@ -58,6 +58,20 @@ class FounderReviewQueueEntry(OwnedResource):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     assessment_id: UUID = Field(description="The assessment awaiting review.")
+    # Set when this row is a CLIENT REPORT awaiting sign-off rather than an assessment (GRS-0245).
+    # One queue rather than two, because the founder's question is the same either way — "what is
+    # waiting on me" — and a second list is a second thing to forget to open.
+    deliverable_id: UUID | None = Field(
+        default=None,
+        description="The deliverable whose client report awaits sign-off; null for an assessment.",
+    )
+    changed_sections: tuple[str, ...] = Field(
+        default=(),
+        description=(
+            "For a re-review of a client report: which of the six sections differ from the version "
+            "the founder last approved. Empty on a first review, where everything is new."
+        ),
+    )
     subject: str = Field(description="The company being assessed.")
     advisor_name: str = Field(description="The advisor who submitted it.")
     advisor_email: str = Field(description="How to reach them about it.")

@@ -35,7 +35,7 @@ from grassmarket.deliverables.report_links import (
     resolve_expiry,
 )
 from grassmarket.web.dependencies import get_current_principal, get_repository
-from grassmarket.web.routers.client_report import assemble_for
+from grassmarket.web.routers.client_report import assemble_for, assert_report_releasable
 
 router = APIRouter(tags=["report-links"])
 public_router = APIRouter(tags=["shared-report"])
@@ -126,6 +126,10 @@ def create_link(
     # page post its own version of one would put the content model's rules on the wrong side of the
     # trust boundary. A report with unwritten sections raises the 409 that names them.
     assembled, deliverable, provenance = assemble_for(repo, principal, deliverable_id)
+    # The same gate the PDF takes (GRS-0245). A share link is the MORE exposed rendition — no
+    # login, anyone with the URL — so gating the download and not this one would have been the
+    # wrong way round.
+    assert_report_releasable(repo, principal, deliverable_id, provenance)
     snapshot = SharedReportPayload(
         report=assembled.report,
         figures={

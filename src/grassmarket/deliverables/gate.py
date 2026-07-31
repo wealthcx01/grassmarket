@@ -49,6 +49,51 @@ class SeniorApprovalError(Exception):
     senior (Consultant-tier) sign-off — the PRD §5 quality-review gate refuses it."""
 
 
+class ReportApprovalPendingError(Exception):
+    """A client report was about to reach a client without the founder having signed off its PROSE.
+
+    Distinct from `FounderApprovalPendingError`, which guards the assessment document. GRS-0245
+    measured why both are needed: the founder approves a scored document, the advisor then writes
+    the words a client actually reads, and nothing bound the second to the first. The gate is on the
+    CONTENT rather than on its authorship, so AI-drafted sections (GRS-0222) flow through it
+    unchanged when they arrive.
+    """
+
+
+def assert_report_founder_approved(
+    approval: object | None,
+    *,
+    non_production: bool,
+    changed_sections: tuple[str, ...] = (),
+    ever_approved: bool = False,
+) -> None:
+    """Refuse to release a client report whose prose the founder has not signed off.
+
+    `non_production` records (demo/sandbox) are exempt and stay exempt: they self-approve under
+    ADR-0029 and carry the GRS-0229 watermark on every rendition, which IS their gate. Putting them
+    through founder review would spend the founder's attention on work that is not going anywhere.
+
+    The refusal teaches (GRS-0245 scope 3). An advisor who is stopped is told which of the three
+    states they are in — never submitted, submitted and waiting, or approved and then edited — and
+    what to do next, because "403" tells them nothing and a queue they cannot see is
+    indistinguishable from a broken button.
+    """
+    if non_production or approval is not None:
+        return
+    if ever_approved:
+        edited = ", ".join(changed_sections) if changed_sections else "the report"
+        raise ReportApprovalPendingError(
+            f"This report was approved and then edited ({edited}), so the approval no longer "
+            f"covers it. Send it back to the founder for review — they will see exactly which "
+            f"sections changed."
+        )
+    raise ReportApprovalPendingError(
+        "The founder signs off every report before it reaches a client (ADR-0041), and this one "
+        "has not been signed off yet. Send it for review from the report editor; it joins the "
+        "founder's queue and you will be able to issue the link as soon as it is approved."
+    )
+
+
 DRAFT_WATERMARK = "DRAFT — not client-usable"
 
 # Seniority ordering (ADR-0009). VA and Advisor authors need a Consultant-tier approver; a
