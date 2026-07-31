@@ -1,6 +1,6 @@
 # GRS-0115 — Seed the target universe
 
-**Status:** Planned
+**Status:** SUPERSEDED (reconciled 2026-08-01). _Previously recorded as: Planned._
 **Loop:** Part 2 — Pipeline / GTM engine (one program)
 **Depends on:** ADR-0027 (Pipeline / GTM engine); GRS-0114 (LSEG influencer mapping)
 
@@ -32,3 +32,9 @@ nothing to port here.** It depends on GRS-0114 for the mapping mechanism.
 
 - The influencer-mapping mechanism itself (GRS-0114).
 - The CRM rebuild (GRS-0111), Google integration (GRS-0112), and GTM MCP surface (GRS-0113).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**SUPERSEDED.** Superseded by GRS-0193. GRS-0193 states it supersedes this ticket's scope and imported the registry.

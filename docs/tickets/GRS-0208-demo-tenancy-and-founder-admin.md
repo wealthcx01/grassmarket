@@ -1,6 +1,6 @@
 # GRS-0208 — One clean demo account, and a founder admin who can act as any advisor
 
-**Status:** Planned (2026-07-26, staging review item 6). **Priority:** HIGH.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-26, staging review item 6). **Priority:** HIGH._
 **Loop:** founder-feedback remediation, Wave 1.
 
 ## Why
@@ -63,3 +63,9 @@ Grassmarket needs to be demonstrable.
 The founder logs in as john@bruntsfield.capital, switches to the demo advisor, and walks one
 client from prospect to signed deliverable to commission without changing accounts or hitting a
 gap.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.

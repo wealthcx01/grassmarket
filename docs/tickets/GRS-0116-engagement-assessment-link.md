@@ -1,6 +1,6 @@
 # GRS-0116 — Clarify the engagement ↔ assessment link
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** GRS-0039 (LinkAssessmentControl)
 
@@ -66,3 +66,9 @@ computed in `list_brokerage_portfolio`; schema + TS mirror updated.
 `tests/test_brokerage_portfolio.py::test_portfolio_surfaces_coverage`. The engagement shows each linked
 assessment's identity + live state with a link through; the assessment shows which engagement(s) consume
 it; the two-way loop no longer dead-ends. Backend + frontend gates green; schema parity green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `71a149c` (GRS-0116: make the engagement ↔ assessment link legible both ways).

@@ -1,6 +1,6 @@
 # GRS-0229 — The shared web report must carry the non-production mark
 
-**Status:** Planned (2026-07-31, first-time-user review G1). **Priority:** HIGHEST. **Type:** Bug.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review G1). **Priority:** HIGHEST. **Type:** Bug._
 **Loop:** client-report hardening. **Extends GRS-0220.** **Relates to:** ADR-0029, GRS-0219.
 
 ## Why
@@ -57,3 +57,9 @@ it asserts something the page does not render. Find out which and say so in the 
 
 The founder opens a share link for any demo or sandbox record and cannot read a single screen
 without knowing the numbers are not production. A production record's link is unchanged.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).

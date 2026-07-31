@@ -1,6 +1,6 @@
 # GRS-0223 — "All the scores seem surprisingly similar": find out why
 
-**Status:** In review (2026-07-30, PR pending) — **measured, answered, no engine change
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-30, PR pending) — **measured, answered, no engine change._
 recommended.** **Priority:** HIGH. **Loop:** founder-feedback remediation, Wave 1.
 **Relates to:** GRS-0179 (the maths document), GRS-0086 (four-index v1.4, gated).
 **Produced:** `docs/analysis/score-dispersion-2026-07.md` + `tests/test_score_dispersion.py`.
@@ -111,3 +111,11 @@ and a methodology version (non-negotiable #2). **No silent recalibration.**
 
 The founder gets a straight answer to "why do all the scores look the same", backed by measurements
 rather than reassurance, and a recommendation on whether anything needs to change.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `abd4854` (GRS-0223: why the scores cluster — measured, not changed).
+
+This ticket carried no *What shipped* record; the commits above are that record.

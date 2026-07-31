@@ -1,6 +1,6 @@
 # GRS-0234 — PDF furniture: the filename, the subtitle, the footer, the precision
 
-**Status:** Planned (2026-07-31, first-time-user review G6). **Priority:** MED.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review G6). **Priority:** MED._
 **Loop:** client-report hardening. **Extends GRS-0219.** **Relates to:** ADR-0040, GRS-0150.
 
 ## Why
@@ -59,3 +59,9 @@ Observed on the staging WeBull and Hargreaves Lansdown PDFs, 31/07/2026:
 The founder downloads a report and could attach it to a client email unedited: the filename says
 what it is, the cover carries no keys, and the footer's caveat reads as a sentence a client can
 understand.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).

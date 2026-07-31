@@ -1,6 +1,6 @@
 # GRS-0137 — Pipeline trust: forecast consistency + win-probability explainability
 
-**Status:** In progress
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In progress._
 **Loop:** Part 2 — critical review / trust hardening
 
 ## Why (outside-in critical review)
@@ -38,3 +38,11 @@ other**, and the KPI **counts already-won work as "expected won deals"**:
 - The headline KPI equals the sum of the non-settled win-probability pills; already-won/lost work is
   excluded. The deal panel shows the win-probability reasons + gaps as visible text. Golden master
   untouched (pipeline is not the scoring path).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `07bd4e6` (GRS-0137: pipeline trust — forecast consistency + win-probability explainabili).
+
+This ticket carried no *What shipped* record; the commits above are that record.

@@ -1,6 +1,6 @@
 # GRS-0163 — Demo-polish sweep (legibility gaps found in the end-to-end run)
 
-**Status:** Done (2026-07-22). Items 1–2 in PR #188; item 3 promoted to GRS-0164 (#184/#187); items 4–5
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-22). Items 1–2 in PR #188; item 3 promoted to GRS-0164 (#184/#187); items 4–5._
 (generic network copy, no host:port leak; abort-vs-failure distinction so dead spinners surface a real
 error) in the follow-up PR. Small trust/legibility fixes from the staging deep-dive + brokerage run.
 **Priority:** MED. **Loop:** demo-readiness. Mostly frontend.
@@ -28,3 +28,11 @@ error) in the follow-up PR. Small trust/legibility fixes from the staging deep-d
 
 Each surface reads cleanly to a first-time viewer; no "—" where a real value exists, no raw internal
 tokens, no dead spinners.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `d344154` (GRS-0163 (items 4-5): generic network copy + abort-vs-failure honesty), `fabe698` (GRS-0163: fill the portfolio Segment + earnings Attribution '—' columns).
+
+This ticket carried no *What shipped* record; the commits above are that record.

@@ -1,6 +1,6 @@
 # GRS-0170 — Powers step: unrated ≠ "None", un-rate affordance, one-click chips
 
-**Status:** Done (2026-07-23). Staging-rerun finding (3/5). **Loop:** rerun remediation.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-23). Staging-rerun finding (3/5). **Loop:** rerun remediation._
 
 ## Why
 
@@ -23,3 +23,11 @@ made). No un-rate existed, and 4–6 dropdowns per power made it the slowest scr
 
 An untouched power shows no rating; rating is one click per side; a power can be returned to
 unrated; nothing is ever recorded that the advisor didn't click.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `51699ec` (GRS-0170: Powers step honesty — unrated ≠ "None", un-rate, one-click chips).
+
+This ticket carried no *What shipped* record; the commits above are that record.

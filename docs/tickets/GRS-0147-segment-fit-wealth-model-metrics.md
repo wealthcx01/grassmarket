@@ -1,6 +1,6 @@
 # GRS-0147 — Segment fit: wealth operating model + segment-native metric taxonomies
 
-**Status:** Surfaced for founder / methodology decision — NOT autonomously buildable
+**Status:** BLOCKED (reconciled 2026-08-01). _Previously recorded as: Surfaced for founder / methodology decision — NOT autonomously buildable._
 **Loop:** Part 2 — mock-advisor stress test / segment fit
 
 ## The finding (all 5 personas)
@@ -43,3 +43,30 @@ Metric **input-domain validation** (a negative −£999,999 AUA saved and scored
 here: a correct guard needs per-metric domain bounds in the registry (some metrics, e.g. gross margin,
 can legitimately be negative; AUA cannot), which is the same registry/methodology decision. See the
 synthesis report `reports/mock-advisor-stress-test-2026-07-19.md`.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**BLOCKED — partly built, with a founder-gated residue.** This umbrella ticket has no commit of its
+own; its scope was delivered through lettered sub-tickets, and two scope items were never built.
+
+**Built:**
+- Wealth operating model — `bdd701b` (GRS-0147c). It is live: `atlas/active.py` registers
+  `_WEALTH_PROFILE_KEY = "wealth"` with an **activated, client-usable** `elicited_wealth_coefficient_set`,
+  so wealth appears in the wizard's operating-model dropdown and no longer self-flags "not client-usable".
+- Wealth infrastructure taxonomy — `bd7e112` (GRS-0147d).
+- Per-profile B-index metric selection — `06534f4` (GRS-0147b).
+- Exchange operating model made native — `e038967` (GRS-0147g).
+- Profile-aware scoreability copy — `bbfd4e6` (GRS-0147e) and graceful rubric guidance for unauthored
+  wealth subcomponents — `a09cedf` (GRS-0147f). **Neither has a ticket file**; they shipped as
+  sub-tickets of this one and are recorded here.
+
+**NOT built — founder decision D4:**
+- **Multi-currency.** The GBP lock the finding named is still in place: there is no currency field or
+  normalisation anywhere in the registry or the assessment contracts.
+- **UK regulatory framing** (Consumer Duty / SM&CR / MiFID suitability). The only trace in the product
+  is a placeholder string in `frontend/components/steps.tsx:222` ("e.g. FCA-authorised; MiFID II
+  passported") — a text hint, not the framing the wealth personas expected.
+
+Elicitation for non-retail (scope item 3) is GRS-0150, blocked on **D1**.

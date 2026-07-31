@@ -1,6 +1,6 @@
 # GRS-0176 — Vertical Kanban for the pipeline
 
-**Status:** In review (2026-07-25) — vertical stage bands, no horizontal scroll, per-card select removed; PR open. **Priority:** MED-HIGH.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-25) — vertical stage bands, no horizontal scroll, per-card select removed; PR open. **Prior._
 **Loop:** founder-feedback remediation, Wave 1. Frontend only.
 
 ## Why
@@ -73,3 +73,11 @@ The full pipeline is readable top-to-bottom without horizontal scrolling at 1280
 mobile widths; a card drags between bands; the illegal-move 409 banner behaviour is unchanged;
 keyboard/mobile stage moves still work from the card detail; an empty stage occupies one slim
 labelled row; the updated KanbanBoard test file passes.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `6c442fe` (GRS-0176: vertical Kanban for the pipeline).
+
+This ticket carried no *What shipped* record; the commits above are that record.

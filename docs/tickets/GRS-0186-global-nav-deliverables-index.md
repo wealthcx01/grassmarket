@@ -1,6 +1,6 @@
 # GRS-0186 — Global navigation + Deliverables reachability
 
-**Status:** In review (2026-07-25) — PrimaryNav + mobile drawer, /deliverables index (owner-scoped), RecordBreadcrumb + portfolio client-record link; PR open. **Priority:** HIGH.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-25) — PrimaryNav + mobile drawer, /deliverables index (owner-scoped), RecordBreadcrumb + po._
 **Loop:** founder-feedback remediation, Wave 1.
 
 ## Why
@@ -112,3 +112,11 @@ row), and the client's workshops/engagements/stage history in one (portfolio/eng
 record); no cross-section movement routes through the dashboard; the `/deliverables` index is
 owner-scoped with a passing cross-advisor negative test; every nav link shows an active state on
 its section.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `d1c0abc` (GRS-0186 followup: remove the /deliverables→/engagements redirect), `429740b` (GRS-0186: global navigation + deliverables reachability).
+
+This ticket carried no *What shipped* record; the commits above are that record.

@@ -1,5 +1,7 @@
 # GRS-0047 — Scoring fail-loud hardening: triad key validation + B-index refusal
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 1 (ATLAS engine)
 - **Status:** Fixed — found in the 2026-07-14 adversarial scoring review (findings F2, F3).
 - **Severity:** Medium (F2, latent structural gap) / Low (F3, diagnosability).
@@ -31,3 +33,11 @@
 - Scoring with all metrics Not Assessed raises the explicit B refusal (not ZeroDivisionError).
 - A dangling triad source literal refuses to score. Both pinned in `test_atlas_engine_properties.py`;
   the golden master is unchanged.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `9687748` (GRS-0047: scoring fail-loud hardening — triad key validation + B-index refusal).
+
+This ticket carried no *What shipped* record; the commits above are that record.

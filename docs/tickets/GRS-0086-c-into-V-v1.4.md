@@ -1,6 +1,6 @@
 # GRS-0086 — Fold C into V (Stage 2, v1.4)
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Loop 7 — C-index (Customer Proposition)
 **Depends on:** GRS-0080–0085, ADR-0023, ADR-0031, ATLAS-Methodology-v1.4
 **Branch:** `grs-0086-fold-c-into-v`
@@ -85,3 +85,9 @@ New: `theta_c`, the four-index V equation, golden-master v2, Methodology v1.4.
 
 - The θ_C elicitation exercise itself (an offline panel, not a code ticket).
 - Any Stage-1 reporting behaviour — GRS-0082 through GRS-0085.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `07e3926` (GRS-0086: fold C into V — four-index composite (Stage 2, Methodology v1.4)).

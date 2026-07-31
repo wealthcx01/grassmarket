@@ -1,6 +1,6 @@
 # GRS-0198 — Pipeline linkage: assessment & deliverable milestones on the pipeline
 
-**Status:** Planned (2026-07-23, founder feedback item 19). **Priority:** MED-HIGH.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-23, founder feedback item 19). **Priority:** MED-HIGH._
 **Loop:** founder-feedback remediation, Wave 5.
 
 ## Why
@@ -111,3 +111,9 @@ without opening the wizard; when an assessment finalises the pipeline shows a no
 "move stage?" prompt that the advisor must confirm; stage changes appear in history only when an
 advisor confirmed them; a dismissed or acted-on prompt does not repeat; all new reads are
 owner-scoped with passing cross-advisor negatives.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.

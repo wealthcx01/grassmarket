@@ -1,6 +1,6 @@
 # GRS-0083 — C wizard step + widget-capture grid
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Loop 7 — C-index (Customer Proposition)
 **Depends on:** GRS-0080/0081/0082, ADR-0023, ATLAS-Methodology-v1.3
 **Branch:** `grs-0083-c-wizard-and-widget-grid`
@@ -102,3 +102,9 @@ New:
 
 - Registry/anchors/engine — GRS-0080/0081/0082 (prerequisites).
 - Benchmark rows — GRS-0084; deliverable sections — GRS-0085; V fold-in — GRS-0086.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `94bed1e` (GRS-0083: C wizard step + widget-capture grid (ADR-0023)).

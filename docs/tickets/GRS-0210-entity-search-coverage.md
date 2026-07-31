@@ -1,6 +1,6 @@
 # GRS-0210 — Smart search has to know the firms an advisor will actually type
 
-**Status:** Planned (2026-07-26, staging review item 8). **Priority:** HIGH.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-26, staging review item 8). **Priority:** HIGH._
 **Loop:** founder-feedback remediation, Wave 1.
 
 ## Why
@@ -55,3 +55,9 @@ it is currently one of the thinnest.
 The founder types ten firm names of their choosing, across banks, brokers, exchanges and wealth
 managers, and the search resolves them with the right segment. The coverage test records the
 number rather than asserting a feeling.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.

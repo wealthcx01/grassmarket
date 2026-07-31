@@ -1,6 +1,6 @@
 # GRS-0096 — Primer: reading the outputs
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** —
 
@@ -51,3 +51,9 @@ concepts, each in plain English at a senior operator's depth:
   divide a score gap into pounds.
 
 Frontend type-check · lint · vitest green. Completes the §2 Primer set (GRS-0092–0096).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `f969bd5` (GRS-0096: primer — reading the outputs (ranges, words vs numbers, bottleneck, ).

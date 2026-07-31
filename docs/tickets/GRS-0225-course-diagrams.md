@@ -1,6 +1,6 @@
 # GRS-0225 — Diagrams for the courses, authored not decorated
 
-**Status:** In review (2026-07-29, PR #220). **Priority:** HIGH. **Loop:** founder-feedback
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-29, PR #220). **Priority:** HIGH. **Loop:** founder-feedback._
 remediation, Wave 4. **Depends on:** GRS-0206 (the Rive toolchain), GRS-0215 (the slide contract).
 
 > **Not yet visible to an advisor.** The nine diagrams are on their slides and served by the API,
@@ -104,3 +104,9 @@ because the job decides the shape) are both ideas the prose was already trying t
 The founder opens the OpenBB course and the AGPL decision and the linked-parameter mechanic are
 drawings rather than paragraphs, each with a still that works on its own, and the depth standard
 refuses a future course that has no diagrams at all.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `67f0e63` (GRS-0225: the last two diagrams, and the SVG the browser actually renders).

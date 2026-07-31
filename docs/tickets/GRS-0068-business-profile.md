@@ -1,6 +1,6 @@
 # GRS-0068 — Structured create + Step-1 business profile
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Track A (guided consulting UX — delivery review §4, NEXT-STEPS §3.6)
 **Branch:** `grs-0068-business-profile`
 
@@ -46,3 +46,9 @@ inputs; `parseList` trims and drops empties. Backend assessment/schema/finalise/
 
 - "Your Brokerages" portfolio home (which will surface `segment`) — GRS-0071.
 - Operating-model profile selector + weights — Track B (profile ADR).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `e6048d8` (GRS-0068: structured create + Step-1 business profile).

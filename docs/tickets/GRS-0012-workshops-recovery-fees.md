@@ -1,5 +1,7 @@
 # GRS-0012 — Workshops & recovery fees (backend)
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 3 (see PRD §9)
 - **Branch:** `grs-0012-workshops-recovery-fees`
 - **Status:** In review
@@ -59,3 +61,9 @@ Repository-only persistence; data scoping absolute + tested; the ADR-0002 bounda
 guarded across the pipeline tree; recovery-fee rates + window are fail-loud config; attribution
 records are append-only + auditable + hashed; `Money` never bare; contract-typed with schema parity;
 one ticket = one branch = one PR.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `4596241` (GRS-0012: workshops & recovery fees (Money enters the pipeline, ADR-0002 held)).

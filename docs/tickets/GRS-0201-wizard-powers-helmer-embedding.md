@@ -1,6 +1,6 @@
 # GRS-0201 — Wizard Powers step: embed the Helmer adaptation + review packet
 
-**Status:** Planned (2026-07-23, founder feedback item 7 follow-through). **Priority:** HIGH —
+**Status:** BLOCKED (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-23, founder feedback item 7 follow-through). **Priority:** HIGH —._
 this is the surface Hamilton Helmer will actually see. **Loop:** founder-feedback remediation,
 Wave 1 (after GRS-0180). Under ADR-0046.
 
@@ -54,3 +54,9 @@ source, the wizard's Powers content is rebuilt from it, per power and per segmen
 An advisor rating Powers for an exchange sees exchange-specific Helmer-grounded guidance with
 attribution; the same for retail and wealth; the review packet is assembled and handed to the
 founder; no score or stored run changes anywhere.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**BLOCKED.** Blocked on founder decision **D7** (docs/FOUNDER-DECISIONS-2026-08.md). Embedding the Helmer adaptation in the wizard waits on the ADR-0046 review Helmer's permission is conditional on.

@@ -1,6 +1,6 @@
 # GRS-0147c — Wealth operating model (ADR-0035 Phase 3)
 
-**Status:** Implemented (2026-07-19) — ADR-0035 Phase 3. Ships **draft / not-client-usable** (Phase 4
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Implemented (2026-07-19) — ADR-0035 Phase 3. Ships **draft / not-client-usable** (Phase 4._
 elicitation is founder/panel-gated).
 **Loop:** Part 2 — segment-fit remediation
 
@@ -35,3 +35,9 @@ B index possible without touching the retail golden master. This authors the con
   the retail coefficient set is incompatible with the wealth view (fail-loud). Ships with the honest
   "indicative, not client-usable" banner until the Phase-4 wealth elicitation panel. Golden master
   V=0.478565 unchanged; 781 backend tests + schema sync + ruff format/check + pyright green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `bdd701b` (GRS-0147c: wealth operating model (ADR-0035 Phase 3) (#162)).

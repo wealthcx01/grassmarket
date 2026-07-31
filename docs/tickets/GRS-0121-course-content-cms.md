@@ -1,6 +1,6 @@
 # GRS-0121 — Course/content model + back-end catalog CMS (foundation)
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 **Depends on:** ADR-0028 (Bruntsfield Academy / Workbench)
 
@@ -55,3 +55,11 @@ back-end, not hardcoded content.
 - The actual course content — Sales Egoist (GRS-0122), the product courses (GRS-0124–0126), the ops
   playbook (GRS-0129) are authored *through* this CMS in their own tickets.
 - Learner-facing catalog browsing polish beyond what the hub (GRS-0128) surfaces.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `ee20243` (GRS-0121: Bruntsfield Academy content model + admin CMS (foundation)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

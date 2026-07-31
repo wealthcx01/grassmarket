@@ -1,6 +1,6 @@
 # GRS-0175 — Guide & Primer rewrite
 
-**Status:** In review (2026-07-25) — /help merged into /guide, page rewritten in the STYLE-VOICE
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-25) — /help merged into /guide, page rewritten in the STYLE-VOICE._
 register, PR open. (2026-07-23, founder feedback items 27 and 6-partial.) **Priority:** HIGH.
 **Loop:** founder-feedback remediation, Wave 1. Depends on GRS-0174 (style guide) and GRS-0179
 (the maths explainer it summarises).
@@ -80,3 +80,11 @@ A reader who has never seen the product can explain V, C, the range, and P10/P50
 Guide alone. No unexplained notation anywhere on the page. One "Guide" entry point: the header,
 dashboard, and all internal links resolve to `/guide`, and `/help` permanently redirects there
 with anchors preserved. The θ values quoted match the shipped coefficient sets exactly.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `b4d585b` (GRS-0175: merge /help into /guide and rewrite the Guide).
+
+This ticket carried no *What shipped* record; the commits above are that record.

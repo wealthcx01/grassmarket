@@ -1,6 +1,6 @@
 # GRS-0177 — Portfolio demo clarity: dedupe, explain, clean
 
-**Status:** In review (2026-07-26) — grouping, explanations and seed hygiene shipped; the
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-26) — grouping, explanations and seed hygiene shipped; the._
 staging cleanup script is written but has NOT been run (needs deploy access). **Priority:**
 HIGH — the founder's own demo confusion.
 **Loop:** founder-feedback remediation, Wave 1.
@@ -91,3 +91,11 @@ The demo account's portfolio shows one row per subject with variants grouped beh
 chip; a first-time viewer can say what SANDBOX and DEMO mean from the screen alone; re-running
 the seed twice changes nothing (asserted by test); staging shows no Meridian or 0%-coverage
 stray after the cleanup script runs; earnings shows each commission line once.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `a4630cd` (GRS-0177 follow-up: let the cleanup tool actually clean (ADR-0047)), `137c713` (GRS-0177: make the portfolio readable — group, explain, clean).
+
+This ticket carried no *What shipped* record; the commits above are that record.

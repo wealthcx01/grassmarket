@@ -1,6 +1,6 @@
 # GRS-0097 — Refine the P & L labels product-wide (UI copy)
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** ADR-0030 (ATLAS → Platform Power rename)
 **Branch:** `grs-0097-refine-p-l-labels`
@@ -71,3 +71,9 @@ wording inside the primer.
 
 - The primer's explanatory lens content (GRS-0093 applies this wording there).
 - Renaming ATLAS → Platform Power (GRS-0090) — a separate, parallel copy change.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `00ef4e7` (GRS-0097: refine the P & L labels product-wide (keep letters, engine untouched).

@@ -1,6 +1,6 @@
 # GRS-0207 — Outreach and CRM platform: decide, then build the thin layer
 
-**Status:** Planned (2026-07-26, staging review item 5). **Priority:** HIGH.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-26, staging review item 5). **Priority:** HIGH._
 **Loop:** founder-feedback remediation, Wave 5. **ADR:** ADR-0048.
 **Reopens the conclusion of GRS-0195.**
 
@@ -73,3 +73,9 @@ landing pages and lead scoring are not what this is.
 The founder reads ADR-0048 and agrees with the pick, or overrules it with the trade-offs visible.
 An advisor can open a target, see its contacts, draft an email with real assessment context, and
 send it after the founder approves.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.

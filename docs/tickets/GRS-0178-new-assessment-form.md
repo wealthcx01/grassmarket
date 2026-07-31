@@ -1,6 +1,6 @@
 # GRS-0178 — New-assessment creation form redesign
 
-**Status:** In review (2026-07-26) — grid layout shipped, PR open (stacked on GRS-0177).
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-26) — grid layout shipped, PR open (stacked on GRS-0177)._
 (2026-07-23, founder feedback item 5.) **Priority:** MED.
 **Loop:** founder-feedback remediation, Wave 1. Frontend only.
 
@@ -70,3 +70,11 @@ Fields align on a shared grid at every viewport width, stacking cleanly below th
 no magic-number spacing remains in the form; the sandbox option sits on its own line with its
 explanation visible; creating an assessment (retail and non-retail profile, production and
 sandbox) behaves exactly as before, asserted by test.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `66fd529` (GRS-0178: align the new-assessment form by structure).
+
+This ticket carried no *What shipped* record; the commits above are that record.

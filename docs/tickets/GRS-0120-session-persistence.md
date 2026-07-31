@@ -1,6 +1,6 @@
 # GRS-0120 — Persist the session / stop the random sign-outs
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — auth/session (ADR-0024)
 **Depends on:** ADR-0024 (Google OAuth / cross-site session)
 **Branch:** `grs-0120-persist-session`
@@ -73,3 +73,9 @@ already anticipates (`auth.py:1-2`), done in the ADR-0024 auth workstream.
 
 - Full Holy Corner SSO handoff (this lays the ADR-0024 groundwork; HC integration is later).
 - Any change to invite-only onboarding or the scoping rules.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `bb42e79` (GRS-0120: persist the session — refresh-token rotation + expiry-aware retry).

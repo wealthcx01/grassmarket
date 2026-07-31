@@ -1,6 +1,6 @@
 # GRS-0077 — Operating-model profiles: the mechanism
 
-**Status:** Planned
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Planned._
 **Loop:** Loop 7 — Operating-model profiles
 **Depends on:** ADR-0025 (operating-model profiles)
 
@@ -58,3 +58,11 @@ view/filter over it. It is strictly ADDITIVE — retail brokerage is the v1 defa
 > Note: `critical` flags + `subcomponent_status` are `draft-pending-ratification`
 > (`modules.yaml:10-15`). Profile criticals therefore layer over an **unratified base set** — flag
 > this in the ADR; a base-set ratification may shift what a profile need only override.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `4e9c102` (GRS-0077: operating-model profile mechanism (ADR-0025)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

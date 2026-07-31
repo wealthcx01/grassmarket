@@ -1,6 +1,6 @@
 # GRS-0114 — LSEG influencer mapping (bcap-lseg)
 
-**Status:** Planned
+**Status:** SUPERSEDED (reconciled 2026-08-01). _Previously recorded as: Planned._
 **Loop:** Part 2 — Pipeline / GTM engine (one program)
 **Depends on:** ADR-0027 (Pipeline / GTM engine)
 
@@ -39,3 +39,9 @@ feed; there is nothing to port.** It uses the existing `bcap-lseg` MCP connector
 
 - Bulk seeding the 150-bank universe (GRS-0115 — depends on this).
 - The CRM rebuild (GRS-0111), Google integration (GRS-0112), and GTM MCP surface (GRS-0113).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**SUPERSEDED.** Superseded by GRS-0194. GRS-0194 built the LSEG influencer maps this ticket described.

@@ -1,5 +1,7 @@
 # GRS-0028 — My Earnings
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 6
 - **Branch:** `grs-0028-my-earnings`
 - **Status:** In review
@@ -24,3 +26,11 @@ Transparent, self-scoped earnings for every consultant.
 - Recovery-fee window edge cases tested (day 364, day 366, conversion on the boundary).
 - All views scoped to self; admin aggregate is Holy Corner scope, not this ticket.
 - Full gate green; CI green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `7102e8f` (GRS-0028: my earnings — commission config, immutable lines, self-scoped views).
+
+This ticket carried no *What shipped* record; the commits above are that record.

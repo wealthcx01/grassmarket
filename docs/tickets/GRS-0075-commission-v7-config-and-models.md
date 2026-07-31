@@ -1,6 +1,6 @@
 # GRS-0075 — Commission Schedule v7: config, contracts, product catalog, migration
 
-**Status:** Planned
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Planned._
 **Loop:** Track B — Earnings v7
 **Depends on:** ADR-0026 (two-stream v7 commission, amends ADR-0017)
 
@@ -76,3 +76,11 @@ rate key.
 - Writing ADR-0026 itself (this ticket *depends on* it; the sourcing-reconciliation and
   window-generalisation decisions are recorded there, not here).
 - Back-filling `product_id` / `delivery_type` onto historical v1 lines (they stay null; non-retroactive).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `e5bd0f7` (GRS-0075: Commission Schedule v7 — config, contracts, product catalog, migrati).
+
+This ticket carried no *What shipped* record; the commits above are that record.

@@ -1,6 +1,6 @@
 # GRS-0195 — Agentic GTM research spike
 
-**Status:** Closed 2026-07-25 — memo written, recommendation is BUILD THIN; PR open.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Closed 2026-07-25 — memo written, recommendation is BUILD THIN; PR open._
 (2026-07-23, founder feedback item 16c.) **Priority:** MED. Time-boxed.
 **Loop:** founder-feedback remediation, Wave 5. Research output, no adoption in this ticket.
 
@@ -73,3 +73,9 @@ change; the PR diff is `docs/planning/agentic-gtm-spike.md` plus drafted ticket 
 - Follow-on ticket drafts for the chosen path exist in `docs/tickets/`.
 - `git diff` for the PR touches only `docs/` — no dependency has been added to the repo.
 - Spike closed within the two-day box (noted in the memo header).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** A research spike, and it delivered its output: `525079a` — the recommendation is BUILD THIN. Its downstream tickets (GRS-0202–0204, GRS-0207) carry the consequences and remain open.

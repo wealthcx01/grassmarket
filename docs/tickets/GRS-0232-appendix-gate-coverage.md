@@ -1,6 +1,6 @@
 # GRS-0232 — The appendix must not contradict the run
 
-**Status:** Planned (2026-07-31, first-time-user review G4). **Priority:** MED. **Type:** Bug.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review G4). **Priority:** MED. **Type:** Bug._
 **Loop:** client-report hardening. **Extends GRS-0211.**
 
 ## Why
@@ -42,3 +42,9 @@ version claim is exactly the kind of number a technical reviewer checks first.
 
 The founder cannot ship a report whose appendix disagrees with the run's own version table, however
 the prose is worded.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).

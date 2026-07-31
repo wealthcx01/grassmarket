@@ -1,6 +1,6 @@
 # GRS-0215 — Rebuild the courses as courses, not paragraphs
 
-**Status:** In review (2026-07-30, PR #220 — the reader landed in GRS-0226; a downloadable
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-30, PR #220 — the reader landed in GRS-0226; a downloadable._
 deck export, scope item 4, is still unbuilt). **Priority:** HIGHEST.
 **Loop:** founder-feedback remediation, Wave 4. **Replaces the content half of GRS-0191.**
 
@@ -84,3 +84,11 @@ Coursera-grade, the LMS question is genuinely open and should be reopened rather
 
 A course that does not meet the standard fails the build. The structure supports what GRS-0216 has
 to deliver, and the founder's judgement of that course is the real verdict on this one.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `e065ee8` (GRS-0215 + GRS-0216: the course depth standard, and the first two OpenBB secti).
+
+This ticket carried no *What shipped* record; the commits above are that record.

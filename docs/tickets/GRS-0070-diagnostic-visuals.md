@@ -1,6 +1,6 @@
 # GRS-0070 — Diagnostic visuals (radar · waterfall · weighted module table · scenario bars)
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Track A (guided consulting UX — delivery review §4, NEXT-STEPS §3.6)
 **Branch:** `grs-0070-diagnostic-visuals`
 
@@ -49,3 +49,9 @@ suite green; frontend type-check · lint · vitest green.
 
 - Structured create + Step-1 business profile — GRS-0068.
 - "Your Brokerages" portfolio home — GRS-0071.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `4758d4c` (GRS-0070: diagnostic visuals (radar, waterfall, weighted module table, scenari).

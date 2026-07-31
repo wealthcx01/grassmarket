@@ -1,5 +1,7 @@
 # GRS-0003 — Golden-master fixture
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 1 (see PRD §9)
 - **Branch:** `grs-0003-golden-master` (stacked on `grs-0002-registry-content`)
 - **Status:** ⏸ **PAUSED FOR JOHN'S RATIFICATION** — GRS-0004 (the engine) does not start until the
@@ -115,3 +117,11 @@ Open the workbook, adjust anything, save, then run
 `uv run python scripts/regen_golden_master_json.py`. Re-run `uv run pytest -q` (the consistency
 tests must stay green). When you're happy, approve and GRS-0004 (the engine) begins — its
 golden-master test will pin these exact numbers.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `c96e18d` (GRS-0003 close-out: powers-never-N/A, triad thresholds, Methodology v1.1), `47ebb73` (GRS-0003 revision: B1/B3/B4/B8 content changes + ADR-0005/0006/0007), `954465d` (GRS-0003: fix review defects A1/A2/A6/A7; draft ADR-0003 (gate) + ADR-0004 (en), and 1 more.
+
+This ticket carried no *What shipped* record; the commits above are that record.

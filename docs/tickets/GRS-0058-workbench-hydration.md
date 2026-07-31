@@ -1,5 +1,7 @@
 # GRS-0058 — Fix the Workbench hydration mismatch (React #418)
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 5 (Workbench)
 - **Status:** Fixed — found in the 2026-07-15 deep-dive functional audit.
 - **Severity:** Medium — a hydration mismatch (uncaught React #418) on every Workbench load.
@@ -24,3 +26,11 @@ real content renders after hydration.
 
 - No React #418 / hydration error on `/workbench` (confirmed by the functional audit: 62 checks, 0
   issues). Role gating and all five tabs unchanged; `WorkbenchClient.test.tsx` green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `09a589e` (GRS-0058: fix the Workbench hydration mismatch (React #418)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

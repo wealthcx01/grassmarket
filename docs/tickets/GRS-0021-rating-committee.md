@@ -1,5 +1,7 @@
 # GRS-0021 — Rating Committee queue
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 5
 - **Branch:** `grs-0021-rating-committee`
 - **Status:** In review — PR #23
@@ -24,3 +26,11 @@ High-stakes ratings require peer sign-off — enforced at runtime.
 - Rationale + dissent render into the methods appendix.
 - Founder-track note: registry critical flags should be ratified before this ships, else the Frontier gate protects draft criticals.
 - Full gate green; CI green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `8f2ec53` (GRS-0021: Rating Committee queue (high-stakes peer sign-off)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

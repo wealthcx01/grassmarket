@@ -1,6 +1,6 @@
 # GRS-0089 — Home welcome + context
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** —
 **Branch:** `grs-0089-home-welcome-context`
@@ -54,3 +54,9 @@ a proper, ideally personalised, welcome and context block to the home page.
 
 - The header account menu (GRS-0087) and the section-grid IA rework (GRS-0091).
 - Deep per-section content — this is the home orientation layer only.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `0594136` (GRS-0089: home welcome + context).

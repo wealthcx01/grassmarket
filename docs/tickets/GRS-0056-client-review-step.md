@@ -1,5 +1,7 @@
 # GRS-0056 — Review-before-send on client-facing deliverables
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 4 (deliverables)
 - **Status:** Fixed — the highest-value item from the 2026-07-15 UX audit (rubric #8, was Partial).
 - **Severity:** Low/Medium — a consequential action lacked proportional friction in the UI.
@@ -27,3 +29,11 @@ gates were already strong (client-usable coefficients, every AI section approved
 - A client-facing generation requires the review step; Cancel backs out with nothing generated;
   confirm generates with `client_facing: true`. An internal draft still generates on one click.
   Pinned by `DeliverablesPanel.test.tsx` (7 tests).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `7301d62` (GRS-0056: review-before-send on client-facing deliverables).
+
+This ticket carried no *What shipped* record; the commits above are that record.

@@ -1,6 +1,6 @@
 # GRS-0179 — docs/ATLAS-Scoring-Explained.md: the maths, in English
 
-**Status:** In review (2026-07-25) — docs/ATLAS-Scoring-Explained.md authored + linked from the Guide and the Summary step; PR open. **Priority:** HIGH.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-25) — docs/ATLAS-Scoring-Explained.md authored + linked from the Guide and the Summary step._
 **Loop:** founder-feedback remediation, Wave 1. Docs only; no engine change.
 
 ## Why
@@ -133,3 +133,11 @@ L bottleneck blend, uncertainty and P10/P50/P90, an honest account of why demo s
 the Helmer treatment (cross-linked to the adaptation doc). Every coefficient quoted matches the
 live sets named in Scope §2 (verified line-by-line in the PR). The Guide and the Summary step both
 link to it. No scoring change anywhere; the golden master is byte-identical.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `d555cab` (GRS-0179: docs/ATLAS-Scoring-Explained.md — the maths, in English).
+
+This ticket carried no *What shipped* record; the commits above are that record.

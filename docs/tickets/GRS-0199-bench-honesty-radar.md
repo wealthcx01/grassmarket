@@ -1,6 +1,6 @@
 # GRS-0199 — Bench honesty + Opportunity Radar wiring
 
-**Status:** Planned (2026-07-23, founder feedback item 25). **Priority:** MED.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-23, founder feedback item 25). **Priority:** MED._
 **Loop:** founder-feedback remediation, Wave 4 (honesty) → Wave 5 (wiring). Depends on GRS-0188
 (queue re-prioritisation) and GRS-0193 (contact data).
 
@@ -98,3 +98,9 @@ the radar's copy claims nothing it does not do (no external-signal language unti
 exists); the queue contains no governance items and follows the new priority order (golden master
 updated); once GRS-0193 lands, radar suggestions drawn from the imported universe cite their source
 dataset and never double-surface an advisor's existing prospects.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.

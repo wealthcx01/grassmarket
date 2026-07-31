@@ -1,6 +1,6 @@
 # GRS-0189 — Rebuild the deliverables to the story architecture
 
-**Status:** Planned (2026-07-23, founder feedback item 17). **Priority:** HIGH.
+**Status:** SUPERSEDED (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-23, founder feedback item 17). **Priority:** HIGH._
 **Loop:** founder-feedback remediation, Wave 3. Carries ADR-0042.
 
 ## Why
@@ -140,3 +140,9 @@ Frontend (vitest):
 - Charts render in the Bruntsfield palette with titles and annotations; no default-styled
   chart remains in any deliverable.
 - ATLAS golden masters byte-identical; contract schema + TS mirror regenerated in the same PR.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**SUPERSEDED.** Superseded by GRS-0211. GRS-0211 says so in terms: 'GRS-0189 was written for this and has not been started. This ticket replaces it.'

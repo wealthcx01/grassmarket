@@ -1,6 +1,6 @@
 # GRS-0211 — The client deliverable, rebuilt: what it says
 
-**Status:** Planned (2026-07-26, staging review items 9 and 10). **Priority:** HIGHEST.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-26, staging review items 9 and 10). **Priority:** HIGHEST._
 **Loop:** founder-feedback remediation, Wave 3. **Extends GRS-0189 / ADR-0042.**
 
 **This ticket owns the narrative and the content model.** The renditions are split out so they can
@@ -131,3 +131,9 @@ holds the six sections per deliverable, `deliverables/client_report_service.py` 
 the finalised run, and `/deliverables/<id>/report` is where an advisor writes them. A report with
 unwritten sections refuses with a 409 naming them; prose the content model rejects (an undeclared
 number) returns a 422 carrying the model's own sentence.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `6a35f8e` (GRS-0211: the client report content model — one narrative, no formatting).

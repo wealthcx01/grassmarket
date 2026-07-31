@@ -1,6 +1,6 @@
 # GRS-0099 — Portfolio home: detail + completeness
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** A (build now)
 **Depends on:** —
@@ -54,3 +54,9 @@ row detail (`app/assessments/page.tsx`):
 
 Each portfolio row shows a completeness/coverage % (with a bar), sourced from the engine's coverage
 output (no UI re-derivation), alongside the richer detail. Frontend type-check · lint · vitest green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `2e0f0bf` (GRS-0099: portfolio home — per-row completeness + richer detail).

@@ -1,6 +1,6 @@
 # GRS-0209 — The Operating Model dropdown still does not line up
 
-**Status:** Planned (2026-07-26, staging review item 7). **Priority:** MED. **Type:** Bug.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-26, staging review item 7). **Priority:** MED. **Type:** Bug._
 **Loop:** founder-feedback remediation, Wave 1. **Follows GRS-0178.**
 
 ## Why
@@ -72,3 +72,9 @@ Scope item 3 is met by `frontend/components/FormField.tsx`: every cell is label-
 captions rendered *below*, so the next field added cannot reintroduce this. The unit tests lock that
 structure only — jsdom has no layout engine, which is exactly why GRS-0178's test passed on a broken
 page. The pixels are proved by the measurements, not the tests.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `83ce92c` (GRS-0209: measure the misalignment, then fix its one cause).

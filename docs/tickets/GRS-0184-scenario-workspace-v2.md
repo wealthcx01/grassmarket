@@ -1,6 +1,6 @@
 # GRS-0184 — Scenario workspace v2
 
-**Status:** Planned (2026-07-23, founder feedback item 12). **Priority:** MED-HIGH.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-23, founder feedback item 12). **Priority:** MED-HIGH._
 **Loop:** founder-feedback remediation, Wave 1.
 
 ## Why
@@ -174,3 +174,9 @@ one-click "start from the bottleneck" seeds the highest-leverage fix; a comparis
 scenarios by ΔV against the baseline. Scenarios are owner-scoped (a second consultant sees none,
 proven by test) and remain editable even on a finalised assessment. The engine path and the golden
 master are untouched.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.

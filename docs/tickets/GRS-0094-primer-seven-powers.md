@@ -1,6 +1,6 @@
 # GRS-0094 — Primer: the 7 Powers (Helmer)
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** GRS-0069 (`lib/powerGuidance.ts` per-power content)
 **Branch:** `grs-0094-primer-seven-powers`
@@ -54,3 +54,9 @@ so this is largely surfacing authored material into the primer rather than writi
 
 - The lens overview and label refinement (GRS-0093/0097).
 - Changes to `powerGuidance.ts` content itself (reuse as-is).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `a92ebdc` (GRS-0094: primer — the seven Powers, one by one (reuse powerGuidance.ts)).

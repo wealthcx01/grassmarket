@@ -1,6 +1,6 @@
 # GRS-0236 — Demo deliverables ship with worked example reports
 
-**Status:** Planned (2026-07-31, founder: "I can't seem to download example client reports").
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, founder: "I can't seem to download example client reports")._
 **Priority:** HIGH. **Loop:** first-time-user coherence. **Extends GRS-0159.** **Relates to:** GRS-0208, GRS-0211.
 
 ## Why
@@ -53,3 +53,9 @@ The demo exists to show the product's best output. Today its best output is a re
 
 A first-time user opens any showcase deliverable, clicks Download the PDF, and holds a complete,
 watermarked, well-written example client report thirty seconds into their first session.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).

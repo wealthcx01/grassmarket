@@ -1,6 +1,6 @@
 # GRS-0119 — Beta/sandbox self-approve mode
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** ADR-0029 (demo/illustrative records)
 
@@ -78,3 +78,9 @@ their OWN assessment and see the real deliverable drafts **without weakening the
 requires the full gate on the same document; a client cannot mint a demo record; provenance is immutable
 across updates; a sandbox run is excluded from the benchmark. Golden master untouched (provenance/gating,
 not scoring). Backend + frontend gates green; schema parity green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `c1feb13` (GRS-0119: sandbox self-approve mode (ADR-0029 record provenance)).

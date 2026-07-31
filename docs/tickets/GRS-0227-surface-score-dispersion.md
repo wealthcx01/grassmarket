@@ -1,6 +1,6 @@
 # GRS-0227 — Surface the dispersion beside the score
 
-**Status:** Built, in review (2026-07-30). **Priority:** HIGH. **Loop:** founder-feedback
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Built, in review (2026-07-30). **Priority:** HIGH. **Loop:** founder-feedback._
 remediation, Wave 1. **Depends on:** GRS-0223 (the measurement that motivates it).
 
 ## Why
@@ -100,3 +100,11 @@ asserted twice: on the helper (`lib/dispersion.test.ts`) and on rendered output
 (`components/LiveScorePanel.dispersion.test.tsx`), because the ticket's acceptance is a claim about
 what is on screen. Assessed-only (D9), zero-spread, and the single-module case (which renders
 nothing rather than claiming a perfectly even firm) are each covered. No change to the scoring path.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `86946df` (GRS-0227: report how uneven the firm is, beside the score).
+
+This ticket carried no *What shipped* record; the commits above are that record.

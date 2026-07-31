@@ -1,6 +1,6 @@
 # GRS-0098 — Broaden beyond retail brokerages (framing + naming)
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** A (build now)
 **Depends on:** ADR-0025 (profiles) / GRS-0077–0079
@@ -62,3 +62,9 @@ Retired the retail-brokerage-only framing and wired the profile in at creation:
 The portfolio page + create form carry no brokerage-only wording; creating an assessment selects an
 operating-model profile that feeds the GRS-0079 mechanism (not a free-standing field); retail stays the
 default and is unchanged. Frontend type-check · lint · vitest green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `020d107` (GRS-0098: broaden framing beyond retail brokerages + profile-at-creation).

@@ -1,6 +1,6 @@
 # GRS-0109 — Screen-recording → AI video dissection → auto-populate the widget checklist
 
-**Status:** Planned
+**Status:** SUPERSEDED (reconciled 2026-08-01). _Previously recorded as: Planned._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** B (flagged follow-up — its own ADR/ticket set later)
 **Depends on:** ADR-0009 (AI-approval gating)
@@ -34,3 +34,9 @@ ADR-0009 — AI-derived checklist values are proposals a human approves before t
 - Manual widget scoring and the C-index computation — GRS-0080–0085.
 - Surfacing the (manual) checklist/C-index in the wizard — GRS-0108.
 - The full video-AI architecture and storage decisions — the deferred ADR.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**SUPERSEDED.** Superseded by GRS-0197. The screen-recording dissection idea was never scheduled; what survives of it is the meeting-intelligence scope in GRS-0197.

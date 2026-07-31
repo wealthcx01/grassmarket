@@ -1,6 +1,6 @@
 # GRS-0085 — C deliverable sections
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Loop 7 — C-index (Customer Proposition)
 **Depends on:** GRS-0082/0083/0084, ADR-0023, ADR-0009, ATLAS-Methodology-v1.3
 **Branch:** `grs-0085-c-deliverable-sections`
@@ -81,3 +81,9 @@ New:
 
 - The engine/contract changes — GRS-0082; benchmark ingestion — GRS-0084 (prerequisites).
 - Folding C into the headline V — GRS-0086.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `3aa3adb` (GRS-0085: C deliverable sections — proposition heatmap + differentiation-vs-ra).

@@ -1,6 +1,6 @@
 # GRS-0205 — Rewrite every string in the app, not just the screens we reviewed
 
-**Status:** Planned (2026-07-26, staging review items 1, 2, 3). **Priority:** HIGH.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-26, staging review items 1, 2, 3). **Priority:** HIGH._
 **Loop:** founder-feedback remediation, Wave 1. **Supersedes the sweep half of GRS-0174.**
 
 ## Why
@@ -67,3 +67,9 @@ nobody listed are still in the old voice.
 
 The founder reads the home page, the primer prompt, the Getting Started messages and ten buttons
 picked at random, and does not flag the voice. The inventory shows zero unreviewed strings.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.

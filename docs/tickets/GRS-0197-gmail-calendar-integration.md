@@ -1,6 +1,6 @@
 # GRS-0197 — Gmail + Google Calendar integration
 
-**Status:** Planned (2026-07-23, founder feedback items 15b and 18). **Priority:** HIGH within
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-23, founder feedback items 15b and 18). **Priority:** HIGH within._
 Wave 5. **Loop:** founder-feedback remediation, Wave 5. Elevates the planned GRS-0112; extends
 ADR-0024/ADR-0044 OAuth.
 
@@ -136,3 +136,9 @@ the prospect and engagement records, and their scheduled workshops appear as Cal
 opting out stops sync and leaves manual entries intact; scoping tests prove no cross-advisor mail
 leakage (including no admin path); Google tokens are never exposed by any endpoint; CI runs the
 whole suite with zero network access.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.

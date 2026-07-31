@@ -1,6 +1,6 @@
 # GRS-0110 — Summary & Interpretation + Scenarios: more detail & analysis
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** A (build now)
 **Depends on:** —
@@ -60,3 +60,9 @@ recomputation):
 The Summary interprets the result (bottleneck, ranges, rate-vs-rank, value bridge) from the existing
 diagnostics; Scenarios show the effect on the headline read against the base. Frontend type-check ·
 lint · vitest green. Completes §3 Wizard Phase A (the buildable set).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `813e074` (GRS-0110: Summary & Scenarios — deeper interpretation & what-if).

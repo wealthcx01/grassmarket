@@ -1,5 +1,7 @@
 # GRS-0043 — Economic Value must read Not Assessed, never a "None" moat floor
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 1 (ATLAS engine)
 - **Status:** Fixed — found in the 2026-07-14 adversarial scoring review.
 - **Severity:** High — a silent default in the deterministic scoring path produces a wrong,
@@ -40,3 +42,11 @@ and `TriadDimensionResult.rating` could not even represent the honest answer.
 - With no scale/unit-economics metric assessed, Economic Value reports Not Assessed (rating/score
   None), never `"None"` — pinned by `test_triad_economic_is_not_assessed_never_a_none_floor`.
 - The golden master (all dimensions assessed) is unchanged; the full suite stays green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `6d2c356` (GRS-0043: Economic Value reads Not Assessed, never a "None" moat floor).
+
+This ticket carried no *What shipped* record; the commits above are that record.

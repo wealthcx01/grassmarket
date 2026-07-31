@@ -1,6 +1,6 @@
 # GRS-0216 — The OpenBB course, built to the founder's standard
 
-**Status:** In review (2026-07-30, PR #220 — 196 slides, eight sections, and since GRS-0226
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-30, PR #220 — 196 slides, eight sections, and since GRS-0226._
 an advisor can actually read them). **Priority:** HIGHEST.
 
 > **The four "superseded reference" modules are deleted** (2026-07-30, founder decision recorded in
@@ -77,3 +77,11 @@ source, it does not go in the course.
 
 The founder takes the course end to end and finishes with OpenBB installed, two workspaces built,
 and a clear view of how and when to sell it. Not a summary of OpenBB. The thing itself.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `b09ddc8` (GRS-0216: sections 6, 7 and 8 — the OpenBB course is complete), `b08f646` (GRS-0216: section 5 — a second workspace, for a different job), `e5d555b` (GRS-0216: section 4 — build your first workspace, for a real target), and 1 more.
+
+This ticket carried no *What shipped* record; the commits above are that record.

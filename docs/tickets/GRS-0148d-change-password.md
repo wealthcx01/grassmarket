@@ -1,6 +1,6 @@
 # GRS-0148d — Self-service change-password + real Profile (ADR-0036 Item 2)
 
-**Status:** Implemented (2026-07-19).
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Implemented (2026-07-19)._
 **Loop:** Part 2 — stress-test remediation (finish & trust)
 
 ## Why
@@ -28,3 +28,9 @@ firm handling client data. This ships the one account control every live product
 - A signed-in advisor changes their own password; the old one 401s, the new one logs in; a wrong
   current password → 401; a new password under 12 chars → 422; unauthenticated → 401. Golden master
   untouched; 787 backend tests + schema sync + frontend build/tests + ruff/pyright green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `59b2039` (GRS-0148d: self-service change-password + real Profile (ADR-0036 Item ).

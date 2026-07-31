@@ -1,6 +1,6 @@
 # GRS-0128 — Bench/Workbench as the single "what I should / must / have done" hub
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 **Depends on:** ADR-0028 (Bruntsfield Academy / Workbench)
 
@@ -45,3 +45,11 @@ dashboard card + `/help`).
 
 - The certification and learning content the hub links to (GRS-0121/0122/0127).
 - Certification-evidence auto-linking (GRS-0131).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `59a946e` (GRS-0128: fold governance + Academy into the one Workbench hub + global nav li).
+
+This ticket carried no *What shipped* record; the commits above are that record.

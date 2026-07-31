@@ -1,6 +1,6 @@
 # GRS-0131 — Auto-link certification evidence to real assessment participation (the actual gap)
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 **Depends on:** ADR-0028 (Bruntsfield Academy / Workbench)
 
@@ -54,3 +54,11 @@ advisor actually appearing in an assessment's `rater_ids` or leading one** (`cer
 
 - Rebuilding rating-request/dual-rating/committee linkage — it already works via `assessment_id`.
 - The certification restructure / course certs (GRS-0127).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `bf8f9b8` (GRS-0131: fix E501 line-length in cert-autolink docstrings/comments), `537b5e6` (GRS-0131: auto-link certification evidence to real assessment participation).
+
+This ticket carried no *What shipped* record; the commits above are that record.

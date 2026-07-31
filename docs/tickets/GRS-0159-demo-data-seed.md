@@ -1,6 +1,6 @@
 # GRS-0159 — Repeatable demo-data seed (Revolut + HL end-to-end)
 
-**Status:** Done (2026-07-22). `grassmarket.demo.brokerage_showcase` + extended `scripts/seed_demo.py`:
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-22). `grassmarket.demo.brokerage_showcase` + extended `scripts/seed_demo.py`:._
 Revolut/HL/WeBull complete DEMO assessments (V+C), engagements, real deliverables, £49,500 statement;
 idempotent; one-command path documented in the README. So a demo instance is never empty when showing
 advisor hires.
@@ -27,3 +27,11 @@ scripts (`tools/staging-e2e/brokerage_e2e.py`, `earnings_e2e.py`). Make it a fir
 
 One command populates a clean environment with the two showcase reports, a live pipeline, and a
 non-zero earnings statement — ready to demo.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `1da1509` (GRS-0159: repeatable demo-data seed — the brokerage showcase).
+
+This ticket carried no *What shipped* record; the commits above are that record.

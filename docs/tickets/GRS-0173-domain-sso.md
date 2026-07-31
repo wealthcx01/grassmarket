@@ -1,6 +1,6 @@
 # GRS-0173 — Workspace domain SSO: @bruntsfield.capital sign-in
 
-**Status:** In review (2026-07-25) — Workspace domain auto-provisioning + login primary Google button; PR open. **Priority:** HIGH.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-25) — Workspace domain auto-provisioning + login primary Google button; PR open. **Priority._
 **Loop:** founder-feedback remediation, Wave 1. Carries ADR-0044 (amends ADR-0024).
 
 ## Why
@@ -123,3 +123,11 @@ and lands in an empty, correctly-scoped book. A non-domain unknown Google accoun
 403. With `GM_GOOGLE_WORKSPACE_DOMAIN` unset, every current auth test passes unchanged. Scoping
 tests cover the auto-provisioned consultant. Password login unchanged. The autoprovision audit
 event is recorded and the JSON Schema diff for `AuditEventType` is committed.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `787289a` (GRS-0173: Workspace domain SSO — @bruntsfield.capital sign-in (ADR-0044)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

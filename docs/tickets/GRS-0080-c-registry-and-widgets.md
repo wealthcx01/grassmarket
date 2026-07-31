@@ -1,6 +1,6 @@
 # GRS-0080 — C registry section + 93-widget Level-1 layer
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Loop 7 — C-index (Customer Proposition)
 **Depends on:** ADR-0023, ATLAS-Methodology-v1.3
 **Branch:** `grs-0080-c-registry-and-widgets`
@@ -45,3 +45,9 @@ rarity / missing status all fail loud. Schema regenerated (parity green).
 
 Rubric anchors (GRS-0081); the C scoring engine + coefficients (GRS-0082); wizard widget grid
 (GRS-0083); C into V (GRS-0086, gated).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `9975213` (GRS-0080: C registry section + 93-widget Level-1 layer (ADR-0023)).

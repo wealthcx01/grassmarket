@@ -1,6 +1,6 @@
 # GRS-0204 — The outreach send path: Gmail scope escalation or own-domain SMTP
 
-**Status:** Draft — not scheduled (2026-07-25, from the GRS-0195 spike). **Priority:** TBD.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Draft — not scheduled (2026-07-25, from the GRS-0195 spike). **Priority:** TBD._
 **Loop:** follow-on. **This is a founder decision before it is an implementation**, and it needs an
 ADR.
 
@@ -49,3 +49,9 @@ it.
 
 An ADR records the decision. The transport sits behind a port. No send exists until GRS-0202 has
 landed.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.

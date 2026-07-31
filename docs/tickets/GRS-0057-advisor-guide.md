@@ -1,5 +1,7 @@
 # GRS-0057 — In-platform Advisor Guide (how-to / docs)
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** — (documentation surface)
 - **Status:** Done — requested in the 2026-07-15 fit-for-purpose review.
 - **Rubric basis:** #4 (guided help for advisors), #7 (plain-language), #10 (orientation).
@@ -26,3 +28,11 @@ page (it carries guidance, never user data). It cross-links `/guide` and each wo
 
 - `/help` renders the full guide on desktop and mobile; the header Guide link reaches it; type-check
   / lint / build green. Content is plain-language and grounded in the actual workflows.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `c0aa72e` (GRS-0057: in-platform Advisor Guide (how-to / docs section)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

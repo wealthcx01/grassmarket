@@ -1,6 +1,6 @@
 # GRS-0160 — Assessment wizard density UX pass (the core "clunky" fix)
 
-**Status:** Done (2026-07-21). Infrastructure step now collapsible; live rail was already sticky. From the founder's "clunky, hard to use" feedback + the staging audit.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-21). Infrastructure step now collapsible; live rail was already sticky. From the founder's "clun._
 **Priority:** HIGH — the headline UX debt. **Loop:** demo-readiness. Frontend-led.
 
 ## Why
@@ -29,3 +29,11 @@ leaves the viewport as you scroll.
 A realistic assessment can be completed in a fraction of the clicks, the score stays visible, and the
 Infrastructure/Customer-Proposition steps no longer read as an endless form. Golden master untouched
 (this is presentation only).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `0ca60c0` (GRS-0160: collapsible modules on the Infrastructure step (density fix)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

@@ -1,5 +1,7 @@
 # GRS-0053 — Global exception safety net + controlled decrypt failure
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 6 (hardening)
 - **Status:** Fixed — from the 2026-07-14 audit backlog (GRS-0049, API finding #3).
 - **Severity:** Low — a few uncaught paths surfaced as bare 500s (not a detail leak).
@@ -27,3 +29,11 @@ the handlers only fire for what slips through):
 - An uncaught `ScopeViolationError` is 404 and a `ConflictError` is 409; a corrupted transcript
   ciphertext yields a controlled 500 with no crypto internals — pinned by `test_error_handling.py`.
 - Existing per-route error mapping is unchanged (regression suite green).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `622f305` (GRS-0053: exception safety net + controlled transcript decrypt failure).
+
+This ticket carried no *What shipped* record; the commits above are that record.

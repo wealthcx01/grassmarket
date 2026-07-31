@@ -1,6 +1,6 @@
 # GRS-0133 — Gamify My Earnings + earnings chart
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** ADR-0026 (Earnings v7) / GRS-0075–0076; GRS-0123 (product-course carrot)
 
@@ -54,3 +54,11 @@ Earnings v7 kernel already computes.
 
 - The Holy Corner / EliteVault-style earnings substrate and deeper commission relationships (later build).
 - Any change to commission rates or the v7 config (governed by ADR-0026).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `49dd18c` (GRS-0133: earnings chart + gamification (incentive layer over Earnings v7)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

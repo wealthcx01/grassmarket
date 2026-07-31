@@ -1,6 +1,6 @@
 # GRS-0140 — Comprehension checks for the product courses
 
-**Status:** In progress
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In progress._
 **Loop:** Part 2 — critical review / trust hardening
 **Follows:** GRS-0139 (Academy learning loop)
 
@@ -42,3 +42,11 @@ Brandfetch does not own the logos). The four shared template lessons — which h
 ## Acceptance
 - Every product-course lesson (bar the bespoke Brandfetch tiers lesson) has an authored
   check_question + check_answer; the courses build and all course tests pass. Golden master untouched.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `8fc5ac6` (GRS-0140: authored comprehension checks for the product courses).
+
+This ticket carried no *What shipped* record; the commits above are that record.

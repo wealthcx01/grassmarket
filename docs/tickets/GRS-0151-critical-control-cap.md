@@ -1,6 +1,6 @@
 # GRS-0151 — Critical-control cap on V (ADR-0038)
 
-**Status:** Done (2026-07-20). Founder-directed after the GRS-0150 scored effect.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-20). Founder-directed after the GRS-0150 scored effect._
 **Loop:** Part 2 — segment fit / scoring integrity. **ADR:** ADR-0038.
 
 ## Why
@@ -37,3 +37,9 @@ out-weighted.
 wealth & exchange critical; cap present-but-slack when criticals strong; V = min(uncapped, cap) always;
 monotone through the cap; construction refuses cap-without-criticals and cap-without-provenance.
 Golden master + full suite green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `4ce97c6` (GRS-0151: critical-control cap on V — operational-maturity guardrail (ADR-0038).

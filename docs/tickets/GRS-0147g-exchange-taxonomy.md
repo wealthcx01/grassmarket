@@ -1,6 +1,6 @@
 # GRS-0147g — Exchange operating model, made native (ADR-0035, exchange completion)
 
-**Status:** Implemented (2026-07-19). Ships **draft / not-client-usable** (Phase-4 elicitation is
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Implemented (2026-07-19). Ships **draft / not-client-usable** (Phase-4 elicitation is._
 founder/panel-gated).
 **Loop:** Part 2 — segment-fit remediation
 
@@ -34,3 +34,9 @@ subcomponent selection + module renames); this applies it to exchange, mirroring
   mutually incompatible (fail-loud). Retail/wealth views byte-identical; golden master V=0.478565
   unchanged; 784 backend tests + schema + ruff + pyright green. Wizard renders it with no frontend
   change. Phase-4 elicitation still gates client-usability.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `e038967` (GRS-0147g: exchange operating model made native (ADR-0035, exchange co).

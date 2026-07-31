@@ -1,6 +1,6 @@
 # GRS-0183 — Remove ConnectTrade from the catalogue
 
-**Status:** In review (2026-07-24) — removed from catalogue, WeBull deal reassigned to OpenBB, tests/docs updated, PR open. **Priority:** HIGH — the demo's top
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-24) — removed from catalogue, WeBull deal reassigned to OpenBB, tests/docs updated, PR open._
 sell recommendation is a product with no agreement.
 **Loop:** founder-feedback remediation, Wave 1. ADR-0026 amendment note (config change).
 
@@ -128,3 +128,11 @@ Backend pytest, frontend vitest per file; `pyright`, `ruff`, `tsc`, `ESLint` the
 `load_commission_config()` load without error (lockstep intact); the demo sell panel recommends only
 agreed products and the WeBull deal shows as OpenBB with unchanged earnings magnitude; every test
 that named ConnectTrade is retargeted and green; staging re-seeded; golden master byte-identical.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `53364ce` (GRS-0183: remove ConnectTrade from the catalogue).
+
+This ticket carried no *What shipped* record; the commits above are that record.

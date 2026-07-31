@@ -1,6 +1,6 @@
 # GRS-0226 — The slide reader and the section gate
 
-**Status:** In review (2026-07-30, PR #220). **Priority:** HIGHEST. **Loop:** founder-feedback
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-30, PR #220). **Priority:** HIGHEST. **Loop:** founder-feedback._
 remediation, Wave 4. **Depends on:** GRS-0215 (the slide + section-test contracts), GRS-0216 (the
 196 slides), GRS-0225 (the nine diagrams).
 
@@ -89,3 +89,11 @@ impossible for any course, not just this one.
 
 The founder opens the OpenBB course, reads it as slides with the diagrams in place, sits the
 section-1 test, and cannot reach section 2 until they pass it.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `d615dad` (GRS-0226: the slide reader and the section gate).
+
+This ticket carried no *What shipped* record; the commits above are that record.

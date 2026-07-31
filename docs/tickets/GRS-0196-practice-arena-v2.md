@@ -1,6 +1,6 @@
 # GRS-0196 — Practice Arena v2: an AI client to practise against
 
-**Status:** Planned (2026-07-23, founder feedback item 22). **Priority:** MED-HIGH.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-23, founder feedback item 22). **Priority:** MED-HIGH._
 **Loop:** founder-feedback remediation, Wave 4. Founder decision 23/07: build in-house, no
 imported mechanism.
 
@@ -103,3 +103,9 @@ lines, seeing labelled AI client replies — and on "End & score" receives the d
 extraction-completeness score plus AI-DRAFTED coaching; the full flow runs in CI offline via the
 scripted roleplay; the scorer golden master is byte-identical; a foreign advisor cannot advance or
 score another's session (404).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.

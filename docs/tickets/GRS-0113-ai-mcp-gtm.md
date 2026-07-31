@@ -1,6 +1,6 @@
 # GRS-0113 — AI / MCP GTM enablement surface
 
-**Status:** Planned
+**Status:** SUPERSEDED (reconciled 2026-08-01). _Previously recorded as: Planned._
 **Loop:** Part 2 — Pipeline / GTM engine (one program)
 **Depends on:** ADR-0027 (Pipeline / GTM engine)
 
@@ -34,3 +34,9 @@ the rebuilt CRM.
 
 - The Google OAuth/scope plumbing itself (GRS-0112).
 - LSEG influencer mapping (GRS-0114) and the target-universe seed (GRS-0115).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**SUPERSEDED.** Superseded by GRS-0207. The AI/MCP GTM surface was folded into the outreach-platform decision, GRS-0207.

@@ -1,6 +1,6 @@
 # GRS-0185 — Brandfetch variant segment scoping
 
-**Status:** In review (2026-07-26) — profiles split, stanzas differentiated, Academy note
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-26) — profiles split, stanzas differentiated, Academy note._
 added; PR open. (2026-07-23, founder feedback item 13.) **Priority:** MED-HIGH.
 **Loop:** founder-feedback remediation, Wave 1. Amends the ADR-0039 fit map (config).
 
@@ -113,3 +113,11 @@ correct pitch (distribution = the client's own app on-brand; redistribution = li
 served downstream); a retail report never lists redistribution and an exchange report never lists
 distribution (proven by test). `load_product_fit()` fails loud on any profile/key drift; the
 GRS-0169 empty-state note still fires; commission rates and the golden master are untouched.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `55e34f5` (GRS-0185 + GRS-0187: scope Brandfetch by segment, surface Stream B).
+
+This ticket carried no *What shipped* record; the commits above are that record.
