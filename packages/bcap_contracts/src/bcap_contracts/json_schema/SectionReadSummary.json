@@ -1,0 +1,67 @@
+{
+  "$defs": {
+    "ReportSectionKind": {
+      "description": "The sections of a client report, in the order they are read.\n\nThe body opens with the business and closes with what acting is worth; the appendix carries\nevery number the body refers to. `SECTION_ORDER` below is normative.",
+      "enum": [
+        "business",
+        "advantage",
+        "constraint",
+        "actions",
+        "value",
+        "appendix"
+      ],
+      "title": "ReportSectionKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "What the advisor sees for one section: was it opened, and for how long in total.",
+  "properties": {
+    "first_viewed_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "First Viewed At"
+    },
+    "last_viewed_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Last Viewed At"
+    },
+    "section": {
+      "$ref": "#/$defs/ReportSectionKind"
+    },
+    "total_dwell_ms": {
+      "minimum": 0,
+      "title": "Total Dwell Ms",
+      "type": "integer"
+    },
+    "views": {
+      "minimum": 0,
+      "title": "Views",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "section",
+    "views",
+    "total_dwell_ms"
+  ],
+  "title": "SectionReadSummary",
+  "type": "object"
+}

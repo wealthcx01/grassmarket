@@ -44,3 +44,31 @@ the input beside it, or a grid column that collapses at the founder's viewport w
 
 The founder opens the new-assessment form and the two controls line up. The PR shows before and
 after screenshots at three widths.
+
+## What shipped
+
+Measured first, on the rendered page, at 1280/1440/1920 — all three identical, so it was never
+width-dependent. **The Operating Model select sat 23.4px below the subject input; it is now 0px.**
+Screenshots, the raw geometry and the re-runnable measuring script are in
+`docs/reviews/GRS-0209-form-alignment/`.
+
+The cause was a single one, and not the one this ticket guessed at. The grid aligned cells on their
+**end**, and `EntitySubjectField` always renders a caption under its input, so the caption's height
+pushed that input up out of line. `align-items: start` fixes it: the label rows share a baseline, so
+the controls beneath them do too, and a field that grows a caption can no longer move its own
+control.
+
+Two of the ticket's assumptions were wrong, and measuring is what caught them:
+
+- **The controls' heights never differed.** Both measured 40.9px, so the suspected "native select
+  computes taller" was not the defect here. Only the submit button was short (35.9px), because
+  `.btn` carries its own padding. `--field-control-height` is therefore a `min-height` matching what
+  the inputs already reach — it resizes neither of them, and brings the button up to the row.
+- **A `<label>` wrapper renames a `<button>`.** Routing the button through the shared field
+  component made its accessible name the empty spacer label instead of "Create and open". Its cell
+  is a `<div>`, and a test locks that.
+
+Scope item 3 is met by `frontend/components/FormField.tsx`: every cell is label-above-control with
+captions rendered *below*, so the next field added cannot reintroduce this. The unit tests lock that
+structure only — jsdom has no layout engine, which is exactly why GRS-0178's test passed on a broken
+page. The pixels are proved by the measurements, not the tests.

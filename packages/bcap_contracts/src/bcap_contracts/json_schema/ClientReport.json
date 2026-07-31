@@ -1,0 +1,166 @@
+{
+  "$defs": {
+    "DeclaredFigure": {
+      "additionalProperties": false,
+      "description": "One number a section is allowed to state, and where it came from.\n\n`rendered` is the exact string the prose uses, so the check that follows compares like with\nlike; `source` names the field on the scoring run it was read from, so a reader (or GRS-0222)\ncan trace any number in the report back to the run that produced it.",
+      "properties": {
+        "key": {
+          "description": "Stable identifier, unique within the section.",
+          "minLength": 1,
+          "title": "Key",
+          "type": "string"
+        },
+        "label": {
+          "description": "What this figure is, in the reader's words.",
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "rendered": {
+          "description": "Exactly as it appears in the prose, e.g. '£1.2m' or '61'.",
+          "minLength": 1,
+          "title": "Rendered",
+          "type": "string"
+        },
+        "source": {
+          "description": "Where it came from on the scoring run, e.g. 'run.platform_value.point'.",
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "label",
+        "rendered",
+        "source"
+      ],
+      "title": "DeclaredFigure",
+      "type": "object"
+    },
+    "ReportSection": {
+      "additionalProperties": false,
+      "description": "One section of the report: prose, the figures that prose is allowed to cite, and its gate.",
+      "properties": {
+        "ai_drafted": {
+          "default": false,
+          "description": "Whether the prose began as an AI draft. If so it needs an approved narrative.",
+          "title": "Ai Drafted",
+          "type": "boolean"
+        },
+        "body": {
+          "description": "Paragraphs of plain prose. No markup — the renditions own presentation.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Body",
+          "type": "array"
+        },
+        "figures": {
+          "items": {
+            "$ref": "#/$defs/DeclaredFigure"
+          },
+          "title": "Figures",
+          "type": "array"
+        },
+        "heading": {
+          "minLength": 1,
+          "title": "Heading",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ReportSectionKind"
+        },
+        "narrative_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The approved AINarrative this prose came from. Required when ai_drafted.",
+          "title": "Narrative Id"
+        },
+        "tier": {
+          "$ref": "#/$defs/ReportTier",
+          "default": "engaged"
+        }
+      },
+      "required": [
+        "kind",
+        "heading",
+        "body"
+      ],
+      "title": "ReportSection",
+      "type": "object"
+    },
+    "ReportSectionKind": {
+      "description": "The sections of a client report, in the order they are read.\n\nThe body opens with the business and closes with what acting is worth; the appendix carries\nevery number the body refers to. `SECTION_ORDER` below is normative.",
+      "enum": [
+        "business",
+        "advantage",
+        "constraint",
+        "actions",
+        "value",
+        "appendix"
+      ],
+      "title": "ReportSectionKind",
+      "type": "string"
+    },
+    "ReportTier": {
+      "description": "Which audience a section is cleared for (the hook GRS-0214 will decide against).\n\nDeclared per section so tiering is a property of the content, not of a renderer's filter.",
+      "enum": [
+        "free",
+        "engaged"
+      ],
+      "title": "ReportTier",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The whole report, rendition-agnostic.\n\nIt is bound to the scoring run it interprets and to the versions that produced that run, so a\nreport is always attributable — the same discipline scoring runs themselves carry.",
+  "properties": {
+    "coefficient_version": {
+      "minLength": 1,
+      "title": "Coefficient Version",
+      "type": "string"
+    },
+    "methodology_version": {
+      "minLength": 1,
+      "title": "Methodology Version",
+      "type": "string"
+    },
+    "scoring_run_id": {
+      "format": "uuid",
+      "title": "Scoring Run Id",
+      "type": "string"
+    },
+    "sections": {
+      "items": {
+        "$ref": "#/$defs/ReportSection"
+      },
+      "title": "Sections",
+      "type": "array"
+    },
+    "subject": {
+      "description": "The firm this report is about.",
+      "minLength": 1,
+      "title": "Subject",
+      "type": "string"
+    }
+  },
+  "required": [
+    "subject",
+    "scoring_run_id",
+    "methodology_version",
+    "coefficient_version",
+    "sections"
+  ],
+  "title": "ClientReport",
+  "type": "object"
+}

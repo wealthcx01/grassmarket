@@ -1242,3 +1242,41 @@ export interface RatingRequestSummary {
   module_name: string;
   submitted: boolean;
 }
+
+// --- The client report (GRS-0211/0219/0220) ---------------------------------------------------
+
+/** One section of the advisor's report prose, as stored and edited. */
+export type ReportProseSection = {
+  heading: string;
+  body: string[];
+  tier: "free" | "engaged";
+};
+
+/** A shareable link to one deliverable's client report. Never carries the plaintext token. */
+export type ClientReportLink = {
+  id: string;
+  deliverable_id: string;
+  engagement_id: string;
+  token_hash: string;
+  recipient_label: string;
+  expires_at: string;
+  revoked_at: string | null;
+  last_viewed_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type SectionReadSummary = {
+  section: string;
+  views: number;
+  total_dwell_ms: number;
+  first_viewed_at: string | null;
+  last_viewed_at: string | null;
+};
+
+export type ReportReadReport = {
+  link_id: string;
+  recipient_label: string;
+  state: "active" | "expired" | "revoked";
+  sections: SectionReadSummary[];
+};

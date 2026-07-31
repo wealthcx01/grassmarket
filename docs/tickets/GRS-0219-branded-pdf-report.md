@@ -54,3 +54,53 @@ because two people can work on them at once.
 
 The founder opens the PDF and it looks like something Bruntsfield would put its name on, before
 reading a word of it.
+
+## What shipped
+
+`grassmarket.deliverables.report_pdf` renders a `ClientReport` (GRS-0211) to a branded PDF. Samples
+for review, both from the golden-master run: `docs/reviews/GRS-0219-client-report-pdf/`.
+
+**Scope items 1–6 are all in** (corrected 2026-07-31 — see below; item 3's contents page was
+claimed here before it existed). A real cover (wordmark, accent rule, client, engagement, date);
+typography set once as tokens in `report_pdf/tokens.py` mirroring `globals.css`; running heads,
+folios, and a ruled break into the appendix; figures at 300dpi; a figures table that repeats its
+header across page breaks; and a provenance footer carrying preparer, date, methodology and
+coefficient versions.
+
+**Four things were harder than the ticket assumed, and each changed the implementation:**
+
+1. **The house fonts were not in the repo at all.** The frontend gets them from `next/font/google`
+   at build time, which is no help to a Python renderer, and reportlab can only embed a TTF on disk.
+   They are now vendored by `scripts/vendor_report_fonts.py` (~1.7MB, all SIL OFL 1.1, each licence
+   committed beside its family). reportlab substitutes Helvetica *silently* when a face is missing —
+   precisely the "no branding" failure this ticket exists to fix — so a missing face now raises.
+2. **Inter ships only as a variable font.** reportlab renders a variable TTF at its default
+   instance, so asking for SemiBold would have silently produced Regular. The two static weights are
+   instanced with fontTools at vendoring time.
+3. **A running head cannot be drawn in one pass.** `onPage` fires before the page's flowables are
+   laid out, so the head named the previous page's section; `onPageEnd` names the *last* section on
+   the page, which is equally wrong. The document is built twice — pass one records which page each
+   section begins on, pass two draws from that map.
+4. **The greyscale palette I first chose did not meet its own contract.** Two adjacent fills were
+   0.101 apart in luminance against a declared 0.15 minimum — different colours on screen, the same
+   grey on a printer. The test caught it; the shipped ramp is solved for ~0.19 separation. Column
+   widths in the figures table are likewise measured with `pdfmetrics` rather than guessed, after a
+   guess broke the coefficient version into "v1-draft-pen ding-elicita tion".
+
+**Test plan status.** Golden-master render on extracted text (1), watermark on/off for draft and
+non-production (2), greyscale legibility asserted on the palette *and* on the generated image (3),
+and samples committed for the founder (4). 17 tests; ruff, pyright clean.
+
+**Still not visible in the app.** This renders a report; nothing yet calls it from a route. Wiring
+the download into the deliverables surface is the last mile and is not in this ticket's scope.
+
+
+## Correction, 2026-07-31
+
+This ticket previously claimed all six scope items were done. **The contents page (item 3) was not
+built.** `CONTENTS_THRESHOLD_PAGES = 8` existed in `report_pdf/tokens.py` and nothing read it — a
+constant that reads as evidence of a feature to anyone grepping for it, which is worse than an
+obvious gap. It is now implemented: the renderer takes a third pass when a report exceeds the
+threshold, so the page numbers are recorded against the layout that HAS the contents page rather
+than the one that does not. A test follows the appendix's printed page number to the page it
+actually lands on, because that off-by-one is the one nobody notices until a client follows it.

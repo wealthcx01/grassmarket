@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+import { FIELD_CONTROL_CLASS, FormField } from "@/components/FormField";
 import { toDisplay } from "@/lib/band";
 import { ApiError, api, getToken } from "@/lib/api";
 import * as doc from "@/lib/doc";
@@ -207,16 +208,14 @@ export default function BrokeragesPage() {
         </p>
       </section>
 
-      {/* A two-row grid (GRS-0178). The fields share one baseline because each is a block label
-          above its input, so `alignItems: end` lines them up on real content — the old flex row
-          did it with a magic-number paddingBottom on the checkbox, which is why the founder saw
-          the subject box and the Operating Model dropdown out of alignment. The breakpoint that
-          stacks the columns lives in globals.css, since inline styles cannot carry a media query. */}
+      {/* A two-row grid. Every cell goes through FormField (GRS-0209), so all three share one
+          markup shape — label row, control, caption below — and the grid aligns them on their TOP.
+          GRS-0178 aligned on the bottom instead, which is why the founder kept seeing the subject
+          box and the Operating Model dropdown out of line: the subject field's caption pushed its
+          own input up by 23.4px. The breakpoint that stacks the columns lives in globals.css,
+          since inline styles cannot carry a media query. */}
       <form onSubmit={onCreate} className="form-create-assessment">
-        <label style={{ fontSize: "0.85rem", minWidth: 0 }}>
-          <span style={{ display: "block", marginBottom: "0.3rem", fontWeight: 500 }}>
-            New assessment — subject company
-          </span>
+        <FormField label="New assessment — subject company">
           <EntitySubjectField
             value={subject}
             entityId={entityId}
@@ -225,12 +224,10 @@ export default function BrokeragesPage() {
               setEntityId(id);
             }}
           />
-        </label>
-        <label style={{ fontSize: "0.85rem", minWidth: 0 }}>
-          <span style={{ display: "block", marginBottom: "0.3rem", fontWeight: 500 }}>
-            Operating model
-          </span>
+        </FormField>
+        <FormField label="Operating model">
           <select
+            className={FIELD_CONTROL_CLASS}
             value={profileKey}
             onChange={(e) => setProfileKey(e.target.value)}
             style={{
@@ -250,10 +247,22 @@ export default function BrokeragesPage() {
               </option>
             ))}
           </select>
-        </label>
-        <button type="submit" className="btn btn-primary" disabled={creating || !subject.trim()}>
-          {creating ? "Creating…" : "Create and open"}
-        </button>
+        </FormField>
+        {/* The button goes through the SAME field wrapper as the two controls, with an empty label
+            reserving the label row. That is deliberate: nudging it down with a computed margin is
+            the magic-number compensation GRS-0178 was faulted for, and it drifts the moment a
+            label's font-size changes. Reserving the row structurally cannot drift.
+            `as="div"` because a <label> around a <button> would rename the button after the empty
+            spacer — see FormField. */}
+        <FormField as="div" label={<span aria-hidden="true">&nbsp;</span>}>
+          <button
+            type="submit"
+            className={`btn btn-primary ${FIELD_CONTROL_CLASS}`}
+            disabled={creating || !subject.trim()}
+          >
+            {creating ? "Creating…" : "Create and open"}
+          </button>
+        </FormField>
         {/* Row 2. The explanation is visible text, not only a tooltip: an advisor deciding
             whether to tick this should not have to hover to find out what it does. */}
         <div style={{ gridColumn: "1 / -1", display: "flex", gap: "0.55rem", alignItems: "flex-start" }}>

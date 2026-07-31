@@ -77,9 +77,9 @@ From the 2026-07-26 staging review. Wave 4 (the course rebuild) is the part that
 | GRS-0206 | Rive as the diagram and motion system (ADR-0049) | Planned — rewritten 2026-07-29 after reading the repo |
 | GRS-0207 | Outreach and CRM platform: decide, then build thin | Planned |
 | GRS-0208 | One clean demo account + a founder admin who can act as any advisor | Planned |
-| GRS-0209 | The Operating Model dropdown still does not line up | Planned |
+| **GRS-0209** | **The Operating Model dropdown still does not line up** | **Fixed, in review** — measured on the rendered page: the select sat **23.4px** below the subject input at all three widths, now **0px**. Cause was `align-items: end` against a field that always renders a caption. Evidence in `docs/reviews/GRS-0209-form-alignment/` |
 | GRS-0210 | Smart search must know the firms an advisor will type | Planned |
-| GRS-0211 | The client deliverable, rebuilt: what it says | Planned |
+| **GRS-0211** | **The client deliverable, rebuilt: what it says** | **Content model built, in review** — `bcap_contracts.client_report` + its builder. Order validated, P10/P50/P90 refused outside the appendix, every figure declared with its run field, approval gate enforced. Prose is a gated input, never invented. **Not yet visible to the founder** — that needs GRS-0219 (PDF) and GRS-0220 (web) |
 | GRS-0212 | Customer Proposition for exchanges: research, model, ship | Planned |
 | GRS-0213 | Scenarios an advisor can drive, with a narrative assistant | Planned |
 | GRS-0214 | What the client gets free vs on engagement | Planned |
@@ -87,13 +87,14 @@ From the 2026-07-26 staging review. Wave 4 (the course rebuild) is the part that
 | **GRS-0216** | **The OpenBB course** — 196 slides, eight sections | **In review, PR #220** |
 | **GRS-0217** | **The remaining product courses, to the same standard** | **COMPLETE, in review, PR #221** — Benzinga, Brandfetch and Sales Ops Playbook all rebuilt (8/8 sections, 192 slides each). `depth.LEGACY_COURSES` is down to one entry |
 | GRS-0218 | The Sales Egoist course | Blocked on source material |
-| GRS-0219 | The client report as a Bruntsfield-branded PDF | Planned |
-| GRS-0220 | The client report as an interactive web page, read tracking | Planned |
-| GRS-0221 | Stage 6 layout: the panels that fight each other | Planned |
+| **GRS-0219** | **The client report as a Bruntsfield-branded PDF** | **Built, in review** — cover, house typography (fonts vendored; reportlab substitutes silently, so a missing face now raises), running heads via a two-pass build, 300dpi greyscale-safe figures, repeating table headers, watermark on draft/non-production. Samples in `docs/reviews/GRS-0219-client-report-pdf/`. **Wired**: download from `/deliverables/<id>/report` |
+| **GRS-0220** | **The client report as an interactive web page, read tracking** | **Built, in review** — `/r/<token>` public page (no login), token stored only as SHA-256, unknown/expired/revoked all 404 identically, immediate revocation, snapshot-at-issue, disclosed per-section tracking. Figures are SVG bars, not the hover-radar (Rive/GRS-0206 unbuilt). **Wired**: issue/revoke links and see reads on `/deliverables/<id>/report` |
+| **GRS-0221** | **Stage 6 layout: the panels that fight each other** | **Fixed, in review** — measured on the rendered page: **119px** of the sell panel sat behind the pinned score card (its full height) at all four viewports, now **0px**. The rail sticks as one block instead of its first child. Auditing the step found a second instance — the rail pinned 44px behind the sticky site header, eating the score card's heading — fixed against `--topbar-height`. Evidence in `docs/reviews/GRS-0221-stage6-layout/` |
 | GRS-0222 | The narrative assistant: drafting against real scored data | Planned |
 | **GRS-0223** | **"All the scores seem surprisingly similar": find out why** | **Answered, in review** — the engine is not compressing (achievable V span 0.815); aggregation is, and the rubric is used at ~1/3 of its width. No engine change recommended. See `docs/analysis/score-dispersion-2026-07.md` |
 | GRS-0227 | Surface the dispersion beside the score | **Built, in review** — module range + one-line meaning on the summary and live panel; bottleneck leads where the spread is wide. New `module_qm_point` on the live payload (deterministic, assessed-only). No new dimension, no band, no rating gate |
 | GRS-0224 | Repository coverage for the dormant peer-governance code | Planned (arose from 0188) |
+| **GRS-0228** | **The E2E gate assertion tested a message we deliberately stopped sending** | **Done** — `CI / E2E` was red on `main` from 2026-07-22 to 2026-07-31. Not a broken gate: GRS-0163 rewrote the refusal copy into plain English and the spec still demanded the old `client_usable=False` jargon. Test-only fix; suite now 8/8. Follow-up worth doing: export the gate's copy as a shared constant so one sentence isn't hand-copied into three files |
 | **GRS-0225** | **Diagrams for the courses, authored not decorated** — nine scenes | **In review, PR #220** |
 | **GRS-0226** | **The slide reader and the section gate** — makes 0215/0216/0225 visible | **In review, PR #220** |
 

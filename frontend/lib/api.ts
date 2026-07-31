@@ -10,6 +10,9 @@
  */
 
 import type {
+  ClientReportLink,
+  ReportProseSection,
+  ReportReadReport,
   FounderApproval,
   FounderReviewQueueEntry,
   AINarrative,
@@ -862,6 +865,96 @@ export const api = {
     const disposition = res.headers.get("content-disposition") ?? "";
     const match = /filename="?([^"]+)"?/.exec(disposition);
     return { blob, filename: match?.[1] ?? `${id}.docx` };
+  },
+
+  // --- The client report (GRS-0211/0219/0220) ------------------------------------------------
+
+  /** The advisor's six sections. An unwritten report returns an empty draft, never a blank page. */
+  getReportProse(
+    deliverableId: string,
+    signal?: AbortSignal,
+  ): Promise<{ sections: Record<string, ReportProseSection>; written: boolean }> {
+    return request(`/deliverables/${deliverableId}/report-prose`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  saveReportProse(
+    deliverableId: string,
+    sections: Record<string, ReportProseSection>,
+    signal?: AbortSignal,
+  ): Promise<{ sections: Record<string, ReportProseSection>; written: boolean }> {
+    return request(`/deliverables/${deliverableId}/report-prose`, {
+      method: "PUT",
+      headers: { ...authHeaders(), "Content-Type": "application/json" },
+      body: JSON.stringify({ sections }),
+      signal,
+    });
+  },
+
+  /**
+   * The branded PDF (GRS-0219). A report with unwritten sections returns 409 naming them, which
+   * surfaces to the advisor as the backend's own sentence rather than a generic failure.
+   */
+  async downloadClientReportPdf(
+    deliverableId: string,
+    signal?: AbortSignal,
+  ): Promise<{ blob: Blob; filename: string }> {
+    const url = `${API_BASE_URL}/deliverables/${deliverableId}/client-report.pdf`;
+    let res: Response;
+    try {
+      res = await fetch(url, { method: "GET", headers: authHeaders(), signal });
+    } catch (cause) {
+      throw new ApiError(0, NETWORK_ERROR_MESSAGE, cause, isAbort(cause));
+    }
+    if (!res.ok) {
+      const body = await parseBody(res);
+      throw new ApiError(res.status, messageFromBody(body, `Download failed (${res.status})`), body);
+    }
+    const blob = await res.blob();
+    const disposition = res.headers.get("content-disposition") ?? "";
+    const match = /filename="?([^"]+)"?/.exec(disposition);
+    return { blob, filename: match?.[1] ?? `${deliverableId}.pdf` };
+  },
+
+  listReportLinks(deliverableId: string, signal?: AbortSignal): Promise<ClientReportLink[]> {
+    return request(`/deliverables/${deliverableId}/links`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  /** The plaintext token comes back exactly once, here. It is not stored and cannot be re-read. */
+  createReportLink(
+    deliverableId: string,
+    body: { recipient_label: string; expires_in_days?: number },
+    signal?: AbortSignal,
+  ): Promise<{ link: ClientReportLink; token: string; share_path: string }> {
+    return request(`/deliverables/${deliverableId}/links`, {
+      method: "POST",
+      headers: { ...authHeaders(), "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal,
+    });
+  },
+
+  revokeReportLink(linkId: string, signal?: AbortSignal): Promise<ClientReportLink> {
+    return request(`/report-links/${linkId}/revoke`, {
+      method: "POST",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  reportLinkReads(linkId: string, signal?: AbortSignal): Promise<ReportReadReport> {
+    return request(`/report-links/${linkId}/reads`, {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
   },
 
   /**

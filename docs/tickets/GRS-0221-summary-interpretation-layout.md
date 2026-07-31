@@ -1,6 +1,6 @@
 # GRS-0221 — Stage 6 layout: the panels that fight each other
 
-**Status:** Planned (2026-07-26, staging review item 9). **Priority:** MED-HIGH. **Type:** Bug.
+**Status:** Fixed, in review (2026-07-31). **Priority:** MED-HIGH. **Type:** Bug.
 **Loop:** founder-feedback remediation, Wave 1. **Follows GRS-0182.**
 
 ## Why
@@ -49,3 +49,29 @@ report rebuild.
 
 The founder scrolls the Summary & Interpretation step at their own window size and nothing slides
 under anything else.
+
+## What shipped (2026-07-31)
+
+Measured on the rendered page before touching anything, at 1280/1440/1920 and a 640px-tall
+viewport. At the worst point in the scroll, **119px of the "recommended to sell" panel was behind
+the pinned Platform Value card — the card's full height — at every viewport. It is now 0px**, with
+paint order confirmed by probing the element stack, not inferred from rectangles. Evidence,
+harness and screenshots in `docs/reviews/GRS-0221-stage6-layout/`.
+
+Cause: the rail's *first child* was sticky while its siblings scrolled on in the same grid column.
+Took option 1 of the two in scope item 2 — **the rail sticks as one block**, so nothing shares a
+column with a pinned element. The intent (keep the headline number visible) was reasonable; only
+the implementation was wrong, and dropping stickiness would have discarded both.
+
+Auditing the whole step (scope item 3) found a second instance of the same defect: the site header
+is itself sticky at z-index 50, and the rail pinned at `top: 1rem` sat **44px behind it** — the
+part it ate was the score card's own heading, so the pinned panel lost the label for the number it
+exists to show. It pre-dates this ticket. Now pinned against the header's own token,
+`top: calc(var(--topbar-height) + 1rem)`, so the two cannot drift.
+
+Short viewports (scope item 4): sticky is dropped entirely below 700px tall; above it the rail is
+capped and scrolls internally, so it cannot strand its own tail.
+
+Five guards added to `WizardLayout.test.ts` — verified to fail against the pre-fix code, so they
+are not vacuous. They guard the declarations; the geometry above is the proof, per the GRS-0209
+lesson that a passing declaration test can sit on top of a visibly wrong page.

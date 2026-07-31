@@ -10,6 +10,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { FIELD_CONTROL_CLASS } from "@/components/FormField";
 import { ApiError, api } from "@/lib/api";
 import type { CompanyEntity } from "@/lib/types";
 
@@ -92,6 +93,7 @@ export function EntitySubjectField({
   return (
     <div style={{ position: "relative" }}>
       <input
+        className={FIELD_CONTROL_CLASS}
         type="text"
         value={value}
         onChange={(e) => onType(e.target.value)}

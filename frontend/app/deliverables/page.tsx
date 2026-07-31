@@ -130,15 +130,26 @@ export default function DeliverablesPage() {
                     {row.generated_at ? new Date(row.generated_at).toLocaleDateString() : "—"}
                   </td>
                   <td style={{ padding: "0.55rem 0.6rem" }}>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      style={{ padding: "0.3rem 0.7rem", fontSize: "0.8rem" }}
-                      disabled={downloading === row.id}
-                      onClick={() => onDownload(row)}
-                    >
-                      {downloading === row.id ? "Preparing…" : "Download"}
-                    </button>
+                    <div style={{ display: "flex", gap: "0.4rem", justifyContent: "flex-end" }}>
+                      {/* The client report (GRS-0219/0220): where the advisor writes the narrative,
+                          renders the branded PDF and issues the client's link. */}
+                      <Link
+                        href={`/deliverables/${row.id}/report`}
+                        className="btn btn-secondary"
+                        style={{ padding: "0.3rem 0.7rem", fontSize: "0.8rem" }}
+                      >
+                        Client report
+                      </Link>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        style={{ padding: "0.3rem 0.7rem", fontSize: "0.8rem" }}
+                        disabled={downloading === row.id}
+                        onClick={() => onDownload(row)}
+                      >
+                        {downloading === row.id ? "Preparing…" : "Download"}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
