@@ -407,9 +407,7 @@ class TestTheNonProductionMark:
         payload = self._issue(client, alice, deliverable_id)
         assert payload["draft"] is True
 
-    def test_the_flags_are_frozen_into_the_snapshot(
-        self, client, alice: SeededConsultant
-    ) -> None:
+    def test_the_flags_are_frozen_into_the_snapshot(self, client, alice: SeededConsultant) -> None:
         """Scope item 2. The public surface reads the stored snapshot and nothing else, so a flag
         present there is a flag no later reclassification can move."""
         payload = self._issue(client, alice, self._sandbox(client, alice))
