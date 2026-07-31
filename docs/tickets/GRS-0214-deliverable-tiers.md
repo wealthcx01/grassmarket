@@ -1,6 +1,6 @@
 # GRS-0214 — What the client gets free, and what they get when they engage
 
-**Status:** Planned (2026-07-26, staging review item 13). **Priority:** MED-HIGH.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-26, staging review item 13). **Priority:** MED-HIGH._
 **Loop:** founder-feedback remediation, Wave 3. **Depends on:** GRS-0211.
 
 ## Why
@@ -54,3 +54,9 @@ moment.
 
 The founder can point at a teaser and a full report side by side and say which sections are which,
 and the rule that separates them is written down rather than remembered.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.

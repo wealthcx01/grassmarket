@@ -1,6 +1,6 @@
 # GRS-0148e — Deliverable generation uses the assessment's profile view (not the retail superset)
 
-**Status:** Implemented (2026-07-20).
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Implemented (2026-07-20)._
 **Loop:** Part 2 — stress-test remediation (from the full re-measure)
 
 ## Why
@@ -28,3 +28,9 @@ its **profile view** — its modules and metrics are profile-specific (`WEALTH_S
   returns a real `.docx` (verified live: HTTP 201, "Platform Power Report — St. James's Place"), not a
   500. Retail deliverables unchanged. New regression test renders wealth + exchange deliverables;
   15 deliverable tests + ruff + pyright green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `2547123` (GRS-0148e: deliverable generation uses the assessment's profile view ().

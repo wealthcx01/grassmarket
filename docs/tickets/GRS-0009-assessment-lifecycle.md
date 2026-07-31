@@ -1,5 +1,7 @@
 # GRS-0009 — Assessment lifecycle + API
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 2 (see PRD §9)
 - **Branch:** `grs-0009-assessment-lifecycle`
 - **Status:** In review
@@ -54,3 +56,9 @@ subcomponent → 404; unauthenticated → 401.
 
 The wizard frontend (GRS-0010); Path B meeting intelligence; committee/dual-rater governance. The
 `todo`-anchor rendering and honest B/P labelling live in the wizard UI (GRS-0010).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `036d2e2` (GRS-0009: assessment lifecycle + API (the Wizard Path A backend)).

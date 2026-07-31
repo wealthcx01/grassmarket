@@ -1,5 +1,7 @@
 # GRS-0017 — AI first-draft narratives (gated)
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 4
 - **Branch:** `grs-0017-ai-draft-narratives`
 - **Status:** Merged to main (PR #17)
@@ -24,3 +26,11 @@ AI drafts the interpretation/commentary/recommendation sections of deliverables;
 - Approval trail (who, when, what changed) persists and renders in the methods appendix.
 - Draft quality exercised against the golden-master run (snapshot review, not asserted in tests).
 - Full gate green; CI green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `71eb68a` (GRS-0017: review fixes — coverage + input bound), `e36cbf7` (GRS-0017: ruff-format migration 0007 (CI format-check parity)), `bdb7941` (GRS-0017: AI first-draft narratives (gated)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

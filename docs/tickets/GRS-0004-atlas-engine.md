@@ -1,5 +1,7 @@
 # GRS-0004 — Deterministic ATLAS engine
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 1 (see PRD §9)
 - **Branch:** `grs-0004-atlas-engine`
 - **Status:** In review
@@ -59,3 +61,9 @@ property guarantees.
 
 Monte Carlo / uncertainty (GRS-0005); scoring-run persistence + value bridge (GRS-0006); the wizard
 that fills these inputs (Loop 2). The elicited weights (they replace the draft set) are the panel's.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `2215526` (GRS-0004: deterministic ATLAS engine (Methodology v1.1 §5)).

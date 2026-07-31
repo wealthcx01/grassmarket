@@ -1,6 +1,6 @@
 # GRS-0243 — First-run orientation: every section says what it is for, and the home page finally gets reworded
 
-**Status:** Planned (2026-07-31, founder: "I have tried to use each section of the studio … and
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, founder: "I have tried to use each section of the studio … and._
 none of it makes sense. Not in my account or the demo account.").
 **Priority:** HIGH. **Loop:** first-time-user coherence. **Relates to:** GRS-0175, GRS-0205, GRS-0208.
 
@@ -70,3 +70,9 @@ string (GRS-0205); it makes each section teach itself at the moment of first con
 The founder logs into a fresh account, and within ten minutes — without opening the Guide — has
 seen a finished example report, knows what each nav item is for, and knows the one thing each
 section wants them to do next. And the sentence they complained about twice is gone.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).

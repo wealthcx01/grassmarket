@@ -1,6 +1,6 @@
 # GRS-0235 — Read tracking an advisor can read
 
-**Status:** Planned (2026-07-31, first-time-user review G7). **Priority:** LOW-MED.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review G7). **Priority:** LOW-MED._
 **Loop:** client-report hardening. **Extends GRS-0220.**
 
 ## Why
@@ -41,3 +41,9 @@ then never displayed anywhere.
 
 Before a follow-up call the founder can see, in plain words, which sections the client read, which
 they skipped, and roughly how long they spent where.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).

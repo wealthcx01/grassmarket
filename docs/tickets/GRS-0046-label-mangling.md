@@ -1,5 +1,7 @@
 # GRS-0046 — humanizeKeysInText must not mangle ordinary text (and must redact UUIDs)
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 3 (pipeline / shared UI)
 - **Status:** Fixed — found in the 2026-07-14 adversarial frontend review.
 - **Severity:** Medium — legitimate free text is corrupted before the advisor sees it.
@@ -33,3 +35,11 @@ through (the matcher was upper-case-anchored), so an id embedded in a message wo
 
 - Real keys still humanize; `EUR/USD`, `A/B`, `TCP/IP`, `Q1/Q2` render unchanged; a raw UUID is
   redacted — all pinned by `labels.test.ts`.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `a0ee084` (GRS-0046: don't mangle ordinary text in humanizeKeysInText; redact UUIDs).
+
+This ticket carried no *What shipped* record; the commits above are that record.

@@ -1,5 +1,7 @@
 # GRS-0002 — Registry content (subcomponents + business-metric register)
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 1 (see PRD §9)
 - **Branch:** `grs-0002-registry-content`
 - **Status:** In review
@@ -110,3 +112,9 @@ retail brokerage pending your Stage-1 judgement (they become percentile-vs-bench
 
 Rubric anchors (204 — separate content track), elicited weights (the panel; replaces the draft
 `CoefficientSet`), and the engine itself (GRS-0004). No scoring code in this ticket.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `b7f3eb1` (GRS-0002: registry content — 51 subcomponents + draft business-metric register), then hardened by `GRS-0002a` (registry fail-loud + fully-qualified subcomponent keys).

@@ -1,6 +1,6 @@
 # GRS-0125 — Brandfetch course (VM research)
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 
 ## Delivered
@@ -49,3 +49,11 @@ as the Benzinga course (GRS-0124) — research first, then authored through the 
 
 - The product-course template (GRS-0123) and the CMS (GRS-0121).
 - Benzinga (GRS-0124) and OpenBB (GRS-0126) courses.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `30dd8a4` (GRS-0125: Brandfetch product course — deep, two-tier, research-grounded).
+
+This ticket carried no *What shipped* record; the commits above are that record.

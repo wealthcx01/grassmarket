@@ -1,5 +1,7 @@
 # GRS-0049 — 2026-07-14 audit follow-up backlog
 
+**Status:** OPEN (reconciled 2026-08-01).
+
 Tracked, deferred findings from the 2026-07-14 adversarial review (scoring, auth/scoping,
 AI-gating/API, frontend). The CRITICAL and HIGH items were fixed under GRS-0042…GRS-0047; this
 ticket keeps the remaining LOW / systemic items visible so nothing is silently dropped. Each should
@@ -49,3 +51,9 @@ become its own `GRS-nnnn` ticket + branch + PR when picked up.
   scoring-runs/transcripts/predictions.
 - Scoring core: no silent coefficient fallback; monotonicity/bottleneck/renormalisation correct;
   score-points and currency never mix.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Register, not a unit of work: its CRITICAL/HIGH items shipped as GRS-0042–0047 and pagination as GRS-0050; the residue below is still open. No implementing commit on main; genuinely unbuilt.

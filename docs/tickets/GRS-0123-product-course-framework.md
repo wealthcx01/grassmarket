@@ -1,6 +1,6 @@
 # GRS-0123 — Product-course framework + the commission "carrot"
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 **Depends on:** ADR-0028 (Bruntsfield Academy / Workbench), GRS-0121 (content CMS), ADR-0026 (Earnings v7)
 
@@ -47,3 +47,11 @@ builds the reusable template that GRS-0124/0125/0126 fill in.
 
 - The individual product content (Benzinga 0124, Brandfetch 0125, OpenBB 0126).
 - Changes to the Earnings v7 rates themselves (ADR-0026 owns those).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `908bb6e` (GRS-0123: mock productCommissions in the earnings page test), `1689e1d` (GRS-0123: product-course framework + live commission carrot).
+
+This ticket carried no *What shipped* record; the commits above are that record.

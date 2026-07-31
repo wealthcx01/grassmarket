@@ -1,6 +1,6 @@
 # GRS-0168 — Portfolio coverage measured against the assessment's own profile view
 
-**Status:** Done (2026-07-23). Staging-rerun finding (4/5 personas). **Loop:** rerun remediation.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-23). Staging-rerun finding (4/5 personas). **Loop:** rerun remediation._
 
 ## Why
 
@@ -18,3 +18,11 @@ row and engagement card while the wizard said "24/24 — 100% of applicable". Co
 
 A fully-rated profile-scoped assessment shows 100% coverage on every surface; retail unchanged
 (its view IS the superset).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `bbb0dc3` (GRS-0168: coverage measured against the assessment's own profile view).
+
+This ticket carried no *What shipped* record; the commits above are that record.

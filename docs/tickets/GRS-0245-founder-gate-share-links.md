@@ -1,6 +1,6 @@
 # GRS-0245 — Founder sign-off covers everything that reaches a client
 
-**Status:** Planned (2026-07-31, first-time-user review; founder decision 23/07 item 24).
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review; founder decision 23/07 item 24)._
 **Priority:** HIGH. **Type:** Policy gap. **Loop:** client-report hardening.
 **Extends GRS-0188 / ADR-0041.** **Relates to:** GRS-0220, GRS-0229.
 
@@ -62,3 +62,9 @@ that proves it.)
 Nothing generated from a production record can reach a client — by PDF or by link — without the
 founder having approved the exact words it carries, and the founder can see that queue in the place
 the product already told them to look.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).

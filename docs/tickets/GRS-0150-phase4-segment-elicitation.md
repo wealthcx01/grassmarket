@@ -1,6 +1,6 @@
 # GRS-0150 — Phase-4: elicit + activate client-usable wealth & exchange coefficient sets
 
-**Status:** Set up (2026-07-20) — awaiting the founder/panel VALUES. ADR-0037.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Set up (2026-07-20) — awaiting the founder/panel VALUES. ADR-0037._
 **Loop:** Part 2 — segment fit, Phase 4 (founder/panel-gated per non-negotiable #2)
 
 ## Why
@@ -29,3 +29,11 @@ because their weights/criticals are still uniform drafts. Flipping them client-u
 - A finalised wealth/exchange assessment produces a **client-facing** deliverable (no draft watermark);
   the wizard drops the "indicative, not client-usable" banner; benchmark rows carry the elicited
   coefficient version. Retail golden master untouched.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `57b8965` (GRS-0150: research-refined elicited wealth+exchange starter sets (gated off) +).
+
+This ticket carried no *What shipped* record; the commits above are that record.

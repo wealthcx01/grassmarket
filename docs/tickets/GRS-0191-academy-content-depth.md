@@ -1,6 +1,6 @@
 # GRS-0191 — Academy content depth program (the 100x)
 
-**Status:** Planned (2026-07-23, founder feedback item 20). **Priority:** HIGH — the founder's
+**Status:** SUPERSEDED (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-23, founder feedback item 20). **Priority:** HIGH — the founder's._
 sharpest criticism. **Loop:** founder-feedback remediation, Wave 4. Depends on GRS-0190.
 Program ticket: expect one PR per course under this umbrella.
 
@@ -97,3 +97,9 @@ Frontend: no new tests (rendering is GRS-0190); existing academy page tests stay
 - The founder signs off course-by-course at PR review (recorded in the PR).
 - Commission figures remain live-from-config; no confidential agreement text or operator
   spreadsheet is committed.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**SUPERSEDED.** Superseded by GRS-0215. GRS-0215 'replaces the content half of GRS-0191'; the reader half became GRS-0226.

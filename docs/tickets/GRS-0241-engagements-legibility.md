@@ -1,6 +1,6 @@
 # GRS-0241 — Engagements: a list you can read, a link you cannot cross-wire
 
-**Status:** Planned (2026-07-31, first-time-user review). **Priority:** MED-HIGH.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review). **Priority:** MED-HIGH._
 **Loop:** first-time-user coherence. **Relates to:** GRS-0177, GRS-0198, GRS-0208.
 
 ## Why
@@ -64,3 +64,9 @@ Walked as a first-time user, 31/07/2026:
 The founder opens Engagements and sees one clean, consistently named row per real engagement, can
 reach the client report from it, and cannot link the wrong firm's scores to it without being told
 exactly what they are about to do.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).

@@ -1,5 +1,7 @@
 # GRS-0039 — Link a finalised assessment to an existing engagement
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 6 (workflow completion)
 - **Branch:** `grs-0039-link-assessment`
 - **Status:** In review
@@ -40,3 +42,11 @@ generated for an engagement opened the normal way.
 - An engagement opened without an assessment can have a finalised assessment linked, after which
   deliverables generate.
 - All the scoping/finalised/duplicate guards hold. Full gate green; CI green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `bcf4f93` (GRS-0039: LinkAssessmentControl — surface load errors, don't render a silent n), `4fab783` (GRS-0039: link a finalised assessment to an existing engagement).
+
+This ticket carried no *What shipped* record; the commits above are that record.

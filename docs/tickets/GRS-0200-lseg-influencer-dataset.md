@@ -1,6 +1,6 @@
 # GRS-0200 — LSEG influencer dataset: the first network-wide pull
 
-**Status:** Done — dataset produced (2026-07-23, founder feedback item 16). **Priority:** HIGH
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done — dataset produced (2026-07-23, founder feedback item 16). **Priority:** HIGH._
 within Wave 5 (it unblocks GRS-0193/0194). **Loop:** founder-feedback remediation, Wave 5.
 Under ADR-0045. The ingest of this dataset into the product is GRS-0193; the per-target map
 generator is GRS-0194. This ticket records the pull itself.
@@ -62,3 +62,11 @@ Met: the unified dataset and the first-draft contributor map are committed at `d
 are recorded here and in `data/README.md`; the Barclays validation confirms the
 roster→institution method. The PII is committed to the private repo by founder decision
 (2026-07-23) so the workbench VM can execute the import without OneDrive access.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Done — the dataset was produced (by design it is not committed to this repo); GRS-0193 ingested it.
+
+This ticket carried no *What shipped* record; the commits above are that record.

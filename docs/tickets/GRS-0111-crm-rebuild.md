@@ -1,6 +1,6 @@
 # GRS-0111 — Rebuild the pipeline as an EliteVault-grade CRM
 
-**Status:** Partially shipped (backend foundation) — see "Delivered" below
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Partially shipped (backend foundation) — see "Delivered" below._
 **Loop:** Part 2 — Pipeline / GTM engine (one program)
 **Depends on:** ADR-0027 (Pipeline / GTM engine)
 
@@ -79,3 +79,11 @@ port; SQL/route code does not** and is re-expressed as ORM + FastAPI + contracts
 
 - Gmail / Google Calendar sync (GRS-0112) and the AI/MCP GTM surface (GRS-0113).
 - LSEG influencer maps (GRS-0114) and the 150-bank seed (GRS-0115).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `ef7e6f3` (GRS-0111: CRM rebuild v1 — @dnd-kit pipeline, deal slide-over, first-class con), `fe93196` (GRS-0111: config-driven win-probability + stage-history timeline (CRM foundati).
+
+This ticket carried no *What shipped* record; the commits above are that record.

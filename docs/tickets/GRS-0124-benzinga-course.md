@@ -1,6 +1,6 @@
 # GRS-0124 — Benzinga course (VM research)
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 
 ## Delivered
@@ -51,3 +51,11 @@ hand-waving, then authors it through the CMS.
 
 - The product-course template itself (GRS-0123) and the CMS (GRS-0121).
 - Brandfetch (GRS-0125) and OpenBB (GRS-0126) courses.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `acbd75b` (GRS-0124: Benzinga product course + the advisor commission rate).
+
+This ticket carried no *What shipped* record; the commits above are that record.

@@ -1,6 +1,6 @@
 # GRS-0074 — Public-site login hand-off (Bruntsfield Capital → advisory app)
 
-**Status:** Planned
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Planned._
 **Loop:** Track B — Auth / SSO
 **Depends on:** ADR-0024
 
@@ -75,3 +75,11 @@ the single hand-off seam, so only the exchange response's storage target changes
 - Any change to how the JWT itself is minted or validated (`create_access_token` /
   `decode_access_token` are reused unchanged).
 - Building the public BC marketing site's markup — only the API contract the "LOG IN" link targets.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `550a37b` (GRS-0074: public-site → app login hand-off (one-time code + multi-origin CORS)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

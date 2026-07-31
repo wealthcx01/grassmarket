@@ -1,6 +1,6 @@
 # GRS-0147d — Wealth infrastructure taxonomy (ADR-0035 Phase 3, completion)
 
-**Status:** Implemented (2026-07-19). Ships **draft / not-client-usable** (Phase-4 elicitation is
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Implemented (2026-07-19). Ships **draft / not-client-usable** (Phase-4 elicitation is._
 founder/panel-gated).
 **Loop:** Part 2 — segment-fit remediation (from the persona re-run measurement)
 
@@ -35,3 +35,9 @@ wealth-native.
   pyright green. The wizard renders it with no frontend change.
 - Still Phase-4-gated: the "indicative, not client-usable" banner remains until the wealth
   weight/critical elicitation panel runs.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `bd7e112` (GRS-0147d: wealth infrastructure taxonomy (ADR-0035 Phase 3 completion).

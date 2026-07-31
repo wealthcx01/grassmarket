@@ -1,5 +1,7 @@
 # GRS-0035 — My Earnings frontend page
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 6 (frontend gap-fill)
 - **Branch:** `grs-0035-my-earnings-frontend`
 - **Status:** In review
@@ -37,3 +39,11 @@ the page needs no role gate beyond the token check — the backend enforces scop
   and commission lines, with a downloadable statement.
 - Money is display-formatted only, never computed client-side.
 - Frontend gate green (type-check · lint · test · build); CI green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `1e81581` (GRS-0035: My Earnings frontend page (#41)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

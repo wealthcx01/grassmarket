@@ -1,6 +1,6 @@
 # GRS-0203 — The thin outreach sequencer over the GTM registry
 
-**Status:** Draft — not scheduled (2026-07-25, from the GRS-0195 spike). **Priority:** TBD.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Draft — not scheduled (2026-07-25, from the GRS-0195 spike). **Priority:** TBD._
 **Loop:** follow-on. Depends on GRS-0202 (the gate) and GRS-0204 (the send path decision).
 
 ## Why
@@ -43,3 +43,9 @@ follow-up ticket is the signal to re-run the GRS-0195 comparison rather than ext
 
 An advisor can select registry contacts, generate drafts, and review them one at a time, with
 suppressed contacts never appearing and nothing sendable until approved.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.

@@ -1,6 +1,6 @@
 # GRS-0180 — 7 Powers mathematics adaptation: the normative document
 
-**Status:** In review (2026-07-24) — docs/ATLAS-7Powers-Adaptation.md authored, PR open; awaiting founder confirmation for the Helmer review packet (GRS-0201). **Priority:** HIGH — Helmer will review the output.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-24) — docs/ATLAS-7Powers-Adaptation.md authored, PR open; awaiting founder confirmation for._
 **Loop:** founder-feedback remediation, Wave 1. Carries ADR-0046. Feeds GRS-0201 (wizard).
 
 ## Why
@@ -71,3 +71,11 @@ explicit where we adapt, precise everywhere.
 The adaptation document stands alone: every equation checked against the PDF, every adaptation
 marked, all three segments covered per power, rights and attribution recorded. The founder
 confirms it is ready to go into the Helmer review packet (assembled in GRS-0201).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `30d0e8a` (GRS-0180: 7 Powers mathematics adaptation — the normative document).
+
+This ticket carried no *What shipped* record; the commits above are that record.

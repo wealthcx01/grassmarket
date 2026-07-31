@@ -1,6 +1,6 @@
 # GRS-0147b — Per-profile B-index metric selection (ADR-0035 Phase 2)
 
-**Status:** Implemented (2026-07-19) — ADR-0035 Phase 2. Mechanism only; wealth content is Phase 3.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Implemented (2026-07-19) — ADR-0035 Phase 2. Mechanism only; wealth content is Phase 3._
 **Loop:** Part 2 — segment-fit remediation
 
 ## Why
@@ -31,3 +31,9 @@ capability. This adds it, mirroring the module mechanism, with the retail path b
   view's metrics still equal the superset (existing invariance test). Fail-loud on unknown/shadowing
   keys. Golden master V=0.478565 unchanged; 774 backend tests + schema sync green.
 - Unblocks Phase 3 (the wealth profile's own metric set) with no golden-master risk.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `06534f4` (GRS-0147b: per-profile B-index metric selection (ADR-0035 Phase 2) (#1).

@@ -1,6 +1,6 @@
 # GRS-0213 — Scenarios an advisor can actually drive, with a narrative assistant
 
-**Status:** Planned (2026-07-26, staging review item 12). **Priority:** HIGH.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-26, staging review item 12). **Priority:** HIGH._
 **Loop:** founder-feedback remediation, Wave 1. **Extends GRS-0184, which is unstarted.**
 
 ## Why
@@ -62,3 +62,9 @@ saved to the repository, comparable over time. On top of that:
 The founder opens a finalised assessment, tries three what-ifs without reading instructions, saves
 two of them, compares them, and gets a draft recommendation paragraph they would be willing to
 edit rather than rewrite.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.

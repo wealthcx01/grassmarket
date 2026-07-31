@@ -1,6 +1,6 @@
 # GRS-0071 — "Your Brokerages" portfolio home
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Track A (guided consulting UX — delivery review §4, NEXT-STEPS §3.6)
 **Branch:** `grs-0071-brokerage-portfolio`
 
@@ -45,3 +45,9 @@ fabricated), no score until finalised, newest-first ordering. Backend scoping/sc
 
 - House deliverable types — GRS-0072/0073.
 - Operating-model profile selector — Track B.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `1765972` (GRS-0071: HTTP-surface tests for /assessments/portfolio), `c8e8981` (GRS-0071: 'Your Brokerages' portfolio home).

@@ -1,6 +1,6 @@
 # GRS-0144b — Refuse-only bounds for every percent/bps metric (GRS-0144 completion)
 
-**Status:** Done (2026-07-23). Staging-rerun finding (Marcus): a 1,234,567,890% gross margin was
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-23). Staging-rerun finding (Marcus): a 1,234,567,890% gross margin was._
 accepted silently and fed B=82.0 — negative AUA refused loudly, so the machinery existed but
 percent metrics had no upper bounds. **Loop:** rerun remediation.
 
@@ -13,3 +13,9 @@ legitimately extreme real values (negative margins, outflow years, >100% NRR) st
 
 Tests: the Marcus value refuses; negatives/extremes stay valid; every percent/bps metric in every
 profile view asserts an upper bound. Golden master untouched.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `b3eb556` (Merge pull request #197 from wealthcx01/grs-0144b-percent-metric-bound), `71caca9` (GRS-0144b: refuse-only bounds for every percent/bps metric).

@@ -1,5 +1,7 @@
 # GRS-0026 — Bench-time queue + performance view
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 5
 - **Branch:** `grs-0026-bench-queue-performance`
 - **Status:** In review
@@ -21,3 +23,11 @@ Idle advisors always have a prioritised next action; bench time becomes measurab
 - Queue renders correct priorities for seeded advisor states (fresh, mid-certification, fully certified with due drills).
 - Performance view scoped to self (404 pattern on other advisors).
 - Full gate green; CI green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `380eee5` (GRS-0026: bench-time queue + self-scoped performance view).
+
+This ticket carried no *What shipped* record; the commits above are that record.

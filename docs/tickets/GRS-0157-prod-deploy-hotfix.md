@@ -1,6 +1,6 @@
 # GRS-0157 — Prod deploy hotfix: httpx runtime dep + Alembic version-column overflow
 
-**Status:** Done (2026-07-20). Hotfix — the Railway backend had been un-deployable for ~5 days.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-20). Hotfix — the Railway backend had been un-deployable for ~5 days._
 **Loop:** Ops. Found while deploying the session's work to Railway (backend stuck at DB rev 0018).
 
 ## Symptom
@@ -37,3 +37,11 @@ first (`railway down` then `railway up`) or the migrations run out-of-band.
 ## Prevention (follow-up, non-blocking)
 - CI builds/boots against Postgres (not just SQLite) so both classes of bug surface pre-merge.
 - A lint/test asserting every migration revision id ≤ 32 chars (until the column widening is universal).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `e36a402` (GRS-0157: fix E501 in 0029 migration comment), `54e5da5` (GRS-0157: prod deploy hotfix — httpx runtime dep + Alembic version_num overflo).
+
+This ticket carried no *What shipped* record; the commits above are that record.

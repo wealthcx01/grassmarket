@@ -1,6 +1,6 @@
 # GRS-0242 — The Workbench stops leaking internals and contradicting itself
 
-**Status:** Planned (2026-07-31, first-time-user review). **Priority:** MED. **Type:** Bug.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review). **Priority:** MED. **Type:** Bug._
 **Loop:** first-time-user coherence. **Relates to:** GRS-0196, GRS-0205.
 
 ## Why
@@ -57,3 +57,9 @@ the founder's overall "none of it makes sense" in miniature.
 
 The founder clicks through all five Workbench tabs and meets no snake_case, no raw enum, no two
 tabs disagreeing about their level, and can send someone a link to a specific tab.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).

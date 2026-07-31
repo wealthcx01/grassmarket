@@ -1,5 +1,7 @@
 # GRS-0022 — Calibration module
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 5
 - **Branch:** `grs-0022-calibration-module`
 - **Status:** In review — PR #24
@@ -24,3 +26,11 @@ Inter-rater reliability as a measured, managed quantity.
 - Blind collection enforced; late raters cannot see distributions before submitting.
 - Flagged-anchor report generates.
 - Full gate green; CI green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `49c9358` (GRS-0022: calibration module (inter-rater reliability, golden-mastered)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

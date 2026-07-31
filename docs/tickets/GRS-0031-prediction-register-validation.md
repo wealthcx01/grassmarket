@@ -1,5 +1,7 @@
 # GRS-0031 — Prediction register + validation loop + benchmark ingestion
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 6
 - **Branch:** `grs-0031-prediction-register-validation`
 - **Status:** In review
@@ -24,3 +26,11 @@ The falsifiability machinery: log what we predicted, check it later, and start a
 - A due follow-up round-trips to a scored outcome.
 - Anonymisation tested (identifier-absence assertions on benchmark rows).
 - Full gate green; CI green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `7258e57` (GRS-0031: prediction register + validation loop + anonymised benchmark).
+
+This ticket carried no *What shipped* record; the commits above are that record.

@@ -1,5 +1,7 @@
 # GRS-0025 — Practice Arena v1
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 5
 - **Branch:** `grs-0025-practice-arena`
 - **Status:** In review
@@ -32,3 +34,11 @@ AI-simulated client sessions: advisors practise discovery against a role-played 
   deterministic, not model-authored (#8). Design recorded in ADR-0015.
 - Scenario authoring admin-only; sessions owner-scoped (foreign session → 404) and single-shot
   (re-submit → 409). No client data — anonymised vignettes only (#9).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `3536d81` (GRS-0025: practice arena — deterministic scoring + AI-drafted feedback).
+
+This ticket carried no *What shipped* record; the commits above are that record.

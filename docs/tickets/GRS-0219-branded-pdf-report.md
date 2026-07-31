@@ -1,6 +1,6 @@
 # GRS-0219 — The client report as a Bruntsfield-branded PDF
 
-**Status:** Planned (2026-07-26, staging review item 9). **Priority:** HIGHEST.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-26, staging review item 9). **Priority:** HIGHEST._
 **Loop:** founder-feedback remediation, Wave 3. **Depends on:** GRS-0211 (narrative content model).
 
 ## Why
@@ -104,3 +104,9 @@ obvious gap. It is now implemented: the renderer takes a third pass when a repor
 threshold, so the page numbers are recorded against the layout that HAS the contents page rather
 than the one that does not. A test follows the appendix's printed page number to the page it
 actually lands on, because that off-by-one is the one nobody notices until a client follows it.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `13f1af3` (GRS-0219/0220: fix three defects found by being critical of the delivery), `3924521` (GRS-0219/0220: wire the client report into the app), `39eb8ef` (GRS-0219: the client report as a branded PDF).

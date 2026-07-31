@@ -1,5 +1,7 @@
 # GRS-0060 — Dual-rating & committee sign-off have no UI (advisor cannot finalise in-product)
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 5 (Workbench + governance)
 - **Status:** Open — found in the 2026-07-15 exhaustive every-control functional audit.
 - **Severity:** HIGH (fit-for-purpose) — blocks the core workflow's completion through the UI.
@@ -46,3 +48,9 @@ missing.
 Nothing in the existing UI is broken. This ticket records a *missing* surface, not a regression. The
 audit's transient failures were all test-harness artifacts (a strict selector, an unexported env
 var), re-verified as correct product behaviour.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** No commit names this ticket; the gap it reported was closed by its two follow-ups — `GRS-0061` (Rating Committee sign-off UI, §8) and `GRS-0062` (dual-rating UI, §9, PR #70), with `GRS-0064` documenting both steps in the Advisor Guide. An advisor can finalise in-product.

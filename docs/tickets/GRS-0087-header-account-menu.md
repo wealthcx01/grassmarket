@@ -1,6 +1,6 @@
 # GRS-0087 — Header account/session menu
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** —
 **Branch:** `grs-0087-header-account-menu`
@@ -60,3 +60,9 @@ footer stub.
 
 - Building out the Profile and Settings pages themselves (menu items may link to placeholders).
 - Session-persistence / refresh-token work — that is the GRS-0120 sign-out fix.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `bf22a91` (GRS-0087: header account/session menu; retire the footer stub).

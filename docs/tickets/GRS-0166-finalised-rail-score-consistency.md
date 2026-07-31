@@ -1,6 +1,6 @@
 # GRS-0166 — Finalised assessment: the wizard rail quotes the locked score (third-surface echo)
 
-**Status:** Done (2026-07-22). The recorded GRS-0161 residual.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-22). The recorded GRS-0161 residual._
 **Priority:** MED-HIGH — a trust bug on the surface an advisor shows a client over their shoulder.
 **Loop:** demo-readiness.
 
@@ -26,3 +26,11 @@ deliverable 60.5). An advisor cannot explain that difference to a client.
 
 Open a finalised assessment: the rail's V equals the portfolio row's V equals the deliverable
 headline, labelled as the locked score. Draft/in-progress assessments are unchanged.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `c5e6c08` (GRS-0166: finalised wizard quotes the locked score (third-surface echo)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

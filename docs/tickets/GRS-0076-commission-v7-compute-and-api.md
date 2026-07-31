@@ -1,6 +1,6 @@
 # GRS-0076 — Commission Schedule v7: compute, pay-when-paid gate, API
 
-**Status:** Planned
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Planned._
 **Loop:** Track B — Earnings v7
 **Depends on:** ADR-0026 (two-stream v7 commission, amends ADR-0017); GRS-0075 (config + contracts + migration)
 
@@ -72,3 +72,11 @@ consultant vs employee ("contracting as") remains consultant context, not a comp
   date-driven period engine is a later ticket).
 - Cross-advisor aggregation (Holy Corner scope); self-scoped views/summary/statement
   (`repository.py:863`, `:877`) are unchanged.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `938f445` (GRS-0076: Commission v7 compute, pay-when-paid gate, two-stream API).
+
+This ticket carried no *What shipped* record; the commits above are that record.

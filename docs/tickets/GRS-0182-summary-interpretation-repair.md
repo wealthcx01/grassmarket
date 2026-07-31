@@ -1,6 +1,6 @@
 # GRS-0182 — Summary & Interpretation repair
 
-**Status:** In review (2026-07-26) — double-V removed, governance display made truthful for
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-26) — double-V removed, governance display made truthful for._
 the finalised state, charts made responsive, rail breakpoint added; PR open.
 (2026-07-23, founder feedback item 10.) **Priority:** HIGH.
 **Loop:** founder-feedback remediation, Wave 1. Frontend only.
@@ -132,3 +132,11 @@ record with no "awaiting sign-off" call to action, and no broken or colliding la
 1024px, and mobile widths — the radar and waterfall scale and never collide with long labels, and
 the rail collapses below ~900px. Draft assessments are unchanged except for the copy/order edits.
 The golden-master test stays green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `5c4dae8` (GRS-0182: repair Summary & Interpretation).
+
+This ticket carried no *What shipped* record; the commits above are that record.

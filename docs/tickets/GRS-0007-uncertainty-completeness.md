@@ -1,5 +1,7 @@
 # GRS-0007 — Uncertainty completeness + honest labelling
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 2, first ticket (see PRD §9)
 - **Branch:** `grs-0007-uncertainty-completeness`
 - **Status:** In review
@@ -57,3 +59,9 @@ degenerate bands), and **label unmodelled uncertainty honestly** — a point est
 The deliverable layer must render `modelled=False` bands as points labelled honestly — that is
 GRS-0010 (wizard) and the later deliverable builder. Rater-agreement remains an unused third §7
 confidence input, pending dual-rating.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `cc310e8` (GRS-0007: uncertainty completeness + honest labelling (Methodology v1.2)).

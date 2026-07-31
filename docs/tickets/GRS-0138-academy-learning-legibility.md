@@ -1,6 +1,6 @@
 # GRS-0138 — Academy learning legibility (dead-ends + honest labels)
 
-**Status:** In progress
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In progress._
 **Loop:** Part 2 — critical review / trust hardening
 
 ## Why (outside-in critical review)
@@ -39,3 +39,11 @@ These convert the Academy from read-and-forget into real learning, but each is a
 ## Acceptance
 - Course completion offers a next action (Practice Arena / next course), no dead-end. No label promises
   reinforcement that doesn't happen. Golden master untouched.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `2de1ae0` (GRS-0138: Academy learning legibility — kill the completion dead-end + honest ).
+
+This ticket carried no *What shipped* record; the commits above are that record.

@@ -1,5 +1,7 @@
 # GRS-0008 — Rubric anchor library
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 2 (see PRD §9)
 - **Branch:** `grs-0008-rubric-anchors`
 - **Status:** In review
@@ -52,3 +54,9 @@ example of the target quality. Authoring a subcomponent moves it out of `todo_al
 Exposing anchors through the assessment API (GRS-0009) and rendering guidance in the wizard
 (GRS-0010). The anchor contracts are not yet in the JSON-Schema mirror — they join it when the API
 surfaces them to the frontend.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `425d0da` (GRS-0008: rubric anchor library (Methodology §4)).

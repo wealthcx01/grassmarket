@@ -1,6 +1,6 @@
 # GRS-0129 — Sales operational process playbook
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 **Depends on:** ADR-0028 (Bruntsfield Academy / Workbench), GRS-0121 (content CMS)
 
@@ -42,3 +42,11 @@ Commission Schedule** and the represented-company contracts. This playbook ties 
 
 - The v7 contract documents themselves (reference-only, not committed).
 - The Pipeline / GTM engine build (§4 tickets).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `5fdbaaa` (GRS-0129: Sales Operations Playbook — the operational motion, authored through).
+
+This ticket carried no *What shipped* record; the commits above are that record.

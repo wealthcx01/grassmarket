@@ -1,5 +1,7 @@
 # GRS-0055 — UX audit fixes (Robinhood-rubric pass)
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 2 / 3 (wizard + pipeline UX)
 - **Status:** Fixed — from the 2026-07-15 UI/UX audit against a Robinhood-derived design rubric.
 - **Severity:** Low/Medium — first-impression clarity, no correctness impact.
@@ -28,3 +30,11 @@ decimals (#6/#15), and the Internal-draft default on client deliverables (#8/#15
 
 - A finalised assessment opens on the Summary step; every empty pipeline stage shows the placeholder
   — pinned by `KanbanBoard.test.tsx` and verified visually. Type-check / lint / build green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `d5a3431` (GRS-0055: UX audit fixes — finalised→Summary landing; empty-stage placeholder).
+
+This ticket carried no *What shipped* record; the commits above are that record.

@@ -1,6 +1,6 @@
 # GRS-0078 — Exchange operating-model profile (content)
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Loop 7 — Operating-model profiles
 **Depends on:** ADR-0025, GRS-0077 (mechanism)
 **Branch:** `grs-0078-exchange-profile`
@@ -57,3 +57,9 @@ unchanged; unknown profile fails loud. Golden master + property tests green.
 - Wealth/advisory + infrastructure-vendor profiles (later).
 - Eliciting real exchange weights (θ panel) — draft only.
 - Wizard selector — GRS-0079. Profile-filtered benchmark comparison — GRS-0084.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `49650d0` (GRS-0078: exchange operating-model profile (ADR-0025)).

@@ -1,6 +1,6 @@
 # GRS-0092 — Primer depth, rationale & provenance
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** —
 **Branch:** `grs-0092-primer-depth-provenance`
@@ -63,3 +63,9 @@ primer from a flick-through into a proper explainer.
 - The lens/label content (GRS-0093), the 7 Powers detail (GRS-0094), evidence grades (GRS-0095), reading
   outputs (GRS-0096) — sibling primer tickets.
 - The guide navigation shell (sequenced last, separate ticket).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `ee62d3f` (GRS-0092: primer depth — rationale, provenance & end-to-end walkthrough).

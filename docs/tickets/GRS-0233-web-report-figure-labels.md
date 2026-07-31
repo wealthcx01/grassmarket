@@ -1,6 +1,6 @@
 # GRS-0233 — Web report figures: label the bars, keep the story's order
 
-**Status:** Planned (2026-07-31, first-time-user review G5). **Priority:** MED-HIGH. **Type:** Bug.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review G5). **Priority:** MED-HIGH. **Type:** Bug._
 **Loop:** client-report hardening. **Extends GRS-0220.** **Relates to:** GRS-0206, GRS-0219.
 
 ## Why
@@ -53,3 +53,9 @@ labels. Aria-labels carrying every number exist and are good; sighted clients de
 
 The founder reads the web report's figures without the grid, and the build-up chart tells the same
 story in the same order as the PDF.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).

@@ -1,6 +1,6 @@
 # GRS-0156 — Activate the Phase-4 wealth & exchange weights (client-usable)
 
-**Status:** Done (2026-07-20). **Founder-directed** — explicit sign-off to activate. ADR-0037 (now ACTIVATED), ADR-0022, ADR-0038.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-20). **Founder-directed** — explicit sign-off to activate. ADR-0037 (now ACTIVATED), ADR-0022, A._
 **Loop:** Part 2 — the single biggest lever from the re-measure ("indicative, not client-usable" was the universal non-retail ceiling).
 
 ## What changed
@@ -39,3 +39,11 @@ Golden master intact; full backend + frontend green.
 Formal panel elicitation refines the starter numbers in place (no structural change). If the founder
 wants the θ_L operational-maturity variant instead of the research EV-leaning θ, that's a one-line
 change to the elicited sets (see `docs/elicitation/scored-effect-analysis.md`).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `da60cee` (GRS-0156: activate the Phase-4 wealth & exchange weights (client-usable) — fou).
+
+This ticket carried no *What shipped* record; the commits above are that record.

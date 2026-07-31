@@ -1,6 +1,6 @@
 # GRS-0148 — Solo-path discoverability + unfinished account surfaces
 
-**Status:** Surfaced — part discoverability (buildable), part founder-call
+**Status:** BLOCKED (reconciled 2026-08-01). _Previously recorded as: Surfaced — part discoverability (buildable), part founder-call._
 **Loop:** Part 2 — mock-advisor stress test / trust & finish
 
 ## Findings
@@ -36,3 +36,23 @@ name/credential editing + change-password + basic preferences, or hide the pages
 - **Founder-gated:** cert-teeth design (#2), doctrine branding + commission-disclosure (#4).
 
 See the synthesis report `reports/mock-advisor-stress-test-2026-07-19.md` for the full ranking.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**BLOCKED — partly built, with a founder-gated residue.** No commit of its own; delivered through
+sub-tickets, with the two founder-call items still open.
+
+**Built:**
+- Finding 1, sandbox discoverability — `1c5ba59` (GRS-0149): "Preview in sandbox" from the wizard.
+- Finding 3, account surfaces — `59b2039` (GRS-0148d): self-service change-password + a real Profile.
+- Also shipped under this parent with **no ticket file**: `9159e2a` (GRS-0148c, power-name casing) and
+  `2547123` (GRS-0148e, deliverable generation uses the assessment's profile view).
+
+**NOT built — founder decision D5:**
+- Finding 2, **cert teeth**: "Certified" is still gated on UX-level self-assessed recall, not a
+  server-enforced quiz pass tied to a drill/arena record.
+- Finding 4, **independence and naming**: the "weapons / zero-sum" doctrine branding is unchanged, and
+  there is still no client-facing conflict/independence disclosure record for the commission the
+  advisor earns on third-party products.

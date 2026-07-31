@@ -1,6 +1,6 @@
 # GRS-0206 — Rive as the diagram and motion system
 
-**Status:** Planned (2026-07-26, staging review item 4; rewritten 2026-07-29 after actually reading
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-26, staging review item 4; rewritten 2026-07-29 after actually reading._
 the repository). **Priority:** HIGH. **Loop:** founder-feedback remediation, Wave 1.
 
 ## Why this ticket was rewritten
@@ -89,3 +89,9 @@ Constraints found by reading, to be confirmed by building:
 A `.riv` file generated from JSON in this repository, rendered and verified by the tool, displayed
 in the studio with a static fallback and reduced-motion respected, and ADR-0049 recording the
 measured bundle cost rather than an estimate of it.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.

@@ -1,6 +1,6 @@
 # GRS-0154 — Assessment-level deliverable preview (the solo/sandbox "see the real deliverable" path)
 
-**Status:** Done (2026-07-20). From the mock-advisor re-measure — Priya/LSEG, Elena/Deutsche Börse, James/Brewin, all **HIGH**.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-20). From the mock-advisor re-measure — Priya/LSEG, Elena/Deutsche Börse, James/Brewin, all **HI._
 **Loop:** Part 2 — trust. **Related:** GRS-0148/0149 (solo/sandbox path), ADR-0023.
 
 ## Why
@@ -30,3 +30,9 @@ buyer, **the artifact is the sale** — and it was unreachable.
 `tests/test_deliverables.py`: finalised ⇒ 200 real `.docx` carrying the "DRAFT — not client-usable"
 watermark; unfinalised ⇒ 409; owner-scoped (another consultant ⇒ 404). 18 deliverable tests green;
 frontend type-check + lint green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `b420e05` (GRS-0154: assessment-level deliverable preview — the solo/sandbox "see the rea).

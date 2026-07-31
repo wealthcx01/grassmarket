@@ -1,6 +1,6 @@
 # GRS-0153 — Wizard number legibility: P10/P50/P90 band labels + inline metric-domain validation
 
-**Status:** Done (2026-07-20). From the mock-advisor re-measure (Elena/Deutsche Börse, quant lens) + UX audit.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-20). From the mock-advisor re-measure (Elena/Deutsche Börse, quant lens) + UX audit._
 **Loop:** Part 2 — trust. Frontend-only (backend already serves the data).
 
 ## Why
@@ -24,3 +24,9 @@
   `domain_violation` copy — so an impossible value is caught at ENTRY, not only at score time.
 
 Frontend type-check + lint + BandDisplay/LiveSummary vitest green. No backend change.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `c132b80` (GRS-0153: wizard number legibility — P10/P50/P90 band labels + inline metric-d).

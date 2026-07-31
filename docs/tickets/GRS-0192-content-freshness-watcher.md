@@ -1,6 +1,6 @@
 # GRS-0192 — Content freshness watcher
 
-**Status:** Planned (2026-07-23, founder feedback item 20, final paragraph). **Priority:** MED.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-23, founder feedback item 20, final paragraph). **Priority:** MED._
 **Loop:** founder-feedback remediation, Wave 4. Extends ADR-0043. Depends on GRS-0190
 (references) and lands after the first GRS-0191 course PRs give it something to watch.
 
@@ -92,3 +92,9 @@ Frontend (vitest):
 - An unreachable source surfaces as a visible failure in both API and UI; nothing is skipped
   silently.
 - CI runs the entire suite with zero network access.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.

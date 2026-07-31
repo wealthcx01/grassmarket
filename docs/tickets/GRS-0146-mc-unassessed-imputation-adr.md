@@ -1,6 +1,6 @@
 # GRS-0146 — Reconcile Monte-Carlo unassessed-imputation with ADR-0001 D9 (needs an ADR)
 
-**Status:** Implemented (2026-07-19) — founder greenlit the remediation program. ADR-0034 +
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Implemented (2026-07-19) — founder greenlit the remediation program. ADR-0034 +._
 Methodology v1.5. See "Resolution" at the foot.
 **Loop:** Part 2 — mock-advisor stress test / scoring integrity
 
@@ -54,3 +54,11 @@ coverage-driven Assessment Uncertainty Rating (VERY_HIGH) and the tornado. Uncer
 `1.2`→`1.5`; deterministic engine + both golden masters byte-identical. ADR-0034 +
 `docs/ATLAS-Methodology-v1.5.md`. Tests: inverted the old widening test + added two property tests
 (zero-coverage module absent from `module_qm`; band width non-increasing in coverage).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `4e2d511` (GRS-0146: uncertainty layer excludes Not Assessed, never imputes (ADR-0034, v1).
+
+This ticket carried no *What shipped* record; the commits above are that record.

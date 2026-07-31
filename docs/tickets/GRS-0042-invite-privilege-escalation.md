@@ -1,5 +1,7 @@
 # GRS-0042 — Close the invitation privilege-escalation hole
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 0 (auth + scoping)
 - **Status:** CRITICAL — found in the 2026-07-14 adversarial security review.
 - **Severity:** Critical (privilege escalation → complete multi-tenant scoping breach).
@@ -35,3 +37,11 @@ and the invite flow let an unprivileged user forge that role via a legitimately-
 - A non-admin cannot mint an invitation for any elevated role or tier (403, fail loud).
 - Admins retain full invitation capability.
 - Tests pin all three paths; the existing accept/login flow is unchanged.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `0fe6286` (GRS-0042: close the invitation privilege-escalation hole).
+
+This ticket carried no *What shipped* record; the commits above are that record.

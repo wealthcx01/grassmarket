@@ -1,6 +1,6 @@
 # GRS-0104 — Fix the confusing "Live V appears once scoreable…" message
 
-**Status:** Planned
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Planned — the work had shipped on branch `grs-0104-live-score-message`; the record lived in a stray second file, now folded in._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** A (build now)
 **Depends on:** —
@@ -31,3 +31,31 @@ current live score or clearly states what's still needed to reach a scoreable st
 
 - Changing live-score computation or the scoreable threshold.
 - Summary/Scenarios depth — GRS-0110.
+
+## What shipped (Status: Shipped — branch grs-0104-live-score-message)
+
+Replaced the opaque "Live V appears once the assessment is scoreable…" placeholder in the wizard side
+rail (`LiveSummary` in `app/assessments/[id]/WizardClient.tsx`) with a genuinely useful preview:
+
+- **Not scoreable** → a "Live score" card that lists, in plain English, exactly what remains — reusing
+  the live-score service's `blocking` reasons (e.g. "Enter at least one business metric.", "Rate all 7
+  Strategic Powers.", "Rate at least one subcomponent in a core module.") — plus how many subcomponents
+  are rated so far. No bare "V" jargon.
+- **Before any blockers are known** (initial load) → a gentle "Start rating the steps — the live score
+  updates as you go."
+- **Scoreable** → the live V band, unchanged (still via `BandDisplay`, honest about uncertainty).
+
+Copy/state-presentation only — reuses the existing live-score service (no new scoring).
+
+## Acceptance / verification
+
+`LiveSummary.test.tsx` — the opaque string is gone; when not scoreable the concrete blockers render;
+when scoreable the honest band renders. Frontend type-check · lint · vitest green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `49b9cac` (GRS-0104: replace the opaque "Live V appears once scoreable" message).
+
+This ticket carried no *What shipped* record; the commits above are that record.

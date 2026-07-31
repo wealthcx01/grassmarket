@@ -1,5 +1,7 @@
 # GRS-0033 — Elicited coefficients: ingestion + client-usable flip
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 6
 - **Branch:** `grs-0033-elicited-coefficients`
 - **Status:** In review — machinery + gate chain delivered; ratified panel VALUES pending (external). See ADR-0022.
@@ -43,3 +45,11 @@ Replace `v1-draft-pending-elicitation` with the real, client-usable coefficient 
 - Every elicited weight traces to its provenance record; none load without one.
 - Elicited-set golden master reproduces exactly.
 - Full gate green; CI green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `a0b7f70` (GRS-0033: elicited coefficients + §7 uncertainty twin, client-usable gate flip).
+
+This ticket carried no *What shipped* record; the commits above are that record.

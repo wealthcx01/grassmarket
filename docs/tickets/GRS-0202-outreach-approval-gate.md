@@ -1,6 +1,6 @@
 # GRS-0202 — Outreach message contract, approval gate, and suppression list
 
-**Status:** Draft — not scheduled (2026-07-25, from the GRS-0195 spike). **Priority:** TBD.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Draft — not scheduled (2026-07-25, from the GRS-0195 spike). **Priority:** TBD._
 **Loop:** follow-on to the founder-feedback remediation programme. Prerequisite for GRS-0203 and
 GRS-0204.
 
@@ -50,3 +50,9 @@ so there is never a window in which a message can leave the building unapproved.
 
 A message cannot be sent unapproved or to a suppressed contact, both enforced at runtime and
 tested. Suppression survives a registry re-import. No send capability exists yet.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.

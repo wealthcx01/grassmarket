@@ -1,5 +1,7 @@
 # GRS-0005 — Uncertainty engine (Monte Carlo, §7)
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 1 (see PRD §9)
 - **Branch:** `grs-0005-uncertainty-engine`
 - **Status:** In review
@@ -81,3 +83,11 @@ the band vs the same input assessed**; the weight-stability interval brackets th
 
 The value bridge and scenario re-scoring (GRS-0006); metric/power input-uncertainty models; rater
 -agreement input (needs dual-rating). No changes to `score()`.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `260a2f9` (GRS-0005: uncertainty engine (Monte Carlo, Methodology v1.1 §7)), `483f589` (GRS-0005 precursor: golden master uses contract enum VALUES for states).
+
+This ticket carried no *What shipped* record; the commits above are that record.

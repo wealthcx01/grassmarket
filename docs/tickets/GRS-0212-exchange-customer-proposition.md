@@ -1,6 +1,6 @@
 # GRS-0212 — Customer Proposition for exchanges: research it, model it, ship it
 
-**Status:** Planned (2026-07-26, staging review item 11). **Priority:** HIGH.
+**Status:** BLOCKED (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-26, staging review item 11). **Priority:** HIGH._
 **Loop:** founder-feedback remediation, Wave 1. **Depends on:** the C-index work (GRS-0085/0086).
 
 ## Why
@@ -61,3 +61,9 @@ A single blended score hides exactly the thing an advisor is being paid to find.
 The founder reads the research document and recognises their market in it. An advisor assessing an
 exchange is asked questions that make sense for an exchange, and the report says which of the four
 customer groups is the weak one.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**BLOCKED.** Blocked on founder decision **D1** (docs/FOUNDER-DECISIONS-2026-08.md). Exchange Customer Proposition needs the exchange coefficient/rubric authoring that D1 covers.

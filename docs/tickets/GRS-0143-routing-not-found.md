@@ -1,6 +1,6 @@
 # GRS-0143 — Routing & not-found resilience (no dead ends from a guessed URL)
 
-**Status:** In progress
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In progress._
 **Loop:** Part 2 — mock-advisor stress test / trust hardening
 
 ## Why
@@ -25,3 +25,9 @@ global not-found page, so any miss dropped the user on a bare Next.js 404 with n
 - `/academy`, `/deliverables`, `/courses` resolve to a real page instead of 404.
 - An unknown route or a malformed record id lands on a friendly page with navigation, never a raw
   error string. Typecheck, prod build, and all frontend tests pass. No scoring code touched.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `ba36cff` (GRS-0143: routing & not-found resilience — no dead ends from a guessed URL, #154), completed by `d11c114` (GRS-0143b: engagement/workshop bad-id → not-found, not raw 422, #163).

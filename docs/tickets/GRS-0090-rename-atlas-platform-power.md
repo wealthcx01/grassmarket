@@ -1,6 +1,6 @@
 # GRS-0090 — Rename "ATLAS" → "Platform Power" product-wide
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** ADR-0030 (ATLAS → Platform Power rename)
 **Branch:** `grs-0090-rename-atlas-platform-power`
@@ -81,3 +81,9 @@ note so the public design is updated in step.
 
 - Refining the P and L labels — that is GRS-0097.
 - Any change to scoring math or engine identifiers.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `819e918` (GRS-0090: rename ATLAS → Platform Power on advisor/client-facing surfaces).

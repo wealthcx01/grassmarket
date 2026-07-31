@@ -1,6 +1,6 @@
 # GRS-0117 — Watermarked end-to-end DEMO dataset (Revolut)
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** ADR-0029 (demo/illustrative records)
 
@@ -54,3 +54,11 @@ follow-up is GRS-0119.
   (sequenced after this).
 - Weakening or altering the real governance gate for non-demo records.
 - Engagement↔assessment link legibility — GRS-0116; cross-screen backlinks — GRS-0118.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `50156f2` (GRS-0117: watermarked Revolut DEMO worked example).
+
+This ticket carried no *What shipped* record; the commits above are that record.

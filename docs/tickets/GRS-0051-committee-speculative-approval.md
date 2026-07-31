@@ -1,5 +1,7 @@
 # GRS-0051 — Reject speculative committee pre-approval
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 5 (Workbench + governance)
 - **Status:** Fixed — from the 2026-07-14 audit backlog (GRS-0049, API finding #4).
 - **Severity:** Low — a privileged (committee) role can weaken the §8 peer-challenge gate.
@@ -28,3 +30,11 @@ is refused.
 - A decision at a rating the score has not reached, or on a non-existent item key, is 409; a genuine
   `(item, rating)` from the queue still succeeds — pinned by
   `test_a_speculative_pre_approval_is_refused`.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `919dbed` (GRS-0051: reject speculative committee pre-approval).
+
+This ticket carried no *What shipped* record; the commits above are that record.

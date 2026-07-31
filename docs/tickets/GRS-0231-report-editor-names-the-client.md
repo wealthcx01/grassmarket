@@ -1,6 +1,6 @@
 # GRS-0231 — The report editor must name the client
 
-**Status:** Planned (2026-07-31, first-time-user review G3). **Priority:** MED-HIGH. **Type:** Bug.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review G3). **Priority:** MED-HIGH. **Type:** Bug._
 **Loop:** client-report hardening. **Extends GRS-0211.**
 
 ## Why
@@ -46,3 +46,9 @@ the Appendix.
 
 The founder opens the two report editors in two tabs and can tell them apart from the tab strip
 alone, and from any scroll position on the page.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).

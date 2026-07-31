@@ -1,6 +1,6 @@
 # GRS-0239 — Lessons that teach before they test
 
-**Status:** Planned (2026-07-31, founder: "the lessons are horrible and just tell me what I should
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, founder: "the lessons are horrible and just tell me what I should._
 learn as opposed to actually being lessons? It just reference links").
 **Priority:** MED-HIGH. **Loop:** first-time-user coherence. **Extends GRS-0215.**
 **Relates to:** GRS-0218, GRS-0190, GRS-0226.
@@ -74,3 +74,9 @@ about what still ships. Verified in source, 31/07/2026:
 The founder opens the first course the catalogue offers and the first screen teaches them
 something; links are citations, not the content; and ticking through a lesson means having *done*
 its checkpoints, not scrolled past them.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).

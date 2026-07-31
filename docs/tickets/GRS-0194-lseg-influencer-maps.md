@@ -1,6 +1,6 @@
 # GRS-0194 — LSEG influencer maps via bcap-lseg
 
-**Status:** In review (2026-07-25) — generator, ranking, two-source owner layer and the
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-25) — generator, ranking, two-source owner layer and the._
 admin-only route shipped; PR open, stacked on GRS-0193. (2026-07-23, founder feedback item
 16b.) **Priority:** MED-HIGH.
 **Loop:** founder-feedback remediation, Wave 5. Elevates the planned GRS-0114; depends on
@@ -65,3 +65,11 @@ mechanics against the live field catalogue.
 Running the generator for a seeded target with a curated `ctb_id` produces the 3-tab artifact
 with provenance, rankings, caveats, and verification flags, reproducing the Barclays workbook
 shape from live data.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `e60b747` (GRS-0194: generate LSEG influencer maps for a GTM target).
+
+This ticket carried no *What shipped* record; the commits above are that record.

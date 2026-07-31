@@ -1,6 +1,6 @@
 # GRS-0105 — Strategic Powers: rigor + Helmer depth + evidence
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** A (build now)
 **Depends on:** —
@@ -58,3 +58,9 @@ the E-grades de-jargoned in place:
 Each power presents the Helmer benefit/barrier framing + how it is assessed + a grounded rationale
 capture; E-grades read in plain English. Content is single-sourced in `powerGuidance.ts`. Frontend
 type-check · lint · vitest green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `21dd6ce` (GRS-0105: Strategic Powers — Helmer rigor + evidence-based rating + de-jargone).

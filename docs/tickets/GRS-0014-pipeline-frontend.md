@@ -1,5 +1,7 @@
 # GRS-0014 — Pipeline frontend
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 3 (see PRD §9) — **the last Loop 3 ticket; this closes Loop 3.**
 - **Branch:** `grs-0014-pipeline-frontend`
 - **Status:** In review
@@ -54,3 +56,9 @@ Backend owns legality (illegal move → 409, revert + reason, never faked); Mone
 API, never recomputed or combined (ADR-0002 at the view layer); the forecast is currency-free; data
 scoping is server-enforced (the client carries the JWT); contract types drive the TS types; one
 ticket = one branch = one PR.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `3dd9b02` (GRS-0014: pipeline frontend — advisor CRM (closes Loop 3)).

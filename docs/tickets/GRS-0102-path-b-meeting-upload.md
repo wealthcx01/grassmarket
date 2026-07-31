@@ -1,6 +1,6 @@
 # GRS-0102 — Meeting-recording upload → AI prepopulation (Path B)
 
-**Status:** Planned
+**Status:** SUPERSEDED (reconciled 2026-08-01). _Previously recorded as: Planned._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** A (build now)
 **Depends on:** Path B (GRS-0029/0030)
@@ -34,3 +34,9 @@ capability that already exists.
 
 - Building the meeting-intelligence extraction backend — GRS-0029/0030.
 - Screen-recording → widget auto-population — GRS-0109.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**SUPERSEDED.** Superseded by GRS-0197. Path-B meeting capture was re-scoped; the Gmail/Calendar half is GRS-0197 and the recording half is not currently scheduled.

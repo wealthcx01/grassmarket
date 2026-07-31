@@ -1,6 +1,6 @@
 # GRS-0130 — Feed practice arena + calibration from the courses
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 **Depends on:** ADR-0028 (Bruntsfield Academy / Workbench)
 
@@ -46,3 +46,11 @@ ticket connects the Academy content into practice/calibration and documents cali
 
 - The course content itself (GRS-0122–0126).
 - Committee/dual-rating governance (that stays approval-recorded; only practice feedback is self-scoped).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `fbe98cc` (GRS-0130: Academy-grounded practice scenarios + calibration explained in the g).
+
+This ticket carried no *What shipped* record; the commits above are that record.

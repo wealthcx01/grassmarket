@@ -1,5 +1,7 @@
 # GRS-0065 — First-run onboarding walkthrough
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** — (UX)
 - **Status:** Done — closes rubric #4 (guided first-run) from the 2026-07-15 UX audit.
 
@@ -21,3 +23,11 @@ before finalise; AI proposes, you approve) → a start action (Read the primer /
 - Shows on a signed-in advisor's first dashboard visit; never again once dismissed; not shown when
   signed out; the guide can replay it. Pinned by `FirstRunWalkthrough.test.tsx` (5) and verified
   live (renders, steps through, navigates, does not reappear, no errors). type-check/lint/build green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `5828efb` (GRS-0065: first-run onboarding walkthrough).
+
+This ticket carried no *What shipped* record; the commits above are that record.

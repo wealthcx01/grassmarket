@@ -1,5 +1,7 @@
 # GRS-0054 — Audit doc/precision fixes (arena gate note, MC reproducibility docstring)
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** — (documentation)
 - **Status:** Fixed — from the 2026-07-14 audit backlog (GRS-0049, findings API #6 and scoring F4).
 - **Severity:** Low — accuracy of the docs, no behaviour change.
@@ -29,3 +31,11 @@ a currency code (`EUR`), an acronym (`ESG`), or emphasis, so a regex hack would 
 GRS-0046 fixed. Doing it safely requires the registry key-set on the client (matching by identity,
 not shape) — a larger change tracked in GRS-0049. Impact today is negligible: the one bare power key
 (`BRANDING`) already renders as a readable word.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `c7b66d5` (GRS-0054: audit doc/precision fixes (arena gate note, MC reproducibility docst).
+
+This ticket carried no *What shipped* record; the commits above are that record.

@@ -1,6 +1,6 @@
 # GRS-0181 — Wizard pagination: smaller pages per module
 
-**Status:** In review (2026-07-26) — both steps paged, show-all preference and sub-step
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-26) — both steps paged, show-all preference and sub-step._
 stepper shipped; PR open (stacked on GRS-0182).
 (2026-07-23, founder feedback item 9.) **Priority:** MED-HIGH.
 **Loop:** founder-feedback remediation, Wave 1. Frontend only; document autosave and engine untouched.
@@ -130,3 +130,11 @@ A "show all modules" toggle restores the single-page collapsible view and its ch
 user across assessments (localStorage `gm:wizard:show-all-modules`). The live-score rail is visible
 on every page. Autosave, scoring, and the golden master are untouched (proven by the golden-master
 test staying green).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `6825843` (GRS-0181: page the long wizard steps one module at a time).
+
+This ticket carried no *What shipped* record; the commits above are that record.

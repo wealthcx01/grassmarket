@@ -1,6 +1,6 @@
 # GRS-0091 — Home IA / layout & the "Sections" grid
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** —
 **Branch:** `grs-0091-home-ia-layout`
@@ -58,3 +58,9 @@ professional, intentional IA.
 
 - Per-section functionality changes (pipeline, wizard, workbench, etc. — their own tickets).
 - The welcome copy (GRS-0089) and header chrome (GRS-0087), though this layout must accommodate them.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `6c611c8` (GRS-0091: home IA — group the sections by client-work flow vs. grow & get paid).

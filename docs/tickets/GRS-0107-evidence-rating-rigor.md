@@ -1,6 +1,6 @@
 # GRS-0107 — Evidence-based rating rigor across the wizard
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** A (build now)
 **Depends on:** —
@@ -58,3 +58,9 @@ per autosave); nothing is silently defaulted. Golden master untouched (`notes` i
 
 Metrics, powers, and deep-dive ratings each capture supporting evidence/rationale that persists on the
 document. Schema parity green; backend + frontend gates green; golden master unchanged.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `ed3f08c` (GRS-0107: evidence-based rating rigor across the wizard).

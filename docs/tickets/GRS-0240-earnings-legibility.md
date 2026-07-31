@@ -1,6 +1,6 @@
 # GRS-0240 — The earnings page explains how you get paid
 
-**Status:** Planned (2026-07-31, founder: "the earnings page is so confusing").
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, founder: "the earnings page is so confusing")._
 **Priority:** MED-HIGH. **Loop:** first-time-user coherence. **Extends GRS-0187.**
 **Relates to:** GRS-0067, ADR-0026.
 
@@ -66,3 +66,9 @@ narrative order and vocabulary, and this page has already needed one legibility 
 A brand-new advisor with £0 earned reads the page top to bottom once and can explain to someone
 else how they will get paid, in which currency of effort, and what each of the five numbers will
 mean when it stops being zero.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).

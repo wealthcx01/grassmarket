@@ -1,6 +1,6 @@
 # GRS-0112 — Native Gmail + Google Calendar integration
 
-**Status:** Planned
+**Status:** SUPERSEDED (reconciled 2026-08-01). _Previously recorded as: Planned._
 **Loop:** Part 2 — Pipeline / GTM engine (one program)
 **Depends on:** ADR-0027 (Pipeline / GTM engine); ADR-0024 (Google OAuth, GRS-0073)
 
@@ -40,3 +40,9 @@ starting primitive to attach synced emails and meetings to.
 
 - The CRM card/panel/win-probability rebuild (GRS-0111).
 - Running GTM/prospecting MCP skills (GRS-0113); LSEG influencer maps (GRS-0114/0115).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**SUPERSEDED.** Superseded by GRS-0197. Same integration, re-specified in the founder-feedback wave; GRS-0197 is the live ticket.

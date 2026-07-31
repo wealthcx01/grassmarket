@@ -1,6 +1,6 @@
 # GRS-0100 — Tie the subject to a real company (entity resolution)
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** B (flagged follow-up — its own ADR/ticket set later)
 **Depends on:** —
@@ -34,3 +34,11 @@ and GRS-0109).
 - Choice of registry / data source and the entity-store contract — the deferred ADR decides these.
 - Broad AI-assisted input — GRS-0101.
 - Portfolio broadening/naming — GRS-0098.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `24bfceb` (GRS-0100: entity resolution — subject resolves to a canonical company (stub re).
+
+This ticket carried no *What shipped* record; the commits above are that record.
