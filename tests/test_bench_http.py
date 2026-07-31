@@ -108,5 +108,5 @@ def test_the_hub_surfaces_an_incomplete_academy_course(
     body = client.get("/bench/queue", headers=auth_header(alice)).json()
     academy = [i for i in body["items"] if i["kind"] == "academy"]
     assert len(academy) == 1
-    assert academy[0]["title"] == "Continue the Academy: Sales Egoist"
+    assert academy[0]["title"] == "Continue the Academy: The Sales Egoist"
     assert academy[0]["action_hint"] == "learn"

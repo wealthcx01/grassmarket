@@ -51,11 +51,14 @@ _DOING_KINDS = frozenset({SlideKind.WALKTHROUGH, SlideKind.EXAMPLE, SlideKind.CH
 # Courses that predate the standard, each with the ticket that rebuilds it. Listing them is the
 # point: an exemption nobody can see is how the last rebuild quietly did not happen.
 LEGACY_COURSES: dict[str, str] = {
-    # `product-openbb`, `product-benzinga`, `product-brandfetch` and `sales-ops-playbook` have all
-    # been rebuilt (GRS-0216, GRS-0217) and came off this list. Note what this register is and is
-    # not: nothing in `check_depth` reads it, so it never exempted anything mechanically. It is the
-    # visible-debt list, and one debt is left — the doctrine course, blocked on source material.
-    "sales-egoist": "GRS-0218",
+    # Empty, and that is the point of the register rather than a reason to delete it. Every course
+    # in the Academy has now been rebuilt to this standard: `product-openbb`, `product-benzinga`,
+    # `product-brandfetch` and `sales-ops-playbook` under GRS-0216 and GRS-0217, and `sales-egoist`
+    # — the last entry, and the one blocked longest on the founder committing source material —
+    # under GRS-0218 on 2026-08-01. Note what this register is and is not: nothing in `check_depth`
+    # reads it, so it never exempted anything mechanically. It is the visible-debt list, and the
+    # debt is now zero. Leave it here: the next course authored starts unbuilt, and an exemption
+    # nobody can see is how the last rebuild quietly did not happen.
 }
 
 

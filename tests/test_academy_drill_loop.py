@@ -37,9 +37,17 @@ def test_completing_a_lesson_auto_enrolls_a_real_drill(
     topics = {c.topic for c in cards}
     assert set(lesson.drill_topics) <= topics  # a card per topic the lesson teaches
     card = next(c for c in cards if c.topic in lesson.drill_topics)
-    # It's a real flashcard — the authored comprehension check, not a blank topic.
+    # It's a real flashcard, not a blank topic. Where a lesson carries an authored
+    # comprehension check the card uses it verbatim; where it does not, the contract says the
+    # reader derives a recall prompt from `measurement` (GRS-0139). Since GRS-0218 rebuilt Sales
+    # Egoist to the slide standard, this course takes the derived path — the section test is now
+    # the gate — so the test covers both rather than assuming the old format.
     assert card.prompt and card.answer
-    assert card.prompt == lesson.check_question
+    if lesson.check_question is not None:
+        assert card.prompt == lesson.check_question
+    else:
+        assert lesson.title in card.prompt
+        assert card.answer == lesson.measurement
 
 
 def test_auto_enroll_is_idempotent_across_lessons(
