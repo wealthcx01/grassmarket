@@ -1,0 +1,134 @@
+{
+  "1280": {
+    "viewport": {
+      "name": "1280",
+      "width": 1280,
+      "height": 950
+    },
+    "worstScrollY": 401,
+    "scoreCard": {
+      "top": 16,
+      "bottom": 135,
+      "height": 119
+    },
+    "panelBelow": {
+      "top": 4.3,
+      "bottom": 414.7,
+      "height": 410.4
+    },
+    "hiddenBehindHeaderPx": 44,
+    "railPosition": "static",
+    "scoreCardPosition": "sticky",
+    "railMaxHeight": "none",
+    "railOverflowY": "visible",
+    "overlapPx": 119,
+    "coveredByScoreCard": true,
+    "probeY": 76,
+    "unreachablePx": 0,
+    "reach": {
+      "atScrollY": 714,
+      "railPinnedHere": false,
+      "railScrollsInternally": false,
+      "unreachablePx": 0
+    }
+  },
+  "1440": {
+    "viewport": {
+      "name": "1440",
+      "width": 1440,
+      "height": 950
+    },
+    "worstScrollY": 401,
+    "scoreCard": {
+      "top": 16,
+      "bottom": 135,
+      "height": 119
+    },
+    "panelBelow": {
+      "top": 4.3,
+      "bottom": 414.7,
+      "height": 410.4
+    },
+    "hiddenBehindHeaderPx": 44,
+    "railPosition": "static",
+    "scoreCardPosition": "sticky",
+    "railMaxHeight": "none",
+    "railOverflowY": "visible",
+    "overlapPx": 119,
+    "coveredByScoreCard": true,
+    "probeY": 76,
+    "unreachablePx": 0,
+    "reach": {
+      "atScrollY": 714,
+      "railPinnedHere": false,
+      "railScrollsInternally": false,
+      "unreachablePx": 0
+    }
+  },
+  "1920": {
+    "viewport": {
+      "name": "1920",
+      "width": 1920,
+      "height": 1080
+    },
+    "worstScrollY": 394,
+    "scoreCard": {
+      "top": 16,
+      "bottom": 135,
+      "height": 119
+    },
+    "panelBelow": {
+      "top": 11.3,
+      "bottom": 421.7,
+      "height": 410.4
+    },
+    "hiddenBehindHeaderPx": 44,
+    "railPosition": "static",
+    "scoreCardPosition": "sticky",
+    "railMaxHeight": "none",
+    "railOverflowY": "visible",
+    "overlapPx": 119,
+    "coveredByScoreCard": true,
+    "probeY": 76,
+    "unreachablePx": 0,
+    "reach": {
+      "atScrollY": 610,
+      "railPinnedHere": false,
+      "railScrollsInternally": false,
+      "unreachablePx": 0
+    }
+  },
+  "short": {
+    "viewport": {
+      "name": "short",
+      "width": 1440,
+      "height": 640
+    },
+    "worstScrollY": 401,
+    "scoreCard": {
+      "top": 16,
+      "bottom": 135,
+      "height": 119
+    },
+    "panelBelow": {
+      "top": 4.3,
+      "bottom": 414.7,
+      "height": 410.4
+    },
+    "hiddenBehindHeaderPx": 44,
+    "railPosition": "static",
+    "scoreCardPosition": "sticky",
+    "railMaxHeight": "none",
+    "railOverflowY": "visible",
+    "overlapPx": 119,
+    "coveredByScoreCard": true,
+    "probeY": 76,
+    "unreachablePx": 0,
+    "reach": {
+      "atScrollY": 962,
+      "railPinnedHere": false,
+      "railScrollsInternally": false,
+      "unreachablePx": 0
+    }
+  }
+}

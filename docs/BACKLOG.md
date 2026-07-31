@@ -89,7 +89,7 @@ From the 2026-07-26 staging review. Wave 4 (the course rebuild) is the part that
 | GRS-0218 | The Sales Egoist course | Blocked on source material |
 | GRS-0219 | The client report as a Bruntsfield-branded PDF | Planned |
 | GRS-0220 | The client report as an interactive web page, read tracking | Planned |
-| GRS-0221 | Stage 6 layout: the panels that fight each other | Planned |
+| **GRS-0221** | **Stage 6 layout: the panels that fight each other** | **Fixed, in review** — measured on the rendered page: **119px** of the sell panel sat behind the pinned score card (its full height) at all four viewports, now **0px**. The rail sticks as one block instead of its first child. Auditing the step found a second instance — the rail pinned 44px behind the sticky site header, eating the score card's heading — fixed against `--topbar-height`. Evidence in `docs/reviews/GRS-0221-stage6-layout/` |
 | GRS-0222 | The narrative assistant: drafting against real scored data | Planned |
 | **GRS-0223** | **"All the scores seem surprisingly similar": find out why** | **Answered, in review** — the engine is not compressing (achievable V span 0.815); aggregation is, and the rubric is used at ~1/3 of its width. No engine change recommended. See `docs/analysis/score-dispersion-2026-07.md` |
 | GRS-0227 | Surface the dispersion beside the score | **Built, in review** — module range + one-line meaning on the summary and live panel; bottleneck leads where the spread is wide. New `module_qm_point` on the live payload (deterministic, assessed-only). No new dimension, no band, no rating gate |

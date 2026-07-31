@@ -459,12 +459,45 @@ button {
 .wizard-two-col {
   grid-template-columns: minmax(0, 1fr) 20rem;
 }
+/* The rail sticks AS ONE BLOCK (GRS-0221). Previously its FIRST CHILD was sticky while the panels
+   below it — the suggestions panel, and the "recommended to sell" panel on a finalised assessment —
+   scrolled on in the same column, so they slid underneath the pinned Platform Value card. A sticky
+   element must never share a column with content that scrolls past it; sticking the container is
+   what makes the intent (keep the headline number visible) actually work. */
+.wizard-two-col [data-wizard-rail] {
+  position: sticky;
+  /* Clear the sticky site header, don't pin under it. Measured at 1440x950: with top: 1rem the
+     rail pinned 44px behind the z-index-50 header — the score card's own heading was the part it
+     ate, so the pinned panel lost the label for the number it exists to show. The old sticky card
+     had the same bug; it is the founder's complaint one layer up, so it is fixed here too. */
+  top: calc(var(--topbar-height) + 1rem);
+  /* A sticky rail taller than the viewport pins its top and puts its bottom out of reach. Cap it
+     and let the rail scroll inside itself, so everything in it stays reachable. The cap has to
+     subtract the header as well, or the capped rail runs off the bottom by exactly its height. */
+  max-height: calc(100vh - var(--topbar-height) - 2rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+/* On a short viewport the rail would own most of the screen, and a pinned block with its own
+   scrollbar is worse than one that simply scrolls with the page. */
+@media (max-height: 700px) {
+  .wizard-two-col [data-wizard-rail] {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+  }
+}
 @media (max-width: 900px) {
   .wizard-two-col {
     grid-template-columns: minmax(0, 1fr);
   }
+  /* Stacked into one column, nothing should be sticky: the rail is no longer beside the content,
+     it is after it, so pinning it just covers what the reader scrolled to. */
+  .wizard-two-col [data-wizard-rail],
   .wizard-two-col [data-wizard-rail] > * {
     position: static !important;
+    max-height: none;
+    overflow-y: visible;
   }
 }
 
