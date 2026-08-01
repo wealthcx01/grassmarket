@@ -438,6 +438,7 @@ def seed_brokerage_showcase(
             backfilled = _backfill_report_prose(client, headers, spec)
             results.append(
                 {
+                    "kind": "showcase",
                     "subject": spec.subject,
                     "status": (
                         f"exists (skipped; {backfilled} example report(s) written)"
@@ -598,6 +599,7 @@ def seed_brokerage_showcase(
 
         results.append(
             {
+                "kind": "showcase",
                 "subject": spec.subject,
                 "status": "seeded",
                 "prospect_id": pid,
@@ -607,4 +609,128 @@ def seed_brokerage_showcase(
             }
         )
 
+    # GRS-0208 scope 1: the story around the scored firms. The showcase gives three finalised
+    # brokerages; on its own that is three cards in one column, nothing in flight and no workshop
+    # ever held — a filing cabinet rather than a business. This adds the pipeline shape on the same
+    # account, and only what the showcase does not already produce.
+    results.extend(_seed_demo_story(client, headers, owner))
+
     return results
+
+
+def _seed_demo_story(client, headers: dict[str, str], owner) -> list[dict[str, str]]:
+    """Prospects across every stage, workshops with real history, and one assessment in progress.
+
+    Everything here goes through the SAME endpoints an advisor uses, including walking each card
+    through its stage path one transition at a time. That is slower than writing rows, and it is the
+    point: a card placed directly into `delivered` carries no transition history, so the board's
+    time-in-stage flags — the most useful thing on it — would show nothing.
+    """
+    from grassmarket.demo.demo_story import (
+        IN_PROGRESS_SUBJECT,
+        STORY_PROSPECTS,
+        WORKSHOP_SUBJECTS,
+        workshop_dates,
+    )
+
+    today = date.today()
+    existing = {p["company_name"]: p for p in client.get("/prospects", headers=headers).json()}
+    out: list[dict[str, str]] = []
+
+    for index, story in enumerate(STORY_PROSPECTS):
+        if story.company_name in existing:
+            out.append(
+                {"kind": "story", "subject": story.company_name, "status": "exists (skipped)"}
+            )
+            continue
+        created = client.post(
+            "/prospects", json={"company_name": story.company_name}, headers=headers
+        )
+        if created.status_code != 201:
+            raise ShowcaseSeedError(
+                f"{story.company_name}: create prospect failed "
+                f"{created.status_code}: {created.text}"
+            )
+        pid = created.json()["id"]
+
+        # The workshop is created BEFORE the stage walk reaches workshop_delivered, so the record
+        # and the history agree. A stage saying a workshop happened with no workshop to open is the
+        # kind of quiet inconsistency a demo is worst placed to survive.
+        if story.company_name in WORKSHOP_SUBJECTS:
+            scheduled_for, delivered_on = workshop_dates(today, offset_days=14 + index * 9)
+            booked = client.post(
+                "/workshops",
+                json={
+                    "prospect_id": pid,
+                    "scheduled_for": scheduled_for.isoformat(),
+                    "pre_workshop_brief": (
+                        f"Platform Power workshop for {story.company_name}: where the "
+                        f"post-trade seam sits, and what the confirmation deadline does to it."
+                    ),
+                },
+                headers=headers,
+            )
+            if booked.status_code != 201:
+                raise ShowcaseSeedError(
+                    f"{story.company_name}: create workshop failed "
+                    f"{booked.status_code}: {booked.text}"
+                )
+            delivered = client.post(
+                f"/workshops/{booked.json()['id']}/deliver",
+                json={
+                    "delivered_on": delivered_on.isoformat(),
+                    "workshop_output": (
+                        "Two hours with operations and architecture. The binding constraint is "
+                        "reconciliation, not execution, and they had not measured it."
+                    ),
+                },
+                headers=headers,
+            )
+            if delivered.status_code not in (200, 201):
+                raise ShowcaseSeedError(
+                    f"{story.company_name}: deliver workshop failed "
+                    f"{delivered.status_code}: {delivered.text}"
+                )
+
+        # A new prospect is already at PROSPECT, so a transition to it is refused as illegal
+        # (correctly — self-transitions are not moves). Track the current stage and only apply the
+        # ones that actually change it, rather than special-casing the first element.
+        current = created.json()["stage"]
+        for stage in story.path:
+            if stage.value == current:
+                continue
+            moved = client.patch(
+                f"/prospects/{pid}/stage", json={"stage": stage.value}, headers=headers
+            )
+            if moved.status_code != 200:
+                raise ShowcaseSeedError(
+                    f"{story.company_name}: stage {current} -> {stage.value} failed "
+                    f"{moved.status_code}: {moved.text}"
+                )
+            current = stage.value
+
+        entry = {
+            "kind": "story",
+            "subject": story.company_name,
+            "status": "seeded",
+            "prospect_id": pid,
+        }
+
+        # One assessment left deliberately UNFINALISED, so the portfolio shows a state other than
+        # finalised and the wizard has something to resume. A demo where everything is finished
+        # teaches a new advisor nothing about the part they will actually spend their time in.
+        if story.company_name == IN_PROGRESS_SUBJECT:
+            started = client.post(
+                "/assessments", json={"subject": story.company_name}, headers=headers
+            )
+            if started.status_code != 201:
+                raise ShowcaseSeedError(
+                    f"{story.company_name}: create assessment failed "
+                    f"{started.status_code}: {started.text}"
+                )
+            entry["assessment_id"] = started.json()["id"]
+            entry["status"] = "seeded (assessment left in progress)"
+
+        out.append(entry)
+
+    return out
