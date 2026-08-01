@@ -113,7 +113,11 @@ def test_showcase_seed_populates_a_demo_instance_and_is_idempotent(
     real deliverables, and a non-zero earnings statement — and a re-run duplicates nothing."""
     email = "showcase-owner@bruntsfieldcapital.com"
     results = seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
-    assert [r["status"] for r in results] == ["seeded"] * len(SHOWCASE)
+    # Since GRS-0208 scope 1 the seed also returns the story prospects that give the account a
+    # pipeline. They are tagged, so this stays a statement about the SCORED firms rather than a
+    # count that drifts every time the story grows.
+    showcase = [r for r in results if r["kind"] == "showcase"]
+    assert [r["status"] for r in showcase] == ["seeded"] * len(SHOWCASE)
 
     session = session_factory()
     try:
@@ -131,7 +135,7 @@ def test_showcase_seed_populates_a_demo_instance_and_is_idempotent(
             assert entry.c_index is not None  # the C spread is the demo's headline story
 
         # Each engagement carries real generated deliverables.
-        for r in results:
+        for r in showcase:
             deliverables = repo.list_deliverables(principal, UUID(r["engagement_id"]))
             assert len(deliverables) >= 5
 
@@ -150,7 +154,11 @@ def test_showcase_seed_populates_a_demo_instance_and_is_idempotent(
         repo = Repository(session)
         owner = repo.get_consultant_by_email(email)
         principal = Principal(consultant_id=owner.id, role=owner.role)
-        assert len(repo.list_assessments(principal)) == len(SHOWCASE)
+        # One more than the showcase: GRS-0208 scope 1 leaves a single assessment IN PROGRESS so
+        # the portfolio shows a state other than finalised and the wizard has something to resume.
+        assert len(repo.list_assessments(principal)) == len(SHOWCASE) + 1
+        # Commissions are unchanged — the story prospects are pipeline shape, not closed business,
+        # and inventing sales for them would put money-shaped numbers behind cards that never sold.
         assert len(repo.list_commission_lines(principal)) == len(SHOWCASE)
     finally:
         session.close()
@@ -469,7 +477,11 @@ def test_every_showcase_deliverable_has_a_worked_example_report(
 
     email = "showcase-reports@bruntsfieldcapital.com"
     results = seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
-    assert [r["status"] for r in results] == ["seeded"] * len(SHOWCASE)
+    # Since GRS-0208 scope 1 the seed also returns the story prospects that give the account a
+    # pipeline. They are tagged, so this stays a statement about the SCORED firms rather than a
+    # count that drifts every time the story grows.
+    showcase = [r for r in results if r["kind"] == "showcase"]
+    assert [r["status"] for r in showcase] == ["seeded"] * len(SHOWCASE)
 
     session = session_factory()
     try:
@@ -477,7 +489,7 @@ def test_every_showcase_deliverable_has_a_worked_example_report(
         owner = repo.get_consultant_by_email(email)
         principal = Principal(consultant_id=owner.id, role=owner.role)
         checked = 0
-        for r in results:
+        for r in showcase:
             for deliverable in repo.list_deliverables(principal, UUID(r["engagement_id"])):
                 context, _, run_id, _ = _context(repo, principal, deliverable.id)
                 sections_json = repo.get_report_prose(principal, deliverable.id)
@@ -588,3 +600,104 @@ def test_the_backfill_does_not_overwrite_words_already_written(
         assert "An advisor's own words." in after.sections_json
     finally:
         session.close()
+
+
+def test_the_demo_account_tells_a_coherent_story(session_factory, engine, settings) -> None:
+    """GRS-0208 scope 1. The founder could not follow a single example client end to end.
+
+    The showcase alone gives three finalised firms — three cards in one column, nothing in flight,
+    no workshop ever held. That is a filing cabinet, not a business. This asserts the shape a
+    first-time user actually needs to see, on ONE account.
+    """
+    from collections import Counter
+
+    from bcap_contracts.entities import PipelineStage
+
+    from grassmarket.data.models import (
+        AssessmentORM,
+        ProspectORM,
+        ProspectStageHistoryORM,
+        WorkshopORM,
+    )
+    from grassmarket.demo.demo_story import IN_PROGRESS_SUBJECT, STORY_PROSPECTS
+
+    email = "demo-story@bruntsfieldcapital.com"
+    seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+
+    session = session_factory()
+    try:
+        repo = Repository(session)
+        owner = repo.get_consultant_by_email(email)
+        prospects = [
+            p
+            for p in session.execute(select(ProspectORM)).scalars().all()
+            if p.owner_consultant_id == owner.id
+        ]
+        stages = Counter(p.stage for p in prospects)
+
+        # Every stage the board can show has at least one card. A demo board with one populated
+        # column teaches an advisor that the product only has one column.
+        for stage in PipelineStage:
+            assert stages[stage.value] >= 1, f"no demo prospect sits at {stage.value}"
+
+        # Something to resume. A demo where everything is finished says nothing about the part an
+        # advisor spends their time in.
+        assessments = [
+            a
+            for a in session.execute(select(AssessmentORM)).scalars().all()
+            if a.owner_consultant_id == owner.id
+        ]
+        states = Counter(a.state for a in assessments)
+        assert states["finalised"] >= 2
+        assert states["draft"] >= 1
+        assert any(a.subject == IN_PROGRESS_SUBJECT and a.state == "draft" for a in assessments)
+
+        # Workshops exist AND are delivered — a stage history claiming a workshop happened with no
+        # workshop to open is the quiet inconsistency a careful viewer checks first.
+        workshops = session.execute(select(WorkshopORM)).scalars().all()
+        assert len(workshops) >= 5
+        assert all(w.delivered_on is not None for w in workshops)
+
+        # Real transition history, not cards teleported into place. The board's time-in-stage flags
+        # are computed from these, so without them its most useful signal shows nothing.
+        history = session.execute(select(ProspectStageHistoryORM)).scalars().all()
+        assert len(history) >= len(STORY_PROSPECTS)
+        per_prospect = Counter(str(h.prospect_id) for h in history)
+        assert max(per_prospect.values()) >= 5, "no card has a multi-step history to age"
+    finally:
+        session.close()
+
+
+def test_the_story_prospects_are_distinct_from_the_scored_showcase(
+    session_factory, engine, settings
+) -> None:
+    """A first-time user should be able to tell which records carry a real scored assessment behind
+    them and which are pipeline colour. Reusing the showcase names for stage filler would blur
+    exactly that line."""
+    from grassmarket.demo.demo_story import STORY_PROSPECTS
+
+    showcase = {spec.subject for spec in SHOWCASE}
+    story = {p.company_name for p in STORY_PROSPECTS}
+    assert showcase.isdisjoint(story)
+
+
+def test_the_story_is_idempotent(session_factory, engine, settings) -> None:
+    """GRS-0177's rule, extended to the new records: a re-run changes no counts."""
+    from grassmarket.data.models import ProspectORM, WorkshopORM
+
+    email = "demo-story-idem@bruntsfieldcapital.com"
+    seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+
+    def counts() -> tuple[int, int]:
+        session = session_factory()
+        try:
+            return (
+                len(session.execute(select(ProspectORM)).scalars().all()),
+                len(session.execute(select(WorkshopORM)).scalars().all()),
+            )
+        finally:
+            session.close()
+
+    before = counts()
+    seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+    assert counts() == before

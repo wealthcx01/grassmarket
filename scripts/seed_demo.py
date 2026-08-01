@@ -41,9 +41,13 @@ def main() -> None:
     )
     print("Brokerage showcase demo seed:")
     for r in results:
-        line = f"  {r['subject']:22} {r['status']}"
+        line = f"  {r['subject']:26} {r['status']}"
         if "assessment_id" in r:
-            line += f"  assessment={r['assessment_id']}  sold={r['product_sold']}"
+            line += f"  assessment={r['assessment_id']}"
+        # The story prospects (GRS-0208 scope 1) have no product sale — they are pipeline shape
+        # rather than closed business, and printing "sold=None" would suggest otherwise.
+        if "product_sold" in r:
+            line += f"  sold={r['product_sold']}"
         print(line)
 
 
