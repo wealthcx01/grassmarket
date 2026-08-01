@@ -21,7 +21,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { ApiError, api, getToken } from "@/lib/api";
-import type { ClientReportLink, ReportProseSection, ReportReadReport } from "@/lib/types";
+import type {
+  ClientReportLink,
+  DeclaredFigure,
+  ReportProseSection,
+  ReportReadReport,
+} from "@/lib/types";
 
 const SECTION_ORDER = [
   "business",
@@ -31,6 +36,78 @@ const SECTION_ORDER = [
   "value",
   "appendix",
 ] as const;
+
+/** Reader-facing names, matching `bcap_contracts.client_report.SECTION_TITLES`. Used for the
+ *  empty-section hint so it names sections the way the page and the report do, never by key. */
+const SECTION_TITLES: Record<string, string> = {
+  business: "The business",
+  advantage: "Where the advantage sits",
+  constraint: "What is holding it back",
+  actions: "What to do about it",
+  value: "What that is worth",
+  appendix: "Technical appendix",
+};
+
+/** "The business and What that is worth" — an English list, not a JSON array at a human. */
+function listSections(keys: string[]): string {
+  const names = keys.map((k) => SECTION_TITLES[k] ?? k);
+  if (names.length <= 1) return names.join("");
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+}
+
+/** Where the last action's message goes: beside the button that caused it (GRS-0230 scope 1). */
+type Feedback = { action: "save" | "download" | "share"; kind: "ok" | "error"; message: string };
+
+function Feedback({ for: action, from }: { for: Feedback["action"]; from: Feedback | null }) {
+  if (!from || from.action !== action) return null;
+  return (
+    <p
+      role={from.kind === "error" ? "alert" : "status"}
+      className={from.kind === "error" ? "callout callout-error" : "callout"}
+      style={{ marginTop: "0.6rem" }}
+      data-testid={`feedback-${action}`}
+    >
+      {from.message}
+    </p>
+  );
+}
+
+/** The figures this section may state, and a one-click way to use one. */
+function FigurePalette({
+  figures,
+  onInsert,
+}: {
+  figures: DeclaredFigure[];
+  onInsert: (rendered: string) => void;
+}) {
+  if (figures.length === 0) {
+    // Silence here is what made the gate a dead end, so say why there is nothing rather than
+    // rendering an empty strip.
+    return (
+      <p className="figure-palette-empty">
+        This section quotes no figures from the run, so any number in it will be refused. Prices
+        come from the value bridge on the deliverable, not from this editor.
+      </p>
+    );
+  }
+  return (
+    <div className="figure-palette">
+      <span className="figure-palette-label">Figures you can quote here:</span>
+      {figures.map((f) => (
+        <button
+          key={f.key}
+          type="button"
+          className="figure-chip"
+          onClick={() => onInsert(f.rendered)}
+          title={`${f.label} — from ${f.source}`}
+        >
+          <span className="figure-chip-value">{f.rendered}</span>
+          <span className="figure-chip-label">{f.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
 
 /** What each section is for, in the advisor's words — the page teaches the shape of the argument. */
 const SECTION_GUIDANCE: Record<string, string> = {
@@ -64,6 +141,14 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
   const [recipient, setRecipient] = useState("");
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [figures, setFigures] = useState<Record<string, DeclaredFigure[]>>({});
+
+  // Which sections have no words in them. Drives the Create-link hint, so the reason a control is
+  // disabled comes from the same data the server will refuse on.
+  const unwritten = SECTION_ORDER.filter(
+    (kind) => !(sections?.[kind]?.body ?? []).some((p) => p && p.trim()),
+  );
   const [busy, setBusy] = useState(false);
 
   const refreshLinks = useCallback(
@@ -91,7 +176,11 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
     const ctrl = new AbortController();
     api
       .getReportProse(id, ctrl.signal)
-      .then((body) => setSections(body.sections))
+      .then((body) => {
+        setSections(body.sections);
+        // The vocabulary the gate accepts, shown BEFORE it teaches by refusal.
+        setFigures(body.available_figures ?? {});
+      })
       .then(() => refreshLinks(ctrl.signal))
       .catch((err: unknown) => {
         if (err instanceof ApiError && err.status === 0 && err.aborted) return;
@@ -100,6 +189,25 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
       });
     return () => ctrl.abort();
   }, [id, router, refreshLinks]);
+
+  /** Append a declared figure to a section's prose (GRS-0230 scope 3).
+
+   *  Appended to the last paragraph rather than inserted at the caret: a controlled textarea does
+   *  not expose a caret position to this component without a ref per section, and the advisor is
+   *  going to write a sentence around the number either way. Getting the digits exactly right is
+   *  the part that matters, because the gate compares strings.
+   */
+  const appendToBody = useCallback((kind: string, rendered: string) => {
+    setSections((current) => {
+      if (!current) return current;
+      const existing = current[kind];
+      if (!existing) return current;  // a section the six-key shape does not have
+      const body = [...(existing.body ?? [])];
+      const last = body.length > 0 ? body.length - 1 : 0;
+      body[last] = body[last] ? `${body[last]} ${rendered}` : rendered;
+      return { ...current, [kind]: { ...existing, body } };
+    });
+  }, []);
 
   const setBody = (kind: string, text: string) => {
     setSections((current) => {
@@ -121,8 +229,11 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
     try {
       await api.saveReportProse(id, sections);
       setStatus("Saved.");
+      setFeedback({ action: "save", kind: "ok", message: "Saved." });
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Could not save.");
+      const message = err instanceof ApiError ? err.message : "Could not save.";
+      setError(message);
+      setFeedback({ action: "save", kind: "error", message });
     } finally {
       setBusy(false);
     }
@@ -136,10 +247,13 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
       const { blob, filename } = await api.downloadClientReportPdf(id);
       triggerBlobDownload(blob, filename);
       setStatus("PDF downloaded.");
+      setFeedback({ action: "download", kind: "ok", message: "PDF downloaded." });
     } catch (err) {
       // A 409 here is the content model refusing an unfinished report. Its sentence names the
       // missing sections, so it is shown as-is rather than replaced with "something went wrong".
-      setError(err instanceof ApiError ? err.message : "Could not render the PDF.");
+      const message = err instanceof ApiError ? err.message : "Could not render the PDF.";
+      setError(message);
+      setFeedback({ action: "download", kind: "error", message });
     } finally {
       setBusy(false);
     }
@@ -156,7 +270,9 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
       setRecipient("");
       await refreshLinks();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Could not create a link.");
+      const message = err instanceof ApiError ? err.message : "Could not create a link.";
+      setError(message);
+      setFeedback({ action: "share", kind: "error", message });
     } finally {
       setBusy(false);
     }
@@ -255,11 +371,26 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
               style={{ width: "100%" }}
               placeholder="Blank lines separate paragraphs."
             />
+            {/* GRS-0230 scope 3. The gate refuses any number the run does not declare, and the
+                editor used to show none of them — so the section titled "What that is worth" could
+                not state what anything was worth, with no way out but guessing. These are the same
+                figures the assembler uses, so what is offered and what is accepted cannot differ.
+                Clicking one appends it, because the alternative is retyping a number by hand into a
+                field that refuses mistyped numbers. */}
+            <FigurePalette
+              figures={figures[kind] ?? []}
+              onInsert={(rendered) => appendToBody(kind, rendered)}
+            />
           </div>
         ))}
         <button type="button" className="btn btn-primary" onClick={save} disabled={busy}>
           {busy ? "Working…" : "Save"}
         </button>
+        {/* GRS-0230 scope 1. The tester clicked Save, saw nothing, and only found the message by
+            scrolling to the top of the page. Feedback belongs where the click happened; the
+            top-of-page strip stays as well, because a long form can scroll the button off screen
+            too. */}
+        <Feedback for="save" from={feedback} />
       </section>
 
       <section aria-labelledby="render-h" style={{ marginTop: "2.5rem" }}>
@@ -273,6 +404,7 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
         <button type="button" className="btn" onClick={download} disabled={busy}>
           Download the PDF
         </button>
+        <Feedback for="download" from={feedback} />
         <button
           type="button"
           className="btn"
@@ -310,11 +442,20 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
               type="button"
               className="btn btn-primary"
               onClick={share}
-              disabled={busy || !recipient.trim()}
+              disabled={busy || !recipient.trim() || unwritten.length > 0}
             >
               Create link
             </button>
           </div>
+          {/* GRS-0230 scope 5. The button used to sit inert with no reason. Naming the empty
+              sections turns a dead control into an instruction. */}
+          {unwritten.length > 0 ? (
+            <p className="hint" data-testid="create-link-hint">
+              Write and save all six sections first — {listSections(unwritten)}{" "}
+              {unwritten.length === 1 ? "is" : "are"} still empty.
+            </p>
+          ) : null}
+          <Feedback for="share" from={feedback} />
         </div>
 
         {issued ? (

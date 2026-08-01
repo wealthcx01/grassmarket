@@ -66,3 +66,48 @@ Reviewed live on staging 31/07/2026, writing a real report end to end on
 The founder writes a value section that cites a run figure without leaving the page or meeting a
 class name, and when they get something wrong the page tells them, next to the button they pressed,
 in a sentence they could read aloud to a client.
+
+
+**DONE.** All five scopes.
+
+## What shipped
+
+**1 — Feedback lands where the action happened.** Save, Download and Create-link each render their
+own confirmation or refusal directly beneath the button pressed. The top-of-page strip stays too: a
+long form can scroll a button off screen just as easily as it scrolled the strip away.
+
+**2 — The refusal, rewritten, in one place.** `undeclared_figure_message()` lives in the contract
+beside the rule it explains. It says what is wrong, why the rule exists, and what to do:
+
+> What that is worth mentions £3.4m, but that number is not among the figures this assessment
+> produced. Every number in a client report has to trace back to the scoring run, so the client can
+> check it. Use one of the figures listed beside this section, or take the number out of the
+> sentence.
+
+No key, no class name, no bracketed repr. **`SECTION_TITLES` moved into the contract** while doing
+it — the reader-facing names were already duplicated between the PDF renderer and the web page, and
+this message needed a third copy. Three copies of a name is exactly the drift GRS-0228 was, red on
+main for nine days. There is a test asserting the sentence leaks no internal vocabulary.
+
+**3 — The declared figures are visible.** Each section shows the figures the run makes available as
+chips (value, label, source on hover); clicking one appends it to the prose so the digits are exact,
+since the gate compares strings. They come from `figures_available_to()`, which is the *same*
+`_figures_for` the assembler uses — so what the editor offers and what the gate accepts cannot
+disagree.
+
+**4 — Where prices come from, stated.** A section with no quotable figures no longer sits silent: it
+says any number in it will be refused, and that prices come from the value bridge on the deliverable
+rather than from this editor. That is the honest answer under ADR-0002 — score-points and currency
+never mix in one equation, so an advisor cannot mint a price here. **The gate is not weakened**:
+prose numbers still trace to the run or they refuse.
+
+**5 — The disabled Create-link button explains itself**, naming the empty sections by their
+on-screen titles: "Write and save all six sections first — The business and Technical appendix are
+still empty."
+
+## Test fallout
+
+Three existing tests asserted the old refusal string. The rule is unchanged; each assertion moved to
+the sentence an advisor now reads, and the wiring test gained leak checks — it now asserts the detail
+names a reader-facing title and contains no raw section key, checked against the contract's own map
+rather than a guessed title.

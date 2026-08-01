@@ -1260,6 +1260,14 @@ export interface RatingRequestSummary {
 // --- The client report (GRS-0211/0219/0220) ---------------------------------------------------
 
 /** One section of the advisor's report prose, as stored and edited. */
+/** One figure the run declares, which a section is allowed to state (GRS-0230). */
+export type DeclaredFigure = {
+  key: string;
+  label: string;
+  rendered: string;
+  source: string;
+};
+
 export type ReportProseSection = {
   heading: string;
   body: string[];

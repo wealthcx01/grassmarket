@@ -756,6 +756,57 @@ body:has(.acting-as-banner) header {
   top: 2.25rem;
 }
 
+/* GRS-0230 — the figure palette in the report editor.
+
+   The gate refuses any number the run does not declare, and the editor used to show none of them,
+   so the section titled "What that is worth" could not state what anything was worth. These chips
+   are the way out: the vocabulary, visible before the gate teaches it by refusal. */
+.figure-palette {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+.figure-palette-label {
+  font-size: 0.78rem;
+  color: var(--color-ink-muted);
+  margin-right: 0.2rem;
+}
+.figure-palette-empty {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--color-ink-muted);
+}
+.figure-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  background: var(--color-accent-tint);
+  border: 1px solid var(--color-accent-tint-border);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.figure-chip:hover {
+  border-color: var(--color-accent);
+}
+.figure-chip-value {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+.figure-chip-label {
+  color: var(--color-ink-muted);
+}
+/* The reason a disabled control is disabled (GRS-0230 scope 5). */
+.hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  color: var(--color-ink-muted);
+}
+
 /* GRS-0208 — the act-as picker. Anchored under the account menu it was opened from, because a
    dialog that appears in the middle of the screen loses its connection to the thing that summoned
    it. Constrained height with its own scroll: the list is however many advisors exist. */

@@ -67,6 +67,16 @@ def _pct(value: float | None) -> str | None:
     return f"{value * 100:.0f}%"
 
 
+def figures_available_to(context: DeliverableContext) -> dict[str, list[DeclaredFigure]]:
+    """Every figure the run makes available, per section (GRS-0230 scope 3).
+
+    The editor shows these so an advisor knows the vocabulary BEFORE the gate teaches it to them by
+    refusal. Nothing new is computed — this is the same `_figures_for` the assembler uses, exposed
+    rather than recalculated, so what the editor offers and what the gate accepts cannot disagree.
+    """
+    return {kind.value: _figures_for(kind, context) for kind in ReportSectionKind}
+
+
 def _figures_for(kind: ReportSectionKind, context: DeliverableContext) -> list[DeclaredFigure]:
     """The figures a section is allowed to cite, read straight off the run.
 

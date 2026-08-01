@@ -145,7 +145,9 @@ class TestProseIsCheckedAgainstTheRun:
         self, context: DeliverableContext
     ) -> None:
         # The failure this whole mechanism exists for: a plausible number nobody can trace.
-        with pytest.raises(ValidationError, match="without declaring it"):
+        # GRS-0230 rewrote the refusal into the product voice. The RULE is unchanged; the
+        # match moved to the sentence an advisor now reads.
+        with pytest.raises(ValidationError, match="not among the figures"):
             build_client_report(
                 context,
                 scoring_run_id=RUN_ID,

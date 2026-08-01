@@ -21,12 +21,16 @@ from io import BytesIO
 from uuid import UUID
 
 from bcap_contracts.assessments import RecordProvenance
-from bcap_contracts.client_report import UnapprovedReportSectionError, assert_client_ready
+from bcap_contracts.client_report import (
+    DeclaredFigure,
+    UnapprovedReportSectionError,
+    assert_client_ready,
+)
 from bcap_contracts.deliverables import Deliverable, DeliverableMode
 from bcap_contracts.narratives import NarrativeStatus
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, Field, ValidationError
 
 from grassmarket.atlas import AssessmentInputs
 from grassmarket.atlas.active import active_uncertainty_model, profile_key_of
@@ -39,6 +43,7 @@ from grassmarket.data.repository import (
     ScopeViolationError,
 )
 from grassmarket.deliverables.builder import DeliverableContext
+from grassmarket.deliverables.client_report import figures_available_to
 from grassmarket.deliverables.client_report_service import (
     AssembledReport,
     ReportNotAssembledError,
@@ -65,6 +70,10 @@ class ReportProseResponse(BaseModel):
 
     sections: dict
     written: bool
+    # The figures the run declares, per section key (GRS-0230 scope 3). Sent with the prose rather
+    # than from a second endpoint because they are read together every time, and a separate call
+    # would give the editor a window where it knows the words but not the vocabulary.
+    available_figures: dict[str, list[DeclaredFigure]] = Field(default_factory=dict)
 
 
 class SaveReportProseRequest(BaseModel):
@@ -211,12 +220,24 @@ def get_report_prose(
 ) -> ReportProseResponse:
     try:
         stored = repo.get_report_prose(principal, deliverable_id)
+        # The vocabulary the gate will accept. Best-effort: a deliverable with no finalised run
+        # cannot produce figures, and that is a legitimate state for a report nobody has scored yet
+        # — it must not stop the editor loading, or an advisor could not even see the shape.
+        try:
+            context, _, _, _ = _context(repo, principal, deliverable_id)
+            available = figures_available_to(context)
+        except HTTPException:
+            available = {}
     except (NotFoundError, ScopeViolationError) as exc:
         raise _not_found() from exc
     if stored is None:
         # An empty draft, so the advisor sees the shape of the argument rather than a blank page.
-        return ReportProseResponse(sections=default_prose(), written=False)
-    return ReportProseResponse(sections=json.loads(stored), written=True)
+        return ReportProseResponse(
+            sections=default_prose(), written=False, available_figures=available
+        )
+    return ReportProseResponse(
+        sections=json.loads(stored), written=True, available_figures=available
+    )
 
 
 @router.put("/deliverables/{deliverable_id}/report-prose", response_model=ReportProseResponse)

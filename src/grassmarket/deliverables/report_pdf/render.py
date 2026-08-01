@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from datetime import date
 from io import BytesIO
 
+from bcap_contracts.client_report import SECTION_TITLES as CONTRACT_SECTION_TITLES
 from bcap_contracts.client_report import ClientReport, ReportSection, ReportSectionKind
 from bcap_contracts.deliverables import DeliverableMode
 from reportlab.lib.colors import Color
@@ -49,14 +50,9 @@ WORDMARK = "BRUNTSFIELD"
 WORDMARK_SUB = "ADVISORY NETWORK"
 
 #: Reader-facing section titles. The content model carries kinds; a client sees words.
-SECTION_TITLES: dict[ReportSectionKind, str] = {
-    ReportSectionKind.BUSINESS: "The business",
-    ReportSectionKind.ADVANTAGE: "Where the advantage sits",
-    ReportSectionKind.CONSTRAINT: "What is holding it back",
-    ReportSectionKind.ACTIONS: "What to do about it",
-    ReportSectionKind.VALUE: "What that is worth",
-    ReportSectionKind.APPENDIX: "Technical appendix",
-}
+# Re-exported from the contract, which is where the reader-facing names now live (GRS-0230). Kept
+# as a module-level name so existing imports from here keep working.
+SECTION_TITLES = CONTRACT_SECTION_TITLES
 
 
 @dataclass(frozen=True)
