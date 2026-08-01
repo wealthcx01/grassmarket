@@ -48,6 +48,17 @@ const SECTION_TITLES: Record<string, string> = {
   appendix: "Technical appendix",
 };
 
+/** Operating-model keys are stored; a reader should not have to decode one. */
+function humanModel(key: string): string {
+  return (
+    {
+      retail_brokerage: "Retail brokerage",
+      wealth: "Wealth",
+      exchange: "Exchange",
+    }[key] ?? key.replace(/_/g, " ")
+  );
+}
+
 /** "The business and What that is worth" — an English list, not a JSON array at a human. */
 function listSections(keys: string[]): string {
   const names = keys.map((k) => SECTION_TITLES[k] ?? k);
@@ -143,6 +154,16 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
   const [error, setError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [figures, setFigures] = useState<Record<string, DeclaredFigure[]>>({});
+  // GRS-0231. Two report editors were pixel-identical and titled "What the client reads"; the only
+  // place the firm's name existed was the URL. An advisor with two engagements open in two tabs
+  // would eventually write one client's constraint into the other's report, and nothing on the page
+  // could catch it.
+  const [identity, setIdentity] = useState<{
+    subject: string | null;
+    engagement_title: string | null;
+    provenance: string | null;
+    operating_model: string | null;
+  }>({ subject: null, engagement_title: null, provenance: null, operating_model: null });
 
   // Which sections have no words in them. Drives the Create-link hint, so the reason a control is
   // disabled comes from the same data the server will refuse on.
@@ -180,6 +201,12 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
         setSections(body.sections);
         // The vocabulary the gate accepts, shown BEFORE it teaches by refusal.
         setFigures(body.available_figures ?? {});
+        setIdentity({
+          subject: body.subject ?? null,
+          engagement_title: body.engagement_title ?? null,
+          provenance: body.provenance ?? null,
+          operating_model: body.operating_model ?? null,
+        });
       })
       .then(() => refreshLinks(ctrl.signal))
       .catch((err: unknown) => {
@@ -208,6 +235,17 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
       return { ...current, [kind]: { ...existing, body } };
     });
   }, []);
+
+  // GRS-0231 scope 2. Two open editors were indistinguishable in the tab strip, which is where an
+  // advisor actually switches between them.
+  useEffect(() => {
+    if (!identity.subject) return;
+    const previous = document.title;
+    document.title = `Client report — ${identity.subject}`;
+    return () => {
+      document.title = previous;
+    };
+  }, [identity.subject]);
 
   const setBody = (kind: string, text: string) => {
     setSections((current) => {
@@ -246,8 +284,13 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
     try {
       const { blob, filename } = await api.downloadClientReportPdf(id);
       triggerBlobDownload(blob, filename);
-      setStatus("PDF downloaded.");
-      setFeedback({ action: "download", kind: "ok", message: "PDF downloaded." });
+      // Names the client: one more chance to catch a cross-client mistake at the moment of export,
+      // which is the last point at which catching it is free.
+      const confirmation = identity.subject
+        ? `PDF downloaded — ${identity.subject}.`
+        : "PDF downloaded.";
+      setStatus(confirmation);
+      setFeedback({ action: "download", kind: "ok", message: confirmation });
     } catch (err) {
       // A 409 here is the content model refusing an unfinished report. Its sentence names the
       // missing sections, so it is shown as-is rather than replaced with "something went wrong".
@@ -326,7 +369,21 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
   return (
     <main style={{ maxWidth: "var(--content-max)", margin: "0 auto", padding: "2rem 1.25rem 4rem" }}>
       <p className="eyebrow">Client report</p>
-      <h1 style={{ fontSize: "2rem", margin: "0.3rem 0 0.4rem" }}>What the client reads</h1>
+      {/* The client's name IS the heading. "What the client reads" described the page and named
+          nobody, which is the whole defect: on a surface where the same words become a branded PDF
+          and a public link, whose words these are is the context that matters most. */}
+      <h1 style={{ fontSize: "2rem", margin: "0.3rem 0 0.4rem" }} data-testid="report-subject">
+        {identity.subject ?? "Client report"}
+      </h1>
+      <div className="report-identity" data-testid="report-identity">
+        {identity.engagement_title ? <span>{identity.engagement_title}</span> : null}
+        {identity.operating_model ? (
+          <span className="badge">{humanModel(identity.operating_model)}</span>
+        ) : null}
+        {identity.provenance && identity.provenance !== "production" ? (
+          <span className="badge badge-warn">{identity.provenance.toUpperCase()}</span>
+        ) : null}
+      </div>
       <p style={{ margin: "0 0 1.5rem", color: "var(--color-ink-muted)", maxWidth: "42rem" }}>
         Six sections, in the order a client reads them: the business first, the score never on its
         own. The same words become the branded PDF and the shared web page, so the two cannot
@@ -351,8 +408,12 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
         </h2>
         {SECTION_ORDER.map((kind) => (
           <div key={kind} style={{ marginBottom: "1.25rem" }}>
-            <label htmlFor={`s-${kind}`} style={{ display: "block", fontWeight: 500 }}>
-              {sections[kind]?.heading ?? kind}
+            <label
+              id={`l-${kind}`}
+              htmlFor={`s-${kind}`}
+              style={{ display: "block", fontWeight: 500 }}
+            >
+              {sections[kind]?.heading ?? SECTION_TITLES[kind] ?? kind}
             </label>
             <p
               style={{
@@ -365,6 +426,10 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
             </p>
             <textarea
               id={`s-${kind}`}
+              /* GRS-0231 scope 3. All six shared one accessible name — the placeholder — so a
+                 screen-reader user could not tell the Business section from the Appendix. The
+                 visible label is the accessible name now; the placeholder is only a hint. */
+              aria-labelledby={`l-${kind}`}
               value={(sections[kind]?.body ?? []).join("\n\n")}
               onChange={(e) => setBody(kind, e.target.value)}
               rows={4}

@@ -923,6 +923,11 @@ export const api = {
     written: boolean;
     /** Per section key: the figures the run declares (GRS-0230 scope 3). */
     available_figures?: Record<string, DeclaredFigure[]>;
+    /** Whose report this is (GRS-0231) — the identity the PDF cover prints. */
+    subject?: string | null;
+    engagement_title?: string | null;
+    provenance?: string | null;
+    operating_model?: string | null;
   }> {
     return request(`/deliverables/${deliverableId}/report-prose`, {
       method: "GET",
@@ -940,6 +945,11 @@ export const api = {
     written: boolean;
     /** Per section key: the figures the run declares (GRS-0230 scope 3). */
     available_figures?: Record<string, DeclaredFigure[]>;
+    /** Whose report this is (GRS-0231) — the identity the PDF cover prints. */
+    subject?: string | null;
+    engagement_title?: string | null;
+    provenance?: string | null;
+    operating_model?: string | null;
   }> {
     return request(`/deliverables/${deliverableId}/report-prose`, {
       method: "PUT",
