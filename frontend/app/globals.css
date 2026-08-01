@@ -805,6 +805,8 @@ body:has(.acting-as-banner) header {
   margin: 0.5rem 0 0;
   font-size: 0.82rem;
   color: var(--color-ink-muted);
+}
+
 /* GRS-0208 — the act-as picker. Anchored under the account menu it was opened from, because a
    dialog that appears in the middle of the screen loses its connection to the thing that summoned
    it. Constrained height with its own scroll: the list is however many advisors exist. */
