@@ -11,6 +11,7 @@
 
 import type {
   ClientReportLink,
+  DeclaredFigure,
   ReportProseSection,
   ReportReadReport,
   FounderApproval,
@@ -912,7 +913,12 @@ export const api = {
   getReportProse(
     deliverableId: string,
     signal?: AbortSignal,
-  ): Promise<{ sections: Record<string, ReportProseSection>; written: boolean }> {
+  ): Promise<{
+    sections: Record<string, ReportProseSection>;
+    written: boolean;
+    /** Per section key: the figures the run declares (GRS-0230 scope 3). */
+    available_figures?: Record<string, DeclaredFigure[]>;
+  }> {
     return request(`/deliverables/${deliverableId}/report-prose`, {
       method: "GET",
       headers: authHeaders(),
@@ -924,7 +930,12 @@ export const api = {
     deliverableId: string,
     sections: Record<string, ReportProseSection>,
     signal?: AbortSignal,
-  ): Promise<{ sections: Record<string, ReportProseSection>; written: boolean }> {
+  ): Promise<{
+    sections: Record<string, ReportProseSection>;
+    written: boolean;
+    /** Per section key: the figures the run declares (GRS-0230 scope 3). */
+    available_figures?: Record<string, DeclaredFigure[]>;
+  }> {
     return request(`/deliverables/${deliverableId}/report-prose`, {
       method: "PUT",
       headers: { ...authHeaders(), "Content-Type": "application/json" },

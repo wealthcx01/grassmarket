@@ -135,6 +135,42 @@ class DeclaredFigure(BaseModel):
     )
 
 
+#: The names a READER sees, per section. Lives here, in the contract, because three renditions need
+#: them — the PDF, the public web page, and the refusal message an advisor reads when a number is
+#: undeclared — and a name authored in three places drifts. That is not a hypothetical: GRS-0228 was
+#: a message asserted in two places and authored in a third, red on main for nine days.
+SECTION_TITLES: dict[ReportSectionKind, str] = {
+    ReportSectionKind.BUSINESS: "The business",
+    ReportSectionKind.ADVANTAGE: "Where the advantage sits",
+    ReportSectionKind.CONSTRAINT: "What is holding it back",
+    ReportSectionKind.ACTIONS: "What to do about it",
+    ReportSectionKind.VALUE: "What that is worth",
+    ReportSectionKind.APPENDIX: "Technical appendix",
+}
+
+
+def undeclared_figure_message(kind: ReportSectionKind, numbers: list[str]) -> str:
+    """The sentence an advisor reads when their prose states a number the run does not declare.
+
+    In the product voice, and in ONE place, because both the API and the editor show it. What it
+    replaced named the section by its internal key and the rule by its class name
+    (`section 'value' states ['£3.4m'] ... must be a DeclaredFigure`) — the exact leak GRS-0163
+    existed to stop.
+
+    It says three things, in this order: what is wrong, why the rule exists, and what to do. The
+    middle one matters most: an advisor who understands that a client will trace the number stops
+    experiencing the gate as an obstacle.
+    """
+    quoted = ", ".join(sorted(set(numbers)))
+    plural = "those numbers are" if len(set(numbers)) > 1 else "that number is"
+    return (
+        f"{SECTION_TITLES[kind]} mentions {quoted}, but {plural} not among the figures this "
+        f"assessment produced. Every number in a client report has to trace back to the scoring "
+        f"run, so the client can check it. Use one of the figures listed beside this section, or "
+        f"take the number out of the sentence."
+    )
+
+
 class ReportSection(BaseModel):
     """One section of the report: prose, the figures that prose is allowed to cite, and its gate."""
 
@@ -199,10 +235,7 @@ class ReportSection(BaseModel):
                     continue
                 undeclared.append(match.strip())
         if undeclared:
-            raise ValueError(
-                f"section '{self.kind}' states {sorted(set(undeclared))} without declaring it. "
-                "Every number in prose must be a DeclaredFigure so it can be traced to the run."
-            )
+            raise ValueError(undeclared_figure_message(self.kind, undeclared))
         return self
 
     @model_validator(mode="after")

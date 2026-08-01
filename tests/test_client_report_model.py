@@ -23,6 +23,7 @@ from bcap_contracts.client_report import (
     ReportTier,
     UnapprovedReportSectionError,
     assert_client_ready,
+    undeclared_figure_message,
 )
 from pydantic import ValidationError
 
@@ -129,7 +130,9 @@ class TestEveryFigureIsDeclared:
     """Rule 3. An undeclared number is a build failure, not a proofreading problem."""
 
     def test_an_undeclared_number_is_refused(self) -> None:
-        with pytest.raises(ValidationError, match="without declaring it"):
+        # GRS-0230 rewrote this refusal into the product voice; the RULE is unchanged, so the
+        # match moved to the sentence a reader now sees rather than the old internal one.
+        with pytest.raises(ValidationError, match="not among the figures"):
             _section(
                 ReportSectionKind.CONSTRAINT,
                 body=["Coverage reached 61% before the assessment was finalised."],
@@ -225,3 +228,47 @@ class TestTiering:
     def test_sections_are_engaged_by_default(self) -> None:
         # Defaulting to the paid tier means a new section cannot leak by omission.
         assert _section(ReportSectionKind.VALUE).tier is ReportTier.ENGAGED
+
+
+class TestTheUndeclaredFigureMessage:
+    """GRS-0230 scope 2. The refusal an advisor reads when a number is not in the run.
+
+    What it replaced named the section by its internal key and the rule by its class name —
+    `section 'value' states ['£3.4m'] ... must be a DeclaredFigure` — which is precisely the leak
+    GRS-0163 existed to stop. It lives in ONE place because both the API and the editor show it, and
+    a message authored in two places drifts (GRS-0228, red on main for nine days).
+    """
+
+    def test_it_names_the_section_a_reader_sees(self) -> None:
+        message = undeclared_figure_message(ReportSectionKind.VALUE, ["£3.4m"])
+        assert "What that is worth" in message
+        assert "'value'" not in message
+
+    def test_it_leaks_no_internal_vocabulary(self) -> None:
+        message = undeclared_figure_message(ReportSectionKind.CONSTRAINT, ["12"])
+        for leak in ("DeclaredFigure", "ReportSection", "[", "]", "kind="):
+            assert leak not in message, f"the refusal leaks {leak!r} at an advisor"
+
+    def test_it_says_what_to_do(self) -> None:
+        # A refusal that only refuses is the dead end the ticket is about.
+        message = undeclared_figure_message(ReportSectionKind.VALUE, ["£3.4m"])
+        assert "Use one of the figures" in message
+        assert "take the number out" in message
+
+    def test_it_reads_naturally_for_one_number_and_for_several(self) -> None:
+        one = undeclared_figure_message(ReportSectionKind.VALUE, ["£3.4m"])
+        many = undeclared_figure_message(ReportSectionKind.VALUE, ["£3.4m", "12%"])
+        assert "that number is not" in one
+        assert "those numbers are not" in many
+
+    def test_the_validator_uses_it(self) -> None:
+        """The message and the gate cannot drift apart, because there is only one of it."""
+        with pytest.raises(ValidationError) as exc:
+            ReportSection(
+                kind=ReportSectionKind.VALUE,
+                heading="What that is worth",
+                body=["The lever is worth £3.4m."],
+                figures=(),
+            )
+        assert "What that is worth" in str(exc.value)
+        assert "DeclaredFigure" not in str(exc.value)

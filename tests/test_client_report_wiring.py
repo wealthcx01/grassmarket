@@ -15,7 +15,7 @@ import io
 
 import pypdf
 import pytest
-from bcap_contracts.client_report import SECTION_ORDER
+from bcap_contracts.client_report import SECTION_ORDER, SECTION_TITLES
 
 from grassmarket.deliverables.gate import DRAFT_WATERMARK
 from tests.client_report_helpers import deliverable_with_run, written_prose
@@ -157,7 +157,15 @@ class TestTheDownloadableReport:
         )
         assert response.status_code == 422
         detail = response.json()["detail"]
-        assert "without declaring it" in detail
+        # GRS-0230: the sentence is now in the product voice and names the section by its
+        # on-screen title. The assertions widen accordingly — and gain the leak checks, because the
+        # whole point of the rewrite was that an advisor should never see an internal name.
+        assert "not among the figures" in detail
+        # Named by a title a reader sees, and by no raw section key. Asserted against the contract's
+        # own map rather than a guessed title, so this keeps working if the fixture's section moves.
+        assert any(title in detail for title in SECTION_TITLES.values())
+        assert not any(f"'{kind.value}'" in detail for kind in SECTION_TITLES)
+        assert "DeclaredFigure" not in detail
         assert "Value error" not in detail, "pydantic's wrapping should not reach the advisor"
 
     def test_an_internal_draft_downloads_watermarked(
