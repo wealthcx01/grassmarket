@@ -305,6 +305,54 @@ def showcase_document(spec: BrokerageSpec) -> AssessmentDocument:
     )
 
 
+def _backfill_report_prose(client, headers: dict[str, str], spec: BrokerageSpec) -> int:
+    """Write the worked example report onto an ALREADY-seeded brokerage's deliverables (GRS-0236).
+
+    Returns how many were written. Only touches deliverables that have no prose, so re-running is
+    quiet and an advisor's own edits to a demo report are never overwritten — the seed's job is to
+    make sure an example EXISTS, not to own its words forever.
+
+    Reads through the API like the rest of this module rather than the ORM, so it obeys the same
+    scoping the product does.
+    """
+    prose = SHOWCASE_PROSE.get(spec.subject)
+    if prose is None:
+        return 0
+    engagements = client.get("/engagements", headers=headers)
+    if engagements.status_code != 200:
+        return 0
+    written = 0
+    for engagement in engagements.json():
+        if not engagement.get("title", "").startswith(spec.subject):
+            continue
+        listed = client.get(f"/engagements/{engagement['id']}/deliverables", headers=headers)
+        if listed.status_code != 200:
+            continue
+        for deliverable in listed.json():
+            existing = client.get(
+                f"/deliverables/{deliverable['id']}/report-prose", headers=headers
+            )
+            # The editor returns the empty SHAPE for an unwritten report, so "has prose" means a
+            # section with words in it rather than a 200.
+            if existing.status_code == 200:
+                sections = existing.json().get("sections")
+                bodies = (
+                    [s.get("body") for s in sections.values()]
+                    if isinstance(sections, dict)
+                    else [s.get("body") for s in (sections or [])]
+                )
+                if any(b for b in bodies if b):
+                    continue
+            put = client.put(
+                f"/deliverables/{deliverable['id']}/report-prose",
+                json={"sections": prose},
+                headers=headers,
+            )
+            if put.status_code == 200:
+                written += 1
+    return written
+
+
 def seed_brokerage_showcase(
     session_factory, engine, settings, *, owner_email: str
 ) -> list[dict[str, str]]:
@@ -382,7 +430,22 @@ def seed_brokerage_showcase(
 
     for spec in SHOWCASE:
         if spec.subject in seeded_subjects:
-            results.append({"subject": spec.subject, "status": "exists (skipped)"})
+            # Skip CREATION, not the example report. Running this on staging (GRS-0236 scope 4)
+            # showed the hole: the skip fired before the prose write, so an environment seeded
+            # before the prose fix kept its demo reports refusing forever — the founder's original
+            # complaint surviving the fix, in exactly the environments they look at. The prose
+            # write is an upsert, so backfilling an already-seeded subject is safe and idempotent.
+            backfilled = _backfill_report_prose(client, headers, spec)
+            results.append(
+                {
+                    "subject": spec.subject,
+                    "status": (
+                        f"exists (skipped; {backfilled} example report(s) written)"
+                        if backfilled
+                        else "exists (skipped)"
+                    ),
+                }
+            )
             continue
 
         # 2) Pipeline: reuse the prospect if a previous partial run created it; advance only the
