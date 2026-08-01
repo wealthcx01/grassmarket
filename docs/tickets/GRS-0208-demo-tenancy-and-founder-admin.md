@@ -149,3 +149,24 @@ not closed business, and inventing sales would put money-shaped numbers behind c
 
 Note that scope 1 and scope 4 now also gate the **production showcase seed** — see the production
 seeding note on GRS-0236.
+
+## The act-as starter, added 2026-08-01
+
+The mechanism shipped without a way to begin: the API, the narrowing, the audit and the exit banner
+all existed, and starting a session needed an API call. **A capability an admin cannot reach from
+the browser is a capability they do not have**, so this was the missing half rather than a nicety.
+
+- **`GET /auth/act-as/candidates`** — admin only, excludes the caller (acting as yourself is refused
+  anyway, so offering it would be a choice the gate then rejects) and excludes inactive accounts.
+  Named for its one purpose rather than as a general directory: a consultant roster is not something
+  anyone asked for on a product whose scoping discipline is that advisors do not see each other.
+- **The picker lives in the account menu**, because acting as someone is a change to who you are for
+  the next few minutes, and that is where a person looks to see and change who they are signed in as.
+- **It names the consequence before it happens** — the session is recorded against their account and
+  yours. The banner says it again once the session starts. Saying it twice is cheap; the surprise of
+  discovering it later is not.
+
+One routing detail worth keeping: `/act-as/candidates` is declared **before** `/act-as/{consultant_id}`
+so the literal path wins the match. Without that ordering "candidates" is parsed as a UUID and every
+request 422s — a routing bug that presents as a permissions bug. There is a test for it.
+

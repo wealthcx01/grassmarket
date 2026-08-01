@@ -2167,6 +2167,33 @@ class Repository:
         )
         self._session.flush()
 
+    def list_consultants_for_act_as(self, principal: Principal) -> list[Consultant]:
+        """Everyone an admin could act as (GRS-0208). ADMIN only.
+
+        Deliberately narrow, and named for its one purpose rather than as a general directory: it
+        exists so the act-as picker has something to show, and a general `list_consultants` would be
+        a roster endpoint nobody asked for on a product whose whole scoping discipline is that
+        advisors do not see each other.
+
+        Excludes the caller (acting as yourself is refused anyway) and inactive accounts, so the
+        picker cannot offer a choice the gate will reject.
+        """
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may list consultants to act as.")
+        rows = (
+            self._session.execute(
+                select(ConsultantORM)
+                .where(
+                    ConsultantORM.id != principal.consultant_id,
+                    ConsultantORM.is_active.is_(True),
+                )
+                .order_by(ConsultantORM.full_name)
+            )
+            .scalars()
+            .all()
+        )
+        return [self._to_stored_consultant(r).to_contract() for r in rows]
+
     # ------------------------------------------------------------------ act-as (GRS-0208)
 
     def begin_act_as(
