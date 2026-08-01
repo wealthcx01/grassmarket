@@ -34,6 +34,8 @@ from bcap_contracts.deliverables import DeliverableType
 from bcap_contracts.entities import PipelineStage
 from bcap_contracts.registry import load_registry
 
+from grassmarket.demo.showcase_reports import SHOWCASE_PROSE
+
 _E3 = EvidenceGrade.E3_ARTIFACT
 
 # The date of the staging simulation the deals reproduce — deterministic on purpose, so a re-run
@@ -450,6 +452,16 @@ def seed_brokerage_showcase(
                 f"{spec.subject}: create engagement failed {opened.status_code}: {opened.text}"
             )
         eid = opened.json()["id"]
+        prose = SHOWCASE_PROSE.get(spec.subject)
+        if prose is None:
+            # Fail loud rather than seeding a showcase whose reports refuse to render. A demo whose
+            # best output is a 409 is the exact failure GRS-0236 exists to correct, and a spec
+            # added without prose would reintroduce it silently.
+            raise ShowcaseSeedError(
+                f"{spec.subject}: no showcase report prose authored. Add it to "
+                f"`showcase_reports.SHOWCASE_PROSE` — a showcase deliverable with no prose cannot "
+                f"produce the example report the seed exists to provide."
+            )
         for dtype in _SHOWCASE_DELIVERABLES:
             generated = client.post(
                 f"/engagements/{eid}/deliverables",
@@ -460,6 +472,20 @@ def seed_brokerage_showcase(
                 raise ShowcaseSeedError(
                     f"{spec.subject}: deliverable {dtype.value} failed "
                     f"{generated.status_code}: {generated.text}"
+                )
+            # The worked example (GRS-0236). Written for EVERY showcase deliverable rather than
+            # only the Platform Power Report: a first-time user opens whichever one they land on,
+            # and finding that four of five refuse would teach them the product is broken. Upsert,
+            # so re-running the showcase refreshes the words instead of duplicating them.
+            written = client.put(
+                f"/deliverables/{generated.json()['id']}/report-prose",
+                json={"sections": prose},
+                headers=headers,
+            )
+            if written.status_code != 200:
+                raise ShowcaseSeedError(
+                    f"{spec.subject}: report prose for {dtype.value} failed "
+                    f"{written.status_code}: {written.text}"
                 )
 
         # 6) The illustrative Year-1 product commission, recorded by the admin (ADR-0026).

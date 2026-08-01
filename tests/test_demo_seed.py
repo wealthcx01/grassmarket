@@ -12,6 +12,7 @@ from uuid import UUID
 
 import pytest
 from bcap_contracts.assessments import AssessmentState, RecordProvenance
+from bcap_contracts.client_report import SECTION_ORDER
 from bcap_contracts.common import AssessorLevel, ConsultantTier, Role
 
 from grassmarket.assessments.service import scoreability_blockers
@@ -26,6 +27,7 @@ from grassmarket.demo.revolut_demo import (
     revolut_demo_document,
     seed_revolut_demo,
 )
+from grassmarket.demo.showcase_reports import SHOWCASE_PROSE
 
 
 def test_revolut_document_is_valid_and_scoreable() -> None:
@@ -447,3 +449,64 @@ def test_an_unfinalised_sandbox_record_is_deletable(session_factory, engine, set
         assert all(a.subject != "Stray Draft" for a in repo.list_assessments(principal))
     finally:
         session.close()
+
+
+def test_every_showcase_deliverable_has_a_worked_example_report(
+    session_factory, engine, settings
+) -> None:
+    """GRS-0236. The founder's complaint was "I can't seem to download example client reports", and
+    the cause was that the showcase wrote no prose at all — so every demo report sat unwritten and
+    both release paths refused with the 409 naming six empty sections.
+
+    This asserts the fix at the level the complaint was made: not that prose rows exist, but that
+    the report each deliverable produces actually ASSEMBLES. A seeded row that still fails the
+    content model would be the same broken demo with more data behind it.
+    """
+    from grassmarket.deliverables.client_report_service import assemble
+    from grassmarket.web.routers.client_report import _context
+
+    email = "showcase-reports@bruntsfieldcapital.com"
+    results = seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+    assert [r["status"] for r in results] == ["seeded"] * len(SHOWCASE)
+
+    session = session_factory()
+    try:
+        repo = Repository(session)
+        owner = repo.get_consultant_by_email(email)
+        principal = Principal(consultant_id=owner.id, role=owner.role)
+        checked = 0
+        for r in results:
+            for deliverable in repo.list_deliverables(principal, UUID(r["engagement_id"])):
+                context, _, run_id, _ = _context(repo, principal, deliverable.id)
+                sections_json = repo.get_report_prose(principal, deliverable.id)
+                assert sections_json, f"{r['subject']}: {deliverable.type} has no prose"
+                # Raises ReportNotAssembledError if a section is missing or empty, and a
+                # ValidationError if the authored prose breaks the content model's own rules —
+                # which is the point: the fixtures prove themselves compliant by construction.
+                assembled = assemble(context, scoring_run_id=run_id, sections_json=sections_json)
+                kinds = [s.kind.value for s in assembled.report.sections]
+                assert kinds == [k.value for k in SECTION_ORDER]
+                checked += 1
+        assert checked >= 15, "expected five deliverables for each of the three brokerages"
+    finally:
+        session.close()
+
+
+def test_the_showcase_prose_is_distinct_per_firm() -> None:
+    """Three variations on "a strong platform with room to improve" would tell a reader that the
+    assessment says nothing. The seed is the product's best output on display, so the reports have
+    to be about the firms they name."""
+    openings = {
+        subject: sections["business"]["body"][0]  # type: ignore[index]
+        for subject, sections in SHOWCASE_PROSE.items()
+    }
+    assert len(set(openings.values())) == len(SHOWCASE_PROSE)
+    for spec in SHOWCASE:
+        assert spec.subject in SHOWCASE_PROSE, f"{spec.subject} has no authored example report"
+
+
+def test_a_showcase_spec_without_prose_fails_loudly() -> None:
+    """A spec added later without prose would reintroduce the exact defect this ticket fixes, and
+    would do it silently — the seed would succeed and the demo would refuse. So the seed refuses
+    instead, naming what to add."""
+    assert set(SHOWCASE_PROSE) >= {spec.subject for spec in SHOWCASE}
