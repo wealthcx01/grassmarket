@@ -63,3 +63,62 @@ Grassmarket needs to be demonstrable.
 The founder logs in as john@bruntsfield.capital, switches to the demo advisor, and walks one
 client from prospect to signed deliverable to commission without changing accounts or hitting a
 gap.
+
+
+**PARTIAL.** Scope 2 — the act-as mechanism, which is the security-sensitive half — is complete.
+Scopes 1, 3 and 4 are not built and the ticket stays open.
+
+## What shipped: scope 2, act-as
+
+**The safety argument is one property, and it is what most of the tests hold up: act-as NARROWS,
+it never widens.** `begin_act_as` returns a principal that IS the subject — their id, their role,
+their founder status — with `acting_admin_id` carried alongside purely as attribution.
+`_assert_can_access` does not read that field and is unchanged, so every pre-existing scoping test
+still passes untouched (1499 green). An admin acting as an advisor is genuinely *less* privileged
+than that admin was a moment earlier, and there is no path by which acting as someone shows more
+than being them would.
+
+Enforced in the repository layer, where scoping already lives (non-negotiable #9), not in a router.
+
+**The token says who is at the keyboard.** `sub` stays the admin; a new `act_as` claim narrows the
+session. That direction was chosen deliberately — the identity that authenticated is the identity
+in `sub`, and act-as is a restriction layered on top rather than a substitution underneath. The
+principal is rebuilt per request from the subject's stored row, so a role change or a deleted
+account takes effect immediately instead of living on inside an issued token, and the admin check
+is re-run on every request rather than trusted from mint time.
+
+**Three refusals**, each for a stated reason: only an admin may start it; nobody may act as
+themselves (it would record a lie); and no chaining, because acting as A and then as B leaves the
+log ambiguous about who authorised the second hop. Worth noting how the first two interact — while
+acting as a consultant the principal is not an admin at all, so the narrowing refuses a chained hop
+before the specific guard is reached. The guard still matters for admin-acting-as-admin, and both
+paths are tested.
+
+**Recorded with both identities.** `ACT_AS_STARTED` / `ACT_AS_ENDED` carry the admin as actor and
+the subject as resource. `record_audit` gained an `acting_admin_id` that annotates rather than
+replaces the actor, because the record has to say both things: the work is the subject's, and a
+named admin did it. Dropping either half is how an audit log stops answering the question it exists
+for.
+
+**A persistent banner.** Fixed above the sticky header, naming the advisor, warning that the work is
+recorded against both accounts, with one click back. Not dismissible — and when the name cannot be
+fetched it degrades to a banner *without* a name rather than to no banner, because the dangerous
+version of this state is the invisible one.
+
+**Not issued a refresh token.** An act-as session is short-lived and non-renewable on purpose: it
+should end because the admin finished looking, not because a background refresh quietly kept it
+alive for a day.
+
+## What is NOT built
+
+- **Scope 1 — the single demo advisor holding the full worked example.** The per-advisor scatter is
+  untouched. This is a data/seed rewrite and is the natural next piece, now that act-as exists to
+  make one demo account viewable from the founder's own login.
+- **Scope 3 — `john@bruntsfield.capital` provisioned as admin via domain SSO (GRS-0173)** rather
+  than a hand-seeded row.
+- **Scope 4 — staging seeded to match, and the two production strays.** The strays (`Revolut` draft
+  at 0%, `Meridian Securities` finalised at 2%) are **explicitly a founder decision** under
+  ADR-0047, which forbids deleting production records. Not mine to make.
+
+Note that scope 1 and scope 4 now also gate the **production showcase seed** — see the production
+seeding note on GRS-0236.

@@ -68,6 +68,7 @@ def get_google_oauth_client(
 def get_current_principal(
     credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
     settings: Settings = Depends(get_app_settings),
+    repository: Repository = Depends(get_repository),
 ) -> Principal:
     """Decode the bearer token into a `Principal`. Any token problem is a 401 — never a silent
     pass to an unauthenticated request."""
@@ -91,7 +92,37 @@ def get_current_principal(
     # new claim that could be forged or go stale. Compared case-insensitively because email
     # local-part case is not identity.
     is_founder = claims.email.strip().lower() == settings.founder_reviewer_email.strip().lower()
-    return Principal(consultant_id=UUID(claims.sub), role=claims.role, is_founder=is_founder)
+    authenticated = Principal(
+        consultant_id=UUID(claims.sub), role=claims.role, is_founder=is_founder
+    )
+    if claims.act_as is None:
+        return authenticated
+
+    # An act-as token (GRS-0208). The session runs as the SUBJECT — their id, their role, their
+    # founder status — with the admin recorded for attribution. Rebuilt per request from the
+    # subject's stored row rather than from claims, so a role change or a deleted account takes
+    # effect immediately instead of living on inside an issued token.
+    #
+    # The admin check is repeated here even though `begin_act_as` made it: this runs on EVERY
+    # request, and a token minted while its holder was an admin must stop acting the moment they
+    # are not one.
+    if not authenticated.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only an admin may act as another consultant.",
+        )
+    subject = repository.get_consultant_by_id(UUID(claims.act_as))
+    if subject is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="The consultant this session was acting as no longer exists.",
+        )
+    return Principal(
+        consultant_id=subject.id,
+        role=subject.role,
+        is_founder=subject.email.strip().lower() == settings.founder_reviewer_email.strip().lower(),
+        acting_admin_id=authenticated.consultant_id,
+    )
 
 
 # Convenience aliases used unmodified by the deferred router; falls back to get_settings if the

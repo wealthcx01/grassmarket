@@ -35,6 +35,11 @@ class AuditEventType(StrEnum):
     FOUNDER_APPROVAL = "founder_approval"  # ADR-0041: the founder signed off a document version
     CERTIFICATION_OVERRIDE = "certification_override"
     COMMISSION_RECORDED = "commission_recorded"
+    # GRS-0208: an admin opened or closed a session scoped to another consultant. Both identities
+    # are on the event — the admin as actor, the subject as the resource — because an act-as with
+    # no trace is impersonation, and the difference between the two is exactly this record.
+    ACT_AS_STARTED = "act_as_started"
+    ACT_AS_ENDED = "act_as_ended"
     GDPR_EXPORT = "gdpr_export"
     GDPR_DELETION = "gdpr_deletion"
 

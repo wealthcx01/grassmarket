@@ -429,6 +429,16 @@ class Principal:
     # re-login and never a migration. Defaults to False so every existing construction of a
     # Principal is unaffected and no caller acquires the claim by accident.
     is_founder: bool = False
+    # Set ONLY while an admin is acting as another consultant (GRS-0208). It is attribution, never
+    # authority: `_assert_can_access` does not read it, and it cannot widen what this principal can
+    # see. During act-as the principal IS the subject — `consultant_id` and `role` are theirs — so
+    # every existing scoping test holds unchanged and the admin is NARROWED rather than extended.
+    # That direction is the whole safety argument: act-as can only ever show less.
+    acting_admin_id: UUID | None = None
+
+    @property
+    def is_acting_as(self) -> bool:
+        return self.acting_admin_id is not None
 
     @property
     def is_admin(self) -> bool:
@@ -2129,9 +2139,22 @@ class Repository:
         resource_type: str | None = None,
         resource_id: UUID | None = None,
         detail: str | None = None,
+        acting_admin_id: UUID | None = None,
     ) -> None:
         """Write one APPEND-ONLY audit event. Never updated or deleted. `detail` must carry no
-        secret (no tokens, no passwords, no plaintext transcript)."""
+        secret (no tokens, no passwords, no plaintext transcript).
+
+        `acting_admin_id` is set when the actor is an admin acting as another consultant
+        (GRS-0208). It is appended to the detail rather than replacing the actor, because the record
+        has to say BOTH things: the work is the subject's, and a named admin did it. Dropping either
+        half is how an audit log stops answering the question it exists for.
+        """
+        if acting_admin_id is not None:
+            note = (
+                f"acting-as: performed by admin {acting_admin_id} "
+                f"on behalf of {actor_consultant_id}"
+            )
+            detail = f"{detail} | {note}" if detail else note
         self._session.add(
             AuditEventORM(
                 actor_consultant_id=actor_consultant_id,
@@ -2143,6 +2166,76 @@ class Repository:
             )
         )
         self._session.flush()
+
+    # ------------------------------------------------------------------ act-as (GRS-0208)
+
+    def begin_act_as(
+        self,
+        principal: Principal,
+        subject_id: UUID,
+        *,
+        now: datetime,
+        founder_reviewer_email: str,
+    ) -> Principal:
+        """Open a session scoped to another consultant, and return the principal to run it under.
+
+        Three rules, all enforced here rather than in a router, because scoping lives in this layer
+        (non-negotiable #9):
+
+        1. **Only an admin may start it.** Not a committee member, not a founder who is not also an
+           admin, and never a consultant.
+        2. **The returned principal IS the subject** — their id, their role, their founder status.
+           It is not an admin principal with a note attached, which is what would make act-as a way
+           to see more rather than a way to see exactly what one advisor sees.
+        3. **An admin already acting as someone may not chain** to a third consultant without
+           ending first. Chaining would make the audit trail ambiguous about who authorised what.
+        """
+        if not principal.is_admin:
+            raise ScopeViolationError(
+                "Only an admin may act as another consultant (GRS-0208). Data scoping is absolute "
+                "(CLAUDE.md non-negotiable #9)."
+            )
+        if principal.is_acting_as:
+            raise ConflictError(
+                "Already acting as another consultant. End that session before starting a new one "
+                "— chained act-as makes the audit trail ambiguous about who authorised what."
+            )
+        subject = self._session.get(ConsultantORM, subject_id)
+        if subject is None:
+            raise NotFoundError(f"Consultant {subject_id} not found.")
+        if subject.id == principal.consultant_id:
+            raise ConflictError("You are already yourself; acting as yourself would record a lie.")
+        self.record_audit(
+            actor_consultant_id=principal.consultant_id,
+            event_type=AuditEventType.ACT_AS_STARTED,
+            now=now,
+            resource_type="consultant",
+            resource_id=subject.id,
+            detail=f"admin {principal.consultant_id} began acting as {subject.email}",
+        )
+        return Principal(
+            consultant_id=subject.id,
+            role=Role(subject.role),
+            # The SUBJECT's founder status, not the admin's. An admin acting as an advisor must not
+            # carry a claim that advisor does not have, or "see exactly what they see" is false at
+            # precisely the gate that matters most (ADR-0041).
+            is_founder=subject.email.strip().lower() == founder_reviewer_email.strip().lower(),
+            acting_admin_id=principal.consultant_id,
+        )
+
+    def end_act_as(self, principal: Principal, *, now: datetime) -> None:
+        """Close an act-as session. Recorded, so the log shows a bounded interval rather than an
+        open-ended one — 'when did they stop' is as much a question as 'when did they start'."""
+        if not principal.is_acting_as:
+            raise ConflictError("Not currently acting as another consultant.")
+        self.record_audit(
+            actor_consultant_id=principal.acting_admin_id,
+            event_type=AuditEventType.ACT_AS_ENDED,
+            now=now,
+            resource_type="consultant",
+            resource_id=principal.consultant_id,
+            detail=f"admin {principal.acting_admin_id} stopped acting as {principal.consultant_id}",
+        )
 
     def list_audit_events(
         self, principal: Principal, *, limit: int | None = None, offset: int = 0

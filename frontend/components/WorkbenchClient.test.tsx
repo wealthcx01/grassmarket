@@ -48,6 +48,7 @@ function session(over: Partial<Session> = {}): Session {
     role: "consultant",
     assessorLevel: "trained",
     isAdmin: false,
+    actingAsConsultantId: null,
     isCommittee: false,
     isCertifiedLead: false,
     ...over,

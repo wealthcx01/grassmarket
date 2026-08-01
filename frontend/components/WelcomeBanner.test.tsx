@@ -15,6 +15,7 @@ const SESSION: Session = {
   isAdmin: false,
   isCommittee: false,
   isCertifiedLead: false,
+    actingAsConsultantId: null,
 };
 
 describe("WelcomeBanner (GRS-0089)", () => {

@@ -495,6 +495,29 @@ export const api = {
   },
   /** Sign off a client report's prose (GRS-0245). Separate from the assessment approval because it
       is bound to a different hash — the words, not the scored document. */
+  /** Who this session currently is. While acting-as (GRS-0208) it answers as the SUBJECT, which
+      is what makes the banner's name the right one to show. */
+  me(signal?: AbortSignal): Promise<{ id: string; full_name: string; email: string }> {
+    return request(`/auth/me`, { headers: authHeaders(), signal });
+  },
+  startActingAs(
+    consultantId: string,
+    signal?: AbortSignal,
+  ): Promise<{
+    access_token: string;
+    subject_consultant_id: string;
+    subject_name: string;
+    subject_email: string;
+  }> {
+    return request(`/auth/act-as/${consultantId}`, {
+      method: "POST",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+  stopActingAs(signal?: AbortSignal): Promise<{ access_token: string }> {
+    return request(`/auth/act-as`, { method: "DELETE", headers: authHeaders(), signal });
+  },
   approveReport(deliverableId: string, signal?: AbortSignal): Promise<FounderApproval> {
     return request<FounderApproval>(`/deliverables/${deliverableId}/report-approval`, {
       method: "POST",
