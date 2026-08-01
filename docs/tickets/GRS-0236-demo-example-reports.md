@@ -89,3 +89,29 @@ One PDF per brokerage, rendered from the seeded demo records:
 `test_every_showcase_deliverable_has_a_worked_example_report` asserts the report **assembles**, not
 that prose rows exist. A seeded row that still failed the content model would be the same broken
 demo with more data behind it.
+
+## Production seeding — decided 2026-08-01, deliberately not done
+
+Scope 4 asked for the seed to be run **on staging**, and it was (11/11 demo deliverables download,
+0 refused). Running it on **production** was considered separately and the founder decided against
+it for now.
+
+Production was measured read-only first, and it is not what an earlier note in this thread assumed:
+it holds 2 consultants, 3 prospects, 4 assessments, 1 engagement and **zero deliverables**. The
+showcase has never been seeded there, so this would have been a fresh creation rather than a prose
+backfill.
+
+Three reasons it waits:
+
+1. **It would not achieve the goal.** Showcase records are owned by the demo advisor and
+   deliverables are owner-scoped, so the founder would not see the examples in their own account —
+   which is this ticket's *own* finding 2, explicitly handed to **GRS-0208**. Seeding before that
+   lands means doing it twice.
+2. **It creates a real login on the live instance** — `advisor@bruntsfieldcapital.com` with a
+   password published in this repository.
+3. **It puts ~£49,500 of illustrative commission on the live earnings page.** Demo-provenanced, but
+   money-shaped numbers on a page about money.
+
+**Do it after GRS-0208**, in one pass, once there is an account structure that makes the examples
+visible to whoever opens them.
+
