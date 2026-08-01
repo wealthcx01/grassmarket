@@ -8,12 +8,14 @@ segregated from the benchmark), and the deliverables are produced by the real ge
 
 from __future__ import annotations
 
+import json
 from uuid import UUID
 
 import pytest
 from bcap_contracts.assessments import AssessmentState, RecordProvenance
 from bcap_contracts.client_report import SECTION_ORDER
 from bcap_contracts.common import AssessorLevel, ConsultantTier, Role
+from sqlalchemy import select
 
 from grassmarket.assessments.service import scoreability_blockers
 from grassmarket.data.repository import Principal, Repository
@@ -510,3 +512,79 @@ def test_a_showcase_spec_without_prose_fails_loudly() -> None:
     would do it silently — the seed would succeed and the demo would refuse. So the seed refuses
     instead, naming what to add."""
     assert set(SHOWCASE_PROSE) >= {spec.subject for spec in SHOWCASE}
+
+
+def test_a_rerun_backfills_prose_onto_already_seeded_brokerages(
+    session_factory, engine, settings
+) -> None:
+    """GRS-0236, found by running the seed on staging rather than by reading it.
+
+    The idempotency skip (GRS-0177) fired BEFORE the prose write, so an environment seeded before
+    the prose fix kept its demo reports refusing forever — the founder's original complaint
+    surviving the fix, in exactly the environments they look at. The skip now covers creation only.
+    """
+    from grassmarket.data.models import ClientReportProseORM
+
+    email = "showcase-backfill@bruntsfieldcapital.com"
+    seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+
+    # Simulate the pre-fix state: the records exist, the prose does not.
+    session = session_factory()
+    try:
+        for row in session.execute(select(ClientReportProseORM)).scalars().all():
+            session.delete(row)
+        session.commit()
+    finally:
+        session.close()
+
+    again = seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+    assert all(r["status"].startswith("exists") for r in again), again
+    assert any("example report(s) written" in r["status"] for r in again), (
+        "a re-run over already-seeded brokerages wrote no prose, so the demo stays broken"
+    )
+
+    session = session_factory()
+    try:
+        restored = session.execute(select(ClientReportProseORM)).scalars().all()
+        assert len(restored) >= 15, "expected prose back on every showcase deliverable"
+    finally:
+        session.close()
+
+
+def test_the_backfill_does_not_overwrite_words_already_written(
+    session_factory, engine, settings
+) -> None:
+    """The seed's job is to make sure an example EXISTS, not to own its words forever. An advisor
+    who edits a demo report and re-runs the seed keeps their edit."""
+    from grassmarket.data.models import ClientReportProseORM
+
+    email = "showcase-noclobber@bruntsfieldcapital.com"
+    seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+
+    session = session_factory()
+    try:
+        row = session.execute(select(ClientReportProseORM)).scalars().first()
+        assert row is not None
+        deliverable_id = row.deliverable_id
+        row.sections_json = json.dumps(
+            {
+                kind.value: {"heading": kind.value.title(), "body": ["An advisor's own words."]}
+                for kind in SECTION_ORDER
+            }
+        )
+        session.commit()
+    finally:
+        session.close()
+
+    seed_brokerage_showcase(session_factory, engine, settings, owner_email=email)
+
+    session = session_factory()
+    try:
+        after = session.execute(
+            select(ClientReportProseORM).where(
+                ClientReportProseORM.deliverable_id == deliverable_id
+            )
+        ).scalar_one()
+        assert "An advisor's own words." in after.sections_json
+    finally:
+        session.close()
