@@ -105,6 +105,7 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
     app.include_router(committee.queue_router)
     app.include_router(founder_review.router)
     app.include_router(founder_review.queue_router)
+    app.include_router(founder_review.report_router)
     app.include_router(calibration.router)
     app.include_router(certification.router)
     app.include_router(workbench.router)

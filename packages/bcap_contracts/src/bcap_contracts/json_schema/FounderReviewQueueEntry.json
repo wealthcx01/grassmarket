@@ -18,10 +18,33 @@
       "title": "Assessment Id",
       "type": "string"
     },
+    "changed_sections": {
+      "default": [],
+      "description": "For a re-review of a client report: which of the six sections differ from the version the founder last approved. Empty on a first review, where everything is new.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Changed Sections",
+      "type": "array"
+    },
     "created_at": {
       "format": "date-time",
       "title": "Created At",
       "type": "string"
+    },
+    "deliverable_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The deliverable whose client report awaits sign-off; null for an assessment.",
+      "title": "Deliverable Id"
     },
     "document_hash": {
       "description": "Current hash of the document to be approved.",

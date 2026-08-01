@@ -62,3 +62,46 @@ that proves it.)
 Nothing generated from a production record can reach a client — by PDF or by link — without the
 founder having approved the exact words it carries, and the founder can see that queue in the place
 the product already told them to look.
+
+
+**DONE.** Matrix, measurement and post-change state in
+`docs/reviews/GRS-0245-founder-gate-share-links/gate-matrix.md`.
+
+## What shipped
+
+**Scope 1 — the matrix, measured before anything changed.** Production was **not** already gated:
+on a production record with prose written after the founder approved the assessment, the PDF
+downloaded (200), the link issued (201) and the public page read (200). The mechanism is that the
+gate was bound to the wrong artefact — `current_founder_approval` matches
+`sha256(document_json)`, the *assessment*, while the report prose lives in another table and is
+written after finalisation.
+
+**Scope 2 — the gap closed.** A report-scoped approval on `founder_approvals`
+(nullable `deliverable_id` + the prose hash, migration `0037`), and both client-report release
+paths now take one shared helper, `assert_report_releasable`. Hash-bound: editing any section after
+approval invalidates it, the same rule the Founder-review tab already states. Demo and sandbox stay
+exempt and stay watermarked — the GRS-0229 mark is their gate.
+
+**Scope 3 — the refusal teaches.** Three states, three sentences: never submitted (with the next
+action), submitted and waiting, or approved-and-then-edited (naming the sections that changed). The
+report editor gained a **Send to the founder for review** button beside where the advisor is
+stopped, because an instruction with no affordance next to it is a dead end dressed as guidance.
+
+**Scope 4 — the queue shows it.** Client reports appear in the Founder-review tab beside
+assessments, labelled as reports, linking to the report rather than the assessment, and carrying a
+**diff**: which of the six sections differ from the version the founder last approved. That needed
+the approval to store the prose it cleared, not just its hash — a hash can say "this differs", only
+the content can say where to look.
+
+## Notes for whoever reads this next
+
+- The approval row keeps its `assessment_id` even for report approvals, so scoping and queue joins
+  are unchanged. Two scopes, one table, one rule.
+- The queue's React key had to become `report:<id>` / `assessment:<id>`: a report is submitted
+  against an assessment that was itself reviewed, so both rows can carry the same `assessment_id`
+  and keying on it alone collapsed them into one row. There is a test for that.
+- A first review reports **no** changed sections rather than "all six". Empty means "nothing to
+  compare against", and telling the founder to re-read work they have never read once would make
+  the diff worse than useless.
+- `test_client_report_wiring.py` needed the founder approval added to seven tests that released a
+  production report. That is the behaviour change working, not collateral damage.

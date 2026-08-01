@@ -35,6 +35,17 @@ def _write_prose(client, alice: SeededConsultant, deliverable: str, sections: di
     )
 
 
+def _approve_report(client, founder: SeededConsultant, deliverable: str):
+    """Since GRS-0245 a production report is not releasable until the founder signs off its PROSE,
+    so every test here that expects a PDF or a link has to clear that gate first. Tests that assert
+    the gate itself live in `test_report_founder_gate.py`."""
+    response = client.post(
+        f"/deliverables/{deliverable}/report-approval", headers=auth_header(founder)
+    )
+    assert response.status_code == 201, response.text
+    return response
+
+
 class TestTheProseTheAdvisorWrites:
     def test_an_unstarted_report_offers_the_shape_not_a_blank_page(
         self, client, alice: SeededConsultant, deliverable: str
@@ -84,9 +95,10 @@ class TestTheProseTheAdvisorWrites:
 
 class TestTheDownloadableReport:
     def test_a_written_report_downloads_as_a_pdf(
-        self, client, alice: SeededConsultant, deliverable: str
+        self, client, alice: SeededConsultant, deliverable: str, founder: SeededConsultant
     ) -> None:
         _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
         response = client.get(
             f"/deliverables/{deliverable}/client-report.pdf", headers=auth_header(alice)
         )
@@ -96,9 +108,10 @@ class TestTheDownloadableReport:
         assert "attachment" in response.headers["content-disposition"]
 
     def test_the_pdf_carries_the_advisors_words(
-        self, client, alice: SeededConsultant, deliverable: str
+        self, client, alice: SeededConsultant, deliverable: str, founder: SeededConsultant
     ) -> None:
         _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
         pdf = client.get(
             f"/deliverables/{deliverable}/client-report.pdf", headers=auth_header(alice)
         ).content
@@ -148,11 +161,12 @@ class TestTheDownloadableReport:
         assert "Value error" not in detail, "pydantic's wrapping should not reach the advisor"
 
     def test_an_internal_draft_downloads_watermarked(
-        self, client, alice: SeededConsultant, deliverable: str
+        self, client, alice: SeededConsultant, deliverable: str, founder: SeededConsultant
     ) -> None:
         # The generated deliverable is DRAFT_INTERNAL (client_facing=False), and the watermark
         # follows the deliverable's own mode rather than anything the caller chooses (ADR-0029).
         _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
         pdf = client.get(
             f"/deliverables/{deliverable}/client-report.pdf", headers=auth_header(alice)
         ).content
@@ -180,7 +194,12 @@ class TestTheApprovalGateIsActuallyWired:
     """
 
     def test_the_download_path_calls_the_gate(
-        self, client, alice: SeededConsultant, deliverable: str, monkeypatch: pytest.MonkeyPatch
+        self,
+        client,
+        alice: SeededConsultant,
+        deliverable: str,
+        founder: SeededConsultant,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         called: list[set] = []
         import grassmarket.web.routers.client_report as module
@@ -193,11 +212,63 @@ class TestTheApprovalGateIsActuallyWired:
 
         monkeypatch.setattr(module, "assert_client_ready", spy)
         _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
         response = client.get(
             f"/deliverables/{deliverable}/client-report.pdf", headers=auth_header(alice)
         )
         assert response.status_code == 200
         assert called, "the client-facing download did not consult the approval gate"
+
+    def test_both_release_paths_call_the_founder_gate(
+        self,
+        client,
+        alice: SeededConsultant,
+        founder: SeededConsultant,
+        deliverable: str,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """GRS-0245 test-plan item 2: the same spy discipline, extended to the founder gate.
+
+        A gate is only a gate while something fails when it is removed. This one is spied on BOTH
+        release paths rather than one, because gating a single route of two equivalent ones is
+        precisely how the gap this closes came about — the docx pack consulted founder approval and
+        the client report did not.
+        """
+        import grassmarket.web.routers.client_report as module
+
+        called: list[str] = []
+        real = module.assert_report_releasable
+
+        def spy(repo, principal, deliverable_id, provenance):
+            called.append(str(deliverable_id))
+            return real(repo, principal, deliverable_id, provenance)
+
+        monkeypatch.setattr(module, "assert_report_releasable", spy)
+        import grassmarket.web.routers.report_links as links_module
+
+        monkeypatch.setattr(links_module, "assert_report_releasable", spy)
+
+        _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
+
+        assert (
+            client.get(
+                f"/deliverables/{deliverable}/client-report.pdf", headers=auth_header(alice)
+            ).status_code
+            == 200
+        )
+        assert called, "the PDF download did not consult the founder gate"
+
+        called.clear()
+        assert (
+            client.post(
+                f"/deliverables/{deliverable}/links",
+                json={"recipient_label": "CFO"},
+                headers=auth_header(alice),
+            ).status_code
+            == 201
+        )
+        assert called, "issuing a share link did not consult the founder gate"
 
     def test_an_unapproved_ai_section_is_refused(
         self, client, alice: SeededConsultant, deliverable: str, monkeypatch: pytest.MonkeyPatch
@@ -239,10 +310,11 @@ class TestTheApprovalGateIsActuallyWired:
 
 class TestTheLoopIsClosed:
     def test_write_share_and_read_end_to_end(
-        self, client, alice: SeededConsultant, deliverable: str
+        self, client, alice: SeededConsultant, deliverable: str, founder: SeededConsultant
     ) -> None:
         """The founder's acceptance test, as far as an API can carry it."""
         _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
 
         created = client.post(
             f"/deliverables/{deliverable}/links",
@@ -276,10 +348,11 @@ class TestTheLoopIsClosed:
         assert opened == {"business", "value"}
 
     def test_the_pdf_and_the_web_page_say_the_same_thing(
-        self, client, alice: SeededConsultant, deliverable: str
+        self, client, alice: SeededConsultant, deliverable: str, founder: SeededConsultant
     ) -> None:
         """Content parity: one model, two renditions, or they disagree in front of a client."""
         _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
         created = client.post(
             f"/deliverables/{deliverable}/links",
             json={"recipient_label": "cfo@client.example"},
@@ -300,11 +373,12 @@ class TestTheLoopIsClosed:
                 )
 
     def test_the_snapshot_does_not_move_when_the_prose_is_edited_later(
-        self, client, alice: SeededConsultant, deliverable: str
+        self, client, alice: SeededConsultant, deliverable: str, founder: SeededConsultant
     ) -> None:
         # A client who read this last week and quotes it back must be quoting something that still
         # exists. Editing the prose changes the NEXT link, not one already sent.
         _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
         created = client.post(
             f"/deliverables/{deliverable}/links",
             json={"recipient_label": "cfo@client.example"},

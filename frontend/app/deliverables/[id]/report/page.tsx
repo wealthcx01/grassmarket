@@ -162,6 +162,23 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
     }
   };
 
+  // Scope 3's other half. The refusal tells the advisor the report needs the founder; this is the
+  // button that acts on it, in the same place they were stopped — an instruction with no affordance
+  // beside it is a dead end dressed as guidance.
+  const sendForReview = async () => {
+    setBusy(true);
+    setError(null);
+    setStatus(null);
+    try {
+      await api.submitReportForReview(id);
+      setStatus("Sent to the founder. It is in their review queue now.");
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Could not send it for review.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const revoke = async (linkId: string) => {
     setBusy(true);
     try {
@@ -255,6 +272,15 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
         </p>
         <button type="button" className="btn" onClick={download} disabled={busy}>
           Download the PDF
+        </button>
+        <button
+          type="button"
+          className="btn"
+          onClick={sendForReview}
+          disabled={busy}
+          style={{ marginLeft: "0.5rem" }}
+        >
+          Send to the founder for review
         </button>
 
         <div style={{ marginTop: "1.5rem" }}>

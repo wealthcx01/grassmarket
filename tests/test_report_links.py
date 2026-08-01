@@ -47,6 +47,11 @@ def deliverable_id(client, alice: SeededConsultant, founder: SeededConsultant) -
         headers=auth_header(alice),
     )
     assert response.status_code == 200, response.text
+    # Since GRS-0245 a PRODUCTION report is not releasable until the founder signs off its prose,
+    # so the fixture clears that gate. This file is about the link itself — what it reveals, how it
+    # revokes, when it expires; the gate has its own tests in `test_report_founder_gate.py`.
+    approved = client.post(f"/deliverables/{did}/report-approval", headers=auth_header(founder))
+    assert approved.status_code == 201, approved.text
     return did
 
 

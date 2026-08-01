@@ -1211,6 +1211,10 @@ export interface FounderReviewQueueEntry {
   document_hash: string;
   /** True when this was signed off and then edited: the founder is re-reading, not reading. */
   previously_approved: boolean;
+  /** Set when this row is a CLIENT REPORT awaiting sign-off rather than an assessment (GRS-0245). */
+  deliverable_id?: string | null;
+  /** On a re-review of a client report: which of the six sections differ from the approved version. */
+  changed_sections?: string[];
   created_at: string;
   updated_at: string;
 }

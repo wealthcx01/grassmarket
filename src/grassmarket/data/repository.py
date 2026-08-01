@@ -3270,6 +3270,144 @@ class Repository:
         approval = self._session.execute(stmt).scalars().first()
         return self._to_founder_approval(approval) if approval is not None else None
 
+    # --- Report-scoped founder approval (GRS-0245) ------------------------------------------
+    #
+    # The same rule as the assessment gate, bound to a different artefact. GRS-0245 measured the
+    # gap: `current_founder_approval` matches against the ASSESSMENT document, the report prose
+    # lives in another table and is written after finalisation, so a founder approval of the
+    # assessment says nothing about the words that actually reach the client.
+
+    @staticmethod
+    def _prose_hash(sections_json: str) -> str:
+        """sha256 of the stored prose. Computed from the database, never taken from a caller."""
+        return hashlib.sha256(sections_json.encode("utf-8")).hexdigest()
+
+    def _report_prose_row(self, deliverable_id: UUID) -> ClientReportProseORM | None:
+        stmt = select(ClientReportProseORM).where(
+            ClientReportProseORM.deliverable_id == deliverable_id
+        )
+        return self._session.execute(stmt).scalar_one_or_none()
+
+    def request_report_review(self, principal: Principal, deliverable_id: UUID) -> None:
+        """The advisor asks the founder to sign off this report. Idempotent, like its assessment
+        twin: asking again moves the timestamp, which is what "I have made changes" means."""
+        self._require_deliverable(principal, deliverable_id)
+        row = self._report_prose_row(deliverable_id)
+        if row is None:
+            raise ConflictError(
+                "This report has no prose yet, so there is nothing for the founder to read."
+            )
+        row.review_requested_at = datetime.now(UTC)
+        self._session.flush()
+
+    def current_report_approval(self, deliverable_id: UUID) -> FounderApproval | None:
+        """The approval that currently clears this report's prose, or None.
+
+        None both when nothing was ever approved and when the prose changed since — the same
+        deliberate conflation the assessment gate makes. What matters is whether the words about to
+        reach a client are the words the founder read.
+
+        Unscoped, like `current_founder_approval`: this is the gate itself, called from paths where
+        the caller's access is already established.
+        """
+        row = self._report_prose_row(deliverable_id)
+        if row is None:
+            return None
+        current = self._prose_hash(row.sections_json)
+        stmt = (
+            select(FounderApprovalORM)
+            .where(
+                FounderApprovalORM.deliverable_id == deliverable_id,
+                FounderApprovalORM.document_hash == current,
+            )
+            .order_by(FounderApprovalORM.approved_at.desc())
+        )
+        approval = self._session.execute(stmt).scalars().first()
+        return self._to_founder_approval(approval) if approval is not None else None
+
+    def record_report_approval(self, principal: Principal, deliverable_id: UUID) -> FounderApproval:
+        """The founder signs off the report's prose as it stands. Founder only — an admin bypass
+        would quietly reintroduce self-approval, which is the thing ADR-0041 exists to prevent."""
+        if not principal.is_founder:
+            raise ScopeViolationError(
+                "Only the founder reviewer may approve a client report for release (ADR-0041)."
+            )
+        deliverable = self._session.get(DeliverableORM, deliverable_id)
+        if deliverable is None:
+            raise NotFoundError(f"Deliverable {deliverable_id} not found.")
+        row = self._report_prose_row(deliverable_id)
+        if row is None:
+            raise ConflictError("This report has no prose yet, so there is nothing to approve.")
+        now = datetime.now(UTC)
+        approval = FounderApprovalORM(
+            owner_consultant_id=deliverable.owner_consultant_id,
+            assessment_id=self._assessment_id_for_deliverable(deliverable),
+            deliverable_id=deliverable_id,
+            document_hash=self._prose_hash(row.sections_json),
+            # The words the founder actually read, kept so the queue can show what changed rather
+            # than only that something did.
+            content_json=row.sections_json,
+            approved_by_consultant_id=principal.consultant_id,
+            approved_at=now,
+        )
+        self._session.add(approval)
+        self._session.flush()
+        return self._to_founder_approval(approval)
+
+    def _assessment_id_for_deliverable(self, deliverable: DeliverableORM) -> UUID:
+        """The assessment behind a deliverable, via its scoring run. Kept on the approval row so
+        report approvals join and scope exactly like assessment ones."""
+        record = self._session.get(ScoringRunORM, deliverable.scoring_run_id)
+        if record is None:
+            raise NotFoundError(
+                f"Deliverable {deliverable.id} has no scoring run to attribute an approval to."
+            )
+        return record.assessment_id
+
+    def report_was_ever_approved(self, deliverable_id: UUID) -> bool:
+        """Whether the founder has signed this report off at ANY version.
+
+        Distinct from `current_report_approval`, which asks whether the CURRENT words are cleared.
+        The difference is what lets the refusal say "approved and then edited" rather than "not
+        approved", which are different problems with different next actions.
+        """
+        stmt = select(FounderApprovalORM.id).where(
+            FounderApprovalORM.deliverable_id == deliverable_id
+        )
+        return self._session.execute(stmt).first() is not None
+
+    def report_sections_changed_since_approval(
+        self, principal: Principal, deliverable_id: UUID
+    ) -> tuple[str, ...]:
+        """Which of the six sections differ from the last approved version (GRS-0245 scope 4).
+
+        Empty when nothing was ever approved — there is no diff against nothing, and calling the
+        whole report "changed" would tell the founder to re-read work they have never read once.
+        The caller distinguishes the two cases by whether a prior approval exists at all.
+        """
+        self._require_deliverable(principal, deliverable_id)
+        row = self._report_prose_row(deliverable_id)
+        if row is None:
+            return ()
+        stmt = (
+            select(FounderApprovalORM)
+            .where(
+                FounderApprovalORM.deliverable_id == deliverable_id,
+                FounderApprovalORM.content_json.is_not(None),
+            )
+            .order_by(FounderApprovalORM.approved_at.desc())
+        )
+        previous = self._session.execute(stmt).scalars().first()
+        if previous is None or previous.content_json is None:
+            return ()
+        try:
+            before = json.loads(previous.content_json)
+            after = json.loads(row.sections_json)
+        except json.JSONDecodeError:  # pragma: no cover - stored by us, always valid
+            return ()
+        keys = sorted(set(before) | set(after))
+        return tuple(k for k in keys if before.get(k) != after.get(k))
+
     def list_founder_review_queue(self, principal: Principal) -> list[FounderReviewQueueEntry]:
         """Everything waiting on the founder, oldest request first.
 
@@ -3324,7 +3462,89 @@ class Repository:
                     updated_at=row.updated_at,
                 )
             )
+        entries.extend(self._report_review_queue())
+        entries.sort(key=lambda e: e.requested_at)
         return entries
+
+    def _report_review_queue(self) -> list[FounderReviewQueueEntry]:
+        """Client reports awaiting sign-off (GRS-0245 scope 4), in the same queue as assessments.
+
+        Production records only, for the same reason the assessment queue filters them: a demo or
+        sandbox report is watermarked on every rendition (GRS-0229) and has no client on the other
+        end, so it is not waiting on anyone.
+        """
+        stmt = select(ClientReportProseORM).where(
+            ClientReportProseORM.review_requested_at.is_not(None)
+        )
+        out: list[FounderReviewQueueEntry] = []
+        for prose in self._session.execute(stmt).scalars().all():
+            deliverable = self._session.get(DeliverableORM, prose.deliverable_id)
+            if deliverable is None:  # pragma: no cover - FK guarantees it
+                continue
+            record = self._session.get(ScoringRunORM, deliverable.scoring_run_id)
+            if record is None:  # pragma: no cover - a deliverable always has its run
+                continue
+            assessment = self._session.get(AssessmentORM, record.assessment_id)
+            if assessment is None or assessment.provenance != RecordProvenance.PRODUCTION.value:
+                continue
+            current = self._prose_hash(prose.sections_json)
+            approvals = (
+                self._session.execute(
+                    select(FounderApprovalORM).where(
+                        FounderApprovalORM.deliverable_id == prose.deliverable_id
+                    )
+                )
+                .scalars()
+                .all()
+            )
+            if any(a.document_hash == current for a in approvals):
+                continue  # signed at this version — not waiting on anyone
+            requested_at = prose.review_requested_at
+            if requested_at is None:  # pragma: no cover - the query filters these out
+                raise ConflictError(
+                    f"Report {prose.deliverable_id} is in the review queue with no request time."
+                )
+            advisor = self._require_consultant(prose.owner_consultant_id)
+            changed = self._changed_sections_from_rows(prose, approvals)
+            out.append(
+                FounderReviewQueueEntry(
+                    id=prose.deliverable_id,
+                    owner_consultant_id=prose.owner_consultant_id,
+                    assessment_id=record.assessment_id,
+                    deliverable_id=prose.deliverable_id,
+                    subject=assessment.subject,
+                    advisor_name=advisor.full_name,
+                    advisor_email=advisor.email,
+                    requested_at=requested_at,
+                    document_hash=current,
+                    previously_approved=bool(approvals),
+                    changed_sections=changed,
+                    created_at=prose.created_at,
+                    updated_at=prose.updated_at,
+                )
+            )
+        return out
+
+    @staticmethod
+    def _changed_sections_from_rows(
+        prose: ClientReportProseORM, approvals: Sequence[FounderApprovalORM]
+    ) -> tuple[str, ...]:
+        """Which sections differ from the most recent approval that stored its content.
+
+        Empty on a first review — there is nothing to diff against, and calling every section
+        "changed" would tell the founder to re-read work they have never read once.
+        """
+        with_content = [a for a in approvals if a.content_json is not None]
+        if not with_content:
+            return ()
+        previous = max(with_content, key=lambda a: a.approved_at)
+        try:
+            before = json.loads(previous.content_json or "{}")
+            after = json.loads(prose.sections_json)
+        except json.JSONDecodeError:  # pragma: no cover - stored by us, always valid
+            return ()
+        keys = sorted(set(before) | set(after))
+        return tuple(k for k in keys if before.get(k) != after.get(k))
 
     @staticmethod
     def _to_founder_approval(row: FounderApprovalORM) -> FounderApproval:
