@@ -265,6 +265,22 @@ class ActAsResponse(BaseModel):
     subject_email: str
 
 
+@router.get("/act-as/candidates", response_model=list[Consultant])
+def act_as_candidates(
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> list[Consultant]:
+    """Who this admin could act as (GRS-0208). 403 for anyone else.
+
+    Declared BEFORE `/act-as/{consultant_id}` so the literal path wins the route match — otherwise
+    "candidates" is parsed as a UUID and every request 422s.
+    """
+    try:
+        return repo.list_consultants_for_act_as(principal)
+    except ScopeViolationError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+
+
 @router.post("/act-as/{consultant_id}", response_model=ActAsResponse)
 def start_act_as(
     consultant_id: UUID,

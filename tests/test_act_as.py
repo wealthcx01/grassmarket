@@ -254,3 +254,43 @@ class TestOverTheApi:
         assert (
             client.get(f"/prospects/{bob_prospect}", headers=auth_header(admin)).status_code == 200
         )
+
+
+class TestTheCandidateList:
+    """The picker needs something to show, and the endpoint that feeds it must not become a roster.
+
+    Deliberately narrow: a general consultant directory is not something anyone asked for on a
+    product whose whole scoping discipline is that advisors do not see each other.
+    """
+
+    def test_only_an_admin_may_read_it(self, repo: Repository, alice: SeededConsultant) -> None:
+        with pytest.raises(ScopeViolationError):
+            repo.list_consultants_for_act_as(alice.principal)
+
+    def test_it_excludes_the_caller(
+        self, repo: Repository, admin: SeededConsultant, alice: SeededConsultant
+    ) -> None:
+        """Acting as yourself is refused, so offering it would be a choice the gate then rejects."""
+        listed = repo.list_consultants_for_act_as(admin.principal)
+        assert admin.stored.id not in {c.id for c in listed}
+        assert alice.stored.id in {c.id for c in listed}
+
+    def test_it_carries_no_password_material(
+        self, repo: Repository, admin: SeededConsultant, alice: SeededConsultant
+    ) -> None:
+        listed = repo.list_consultants_for_act_as(admin.principal)
+        for consultant in listed:
+            assert not hasattr(consultant, "hashed_password")
+
+    def test_over_the_api_a_consultant_is_refused(self, client, alice: SeededConsultant) -> None:
+        assert client.get("/auth/act-as/candidates", headers=auth_header(alice)).status_code == 403
+
+    def test_over_the_api_the_literal_path_wins_the_route_match(
+        self, client, admin: SeededConsultant, alice: SeededConsultant
+    ) -> None:
+        """`/act-as/candidates` is declared before `/act-as/{consultant_id}`. Without that ordering
+        "candidates" is parsed as a UUID and every request 422s — a routing bug that looks like a
+        permissions bug."""
+        listed = client.get("/auth/act-as/candidates", headers=auth_header(admin))
+        assert listed.status_code == 200, listed.text
+        assert alice.stored.email in {c["email"] for c in listed.json()}

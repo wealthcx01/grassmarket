@@ -8,6 +8,8 @@
 "use client";
 
 import Link from "next/link";
+
+import { ActAsPicker } from "@/components/ActAsPicker";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -22,6 +24,7 @@ export function AccountMenu() {
   // first client paint matches the server and there is no signed-in/out hydration flash.
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [open, setOpen] = useState(false);
+  const [picking, setPicking] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -154,6 +157,22 @@ export function AccountMenu() {
               {session.email}
             </div>
           </div>
+          {/* Admin only, and gated on the SAME claim the server checks — the menu mirrors what the
+              API will allow rather than deciding it. A non-admin who forged the claim still gets a
+              403 from /auth/act-as/candidates. */}
+          {session.isAdmin && !session.actingAsConsultantId ? (
+            <button
+              type="button"
+              role="menuitem"
+              style={itemStyle}
+              onClick={() => {
+                setOpen(false);
+                setPicking(true);
+              }}
+            >
+              View as another advisor…
+            </button>
+          ) : null}
           <Link href="/profile" role="menuitem" style={itemStyle} onClick={() => setOpen(false)}>
             Profile
           </Link>
@@ -173,6 +192,7 @@ export function AccountMenu() {
           </button>
         </div>
       ) : null}
+      {picking ? <ActAsPicker onClose={() => setPicking(false)} /> : null}
     </div>
   );
 }

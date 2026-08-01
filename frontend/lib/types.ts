@@ -732,6 +732,16 @@ export type NarrativeSection = "interpretation" | "commentary" | "recommendation
 export type NarrativeStatus = "proposed" | "approved" | "rejected";
 export type ConsultantTier = "venture_associate" | "advisor" | "consultant";
 
+/** A consultant as the API returns them — no password material (GRS-0208 act-as picker). */
+export interface Consultant {
+  id: string;
+  email: string;
+  full_name: string;
+  role: "consultant" | "committee_member" | "admin";
+  tier: ConsultantTier;
+  is_active: boolean;
+}
+
 export interface AINarrative {
   id: string;
   owner_consultant_id: string;
