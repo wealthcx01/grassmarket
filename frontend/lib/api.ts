@@ -11,6 +11,7 @@
 
 import type {
   ClientReportLink,
+  Consultant,
   DeclaredFigure,
   ReportProseSection,
   ReportReadReport,
@@ -500,6 +501,10 @@ export const api = {
       is what makes the banner's name the right one to show. */
   me(signal?: AbortSignal): Promise<{ id: string; full_name: string; email: string }> {
     return request(`/auth/me`, { headers: authHeaders(), signal });
+  },
+  /** Who this admin could act as (GRS-0208). 403 for anyone else. */
+  actAsCandidates(signal?: AbortSignal): Promise<Consultant[]> {
+    return request<Consultant[]>(`/auth/act-as/candidates`, { headers: authHeaders(), signal });
   },
   startActingAs(
     consultantId: string,

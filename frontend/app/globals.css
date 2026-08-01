@@ -805,4 +805,72 @@ body:has(.acting-as-banner) header {
   margin: 0.5rem 0 0;
   font-size: 0.82rem;
   color: var(--color-ink-muted);
+/* GRS-0208 — the act-as picker. Anchored under the account menu it was opened from, because a
+   dialog that appears in the middle of the screen loses its connection to the thing that summoned
+   it. Constrained height with its own scroll: the list is however many advisors exist. */
+.act-as-picker {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.4rem);
+  z-index: 70;
+  width: 22rem;
+  max-width: calc(100vw - 2rem);
+  background: var(--color-surface, #fff);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  padding: 0.9rem 1rem;
+}
+.act-as-picker-lede {
+  margin: 0 0 0.75rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+}
+.act-as-picker-error {
+  margin: 0 0 0.6rem;
+  font-size: 0.82rem;
+  color: var(--color-warn);
+}
+.act-as-picker-list {
+  list-style: none;
+  margin: 0 0 0.6rem;
+  padding: 0;
+  max-height: 16rem;
+  overflow-y: auto;
+}
+.act-as-picker-list button {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-radius: var(--radius);
+  padding: 0.45rem 0.5rem;
+  cursor: pointer;
+}
+.act-as-picker-list button:hover:not(:disabled) {
+  background: var(--color-accent-tint);
+}
+.act-as-picker-list button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.act-as-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.act-as-email {
+  font-size: 0.78rem;
+  color: var(--color-ink-muted);
+}
+.act-as-picker-cancel {
+  background: none;
+  border: 0;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.82rem;
+  color: var(--color-ink-muted);
+  cursor: pointer;
 }
