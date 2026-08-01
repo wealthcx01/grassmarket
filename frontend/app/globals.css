@@ -630,26 +630,6 @@ button {
   margin-top: 0.4rem;
 }
 /* The figure's numbers as text beside the bars: the chart is never the only way to read a value. */
-.shared-figure-key {
-  list-style: none;
-  margin: 0.5rem 0 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
-  gap: 0.15rem 1rem;
-  font-size: 0.85rem;
-}
-.shared-figure-key li {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  border-bottom: 1px dotted var(--color-border);
-  padding: 0.15rem 0;
-}
-.shared-figure-key b {
-  font-family: var(--font-mono);
-  font-weight: 500;
-}
 /* Disclosed, not deleted — a native <details> so it is keyboard- and screen-reader-correct. */
 .shared-appendix {
   border-top: 1px solid var(--color-border-strong);
@@ -900,4 +880,53 @@ body:has(.acting-as-banner) header {
   border-color: var(--color-warn);
   color: var(--color-warn);
   font-family: var(--font-mono);
+}
+
+/* GRS-0233 — labelled bars on the shared report.
+
+   Rows of HTML rather than a stretched SVG. The old figure was unlabelled <rect>s with the names in
+   a separate grid sorted differently, so a client had to count rows against a mismatched table. A
+   grid keeps label, bar and value on one line and lets the label WRAP at phone widths instead of
+   truncating — the ticket's "by measurement, not truncation". */
+.shared-bars {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0 0 0.5rem;
+}
+.shared-bar-row {
+  display: grid;
+  grid-template-columns: minmax(6rem, 11rem) 1fr 2.2rem;
+  align-items: center;
+  gap: 0.6rem;
+}
+.shared-bar-label {
+  font-size: 0.85rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.shared-bar-track {
+  display: block;
+  height: 0.85rem;
+  background: var(--color-accent-tint);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.shared-bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+}
+.shared-bar-value {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  text-align: right;
+}
+/* On a phone the label takes its own line, so it never squeezes the bar to nothing. */
+@media (max-width: 30rem) {
+  .shared-bar-row {
+    grid-template-columns: 1fr 2.2rem;
+  }
+  .shared-bar-label {
+    grid-column: 1 / -1;
+  }
 }

@@ -180,3 +180,74 @@ describe("the non-production mark (GRS-0229)", () => {
     expect(reportMarkText({})).toContain("NON-PRODUCTION DATA");
   });
 });
+
+describe("figures label their bars and keep meaningful order (GRS-0233)", () => {
+  const BUILDUP = {
+    labels: ["Business", "Powers", "Infrastructure", "Platform Value"],
+    values: [77, 29, 58, 55],
+    ordered: true,
+  };
+  const RANKED = {
+    labels: ["Back Office", "Front End", "EMS Gateway"],
+    values: [80, 82, 50],
+    notes: ["Back Office: scored on 3 of 4.", "Front End: scored on 4 of 4.", "EMS: 2 of 5."],
+    ordered: false,
+  };
+
+  function figuresFor(over: Record<string, unknown>) {
+    return payload({ figures: { ...(payload().figures as object), ...over } } as never);
+  }
+
+  it("keeps a composition figure in its declared order", () => {
+    // The bug: every figure was sorted ascending, so the build-up rendered
+    // Powers -> Platform Value -> Infrastructure -> Business under a caption promising a
+    // composition. The sort destroyed the thing the figure was for.
+    render(<SharedReport payload={figuresFor({ value_buildup: BUILDUP })} token="t" />);
+    const rows = screen.getAllByText(/Business|Powers|Infrastructure|Platform Value/);
+    const order = rows.map((r) => r.textContent);
+    expect(order.slice(0, 4)).toEqual([
+      "Business",
+      "Powers",
+      "Infrastructure",
+      "Platform Value",
+    ]);
+  });
+
+  it("still sorts a ranked figure weakest-first", () => {
+    render(<SharedReport payload={figuresFor({ maturity: RANKED })} token="t" />);
+    const labels = screen
+      .getAllByText(/Back Office|Front End|EMS Gateway/)
+      .map((el) => el.textContent);
+    // Weakest-first is what the ranked figure's caption says it is, so it stays.
+    expect(labels[0]).toBe("EMS Gateway");
+  });
+
+  it("labels every bar with its name and value", () => {
+    // Nine solid bars with no labels was the defect. A client should never have to count rows
+    // against a separately-sorted table to know which bar is which.
+    render(<SharedReport payload={figuresFor({ maturity: RANKED })} token="t" />);
+    for (const label of RANKED.labels) {
+      // getAllBy, not getBy: a module can legitimately appear in more than one figure on the page.
+      expect(screen.getAllByText(label).length).toBeGreaterThan(0);
+    }
+    for (const value of ["80", "82", "50"]) {
+      expect(screen.getAllByText(value).length).toBeGreaterThan(0);
+    }
+  });
+
+  it("carries each bar's meaning on hover where there is one", () => {
+    const { container } = render(
+      <SharedReport payload={figuresFor({ maturity: RANKED })} token="t" />,
+    );
+    const titled = container.querySelectorAll(".shared-bar-row[title]");
+    expect(titled.length).toBe(RANKED.labels.length);
+  });
+
+  it("renders without notes, because an older snapshot has none", () => {
+    // Snapshots issued before GRS-0233 carry no `notes` and no `ordered`. They must still render.
+    const legacy = { labels: ["A", "B"], values: [10, 20] };
+    render(<SharedReport payload={figuresFor({ maturity: legacy })} token="t" />);
+    expect(screen.getByText("A")).toBeTruthy();
+  });
+});
+

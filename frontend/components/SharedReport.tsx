@@ -20,7 +20,14 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-export type Figure = { labels: string[]; values: number[] };
+export type Figure = {
+  labels: string[];
+  values: number[];
+  /** One line per entry, shown on hover (GRS-0233 scope 4). May be absent on older snapshots. */
+  notes?: string[];
+  /** True when the ORDER carries meaning and must be rendered as given (GRS-0233 scope 2). */
+  ordered?: boolean;
+};
 
 export type SharedReportPayload = {
   report: {
@@ -159,48 +166,48 @@ function useSectionTracking(token: string, enabled: boolean) {
  * by colour alone, matching the PDF's greyscale rule.
  */
 function BarFigure({ figure, caption }: { figure: Figure; caption: string }) {
-  const rows = useMemo(
-    () =>
-      figure.labels
-        .map((label, index) => ({ label, value: figure.values[index] ?? 0 }))
-        .sort((a, b) => a.value - b.value),
-    [figure]
-  );
+  const rows = useMemo(() => {
+    const built = figure.labels.map((label, index) => ({
+      label,
+      value: figure.values[index] ?? 0,
+      note: figure.notes?.[index],
+    }));
+    // GRS-0233 scope 2. The old renderer sorted EVERY figure ascending, which turned the value
+    // build-up into four bars in the wrong sequence under a caption promising a composition. A
+    // series that declares its order keeps it; a ranked one is still shown weakest-first, because
+    // weakest-first is what its caption says it is.
+    return figure.ordered ? built : [...built].sort((a, b) => a.value - b.value);
+  }, [figure]);
   if (!rows.length) return null;
 
-  const rowHeight = 26;
-  const height = rows.length * rowHeight + 8;
+  const max = Math.max(...rows.map((r) => r.value), 100);
 
   return (
     <figure className="shared-figure">
-      <svg
-        viewBox={`0 0 100 ${height}`}
-        preserveAspectRatio="none"
+      {/* GRS-0233 scope 1. This was nine unlabelled <rect>s in an SVG, with the names in a separate
+          grid sorted differently — a client had to count rows against a mismatched table to know
+          which bar was which. Rows of HTML instead of a stretched SVG: the label wraps at phone
+          widths instead of distorting or truncating, and the value sits beside its own bar. */}
+      <div
+        className="shared-bars"
         role="img"
-        aria-label={`${caption}. ${rows.map((r) => `${r.label}: ${r.value.toFixed(0)} out of 100`).join(". ")}`}
-        style={{ width: "100%", height: `${height}px` }}
+        aria-label={`${caption}. ${rows
+          .map((r) => `${r.label}: ${r.value.toFixed(0)} out of 100`)
+          .join(". ")}`}
       >
-        {rows.map((row, index) => (
-          <g key={row.label}>
-            <rect
-              x={0}
-              y={index * rowHeight + 4}
-              width={Math.max(row.value, 0.5)}
-              height={rowHeight - 12}
-              fill="var(--color-accent)"
-              rx={1}
-            />
-          </g>
-        ))}
-      </svg>
-      <ul className="shared-figure-key">
         {rows.map((row) => (
-          <li key={row.label}>
-            <span>{row.label}</span>
-            <b>{row.value.toFixed(0)}</b>
-          </li>
+          <div className="shared-bar-row" key={row.label} title={row.note ?? undefined}>
+            <span className="shared-bar-label">{row.label}</span>
+            <span className="shared-bar-track" aria-hidden>
+              <span
+                className="shared-bar-fill"
+                style={{ width: `${Math.max((row.value / max) * 100, 0.5)}%` }}
+              />
+            </span>
+            <b className="shared-bar-value">{row.value.toFixed(0)}</b>
+          </div>
         ))}
-      </ul>
+      </div>
       <figcaption>{caption}</figcaption>
     </figure>
   );
