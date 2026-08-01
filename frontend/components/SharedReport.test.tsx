@@ -9,7 +9,11 @@
 import { render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { SharedReport, type SharedReportPayload } from "@/components/SharedReport";
+import {
+  SharedReport,
+  reportMarkText,
+  type SharedReportPayload,
+} from "@/components/SharedReport";
 
 const SECTIONS = ["business", "advantage", "constraint", "actions", "value", "appendix"];
 
@@ -120,5 +124,59 @@ describe("SharedReport (GRS-0220)", () => {
     const bare = payload();
     bare.figures = {};
     expect(() => render(<SharedReport payload={bare} token="t" />)).not.toThrow();
+  });
+});
+
+describe("the non-production mark (GRS-0229)", () => {
+  it("marks a sandbox record, persistently and at the top", () => {
+    render(
+      <SharedReport payload={payload({ non_production: true, draft: true })} token="t" />,
+    );
+    const mark = screen.getByTestId("report-mark");
+    expect(mark.textContent).toContain("NON-PRODUCTION DATA");
+    // role=alert, not note: this is the one thing on the page a reader must not miss.
+    expect(mark.getAttribute("role")).toBe("alert");
+    // The class carries `position: fixed`, which is what makes it survive scrolling. Asserting the
+    // hook rather than the computed style, because jsdom does not lay anything out.
+    expect(mark.className).toContain("shared-report-mark");
+  });
+
+  it("renders nothing for a production, client-approved record", () => {
+    render(
+      <SharedReport payload={payload({ non_production: false, draft: false })} token="t" />,
+    );
+    expect(screen.queryByTestId("report-mark")).toBeNull();
+  });
+
+  it("marks a draft on a production record, and says so in the PDF's words", () => {
+    render(
+      <SharedReport payload={payload({ non_production: false, draft: true })} token="t" />,
+    );
+    const mark = screen.getByTestId("report-mark");
+    expect(mark.textContent).toContain("DRAFT");
+    expect(mark.textContent).toContain("not client-usable");
+    expect(mark.textContent).not.toContain("NON-PRODUCTION");
+  });
+
+  it("shows the mark when the flags are absent, because a legacy snapshot is not a safe one", () => {
+    // A link issued before GRS-0229 has neither flag in its stored JSON. The backend defaults both
+    // to true; this asserts the component agrees rather than silently rendering a clean page.
+    const { non_production, draft, ...legacy } = payload({
+      non_production: true,
+      draft: true,
+    });
+    void non_production;
+    void draft;
+    render(<SharedReport payload={legacy as SharedReportPayload} token="t" />);
+    const mark = screen.getByTestId("report-mark");
+    expect(mark.textContent).toContain("NON-PRODUCTION DATA");
+  });
+
+  it("combines both marks when both apply", () => {
+    expect(reportMarkText({ non_production: true, draft: true })).toContain("DRAFT");
+    expect(reportMarkText({ non_production: true, draft: true })).toContain("NON-PRODUCTION DATA");
+    expect(reportMarkText({ non_production: false, draft: false })).toBeNull();
+    // Absent is not the same as false, and must not be treated as it.
+    expect(reportMarkText({})).toContain("NON-PRODUCTION DATA");
   });
 });

@@ -49,6 +49,39 @@ def finalised_assessment(client, owner: SeededConsultant, founder: SeededConsult
     return aid
 
 
+def sandbox_deliverable_with_run(client, owner: SeededConsultant) -> str:
+    """The same thing on a SANDBOX record — which self-approves, so no founder is needed (ADR-0029).
+
+    This is the record type GRS-0229 is about: watermarked everywhere, never client-facing, and the
+    one an advisor is most likely to share a link for, because it is what they use to preview the
+    client experience.
+    """
+    pid = contracted_prospect(client, owner)
+    aid = client.post(
+        "/assessments",
+        json={"subject": "Meridian", "provenance": "sandbox"},
+        headers=auth_header(owner),
+    ).json()["id"]
+    client.put(
+        f"/assessments/{aid}", json=_body(_scoreable_partial_doc()), headers=auth_header(owner)
+    )
+    finalised = client.post(f"/assessments/{aid}/finalise", headers=auth_header(owner))
+    assert finalised.status_code == 200, finalised.text
+    engagement = client.post(
+        "/engagements",
+        json={"prospect_id": pid, "title": "Sandbox preview", "assessment_ids": [aid]},
+        headers=auth_header(owner),
+    )
+    assert engagement.status_code == 201, engagement.text
+    generated = client.post(
+        f"/engagements/{engagement.json()['id']}/deliverables",
+        json={"client_facing": False},
+        headers=auth_header(owner),
+    )
+    assert generated.status_code in (200, 201), generated.text
+    return generated.json()["id"]
+
+
 def deliverable_with_run(client, owner: SeededConsultant, founder: SeededConsultant) -> str:
     """A generated deliverable bound to a finalised run — what a client report is built from."""
     pid = contracted_prospect(client, owner)

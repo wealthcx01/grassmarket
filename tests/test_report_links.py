@@ -23,7 +23,12 @@ from grassmarket.deliverables.report_links import (
     hash_token,
     resolve_expiry,
 )
-from tests.client_report_helpers import deliverable_with_run, written_prose
+from grassmarket.web.routers.report_links import SharedReportPayload
+from tests.client_report_helpers import (
+    deliverable_with_run,
+    sandbox_deliverable_with_run,
+    written_prose,
+)
 from tests.conftest import SeededConsultant, auth_header
 
 
@@ -348,3 +353,74 @@ class TestTheSnapshot:
 def test_report_section_kinds_round_trip() -> None:
     """The tracking API speaks the content model's section vocabulary, not a parallel one."""
     assert {k.value for k in SECTION_ORDER} == {k.value for k in ReportSectionKind}
+
+
+class TestTheNonProductionMark:
+    """GRS-0229. A demo or sandbox record's share link is the one rendition an outsider can reach
+    without a login, and it shipped with no mark of any kind while the PDF of the same record
+    carried one on every page.
+
+    The flags live IN the snapshot rather than being derived when the page is served, for the same
+    reason the report does: a record reclassified later must not retroactively change what an
+    already-issued link shows a reader.
+    """
+
+    def _issue(self, client, owner, deliverable: str) -> dict:
+        created = client.post(
+            f"/deliverables/{deliverable}/links",
+            json={"recipient_label": "CFO"},
+            headers=auth_header(owner),
+        )
+        assert created.status_code == 201, created.text
+        public = client.get(f"/shared/report/{created.json()['token']}")
+        assert public.status_code == 200, public.text
+        return public.json()
+
+    def _sandbox(self, client, owner) -> str:
+        did = sandbox_deliverable_with_run(client, owner)
+        written = client.put(
+            f"/deliverables/{did}/report-prose",
+            json={"sections": written_prose()},
+            headers=auth_header(owner),
+        )
+        assert written.status_code == 200, written.text
+        return did
+
+    def test_a_sandbox_record_is_marked_non_production(
+        self, client, alice: SeededConsultant
+    ) -> None:
+        payload = self._issue(client, alice, self._sandbox(client, alice))
+        assert payload["non_production"] is True
+
+    def test_a_production_record_is_not(
+        self, client, alice: SeededConsultant, deliverable_id: str
+    ) -> None:
+        payload = self._issue(client, alice, deliverable_id)
+        assert payload["non_production"] is False
+
+    def test_a_draft_internal_deliverable_is_marked_draft(
+        self, client, alice: SeededConsultant, deliverable_id: str
+    ) -> None:
+        """The fixture generates `client_facing=False`, so the deliverable is DRAFT_INTERNAL: a
+        production record that is nonetheless not approved for client use. The two marks are
+        independent, and the page draws whichever apply."""
+        payload = self._issue(client, alice, deliverable_id)
+        assert payload["draft"] is True
+
+    def test_the_flags_are_frozen_into_the_snapshot(self, client, alice: SeededConsultant) -> None:
+        """Scope item 2. The public surface reads the stored snapshot and nothing else, so a flag
+        present there is a flag no later reclassification can move."""
+        payload = self._issue(client, alice, self._sandbox(client, alice))
+        assert set(payload) >= {"report", "figures", "tracking_notice", "non_production", "draft"}
+
+    def test_a_legacy_snapshot_defaults_to_showing_the_mark(
+        self, client, alice: SeededConsultant, deliverable_id: str
+    ) -> None:
+        """A link issued before this field existed has no flag in its stored JSON. The default is
+        the SAFE direction — show the mark — because a snapshot whose provenance nobody recorded is
+        exactly the case where a reader should be told the numbers may not be production."""
+        payload = self._issue(client, alice, deliverable_id)
+        legacy = {k: v for k, v in payload.items() if k not in ("non_production", "draft")}
+        restored = SharedReportPayload.model_validate(legacy)
+        assert restored.non_production is True
+        assert restored.draft is True
