@@ -35,6 +35,19 @@
   "additionalProperties": false,
   "description": "Decoded access-token claims. `sub` is the consultant id — the principal the repository\nlayer scopes every query to.",
   "properties": {
+    "act_as": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Consultant id this admin session is scoped to (stringified UUID), or null.",
+      "title": "Act As"
+    },
     "assessor_level": {
       "$ref": "#/$defs/AssessorLevel"
     },

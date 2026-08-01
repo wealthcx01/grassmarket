@@ -709,3 +709,49 @@ button {
   font-family: var(--font-serif);
   margin: 0.4rem 0 0.6rem;
 }
+
+/* GRS-0208 — the acting-as banner.
+
+   Fixed, full width, above the sticky header (z-index 60 vs the header's 50), and in the caution
+   colour rather than the accent: this is a state to leave, not a feature to enjoy. It is not
+   dismissible, for the same reason the non-production report mark is not — the dangerous version of
+   this state is the one nobody can see. */
+.acting-as-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: var(--color-warn, #8a5a00);
+  color: #fff;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+.acting-as-banner button {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius);
+  padding: 0.25rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.acting-as-banner button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.acting-as-error {
+  width: 100%;
+  text-align: center;
+  font-size: 0.78rem;
+}
+/* The sticky header sits below the banner when it is present, so neither covers the other. */
+body:has(.acting-as-banner) header {
+  top: 2.25rem;
+}

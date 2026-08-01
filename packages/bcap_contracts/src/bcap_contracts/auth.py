@@ -31,6 +31,14 @@ class JWTClaims(BaseModel):
     aud: str = Field(description="Audience, e.g. bruntsfield.")
     iat: int = Field(description="Issued-at (unix seconds).")
     exp: int = Field(description="Expiry (unix seconds).")
+    # GRS-0208. `sub` stays the ADMIN who authenticated — the token never lies about who is at the
+    # keyboard — and this claim narrows the session to one consultant. Deliberately this way round:
+    # the identity that signed in is the identity in `sub`, and act-as is a restriction layered on
+    # top rather than a substitution underneath.
+    act_as: str | None = Field(
+        default=None,
+        description="Consultant id this admin session is scoped to (stringified UUID), or null.",
+    )
 
 
 class Consultant(ResourceBase):

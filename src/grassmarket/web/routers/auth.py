@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import secrets
+from datetime import UTC, datetime
+from uuid import UUID
 
 from bcap_contracts.auth import (
     AcceptInvitationRequest,
@@ -15,7 +17,7 @@ from bcap_contracts.auth import (
 from bcap_contracts.common import ConsultantTier, Role
 from fastapi import APIRouter, Cookie, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 from grassmarket.auth.google_oauth import (
     GoogleOAuthClient,
@@ -24,6 +26,7 @@ from grassmarket.auth.google_oauth import (
     sign_oauth_txn,
     verify_oauth_txn,
 )
+from grassmarket.auth.security import create_access_token
 from grassmarket.auth.service import (
     AuthService,
     ForbiddenInvitationError,
@@ -32,7 +35,13 @@ from grassmarket.auth.service import (
     UnprovisionedGoogleAccountError,
 )
 from grassmarket.config import Settings
-from grassmarket.data.repository import ConflictError, NotFoundError, Principal, Repository
+from grassmarket.data.repository import (
+    ConflictError,
+    NotFoundError,
+    Principal,
+    Repository,
+    ScopeViolationError,
+)
 from grassmarket.web.dependencies import (
     get_app_settings,
     get_auth_service,
@@ -242,3 +251,103 @@ def exchange_session(
     except InvalidCredentialsError as exc:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc)) from exc
     return TokenResponse(access_token=tokens.access_token, refresh_token=tokens.refresh_token)
+
+
+class ActAsResponse(BaseModel):
+    """The narrowed session, plus who it is for — the banner needs a name, not a UUID."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    access_token: str
+    token_type: str = "bearer"
+    subject_consultant_id: UUID
+    subject_name: str
+    subject_email: str
+
+
+@router.post("/act-as/{consultant_id}", response_model=ActAsResponse)
+def start_act_as(
+    consultant_id: UUID,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+    settings: Settings = Depends(get_app_settings),
+) -> ActAsResponse:
+    """Open an admin session scoped to one consultant (GRS-0208).
+
+    No refresh token is issued. An act-as session is deliberately short-lived and non-renewable:
+    it should end because the admin finished looking, not because a background refresh quietly kept
+    it alive for a day. Ending is `DELETE /auth/act-as`; expiry ends it too.
+    """
+    now = datetime.now(UTC)
+    try:
+        acting = repo.begin_act_as(
+            principal,
+            consultant_id,
+            now=now,
+            founder_reviewer_email=settings.founder_reviewer_email,
+        )
+    except ScopeViolationError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+    except NotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except ConflictError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+
+    subject = repo.get_consultant_by_id(acting.consultant_id)
+    if subject is None:  # pragma: no cover - begin_act_as just read this row
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found.")
+    admin = repo.get_consultant_by_id(principal.consultant_id)
+    if admin is None:  # pragma: no cover - the caller authenticated as this row
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found.")
+
+    # `sub` stays the ADMIN. The token names who is at the keyboard; `act_as` is the restriction.
+    token = create_access_token(
+        settings,
+        consultant_id=admin.id,
+        email=admin.email,
+        role=admin.role,
+        tier=admin.tier,
+        assessor_level=admin.assessor_level,
+        now=now,
+        act_as=subject.id,
+    )
+    return ActAsResponse(
+        access_token=token,
+        subject_consultant_id=subject.id,
+        subject_name=subject.full_name,
+        subject_email=subject.email,
+    )
+
+
+@router.delete("/act-as", response_model=TokenResponse)
+def stop_act_as(
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+    settings: Settings = Depends(get_app_settings),
+) -> TokenResponse:
+    """Close the act-as session and hand back an ordinary admin token.
+
+    The admin's own identity is rebuilt from `acting_admin_id` rather than trusted from the client,
+    so "stop acting as" can only ever return you to yourself.
+    """
+    now = datetime.now(UTC)
+    try:
+        repo.end_act_as(principal, now=now)
+    except ConflictError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+    assert principal.acting_admin_id is not None  # end_act_as refused otherwise
+    admin = repo.get_consultant_by_id(principal.acting_admin_id)
+    if admin is None:  # pragma: no cover - they authenticated moments ago
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unknown admin.")
+    token = create_access_token(
+        settings,
+        consultant_id=admin.id,
+        email=admin.email,
+        role=admin.role,
+        tier=admin.tier,
+        assessor_level=admin.assessor_level,
+        now=now,
+    )
+    # No refresh token here either: this path returns an admin to their own scope, and the client
+    # already holds whatever refresh token their original login issued.
+    return TokenResponse(access_token=token, refresh_token="", token_type="bearer")

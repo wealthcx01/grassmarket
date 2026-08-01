@@ -18,6 +18,8 @@ export interface Session {
   isAdmin: boolean;
   isCommittee: boolean;
   isCertifiedLead: boolean;
+  /** Set while an admin is acting as another consultant (GRS-0208): the subject's id. */
+  actingAsConsultantId: string | null;
 }
 
 function decodePayload(token: string): Record<string, unknown> | null {
@@ -64,6 +66,7 @@ export function getSession(): Session | null {
     assessorLevel: level,
     isAdmin: role === "admin",
     isCommittee: role === "committee_member" || role === "admin",
+    actingAsConsultantId: typeof claims.act_as === "string" ? claims.act_as : null,
     isCertifiedLead: level === "certified_lead",
   };
 }
