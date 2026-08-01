@@ -74,6 +74,13 @@ class ReportProseResponse(BaseModel):
     # than from a second endpoint because they are read together every time, and a separate call
     # would give the editor a window where it knows the words but not the vocabulary.
     available_figures: dict[str, list[DeclaredFigure]] = Field(default_factory=dict)
+    # Whose report this is (GRS-0231). The same identity the PDF cover prints, from the same
+    # assembly path, so the editor and the artefact cannot disagree about the client. Optional
+    # because a deliverable with no finalised run has no cover to agree with.
+    subject: str | None = None
+    engagement_title: str | None = None
+    provenance: str | None = None
+    operating_model: str | None = None
 
 
 class SaveReportProseRequest(BaseModel):
@@ -223,9 +230,24 @@ def get_report_prose(
         # The vocabulary the gate will accept. Best-effort: a deliverable with no finalised run
         # cannot produce figures, and that is a legitimate state for a report nobody has scored yet
         # — it must not stop the editor loading, or an advisor could not even see the shape.
+        identity: dict[str, str | None] = {
+            "subject": None,
+            "engagement_title": None,
+            "provenance": None,
+            "operating_model": None,
+        }
         try:
-            context, _, _, _ = _context(repo, principal, deliverable_id)
+            context, deliverable, run_id, provenance = _context(repo, principal, deliverable_id)
             available = figures_available_to(context)
+            engagement = repo.get_engagement(principal, deliverable.engagement_id)
+            record = repo.get_scoring_run_record(principal, run_id)
+            document = repo.get_assessment(principal, record.assessment_id).document
+            identity = {
+                "subject": context.subject,
+                "engagement_title": engagement.title,
+                "provenance": provenance.value,
+                "operating_model": profile_key_of(document),
+            }
         except HTTPException:
             available = {}
     except (NotFoundError, ScopeViolationError) as exc:
@@ -233,10 +255,10 @@ def get_report_prose(
     if stored is None:
         # An empty draft, so the advisor sees the shape of the argument rather than a blank page.
         return ReportProseResponse(
-            sections=default_prose(), written=False, available_figures=available
+            sections=default_prose(), written=False, available_figures=available, **identity
         )
     return ReportProseResponse(
-        sections=json.loads(stored), written=True, available_figures=available
+        sections=json.loads(stored), written=True, available_figures=available, **identity
     )
 
 
