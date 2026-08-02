@@ -272,3 +272,118 @@ class TestTheUndeclaredFigureMessage:
             )
         assert "What that is worth" in str(exc.value)
         assert "DeclaredFigure" not in str(exc.value)
+
+
+class TestTheAppendixCannotContradictTheRun:
+    """GRS-0232. Appendix prose reading "Methodology v1.2" shipped into a client PDF a centimetre
+    above the run's own table reading "Methodology version 1.1".
+
+    The declared-figure gate exempts the appendix — right for percentile prose, and wrong for this:
+    it meant the one section holding the audit trail was the one section where a wrong number
+    survived into a client artefact. A version claim is exactly what a technical reviewer checks
+    first.
+    """
+
+    #: The appendix declares the run's own values, exactly as the real builder does — including the
+    #: versions. Without these the DECLARED-FIGURE rule refuses first and the version rule is never
+    #: reached, so the fixture would be testing the wrong gate.
+    _APPENDIX_FIGURES = (
+        DeclaredFigure(
+            key="methodology_version", label="Methodology", rendered="1.1", source="run.methodology"
+        ),
+        DeclaredFigure(
+            key="coefficient_version",
+            label="Coefficients",
+            rendered="v1-elicited",
+            source="run.coefficients",
+        ),
+        DeclaredFigure(key="modules", label="Modules", rendered="9", source="run.modules"),
+        DeclaredFigure(
+            key="subcomponents", label="Subcomponents", rendered="51", source="run.subcomponents"
+        ),
+        DeclaredFigure(key="engine", label="Engine", rendered="3.0", source="run.engine_version"),
+        DeclaredFigure(key="other", label="Other", rendered="1.2", source="run.other"),
+        DeclaredFigure(key="another", label="Another", rendered="2-something", source="run.other2"),
+        DeclaredFigure(key="third", label="Third", rendered="9.9", source="run.other3"),
+    )
+
+    def _report(self, appendix_body: str, *, methodology: str = "1.1") -> ClientReport:
+        sections = []
+        for kind in SECTION_ORDER:
+            body = appendix_body if kind is ReportSectionKind.APPENDIX else "Prose without numbers."
+            sections.append(
+                ReportSection(
+                    kind=kind,
+                    heading=kind.value.title(),
+                    body=[body],
+                    figures=self._APPENDIX_FIGURES if kind is ReportSectionKind.APPENDIX else (),
+                )
+            )
+        return ClientReport(
+            subject="WeBull",
+            scoring_run_id=uuid4(),
+            methodology_version=methodology,
+            coefficient_version="v1-elicited",
+            sections=sections,
+        )
+
+    def test_a_wrong_methodology_version_in_the_appendix_is_refused(self) -> None:
+        with pytest.raises(ValidationError) as exc:
+            self._report("Scored under Methodology v1.2.", methodology="1.1")
+        assert "Technical appendix" in str(exc.value)
+        assert "1.2" in str(exc.value) and "1.1" in str(exc.value)
+
+    def test_the_correct_version_passes(self) -> None:
+        report = self._report("Scored under Methodology v1.1.", methodology="1.1")
+        assert report.methodology_version == "1.1"
+
+    def test_decoration_is_not_a_difference(self) -> None:
+        """'v1.1', 'V1.1' and 'version 1.1' are the same claim. Refusing on capitalisation would
+        teach an advisor the gate is arbitrary."""
+        for wording in ("Methodology v1.1.", "Methodology V1.1.", "methodology version 1.1."):
+            assert self._report(wording, methodology="1.1") is not None
+
+    def test_a_wrong_version_in_a_BODY_section_is_refused_too(self) -> None:
+        """Scope 1 says every section, not just the appendix — the body could always have carried
+        one, and the old gate only counted it as an undeclared NUMBER, which says nothing about
+        whether the version is right."""
+        sections = []
+        for kind in SECTION_ORDER:
+            body = (
+                "Scored under Methodology v9.9."
+                if kind is ReportSectionKind.BUSINESS
+                else "Prose without numbers."
+            )
+            sections.append(
+                ReportSection(
+                    kind=kind,
+                    heading=kind.value.title(),
+                    body=[body],
+                    # 9.9 IS declared here — which is the whole point. The declared-figure rule is a
+                    # PRESENCE check, so a number can be declared and still be the wrong claim.
+                    figures=self._APPENDIX_FIGURES if kind is ReportSectionKind.BUSINESS else (),
+                )
+            )
+        with pytest.raises(ValidationError, match="The business"):
+            ClientReport(
+                subject="WeBull",
+                scoring_run_id=uuid4(),
+                methodology_version="1.1",
+                coefficient_version="v1-elicited",
+                sections=sections,
+            )
+
+    def test_the_coefficient_set_is_checked(self) -> None:
+        with pytest.raises(ValidationError, match="coefficient"):
+            self._report("Priced on the coefficient set v2-something.")
+
+    def test_an_ordinary_number_is_not_mistaken_for_a_version(self) -> None:
+        """A false refusal here would teach an advisor to distrust the gate, which costs more than
+        the check is worth. The pattern anchors on the NAME, not on anything version-shaped."""
+        assert self._report("The run covered 9 modules across 51 subcomponents.") is not None
+        assert self._report("The 7 Powers framework applies to all of them.") is not None
+
+    def test_a_version_the_report_does_not_carry_is_left_alone(self) -> None:
+        """Refusing on an engine version this report declares nowhere would block prose about
+        something the rule has no truth for — that is not this gate's business."""
+        assert self._report("Produced by engine version 3.0.") is not None
