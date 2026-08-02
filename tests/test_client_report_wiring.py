@@ -380,6 +380,55 @@ class TestTheLoopIsClosed:
                     f"the web page says something the PDF does not: {paragraph}"
                 )
 
+    def test_the_two_renditions_agree_on_figure_order(
+        self, client, alice: SeededConsultant, deliverable: str, founder: SeededConsultant
+    ) -> None:
+        """GRS-0233 scope 3: parity ASSERTED, not hoped.
+
+        The web page used to sort every figure ascending client-side, so the value build-up rendered
+        Powers -> Platform Value -> Infrastructure -> Business under a caption promising a
+        composition, while the PDF kept the build-up order. Two renditions of one figure disagreeing
+        is exactly the drift GRS-0211 exists to prevent, and nothing was checking it.
+
+        The payload now carries the order AND whether that order is significant, so the web renderer
+        has no reason to invent one. This asserts the contract between them; the renderer's own
+        behaviour is asserted in `SharedReport.test.tsx`.
+        """
+        _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
+        created = client.post(
+            f"/deliverables/{deliverable}/links",
+            json={"recipient_label": "cfo@client.example"},
+            headers=auth_header(alice),
+        )
+        served = client.get(f"/shared/report/{created.json()['token']}").json()
+
+        buildup = served["figures"]["value_buildup"]
+        assert buildup["labels"] == ["Business", "Powers", "Infrastructure", "Platform Value"]
+        assert buildup["ordered"] is True, "the composition figure must declare its order binding"
+
+        # The ranked figures do NOT claim a binding order — weakest-first is applied at render, and
+        # saying otherwise would freeze them in registry order instead.
+        assert served["figures"]["maturity"]["ordered"] is False
+        assert served["figures"]["module_breakdown"]["ordered"] is False
+
+    def test_every_figure_entry_carries_a_label(
+        self, client, alice: SeededConsultant, deliverable: str, founder: SeededConsultant
+    ) -> None:
+        """GRS-0233 scope 1. Nine solid bars with no labels was the defect; a payload that ships
+        values without matching labels would put it straight back."""
+        _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
+        created = client.post(
+            f"/deliverables/{deliverable}/links",
+            json={"recipient_label": "cfo@client.example"},
+            headers=auth_header(alice),
+        )
+        served = client.get(f"/shared/report/{created.json()['token']}").json()
+        for name, figure in served["figures"].items():
+            assert len(figure["labels"]) == len(figure["values"]), f"{name}: unlabelled bars"
+            assert all(label.strip() for label in figure["labels"]), f"{name}: a blank label"
+
     def test_the_snapshot_does_not_move_when_the_prose_is_edited_later(
         self, client, alice: SeededConsultant, deliverable: str, founder: SeededConsultant
     ) -> None:

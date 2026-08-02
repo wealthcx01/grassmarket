@@ -65,7 +65,7 @@ class SharedReportPayload(BaseModel):
 
     report: ClientReport
     #: Parallel label/value lists per figure, drawn as SVG client-side rather than as images.
-    figures: dict[str, dict[str, list]]
+    figures: dict[str, dict[str, object]]
     #: Shown on the page. The reader is told, in plain words, that reads are visible to the sender.
     tracking_notice: str
     # The two marks the PDF draws, carried IN the snapshot rather than derived when the page is
@@ -132,19 +132,21 @@ def create_link(
     assert_report_releasable(repo, principal, deliverable_id, provenance)
     snapshot = SharedReportPayload(
         report=assembled.report,
+        # Serialised from the ONE figure source the PDF also renders from, including the order and
+        # the per-entry notes — so the two renditions cannot disagree about what is shown or in what
+        # sequence (GRS-0233 scope 3).
         figures={
-            "maturity": {
-                "labels": list(assembled.figures.maturity.labels),
-                "values": list(assembled.figures.maturity.values),
-            },
-            "value_buildup": {
-                "labels": list(assembled.figures.value_buildup.labels),
-                "values": list(assembled.figures.value_buildup.values),
-            },
-            "module_breakdown": {
-                "labels": list(assembled.figures.module_breakdown.labels),
-                "values": list(assembled.figures.module_breakdown.values),
-            },
+            name: {
+                "labels": list(series.labels),
+                "values": list(series.values),
+                "notes": list(series.notes),
+                "ordered": series.ordered,
+            }
+            for name, series in (
+                ("maturity", assembled.figures.maturity),
+                ("value_buildup", assembled.figures.value_buildup),
+                ("module_breakdown", assembled.figures.module_breakdown),
+            )
         },
         tracking_notice=TRACKING_NOTICE,
         # Provenance, not mode — see the note on `assemble_for`. A sandbox record scored on an
