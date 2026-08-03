@@ -149,6 +149,39 @@ SECTION_TITLES: dict[ReportSectionKind, str] = {
 }
 
 
+#: A version CLAIM in prose: the thing named, then the value asserted for it. Matches "Methodology
+#: v1.2", "methodology version 1.1", "the coefficient set v1-elicited", "engine version 1.4.0".
+#: Deliberately anchored on the NAME rather than on anything version-shaped, so it cannot fire on an
+#: ordinary number that happens to look like a version — a false refusal here would teach an advisor
+#: to distrust the gate, which costs more than the check is worth.
+_VERSION_CLAIM = re.compile(
+    r"\b(methodology|coefficient(?:\s+set)?|engine|uncertainty)\b"
+    r"[^.\n]{0,20}?"
+    r"\bv(?:ersion)?\.?\s*([0-9][\w.\-]*)",
+    re.IGNORECASE,
+)
+
+
+def _normalise_version(value: str) -> str:
+    """Compare versions on their digits and separators, not their decoration. 'v1.2', 'V1.2' and
+    '1.2' are the same claim; 'v1-elicited' and 'v1-draft' are not."""
+    return value.strip().lstrip("vV").strip(". ").lower()
+
+
+def version_mismatch_message(kind: ReportSectionKind, named: str, claimed: str, actual: str) -> str:
+    """The refusal when prose asserts a version the run does not have (GRS-0232).
+
+    In the product voice and beside its rule, for the same reason as `undeclared_figure_message` —
+    both are read by an advisor and both are shown in two places.
+    """
+    return (
+        f"{SECTION_TITLES[kind]} says the {named.lower()} version is {claimed}, but this "
+        f"assessment ran on {actual}. A client checks the version table first, so the words and "
+        f"the table have to agree. Correct the sentence, or re-run the assessment if it is "
+        f"genuinely out of date."
+    )
+
+
 def undeclared_figure_message(kind: ReportSectionKind, numbers: list[str]) -> str:
     """The sentence an advisor reads when their prose states a number the run does not declare.
 
@@ -280,6 +313,46 @@ class ClientReport(BaseModel):
                 "report sections are out of order. Expected "
                 f"{' → '.join(SECTION_ORDER)}, got {' → '.join(kinds)}."
             )
+        return self
+
+    @model_validator(mode="after")
+    def _no_section_contradicts_the_run(self) -> ClientReport:
+        """Rule 5 (GRS-0232). A version stated in prose must match the run — in EVERY section.
+
+        The declared-figure gate (rule 3) exempts the appendix, which is right for percentile prose
+        and wrong for this: it meant the one section holding the audit trail was the one section
+        where a wrong number survived into a client artefact. "Methodology v1.2" shipped a
+        centimetre above a table reading "Methodology version 1.1", and nothing caught it.
+
+        Checked here rather than on `ReportSection` because a section does not know the run's
+        versions — only the assembled report does. That also means no rendition can opt out: both
+        the PDF and the web page are built from a validated `ClientReport` (GRS-0211's construction
+        rule).
+        """
+        truth = {
+            "methodology": self.methodology_version,
+            "coefficient": self.coefficient_version,
+            "coefficient set": self.coefficient_version,
+        }
+        # The engine and uncertainty versions are not fields on the report, but the appendix
+        # declares them as figures — so where one exists, its declared value is the truth.
+        for section in self.sections:
+            for figure in section.figures:
+                if figure.key in ("engine_version", "uncertainty_version"):
+                    truth[figure.key.split("_")[0]] = figure.rendered
+
+        for section in self.sections:
+            for paragraph in section.body:
+                for named, claimed in _VERSION_CLAIM.findall(paragraph):
+                    actual = truth.get(named.strip().lower())
+                    if actual is None:
+                        # Nothing to check it against. Refusing here would block prose about a
+                        # version this report does not carry, which is not this rule's business.
+                        continue
+                    if _normalise_version(claimed) != _normalise_version(actual):
+                        raise ValueError(
+                            version_mismatch_message(section.kind, named, claimed, actual)
+                        )
         return self
 
     def section(self, kind: ReportSectionKind) -> ReportSection:

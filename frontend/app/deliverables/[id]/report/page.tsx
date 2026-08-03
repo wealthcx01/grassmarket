@@ -127,7 +127,13 @@ const SECTION_GUIDANCE: Record<string, string> = {
   constraint: "The honest reading of what is holding them back.",
   actions: "What to do about it, with the levers ranked.",
   value: "What that is worth if they act.",
-  appendix: "Coefficients, weights, uncertainty method, coverage. P10/P50/P90 may ONLY appear here.",
+  // GRS-0232 scope 3: say what is checked here, so the rule is met by reading rather than by
+  // refusal — the same principle as showing the declared figures (GRS-0230 scope 3).
+  appendix:
+    "Coefficients, weights, uncertainty method, coverage. P10/P50/P90 may ONLY appear here. " +
+    "Every number still has to be one the run declares, and any methodology, coefficient or " +
+    "engine version you state is checked against the run's own — the appendix is the audit trail, " +
+    "so it is the one section that must not contradict it.",
 };
 
 function triggerBlobDownload(blob: Blob, filename: string): void {
