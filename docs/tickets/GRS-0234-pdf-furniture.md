@@ -59,3 +59,68 @@ Observed on the staging WeBull and Hargreaves Lansdown PDFs, 31/07/2026:
 The founder downloads a report and could attach it to a client email unedited: the filename says
 what it is, the cover carries no keys, and the footer's caveat reads as a sentence a client can
 understand.
+
+
+**MOSTLY DONE.** Four scopes shipped. Scope 4 is half done and the half that is not is stated below
+rather than glossed.
+
+## 1 — The filename, and the reason it was a UUID
+
+The backend was **already** naming the file after the client. The UUID came from the frontend
+falling back to `${deliverableId}.pdf` because it could not read `Content-Disposition` — that header
+is not CORS-safelisted, and `expose_headers` was never set. `allow_headers` governs the *request*;
+exposing a *response* header is a separate list, and the asymmetry is easy to miss.
+
+Both halves fixed. The name is now
+`Bruntsfield — Platform assessment — <Client> — <YYYY-MM>.pdf`, punctuation-stripped because it
+crosses a filesystem, an email client and whatever the recipient uses, and sent in both spellings —
+RFC 5987 `filename*` for the real name, a plain ASCII `filename` for anything that cannot read it.
+
+## 2 — The cover
+
+The engagement title is **dropped**, not humanised. The title above it is the client and the line
+above it is the document, so a third line could only repeat one of them.
+
+## 3 — The footer
+
+`COEFFICIENT_STATUS_SENTENCES` in contracts maps status → sentence, so GRS-0150's ratification
+changes the words by changing which status the set carries rather than by editing a renderer. The
+identifier keeps its place in the appendix version table — asserted to appear exactly **once** in
+the document rather than once per page.
+
+A set that is client-usable and still names itself draft resolves to the *weaker* sentence. A
+labelling mistake must not be able to produce a stronger claim than the evidence.
+
+## 5 — One precision for V
+
+One decimal, everywhere. The portfolio quoted 54.7 where the appendix quoted 55 — the same number at
+two precisions, which is what ADR-0040's one-number rule exists to prevent. The rule is about the
+*displayed* number: a reader cannot tell rounding from disagreement.
+
+One decimal rather than zero because the wizard and portfolio already use it; rounding the surfaces
+an advisor reads daily to match a document they send occasionally is the wrong way round. Module
+scores keep 0dp — they are read as a ranking, V is read as a value.
+
+## 4 — Half done, and the half that is not
+
+**Done:** a regression check that no interior page of the three sample PDFs is effectively blank.
+
+**Not done:** the sparse page. Narrowing the build-up figure to 0.72 of the frame was tried as the
+cheap fix and **measured not to help** — across all three samples the page stayed at ~300–460
+characters beside the chart. The change was reverted rather than kept, because it had no effect and
+its comment would have claimed one; the finding is recorded in `render.py` where the next person
+will look.
+
+The cause is not the figure's width. It is the VALUE section's own length plus a figure that
+`KeepTogether` will not split. A real fix is a reportlab keep-with rule binding the figure to its
+preceding paragraph, and that is not written here.
+
+The regression check is therefore narrower than the ticket asks: it catches a genuinely blank page,
+which is a rendering fault, and does **not** catch a thin one, which is the reported symptom. Said
+plainly in the test's own docstring so nobody reads it as covering more than it does.
+
+## Golden master
+
+Re-baselined once. The diff is exactly three things and nothing else: the cover subtitle removed,
+five footer lines rewritten, and `48` → `47.9`. **Engine golden master untouched** — 56 golden tests
+pass unchanged.

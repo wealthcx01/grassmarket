@@ -182,6 +182,37 @@ def version_mismatch_message(kind: ReportSectionKind, named: str, claimed: str, 
     )
 
 
+#: What a coefficient set's status MEANS, in a sentence a client can read (GRS-0234 scope 3).
+#: Every page footer printed `coefficients v1-draft-pending-elicitation` — the provenance honesty is
+#: right and stays, the internal config identifier is not something to put in front of a client. The
+#: identifier keeps its place in the appendix's version table, where identifiers belong.
+#:
+#: Data rather than branching, so GRS-0150's eventual ratification changes the sentence by changing
+#: which status the set carries — not by editing a renderer.
+COEFFICIENT_STATUS_SENTENCES: dict[str, str] = {
+    "draft": "Draft weighting — pending expert panel ratification.",
+    "elicited": "Expert-elicited weighting — panel ratification pending.",
+    "ratified": "Expert-elicited weighting, ratified by the Bruntsfield panel.",
+}
+
+
+def coefficient_status_sentence(*, version: str, client_usable: bool) -> str:
+    """The footer's plain-English provenance line.
+
+    Derived from what the set IS rather than from a status column, because there is no status
+    column: `client_usable` is the flag the gate turns on when a set is fit to price a client pack,
+    and the version string carries the rest. A set that is client-usable and still names itself
+    draft is a contradiction worth surfacing rather than smoothing over — it resolves to the
+    honest, weaker sentence.
+    """
+    names_draft = "draft" in version.lower()
+    if names_draft or not client_usable:
+        return COEFFICIENT_STATUS_SENTENCES["draft"]
+    if "ratified" in version.lower():
+        return COEFFICIENT_STATUS_SENTENCES["ratified"]
+    return COEFFICIENT_STATUS_SENTENCES["elicited"]
+
+
 def undeclared_figure_message(kind: ReportSectionKind, numbers: list[str]) -> str:
     """The sentence an advisor reads when their prose states a number the run does not declare.
 

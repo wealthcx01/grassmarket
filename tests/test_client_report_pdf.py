@@ -21,7 +21,12 @@ from uuid import UUID
 
 import pypdf
 import pytest
-from bcap_contracts.client_report import SECTION_ORDER, ClientReport, ReportSectionKind
+from bcap_contracts.client_report import (
+    SECTION_ORDER,
+    ClientReport,
+    ReportSectionKind,
+    coefficient_status_sentence,
+)
 from bcap_contracts.deliverables import DeliverableMode
 from bcap_contracts.registry import load_registry
 from PIL import Image
@@ -150,7 +155,10 @@ class TestTheDocumentItProduces:
         cover = _normalise(pypdf.PdfReader(io.BytesIO(pdf)).pages[0].extract_text() or "")
         assert "BRUNTSFIELD" in cover
         assert "Deutsche Börse" in cover  # a real cover, not a heading on page one
-        assert "Q3 platform review" in cover
+        # GRS-0234 scope 2: the engagement title no longer prints on the cover. It was an internal
+        # filing key ("WeBull — delivery") under an otherwise good cover, and the two lines above it
+        # already say who the client is and what the document is.
+        assert "Q3 platform review" not in cover
         assert "30 July 2026" in cover
 
     def test_every_section_reaches_the_page_in_order(
@@ -174,7 +182,19 @@ class TestTheDocumentItProduces:
         )
         assert "Confidential" in body
         assert f"methodology {report.methodology_version}" in body
-        assert f"coefficients {report.coefficient_version}" in body
+        # GRS-0234 scope 3: the footer says what the coefficient status MEANS. The identifier keeps
+        # its place in the appendix's version table, where identifiers belong.
+        assert (
+            coefficient_status_sentence(version=report.coefficient_version, client_usable=False)
+            in body
+        )
+        # The identifier itself is NOT banned from the document — the ticket puts it in the
+        # appendix's version table, "where identifiers belong". What it must no longer do is print
+        # on every page. So: it appears, and it appears once, rather than once per footer.
+        assert body.count(report.coefficient_version) == 1, (
+            "the config identifier should appear only in the appendix version table, "
+            "not in the footer of every page"
+        )
 
     def test_the_running_head_names_the_section_the_page_opens_in(
         self, report: ClientReport, figure_data: ReportFigureData
