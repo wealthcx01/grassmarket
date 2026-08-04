@@ -50,9 +50,13 @@ const SECTION_TITLES: Record<string, string> = {
 
 /** Operating-model keys are stored; a reader should not have to decode one. */
 function humanModel(key: string): string {
+  // The keys are `retail`, `wealth` and `exchange` — `RETAIL_PROFILE_KEY` in
+  // `bcap_contracts.registry`, not the `retail_brokerage` this first guessed. The badge showed the
+  // raw key on staging as a result: the property was right and the fixture was wrong, so the test
+  // passed while the page was wrong. Both are keyed off the real values now.
   return (
     {
-      retail_brokerage: "Retail brokerage",
+      retail: "Retail brokerage",
       wealth: "Wealth",
       exchange: "Exchange",
     }[key] ?? key.replace(/_/g, " ")

@@ -21,8 +21,11 @@ const SECTION_TITLES: Record<string, string> = {
 };
 
 function humanModel(key: string): string {
+  // The REAL keys, from `bcap_contracts.registry.RETAIL_PROFILE_KEY`. The first version of this
+  // fixture invented `retail_brokerage`, so the test asserted the right property against a value
+  // the API never sends and passed while staging showed a raw `retail`.
   return (
-    { retail_brokerage: "Retail brokerage", wealth: "Wealth", exchange: "Exchange" }[key] ??
+    { retail: "Retail brokerage", wealth: "Wealth", exchange: "Exchange" }[key] ??
     key.replace(/_/g, " ")
   );
 }
@@ -75,7 +78,7 @@ function Sections() {
 describe("the report editor names its client (GRS-0231)", () => {
   it("puts the client's name where the generic title used to be", () => {
     render(
-      <Header subject="WeBull" engagement="WeBull — delivery" model="retail_brokerage" provenance="production" />,
+      <Header subject="WeBull" engagement="WeBull — delivery" model="retail" provenance="production" />,
     );
     expect(screen.getByTestId("report-subject").textContent).toBe("WeBull");
     expect(screen.getByTestId("report-identity").textContent).toContain("WeBull — delivery");
@@ -83,7 +86,7 @@ describe("the report editor names its client (GRS-0231)", () => {
 
   it("distinguishes two clients that would otherwise render identically", () => {
     const { unmount } = render(
-      <Header subject="WeBull" engagement="WeBull — delivery" model="retail_brokerage" provenance="production" />,
+      <Header subject="WeBull" engagement="WeBull — delivery" model="retail" provenance="production" />,
     );
     const first = screen.getByTestId("report-subject").textContent;
     unmount();
@@ -99,10 +102,10 @@ describe("the report editor names its client (GRS-0231)", () => {
   });
 
   it("shows the operating model in words, not as a stored key", () => {
-    render(<Header subject="X" engagement={null} model="retail_brokerage" provenance="production" />);
+    render(<Header subject="X" engagement={null} model="retail" provenance="production" />);
     const identity = screen.getByTestId("report-identity").textContent ?? "";
     expect(identity).toContain("Retail brokerage");
-    expect(identity).not.toContain("retail_brokerage");
+    expect(identity).not.toContain("retail");  // the raw key, lowercased
   });
 
   it("badges a non-production record and stays quiet on a production one", () => {
@@ -139,3 +142,28 @@ describe("each section has its own accessible name (GRS-0231 scope 3)", () => {
     expect(new Set(names).size).toBe(6);
   });
 });
+
+describe("the operating-model map matches the keys the API actually sends", () => {
+  // The lesson from the staging check: the property under test was right and the FIXTURE was wrong,
+  // so the suite stayed green while the badge showed a raw `retail`. A test that invents its own
+  // input can only ever prove the code agrees with the test.
+  //
+  // These are `RETAIL_PROFILE_KEY`, `_WEALTH_PROFILE_KEY` and `_EXCHANGE_PROFILE_KEY` — the values
+  // `profile_key_of()` returns and the API puts on `operating_model`.
+  const KEYS_THE_API_SENDS = ["retail", "wealth", "exchange"];
+
+  it("renders a human name for every key, and never the key itself", () => {
+    for (const key of KEYS_THE_API_SENDS) {
+      const rendered = humanModel(key);
+      expect(rendered).not.toBe(key);
+      expect(rendered[0]).toBe(rendered[0]?.toUpperCase());
+    }
+  });
+
+  it("degrades readably for a profile that does not exist yet", () => {
+    // A fourth operating model will arrive before this map is updated. Showing "some model" beats
+    // showing nothing, and beats throwing.
+    expect(humanModel("some_model")).toBe("some model");
+  });
+});
+
