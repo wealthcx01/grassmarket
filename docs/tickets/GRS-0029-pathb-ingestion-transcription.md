@@ -1,5 +1,7 @@
 # GRS-0029 — Path B: ingestion + transcription
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 6
 - **Branch:** `grs-0029-pathb-ingestion-transcription`
 - **Status:** In review
@@ -28,3 +30,11 @@ Meeting recordings and transcripts enter the system safely, behind a swappable t
 - Adapter contract tests pass against a fake second provider (swap proven).
 - Cross-owner access → 404.
 - Full gate green; CI green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `b7d0317` (GRS-0029: Path B ingestion + transcription — encrypted, scoped, swappable).
+
+This ticket carried no *What shipped* record; the commits above are that record.

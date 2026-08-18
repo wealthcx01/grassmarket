@@ -1,6 +1,6 @@
 # GRS-0190 — Rich lesson renderer + content contracts
 
-**Status:** In review (2026-07-25) — contracts, markdown renderer, SVG sanitiser, LessonBody
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-25) — contracts, markdown renderer, SVG sanitiser, LessonBody._
 and both integrations shipped; PR open. Unblocks GRS-0191. (2026-07-23, founder feedback
 items 20/21.) **Priority:** HIGH.
 **Loop:** founder-feedback remediation, Wave 4. Carries ADR-0043 (in-house build — founder
@@ -116,3 +116,11 @@ Frontend (vitest, per-file):
 - No `dangerouslySetInnerHTML` and no new runtime dependency is introduced; the sanitiser
   strips scripted SVG (test-covered).
 - JSON schemas and the TS mirror are regenerated in the same PR.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `1ba6cf1` (GRS-0190: rich lesson renderer + content contracts (ADR-0043)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

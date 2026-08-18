@@ -1,5 +1,7 @@
 # GRS-0052 — Validate the engagement a transcript is attached to
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 6 (Path B meeting intelligence)
 - **Status:** Fixed — from the 2026-07-14 audit backlog (GRS-0049, API finding #5).
 - **Severity:** Low — a scoping smell (dangling/foreign reference), not a cross-tenant read leak.
@@ -25,3 +27,11 @@ but it creates a dangling/foreign reference inconsistent with every other link i
 
 - Attaching a transcript to one's own engagement succeeds and is recorded; a missing or cross-owner
   `engagement_id` is 404 with nothing stored — pinned by `test_transcript_engagement_link_is_scoped`.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `05fcff3` (GRS-0052: validate the engagement a transcript is attached to).
+
+This ticket carried no *What shipped* record; the commits above are that record.

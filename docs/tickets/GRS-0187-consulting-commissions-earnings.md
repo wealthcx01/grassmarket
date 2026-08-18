@@ -1,6 +1,6 @@
 # GRS-0187 — Consulting commissions on the Earnings page
 
-**Status:** In review (2026-07-26) — carrot contract, builder, endpoint, Stream-B card and
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-26) — carrot contract, builder, endpoint, Stream-B card and._
 statement section shipped; PR open. (2026-07-23, founder feedback item 26.) **Priority:** MED.
 **Loop:** founder-feedback remediation, Wave 1.
 
@@ -109,3 +109,9 @@ An advisor can read, from the earnings page alone, all four consulting rates
 same four appear in the downloaded statement; every rate and £ is traceably live from
 `commissions.yaml` (test-enforced against a mutated fixture config), and no consultancy figure is a
 typed constant anywhere in the surface.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `55e34f5` (GRS-0185 + GRS-0187: scope Brandfetch by segment, surface Stream B). This ticket shipped jointly with GRS-0185 on one branch — the Stream-B consulting commissions on the Earnings page are the GRS-0187 half.

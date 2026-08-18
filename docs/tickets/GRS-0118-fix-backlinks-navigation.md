@@ -1,6 +1,6 @@
 # GRS-0118 — Fix backlinks / cross-screen navigation
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** —
 
@@ -52,3 +52,9 @@ as new screens are added, rather than hand-rolled back buttons.
 
 The prospect, engagement, and assessment screens each show a consistent breadcrumb with a reliable
 back-link; no detail screen dead-ends. Frontend type-check · lint · vitest green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `947100e` (GRS-0118: shared Breadcrumb — consistent back-links across the detail screens).

@@ -1,6 +1,6 @@
 # GRS-0141 — Deepen the doctrine course bodies (show, don't just tell)
 
-**Status:** In progress
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In progress._
 **Loop:** Part 2 — critical review / trust hardening
 
 ## Why
@@ -36,3 +36,11 @@ inline **bold**). No contract/schema/frontend change. The comprehension checks +
 - Each doctrine lesson has a worked example / sample dialogue and a concrete move, ~200+ words; the
   courses build and all course/academy tests pass; the reader renders the paragraphs + bold. Golden
   master untouched.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `6df8818` (GRS-0141: deepen the doctrine course bodies (show, don't just tell)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

@@ -1,6 +1,6 @@
 # GRS-0169 — Sell-from-report: segment-scope the catalogue and the gap matcher
 
-**Status:** Done (2026-07-23). Staging-rerun finding (3/5 personas — "laughed out of the room").
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-23). Staging-rerun finding (3/5 personas — "laughed out of the room")._
 **Loop:** rerun remediation. Amends ADR-0039.
 
 ## Why
@@ -23,3 +23,11 @@ of the assessment's profile view; (b) the retail-only catalogue had no per-segme
 ## Acceptance
 
 Wealth/exchange assessments get zero recommendations + the note; retail behaviour unchanged.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `d3ccec4` (GRS-0169: sell-from-report — segment-scope the catalogue and matcher).
+
+This ticket carried no *What shipped* record; the commits above are that record.

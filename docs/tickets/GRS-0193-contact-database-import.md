@@ -1,6 +1,6 @@
 # GRS-0193 — Import the GTM contact databases
 
-**Status:** In review (2026-07-25) — registry, adapter, four importers and the prospect panel
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-25) — registry, adapter, four importers and the prospect panel._
 shipped; PR open. (2026-07-23, founder feedback item 16a.) **Priority:** HIGH within Wave 5 —
 it unblocks GRS-0194 and the GRS-0199 radar wiring. **Loop:** founder-feedback remediation,
 Wave 5. Carries ADR-0045 (target & contact registry; extends ADR-0027). Supersedes the scope of
@@ -154,3 +154,11 @@ autocompletes in Add-prospect through the unchanged `EntityRegistry` seam; regis
 render on the prospect record with role, verification, and source provenance; the shared-read vs
 owner-private scoping split is test-enforced; SAR export includes registry contacts and scrub
 removes them; no operator file or PII is committed; golden master byte-identical.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `1bf67e8` (GRS-0193: import the GTM target and contact registry (ADR-0045)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

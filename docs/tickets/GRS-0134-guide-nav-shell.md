@@ -1,6 +1,6 @@
 # GRS-0134 — Guide / primer navigation shell
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** GRS-0092–0097 (primer depth); do this LAST, after the content tickets land
 
@@ -46,3 +46,11 @@ certain length. This ticket adds the navigation shell so the guide stays browsab
 - The primer *content* itself (GRS-0092–0097).
 - A site-wide navigation redesign beyond the guide (the workbench-hub nav link is GRS-0128; the header
   account menu is GRS-0087).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `14a9439` (GRS-0134: guide navigation shell (TOC / sidebar / burger + scrollspy)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

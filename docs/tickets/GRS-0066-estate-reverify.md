@@ -1,6 +1,6 @@
 # GRS-0066 — Estate doc corrections + engine A1/A2 re-verification
 
-**Status:** In review
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review._
 **Loop:** Track A (estate reconciliation — no methodology decision needed)
 **Branch:** `grs-0066-estate-reverify`
 
@@ -51,3 +51,9 @@ No engine code changed — both invariants were already structurally correct; A1
 - `docs/METHODOLOGY-V2-SCOPE.md` — corpus correction banner + inline figure fixes.
 - `docs/BACKLOG.md` — full index refresh.
 - `docs/tickets/GRS-0066-estate-reverify.md` — this ticket.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `03b4141` (GRS-0066: estate doc corrections + engine A1/A2 re-verification).

@@ -1,6 +1,6 @@
 # GRS-0158 — Academy content: seed it into production (the empty-Workbench fix)
 
-**Status:** Planned (2026-07-21). Root-caused on the staging deep-dive; the founder saw an empty Workbench.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-21). Root-caused on the staging deep-dive; the founder saw an empty Workbench._
 **Priority:** HIGH — demo blocker. **Loop:** demo-readiness.
 
 ## Why
@@ -26,3 +26,11 @@ practice_scenarios) are published only by `seed_academy_content()`, whose **only
 ## Acceptance
 
 A freshly-migrated environment serves the full Academy catalogue with no manual step.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `e918abb` (GRS-0158: seed the Academy catalog into production (empty-Workbench fix)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

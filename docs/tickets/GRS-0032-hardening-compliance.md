@@ -1,5 +1,7 @@
 # GRS-0032 — Hardening + compliance
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 6
 - **Branch:** `grs-0032-hardening-compliance`
 - **Status:** In review
@@ -36,3 +38,11 @@ Production-grade security and compliance posture.
 - Audit log covers every listed event class (tested).
 - GDPR export produces a complete scoped bundle; deletion request leaves no personal data outside anonymised immutable runs (tested).
 - Full gate green; CI green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `69ba22f` (GRS-0032: hardening — append-only audit log + GDPR export/erasure).
+
+This ticket carried no *What shipped* record; the commits above are that record.

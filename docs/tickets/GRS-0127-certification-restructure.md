@@ -1,6 +1,6 @@
 # GRS-0127 — Certification restructure
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 **Depends on:** ADR-0028 (Bruntsfield Academy / Workbench)
 
@@ -48,3 +48,11 @@ rebuild it.
 
 - Auto-computing certification *evidence* from assessment participation (GRS-0131).
 - The course content the certs sit on (GRS-0122/0124/0125/0126).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `071f82f` (GRS-0127: course/product certifications on the assessor ladder (senior↔junior ).
+
+This ticket carried no *What shipped* record; the commits above are that record.

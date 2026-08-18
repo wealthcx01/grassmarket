@@ -1,5 +1,7 @@
 # GRS-0018 — Complete the Diagnostic pack + charts
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 4
 - **Branch:** `grs-0018-diagnostic-pack-complete`
 - **Status:** Merged to main (PR #18)
@@ -24,3 +26,11 @@ All seven PRD §5 deliverable types generate from a finalised scoring run.
 - Every deliverable type generates from fixtures; Score Evolution correctly diffs two finalised runs including a version-change annotation.
 - Not Assessed cells visually distinct in the heatmap (rendering test on document XML).
 - Full gate green; CI green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `2059cfb` (GRS-0018: review fixes — single-source registry, shared scaffolding, stronger ), `7d3f0ae` (GRS-0018: complete the Diagnostic pack + charts).
+
+This ticket carried no *What shipped* record; the commits above are that record.

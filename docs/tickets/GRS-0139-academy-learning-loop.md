@@ -1,6 +1,6 @@
 # GRS-0139 — Academy learning loop (comprehension gate + wired spaced repetition)
 
-**Status:** In progress
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In progress._
 **Loop:** Part 2 — critical review / trust hardening
 
 ## Why
@@ -44,3 +44,11 @@ topic. (`DrillCard` gains `prompt` / `answer`; migration `0031` backfills legacy
 ## Acceptance
 - Completing a lesson requires a recall attempt + reveal; it auto-enrolls a real Q&A drill per topic;
   the drills strip shows question → reveal answer → grade. Golden master untouched.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `d33dbf5` (GRS-0139: Academy learning loop — comprehension gate + wired spaced repetition).
+
+This ticket carried no *What shipped* record; the commits above are that record.

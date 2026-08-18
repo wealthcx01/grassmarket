@@ -1,5 +1,7 @@
 # GRS-0010 — Wizard Path A frontend
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 2 (see PRD §9) — **the last Loop 2 ticket; this closes Loop 2.**
 - **Branch:** `grs-0010-wizard-frontend`
 - **Status:** In review
@@ -75,3 +77,9 @@ Frontend `type-check` + `lint` + `test` and the full backend gate are green.
 Data scoping stays server-enforced (the client only carries the JWT and shows the user's own work);
 contract types drive the TS types; Path A is manual entry (no AI in this path); one ticket = one
 branch = one PR.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `7b75d80` (GRS-0010: Wizard Path A frontend + scenario/registry endpoints (closes Loop 2)).

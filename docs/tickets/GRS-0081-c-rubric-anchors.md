@@ -1,6 +1,6 @@
 # GRS-0081 — C rubric anchors
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Loop 7 — C-index (Customer Proposition)
 **Depends on:** GRS-0080 (C registry + widgets), ADR-0023, ATLAS-Methodology-v1.3
 **Branch:** `grs-0081-c-rubric-anchors`
@@ -52,3 +52,9 @@ byte-identical (no engine change). Schema parity green.
 - Wizard widget grid + C guidance UI — GRS-0083.
 - Benchmark ingestion of the scored reviews — GRS-0084.
 - C deliverable sections — GRS-0085. C into V — GRS-0086 (gated).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `87ca85e` (GRS-0081: C rubric anchors — full §4 coverage for the 39 Customer-Proposition ).

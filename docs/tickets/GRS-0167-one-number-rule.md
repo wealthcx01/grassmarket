@@ -1,6 +1,6 @@
 # GRS-0167 — One-number rule: every surface quotes the deterministic score (ADR-0040)
 
-**Status:** Done (2026-07-23). THE finding of the 2026-07-22 staging rerun (5/5 personas,
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-23). THE finding of the 2026-07-22 staging rerun (5/5 personas,._
 top severity). **Priority:** HIGHEST. **Loop:** staging-rerun remediation.
 
 ## Why
@@ -21,3 +21,11 @@ technical persona called it disqualifying. See ADR-0040.
 
 The finalise click does not change the headline; the build-up chart recomputes to the headline;
 rail = summary = scenario baseline = locked = portfolio = deliverable.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `d98d07d` (GRS-0167: the one-number rule — every surface quotes the deterministic score ().
+
+This ticket carried no *What shipped* record; the commits above are that record.

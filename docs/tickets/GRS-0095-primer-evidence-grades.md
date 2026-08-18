@@ -1,6 +1,6 @@
 # GRS-0095 — Primer: evidence grades E1–E4, de-jargoned
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Branch:** `grs-0095-primer-evidence-grades`
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** —
@@ -49,3 +49,9 @@ a plain source label + what actually qualifies, and the escalation is obvious:
 
 Each grade E1–E4 is defined in plain English with what qualifies; the escalation is explicit; no bare
 codes. Frontend type-check · lint · vitest green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `c6c5c3d` (GRS-0095: primer — evidence grades E1–E4, de-jargoned).

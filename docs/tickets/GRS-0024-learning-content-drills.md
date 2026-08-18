@@ -1,5 +1,7 @@
 # GRS-0024 — Learning content + Power Drills
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 5
 - **Branch:** `grs-0024-learning-content-drills`
 - **Status:** In review — PR #26
@@ -23,3 +25,11 @@ The Workbench's teaching half: structured content plus spaced-repetition drills.
 - Generated quiz lands in an approval queue; unapproved content is unreachable by advisors.
 - Completions feed GRS-0023 certification evidence.
 - Full gate green; CI green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `a6b429c` (GRS-0024: learning content + Power Drills (the Workbench teaching half)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

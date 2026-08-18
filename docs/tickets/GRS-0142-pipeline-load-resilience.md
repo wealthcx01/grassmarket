@@ -1,6 +1,6 @@
 # GRS-0142 — Pipeline board load resilience (kill the stuck "Loading…")
 
-**Status:** In progress
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In progress._
 **Loop:** Part 2 — mock-advisor stress test / trust hardening
 
 ## Why
@@ -35,3 +35,11 @@ stuck on the loading placeholder with no way back.
 - An aborted reload (navigating away) shows nothing (no spurious error).
 - Typecheck, prod build, and all 19 frontend test files pass; golden master untouched (no scoring
   code touched).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `f9357a6` (GRS-0142: pipeline board load resilience — kill the stuck "Loading…" (#153)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

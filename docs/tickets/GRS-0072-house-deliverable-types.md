@@ -1,6 +1,6 @@
 # GRS-0072/0073 — House deliverable types (Outside Read Deck · Note · Primer · Strategic Assessment)
 
-**Status:** Audited — delta specified; build gated (see Gates)
+**Status:** BLOCKED (reconciled 2026-08-01). _Previously recorded as: Audited — delta specified; build gated (see Gates)._
 **Loop:** Track A (estate reconciliation — deliverable types)
 **Branch:** `grs-0072-house-deliverables-audit`
 **Source of truth for house structure:** the OneDrive ASX / NSI packs (**not** in this repo) +
@@ -68,3 +68,9 @@ pattern (they may be the same artifact under two names).
 ## What shipped (this PR)
 
 - `docs/tickets/GRS-0072-house-deliverable-types.md` — this audit + delta spec. No code change.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**BLOCKED.** Blocked on founder decision **D3** (docs/FOUNDER-DECISIONS-2026-08.md). House deliverable types — needs founder approval to harvest the ASX/NSI pack structure (anonymised) and access to the packs.

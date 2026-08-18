@@ -1,6 +1,6 @@
 # GRS-0069 — Guided power cards (7 Powers step)
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Track A (guided consulting UX — delivery review §4, NEXT-STEPS §3.6)
 **Branch:** `grs-0069-guided-power-cards`
 
@@ -46,3 +46,9 @@ entry has non-empty hints + example (a new power can't ship without guidance). F
 - Diagnostic visuals (radar / waterfall) — GRS-0070.
 - Structured create + Step-1 business profile — GRS-0068.
 - No backend/contract change (the fields used already existed).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `fa64857` (GRS-0069: guided power cards (7 Powers step)).

@@ -1,6 +1,6 @@
 # GRS-0217 — The remaining product courses, to the same standard
 
-**Status:** In review (2026-07-30, PR #221) — **COMPLETE. All three remaining courses rebuilt:
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-30, PR #221) — **COMPLETE. All three remaining courses rebuilt:._
 Benzinga, Brandfetch and the Sales Operations Playbook, 8 of 8 sections each.** **Priority:** HIGH.
 **Loop:** founder-feedback remediation, Wave 4. **Depends on:** GRS-0215, GRS-0216 (sets the bar),
 GRS-0226 (the reader, without which none of it is visible).
@@ -261,3 +261,11 @@ description so it is a decision, not an accident.
 
 An advisor can finish any product course and run a first client conversation about that product
 without needing to be coached first.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `0d775c7` (GRS-0217 complete: the Sales Operations Playbook, rebuilt), `869af4d` (GRS-0217: the Brandfetch course, complete — and the split it was rebuilt to te), `5ff8de0` (GRS-0217: eight Brandfetch diagrams, and the contrast check they earned), and 6 more.
+
+This ticket carried no *What shipped* record; the commits above are that record.

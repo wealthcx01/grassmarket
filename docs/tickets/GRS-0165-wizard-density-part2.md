@@ -1,6 +1,6 @@
 # GRS-0165 — Wizard density part 2: Customer-Proposition collapse + segmented rating control
 
-**Status:** Done (2026-07-22). The two GRS-0160 scope items that shipped for Infrastructure
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-22). The two GRS-0160 scope items that shipped for Infrastructure._
 only (collapse) or not at all (segmented control) — the recorded demo-readiness residual.
 **Priority:** MED-HIGH. **Loop:** demo-readiness. Frontend-only (presentation; golden master untouched).
 
@@ -25,3 +25,11 @@ option) — two clicks and a popup per rating, hundreds of times per assessment.
 
 Rating a subcomponent is one click; the Customer Proposition step reads as navigable sections, not
 an endless form. No scoring-path change (presentation only).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `fbb7ad5` (GRS-0165: wizard density part 2 — C-step collapse + segmented rating).
+
+This ticket carried no *What shipped* record; the commits above are that record.

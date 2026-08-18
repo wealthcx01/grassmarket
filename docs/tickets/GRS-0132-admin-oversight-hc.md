@@ -1,6 +1,6 @@
 # GRS-0132 — Admin/oversight — DEFERRED to Holy Corner (record only)
 
-**Status:** Planned
+**Status:** BLOCKED (reconciled 2026-08-01). _Previously recorded as: Planned._
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 **Depends on:** ADR-0028 (Bruntsfield Academy / Workbench)
 
@@ -33,3 +33,9 @@ founder decision — the backdoor is HC's job.
 
 - Building any oversight/backdoor dashboard in Grassmarket — deferred to Holy Corner.
 - Any change to the flat-consultant model or the existing admin role plumbing.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**BLOCKED.** Explicitly deferred to Holy Corner; recorded here only.

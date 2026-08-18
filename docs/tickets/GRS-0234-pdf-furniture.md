@@ -1,6 +1,6 @@
 # GRS-0234 — PDF furniture: the filename, the subtitle, the footer, the precision
 
-**Status:** Planned (2026-07-31, first-time-user review G6). **Priority:** MED.
+**Status:** MOSTLY DONE — scope 4 half built (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review G6). **Priority:** MED._
 **Loop:** client-report hardening. **Extends GRS-0219.** **Relates to:** ADR-0040, GRS-0150.
 
 ## Why
@@ -60,6 +60,9 @@ The founder downloads a report and could attach it to a client email unedited: t
 what it is, the cover carries no keys, and the footer's caveat reads as a sentence a client can
 understand.
 
+---
+
+## Status reconciliation — 2026-08-01
 
 **MOSTLY DONE.** Four scopes shipped. Scope 4 is half done and the half that is not is stated below
 rather than glossed.

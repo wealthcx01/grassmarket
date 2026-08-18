@@ -1,5 +1,7 @@
 # GRS-0011 — Pipeline & prospect lifecycle (backend)
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 3 (see PRD §9) — first ticket of the advisor-CRM loop.
 - **Branch:** `grs-0011-pipeline-lifecycle`
 - **Status:** In review
@@ -54,3 +56,9 @@ Repository-only persistence; data scoping absolute + tested (own board/forecast,
 ADR-0002 boundary kept by staying currency-free (Money deferred to GRS-0012 with the guard); rates
 are config; fail-loud config + transitions; contract-typed with schema parity; entity-shaped
 `Prospect` for later Holy Corner sync; one ticket = one branch = one PR.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `08b1cfc` (GRS-0011: pipeline & prospect lifecycle (validated stages, time-in-stage, fore).

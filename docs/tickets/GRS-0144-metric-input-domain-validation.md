@@ -1,6 +1,6 @@
 # GRS-0144 — Metric input-domain validation (fail-loud, no more silent clamp)
 
-**Status:** Implemented (2026-07-19) — ADR-0035 Phase 1.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Implemented (2026-07-19) — ADR-0035 Phase 1._
 **Loop:** Part 2 — segment-fit remediation
 
 ## Why
@@ -30,3 +30,9 @@ visible non-negotiable #3 (fail-loud) violation: garbage fed the score with no r
 - A negative AUA blocks scoring with "Assets Under Administration can't be below 0 GBP (got …)"; a
   negative gross margin scores fine. Golden master V=0.478565 unchanged. Full backend suite + schema
   sync green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `72913eb` (GRS-0144: metric input-domain validation — fail-loud, no more silent clamp, ADR-0035 Phase 1, #160). Completed by GRS-0144b (`71caca9`), which added refuse-only bounds for every percent/bps metric after the staging rerun found a 1,234,567,890% gross margin was accepted.

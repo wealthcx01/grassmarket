@@ -1,6 +1,6 @@
 # GRS-0103 — Business Metrics: depth + per-metric context
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** A (build now)
 **Depends on:** —
@@ -56,3 +56,9 @@ description, single-sourced from the registry and fail-loud:
 Every metric renders an operating-model-appropriate description sourced from the registry; a metric
 missing its description fails loud at load (`test_registry` construction guards). Backend + frontend
 gates green; schema parity green; golden master unchanged.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `b9679a5` (GRS-0103: Business Metrics — per-metric, operating-model-aware descriptions).

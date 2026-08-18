@@ -1,6 +1,6 @@
 # GRS-0172 — Trust-polish sweep (staging-rerun assorted findings)
 
-**Status:** Done (2026-07-23). The bounded low/med findings from the 2026-07-22 rerun.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-23). The bounded low/med findings from the 2026-07-22 rerun._
 **Loop:** rerun remediation.
 
 ## Items shipped
@@ -26,3 +26,11 @@
 
 Deliverables Audience column + duplicate-generation warning; US date locale; Academy
 lesson-completion discoverability; drawer stage-history staleness; `/assessments/new` 422.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `460db24` (GRS-0172: trust-polish sweep (staging-rerun assorted findings)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

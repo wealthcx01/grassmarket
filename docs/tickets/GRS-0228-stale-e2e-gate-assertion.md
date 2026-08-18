@@ -1,6 +1,6 @@
 # GRS-0228 — The E2E gate assertion tested a message we deliberately stopped sending
 
-**Status:** Done
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done._
 **Branch:** `integration-test-0731` (landed with the client-report wave)
 
 ## The defect
@@ -50,3 +50,11 @@ after. Full suite `npm run e2e`: **8/8 passed**. Backend `pytest`: 1431 passed.
 A message asserted in two places and authored in a third will drift again. The durable fix is to
 export the gate's copy as a contract constant both sides import, rather than three hand-copies of an
 English sentence — see the follow-up note in `docs/BACKLOG.md`.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `64cc44c` (GRS-0228: the red E2E gate was testing copy we deliberately removed).
+
+This ticket carried no *What shipped* record; the commits above are that record.

@@ -1,6 +1,6 @@
 # GRS-0171 — Two-step finalise confirmation
 
-**Status:** Done (2026-07-23). Staging-rerun finding (4/5 personas). **Loop:** rerun remediation.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-23). Staging-rerun finding (4/5 personas). **Loop:** rerun remediation._
 
 ## Why
 
@@ -14,3 +14,11 @@ created and inputs lock permanently, quotes the exact score that will lock (the 
 "the same number showing above"), and explains the current path (sandbox: self-approved,
 watermarked, no second rater/committee, never client-facing · production: dual-rating + committee,
 client-usability gates). Confirm / Cancel.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `fd8888a` (GRS-0171: two-step finalise confirmation).
+
+This ticket carried no *What shipped* record; the commits above are that record.

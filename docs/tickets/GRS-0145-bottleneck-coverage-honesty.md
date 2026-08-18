@@ -1,6 +1,6 @@
 # GRS-0145 — Low-coverage honesty caveat on the "likely constraint" callout
 
-**Status:** In progress
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In progress._
 **Loop:** Part 2 — mock-advisor stress test / trust hardening
 
 ## Why
@@ -33,3 +33,11 @@ as a confident fact. The scores themselves are untouched.
 - Below 50% coverage the bottleneck callout is labelled provisional and explains the coverage caveat;
   at/above 50% it is unchanged. Typecheck, prod build, and all 19 frontend tests pass. Golden master
   untouched (no scoring code).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `3a7544b` (GRS-0145: low-coverage honesty caveat on the "likely constraint" callout (#155).
+
+This ticket carried no *What shipped* record; the commits above are that record.

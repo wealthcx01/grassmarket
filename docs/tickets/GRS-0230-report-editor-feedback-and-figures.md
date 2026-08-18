@@ -1,6 +1,6 @@
 # GRS-0230 — The report editor: feedback where you can see it, figures you can actually declare
 
-**Status:** Planned (2026-07-31, first-time-user review G2). **Priority:** HIGH. **Type:** Bug + UX.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review G2). **Priority:** HIGH. **Type:** Bug + UX._
 **Loop:** client-report hardening. **Extends GRS-0211.** **Relates to:** GRS-0222, GRS-0163.
 
 ## Why
@@ -67,6 +67,9 @@ The founder writes a value section that cites a run figure without leaving the p
 class name, and when they get something wrong the page tells them, next to the button they pressed,
 in a sentence they could read aloud to a client.
 
+---
+
+## Status reconciliation — 2026-08-01
 
 **DONE.** All five scopes.
 

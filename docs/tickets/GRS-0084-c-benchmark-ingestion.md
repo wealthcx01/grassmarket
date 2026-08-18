@@ -1,6 +1,6 @@
 # GRS-0084 — C benchmark ingestion (7 scored reviews)
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Loop 7 — C-index (Customer Proposition)
 **Depends on:** GRS-0080/0082, ADR-0023, ADR-0009, ATLAS-Methodology-v1.3
 **Branch:** `grs-0084-c-benchmark-ingestion`
@@ -95,3 +95,9 @@ Capital, Charles Schwab, EFG Hermes, EasyEquities, Futu, Hapi, Robinhood, Trii, 
 - Scoring the 9 unscored apps (next content batch).
 - The wizard step — GRS-0083; deliverable rendering of benchmarks — GRS-0085.
 - Any V composition change — GRS-0086.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `74eddf4` (GRS-0084: C benchmark ingestion + peer comparison (ADR-0023, ADR-0009)).

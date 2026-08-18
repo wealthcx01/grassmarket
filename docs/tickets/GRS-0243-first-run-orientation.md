@@ -1,6 +1,6 @@
 # GRS-0243 — First-run orientation: every section says what it is for, and the home page finally gets reworded
 
-**Status:** Planned (2026-07-31, founder: "I have tried to use each section of the studio … and
+**Status:** PARTIAL — scope 1 shipped; 2-5 open (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, founder: "I have tried to use each section of the studio … and._
 none of it makes sense. Not in my account or the demo account.").
 **Priority:** HIGH. **Loop:** first-time-user coherence. **Relates to:** GRS-0175, GRS-0205, GRS-0208.
 
@@ -71,6 +71,9 @@ The founder logs into a fresh account, and within ten minutes — without openin
 seen a finished example report, knows what each nav item is for, and knows the one thing each
 section wants them to do next. And the sentence they complained about twice is gone.
 
+---
+
+## Status reconciliation — 2026-08-01
 
 **PARTIAL.** Read this section before assuming the ticket is closed — three of its five scopes are
 still open, and the ticket stays open with them.

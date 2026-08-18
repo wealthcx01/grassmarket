@@ -1,5 +1,7 @@
 # GRS-0013 — Engagement detail (backend)
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 3 (see PRD §9) — third Loop 3 ticket.
 - **Branch:** `grs-0013-engagement-detail`
 - **Status:** In review
@@ -51,3 +53,9 @@ Repository-only persistence; data scoping absolute + tested (own engagements + c
 cross-owner → 404 everywhere); contract-typed with schema parity; fail-loud link rules (no silent
 defaults); deliverables are a typed forward-compatible placeholder, not a fabricated builder;
 score-and-money-free; one ticket = one branch = one PR.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `bffb3c9` (GRS-0013: engagement detail (contracted prospect → assessments, deliverables s).

@@ -1,6 +1,6 @@
 # GRS-0101 — AI-assisted input in the wizard
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** B (flagged follow-up — its own ADR/ticket set later)
 **Depends on:** —
@@ -33,3 +33,11 @@ are ticketed separately.
 - Path B meeting-recording upload — GRS-0102 (Phase A).
 - Screen-recording → video dissection → widget auto-population — GRS-0109.
 - Entity/company linking — GRS-0100.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `7fd443a` (GRS-0101: AI-assisted wizard input (deterministic proposals, gated by accept/e).
+
+This ticket carried no *What shipped* record; the commits above are that record.

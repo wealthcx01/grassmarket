@@ -1,5 +1,7 @@
 # GRS-0050 — Bound the org-wide list endpoints (pagination)
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 0 / 6 (API hardening)
 - **Status:** Fixed — from the 2026-07-14 audit backlog (GRS-0049, API finding #2).
 - **Severity:** Medium — unbounded reads on append-only, org-wide tables are a latency/memory DoS.
@@ -36,3 +38,11 @@ here is the shared mechanism they will reuse.
 
 - `/benchmark` and `/compliance/audit` cap their result set; an over-limit `limit` is 422; `offset`
   pages correctly; the audit page is newest-first. Pinned by `test_compliance.py`.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `c035b47` (GRS-0050: bound the org-wide list endpoints (pagination)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

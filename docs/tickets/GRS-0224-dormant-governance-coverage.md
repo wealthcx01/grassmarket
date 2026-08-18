@@ -1,6 +1,6 @@
 # GRS-0224 — Repository-layer coverage for the dormant peer-governance code
 
-**Status:** Planned (2026-07-29, arising from GRS-0188). **Priority:** LOW, unless the peer
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-29, arising from GRS-0188). **Priority:** LOW, unless the peer._
 machinery is re-mounted, in which case it is a blocker.
 
 ## Why
@@ -50,3 +50,9 @@ repository methods directly.
 
 The dormant governance code is covered without any of its routes being reachable, so a future
 decision to re-mount is a routing change rather than an act of faith.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.

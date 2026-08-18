@@ -1,6 +1,6 @@
 # GRS-0082 — C engine + coefficients (Stage 1: report-alongside)
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Loop 7 — C-index (Customer Proposition)
 **Depends on:** GRS-0080, GRS-0081, ADR-0023, ATLAS-Methodology-v1.3
 **Branch:** `grs-0082-c-engine-and-coefficients`
@@ -100,3 +100,9 @@ reported field, `CustomerResult`.
 - Any V composition change / four-index V — GRS-0086 (Stage 2, gated).
 - Wizard capture and grid — GRS-0083.
 - Benchmark ingestion — GRS-0084; deliverable sections — GRS-0085.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `a4e46f2` (GRS-0082: C engine + coefficients — Stage 1 report-alongside (ADR-0023)).

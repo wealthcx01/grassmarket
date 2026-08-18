@@ -1,6 +1,6 @@
 # GRS-0244 — The Guide must describe the product that exists
 
-**Status:** Planned (2026-07-31, first-time-user review). **Priority:** MED. **Type:** Bug (docs).
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review). **Priority:** MED. **Type:** Bug (docs)._
 **Loop:** first-time-user coherence. **Extends GRS-0175.** **Relates to:** GRS-0188, GRS-0211.
 
 ## Why
@@ -57,3 +57,9 @@ the shipped stepper rather than assuming.
 
 A new advisor can follow the Guide's walkthroughs step by step against the live product and never
 hit an instruction the product refuses or a gate the product no longer has.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).

@@ -1,5 +1,7 @@
 # GRS-0006 — Value layer + scoring-run persistence (closes Loop 1)
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 1, final ticket (see PRD §9)
 - **Branch:** `grs-0006-value-layer`
 - **Status:** In review
@@ -79,3 +81,11 @@ scenarios rank in the score domain; the bridge prices in currency; runs persist 
 ## Out of scope
 
 The wizard (Loop 2); deliverable generation; the elicited weights (the panel's, replacing the drafts).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `852d7e9` (GRS-0006: value layer + scoring-run persistence (closes Loop 1)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

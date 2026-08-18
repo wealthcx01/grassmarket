@@ -1,6 +1,6 @@
 # GRS-0174 — Voice & style guide + application copy sweep
 
-**Status:** In review (2026-07-24) — STYLE-VOICE.md founder-approved; sweep of core surfaces done, PR open. **Priority:** HIGH — lands first;
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In review (2026-07-24) — STYLE-VOICE.md founder-approved; sweep of core surfaces done, PR open. **Priority:**._
 every later frontend ticket writes in the new register.
 **Loop:** founder-feedback remediation, Wave 1.
 
@@ -81,3 +81,11 @@ STYLE-VOICE.md approved by the founder before the sweep merges. A cold read of t
 portfolio, pipeline, and earnings screens finds no em-dash chains, no tweet-cadence lines, and no
 unexplained jargon. `rg "Words rate|honest by design" frontend` matches nothing outside the two
 guide pages. All existing tests pass with updated copy assertions.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `fc126e8` (GRS-0174: voice & style guide + core-surface copy sweep).
+
+This ticket carried no *What shipped* record; the commits above are that record.

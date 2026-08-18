@@ -1,6 +1,6 @@
 # GRS-0093 — Primer: the lenses (B/P/L/V) + label clarity
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** GRS-0097 (refine the P & L labels product-wide)
 **Branch:** `grs-0093-primer-lenses-labels`
@@ -63,3 +63,9 @@ lens properly and applies the refined labels in the primer.
 
 - The product-wide label refinement itself (GRS-0097 — wizard, panels, dashboard, public site).
 - The 7 Powers deep content (GRS-0094).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `d638b8b` (GRS-0093: primer — the lenses in depth + letter↔word mapping).

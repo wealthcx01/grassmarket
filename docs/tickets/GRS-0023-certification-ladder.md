@@ -1,5 +1,7 @@
 # GRS-0023 — Certification ladder (enforced)
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 5
 - **Branch:** `grs-0023-certification-ladder`
 - **Status:** In review — PR #25
@@ -24,3 +26,11 @@ Trained → Shadow → Observed Lead → Certified Lead as *enforced capability*
 - State transitions require their evidence (cannot reach Observed Lead with one shadow).
 - Override leaves an audit record.
 - Full gate green; CI green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `4c0df6e` (GRS-0023: certification ladder (enforced capability, not a badge)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

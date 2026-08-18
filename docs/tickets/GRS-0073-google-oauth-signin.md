@@ -1,6 +1,6 @@
 # GRS-0073 — Google OAuth sign-in (backend as the client)
 
-**Status:** Planned
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Planned._
 **Loop:** Track B — Auth / SSO
 **Depends on:** ADR-0024
 
@@ -71,3 +71,11 @@ Google proves *who* you are, but only a pre-provisioned consultant may get a tok
   the custom-domain SSO work replaces that; see GRS-0074 evolution note).
 - Linking a Google identity to an existing password account via UI (`google_sub` column is added
   now but populated later).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `216ffc1` (GRS-0073: Google OAuth sign-in (backend as the client)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

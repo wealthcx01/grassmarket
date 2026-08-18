@@ -1,6 +1,6 @@
 # GRS-0079 — Wizard operating-model profile selector
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Loop 7 — Operating-model profiles
 **Depends on:** ADR-0025, GRS-0077 (mechanism), GRS-0078 (exchange profile)
 **Branch:** `grs-0079-wizard-profile-selector`
@@ -54,3 +54,9 @@ descriptive fields it IS scoring-relevant configuration — it selects WHICH key
 
 - Profile-aware **co-rater** dual-rating (the `/rate/…` page stays full-superset for now).
 - Wealth/infra profiles, real weight elicitation, profile-filtered benchmark comparison (GRS-0084).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `7f5637c` (GRS-0079: wizard operating-model profile selector).

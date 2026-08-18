@@ -1,6 +1,6 @@
 # GRS-0188 — Implement the founder review gate
 
-**Status:** Planned (2026-07-23, founder feedback items 23 and 24). **Priority:** HIGH.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-23, founder feedback items 23 and 24). **Priority:** HIGH._
 **Loop:** founder-feedback remediation, Wave 2. Carries ADR-0041; Methodology v1.6 amends §8/§9.
 
 ## Why
@@ -180,3 +180,11 @@ Frontend (vitest, per-file):
   event is created by finalisation.
 - ATLAS golden masters byte-identical; sandbox/demo flows unchanged.
 - ADR-0041 Accepted and the Methodology v1.6 amendment merged in the same PR.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `a9a6ed1` (GRS-0188: the dev seed and the tab test, the last two callers), `1a971ce` (GRS-0188: the last four callers the founder gate broke), `87aadee` (GRS-0188: repair the callers the founder gate broke), and 6 more.
+
+This ticket carried no *What shipped* record; the commits above are that record.

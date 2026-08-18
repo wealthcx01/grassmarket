@@ -1,5 +1,7 @@
 # GRS-0034 — Launch readiness
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 6 (closes the build)
 - **Branch:** `grs-0034-launch-readiness`
 - **Status:** In review — launch ARTIFACTS delivered; production cutover flagged for the operator (see `docs/ops/launch-cutover.md`).
@@ -52,3 +54,11 @@ checklist, not code.
 - A real advisor completes login → training module → practice assessment on production.
 - Restore drill and rollback exercised once each, documented in the runbook.
 - Smoke suite green against production.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `98f4dc9` (GRS-0034: launch-readiness artifacts (smoke suite, runbook, seams, invite flow).
+
+This ticket carried no *What shipped* record; the commits above are that record.

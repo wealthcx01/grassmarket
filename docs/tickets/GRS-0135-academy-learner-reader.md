@@ -1,6 +1,6 @@
 # GRS-0135 — Bruntsfield Academy: learner catalog + course reader
 
-**Status:** In progress
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In progress._
 **Loop:** Part 2 — Bruntsfield Academy / Workbench
 **Depends on:** GRS-0121 (course CMS + published-catalog API), GRS-0122 (Sales Egoist), GRS-0123–0126 (product courses), GRS-0128 (workbench hub)
 
@@ -42,3 +42,11 @@ meant to learn from it. The tickets already presume a "learner catalog" and "lea
 - A non-admin advisor can browse the catalog, open any published course, read every lesson, mark
   lessons complete, see progress persist across reload, and (for a coursework course) earn the credit.
 - Owner-scoping: an advisor's completions are their own. Golden master untouched.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `95c3155` (GRS-0135: Bruntsfield Academy — learner catalog + course reader).
+
+This ticket carried no *What shipped* record; the commits above are that record.

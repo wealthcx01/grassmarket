@@ -1,6 +1,6 @@
 # GRS-0218 — The Sales Egoist course
 
-**Status:** DONE (2026-08-01). **Priority:** HIGH.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Blocked on source material (2026-07-26; 23/07 item 20). **Priority:** HIGH._
 **Loop:** founder-feedback remediation, Wave 4. **Depends on:** GRS-0215.
 
 ## Why
@@ -61,6 +61,9 @@ GRS-0215 structure: sections of lessons, each lesson 20 to 40 slides, a test bet
 The founder reads the course and recognises the material they gave us, developed rather than
 compressed.
 
+---
+
+## Status reconciliation — 2026-08-01
 
 **DONE.** Built from the committed source on 2026-08-01, after `2d81f56` landed the material.
 

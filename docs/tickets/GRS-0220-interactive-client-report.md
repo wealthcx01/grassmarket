@@ -1,6 +1,6 @@
 # GRS-0220 — The client report as an interactive web page, with read tracking
 
-**Status:** Planned (2026-07-26, staging review item 9). **Priority:** HIGH.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-26, staging review item 9). **Priority:** HIGH._
 **Loop:** founder-feedback remediation, Wave 3. **Depends on:** GRS-0211. **Relates to:** GRS-0206.
 
 ## Why
@@ -114,3 +114,9 @@ Also corrected: the client-facing routes never called `assert_client_ready`. Eve
 consultant-written today, so the gate passed trivially — which is precisely why it needed wiring
 before GRS-0222 starts drafting. Non-negotiable #8 is now enforced on the path that reaches a
 client, with a test that fails if the call is removed.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `6a892cb` (GRS-0220: tell a client WHY the report did not load), `2eae954` (GRS-0220: the client report as a shared web page, with disclosed read tracking).

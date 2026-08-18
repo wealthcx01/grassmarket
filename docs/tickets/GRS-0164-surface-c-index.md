@@ -1,6 +1,6 @@
 # GRS-0164 — Surface the Customer-Proposition index (C) alongside V
 
-**Status:** Done (2026-07-21). Merged PR #184, deployed to staging (V+C columns live). Founder-directed ("surface C first"). Promotes GRS-0163 item 3.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-21). Merged PR #184, deployed to staging (V+C columns live). Founder-directed ("surface C first"._
 **Priority:** HIGH — highest-leverage demo fix. **Loop:** demo-readiness.
 
 ## Why
@@ -31,3 +31,11 @@ showed only V. So the most demo-relevant score was invisible.
 ## Acceptance
 
 The portfolio shows V and C side by side; the C spread across the demo brokerages reads at a glance.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `8ba5043` (GRS-0164 follow-up: show C in the deliverable/report headline), `b3945ff` (GRS-0164: surface the Customer-Proposition index (C) alongside V).
+
+This ticket carried no *What shipped* record; the commits above are that record.

@@ -1,5 +1,7 @@
 # GRS-0044 — Assessment wizard integrity: band honesty + autosave race
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 2 (Wizard Path A)
 - **Status:** Fixed — found in the 2026-07-14 adversarial frontend review.
 - **Severity:** High — a two-track honesty violation shown to advisors, plus an autosave race that
@@ -38,3 +40,11 @@
 - `LiveSummary` shows a point for an unmodelled V and a range for a modelled one — pinned by
   `LiveSummary.test.tsx`.
 - Type-check, lint, and build are green; the band-honesty guarantee lives only in `BandDisplay`.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `c7c2974` (GRS-0044: assessment wizard integrity — band honesty + autosave race).
+
+This ticket carried no *What shipped* record; the commits above are that record.

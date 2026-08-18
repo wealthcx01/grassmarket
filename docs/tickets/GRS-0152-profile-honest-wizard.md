@@ -1,6 +1,6 @@
 # GRS-0152 — Profile-honest wizard: C-dimension degrade, dynamic module counts, provisional banner on score views
 
-**Status:** Done (2026-07-20). From the mock-advisor re-measure (Elena + Tom, HIGH) + the frontend UX audit.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-20). From the mock-advisor re-measure (Elena + Tom, HIGH) + the frontend UX audit._
 **Loop:** Part 2 — segment fit / trust. **Related:** ADR-0023 (C dimension), ADR-0025/0035 (profiles).
 
 ## Why
@@ -41,3 +41,9 @@ untouched (C never enters V). Frontend type-check + lint + LiveSummary vitest gr
 ## NOT in scope (founder-gated, logged as outstanding)
 A real per-segment C taxonomy (member/ISV/data/issuer proposition for an exchange; advice-relationship
 / planning / reporting for wealth) — a content + methodology build like the L/B taxonomy was (ADR-0025).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `c29cdc4` (GRS-0152: profile-honest wizard — C-dimension degrade, dynamic module counts, ).

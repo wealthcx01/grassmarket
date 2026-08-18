@@ -1,222 +1,151 @@
-# Grassmarket Backlog — index
+# Grassmarket Backlog — the single source of truth
 
-All tickets exist as files in `docs/tickets/` (detail lives there, not here). The builder updates a
-ticket's status and appends "What shipped" when its PR lands.
+Every ticket lives in `docs/tickets/` and carries a **reconciled status stamp** dated 2026-08-01.
+This file indexes them; the ticket file is always the detail. Founder decisions live in
+`docs/FOUNDER-DECISIONS-2026-08.md`.
 
-**Loops 0–6 shipped (GRS-0001–0034).** Since then a UI/UX, governance and onboarding series has
-landed (GRS-0035–0065), plus an estate-reconciliation + guided-consulting track (GRS-0066–). The
-authoritative sequencing narrative is `NEXT-STEPS-2026-07.md` (the binder); this file is just the index.
+## Where things stand
 
-> **Index freshness (2026-07-30).** This file had drifted: it stopped at GRS-0163 while three
-> further programmes — the two-estimator fix, the 2026-07-23 founder-feedback wave, and the
-> 2026-07-26 staging-review wave — took the range to GRS-0226. The section immediately below closes
-> that gap. Everything from GRS-0173 onward carries the **open-PRs-never-merge holding rule**: work
-> lands on its own branch with a PR and is collected on an integration branch for the founder, so
-> "In review" here means "built, gated, and waiting on the founder", not "half-done".
+Reconciled 2026-08-01 by auditing all 243 ticket files against git history and the shipped code,
+then brought forward on 2026-08-18 when this index finally landed on `main`.
 
-## The two-estimator fix (GRS-0164–0172, 2026-07-22) — all shipped
-
-From `reports/staging-rerun-2026-07-22.md`: two different estimators were quoting two different
-scores for the same assessment. ADR-0040 made the deterministic composite the one number every
-surface quotes.
-
-| Ticket | Title | Status |
+| State | Count | Meaning |
 |---|---|---|
-| GRS-0164 | Surface the Customer-Proposition index (C) alongside V | Done |
-| GRS-0165 | Wizard density part 2: C collapse + segmented rating control | Done |
-| GRS-0166 | Finalised assessment: wizard rail quotes the locked score | Done |
-| GRS-0167 | One-number rule: every surface quotes the deterministic score (ADR-0040) | Done |
-| GRS-0168 | Portfolio coverage measured against the assessment's own profile view | Done |
-| GRS-0169 | Sell-from-report: segment-scope the catalogue and the gap matcher | Done |
-| GRS-0170 | Powers step: unrated ≠ "None", un-rate affordance, one-click chips | Done |
-| GRS-0171 | Two-step finalise confirmation | Done |
-| GRS-0172 | Trust-polish sweep | Done |
+| **DONE** | 198 | An implementing commit is on `main`, named in the ticket |
+| **OPEN** | 30 | Genuinely unbuilt and schedulable — **3 of them partly built** (GRS-0208, 0234, 0243) |
+| **BLOCKED** | 7 | Waiting on a founder decision (D1–D7) |
+| **SUPERSEDED** | 8 | Replaced by a later ticket, named in the stamp |
+| **Total** | 243 | |
 
-## Founder-feedback wave (GRS-0173–0204, 2026-07-23) — built, in review
+**What the audit corrected.** 99 tickets carried a status that git contradicted — most of Loops 0–6
+had no status line at all, GRS-0073–0077 (OAuth, Commission v7, profiles) said *Planned* while each
+had its own implementing commit, and the whole GRS-0135–0149 wave still said *In progress* months
+after merging. Two umbrella tickets (GRS-0147, GRS-0148) were found **partly** built with a
+founder-gated residue and are now BLOCKED rather than silently DONE. GRS-0104 existed as two files,
+one a stray What-shipped fragment while the ticket said *Planned*; they are folded into one.
 
-| Ticket | Title | Status |
+**Why this index arrived seventeen days after its own date.** The reconciliation was written on
+2026-08-01 and then sat on an unmerged branch while Phase 2 shipped ten tickets past it, editing the
+same ticket files. The two sides conflicted, and until they were resolved `main` carried tickets that
+said *Planned* above a *What shipped* record of their own delivery — and carried no founder-decision
+file at all. Both are fixed here. The lesson is the ordinary one: a docs branch that indexes moving
+work has to land before the work moves, or it becomes a second source of truth competing with the
+first.
+
+---
+
+## Open work, in build order
+
+### Phase 1 — shipped
+
+| Ticket | Title | Note |
 |---|---|---|
-| GRS-0173 | Workspace domain SSO — @bruntsfield.capital sign-in (ADR-0044) | In review, PR #206 |
-| GRS-0174 | Voice & style guide + application copy sweep | In review, PR #201 |
-| GRS-0175 | Guide & Primer rewrite (/help merged into /guide) | In review, PR #208 |
-| GRS-0176 | Vertical Kanban for the pipeline | In review, PR #205 |
-| GRS-0177 | Portfolio clarity: dedupe, explain, clean | In review, PRs #214/#218 — portfolio cleanup verified run on staging 31/07 (portfolio is clean); **engagements still hold duplicate demo rows** → GRS-0241 |
-| GRS-0178 | New-assessment creation form redesign | In review, PR #215 (stacked on 0177) |
-| GRS-0179 | `docs/ATLAS-Scoring-Explained.md` — the maths, in English | In review, PR #204 |
-| GRS-0180 | 7 Powers mathematics adaptation — normative document | In review, PR #203 |
-| GRS-0181 | Wizard pagination: smaller pages per module | In review, PR #216 (stacked on 0182) |
-| GRS-0182 | Summary & Interpretation repair (double-V removed) | In review, PR #213 |
-| GRS-0183 | Remove ConnectTrade from the catalogue | In review, PR #202 |
-| GRS-0184 | Scenario workspace v2 | Planned |
-| GRS-0185 | Brandfetch variant segment scoping | In review, PR #217 |
-| GRS-0186 | Global navigation + Deliverables reachability | In review, PR #207 |
-| GRS-0187 | Consulting commissions on the Earnings page (Stream B) | In review, PR #217 |
-| GRS-0188 | The founder review gate (ADR-0041) | In review, PR #219 — retires peer governance; callers repaired |
-| GRS-0189 | Rebuild the deliverables to the story architecture | Planned |
-| GRS-0190 | Rich lesson renderer + content contracts (ADR-0043) | In review, PR #212 |
-| GRS-0191 | Academy content depth program (the 100x) | Superseded — content half became GRS-0215+ |
-| GRS-0192 | Content freshness watcher | Planned |
-| GRS-0193 | Import the GTM contact databases (ADR-0045) | In review, PR #209 |
-| GRS-0194 | LSEG influencer maps via bcap-lseg | In review, PR #211 (stacked on 0193) |
-| GRS-0195 | Agentic GTM research spike | Closed — recommendation is BUILD THIN, PR #210 |
-| GRS-0196 | Practice Arena v2: an AI client to practise against | Planned |
-| GRS-0197 | Gmail + Google Calendar integration | Planned |
-| GRS-0198 | Pipeline linkage: assessment & deliverable milestones | Planned |
-| GRS-0199 | Bench honesty + Opportunity Radar wiring | Planned |
-| GRS-0200 | LSEG influencer dataset: first network-wide pull | Done — dataset produced |
-| GRS-0201 | Wizard Powers step: embed the Helmer adaptation | Planned |
-| GRS-0202–0204 | Outreach contract / sequencer / send path | Draft, not scheduled (from the 0195 spike) |
+| GRS-0218 | The Sales Egoist course | **DONE** 2026-08-01 (PR #232, merged 08-18). Eight sections, 177 slides, eight diagrams, every lesson citing `data/reference/sales-egoist/`. Resolves GRS-0239 scope 5 |
 
-## Staging-review wave (GRS-0205–0226, 2026-07-26 onward)
+### Phase 2 — the GRS-0229–0245 wave (2026-07-31 first-time-user review)
 
-From the 2026-07-26 staging review. Wave 4 (the course rebuild) is the part that has landed.
+Build order below is the wave's own priority: client-trust breaches, then first-run, then the
+report workflow, then the rest. **Ten of seventeen have landed**; the status column is the ticket's
+own reconciled stamp, not a summary of it.
 
-| Ticket | Title | Status |
+| # | Ticket | Title | Group | Status |
+|---|---|---|---|---|
+| 1 | GRS-0229 | The shared web report must carry the non-production mark | client trust | **DONE** (#233) |
+| 2 | GRS-0245 | Founder sign-off covers everything that reaches a client | client trust | **DONE** (#234) |
+| 3 | GRS-0236 | Demo deliverables ship with worked example reports | first run | **DONE** (#235, #237) |
+| 4 | GRS-0243 | First-run orientation: every section says what it is for, and the home page finally gets reworded | first run | **PARTIAL** (#236) — scope 1 only; 2–5 open |
+| 5 | GRS-0230 | The report editor: feedback where you can see it, figures you can actually declare | report workflow | **DONE** (#243) |
+| 6 | GRS-0231 | The report editor must name the client | report workflow | **DONE** (#244, #247) |
+| 7 | GRS-0233 | Web report figures: label the bars, keep the story's order | report workflow | **DONE** (#245) |
+| 8 | GRS-0232 | The appendix must not contradict the run | report workflow | **DONE** (#246) |
+| 9 | GRS-0234 | PDF furniture: the filename, the subtitle, the footer, the precision | report polish | **MOSTLY DONE** (#248) — scope 4's sparse-page fix measured not to work and was reverted |
+| 10 | GRS-0235 | Read tracking an advisor can read | report polish | OPEN — **next** |
+| 11 | GRS-0237 | The engine white paper: one document that answers "is this up to scratch?" | legibility & truthfulness | OPEN — scope 3 needs D1 |
+| 12 | GRS-0238 | A Prospecting surface: browse the registry we imported | legibility & truthfulness | OPEN |
+| 13 | GRS-0239 | Lessons that teach before they test | legibility & truthfulness | OPEN — scope 5 resolved by GRS-0218 |
+| 14 | GRS-0240 | The earnings page explains how you get paid | legibility & truthfulness | OPEN |
+| 15 | GRS-0241 | Engagements: a list you can read, a link you cannot cross-wire | legibility & truthfulness | OPEN |
+| 16 | GRS-0242 | The Workbench stops leaking internals and contradicting itself | legibility & truthfulness | OPEN |
+| 17 | GRS-0244 | The Guide must describe the product that exists | legibility & truthfulness | OPEN |
+
+**Carried out of Phase 2, still open:** GRS-0208 scopes 3 and 4 (the demo tenancy proper, and the
+account surfaces) — scopes 1 and 2 shipped in #239/#240/#242.
+
+### Phase 3 — legacy open queue
+
+| Ticket | Title |
+|---|---|
+| GRS-0158 | Academy content: seed it into production (the empty-Workbench fix) |
+| GRS-0196 | Practice Arena v2: an AI client to practise against |
+| GRS-0198 | Pipeline linkage: assessment & deliverable milestones on the pipeline |
+| GRS-0199 | Bench honesty + Opportunity Radar wiring |
+| GRS-0205 | Rewrite every string in the app, not just the screens we reviewed |
+| GRS-0213 | Scenarios an advisor can actually drive, with a narrative assistant |
+| GRS-0184 | Scenario workspace v2 |
+| GRS-0214 | What the client gets free, and what they get when they engage |
+| GRS-0222 | The narrative assistant: drafting against real scored data |
+| GRS-0210 | Smart search has to know the firms an advisor will actually type |
+| GRS-0224 | Repository-layer coverage for the dormant peer-governance code |
+
+### Open, not yet scheduled
+
+| Ticket | Title |
+|---|---|
+| GRS-0041 | Expose gated module rating words in the live-score contract |
+| GRS-0049 | 2026-07-14 audit follow-up backlog |
+| GRS-0192 | Content freshness watcher |
+| GRS-0197 | Gmail + Google Calendar integration |
+| GRS-0202 | Outreach message contract, approval gate, and suppression list |
+| GRS-0203 | The thin outreach sequencer over the GTM registry |
+| GRS-0204 | The outreach send path: Gmail scope escalation or own-domain SMTP |
+| GRS-0206 | Rive as the diagram and motion system |
+| GRS-0207 | Outreach and CRM platform: decide, then build the thin layer |
+| GRS-0208 | One clean demo account, and a founder admin who can act as any advisor — **scopes 3 and 4 only**; 1 and 2 shipped |
+
+---
+
+## Blocked on a founder decision
+
+Detail, options and recommendations in `docs/FOUNDER-DECISIONS-2026-08.md`.
+
+| Ticket | Title | Decision |
 |---|---|---|
-| GRS-0205 | Rewrite every string in the app, not just the reviewed screens | Planned |
-| GRS-0206 | Rive as the diagram and motion system (ADR-0049) | Planned — rewritten 2026-07-29 after reading the repo |
-| GRS-0207 | Outreach and CRM platform: decide, then build thin | Planned |
-| GRS-0208 | One clean demo account + a founder admin who can act as any advisor | Planned |
-| **GRS-0209** | **The Operating Model dropdown still does not line up** | **Fixed, in review** — measured on the rendered page: the select sat **23.4px** below the subject input at all three widths, now **0px**. Cause was `align-items: end` against a field that always renders a caption. Evidence in `docs/reviews/GRS-0209-form-alignment/` |
-| GRS-0210 | Smart search must know the firms an advisor will type | Planned |
-| **GRS-0211** | **The client deliverable, rebuilt: what it says** | **Content model built, in review** — `bcap_contracts.client_report` + its builder. Order validated, P10/P50/P90 refused outside the appendix, every figure declared with its run field, approval gate enforced. Prose is a gated input, never invented. **Not yet visible to the founder** — that needs GRS-0219 (PDF) and GRS-0220 (web) |
-| GRS-0212 | Customer Proposition for exchanges: research, model, ship | Planned |
-| GRS-0213 | Scenarios an advisor can drive, with a narrative assistant | Planned |
-| GRS-0214 | What the client gets free vs on engagement | Planned |
-| **GRS-0215** | **Rebuild the courses as courses, not paragraphs** — the depth standard | **In review, PR #220** (deck export still unbuilt) |
-| **GRS-0216** | **The OpenBB course** — 196 slides, eight sections | **In review, PR #220** |
-| **GRS-0217** | **The remaining product courses, to the same standard** | **COMPLETE, in review, PR #221** — Benzinga, Brandfetch and Sales Ops Playbook all rebuilt (8/8 sections, 192 slides each). `depth.LEGACY_COURSES` is down to one entry |
-| GRS-0218 | The Sales Egoist course | Blocked on source material |
-| **GRS-0219** | **The client report as a Bruntsfield-branded PDF** | **Built, in review** — cover, house typography (fonts vendored; reportlab substitutes silently, so a missing face now raises), running heads via a two-pass build, 300dpi greyscale-safe figures, repeating table headers, watermark on draft/non-production. Samples in `docs/reviews/GRS-0219-client-report-pdf/`. **Wired**: download from `/deliverables/<id>/report` |
-| **GRS-0220** | **The client report as an interactive web page, read tracking** | **Built, in review** — `/r/<token>` public page (no login), token stored only as SHA-256, unknown/expired/revoked all 404 identically, immediate revocation, snapshot-at-issue, disclosed per-section tracking. Figures are SVG bars, not the hover-radar (Rive/GRS-0206 unbuilt). **Wired**: issue/revoke links and see reads on `/deliverables/<id>/report` |
-| **GRS-0221** | **Stage 6 layout: the panels that fight each other** | **Fixed, in review** — measured on the rendered page: **119px** of the sell panel sat behind the pinned score card (its full height) at all four viewports, now **0px**. The rail sticks as one block instead of its first child. Auditing the step found a second instance — the rail pinned 44px behind the sticky site header, eating the score card's heading — fixed against `--topbar-height`. Evidence in `docs/reviews/GRS-0221-stage6-layout/` |
-| GRS-0222 | The narrative assistant: drafting against real scored data | Planned |
-| **GRS-0223** | **"All the scores seem surprisingly similar": find out why** | **Answered, in review** — the engine is not compressing (achievable V span 0.815); aggregation is, and the rubric is used at ~1/3 of its width. No engine change recommended. See `docs/analysis/score-dispersion-2026-07.md` |
-| GRS-0227 | Surface the dispersion beside the score | **Built, in review** — module range + one-line meaning on the summary and live panel; bottleneck leads where the spread is wide. New `module_qm_point` on the live payload (deterministic, assessed-only). No new dimension, no band, no rating gate |
-| GRS-0224 | Repository coverage for the dormant peer-governance code | Planned (arose from 0188) |
-| **GRS-0228** | **The E2E gate assertion tested a message we deliberately stopped sending** | **Done** — `CI / E2E` was red on `main` from 2026-07-22 to 2026-07-31. Not a broken gate: GRS-0163 rewrote the refusal copy into plain English and the spec still demanded the old `client_usable=False` jargon. Test-only fix; suite now 8/8. Follow-up worth doing: export the gate's copy as a shared constant so one sentence isn't hand-copied into three files |
-| **GRS-0225** | **Diagrams for the courses, authored not decorated** — nine scenes | **In review, PR #220** |
-| **GRS-0226** | **The slide reader and the section gate** — makes 0215/0216/0225 visible | **In review, PR #220** |
+| GRS-0067 | Earnings config: Commission Schedule v7 delta | D2 |
+| GRS-0072 | House deliverable types (Outside Read Deck · Note · Primer · Strategic Assessment) | D3 |
+| GRS-0132 | Admin/oversight — DEFERRED to Holy Corner (record only) | — (deferred, not a decision) |
+| GRS-0147 | Segment fit — **residue only**: multi-currency + UK regulatory framing | D4 |
+| GRS-0148 | Account surfaces — **residue only**: cert teeth, doctrine naming, disclosure | D5 |
+| GRS-0201 | Wizard Powers step: embed the Helmer adaptation + review packet | D7 |
+| GRS-0212 | Customer Proposition for exchanges: research it, model it, ship it | D1 |
 
-## First-time-user review wave (GRS-0229–0245, 2026-07-31)
+## Superseded register
 
-From the founder's 31/07 review ("I have tried to use each section of the studio … and none of it
-makes sense") plus the same-day critical staging review of the client-report wave. Two threads:
-**client-report hardening** (0229–0235, 0245) and **first-time-user coherence** (0236–0244).
-
-| Ticket | Title | Priority |
+| Ticket | Title | Superseded by |
 |---|---|---|
-| GRS-0229 | The shared web report must carry the non-production mark | HIGHEST (bug) |
-| GRS-0230 | Report editor: feedback where you can see it, figures you can declare | HIGH (bug+UX) |
-| GRS-0231 | The report editor must name the client | MED-HIGH (bug) |
-| GRS-0232 | The appendix must not contradict the run | MED (bug) |
-| GRS-0233 | Web report figures: label the bars, keep the story's order | MED-HIGH (bug) |
-| GRS-0234 | PDF furniture: filename, subtitle, footer, precision | MED |
-| GRS-0235 | Read tracking an advisor can read | LOW-MED |
-| GRS-0236 | Demo deliverables ship with worked example reports | HIGH |
-| GRS-0237 | The engine white paper: "is this up to scratch?", answered | HIGH |
-| GRS-0238 | A Prospecting surface: browse the registry we imported | HIGH |
-| GRS-0239 | Lessons that teach before they test | MED-HIGH |
-| GRS-0240 | The earnings page explains how you get paid | MED-HIGH |
-| GRS-0241 | Engagements: a list you can read, a link you cannot cross-wire | MED-HIGH |
-| GRS-0242 | The Workbench stops leaking internals and contradicting itself | MED (bug) |
-| GRS-0243 | First-run orientation + the twice-flagged home copy | HIGH |
-| GRS-0244 | The Guide must describe the product that exists | MED (docs bug) |
-| GRS-0245 | Founder sign-off covers everything that reaches a client | HIGH (policy) |
+| GRS-0102 | Meeting-recording upload → AI prepopulation (Path B) | GRS-0197 |
+| GRS-0109 | Screen-recording → AI video dissection → auto-populate the widget checklist | GRS-0197 |
+| GRS-0112 | Native Gmail + Google Calendar integration | GRS-0197 |
+| GRS-0113 | AI / MCP GTM enablement surface | GRS-0207 |
+| GRS-0114 | LSEG influencer mapping (bcap-lseg) | GRS-0194 |
+| GRS-0115 | Seed the target universe | GRS-0193 |
+| GRS-0189 | Rebuild the deliverables to the story architecture | GRS-0211 |
+| GRS-0191 | Academy content depth program (the 100x) | GRS-0215 |
 
-Suggested order: 0229 and 0245 first (client-trust breaches), then 0236/0243 (the first-run
-experience), then 0230/0231/0233 (report workflow), then the rest.
+---
 
-## Demo-readiness program (GRS-0158–0163, 2026-07-21) — get the studio performant enough to show advisor hires
+## Done
 
-From the staging deep-dive + brokerage end-to-end run (`reports/product-confidence-staging-2026-07-20.md`,
-`reports/brokerage-e2e-staging-2026-07-21.md`). Target = **demo-ready** (recruit advisors), distinct from
-**production-ready** (real client deliverables — still gated on founder coefficient elicitation).
-
-| Ticket | Title | Phase | Priority |
-|---|---|---|---|
-| GRS-0158 | Academy production seed (empty-Workbench fix) | 1 populate | HIGH |
-| GRS-0159 | Repeatable demo-data seed (Revolut + HL end-to-end) | 1 populate | HIGH |
-| GRS-0161 | Reconcile the two V numbers (portfolio vs deliverable) | 1 legible | HIGH |
-| GRS-0163 | Demo-polish sweep (segment/attribution/error copy/spinner) | 1 legible | MED |
-| GRS-0160 | Assessment wizard density UX pass (the "clunky" fix) | 2 feel | HIGH |
-| GRS-0162 | "What can I sell against this report" (gaps → products) | 3 value | MED-HIGH |
-
-## Shipped
+190 tickets. Each names its implementing commit in its own
+*Status reconciliation* section — that is the record, not this index. Broad shape:
 
 | Range | Theme |
 |---|---|
-| GRS-0001–0015 | Scaffold, CI, auth + scoping, contracts, ATLAS engine to Methodology v1.1/v1.2 + golden master, wizard Path A |
-| GRS-0016–0019 | Loop 4 — Deliverable Builder (value bridge, AI drafts gated, diagnostic pack, deliverables frontend) |
-| GRS-0020–0027 | Loop 5 — Workbench + Governance (dual-rating + consensus, committee queue, calibration, certification, learning content + Power Drills, Practice Arena, bench queue, workbench frontend) |
-| GRS-0028–0034 | Loop 6 — Earnings, Path B (ingestion/transcription, extraction→review→scoring), prediction register + benchmark ingestion, hardening + compliance, elicited coefficients, launch readiness |
-| GRS-0035–0065 | UI/UX + onboarding series — Claude-aligned design system, `/guide` primer, first-run walkthrough, earnings page, engagement→assessment linking, live-score bottleneck + module breakdown, dual-rating + committee UI, review-before-send |
+| GRS-0001–0034 | Loops 0–6: scaffold, ATLAS engine + golden master, wizard, pipeline, deliverables, workbench, earnings, Path B |
+| GRS-0035–0065 | UI/UX + governance + onboarding series |
+| GRS-0066–0086 | Estate reconciliation, OAuth, Commission v7, operating-model profiles, C-index Stage 1 |
+| GRS-0087–0134 | Part 2 Advisor Studio UI/UX review |
+| GRS-0135–0163 | Academy, trust-hardening, stress-test remediation, demo readiness |
+| GRS-0164–0172 | The two-estimator fix (ADR-0040, one-number rule) |
+| GRS-0173–0204 | Founder-feedback wave |
+| GRS-0205–0228 | Staging-review wave: course rebuild, client report (content model, PDF, shared page), layout fixes |
 
-_Note: some earlier tickets shipped with placeholder config (earnings v7, GRS-0028) or against the
-ratified-v1 scope only — the deltas are tracked as new tickets below, not silent edits._
-
-## In flight — estate reconciliation + guided consulting (Track A, no methodology decision needed)
-
-| Ticket | Title | Status |
-|---|---|---|
-| GRS-0066 | Estate doc corrections + engine A1/A2 re-verification | In review |
-| GRS-0067 | Earnings v7 delta — audit shipped config vs Commission Schedule v7, ticket the gap | Planned |
-| GRS-0068 | Guided consulting: structured create + Step-1 business profile (country/segment/asset classes/regions/licensing) | Planned |
-| GRS-0069 | Guided power cards — plain-English + brokerage examples + notes + tooltips (KEEP benefit/barrier; **no** 0–10 slider) | Planned |
-| GRS-0070 | Diagnostic visuals — module-q_m radar, B→P→L→V waterfall, module table with κ_m, scenario impact chart (KEEP P10/P50/P90) | Planned |
-| GRS-0071 | "Your Brokerages" portfolio home (segment / last score / last updated) | Planned |
-| GRS-0072–0073 | House deliverable types (Outside Read Deck / Note / Primer / Strategic Assessment) | Planned |
-
-## Next loop — gated on founder decisions (Track B)
-
-| Item | Blocks | Gate |
-|---|---|---|
-| **Loop 7 — C-index (Customer Proposition)** — C registry (10 Phase-E modules + 93 widget subcomponents + rarity tags), rubric anchors from the 7 scored checklists, wizard C-step, benchmark ingestion (approval-gated), deliverable sections; reported *alongside* V (Stage 1) | v1.3 normative | Founder D1 (ratify Phase E 10) + D2 (staged entry) — `adr/ADR-0023` |
-| **Exchange operating-model profile** — profile = module selection + criticals + weight set per operating model | Loop 7 scope / sequencing | Its own ADR (`METHODOLOGY-V2-SCOPE` §2); active book is exchange-side (ASX, NSE) |
-| **v1.4** — θ re-elicitation across four lenses → C enters V → golden-master v2 | C-in-composite | After 2–3 C engagements + D1/D2 |
-
-## Parallel founder/content track (dependencies, not tickets)
-
-| Item | Blocks |
-|---|---|
-| Ratify ADR-0023 decisions 1–2 | Loop 7 normative status |
-| Commission the Power Primers (Foundation Package strand 1, unwritten) | GRS-0024 quiz bank depth |
-| Score the 9 captured-but-unscored apps (Capital, Charles Schwab, EFG Hermes, EasyEquities, Futu, Hapi, Robinhood, Trii, eToro) | C benchmark corpus breadth at launch |
-| Confirm Commission Schedule v7 as earnings config source | GRS-0067 |
-| Approve harvesting ASX/NSI pack structure (anonymised) as deliverable templates | GRS-0072–0073 |
-| θ re-elicitation panel — share a session with v1 annual re-elicitation? | v1.4 (θ_C) |
-
-## Planned — Part 1 (founder-greenlit 2026-07-16) — see `planning/PART1-oauth-earnings-profiles-cindex.md`
-
-| Tickets | Workstream | ADR |
-|---|---|---|
-| GRS-0073, 0074 | Google OAuth sign-in + public-site → app login handoff | ADR-0024 |
-| GRS-0075, 0076 | Earnings: Commission Schedule v7 (two-stream) | ADR-0026 (amends ADR-0017) |
-| GRS-0077, 0078, 0079 | Operating-model profiles (exchange-first) | ADR-0025 |
-| GRS-0080–0086 | C-index / Loop 7 (Stage 1 v1.3; 0086 = Stage 2 v1.4, gated) | ADR-0023 · Methodology v1.3 |
-
-## Planned — Part 2: Advisor Studio UI/UX & product review (founder-greenlit 2026-07-16) — see `planning/PART2-uiux-review.md`
-
-Section-by-section founder review → 48 tickets (GRS-0087–0134) + 4 ADRs. Suggested order: session fix →
-Home/Primer/rename → Deliverables + Revolut demo → Wizard Phase A → Pipeline program → Academy program →
-earnings/guide → Phase-B flags.
-
-| Tickets | Section / workstream | ADR |
-|---|---|---|
-| GRS-0087–0091 | §1 Home / Dashboard (account menu, health chip, welcome, rename, IA) | ADR-0030 (rename) |
-| GRS-0092–0097 | §2 Primer depth + P/L label refinement | ADR-0030 (labels) |
-| GRS-0098–0110 | §3 Portfolio + Wizard rigor (Phase A now; 0100/0101/0109 Phase B) | ADR-0025 / ADR-0023 (overlap) |
-| GRS-0111–0115 | §4 Pipeline / GTM engine (one program) | ADR-0027 |
-| GRS-0116–0119 | §5 Deliverables / Engagements (0117 demo now, 0119 sandbox later) | ADR-0029 |
-| GRS-0120 | §0 Session persistence / stop random sign-outs | ADR-0024 |
-| GRS-0121–0132 | §6 Workbench → Bruntsfield Academy (one program) | ADR-0028 |
-| GRS-0133 | §7 My Earnings — gamify + chart | ADR-0026 (reuse) |
-| GRS-0134 | §8 Guide navigation shell (last) | — |
-
-## Sequencing notes
-
-- Track A (GRS-0066–0072) needed **no** methodology decision — the advisor-day-1 guided-consulting program; shipped.
-- **Part 1 (GRS-0073–0086)** is unblocked: founder D-1..D-7 resolved (`PENDING-FOUNDER-REVIEW.md`). Suggested order: OAuth → Earnings v7 → profiles mechanism/exchange → C-index Stage 1; C into V (v1.4, GRS-0086) is gated on the θ_C panel + golden-master v2.
-- Track B (Loop 7 / exchange profile / v1.4) consumes the review corpus through the app's scoped storage (never committed to this repo).
-- After Track B: phase 2 = Holy Corner (Elite Vault adaptation, new ticket prefix), phase 3 = Viewforth.
-  Both consume `bcap-contracts` as-is.

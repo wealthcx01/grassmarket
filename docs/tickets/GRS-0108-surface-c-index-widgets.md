@@ -1,6 +1,6 @@
 # GRS-0108 — Surface the widget checklist + Customer Proposition Index in the wizard
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** A (build now)
 **Depends on:** ADR-0023 (C-index) / GRS-0080–0085
@@ -53,3 +53,9 @@ Reuses the Part-1 C-index computation and widget scoring; no new index.
 The widget checklist + C-index are a prominent, first-class part of the wizard (a live C card on every
 step + a reframed step intro), reusing the existing C computation. Frontend type-check · lint · vitest
 green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `08cf6dc` (GRS-0108: surface the widget checklist + Customer Proposition Index prominentl).

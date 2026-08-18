@@ -1,5 +1,7 @@
 # GRS-0001 — Scaffold (Loop 0)
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 0 (see PRD §9)
 - **Branch:** `grs-0001-scaffold`
 - **Status:** In progress
@@ -70,3 +72,11 @@ value and a `Money` value and returns a number.
 ATLAS scoring engine, Monte Carlo, value-bridge computation, wizard, pipeline UI,
 deliverable builder, Workbench, earnings math, Path B meeting intelligence. Loop 0
 ships **mechanisms and seams**, not features.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `c5e79eb` (GRS-0001: Loop 0 scaffold — repo, contracts, auth+scoping, CI, Railway (#1)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

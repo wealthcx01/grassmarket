@@ -1,6 +1,6 @@
 # GRS-0208 — One clean demo account, and a founder admin who can act as any advisor
 
-**Status:** Planned (2026-07-26, staging review item 6). **Priority:** HIGH.
+**Status:** PARTIAL — scopes 1 and 2 shipped; 3 and 4 open (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-26, staging review item 6). **Priority:** HIGH._
 **Loop:** founder-feedback remediation, Wave 1.
 
 ## Why
@@ -64,6 +64,9 @@ The founder logs in as john@bruntsfield.capital, switches to the demo advisor, a
 client from prospect to signed deliverable to commission without changing accounts or hitting a
 gap.
 
+---
+
+## Status reconciliation — 2026-08-01
 
 **PARTIAL.** Scopes 1 and 2 are complete. Scopes 3 and 4 are not built and the ticket stays open.
 

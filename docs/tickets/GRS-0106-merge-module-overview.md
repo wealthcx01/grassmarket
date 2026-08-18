@@ -1,6 +1,6 @@
 # GRS-0106 — Merge Module Overview into the Infrastructure Deep Dive
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Phase:** A (build now)
 **Depends on:** —
@@ -52,3 +52,9 @@ Proposition · Summary · Scenarios).
 
 `WIZARD_STEPS` has one fewer step and no standalone Module Overview page; the per-subcomponent Guidance
 is preserved inside the deep dive; step navigation is correct. Frontend type-check · lint · vitest green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `ab84df9` (GRS-0106: merge Module Overview into the Infrastructure Deep Dive).

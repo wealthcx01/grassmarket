@@ -1,6 +1,6 @@
 # GRS-0161 — Reconcile the two V numbers (portfolio deterministic vs deliverable median)
 
-**Status:** Done (2026-07-21). Deliverable headline + component statements now report the deterministic v_index (matching the portfolio), band clamped to contain the point. Found by a clean-room recompute during the staging verification.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-21). Deliverable headline + component statements now report the deterministic v_index (matching._
 **Priority:** HIGH — trust/correctness. **Loop:** demo-readiness.
 
 ## Why
@@ -25,3 +25,11 @@ Both are legitimate outputs, but an advisor (or a hire being shown the demo) see
 
 Portfolio, assessment detail, live-score, and every deliverable agree on the headline V for a given
 assessment (or clearly label any deliberately-different figure).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `7a36a1f` (GRS-0161: reconcile the two V numbers — deliverable headlines the stored v_ind).
+
+This ticket carried no *What shipped* record; the commits above are that record.

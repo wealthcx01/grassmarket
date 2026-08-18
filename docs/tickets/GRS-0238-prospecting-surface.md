@@ -1,6 +1,6 @@
 # GRS-0238 — A Prospecting surface: browse the registry we imported
 
-**Status:** Planned (2026-07-31, founder: "I can't see prospective clients from our bcap database").
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, founder: "I can't see prospective clients from our bcap database")._
 **Priority:** HIGH. **Loop:** first-time-user coherence. **Depends on:** GRS-0193.
 **Relates to:** GRS-0194, GRS-0199, GRS-0207, GRS-0210, ADR-0045.
 
@@ -58,3 +58,9 @@ between.
 
 The founder opens Prospecting, filters to exchanges, sees the imported universe with contacts and
 provenance, and claims one as a pipeline prospect — without typing a name they had to already know.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).

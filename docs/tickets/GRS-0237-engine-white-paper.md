@@ -1,6 +1,6 @@
 # GRS-0237 — The engine white paper: one document that answers "is this up to scratch?"
 
-**Status:** Planned (2026-07-31, founder: "I am not sure if the engine calculator behind the
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, founder: "I am not sure if the engine calculator behind the._
 assessment wizard is up to scratch — need a white paper on this"). **Priority:** HIGH.
 **Loop:** first-time-user coherence. **Relates to:** GRS-0179, GRS-0180, GRS-0150, GRS-0223, ADR-0046.
 
@@ -74,3 +74,9 @@ runs on (non-negotiable #3).
 The founder hands one PDF/markdown document to a sceptical technical reader and it answers what the
 engine does, why, how it is tested, what is not yet proven, and when that closes — without a single
 claim the repo cannot back.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).

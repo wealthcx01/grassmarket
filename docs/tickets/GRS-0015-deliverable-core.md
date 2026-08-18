@@ -1,5 +1,7 @@
 # GRS-0015 — Deliverable core + the client-usable gate
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 4 (see PRD §9) — first Loop 4 ticket.
 - **Branch:** `grs-0015-deliverable-core`
 - **Status:** In review
@@ -62,3 +64,9 @@ The client-usable gate is a runtime refusal (tested); Methodology v1.2 normative
 repository-only persistence; data scoping absolute + tested; ADR-0002 with the AST guard extended to
 `deliverables`; the approval fields carry non-negotiable #8 (AI drafts are GRS-0017); one ticket =
 one branch = one PR.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `5390fe8` (GRS-0015: deliverable core + the client-usable gate (Loop 4 begins)).

@@ -1,6 +1,6 @@
 # GRS-0088 — Remove the dev health chip from the dashboard
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Advisor Studio UI/UX review
 **Depends on:** —
 **Branch:** `grs-0088-remove-dev-health-chip`
@@ -39,3 +39,9 @@ page.
 
 - Building a full admin system-status dashboard (only relocation, if the signal is kept).
 - Any change to the underlying health endpoint itself.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `9693aea` (GRS-0088: remove the dev health chip from the advisor dashboard).

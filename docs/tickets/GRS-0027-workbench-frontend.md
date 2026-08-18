@@ -1,5 +1,7 @@
 # GRS-0027 — Workbench frontend
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 5 (closes Loop 5)
 - **Branch:** `grs-0027-workbench-frontend`
 - **Status:** In review
@@ -25,3 +27,11 @@ The Workbench as one coherent surface in the Next.js app.
 - All Loop 5 features usable in-browser against seeded data.
 - Blind-entry and role gating verified in UI tests.
 - Type-check/lint green; frontend CI green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `89b0755` (GRS-0027: workbench frontend — closes Loop 5).
+
+This ticket carried no *What shipped* record; the commits above are that record.

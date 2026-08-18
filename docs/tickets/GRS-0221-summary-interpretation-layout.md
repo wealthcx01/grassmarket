@@ -1,6 +1,6 @@
 # GRS-0221 — Stage 6 layout: the panels that fight each other
 
-**Status:** Fixed, in review (2026-07-31). **Priority:** MED-HIGH. **Type:** Bug.
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Fixed, in review (2026-07-31). **Priority:** MED-HIGH. **Type:** Bug._
 **Loop:** founder-feedback remediation, Wave 1. **Follows GRS-0182.**
 
 ## Why
@@ -75,3 +75,9 @@ capped and scrolls internally, so it cannot strand its own tail.
 Five guards added to `WizardLayout.test.ts` — verified to fail against the pre-fix code, so they
 are not vacuous. They guard the declarations; the geometry above is the proof, per the GRS-0209
 lesson that a passing declaration test can sit on top of a visibly wrong page.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `0226aa2` (GRS-0221: measure what covers what, then stick the rail as one block).

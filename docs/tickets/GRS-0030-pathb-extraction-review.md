@@ -1,5 +1,7 @@
 # GRS-0030 — Path B: extraction → review → identical scoring
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 6
 - **Branch:** `grs-0030-pathb-extraction-review`
 - **Status:** In review
@@ -24,3 +26,11 @@ AI maps conversation content to the assessment schema; the consultant confirms e
 - Unconfirmed extractions provably never reach the engine.
 - Field-level provenance persisted (transcript + span + confidence + acceptance).
 - Full gate green; CI green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `dfeded1` (GRS-0030: Path B extraction → review → identical scoring).
+
+This ticket carried no *What shipped* record; the commits above are that record.

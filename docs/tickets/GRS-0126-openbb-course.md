@@ -1,6 +1,6 @@
 # GRS-0126 — OpenBB course (dedicated research agent — the biggest)
 
-**Status:** Shipped
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Shipped._
 **Loop:** Part 2 — Bruntsfield Academy / Workbench (one program)
 **Depends on:** ADR-0028 (Bruntsfield Academy / Workbench), GRS-0121 (content CMS), GRS-0123 (product-course framework)
 
@@ -55,3 +55,11 @@ exists yet; this is a **VM-research ticket** built through the CMS.
 
 - The product-course template (GRS-0123) and the CMS (GRS-0121).
 - Benzinga (GRS-0124) and Brandfetch (GRS-0125) courses.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `028e57a` (GRS-0126: OpenBB product course — deep, use-case-aligned, research-grounded).
+
+This ticket carried no *What shipped* record; the commits above are that record.

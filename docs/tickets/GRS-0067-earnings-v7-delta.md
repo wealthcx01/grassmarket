@@ -1,6 +1,6 @@
 # GRS-0067 — Earnings config: Commission Schedule v7 delta
 
-**Status:** Audited — delta specified; build gated (see Gates)
+**Status:** BLOCKED (reconciled 2026-08-01). _Previously recorded as: Audited — delta specified; build gated (see Gates)._
 **Loop:** Track A (estate reconciliation)
 **Branch:** `grs-0067-earnings-v7-delta`
 **Source of truth for v7:** `NEXT-STEPS-2026-07.md` §3.1 (structure) + the OneDrive Commission
@@ -81,3 +81,9 @@ The shipped architecture is correct and every v7 change must preserve it:
 
 - `docs/tickets/GRS-0067-earnings-v7-delta.md` — this audit + delta spec.
 - No code change (audit-only; the build is the follow-on sequence above).
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**BLOCKED.** Blocked on founder decision **D2** (docs/FOUNDER-DECISIONS-2026-08.md). Commission Schedule v7 delta — needs the founder to confirm v7 as the config source and supply the template values.

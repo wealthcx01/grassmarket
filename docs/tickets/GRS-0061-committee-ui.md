@@ -1,5 +1,7 @@
 # GRS-0061 — Rating Committee sign-off UI (§8) — resolves the committee finalise blocker in-product
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 5 (governance)
 - **Status:** Done — from GRS-0060 (governance-UI gap). Half 1 of 2 (committee; dual-rating is GRS-0062).
 
@@ -36,3 +38,11 @@ The committee sign-off workflow was API-only. Now it is fully in-product:
 
 - A committee member can find and sign off high-stakes ratings entirely in the UI; the owner sees
   the status. (Dual-rating §9 — the other finalise precondition — is GRS-0062.)
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `22def0c` (GRS-0061: Rating Committee sign-off UI (§8)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

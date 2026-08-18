@@ -1,5 +1,7 @@
 # GRS-0045 — Scenario evaluation must report an incomplete scenario, never 500
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 2 (Wizard Path A / scenarios)
 - **Status:** Fixed — found in the 2026-07-14 adversarial API review.
 - **Severity:** Medium — a schema-valid but structurally-incomplete request crashes the endpoint.
@@ -29,3 +31,11 @@ refusal instead of a 500.
 - A scenario missing powers (or otherwise unscoreable) returns 200 `scoreable=False` with a blocker
   naming the scenario — pinned by `test_scenario_missing_powers_reports_blocking_not_500`.
 - The happy-path ranking and unscoreable-baseline behaviours are unchanged.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `9e60d31` (GRS-0045: scenario evaluation reports an incomplete scenario, never 500).
+
+This ticket carried no *What shipped* record; the commits above are that record.

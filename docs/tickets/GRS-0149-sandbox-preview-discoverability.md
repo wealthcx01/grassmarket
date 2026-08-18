@@ -1,6 +1,6 @@
 # GRS-0149 — Surface the solo path: "Preview in sandbox" from the wizard
 
-**Status:** In progress
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: In progress._
 **Loop:** Part 2 — stress-test remediation (GRS-0148 Item 1)
 
 ## Why
@@ -31,3 +31,11 @@ behind, and there was no way to reach it once inside a production assessment.
 - A production assessment's Summary step offers "Preview in sandbox"; clicking it lands the advisor on
   a sandbox copy carrying the same inputs, which finalises solo into a watermarked deliverable.
 - Typecheck, prod build, and all 19 frontend tests pass. No backend/contract/scoring change.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `1c5ba59` (GRS-0149: surface the solo path — "Preview in sandbox" from the wizard (#158)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

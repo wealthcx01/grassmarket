@@ -1,6 +1,6 @@
 # GRS-0162 — "What can I sell against this report" — assessment gaps → recommended products
 
-**Status:** Done (2026-07-22, ADR-0039). `product_fit.yaml` (per-product modules/c_modules/powers +
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Done (2026-07-22, ADR-0039). `product_fit.yaml` (per-product modules/c_modules/powers +._
 pitch, fail-loud loader), `earnings/opportunities.py` deterministic join (gap = assessed-and-weak by
 the report's own gate band; Not Assessed never a gap; ranked by min q_m — commission displayed, never
 ordered on), `GET /assessments/{id}/sell-opportunities` (owner-scoped, finalised-only), panel on the
@@ -37,3 +37,11 @@ in the product. It's also the clearest link from the (draft-scored) assessment t
 
 Opening a finalised assessment shows which represented products best address its gaps, with the gap and
 the commission — no hard-coded per-client logic.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `5434f04` (GRS-0162: sell-from-report — gaps → recommended products (ADR-0039)).
+
+This ticket carried no *What shipped* record; the commits above are that record.

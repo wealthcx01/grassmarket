@@ -1,5 +1,7 @@
 # GRS-0062 — Dual-rating UI (§9) — completes the finalise workflow in-product
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 5 (governance)
 - **Status:** Done — half 2 of 2 of the GRS-0060 governance-UI gap (committee was GRS-0061).
 
@@ -37,3 +39,11 @@ and a scoring run is created — entirely in-product.** Zero console/JS errors.
 
 - A lead + a co-rater + a committee member can take an assessment from scored → consensus →
   sign-off → **finalised** without leaving the UI. GRS-0060 is fully closed.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `2f79f44` (GRS-0062: dual-rating UI (§9) — completes the finalise workflow in-product).
+
+This ticket carried no *What shipped* record; the commits above are that record.

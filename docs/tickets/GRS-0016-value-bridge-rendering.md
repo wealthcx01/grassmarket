@@ -1,5 +1,7 @@
 # GRS-0016 — Value-bridge rendering + Modernisation Roadmap
 
+**Status:** DONE (reconciled 2026-08-01).
+
 - **Loop:** 4
 - **Branch:** `grs-0016-value-bridge-rendering`
 - **Status:** Merged to main (PR #16)
@@ -24,3 +26,11 @@ The flagship money pages of the Diagnostic pack — honest by construction. The 
 - Assumption register renders complete for every lever NPV.
 - Gate/watermark behaviour inherited from GRS-0015 (draft set → watermarked internal only).
 - Full local gate green (ruff · pyright · pytest · pre-commit); CI green.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**DONE.** Landed on main in `bb700b0` (GRS-0016: review fixes — reuse cleanups + honest reproducibility), `1fad191` (GRS-0016: value-bridge rendering + Modernisation Roadmap).
+
+This ticket carried no *What shipped* record; the commits above are that record.

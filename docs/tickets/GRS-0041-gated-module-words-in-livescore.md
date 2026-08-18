@@ -1,5 +1,7 @@
 # GRS-0041 — Expose gated module rating words in the live-score contract
 
+**Status:** OPEN (reconciled 2026-08-01).
+
 - **Loop:** 6 (scoring surface)
 - **Status:** Triage — found in the 2026-07-14 post-redesign audit. NOT yet built (contract change).
 - **Severity:** Medium — a real gap between what the engine computes and what the advisor/client sees.
@@ -33,3 +35,9 @@ defend in the boardroom", per `/guide`). The engine already computes them (`gate
 - The live score returns each assessed module's gated band word; the UI shows it distinctly from the
   continuous score.
 - Golden-master/contract tests pin the words; schema parity holds; the two-track separation is intact.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** Verified still unbuilt: `LiveScore` in bcap_contracts exposes module_qm / module_qm_point / triad ordinals but no rule-based module rating WORD. No implementing commit on main; genuinely unbuilt.

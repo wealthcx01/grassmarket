@@ -1,6 +1,6 @@
 # GRS-0245 — Founder sign-off covers everything that reaches a client
 
-**Status:** Planned (2026-07-31, first-time-user review; founder decision 23/07 item 24).
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review; founder decision 23/07 item 24)._
 **Priority:** HIGH. **Type:** Policy gap. **Loop:** client-report hardening.
 **Extends GRS-0188 / ADR-0041.** **Relates to:** GRS-0220, GRS-0229.
 
@@ -63,6 +63,9 @@ Nothing generated from a production record can reach a client — by PDF or by l
 founder having approved the exact words it carries, and the founder can see that queue in the place
 the product already told them to look.
 
+---
+
+## Status reconciliation — 2026-08-01
 
 **DONE.** Matrix, measurement and post-change state in
 `docs/reviews/GRS-0245-founder-gate-share-links/gate-matrix.md`.

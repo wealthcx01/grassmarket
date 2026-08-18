@@ -1,6 +1,6 @@
 # GRS-0222 — The narrative assistant: drafting against real scored data
 
-**Status:** Planned (2026-07-26, staging review item 12). **Priority:** HIGH.
+**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-26, staging review item 12). **Priority:** HIGH._
 **Loop:** founder-feedback remediation, Wave 3. **Depends on:** GRS-0213 (scenario workspace),
 GRS-0211 (report content model). **ADR:** ADR-0050.
 
@@ -64,3 +64,9 @@ between a useful tool and a liability.
 
 An advisor drafts a recommendation paragraph they would edit rather than rewrite, every number in
 it is traceable to the run, and the founder approves it before it reaches a client.
+
+---
+
+## Status reconciliation — 2026-08-01
+
+**OPEN.** No implementing commit on main; genuinely unbuilt.
