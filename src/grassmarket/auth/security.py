@@ -63,6 +63,7 @@ def create_access_token(
     tier: ConsultantTier,
     assessor_level: AssessorLevel,
     now: datetime | None = None,
+    act_as: UUID | None = None,
 ) -> str:
     issued = now or datetime.now(UTC)
     expires = issued + timedelta(minutes=settings.jwt_access_ttl_minutes)
@@ -77,6 +78,10 @@ def create_access_token(
         "iat": int(issued.timestamp()),
         "exp": int(expires.timestamp()),
     }
+    # Omitted entirely when absent rather than serialised as null: a claim that is not there cannot
+    # be misread, and every token minted before GRS-0208 decodes unchanged.
+    if act_as is not None:
+        payload["act_as"] = str(act_as)
     return jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
 
 

@@ -178,12 +178,15 @@ def test_the_rebuild_is_complete() -> None:
     assert len(rebuilt_sections()) == 8
 
 
-def test_the_legacy_register_is_down_to_the_doctrine_course() -> None:
-    """GRS-0217 is finished, so the only visible debt left is Sales Egoist — and that one is blocked
-    on source material rather than on effort, which is worth the register saying."""
+def test_the_legacy_register_is_empty() -> None:
+    """GRS-0217 finished the product courses and GRS-0218 rebuilt the doctrine course once its
+    source material landed, so the visible-debt register is empty."""
     assert "sales-ops-playbook" not in LEGACY_COURSES
-    assert set(LEGACY_COURSES) == {"sales-egoist"}
-    assert LEGACY_COURSES["sales-egoist"] == "GRS-0218"
+    # GRS-0218 rebuilt Sales Egoist from the committed curriculum on 2026-08-01, which was
+    # the last entry. The register is now empty and stays in place: the next course
+    # authored starts unbuilt, and an exemption nobody can see is how the last rebuild
+    # quietly did not happen.
+    assert LEGACY_COURSES == {}
 
 
 # --- The two rules this course exists to enforce ---------------------------------------------

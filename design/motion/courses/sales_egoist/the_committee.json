@@ -1,0 +1,1042 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "TheCommittee",
+    "width": 1120,
+    "height": 580,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 560,
+        "y": 46,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 27,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "One committee, six appetites, six weapons"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 560,
+        "y": 84,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "No single message satisfies all of them. The wrong weapon is a disqualification."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "ColWho",
+        "x": 240,
+        "y": 146,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "ColWhoStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "ColWhoStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "ColWhoStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "ColWhoRun",
+            "style": "ColWhoStyle",
+            "text": "THE SEAT"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "ColWant",
+        "x": 560,
+        "y": 146,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "ColWantStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "ColWantStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "ColWantStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "ColWantRun",
+            "style": "ColWantStyle",
+            "text": "WHAT THEY WANT"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "ColWeapon",
+        "x": 880,
+        "y": 146,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "ColWeaponStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "ColWeaponStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "ColWeaponStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "ColWeaponRun",
+            "style": "ColWeaponStyle",
+            "text": "WHAT MOVES THEM"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Who0",
+        "x": 240,
+        "y": 208,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Who0Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Who0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Who0StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Who0Run",
+            "style": "Who0Style",
+            "text": "Head of Trading"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Want0",
+        "x": 560,
+        "y": 208,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Want0Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Want0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Want0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Want0Run",
+            "style": "Want0Style",
+            "text": "wants speed"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Weapon0",
+        "x": 880,
+        "y": 208,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Weapon0Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Weapon0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Weapon0StyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Weapon0Run",
+            "style": "Weapon0Style",
+            "text": "Challenger insight"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Who1",
+        "x": 240,
+        "y": 266,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Who1Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Who1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Who1StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Who1Run",
+            "style": "Who1Style",
+            "text": "The quant"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Want1",
+        "x": 560,
+        "y": 266,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Want1Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Want1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Want1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Want1Run",
+            "style": "Want1Style",
+            "text": "wants elegant data access"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Weapon1",
+        "x": 880,
+        "y": 266,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Weapon1Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Weapon1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Weapon1StyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Weapon1Run",
+            "style": "Weapon1Style",
+            "text": "A working demo"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Rule1",
+        "x": 560,
+        "y": 236,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Rule1Path",
+            "width": 900,
+            "height": 1,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Rule1Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Rule1Solid",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Who2",
+        "x": 240,
+        "y": 324,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Who2Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Who2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Who2StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Who2Run",
+            "style": "Who2Style",
+            "text": "Head of Architecture"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Want2",
+        "x": 560,
+        "y": 324,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Want2Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Want2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Want2StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Want2Run",
+            "style": "Want2Style",
+            "text": "wants resilience, no lock-in"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Weapon2",
+        "x": 880,
+        "y": 324,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Weapon2Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Weapon2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Weapon2StyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Weapon2Run",
+            "style": "Weapon2Style",
+            "text": "Strangler-gateway story"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Rule2",
+        "x": 560,
+        "y": 294,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Rule2Path",
+            "width": 900,
+            "height": 1,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Rule2Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Rule2Solid",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Who3",
+        "x": 240,
+        "y": 382,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Who3Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Who3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Who3StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Who3Run",
+            "style": "Who3Style",
+            "text": "The CRO"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Want3",
+        "x": 560,
+        "y": 382,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Want3Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Want3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Want3StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Want3Run",
+            "style": "Want3Style",
+            "text": "wants real-time risk"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Weapon3",
+        "x": 880,
+        "y": 382,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Weapon3Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Weapon3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Weapon3StyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Weapon3Run",
+            "style": "Weapon3Style",
+            "text": "Trust plus regulatory case"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Rule3",
+        "x": 560,
+        "y": 352,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Rule3Path",
+            "width": 900,
+            "height": 1,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Rule3Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Rule3Solid",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Who4",
+        "x": 240,
+        "y": 440,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Who4Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Who4StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Who4StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Who4Run",
+            "style": "Who4Style",
+            "text": "Compliance"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Want4",
+        "x": 560,
+        "y": 440,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Want4Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Want4StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Want4StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Want4Run",
+            "style": "Want4Style",
+            "text": "wants explainability"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Weapon4",
+        "x": 880,
+        "y": 440,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Weapon4Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Weapon4StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Weapon4StyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Weapon4Run",
+            "style": "Weapon4Style",
+            "text": "Governance narrative"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Rule4",
+        "x": 560,
+        "y": 410,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Rule4Path",
+            "width": 900,
+            "height": 1,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Rule4Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Rule4Solid",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Who5",
+        "x": 240,
+        "y": 498,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Who5Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Who5StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Who5StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Who5Run",
+            "style": "Who5Style",
+            "text": "Procurement"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Want5",
+        "x": 560,
+        "y": 498,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Want5Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Want5StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Want5StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Want5Run",
+            "style": "Want5Style",
+            "text": "wants price and terms"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Weapon5",
+        "x": 880,
+        "y": 498,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "Weapon5Style",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "Weapon5StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "Weapon5StyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "Weapon5Run",
+            "style": "Weapon5Style",
+            "text": "Mutual action plan"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Rule5",
+        "x": 560,
+        "y": 468,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Rule5Path",
+            "width": 900,
+            "height": 1,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Rule5Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Rule5Solid",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "WeaponCol",
+        "x": 880,
+        "y": 322,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "WeaponColPath",
+            "width": 300,
+            "height": 420,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "WeaponColFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "WeaponColSolid",
+                "color": "#E4EBE5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 560,
+        "y": 290,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 1120,
+            "height": 580,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -54,6 +54,21 @@ class SectionProse:
     extra_figures: tuple[DeclaredFigure, ...] = field(default_factory=tuple)
 
 
+def format_v_display(value: float) -> str:
+    """THE display form of Platform Value, everywhere (GRS-0234 scope 5, ADR-0040).
+
+    One decimal. The portfolio quoted V as 54.7 while the PDF appendix quoted 55 — the same number
+    at two precisions, so an advisor saying "54.7" faced a client holding a page saying "55". The
+    one-number rule (ADR-0040) exists to stop exactly that, and it is about the *displayed* number,
+    not only the computed one: a reader cannot tell rounding from disagreement.
+
+    One decimal rather than zero because the wizard and the portfolio already use it, and rounding
+    the two surfaces an advisor looks at every day to match a document they send occasionally is the
+    wrong way round. Module scores keep 0dp — they are read as a ranking, and V is read as a value.
+    """
+    return f"{value:.1f}"
+
+
 def _score(value: float | None) -> str | None:
     """A score as the report prints it: 0–100, no decimals. None stays None — never a zero (D9)."""
     if value is None:
@@ -65,6 +80,16 @@ def _pct(value: float | None) -> str | None:
     if value is None:
         return None
     return f"{value * 100:.0f}%"
+
+
+def figures_available_to(context: DeliverableContext) -> dict[str, list[DeclaredFigure]]:
+    """Every figure the run makes available, per section (GRS-0230 scope 3).
+
+    The editor shows these so an advisor knows the vocabulary BEFORE the gate teaches it to them by
+    refusal. Nothing new is computed — this is the same `_figures_for` the assembler uses, exposed
+    rather than recalculated, so what the editor offers and what the gate accepts cannot disagree.
+    """
+    return {kind.value: _figures_for(kind, context) for kind in ReportSectionKind}
 
 
 def _figures_for(kind: ReportSectionKind, context: DeliverableContext) -> list[DeclaredFigure]:
@@ -145,7 +170,7 @@ def _figures_for(kind: ReportSectionKind, context: DeliverableContext) -> list[D
             DeclaredFigure(
                 key="platform_value",
                 label="Platform Value (0–100)",
-                rendered=f"{result.v_display_0_100:.0f}",
+                rendered=format_v_display(result.v_display_0_100),
                 source="run.v_display_0_100",
             )
         )
@@ -196,7 +221,7 @@ def _figures_for(kind: ReportSectionKind, context: DeliverableContext) -> list[D
             DeclaredFigure(
                 key="platform_value",
                 label="Platform Value (0–100)",
-                rendered=f"{result.v_display_0_100:.0f}",
+                rendered=format_v_display(result.v_display_0_100),
                 source="run.v_display_0_100",
             ),
         ]

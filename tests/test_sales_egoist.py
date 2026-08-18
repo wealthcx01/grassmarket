@@ -19,10 +19,10 @@ from grassmarket.workbench.content.seed import seed_academy_content
 from tests.conftest import SeededConsultant
 
 _NOW = datetime(2026, 7, 17, 12, 0, tzinfo=UTC)
-_OPERATING_MODELS = ("retail brokerage", "wealth", "exchange")
+_OPERATING_MODELS = ("brokerage", "wealth", "exchange")
 
 
-def test_eight_structured_lessons_each_with_drill_and_measurement() -> None:
+def test_eight_sections_each_with_drill_and_measurement() -> None:
     tree = sales_egoist_course()
     lessons = [lesson for module in tree.modules for lesson in module.lessons]
     assert len(lessons) == 8
@@ -32,13 +32,22 @@ def test_eight_structured_lessons_each_with_drill_and_measurement() -> None:
         assert lesson.measurement  # a measurement
 
 
-def test_each_lesson_ties_to_all_three_operating_models() -> None:
+def test_the_course_ties_to_all_three_operating_models() -> None:
+    """GRS-0122 required each paragraph-lesson's body to name all three operating models, because
+    in that format the body WAS the lesson. Since GRS-0218 rebuilt the course to the slide
+    standard, `Lesson.body` is the objective statement and the teaching is in the slides — so the
+    requirement moves to the slide corpus rather than being dropped.
+
+    Keeping it matters: the mock-advisor stress test found wealth personas felt unaddressed, and
+    the wealth operating model is now live and client-usable (GRS-0147c). A doctrine course whose
+    worked examples never mention wealth would reproduce that gap.
+    """
     tree = sales_egoist_course()
-    for module in tree.modules:
-        for lesson in module.lessons:
-            body = lesson.body.lower()
-            for model in _OPERATING_MODELS:
-                assert model in body, f"{lesson.title!r} does not tie to {model!r}"
+    corpus = " ".join(
+        f"{s.title} {s.body}" for m in tree.modules for les in m.lessons for s in les.slides
+    ).lower()
+    for model in _OPERATING_MODELS:
+        assert model in corpus, f"no slide in the course ties to {model!r}"
 
 
 def test_module_is_flagged_mandatory_first() -> None:

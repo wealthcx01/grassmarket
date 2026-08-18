@@ -30,6 +30,7 @@ from grassmarket.deliverables.client_report import (
     MissingReportProseError,
     SectionProse,
     build_client_report,
+    format_v_display,
 )
 from tests._atlas_inputs import meridian_inputs
 
@@ -112,7 +113,9 @@ class TestTheReportItBuilds:
         report = build_client_report(context, scoring_run_id=RUN_ID, prose=_prose())
         value = report.section(ReportSectionKind.VALUE)
         headline = next(f for f in value.figures if f.key == "platform_value")
-        assert headline.rendered == f"{context.result.v_display_0_100:.0f}"
+        # GRS-0234 scope 5: ONE display precision for V, one decimal, on every surface and
+        # both renditions. The portfolio said 54.7 while the appendix said 55.
+        assert headline.rendered == format_v_display(context.result.v_display_0_100)
         assert headline.source == "run.v_display_0_100"
 
     def test_every_declared_figure_names_where_it_came_from(
@@ -128,7 +131,7 @@ class TestTheReportItBuilds:
 
 class TestProseIsCheckedAgainstTheRun:
     def test_prose_may_quote_a_figure_the_run_supplied(self, context: DeliverableContext) -> None:
-        score = f"{context.result.v_display_0_100:.0f}"
+        score = format_v_display(context.result.v_display_0_100)
         report = build_client_report(
             context,
             scoring_run_id=RUN_ID,
@@ -145,7 +148,9 @@ class TestProseIsCheckedAgainstTheRun:
         self, context: DeliverableContext
     ) -> None:
         # The failure this whole mechanism exists for: a plausible number nobody can trace.
-        with pytest.raises(ValidationError, match="without declaring it"):
+        # GRS-0230 rewrote the refusal into the product voice. The RULE is unchanged; the
+        # match moved to the sentence an advisor now reads.
+        with pytest.raises(ValidationError, match="not among the figures"):
             build_client_report(
                 context,
                 scoring_run_id=RUN_ID,

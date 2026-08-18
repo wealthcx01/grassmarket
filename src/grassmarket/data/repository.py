@@ -429,6 +429,16 @@ class Principal:
     # re-login and never a migration. Defaults to False so every existing construction of a
     # Principal is unaffected and no caller acquires the claim by accident.
     is_founder: bool = False
+    # Set ONLY while an admin is acting as another consultant (GRS-0208). It is attribution, never
+    # authority: `_assert_can_access` does not read it, and it cannot widen what this principal can
+    # see. During act-as the principal IS the subject — `consultant_id` and `role` are theirs — so
+    # every existing scoping test holds unchanged and the admin is NARROWED rather than extended.
+    # That direction is the whole safety argument: act-as can only ever show less.
+    acting_admin_id: UUID | None = None
+
+    @property
+    def is_acting_as(self) -> bool:
+        return self.acting_admin_id is not None
 
     @property
     def is_admin(self) -> bool:
@@ -2129,9 +2139,22 @@ class Repository:
         resource_type: str | None = None,
         resource_id: UUID | None = None,
         detail: str | None = None,
+        acting_admin_id: UUID | None = None,
     ) -> None:
         """Write one APPEND-ONLY audit event. Never updated or deleted. `detail` must carry no
-        secret (no tokens, no passwords, no plaintext transcript)."""
+        secret (no tokens, no passwords, no plaintext transcript).
+
+        `acting_admin_id` is set when the actor is an admin acting as another consultant
+        (GRS-0208). It is appended to the detail rather than replacing the actor, because the record
+        has to say BOTH things: the work is the subject's, and a named admin did it. Dropping either
+        half is how an audit log stops answering the question it exists for.
+        """
+        if acting_admin_id is not None:
+            note = (
+                f"acting-as: performed by admin {acting_admin_id} "
+                f"on behalf of {actor_consultant_id}"
+            )
+            detail = f"{detail} | {note}" if detail else note
         self._session.add(
             AuditEventORM(
                 actor_consultant_id=actor_consultant_id,
@@ -2143,6 +2166,103 @@ class Repository:
             )
         )
         self._session.flush()
+
+    def list_consultants_for_act_as(self, principal: Principal) -> list[Consultant]:
+        """Everyone an admin could act as (GRS-0208). ADMIN only.
+
+        Deliberately narrow, and named for its one purpose rather than as a general directory: it
+        exists so the act-as picker has something to show, and a general `list_consultants` would be
+        a roster endpoint nobody asked for on a product whose whole scoping discipline is that
+        advisors do not see each other.
+
+        Excludes the caller (acting as yourself is refused anyway) and inactive accounts, so the
+        picker cannot offer a choice the gate will reject.
+        """
+        if not principal.is_admin:
+            raise ScopeViolationError("Only an admin may list consultants to act as.")
+        rows = (
+            self._session.execute(
+                select(ConsultantORM)
+                .where(
+                    ConsultantORM.id != principal.consultant_id,
+                    ConsultantORM.is_active.is_(True),
+                )
+                .order_by(ConsultantORM.full_name)
+            )
+            .scalars()
+            .all()
+        )
+        return [self._to_stored_consultant(r).to_contract() for r in rows]
+
+    # ------------------------------------------------------------------ act-as (GRS-0208)
+
+    def begin_act_as(
+        self,
+        principal: Principal,
+        subject_id: UUID,
+        *,
+        now: datetime,
+        founder_reviewer_email: str,
+    ) -> Principal:
+        """Open a session scoped to another consultant, and return the principal to run it under.
+
+        Three rules, all enforced here rather than in a router, because scoping lives in this layer
+        (non-negotiable #9):
+
+        1. **Only an admin may start it.** Not a committee member, not a founder who is not also an
+           admin, and never a consultant.
+        2. **The returned principal IS the subject** — their id, their role, their founder status.
+           It is not an admin principal with a note attached, which is what would make act-as a way
+           to see more rather than a way to see exactly what one advisor sees.
+        3. **An admin already acting as someone may not chain** to a third consultant without
+           ending first. Chaining would make the audit trail ambiguous about who authorised what.
+        """
+        if not principal.is_admin:
+            raise ScopeViolationError(
+                "Only an admin may act as another consultant (GRS-0208). Data scoping is absolute "
+                "(CLAUDE.md non-negotiable #9)."
+            )
+        if principal.is_acting_as:
+            raise ConflictError(
+                "Already acting as another consultant. End that session before starting a new one "
+                "— chained act-as makes the audit trail ambiguous about who authorised what."
+            )
+        subject = self._session.get(ConsultantORM, subject_id)
+        if subject is None:
+            raise NotFoundError(f"Consultant {subject_id} not found.")
+        if subject.id == principal.consultant_id:
+            raise ConflictError("You are already yourself; acting as yourself would record a lie.")
+        self.record_audit(
+            actor_consultant_id=principal.consultant_id,
+            event_type=AuditEventType.ACT_AS_STARTED,
+            now=now,
+            resource_type="consultant",
+            resource_id=subject.id,
+            detail=f"admin {principal.consultant_id} began acting as {subject.email}",
+        )
+        return Principal(
+            consultant_id=subject.id,
+            role=Role(subject.role),
+            # The SUBJECT's founder status, not the admin's. An admin acting as an advisor must not
+            # carry a claim that advisor does not have, or "see exactly what they see" is false at
+            # precisely the gate that matters most (ADR-0041).
+            is_founder=subject.email.strip().lower() == founder_reviewer_email.strip().lower(),
+            acting_admin_id=principal.consultant_id,
+        )
+
+    def end_act_as(self, principal: Principal, *, now: datetime) -> None:
+        """Close an act-as session. Recorded, so the log shows a bounded interval rather than an
+        open-ended one — 'when did they stop' is as much a question as 'when did they start'."""
+        if not principal.is_acting_as:
+            raise ConflictError("Not currently acting as another consultant.")
+        self.record_audit(
+            actor_consultant_id=principal.acting_admin_id,
+            event_type=AuditEventType.ACT_AS_ENDED,
+            now=now,
+            resource_type="consultant",
+            resource_id=principal.consultant_id,
+            detail=f"admin {principal.acting_admin_id} stopped acting as {principal.consultant_id}",
+        )
 
     def list_audit_events(
         self, principal: Principal, *, limit: int | None = None, offset: int = 0
@@ -3270,6 +3390,144 @@ class Repository:
         approval = self._session.execute(stmt).scalars().first()
         return self._to_founder_approval(approval) if approval is not None else None
 
+    # --- Report-scoped founder approval (GRS-0245) ------------------------------------------
+    #
+    # The same rule as the assessment gate, bound to a different artefact. GRS-0245 measured the
+    # gap: `current_founder_approval` matches against the ASSESSMENT document, the report prose
+    # lives in another table and is written after finalisation, so a founder approval of the
+    # assessment says nothing about the words that actually reach the client.
+
+    @staticmethod
+    def _prose_hash(sections_json: str) -> str:
+        """sha256 of the stored prose. Computed from the database, never taken from a caller."""
+        return hashlib.sha256(sections_json.encode("utf-8")).hexdigest()
+
+    def _report_prose_row(self, deliverable_id: UUID) -> ClientReportProseORM | None:
+        stmt = select(ClientReportProseORM).where(
+            ClientReportProseORM.deliverable_id == deliverable_id
+        )
+        return self._session.execute(stmt).scalar_one_or_none()
+
+    def request_report_review(self, principal: Principal, deliverable_id: UUID) -> None:
+        """The advisor asks the founder to sign off this report. Idempotent, like its assessment
+        twin: asking again moves the timestamp, which is what "I have made changes" means."""
+        self._require_deliverable(principal, deliverable_id)
+        row = self._report_prose_row(deliverable_id)
+        if row is None:
+            raise ConflictError(
+                "This report has no prose yet, so there is nothing for the founder to read."
+            )
+        row.review_requested_at = datetime.now(UTC)
+        self._session.flush()
+
+    def current_report_approval(self, deliverable_id: UUID) -> FounderApproval | None:
+        """The approval that currently clears this report's prose, or None.
+
+        None both when nothing was ever approved and when the prose changed since — the same
+        deliberate conflation the assessment gate makes. What matters is whether the words about to
+        reach a client are the words the founder read.
+
+        Unscoped, like `current_founder_approval`: this is the gate itself, called from paths where
+        the caller's access is already established.
+        """
+        row = self._report_prose_row(deliverable_id)
+        if row is None:
+            return None
+        current = self._prose_hash(row.sections_json)
+        stmt = (
+            select(FounderApprovalORM)
+            .where(
+                FounderApprovalORM.deliverable_id == deliverable_id,
+                FounderApprovalORM.document_hash == current,
+            )
+            .order_by(FounderApprovalORM.approved_at.desc())
+        )
+        approval = self._session.execute(stmt).scalars().first()
+        return self._to_founder_approval(approval) if approval is not None else None
+
+    def record_report_approval(self, principal: Principal, deliverable_id: UUID) -> FounderApproval:
+        """The founder signs off the report's prose as it stands. Founder only — an admin bypass
+        would quietly reintroduce self-approval, which is the thing ADR-0041 exists to prevent."""
+        if not principal.is_founder:
+            raise ScopeViolationError(
+                "Only the founder reviewer may approve a client report for release (ADR-0041)."
+            )
+        deliverable = self._session.get(DeliverableORM, deliverable_id)
+        if deliverable is None:
+            raise NotFoundError(f"Deliverable {deliverable_id} not found.")
+        row = self._report_prose_row(deliverable_id)
+        if row is None:
+            raise ConflictError("This report has no prose yet, so there is nothing to approve.")
+        now = datetime.now(UTC)
+        approval = FounderApprovalORM(
+            owner_consultant_id=deliverable.owner_consultant_id,
+            assessment_id=self._assessment_id_for_deliverable(deliverable),
+            deliverable_id=deliverable_id,
+            document_hash=self._prose_hash(row.sections_json),
+            # The words the founder actually read, kept so the queue can show what changed rather
+            # than only that something did.
+            content_json=row.sections_json,
+            approved_by_consultant_id=principal.consultant_id,
+            approved_at=now,
+        )
+        self._session.add(approval)
+        self._session.flush()
+        return self._to_founder_approval(approval)
+
+    def _assessment_id_for_deliverable(self, deliverable: DeliverableORM) -> UUID:
+        """The assessment behind a deliverable, via its scoring run. Kept on the approval row so
+        report approvals join and scope exactly like assessment ones."""
+        record = self._session.get(ScoringRunORM, deliverable.scoring_run_id)
+        if record is None:
+            raise NotFoundError(
+                f"Deliverable {deliverable.id} has no scoring run to attribute an approval to."
+            )
+        return record.assessment_id
+
+    def report_was_ever_approved(self, deliverable_id: UUID) -> bool:
+        """Whether the founder has signed this report off at ANY version.
+
+        Distinct from `current_report_approval`, which asks whether the CURRENT words are cleared.
+        The difference is what lets the refusal say "approved and then edited" rather than "not
+        approved", which are different problems with different next actions.
+        """
+        stmt = select(FounderApprovalORM.id).where(
+            FounderApprovalORM.deliverable_id == deliverable_id
+        )
+        return self._session.execute(stmt).first() is not None
+
+    def report_sections_changed_since_approval(
+        self, principal: Principal, deliverable_id: UUID
+    ) -> tuple[str, ...]:
+        """Which of the six sections differ from the last approved version (GRS-0245 scope 4).
+
+        Empty when nothing was ever approved — there is no diff against nothing, and calling the
+        whole report "changed" would tell the founder to re-read work they have never read once.
+        The caller distinguishes the two cases by whether a prior approval exists at all.
+        """
+        self._require_deliverable(principal, deliverable_id)
+        row = self._report_prose_row(deliverable_id)
+        if row is None:
+            return ()
+        stmt = (
+            select(FounderApprovalORM)
+            .where(
+                FounderApprovalORM.deliverable_id == deliverable_id,
+                FounderApprovalORM.content_json.is_not(None),
+            )
+            .order_by(FounderApprovalORM.approved_at.desc())
+        )
+        previous = self._session.execute(stmt).scalars().first()
+        if previous is None or previous.content_json is None:
+            return ()
+        try:
+            before = json.loads(previous.content_json)
+            after = json.loads(row.sections_json)
+        except json.JSONDecodeError:  # pragma: no cover - stored by us, always valid
+            return ()
+        keys = sorted(set(before) | set(after))
+        return tuple(k for k in keys if before.get(k) != after.get(k))
+
     def list_founder_review_queue(self, principal: Principal) -> list[FounderReviewQueueEntry]:
         """Everything waiting on the founder, oldest request first.
 
@@ -3324,7 +3582,89 @@ class Repository:
                     updated_at=row.updated_at,
                 )
             )
+        entries.extend(self._report_review_queue())
+        entries.sort(key=lambda e: e.requested_at)
         return entries
+
+    def _report_review_queue(self) -> list[FounderReviewQueueEntry]:
+        """Client reports awaiting sign-off (GRS-0245 scope 4), in the same queue as assessments.
+
+        Production records only, for the same reason the assessment queue filters them: a demo or
+        sandbox report is watermarked on every rendition (GRS-0229) and has no client on the other
+        end, so it is not waiting on anyone.
+        """
+        stmt = select(ClientReportProseORM).where(
+            ClientReportProseORM.review_requested_at.is_not(None)
+        )
+        out: list[FounderReviewQueueEntry] = []
+        for prose in self._session.execute(stmt).scalars().all():
+            deliverable = self._session.get(DeliverableORM, prose.deliverable_id)
+            if deliverable is None:  # pragma: no cover - FK guarantees it
+                continue
+            record = self._session.get(ScoringRunORM, deliverable.scoring_run_id)
+            if record is None:  # pragma: no cover - a deliverable always has its run
+                continue
+            assessment = self._session.get(AssessmentORM, record.assessment_id)
+            if assessment is None or assessment.provenance != RecordProvenance.PRODUCTION.value:
+                continue
+            current = self._prose_hash(prose.sections_json)
+            approvals = (
+                self._session.execute(
+                    select(FounderApprovalORM).where(
+                        FounderApprovalORM.deliverable_id == prose.deliverable_id
+                    )
+                )
+                .scalars()
+                .all()
+            )
+            if any(a.document_hash == current for a in approvals):
+                continue  # signed at this version — not waiting on anyone
+            requested_at = prose.review_requested_at
+            if requested_at is None:  # pragma: no cover - the query filters these out
+                raise ConflictError(
+                    f"Report {prose.deliverable_id} is in the review queue with no request time."
+                )
+            advisor = self._require_consultant(prose.owner_consultant_id)
+            changed = self._changed_sections_from_rows(prose, approvals)
+            out.append(
+                FounderReviewQueueEntry(
+                    id=prose.deliverable_id,
+                    owner_consultant_id=prose.owner_consultant_id,
+                    assessment_id=record.assessment_id,
+                    deliverable_id=prose.deliverable_id,
+                    subject=assessment.subject,
+                    advisor_name=advisor.full_name,
+                    advisor_email=advisor.email,
+                    requested_at=requested_at,
+                    document_hash=current,
+                    previously_approved=bool(approvals),
+                    changed_sections=changed,
+                    created_at=prose.created_at,
+                    updated_at=prose.updated_at,
+                )
+            )
+        return out
+
+    @staticmethod
+    def _changed_sections_from_rows(
+        prose: ClientReportProseORM, approvals: Sequence[FounderApprovalORM]
+    ) -> tuple[str, ...]:
+        """Which sections differ from the most recent approval that stored its content.
+
+        Empty on a first review — there is nothing to diff against, and calling every section
+        "changed" would tell the founder to re-read work they have never read once.
+        """
+        with_content = [a for a in approvals if a.content_json is not None]
+        if not with_content:
+            return ()
+        previous = max(with_content, key=lambda a: a.approved_at)
+        try:
+            before = json.loads(previous.content_json or "{}")
+            after = json.loads(prose.sections_json)
+        except json.JSONDecodeError:  # pragma: no cover - stored by us, always valid
+            return ()
+        keys = sorted(set(before) | set(after))
+        return tuple(k for k in keys if before.get(k) != after.get(k))
 
     @staticmethod
     def _to_founder_approval(row: FounderApprovalORM) -> FounderApproval:

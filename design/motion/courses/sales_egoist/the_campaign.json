@@ -1,0 +1,1016 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "TheCampaign",
+    "width": 1400,
+    "height": 500,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 700,
+        "y": 46,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 28,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "Eight convictions, one campaign"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 700,
+        "y": 84,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "They are not eight skills practised apart. Run end to end they look like this."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P0",
+        "x": 190,
+        "y": 172,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P0Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P0StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.3
+          },
+          {
+            "type": "text_value_run",
+            "name": "P0Run",
+            "style": "P0Style",
+            "text": "BEFORE"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "PB0_0",
+        "x": 190,
+        "y": 226,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "PB0_0Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "PB0_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "PB0_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "PB0_0Run",
+            "style": "PB0_0Style",
+            "text": "Choose the hard account (I)"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "PB0_1",
+        "x": 190,
+        "y": 252,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "PB0_1Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "PB0_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "PB0_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "PB0_1Run",
+            "style": "PB0_1Style",
+            "text": "Enter with one weapon (II)"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "PB0_2",
+        "x": 190,
+        "y": 278,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "PB0_2Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "PB0_2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "PB0_2StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "PB0_2Run",
+            "style": "PB0_2Style",
+            "text": "Be present early (VI)"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P1",
+        "x": 540,
+        "y": 172,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P1Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P1StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.3
+          },
+          {
+            "type": "text_value_run",
+            "name": "P1Run",
+            "style": "P1Style",
+            "text": "THE TRIGGER"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "PB1_0",
+        "x": 540,
+        "y": 226,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "PB1_0Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "PB1_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "PB1_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "PB1_0Run",
+            "style": "PB1_0Style",
+            "text": "Run the documented play (III)"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "PB1_1",
+        "x": 540,
+        "y": 252,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "PB1_1Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "PB1_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "PB1_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "PB1_1Run",
+            "style": "PB1_1Style",
+            "text": "Seek the hardest room (IV)"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P2",
+        "x": 890,
+        "y": 172,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P2Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P2StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.3
+          },
+          {
+            "type": "text_value_run",
+            "name": "P2Run",
+            "style": "P2Style",
+            "text": "THE ENGAGEMENT"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "PB2_0",
+        "x": 890,
+        "y": 226,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "PB2_0Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "PB2_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "PB2_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "PB2_0Run",
+            "style": "PB2_0Style",
+            "text": "Orchestrate the committee (V)"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "PB2_1",
+        "x": 890,
+        "y": 252,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "PB2_1Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "PB2_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "PB2_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "PB2_1Run",
+            "style": "PB2_1Style",
+            "text": "Drop the script (VII)"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "P3",
+        "x": 1240,
+        "y": 172,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "P3Style",
+            "font_asset": "Display",
+            "font_size": 17,
+            "children": [
+              {
+                "type": "fill",
+                "name": "P3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "P3StyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.3
+          },
+          {
+            "type": "text_value_run",
+            "name": "P3Run",
+            "style": "P3Style",
+            "text": "THE CLOSE"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "PB3_0",
+        "x": 1240,
+        "y": 226,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "PB3_0Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "PB3_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "PB3_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "PB3_0Run",
+            "style": "PB3_0Style",
+            "text": "Pre-emptive strike (VIII)"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "PB3_1",
+        "x": 1240,
+        "y": 252,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "PB3_1Style",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "PB3_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "PB3_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "PB3_1Run",
+            "style": "PB3_1Style",
+            "text": "before an RFP exists"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Arrow0Head",
+        "x": 364.0,
+        "y": 224,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "Arrow0HeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Arrow0HeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Arrow0HeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Arrow0Stem",
+        "x": 348,
+        "y": 224,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Arrow0StemPath",
+            "width": 23.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Arrow0StemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Arrow0StemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Arrow1Head",
+        "x": 714.0,
+        "y": 224,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "Arrow1HeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Arrow1HeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Arrow1HeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Arrow1Stem",
+        "x": 698,
+        "y": 224,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Arrow1StemPath",
+            "width": 23.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Arrow1StemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Arrow1StemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Arrow2Head",
+        "x": 1064.0,
+        "y": 224,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "Arrow2HeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Arrow2HeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Arrow2HeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Arrow2Stem",
+        "x": 1048,
+        "y": 224,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Arrow2StemPath",
+            "width": 23.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Arrow2StemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Arrow2StemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Through",
+        "x": 700,
+        "y": 394,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "ThroughStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "ThroughStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "ThroughStyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.3
+          },
+          {
+            "type": "text_value_run",
+            "name": "ThroughRun",
+            "style": "ThroughStyle",
+            "text": "VIII . TOTAL ACCOUNT AWARENESS RUNS THE WHOLE WAY THROUGH"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "ThroughBar",
+        "x": 700,
+        "y": 394,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "ThroughBarPath",
+            "width": 1200,
+            "height": 54,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "ThroughBarFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "ThroughBarSolid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "PCard0",
+        "x": 190,
+        "y": 224,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "PCard0Path",
+            "width": 300,
+            "height": 168,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "PCard0Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "PCard0Solid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "PCard0Stroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "PCard0StrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "PCard1",
+        "x": 540,
+        "y": 224,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "PCard1Path",
+            "width": 300,
+            "height": 168,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "PCard1Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "PCard1Solid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "PCard1Stroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "PCard1StrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "PCard2",
+        "x": 890,
+        "y": 224,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "PCard2Path",
+            "width": 300,
+            "height": 168,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "PCard2Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "PCard2Solid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "PCard2Stroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "PCard2StrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "PCard3",
+        "x": 1240,
+        "y": 224,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "PCard3Path",
+            "width": 300,
+            "height": 168,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "PCard3Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "PCard3Solid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "PCard3Stroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "PCard3StrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 700,
+        "y": 462,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "That is the Bruntsfield playbook: a closed loop from conviction to ownership."
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 700,
+        "y": 250,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 1400,
+            "height": 500,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

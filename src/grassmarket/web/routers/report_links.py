@@ -18,7 +18,9 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
+from bcap_contracts.assessments import RecordProvenance
 from bcap_contracts.client_report import ClientReport, ReportSectionKind
+from bcap_contracts.deliverables import DeliverableMode
 from bcap_contracts.report_links import ClientReportLink, ReportReadReport
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
@@ -33,7 +35,7 @@ from grassmarket.deliverables.report_links import (
     resolve_expiry,
 )
 from grassmarket.web.dependencies import get_current_principal, get_repository
-from grassmarket.web.routers.client_report import assemble_for
+from grassmarket.web.routers.client_report import assemble_for, assert_report_releasable
 
 router = APIRouter(tags=["report-links"])
 public_router = APIRouter(tags=["shared-report"])
@@ -63,9 +65,18 @@ class SharedReportPayload(BaseModel):
 
     report: ClientReport
     #: Parallel label/value lists per figure, drawn as SVG client-side rather than as images.
-    figures: dict[str, dict[str, list]]
+    figures: dict[str, dict[str, object]]
     #: Shown on the page. The reader is told, in plain words, that reads are visible to the sender.
     tracking_notice: str
+    # The two marks the PDF draws, carried IN the snapshot rather than derived when the page is
+    # served (GRS-0229). Stored at issue for the same reason the report is: a record reclassified
+    # later must not retroactively change what an already-issued link shows a reader. Defaulted so
+    # a link issued before this field existed deserialises — and defaulted to the SAFE value, which
+    # for a mark is "show it": a legacy snapshot whose provenance nobody recorded is exactly the
+    # case where the reader should be told the numbers may not be production.
+    non_production: bool = True
+    #: The deliverable was DRAFT_INTERNAL at issue — not approved for client use.
+    draft: bool = True
 
 
 class CreateLinkRequest(BaseModel):
@@ -114,24 +125,35 @@ def create_link(
     # Assembled HERE, not sent by the browser. The client report is a gated artefact; letting the
     # page post its own version of one would put the content model's rules on the wrong side of the
     # trust boundary. A report with unwritten sections raises the 409 that names them.
-    assembled, _ = assemble_for(repo, principal, deliverable_id)
+    assembled, deliverable, provenance = assemble_for(repo, principal, deliverable_id)
+    # The same gate the PDF takes (GRS-0245). A share link is the MORE exposed rendition — no
+    # login, anyone with the URL — so gating the download and not this one would have been the
+    # wrong way round.
+    assert_report_releasable(repo, principal, deliverable_id, provenance)
     snapshot = SharedReportPayload(
         report=assembled.report,
+        # Serialised from the ONE figure source the PDF also renders from, including the order and
+        # the per-entry notes — so the two renditions cannot disagree about what is shown or in what
+        # sequence (GRS-0233 scope 3).
         figures={
-            "maturity": {
-                "labels": list(assembled.figures.maturity.labels),
-                "values": list(assembled.figures.maturity.values),
-            },
-            "value_buildup": {
-                "labels": list(assembled.figures.value_buildup.labels),
-                "values": list(assembled.figures.value_buildup.values),
-            },
-            "module_breakdown": {
-                "labels": list(assembled.figures.module_breakdown.labels),
-                "values": list(assembled.figures.module_breakdown.values),
-            },
+            name: {
+                "labels": list(series.labels),
+                "values": list(series.values),
+                "notes": list(series.notes),
+                "ordered": series.ordered,
+            }
+            for name, series in (
+                ("maturity", assembled.figures.maturity),
+                ("value_buildup", assembled.figures.value_buildup),
+                ("module_breakdown", assembled.figures.module_breakdown),
+            )
         },
         tracking_notice=TRACKING_NOTICE,
+        # Provenance, not mode — see the note on `assemble_for`. A sandbox record scored on an
+        # activated profile resolves to mode=CLIENT, so keying the mark on mode alone showed
+        # nothing on precisely the records that most need it.
+        non_production=provenance is not RecordProvenance.PRODUCTION,
+        draft=deliverable.mode is not DeliverableMode.CLIENT,
     )
 
     try:

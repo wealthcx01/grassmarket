@@ -9,7 +9,11 @@
 import { render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { SharedReport, type SharedReportPayload } from "@/components/SharedReport";
+import {
+  SharedReport,
+  reportMarkText,
+  type SharedReportPayload,
+} from "@/components/SharedReport";
 
 const SECTIONS = ["business", "advantage", "constraint", "actions", "value", "appendix"];
 
@@ -122,3 +126,128 @@ describe("SharedReport (GRS-0220)", () => {
     expect(() => render(<SharedReport payload={bare} token="t" />)).not.toThrow();
   });
 });
+
+describe("the non-production mark (GRS-0229)", () => {
+  it("marks a sandbox record, persistently and at the top", () => {
+    render(
+      <SharedReport payload={payload({ non_production: true, draft: true })} token="t" />,
+    );
+    const mark = screen.getByTestId("report-mark");
+    expect(mark.textContent).toContain("NON-PRODUCTION DATA");
+    // role=alert, not note: this is the one thing on the page a reader must not miss.
+    expect(mark.getAttribute("role")).toBe("alert");
+    // The class carries `position: fixed`, which is what makes it survive scrolling. Asserting the
+    // hook rather than the computed style, because jsdom does not lay anything out.
+    expect(mark.className).toContain("shared-report-mark");
+  });
+
+  it("renders nothing for a production, client-approved record", () => {
+    render(
+      <SharedReport payload={payload({ non_production: false, draft: false })} token="t" />,
+    );
+    expect(screen.queryByTestId("report-mark")).toBeNull();
+  });
+
+  it("marks a draft on a production record, and says so in the PDF's words", () => {
+    render(
+      <SharedReport payload={payload({ non_production: false, draft: true })} token="t" />,
+    );
+    const mark = screen.getByTestId("report-mark");
+    expect(mark.textContent).toContain("DRAFT");
+    expect(mark.textContent).toContain("not client-usable");
+    expect(mark.textContent).not.toContain("NON-PRODUCTION");
+  });
+
+  it("shows the mark when the flags are absent, because a legacy snapshot is not a safe one", () => {
+    // A link issued before GRS-0229 has neither flag in its stored JSON. The backend defaults both
+    // to true; this asserts the component agrees rather than silently rendering a clean page.
+    const { non_production, draft, ...legacy } = payload({
+      non_production: true,
+      draft: true,
+    });
+    void non_production;
+    void draft;
+    render(<SharedReport payload={legacy as SharedReportPayload} token="t" />);
+    const mark = screen.getByTestId("report-mark");
+    expect(mark.textContent).toContain("NON-PRODUCTION DATA");
+  });
+
+  it("combines both marks when both apply", () => {
+    expect(reportMarkText({ non_production: true, draft: true })).toContain("DRAFT");
+    expect(reportMarkText({ non_production: true, draft: true })).toContain("NON-PRODUCTION DATA");
+    expect(reportMarkText({ non_production: false, draft: false })).toBeNull();
+    // Absent is not the same as false, and must not be treated as it.
+    expect(reportMarkText({})).toContain("NON-PRODUCTION DATA");
+  });
+});
+
+describe("figures label their bars and keep meaningful order (GRS-0233)", () => {
+  const BUILDUP = {
+    labels: ["Business", "Powers", "Infrastructure", "Platform Value"],
+    values: [77, 29, 58, 55],
+    ordered: true,
+  };
+  const RANKED = {
+    labels: ["Back Office", "Front End", "EMS Gateway"],
+    values: [80, 82, 50],
+    notes: ["Back Office: scored on 3 of 4.", "Front End: scored on 4 of 4.", "EMS: 2 of 5."],
+    ordered: false,
+  };
+
+  function figuresFor(over: Record<string, unknown>) {
+    return payload({ figures: { ...(payload().figures as object), ...over } } as never);
+  }
+
+  it("keeps a composition figure in its declared order", () => {
+    // The bug: every figure was sorted ascending, so the build-up rendered
+    // Powers -> Platform Value -> Infrastructure -> Business under a caption promising a
+    // composition. The sort destroyed the thing the figure was for.
+    render(<SharedReport payload={figuresFor({ value_buildup: BUILDUP })} token="t" />);
+    const rows = screen.getAllByText(/Business|Powers|Infrastructure|Platform Value/);
+    const order = rows.map((r) => r.textContent);
+    expect(order.slice(0, 4)).toEqual([
+      "Business",
+      "Powers",
+      "Infrastructure",
+      "Platform Value",
+    ]);
+  });
+
+  it("still sorts a ranked figure weakest-first", () => {
+    render(<SharedReport payload={figuresFor({ maturity: RANKED })} token="t" />);
+    const labels = screen
+      .getAllByText(/Back Office|Front End|EMS Gateway/)
+      .map((el) => el.textContent);
+    // Weakest-first is what the ranked figure's caption says it is, so it stays.
+    expect(labels[0]).toBe("EMS Gateway");
+  });
+
+  it("labels every bar with its name and value", () => {
+    // Nine solid bars with no labels was the defect. A client should never have to count rows
+    // against a separately-sorted table to know which bar is which.
+    render(<SharedReport payload={figuresFor({ maturity: RANKED })} token="t" />);
+    for (const label of RANKED.labels) {
+      // getAllBy, not getBy: a module can legitimately appear in more than one figure on the page.
+      expect(screen.getAllByText(label).length).toBeGreaterThan(0);
+    }
+    for (const value of ["80", "82", "50"]) {
+      expect(screen.getAllByText(value).length).toBeGreaterThan(0);
+    }
+  });
+
+  it("carries each bar's meaning on hover where there is one", () => {
+    const { container } = render(
+      <SharedReport payload={figuresFor({ maturity: RANKED })} token="t" />,
+    );
+    const titled = container.querySelectorAll(".shared-bar-row[title]");
+    expect(titled.length).toBe(RANKED.labels.length);
+  });
+
+  it("renders without notes, because an older snapshot has none", () => {
+    // Snapshots issued before GRS-0233 carry no `notes` and no `ordered`. They must still render.
+    const legacy = { labels: ["A", "B"], values: [10, 20] };
+    render(<SharedReport payload={figuresFor({ maturity: legacy })} token="t" />);
+    expect(screen.getByText("A")).toBeTruthy();
+  });
+});
+

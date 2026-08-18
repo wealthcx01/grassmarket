@@ -1,6 +1,6 @@
 # GRS-0218 — The Sales Egoist course
 
-**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Blocked on source material (2026-07-26; 23/07 item 20). **Priority:** HIGH._
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Blocked on source material (2026-07-26; 23/07 item 20). **Priority:** HIGH._
 **Loop:** founder-feedback remediation, Wave 4. **Depends on:** GRS-0215.
 
 ## Why
@@ -26,6 +26,8 @@ The founder has said they will add the Helmer and Sales Egoist materials. Until 
 exactly the failure being complained about.
 
 **Unblocking condition:** the Sales Egoist material committed under `data/reference/`.
+**UNBLOCKED 2026-07-31** by commit `2d81f56`: the Master Curriculum docx and both
+authored lesson decks landed under `data/reference/sales-egoist/`.
 
 ## Scope, once unblocked
 
@@ -63,4 +65,59 @@ compressed.
 
 ## Status reconciliation — 2026-08-01
 
-**OPEN.** UNBLOCKED 2026-07-31: the source landed in data/reference/sales-egoist/ (commit 2d81f56). Build scheduled as Phase 1.
+**DONE.** Built from the committed source on 2026-08-01, after `2d81f56` landed the material.
+
+## What shipped
+
+**Eight sections, 177 slides, one section test each** — `sales_egoist_slides.py`. The shape follows
+the curriculum's own rather than being imposed on it: Part One becomes sections 1 to 3 (the
+doctrine and the terrain; the battlefield; the armoury), Part Two's eight convictions become
+sections 4 to 7 at two per section, and Part Three's integration becomes section 8, which then runs
+the whole campaign against an actual ATLAS engagement.
+
+Per section: 22, 24, 24, 23, 22, 21, 21, 21 slides. Six questions per section test, each with an
+explanation that teaches rather than only marking. Eight diagrams, one per section, authored as
+SceneSpecs under `design/motion/courses/sales_egoist/` and exported through the existing pipeline.
+
+**Every claim is sourced.** Three `SourceRef`s point at the committed artefacts by their canonical
+blob URL — the curriculum docx and both decks. `SourceRef.url` is https-only at the contract, so a
+repo file has to be cited that way; the link resolves to the exact committed file each lesson was
+written from. `tests/test_sales_egoist_course.py` enforces that every lesson cites committed
+material, which is the ticket's test-plan item 2: the "generic summary" failure is now caught by the
+build rather than by the founder.
+
+**The thin course was deleted, not left alongside.** The eight paragraph-lessons in
+`sales_egoist.py` were written in July 2026 from a paraphrase and are exactly what the founder was
+describing. Keeping them would have meant that sentence still shipped. What they contained that the
+rebuild does not simply inherit is recorded in the module docstring rather than lost: their
+strongest idea — *the assessment is the demo* — survives, developed, as section 8's treatment of
+the assessment's three jobs in a campaign.
+
+**GRS-0148 call (b) honoured as written.** The doctrine's own vocabulary is kept inside the course
+(it is internal training, and the voice is part of its force) and spreads to no new client-adjacent
+surface. That decision is recorded in the module docstring and asserted by a test, and the wider
+question — whether the naming survives on client-facing surfaces — stays with the founder as **D5b**.
+
+**GRS-0239 scope 5 resolved at the root.** That ticket proposed moving `mandatory_first` off this
+course because "Start here" pointed at the worst content we had. Rebuilding the course fixes the
+cause, so the flag stays where the Academy's design always wanted it. There is no temporary shuffle
+to undo later.
+
+**`LEGACY_COURSES` is now empty.** This was its last entry. The register stays in place, because the
+next course authored starts unbuilt and an exemption nobody can see is how the last rebuild quietly
+did not happen.
+
+### One thing that was NOT done, and one thing found on the way
+
+- **Scope item 4, Practice**, is partially met. The course carries 30 checkpoint slides that each
+  produce a written artefact, and the campaign section ends with a diarised action. What it does not
+  do is connect those to the Practice Arena, because the Arena rebuild (GRS-0196) has not been
+  built. The hooks are the `drill_topics` on each lesson; wiring them is GRS-0196's job.
+- **A content gap was found by a pre-existing test and fixed rather than argued away.** The old
+  GRS-0122 test required every lesson to tie to all three operating models. On the first pass the
+  rebuilt course mentioned wealth **zero times** — the curriculum is written institution-wide and
+  names asset managers rather than wealth managers. Since the wealth operating model is now live and
+  client-usable (GRS-0147c), and the mock-advisor stress test found wealth personas felt
+  unaddressed, the fix was a new worked example in section 2 rather than a weaker test. The test
+  itself moved from per-lesson-body to the slide corpus, because in the rebuilt format the body is
+  the objective and the teaching is in the slides.

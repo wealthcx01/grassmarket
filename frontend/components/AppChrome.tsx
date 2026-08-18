@@ -17,6 +17,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { AccountMenu } from "@/components/AccountMenu";
+import { ActingAsBanner } from "@/components/ActingAsBanner";
 import { PrimaryNav } from "@/components/PrimaryNav";
 
 /** Paths rendered bare, with no advisor chrome and no layout gutter. */
@@ -34,6 +35,10 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      {/* Above the header, and fixed: an admin who forgets they are acting as an advisor will read
+          that advisor's pipeline as their own and write as them without noticing (GRS-0208). It
+          renders nothing when not acting-as. */}
+      <ActingAsBanner />
       {/* BC site chrome: paper header + hairline rule (not a colour bar), the Bruntsfield
           wordmark lockup with the "ADVISORY" sub-label in accent green. Matches the
           bruntsfield.capital header so the login redirect reads as one continuous site. */}

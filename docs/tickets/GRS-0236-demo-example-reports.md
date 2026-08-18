@@ -1,6 +1,6 @@
 # GRS-0236 — Demo deliverables ship with worked example reports
 
-**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, founder: "I can't seem to download example client reports")._
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, founder: "I can't seem to download example client reports")._
 **Priority:** HIGH. **Loop:** first-time-user coherence. **Extends GRS-0159.** **Relates to:** GRS-0208, GRS-0211.
 
 ## Why
@@ -58,4 +58,37 @@ watermarked, well-written example client report thirty seconds into their first 
 
 ## Status reconciliation — 2026-08-01
 
-**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).
+**DONE.** Example PDFs in `docs/reviews/GRS-0236-demo-example-reports/`.
+
+## What shipped
+
+**Authored example prose for all three showcase brokerages** — six sections each, in
+`src/grassmarket/demo/showcase_reports.py`, distinct per firm and written to the GRS-0211 standard.
+Revolut is a distribution-led neobank whose constraint is execution depth; Hargreaves Lansdown is an
+incumbent whose franchise is defended against the wrong attack; WeBull is a technology-led
+challenger with a distribution problem rather than a product one. Three variations on "a strong
+platform with room to improve" would have told a reader the assessment says nothing.
+
+**Seeded for EVERY showcase deliverable, not only the Platform Power Report.** A first-time user
+opens whichever of the five they land on, and finding that four refuse would teach them the product
+is broken. Upsert, so re-running refreshes rather than duplicates.
+
+**A spec without prose now fails the seed loudly**, naming what to add. Adding a fourth brokerage
+without an example report would otherwise reintroduce this exact defect silently — the seed would
+succeed and the demo would refuse.
+
+**No numerals in the body.** The content model refuses undeclared figures, but the deeper reason is
+that this prose is bound to a scoring run whose numbers move when coefficients are re-elicited.
+Prose quoting a score would go stale and start contradicting the appendix beside it.
+
+## Evidence
+
+One PDF per brokerage, rendered from the seeded demo records:
+`revolut-`, `hargreaves-lansdown-` and `webull-platform-assessment.pdf`. Six pages each,
+`DRAFT — not client-usable / NON-PRODUCTION DATA` on **every page**, provenance `demo`.
+
+## The test that matters
+
+`test_every_showcase_deliverable_has_a_worked_example_report` asserts the report **assembles**, not
+that prose rows exist. A seeded row that still failed the content model would be the same broken
+demo with more data behind it.

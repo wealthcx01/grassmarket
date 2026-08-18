@@ -1,0 +1,1219 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "TheArmoury",
+    "width": 1120,
+    "height": 560,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 560,
+        "y": 46,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 27,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "The armoury, organised by what you need it to do"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 560,
+        "y": 84,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "Wide on purpose: not so you use everything, so you choose with knowledge."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "H0_0",
+        "x": 260,
+        "y": 176,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "H0_0Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "H0_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "H0_0StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "H0_0Run",
+            "style": "H0_0Style",
+            "text": "Discovery"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "H0_1",
+        "x": 260,
+        "y": 204,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "H0_1Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "H0_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "H0_1StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "H0_1Run",
+            "style": "H0_1Style",
+            "text": "and diagnosis"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B0_0",
+        "x": 260,
+        "y": 244,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B0_0Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B0_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B0_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B0_0Run",
+            "style": "B0_0Style",
+            "text": "SPIN . Solution"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B0_1",
+        "x": 260,
+        "y": 270,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B0_1Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B0_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B0_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B0_1Run",
+            "style": "B0_1Style",
+            "text": "Conceptual . Gap"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "H1_0",
+        "x": 560,
+        "y": 176,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "H1_0Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "H1_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "H1_0StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "H1_0Run",
+            "style": "H1_0Style",
+            "text": "Insight"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "H1_1",
+        "x": 560,
+        "y": 204,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "H1_1Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "H1_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "H1_1StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "H1_1Run",
+            "style": "H1_1Style",
+            "text": "and reframing"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B1_0",
+        "x": 560,
+        "y": 244,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B1_0Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B1_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B1_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B1_0Run",
+            "style": "B1_0Style",
+            "text": "Challenger . Provocation"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B1_1",
+        "x": 560,
+        "y": 270,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B1_1Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B1_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B1_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B1_1Run",
+            "style": "B1_1Style",
+            "text": "Command of the Message"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "H2_0",
+        "x": 860,
+        "y": 176,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "H2_0Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "H2_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "H2_0StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "H2_0Run",
+            "style": "H2_0Style",
+            "text": "Value"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "H2_1",
+        "x": 860,
+        "y": 204,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "H2_1Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "H2_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "H2_1StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "H2_1Run",
+            "style": "H2_1Style",
+            "text": "and economics"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B2_0",
+        "x": 860,
+        "y": 244,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B2_0Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B2_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B2_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B2_0Run",
+            "style": "B2_0Style",
+            "text": "Value / ROI Selling"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B2_1",
+        "x": 860,
+        "y": 270,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B2_1Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B2_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B2_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B2_1Run",
+            "style": "B2_1Style",
+            "text": "Mutual Action Plan"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "H3_0",
+        "x": 260,
+        "y": 396,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "H3_0Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "H3_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "H3_0StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "H3_0Run",
+            "style": "H3_0Style",
+            "text": "Qualification"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "H3_1",
+        "x": 260,
+        "y": 424,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "H3_1Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "H3_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "H3_1StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "H3_1Run",
+            "style": "H3_1Style",
+            "text": "and deal control"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B3_0",
+        "x": 260,
+        "y": 464,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B3_0Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B3_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B3_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B3_0Run",
+            "style": "B3_0Style",
+            "text": "MEDDIC / MEDDPICC"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B3_1",
+        "x": 260,
+        "y": 490,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B3_1Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B3_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B3_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B3_1Run",
+            "style": "B3_1Style",
+            "text": "Sandler . NEAT / SNAP"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "H4_0",
+        "x": 560,
+        "y": 396,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "H4_0Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "H4_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "H4_0StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "H4_0Run",
+            "style": "H4_0Style",
+            "text": "Committee"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "H4_1",
+        "x": 560,
+        "y": 424,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "H4_1Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "H4_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "H4_1StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "H4_1Run",
+            "style": "H4_1Style",
+            "text": "and account"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B4_0",
+        "x": 560,
+        "y": 464,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B4_0Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B4_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B4_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B4_0Run",
+            "style": "B4_0Style",
+            "text": "Miller Heiman Blue Sheet"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B4_1",
+        "x": 560,
+        "y": 490,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B4_1Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B4_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B4_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B4_1Run",
+            "style": "B4_1Style",
+            "text": "Target Account Selling"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "H5_0",
+        "x": 860,
+        "y": 396,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "H5_0Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "H5_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "H5_0StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "H5_0Run",
+            "style": "H5_0Style",
+            "text": "Timing"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "H5_1",
+        "x": 860,
+        "y": 424,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "H5_1Style",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "H5_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "H5_1StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "H5_1Run",
+            "style": "H5_1Style",
+            "text": "and presence"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B5_0",
+        "x": 860,
+        "y": 464,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B5_0Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B5_0StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B5_0StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B5_0Run",
+            "style": "B5_0Style",
+            "text": "Social and Digital"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B5_1",
+        "x": 860,
+        "y": 490,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B5_1Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B5_1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B5_1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B5_1Run",
+            "style": "B5_1Style",
+            "text": "The Timing Layer"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Cell0",
+        "x": 260,
+        "y": 220,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Cell0Path",
+            "width": 272,
+            "height": 176,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Cell0Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Cell0Solid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "Cell0Stroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Cell0StrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Cell1",
+        "x": 560,
+        "y": 220,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Cell1Path",
+            "width": 272,
+            "height": 176,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Cell1Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Cell1Solid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "Cell1Stroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Cell1StrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Cell2",
+        "x": 860,
+        "y": 220,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Cell2Path",
+            "width": 272,
+            "height": 176,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Cell2Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Cell2Solid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "Cell2Stroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Cell2StrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Cell3",
+        "x": 260,
+        "y": 440,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Cell3Path",
+            "width": 272,
+            "height": 176,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Cell3Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Cell3Solid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "Cell3Stroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Cell3StrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Cell4",
+        "x": 560,
+        "y": 440,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Cell4Path",
+            "width": 272,
+            "height": 176,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Cell4Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Cell4Solid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "Cell4Stroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Cell4StrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Cell5",
+        "x": 860,
+        "y": 440,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Cell5Path",
+            "width": 272,
+            "height": 176,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Cell5Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Cell5Solid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "Cell5Stroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Cell5StrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 560,
+        "y": 280,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 1120,
+            "height": 560,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

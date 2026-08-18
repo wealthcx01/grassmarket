@@ -1017,9 +1017,22 @@ class FounderApprovalORM(Base):
     assessment_id: Mapped[UUID] = mapped_column(
         ForeignKey("assessments.id"), index=True, nullable=False
     )
-    # Lowercase sha256 hex of the assessment document as stored at approval time. Server-computed;
-    # never accepted from a caller.
+    # Lowercase sha256 hex of what was approved, as stored at approval time. Server-computed;
+    # never accepted from a caller. For an assessment approval that is the assessment document; for
+    # a REPORT approval (GRS-0245) it is the client report's prose.
     document_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    # Set only on a REPORT approval (GRS-0245): the deliverable whose client report was signed off.
+    # NULL means this row is an assessment approval, which is what every pre-existing row is. The
+    # two scopes share a table because they share a rule — an approval is a fact about a hash, and
+    # editing what it names returns the record to the queue.
+    deliverable_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("deliverables.id"), index=True, nullable=True
+    )
+    # The exact prose the founder read, stored on a report approval so the queue can show what
+    # CHANGED since it (GRS-0245 scope 4). A hash alone can say "this differs"; it cannot say which
+    # of the six sections the founder needs to re-read, and that is the difference between a queue
+    # entry that helps and one that just reopens the work.
+    content_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     approved_by_consultant_id: Mapped[UUID] = mapped_column(
         ForeignKey("consultants.id"), nullable=False
     )
@@ -1228,6 +1241,12 @@ class ClientReportProseORM(Base):
     __tablename__ = "client_report_prose"
 
     id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    # Set when the advisor asks the founder to sign the report off (GRS-0245). Its own timestamp
+    # rather than the assessment's: the prose is written after the assessment is already approved,
+    # so the two are reviewed at different moments and a shared field would conflate them.
+    review_requested_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     owner_consultant_id: Mapped[UUID] = mapped_column(
         ForeignKey("consultants.id"), index=True, nullable=False
     )

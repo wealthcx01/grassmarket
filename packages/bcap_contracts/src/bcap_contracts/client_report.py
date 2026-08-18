@@ -135,6 +135,106 @@ class DeclaredFigure(BaseModel):
     )
 
 
+#: The names a READER sees, per section. Lives here, in the contract, because three renditions need
+#: them — the PDF, the public web page, and the refusal message an advisor reads when a number is
+#: undeclared — and a name authored in three places drifts. That is not a hypothetical: GRS-0228 was
+#: a message asserted in two places and authored in a third, red on main for nine days.
+SECTION_TITLES: dict[ReportSectionKind, str] = {
+    ReportSectionKind.BUSINESS: "The business",
+    ReportSectionKind.ADVANTAGE: "Where the advantage sits",
+    ReportSectionKind.CONSTRAINT: "What is holding it back",
+    ReportSectionKind.ACTIONS: "What to do about it",
+    ReportSectionKind.VALUE: "What that is worth",
+    ReportSectionKind.APPENDIX: "Technical appendix",
+}
+
+
+#: A version CLAIM in prose: the thing named, then the value asserted for it. Matches "Methodology
+#: v1.2", "methodology version 1.1", "the coefficient set v1-elicited", "engine version 1.4.0".
+#: Deliberately anchored on the NAME rather than on anything version-shaped, so it cannot fire on an
+#: ordinary number that happens to look like a version — a false refusal here would teach an advisor
+#: to distrust the gate, which costs more than the check is worth.
+_VERSION_CLAIM = re.compile(
+    r"\b(methodology|coefficient(?:\s+set)?|engine|uncertainty)\b"
+    r"[^.\n]{0,20}?"
+    r"\bv(?:ersion)?\.?\s*([0-9][\w.\-]*)",
+    re.IGNORECASE,
+)
+
+
+def _normalise_version(value: str) -> str:
+    """Compare versions on their digits and separators, not their decoration. 'v1.2', 'V1.2' and
+    '1.2' are the same claim; 'v1-elicited' and 'v1-draft' are not."""
+    return value.strip().lstrip("vV").strip(". ").lower()
+
+
+def version_mismatch_message(kind: ReportSectionKind, named: str, claimed: str, actual: str) -> str:
+    """The refusal when prose asserts a version the run does not have (GRS-0232).
+
+    In the product voice and beside its rule, for the same reason as `undeclared_figure_message` —
+    both are read by an advisor and both are shown in two places.
+    """
+    return (
+        f"{SECTION_TITLES[kind]} says the {named.lower()} version is {claimed}, but this "
+        f"assessment ran on {actual}. A client checks the version table first, so the words and "
+        f"the table have to agree. Correct the sentence, or re-run the assessment if it is "
+        f"genuinely out of date."
+    )
+
+
+#: What a coefficient set's status MEANS, in a sentence a client can read (GRS-0234 scope 3).
+#: Every page footer printed `coefficients v1-draft-pending-elicitation` — the provenance honesty is
+#: right and stays, the internal config identifier is not something to put in front of a client. The
+#: identifier keeps its place in the appendix's version table, where identifiers belong.
+#:
+#: Data rather than branching, so GRS-0150's eventual ratification changes the sentence by changing
+#: which status the set carries — not by editing a renderer.
+COEFFICIENT_STATUS_SENTENCES: dict[str, str] = {
+    "draft": "Draft weighting — pending expert panel ratification.",
+    "elicited": "Expert-elicited weighting — panel ratification pending.",
+    "ratified": "Expert-elicited weighting, ratified by the Bruntsfield panel.",
+}
+
+
+def coefficient_status_sentence(*, version: str, client_usable: bool) -> str:
+    """The footer's plain-English provenance line.
+
+    Derived from what the set IS rather than from a status column, because there is no status
+    column: `client_usable` is the flag the gate turns on when a set is fit to price a client pack,
+    and the version string carries the rest. A set that is client-usable and still names itself
+    draft is a contradiction worth surfacing rather than smoothing over — it resolves to the
+    honest, weaker sentence.
+    """
+    names_draft = "draft" in version.lower()
+    if names_draft or not client_usable:
+        return COEFFICIENT_STATUS_SENTENCES["draft"]
+    if "ratified" in version.lower():
+        return COEFFICIENT_STATUS_SENTENCES["ratified"]
+    return COEFFICIENT_STATUS_SENTENCES["elicited"]
+
+
+def undeclared_figure_message(kind: ReportSectionKind, numbers: list[str]) -> str:
+    """The sentence an advisor reads when their prose states a number the run does not declare.
+
+    In the product voice, and in ONE place, because both the API and the editor show it. What it
+    replaced named the section by its internal key and the rule by its class name
+    (`section 'value' states ['£3.4m'] ... must be a DeclaredFigure`) — the exact leak GRS-0163
+    existed to stop.
+
+    It says three things, in this order: what is wrong, why the rule exists, and what to do. The
+    middle one matters most: an advisor who understands that a client will trace the number stops
+    experiencing the gate as an obstacle.
+    """
+    quoted = ", ".join(sorted(set(numbers)))
+    plural = "those numbers are" if len(set(numbers)) > 1 else "that number is"
+    return (
+        f"{SECTION_TITLES[kind]} mentions {quoted}, but {plural} not among the figures this "
+        f"assessment produced. Every number in a client report has to trace back to the scoring "
+        f"run, so the client can check it. Use one of the figures listed beside this section, or "
+        f"take the number out of the sentence."
+    )
+
+
 class ReportSection(BaseModel):
     """One section of the report: prose, the figures that prose is allowed to cite, and its gate."""
 
@@ -199,10 +299,7 @@ class ReportSection(BaseModel):
                     continue
                 undeclared.append(match.strip())
         if undeclared:
-            raise ValueError(
-                f"section '{self.kind}' states {sorted(set(undeclared))} without declaring it. "
-                "Every number in prose must be a DeclaredFigure so it can be traced to the run."
-            )
+            raise ValueError(undeclared_figure_message(self.kind, undeclared))
         return self
 
     @model_validator(mode="after")
@@ -247,6 +344,46 @@ class ClientReport(BaseModel):
                 "report sections are out of order. Expected "
                 f"{' → '.join(SECTION_ORDER)}, got {' → '.join(kinds)}."
             )
+        return self
+
+    @model_validator(mode="after")
+    def _no_section_contradicts_the_run(self) -> ClientReport:
+        """Rule 5 (GRS-0232). A version stated in prose must match the run — in EVERY section.
+
+        The declared-figure gate (rule 3) exempts the appendix, which is right for percentile prose
+        and wrong for this: it meant the one section holding the audit trail was the one section
+        where a wrong number survived into a client artefact. "Methodology v1.2" shipped a
+        centimetre above a table reading "Methodology version 1.1", and nothing caught it.
+
+        Checked here rather than on `ReportSection` because a section does not know the run's
+        versions — only the assembled report does. That also means no rendition can opt out: both
+        the PDF and the web page are built from a validated `ClientReport` (GRS-0211's construction
+        rule).
+        """
+        truth = {
+            "methodology": self.methodology_version,
+            "coefficient": self.coefficient_version,
+            "coefficient set": self.coefficient_version,
+        }
+        # The engine and uncertainty versions are not fields on the report, but the appendix
+        # declares them as figures — so where one exists, its declared value is the truth.
+        for section in self.sections:
+            for figure in section.figures:
+                if figure.key in ("engine_version", "uncertainty_version"):
+                    truth[figure.key.split("_")[0]] = figure.rendered
+
+        for section in self.sections:
+            for paragraph in section.body:
+                for named, claimed in _VERSION_CLAIM.findall(paragraph):
+                    actual = truth.get(named.strip().lower())
+                    if actual is None:
+                        # Nothing to check it against. Refusing here would block prose about a
+                        # version this report does not carry, which is not this rule's business.
+                        continue
+                    if _normalise_version(claimed) != _normalise_version(actual):
+                        raise ValueError(
+                            version_mismatch_message(section.kind, named, claimed, actual)
+                        )
         return self
 
     def section(self, kind: ReportSectionKind) -> ReportSection:

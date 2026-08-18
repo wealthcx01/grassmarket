@@ -19,6 +19,7 @@ const SESSION: Session = {
   isAdmin: false,
   isCommittee: false,
   isCertifiedLead: false,
+    actingAsConsultantId: null,
 };
 
 describe("AccountMenu (GRS-0087)", () => {

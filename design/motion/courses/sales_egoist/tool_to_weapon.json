@@ -1,0 +1,843 @@
+{
+  "scene_format_version": 1,
+  "artboard": {
+    "name": "ToolToWeapon",
+    "width": 1120,
+    "height": 500,
+    "children": [
+      {
+        "type": "font_asset",
+        "name": "Display",
+        "source": "../../assets/fonts/Inter-Bold-Subset.ttf"
+      },
+      {
+        "type": "text",
+        "name": "Title",
+        "x": 560,
+        "y": 48,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "TitleStyle",
+            "font_asset": "Display",
+            "font_size": 30,
+            "children": [
+              {
+                "type": "fill",
+                "name": "TitleStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "TitleStyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "TitleRun",
+            "style": "TitleStyle",
+            "text": "A tool is not a weapon"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Sub",
+        "x": 560,
+        "y": 88,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "SubStyle",
+            "font_asset": "Display",
+            "font_size": 16,
+            "children": [
+              {
+                "type": "fill",
+                "name": "SubStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "SubStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "SubRun",
+            "style": "SubStyle",
+            "text": "A method becomes a weapon only when you define the formula for how it strikes."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "N1",
+        "x": 230,
+        "y": 178,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "N1Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "N1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "N1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "N1Run",
+            "style": "N1Style",
+            "text": "01"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T1",
+        "x": 230,
+        "y": 224,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T1Style",
+            "font_asset": "Display",
+            "font_size": 22,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T1StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.6
+          },
+          {
+            "type": "text_value_run",
+            "name": "T1Run",
+            "style": "T1Style",
+            "text": "TOOL"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B1",
+        "x": 230,
+        "y": 272,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B1Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B1StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B1StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B1Run",
+            "style": "B1Style",
+            "text": "A methodology you"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B1b",
+        "x": 230,
+        "y": 296,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B1bStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B1bStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B1bStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B1bRun",
+            "style": "B1bStyle",
+            "text": "happen to know."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "N2",
+        "x": 560,
+        "y": 178,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "N2Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "N2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "N2StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "N2Run",
+            "style": "N2Style",
+            "text": "02"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T2",
+        "x": 560,
+        "y": 224,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T2Style",
+            "font_asset": "Display",
+            "font_size": 22,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T2StyleCol",
+                    "color": "#1A1A18"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.6
+          },
+          {
+            "type": "text_value_run",
+            "name": "T2Run",
+            "style": "T2Style",
+            "text": "WEAPON"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B2",
+        "x": 560,
+        "y": 272,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B2Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B2StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B2StyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B2Run",
+            "style": "B2Style",
+            "text": "That tool, chosen"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B2b",
+        "x": 560,
+        "y": 296,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B2bStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B2bStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B2bStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B2bRun",
+            "style": "B2bStyle",
+            "text": "deliberately as your one edge."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "N3",
+        "x": 890,
+        "y": 178,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "N3Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "N3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "N3StyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "N3Run",
+            "style": "N3Style",
+            "text": "03"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "T3",
+        "x": 890,
+        "y": 224,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "T3Style",
+            "font_asset": "Display",
+            "font_size": 22,
+            "children": [
+              {
+                "type": "fill",
+                "name": "T3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "T3StyleCol",
+                    "color": "#EDF2EE"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.6
+          },
+          {
+            "type": "text_value_run",
+            "name": "T3Run",
+            "style": "T3Style",
+            "text": "FORMULA"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B3",
+        "x": 890,
+        "y": 272,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B3Style",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B3StyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B3StyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B3Run",
+            "style": "B3Style",
+            "text": "The repeatable equation for"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "B3b",
+        "x": 890,
+        "y": 296,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "B3bStyle",
+            "font_asset": "Display",
+            "font_size": 15,
+            "children": [
+              {
+                "type": "fill",
+                "name": "B3bStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "B3bStyleCol",
+                    "color": "#B9C7BC"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "B3bRun",
+            "style": "B3bStyle",
+            "text": "when and how it wins."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "Foot",
+        "x": 560,
+        "y": 416,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootStyle",
+            "font_asset": "Display",
+            "font_size": 19,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootStyleCol",
+                    "color": "#1A3B26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootRun",
+            "style": "FootStyle",
+            "text": "When I do X to buyer Y, I produce outcome Z."
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "FootLabel",
+        "x": 560,
+        "y": 456,
+        "origin_x": 0.5,
+        "origin_y": 0.5,
+        "sizing_value": 0,
+        "children": [
+          {
+            "type": "text_style",
+            "name": "FootLabelStyle",
+            "font_asset": "Display",
+            "font_size": 14,
+            "children": [
+              {
+                "type": "fill",
+                "name": "FootLabelStyleFill",
+                "children": [
+                  {
+                    "type": "solid_color",
+                    "name": "FootLabelStyleCol",
+                    "color": "#6E6A60"
+                  }
+                ]
+              }
+            ],
+            "letter_spacing": 1.4
+          },
+          {
+            "type": "text_value_run",
+            "name": "FootLabelRun",
+            "style": "FootLabelStyle",
+            "text": "A FORMULA, NOT A FEATURE LIST"
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Arrow1Head",
+        "x": 395.0,
+        "y": 240,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "Arrow1HeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Arrow1HeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Arrow1HeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Arrow1Stem",
+        "x": 372,
+        "y": 240,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Arrow1StemPath",
+            "width": 37.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Arrow1StemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Arrow1StemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Arrow2Head",
+        "x": 725.0,
+        "y": 240,
+        "rotation": 1.5708,
+        "children": [
+          {
+            "type": "triangle",
+            "name": "Arrow2HeadPath",
+            "width": 14.4,
+            "height": 14.4,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Arrow2HeadFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Arrow2HeadCol",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Arrow2Stem",
+        "x": 702,
+        "y": 240,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Arrow2StemPath",
+            "width": 37.0,
+            "height": 2.5,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Arrow2StemFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Arrow2StemSolid",
+                "color": "#6E6A60"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Card1",
+        "x": 230,
+        "y": 250,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Card1Path",
+            "width": 260,
+            "height": 190,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Card1Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Card1Solid",
+                "color": "#F7F5EF"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "Card1Stroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Card1StrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Card2",
+        "x": 560,
+        "y": 250,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Card2Path",
+            "width": 260,
+            "height": 190,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Card2Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Card2Solid",
+                "color": "#E4EBE5"
+              }
+            ]
+          },
+          {
+            "type": "stroke",
+            "name": "Card2Stroke",
+            "thickness": 2,
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Card2StrokeCol",
+                "color": "#D8D3C7"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Card3",
+        "x": 890,
+        "y": 250,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "Card3Path",
+            "width": 260,
+            "height": 190,
+            "corner_radius": 14,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "Card3Fill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "Card3Solid",
+                "color": "#1A3B26"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "shape",
+        "name": "Bg",
+        "x": 560,
+        "y": 250,
+        "children": [
+          {
+            "type": "rectangle",
+            "name": "BgPath",
+            "width": 1120,
+            "height": 500,
+            "corner_radius": 0,
+            "origin_x": 0.5,
+            "origin_y": 0.5
+          },
+          {
+            "type": "fill",
+            "name": "BgFill",
+            "children": [
+              {
+                "type": "solid_color",
+                "name": "BgSolid",
+                "color": "#F7F5EF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

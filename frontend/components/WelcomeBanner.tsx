@@ -54,8 +54,13 @@ export function WelcomeBanner() {
           lineHeight: 1.55,
         }}
       >
-        Your home for the Bruntsfield Advisory Network — manage your pipeline, run Platform Power
-        assessments, generate client deliverables, and grow in the Workbench.
+        {/* Rewritten under GRS-0243. The sentence this replaces listed the navigation back to the
+            reader and survived two rounds of copy work after the founder flagged it, which is why
+            it is now in the copy register (`frontend/lib/retiredCopy.ts`) with a test that fails if
+            it returns. What a first-time user needs on this screen is what the product DOES, in one
+            claim they can judge — not an index of the menu. */}
+        You measure what a brokerage&rsquo;s platform is actually worth, and sell the work that
+        closes the gap. Every number here traces to a scored assessment you can show a client.
       </p>
       <p style={{ margin: "0.9rem 0 0", fontSize: "0.95rem", lineHeight: 1.55 }}>
         Starting fresh? Begin your{" "}

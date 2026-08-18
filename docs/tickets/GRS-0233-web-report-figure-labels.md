@@ -1,6 +1,6 @@
 # GRS-0233 — Web report figures: label the bars, keep the story's order
 
-**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review G5). **Priority:** MED-HIGH. **Type:** Bug._
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review G5). **Priority:** MED-HIGH. **Type:** Bug._
 **Loop:** client-report hardening. **Extends GRS-0220.** **Relates to:** GRS-0206, GRS-0219.
 
 ## Why
@@ -58,4 +58,34 @@ story in the same order as the PDF.
 
 ## Status reconciliation — 2026-08-01
 
-**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).
+**DONE.** All four scopes.
+
+## What shipped
+
+**1 — Every bar is labelled.** The figure was nine unlabelled `<rect>`s in a stretched SVG with the
+names in a *separately sorted* grid underneath, so a client had to count rows against a mismatched
+table. It is now rows of HTML: label, bar, value on one line. At phone widths the label takes its
+own line and **wraps** rather than truncating — the ticket's "by measurement, not truncation". The
+separate key grid is gone, and its now-dead CSS with it.
+
+**2 — Composition figures keep composition order.** The renderer sorted *every* figure ascending, so
+the value build-up rendered Powers → Platform Value → Infrastructure → Business under a caption
+promising a build-up. `Series` now declares whether its order is binding; the build-up says yes, the
+ranked figures say no and are still shown weakest-first, because weakest-first is what their caption
+says they are.
+
+**3 — Parity is asserted.** The payload carries the order *and* whether that order is significant,
+so the web renderer has no reason to invent one. A backend test asserts the contract
+(`value_buildup.ordered is True`, its four labels in build-up order, the ranked figures not
+claiming a binding order) and a vitest asserts the renderer honours it both ways.
+
+**4 — Hover explains.** Each bar carries its module's coverage: "Back Office: scored on 3 of 4
+applicable subcomponents." Coverage rather than a registry description, deliberately — the score
+alone does not tell a reader how much of the module was assessed, and a module scored on two
+subcomponents of nine looks identical to one scored on all nine. That is the question a client asks
+first when a number looks low.
+
+## Compatibility
+
+`notes` and `ordered` are optional on the wire. A link issued before this change carries neither and
+still renders — tested — falling back to weakest-first, which is what those snapshots already showed.

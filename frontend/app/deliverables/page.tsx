@@ -85,7 +85,36 @@ export default function DeliverablesPage() {
       {rows === null ? (
         <p style={{ color: "var(--color-ink-muted)" }}>Loading…</p>
       ) : rows.length === 0 ? (
-        <p style={{ color: "var(--color-ink-muted)" }}>No deliverables generated yet.</p>
+        /* GRS-0243 scope 4. "No deliverables generated yet" states the obvious and teaches
+           nothing: a first-time user is looking at an empty table precisely because they do not
+           know what fills it. The chain is named because every link in it is a prerequisite, and
+           the demo examples are linked because reading one is faster than building one. */
+        <div
+          style={{
+            border: "1px solid var(--color-rule)",
+            borderRadius: "var(--radius)",
+            padding: "1.25rem 1.4rem",
+            maxWidth: "44rem",
+          }}
+          data-testid="deliverables-empty"
+        >
+          <p style={{ margin: "0 0 0.6rem", fontWeight: 600 }}>
+            Nothing here yet — deliverables are produced, not created.
+          </p>
+          <p style={{ margin: "0 0 0.8rem", color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
+            A deliverable comes out of a scored assessment, so the chain runs:{" "}
+            <strong>assessment → finalise → engagement → deliverable → client report</strong>. Each
+            step needs the one before it, which is why this page stays empty until an assessment is
+            finalised and attached to an engagement.
+          </p>
+          <p style={{ margin: 0, lineHeight: 1.6 }}>
+            <Link href="/assessments" style={{ fontWeight: 600 }}>
+              Start an assessment
+            </Link>{" "}
+            to begin the chain, or open one of the worked examples on a demo brokerage to see a
+            finished client report before you build one.
+          </p>
+        </div>
       ) : (
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.88rem" }}>

@@ -6,12 +6,13 @@ This file indexes them; the ticket file is always the detail. Founder decisions 
 
 ## Where things stand
 
-Reconciled 2026-08-01 by auditing all 243 ticket files against git history and the shipped code.
+Reconciled 2026-08-01 by auditing all 243 ticket files against git history and the shipped code,
+then brought forward on 2026-08-18 when this index finally landed on `main`.
 
 | State | Count | Meaning |
 |---|---|---|
-| **DONE** | 190 | An implementing commit is on `main`, named in the ticket |
-| **OPEN** | 38 | Genuinely unbuilt and schedulable |
+| **DONE** | 198 | An implementing commit is on `main`, named in the ticket |
+| **OPEN** | 30 | Genuinely unbuilt and schedulable — **3 of them partly built** (GRS-0208, 0234, 0243) |
 | **BLOCKED** | 7 | Waiting on a founder decision (D1–D7) |
 | **SUPERSEDED** | 8 | Replaced by a later ticket, named in the stamp |
 | **Total** | 243 | |
@@ -23,40 +24,52 @@ after merging. Two umbrella tickets (GRS-0147, GRS-0148) were found **partly** b
 founder-gated residue and are now BLOCKED rather than silently DONE. GRS-0104 existed as two files,
 one a stray What-shipped fragment while the ticket said *Planned*; they are folded into one.
 
+**Why this index arrived seventeen days after its own date.** The reconciliation was written on
+2026-08-01 and then sat on an unmerged branch while Phase 2 shipped ten tickets past it, editing the
+same ticket files. The two sides conflicted, and until they were resolved `main` carried tickets that
+said *Planned* above a *What shipped* record of their own delivery — and carried no founder-decision
+file at all. Both are fixed here. The lesson is the ordinary one: a docs branch that indexes moving
+work has to land before the work moves, or it becomes a second source of truth competing with the
+first.
+
 ---
 
 ## Open work, in build order
 
-### Phase 1 — newly unblocked
+### Phase 1 — shipped
 
 | Ticket | Title | Note |
 |---|---|---|
-| GRS-0218 | The Sales Egoist course | Source landed 2026-07-31 in `data/reference/sales-egoist/`. Build to the GRS-0215 depth standard. Resolves GRS-0239 scope 5 |
+| GRS-0218 | The Sales Egoist course | **DONE** 2026-08-01 (PR #232, merged 08-18). Eight sections, 177 slides, eight diagrams, every lesson citing `data/reference/sales-egoist/`. Resolves GRS-0239 scope 5 |
 
 ### Phase 2 — the GRS-0229–0245 wave (2026-07-31 first-time-user review)
 
 Build order below is the wave's own priority: client-trust breaches, then first-run, then the
-report workflow, then the rest.
+report workflow, then the rest. **Ten of seventeen have landed**; the status column is the ticket's
+own reconciled stamp, not a summary of it.
 
-| # | Ticket | Title | Group |
-|---|---|---|---|
-| 1 | GRS-0229 | The shared web report must carry the non-production mark | client trust |
-| 2 | GRS-0245 | Founder sign-off covers everything that reaches a client | client trust |
-| 3 | GRS-0236 | Demo deliverables ship with worked example reports | first run |
-| 4 | GRS-0243 | First-run orientation: every section says what it is for, and the home page finally gets reworded | first run |
-| 5 | GRS-0230 | The report editor: feedback where you can see it, figures you can actually declare | report workflow |
-| 6 | GRS-0231 | The report editor must name the client | report workflow |
-| 7 | GRS-0233 | Web report figures: label the bars, keep the story's order | report workflow |
-| 8 | GRS-0232 | The appendix must not contradict the run | report workflow |
-| 9 | GRS-0234 | PDF furniture: the filename, the subtitle, the footer, the precision | report polish |
-| 10 | GRS-0235 | Read tracking an advisor can read | report polish |
-| 11 | GRS-0237 | The engine white paper: one document that answers "is this up to scratch?" | legibility & truthfulness |
-| 12 | GRS-0238 | A Prospecting surface: browse the registry we imported | legibility & truthfulness |
-| 13 | GRS-0239 | Lessons that teach before they test | legibility & truthfulness |
-| 14 | GRS-0240 | The earnings page explains how you get paid | legibility & truthfulness |
-| 15 | GRS-0241 | Engagements: a list you can read, a link you cannot cross-wire | legibility & truthfulness |
-| 16 | GRS-0242 | The Workbench stops leaking internals and contradicting itself | legibility & truthfulness |
-| 17 | GRS-0244 | The Guide must describe the product that exists | legibility & truthfulness |
+| # | Ticket | Title | Group | Status |
+|---|---|---|---|---|
+| 1 | GRS-0229 | The shared web report must carry the non-production mark | client trust | **DONE** (#233) |
+| 2 | GRS-0245 | Founder sign-off covers everything that reaches a client | client trust | **DONE** (#234) |
+| 3 | GRS-0236 | Demo deliverables ship with worked example reports | first run | **DONE** (#235, #237) |
+| 4 | GRS-0243 | First-run orientation: every section says what it is for, and the home page finally gets reworded | first run | **PARTIAL** (#236) — scope 1 only; 2–5 open |
+| 5 | GRS-0230 | The report editor: feedback where you can see it, figures you can actually declare | report workflow | **DONE** (#243) |
+| 6 | GRS-0231 | The report editor must name the client | report workflow | **DONE** (#244, #247) |
+| 7 | GRS-0233 | Web report figures: label the bars, keep the story's order | report workflow | **DONE** (#245) |
+| 8 | GRS-0232 | The appendix must not contradict the run | report workflow | **DONE** (#246) |
+| 9 | GRS-0234 | PDF furniture: the filename, the subtitle, the footer, the precision | report polish | **MOSTLY DONE** (#248) — scope 4's sparse-page fix measured not to work and was reverted |
+| 10 | GRS-0235 | Read tracking an advisor can read | report polish | OPEN — **next** |
+| 11 | GRS-0237 | The engine white paper: one document that answers "is this up to scratch?" | legibility & truthfulness | OPEN — scope 3 needs D1 |
+| 12 | GRS-0238 | A Prospecting surface: browse the registry we imported | legibility & truthfulness | OPEN |
+| 13 | GRS-0239 | Lessons that teach before they test | legibility & truthfulness | OPEN — scope 5 resolved by GRS-0218 |
+| 14 | GRS-0240 | The earnings page explains how you get paid | legibility & truthfulness | OPEN |
+| 15 | GRS-0241 | Engagements: a list you can read, a link you cannot cross-wire | legibility & truthfulness | OPEN |
+| 16 | GRS-0242 | The Workbench stops leaking internals and contradicting itself | legibility & truthfulness | OPEN |
+| 17 | GRS-0244 | The Guide must describe the product that exists | legibility & truthfulness | OPEN |
+
+**Carried out of Phase 2, still open:** GRS-0208 scopes 3 and 4 (the demo tenancy proper, and the
+account surfaces) — scopes 1 and 2 shipped in #239/#240/#242.
 
 ### Phase 3 — legacy open queue
 
@@ -87,7 +100,7 @@ report workflow, then the rest.
 | GRS-0204 | The outreach send path: Gmail scope escalation or own-domain SMTP |
 | GRS-0206 | Rive as the diagram and motion system |
 | GRS-0207 | Outreach and CRM platform: decide, then build the thin layer |
-| GRS-0208 | One clean demo account, and a founder admin who can act as any advisor |
+| GRS-0208 | One clean demo account, and a founder admin who can act as any advisor — **scopes 3 and 4 only**; 1 and 2 shipped |
 
 ---
 

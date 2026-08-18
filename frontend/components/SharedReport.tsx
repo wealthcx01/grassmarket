@@ -20,7 +20,14 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-export type Figure = { labels: string[]; values: number[] };
+export type Figure = {
+  labels: string[];
+  values: number[];
+  /** One line per entry, shown on hover (GRS-0233 scope 4). May be absent on older snapshots. */
+  notes?: string[];
+  /** True when the ORDER carries meaning and must be rendered as given (GRS-0233 scope 2). */
+  ordered?: boolean;
+};
 
 export type SharedReportPayload = {
   report: {
@@ -36,7 +43,35 @@ export type SharedReportPayload = {
   };
   figures: Record<string, Figure>;
   tracking_notice: string;
+  /** Demo or sandbox provenance at issue — the numbers describe nobody's actual platform. */
+  non_production?: boolean;
+  /** The deliverable was DRAFT_INTERNAL at issue — not approved for client use. */
+  draft?: boolean;
 };
+
+/* The PDF's two marks, verbatim (`deliverables/gate.py:DRAFT_WATERMARK` and the second mark in
+   `report_pdf/render.py:_draw_watermark`). Reused rather than reworded so the two renditions of the
+   same record cannot tell a reader different things — GRS-0220's whole premise is one source, two
+   renditions, and this is the part of it that was missing. */
+const DRAFT_MARK = "DRAFT \u2014 not client-usable";
+const NON_PRODUCTION_MARK = "NON-PRODUCTION DATA";
+
+/** The banner text for a record's marks, or null when there is nothing to say. */
+export function reportMarkText(payload: {
+  non_production?: boolean;
+  draft?: boolean;
+}): string | null {
+  // `?? true` is the safe direction and it matches the backend's own default. A payload with no
+  // flags is a snapshot issued before GRS-0229, whose provenance nobody recorded — which is exactly
+  // the case where a reader should be told the numbers may not be production. Defaulting to false
+  // here would have let a legacy link render a clean, unmarked page.
+  const marks = [
+    (payload.draft ?? true) ? DRAFT_MARK : null,
+    (payload.non_production ?? true) ? NON_PRODUCTION_MARK : null,
+  ].filter(Boolean);
+  if (marks.length === 0) return null;
+  return `${marks.join("  \u00b7  ")} \u2014 this report does not describe a live platform`;
+}
 
 /** Reader-facing titles. Kept in step with `report_pdf.render.SECTION_TITLES`. */
 const SECTION_TITLES: Record<string, string> = {
@@ -131,48 +166,48 @@ function useSectionTracking(token: string, enabled: boolean) {
  * by colour alone, matching the PDF's greyscale rule.
  */
 function BarFigure({ figure, caption }: { figure: Figure; caption: string }) {
-  const rows = useMemo(
-    () =>
-      figure.labels
-        .map((label, index) => ({ label, value: figure.values[index] ?? 0 }))
-        .sort((a, b) => a.value - b.value),
-    [figure]
-  );
+  const rows = useMemo(() => {
+    const built = figure.labels.map((label, index) => ({
+      label,
+      value: figure.values[index] ?? 0,
+      note: figure.notes?.[index],
+    }));
+    // GRS-0233 scope 2. The old renderer sorted EVERY figure ascending, which turned the value
+    // build-up into four bars in the wrong sequence under a caption promising a composition. A
+    // series that declares its order keeps it; a ranked one is still shown weakest-first, because
+    // weakest-first is what its caption says it is.
+    return figure.ordered ? built : [...built].sort((a, b) => a.value - b.value);
+  }, [figure]);
   if (!rows.length) return null;
 
-  const rowHeight = 26;
-  const height = rows.length * rowHeight + 8;
+  const max = Math.max(...rows.map((r) => r.value), 100);
 
   return (
     <figure className="shared-figure">
-      <svg
-        viewBox={`0 0 100 ${height}`}
-        preserveAspectRatio="none"
+      {/* GRS-0233 scope 1. This was nine unlabelled <rect>s in an SVG, with the names in a separate
+          grid sorted differently — a client had to count rows against a mismatched table to know
+          which bar was which. Rows of HTML instead of a stretched SVG: the label wraps at phone
+          widths instead of distorting or truncating, and the value sits beside its own bar. */}
+      <div
+        className="shared-bars"
         role="img"
-        aria-label={`${caption}. ${rows.map((r) => `${r.label}: ${r.value.toFixed(0)} out of 100`).join(". ")}`}
-        style={{ width: "100%", height: `${height}px` }}
+        aria-label={`${caption}. ${rows
+          .map((r) => `${r.label}: ${r.value.toFixed(0)} out of 100`)
+          .join(". ")}`}
       >
-        {rows.map((row, index) => (
-          <g key={row.label}>
-            <rect
-              x={0}
-              y={index * rowHeight + 4}
-              width={Math.max(row.value, 0.5)}
-              height={rowHeight - 12}
-              fill="var(--color-accent)"
-              rx={1}
-            />
-          </g>
-        ))}
-      </svg>
-      <ul className="shared-figure-key">
         {rows.map((row) => (
-          <li key={row.label}>
-            <span>{row.label}</span>
-            <b>{row.value.toFixed(0)}</b>
-          </li>
+          <div className="shared-bar-row" key={row.label} title={row.note ?? undefined}>
+            <span className="shared-bar-label">{row.label}</span>
+            <span className="shared-bar-track" aria-hidden>
+              <span
+                className="shared-bar-fill"
+                style={{ width: `${Math.max((row.value / max) * 100, 0.5)}%` }}
+              />
+            </span>
+            <b className="shared-bar-value">{row.value.toFixed(0)}</b>
+          </div>
         ))}
-      </ul>
+      </div>
       <figcaption>{caption}</figcaption>
     </figure>
   );
@@ -190,11 +225,20 @@ export function SharedReport({
 }) {
   const observe = useSectionTracking(token, trackingEnabled);
   const { report, figures } = payload;
+  const mark = reportMarkText(payload);
   const body = report.sections.filter((s) => s.kind !== "appendix");
   const appendix = report.sections.find((s) => s.kind === "appendix");
 
   return (
     <article className="shared-report">
+      {/* Fixed, so it is on screen at every scroll position — the PDF repeats its watermark on
+          every page and a banner that scrolls away is not the same guarantee. role="alert" rather
+          than "note": this is the one thing on the page a reader must not miss. */}
+      {mark ? (
+        <p className="shared-report-mark" role="alert" data-testid="report-mark">
+          {mark}
+        </p>
+      ) : null}
       <header className="shared-report-head">
         <p className="eyebrow">Bruntsfield Advisory Network</p>
         <h1>{report.subject}</h1>

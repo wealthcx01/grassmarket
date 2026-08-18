@@ -1,6 +1,6 @@
 # GRS-0229 — The shared web report must carry the non-production mark
 
-**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review G1). **Priority:** HIGHEST. **Type:** Bug._
+**Status:** DONE (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review G1). **Priority:** HIGHEST. **Type:** Bug._
 **Loop:** client-report hardening. **Extends GRS-0220.** **Relates to:** ADR-0029, GRS-0219.
 
 ## Why
@@ -62,4 +62,37 @@ without knowing the numbers are not production. A production record's link is un
 
 ## Status reconciliation — 2026-08-01
 
-**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).
+**DONE.** Evidence in `docs/reviews/GRS-0229-web-report-nonproduction-mark/`.
+
+## What shipped
+
+**The mark.** A fixed banner on `/r/<token>`, on screen at every scroll position and at phone
+widths, in the PDF's own words (`DRAFT — not client-usable`, `NON-PRODUCTION DATA`) reused as
+constants rather than reworded. Screenshots at top, mid-scroll and 390px are in the review folder;
+the mid-scroll ones are the point, since a header banner satisfies the ticket's wording and fails
+its intent.
+
+**The flags are in the snapshot.** `SharedReportPayload` gains `non_production` and `draft`, written
+at issue. A record reclassified later cannot change what an already-issued link shows.
+
+**Scope 3 decision: links on non-production records are ALLOWED and watermarked.** An advisor needs
+to see what a client sees and the share link is the only rendition that shows it; refusing would
+push the first real test of the client experience onto a real client. Marking is the guarantee,
+and a refusal path would make the mark look optional.
+
+**Scope 4 answer: the test was never written.** No test anywhere in the repo mentioned a watermark
+on the shared page. The reason it was missed is recorded in the review: the payload's parity with
+the PDF was on the *content model*, and the mark is not in the content model — in the PDF it lives
+in `ReportMeta`, passed alongside. Structural parity on the wrong structure.
+
+## A defect this ticket did not anticipate
+
+The ticket lists the PDF watermark as "correct today". **It was not.** `non_production` was derived
+from `deliverable.mode`, which comes from the coefficient set's `client_usable` flag rather than
+from provenance. Since wealth and exchange were activated (ADR-0037/GRS-0156), a SANDBOX record on
+an activated profile resolves to `mode=CLIENT` — and the PDF rendered **no non-production mark at
+all**. Both renditions are now keyed on `RecordProvenance`, which is immutable and set at creation,
+with mode kept as an `or` so a draft-internal production record still carries its draft mark.
+
+Fixing it here rather than filing it was deliberate: it is the same one-line derivation, and
+knowingly leaving the PDF wrong while fixing the web page would have been indefensible.
