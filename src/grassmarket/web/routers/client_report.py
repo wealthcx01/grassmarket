@@ -16,8 +16,10 @@ naming them, rather than rendering blanks that look finished.
 from __future__ import annotations
 
 import json
+import unicodedata
 from datetime import UTC, datetime
 from io import BytesIO
+from urllib.parse import quote
 from uuid import UUID
 
 from bcap_contracts.assessments import RecordProvenance
@@ -55,6 +57,7 @@ from grassmarket.deliverables.gate import (
     assert_report_founder_approved,
 )
 from grassmarket.deliverables.report_pdf import ReportMeta, render_client_report_pdf
+from grassmarket.deliverables.report_pdf.render import client_report_filename
 from grassmarket.web.dependencies import get_current_principal, get_repository
 
 router = APIRouter(tags=["client-report"])
@@ -195,6 +198,12 @@ def assemble_for(
     return assembled, deliverable, provenance
 
 
+def _ascii_fallback(filename: str) -> str:
+    """The legacy `filename=` value: ASCII only, and no quotes to break the header."""
+    folded = unicodedata.normalize("NFKD", filename).encode("ascii", "ignore").decode()
+    return folded.replace('"', "").replace("—", "-").strip() or "client-report.pdf"
+
+
 def assert_report_releasable(
     repo: Repository, principal: Principal, deliverable_id: UUID, provenance: RecordProvenance
 ) -> None:
@@ -317,9 +326,21 @@ def download_client_report(
         ),
         figure_data=assembled.figures,
     )
-    filename = f"{assembled.report.subject.replace(' ', '-')}-platform-assessment.pdf"
+    filename = client_report_filename(
+        subject=assembled.report.subject,
+        generated_on=(deliverable.generated_at or datetime.now(UTC)).date(),
+    )
     return StreamingResponse(
         BytesIO(pdf),
         media_type=_PDF_MEDIA,
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        # Both spellings: `filename` for anything that cannot read RFC 5987, `filename*` carrying
+        # the real name with its em-dashes. A bare `filename="…—…"` is not valid in an HTTP header,
+        # so the ASCII fallback is deliberately plainer rather than the same string
+        # smuggled through.
+        headers={
+            "Content-Disposition": (
+                f'attachment; filename="{_ascii_fallback(filename)}"; '
+                f"filename*=UTF-8''{quote(filename)}"
+            )
+        },
     )
