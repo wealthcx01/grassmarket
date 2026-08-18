@@ -88,6 +88,11 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        # Without this the browser hides `Content-Disposition` from the page, so the client report
+        # downloaded as `<deliverable-uuid>.pdf` — the frontend's fallback — no matter what the
+        # server named it (GRS-0234 scope 1). `allow_headers` governs the REQUEST; exposing a
+        # RESPONSE header is a separate list, and that asymmetry is easy to miss.
+        expose_headers=["Content-Disposition"],
     )
 
     app.include_router(health.router)
@@ -105,6 +110,7 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
     app.include_router(committee.queue_router)
     app.include_router(founder_review.router)
     app.include_router(founder_review.queue_router)
+    app.include_router(founder_review.report_router)
     app.include_router(calibration.router)
     app.include_router(certification.router)
     app.include_router(workbench.router)

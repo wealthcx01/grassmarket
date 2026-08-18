@@ -87,6 +87,66 @@ def current_approval(
     return repo.current_founder_approval(assessment_id)
 
 
+report_router = APIRouter(prefix="/deliverables", tags=["founder-review"])
+
+
+@report_router.post(
+    "/{deliverable_id}/submit-report-for-review", status_code=status.HTTP_204_NO_CONTENT
+)
+def submit_report_for_review(
+    deliverable_id: UUID,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> None:
+    """Ask the founder to sign off this client report's prose (GRS-0245).
+
+    Idempotent, like its assessment twin: re-submitting after an edit is the normal case.
+    """
+    try:
+        repo.request_report_review(principal, deliverable_id)
+    except (NotFoundError, ScopeViolationError) as exc:
+        raise _not_found(exc) from exc
+    except ConflictError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+
+
+@report_router.post(
+    "/{deliverable_id}/report-approval",
+    response_model=FounderApproval,
+    status_code=status.HTTP_201_CREATED,
+)
+def approve_report(
+    deliverable_id: UUID,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> FounderApproval:
+    """The founder signs off the report's words as they stand. The hash is computed server-side
+    from the stored prose: a caller cannot name the version they are approving."""
+    try:
+        return repo.record_report_approval(principal, deliverable_id)
+    except ScopeViolationError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+    except NotFoundError as exc:
+        raise _not_found(exc) from exc
+    except ConflictError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+
+
+@report_router.get("/{deliverable_id}/report-approval", response_model=FounderApproval | None)
+def current_report_approval(
+    deliverable_id: UUID,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> FounderApproval | None:
+    """The approval that currently clears this report, or null. Null after an edit is the correct
+    answer, and the reason the editor can say "re-edited since approval"."""
+    try:
+        repo.get_deliverable(principal, deliverable_id)  # scope check before the unscoped gate read
+    except (NotFoundError, ScopeViolationError) as exc:
+        raise _not_found(exc) from exc
+    return repo.current_report_approval(deliverable_id)
+
+
 @queue_router.get("/queue", response_model=list[FounderReviewQueueEntry])
 def review_queue(
     principal: Principal = Depends(get_current_principal),

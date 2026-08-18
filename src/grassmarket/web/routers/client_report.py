@@ -16,16 +16,23 @@ naming them, rather than rendering blanks that look finished.
 from __future__ import annotations
 
 import json
+import unicodedata
 from datetime import UTC, datetime
 from io import BytesIO
+from urllib.parse import quote
 from uuid import UUID
 
-from bcap_contracts.client_report import UnapprovedReportSectionError, assert_client_ready
+from bcap_contracts.assessments import RecordProvenance
+from bcap_contracts.client_report import (
+    DeclaredFigure,
+    UnapprovedReportSectionError,
+    assert_client_ready,
+)
 from bcap_contracts.deliverables import Deliverable, DeliverableMode
 from bcap_contracts.narratives import NarrativeStatus
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, Field, ValidationError
 
 from grassmarket.atlas import AssessmentInputs
 from grassmarket.atlas.active import active_uncertainty_model, profile_key_of
@@ -38,13 +45,19 @@ from grassmarket.data.repository import (
     ScopeViolationError,
 )
 from grassmarket.deliverables.builder import DeliverableContext
+from grassmarket.deliverables.client_report import figures_available_to
 from grassmarket.deliverables.client_report_service import (
     AssembledReport,
     ReportNotAssembledError,
     assemble,
     default_prose,
 )
+from grassmarket.deliverables.gate import (
+    ReportApprovalPendingError,
+    assert_report_founder_approved,
+)
 from grassmarket.deliverables.report_pdf import ReportMeta, render_client_report_pdf
+from grassmarket.deliverables.report_pdf.render import client_report_filename
 from grassmarket.web.dependencies import get_current_principal, get_repository
 
 router = APIRouter(tags=["client-report"])
@@ -60,6 +73,17 @@ class ReportProseResponse(BaseModel):
 
     sections: dict
     written: bool
+    # The figures the run declares, per section key (GRS-0230 scope 3). Sent with the prose rather
+    # than from a second endpoint because they are read together every time, and a separate call
+    # would give the editor a window where it knows the words but not the vocabulary.
+    available_figures: dict[str, list[DeclaredFigure]] = Field(default_factory=dict)
+    # Whose report this is (GRS-0231). The same identity the PDF cover prints, from the same
+    # assembly path, so the editor and the artefact cannot disagree about the client. Optional
+    # because a deliverable with no finalised run has no cover to agree with.
+    subject: str | None = None
+    engagement_title: str | None = None
+    provenance: str | None = None
+    operating_model: str | None = None
 
 
 class SaveReportProseRequest(BaseModel):
@@ -85,7 +109,7 @@ def _not_found() -> HTTPException:
 
 def _context(
     repo: Repository, principal: Principal, deliverable_id: UUID
-) -> tuple[DeliverableContext, Deliverable, UUID]:
+) -> tuple[DeliverableContext, Deliverable, UUID, RecordProvenance]:
     """The DeliverableContext for a deliverable's finalised run, plus its subject and run id.
 
     Rebuilt from the STORED run rather than rescored, so the report quotes the immutable finalised
@@ -104,7 +128,8 @@ def _context(
 
     record = repo.get_scoring_run_record(principal, deliverable.scoring_run_id)
     subject = repo.get_prospect(principal, engagement.prospect_id).company_name
-    document = repo.get_assessment(principal, record.assessment_id).document
+    assessment = repo.get_assessment(principal, record.assessment_id)
+    document = assessment.document
     profile_key = profile_key_of(document)
 
     from grassmarket.atlas.active import profile_scoring_context
@@ -128,14 +153,20 @@ def _context(
         uncertainty_version=model.version,
         generated_on=(deliverable.generated_at or datetime.now(UTC)).date(),
     )
-    return context, deliverable, record.id
+    return context, deliverable, record.id, assessment.provenance
 
 
 def assemble_for(
     repo: Repository, principal: Principal, deliverable_id: UUID
-) -> tuple[AssembledReport, Deliverable]:
-    """Assemble a deliverable's report, or raise the 409 that names what is unwritten."""
-    context, deliverable, run_id = _context(repo, principal, deliverable_id)
+) -> tuple[AssembledReport, Deliverable, RecordProvenance]:
+    """Assemble a deliverable's report, or raise the 409 that names what is unwritten.
+
+    Returns the record's provenance alongside, because both renditions need it and neither can
+    derive it from what it already holds. `Deliverable.mode` is NOT a substitute: mode comes
+    from the coefficient set's `client_usable` flag, so a sandbox record scored on an activated
+    profile is mode=CLIENT (GRS-0229).
+    """
+    context, deliverable, run_id, provenance = _context(repo, principal, deliverable_id)
     sections_json = repo.get_report_prose(principal, deliverable_id)
     try:
         assembled = assemble(context, scoring_run_id=run_id, sections_json=sections_json)
@@ -164,7 +195,37 @@ def assemble_for(
     except UnapprovedReportSectionError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
 
-    return assembled, deliverable
+    return assembled, deliverable, provenance
+
+
+def _ascii_fallback(filename: str) -> str:
+    """The legacy `filename=` value: ASCII only, and no quotes to break the header."""
+    folded = unicodedata.normalize("NFKD", filename).encode("ascii", "ignore").decode()
+    return folded.replace('"', "").replace("—", "-").strip() or "client-report.pdf"
+
+
+def assert_report_releasable(
+    repo: Repository, principal: Principal, deliverable_id: UUID, provenance: RecordProvenance
+) -> None:
+    """The founder gate on the CLIENT REPORT's prose (GRS-0245, ADR-0041).
+
+    Called by every path that puts the report in front of a client — the PDF download and the
+    share-link issue. It lives here, beside `assemble_for`, and both callers take it, because a
+    gate wired onto one of two equivalent paths is the failure this ticket exists to correct.
+    """
+    non_production = provenance is not RecordProvenance.PRODUCTION
+    approval = repo.current_report_approval(deliverable_id)
+    changed = repo.report_sections_changed_since_approval(principal, deliverable_id)
+    ever = repo.report_was_ever_approved(deliverable_id)
+    try:
+        assert_report_founder_approved(
+            approval,
+            non_production=non_production,
+            changed_sections=changed,
+            ever_approved=ever,
+        )
+    except ReportApprovalPendingError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
 
 
 @router.get("/deliverables/{deliverable_id}/report-prose", response_model=ReportProseResponse)
@@ -175,12 +236,39 @@ def get_report_prose(
 ) -> ReportProseResponse:
     try:
         stored = repo.get_report_prose(principal, deliverable_id)
+        # The vocabulary the gate will accept. Best-effort: a deliverable with no finalised run
+        # cannot produce figures, and that is a legitimate state for a report nobody has scored yet
+        # — it must not stop the editor loading, or an advisor could not even see the shape.
+        identity: dict[str, str | None] = {
+            "subject": None,
+            "engagement_title": None,
+            "provenance": None,
+            "operating_model": None,
+        }
+        try:
+            context, deliverable, run_id, provenance = _context(repo, principal, deliverable_id)
+            available = figures_available_to(context)
+            engagement = repo.get_engagement(principal, deliverable.engagement_id)
+            record = repo.get_scoring_run_record(principal, run_id)
+            document = repo.get_assessment(principal, record.assessment_id).document
+            identity = {
+                "subject": context.subject,
+                "engagement_title": engagement.title,
+                "provenance": provenance.value,
+                "operating_model": profile_key_of(document),
+            }
+        except HTTPException:
+            available = {}
     except (NotFoundError, ScopeViolationError) as exc:
         raise _not_found() from exc
     if stored is None:
         # An empty draft, so the advisor sees the shape of the argument rather than a blank page.
-        return ReportProseResponse(sections=default_prose(), written=False)
-    return ReportProseResponse(sections=json.loads(stored), written=True)
+        return ReportProseResponse(
+            sections=default_prose(), written=False, available_figures=available, **identity
+        )
+    return ReportProseResponse(
+        sections=json.loads(stored), written=True, available_figures=available, **identity
+    )
 
 
 @router.put("/deliverables/{deliverable_id}/report-prose", response_model=ReportProseResponse)
@@ -210,7 +298,11 @@ def download_client_report(
     The watermark follows the deliverable's own mode, so an internal draft downloads stamped without
     the caller choosing to — a draft escaping unmarked is the failure that matters most (ADR-0029).
     """
-    assembled, deliverable = assemble_for(repo, principal, deliverable_id)
+    assembled, deliverable, provenance = assemble_for(repo, principal, deliverable_id)
+    # The founder signs what reaches a client (ADR-0041, GRS-0245). Before the PDF is built,
+    # not after: rendering a document the gate is about to refuse wastes the work and, more to
+    # the point, means the bytes existed.
+    assert_report_releasable(repo, principal, deliverable_id, provenance)
     engagement = repo.get_engagement(principal, deliverable.engagement_id)
     consultant = repo.get_consultant_by_id(principal.consultant_id)
     prepared_by = consultant.full_name if consultant else "Bruntsfield Advisory Network"
@@ -222,13 +314,33 @@ def download_client_report(
             prepared_by=prepared_by,
             generated_on=(deliverable.generated_at or datetime.now(UTC)).date(),
             mode=deliverable.mode,
-            non_production=deliverable.mode is not DeliverableMode.CLIENT,
+            # Provenance, not mode. `mode is not CLIENT` was the original derivation and it is
+            # not the same question: mode comes from the coefficient set, so a SANDBOX record
+            # scored on an activated profile (wealth/exchange, client_usable=True) resolves to
+            # mode=CLIENT and rendered a demo report with NO non-production mark at all. Kept
+            # as an OR so a draft-internal production record still carries it (GRS-0229).
+            non_production=(
+                provenance is not RecordProvenance.PRODUCTION
+                or deliverable.mode is not DeliverableMode.CLIENT
+            ),
         ),
         figure_data=assembled.figures,
     )
-    filename = f"{assembled.report.subject.replace(' ', '-')}-platform-assessment.pdf"
+    filename = client_report_filename(
+        subject=assembled.report.subject,
+        generated_on=(deliverable.generated_at or datetime.now(UTC)).date(),
+    )
     return StreamingResponse(
         BytesIO(pdf),
         media_type=_PDF_MEDIA,
-        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        # Both spellings: `filename` for anything that cannot read RFC 5987, `filename*` carrying
+        # the real name with its em-dashes. A bare `filename="…—…"` is not valid in an HTTP header,
+        # so the ASCII fallback is deliberately plainer rather than the same string
+        # smuggled through.
+        headers={
+            "Content-Disposition": (
+                f'attachment; filename="{_ascii_fallback(filename)}"; '
+                f"filename*=UTF-8''{quote(filename)}"
+            )
+        },
     )

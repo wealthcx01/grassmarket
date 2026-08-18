@@ -46,3 +46,30 @@ the Appendix.
 
 The founder opens the two report editors in two tabs and can tell them apart from the tab strip
 alone, and from any scroll position on the page.
+
+
+**DONE.** All four scopes.
+
+## What shipped
+
+**1 — The client's name IS the heading.** "What the client reads" described the page and named
+nobody; it is now the firm. Beneath it: engagement title, operating model in words, and a badge for
+non-production records. The identity comes from the *same* assembly path the PDF cover uses, so the
+editor and the artefact cannot disagree about whose report this is — returned on the prose fetch the
+editor already makes rather than from a second call.
+
+**2 — The browser tab.** `Client report — WeBull`, restored on unmount. Two open editors are now
+distinguishable in the tab strip, which is where an advisor actually switches between them.
+
+**3 — Six distinct accessible names.** Each textarea is `aria-labelledby` its own visible heading;
+the shared placeholder is demoted to a hint. Tested through accessibility queries —
+`getByRole("textbox", { name: "The business" })` — rather than class names, which is a screen-reader
+user's view of the page rather than a proxy for it.
+
+**4 — The export names the client.** "PDF downloaded — WeBull." One more chance to catch a
+cross-client mistake at the moment of export, which is the last point at which catching it is free.
+
+## A note on the production badge
+
+Only demo and sandbox are badged. Badging *production* too would have made the warning badge mean
+nothing — a marker every record carries stops being a marker.

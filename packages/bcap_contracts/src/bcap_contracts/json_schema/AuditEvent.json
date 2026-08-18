@@ -14,6 +14,8 @@
         "founder_approval",
         "certification_override",
         "commission_recorded",
+        "act_as_started",
+        "act_as_ended",
         "gdpr_export",
         "gdpr_deletion"
       ],

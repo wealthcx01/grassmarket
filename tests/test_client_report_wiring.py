@@ -15,7 +15,7 @@ import io
 
 import pypdf
 import pytest
-from bcap_contracts.client_report import SECTION_ORDER
+from bcap_contracts.client_report import SECTION_ORDER, SECTION_TITLES
 
 from grassmarket.deliverables.gate import DRAFT_WATERMARK
 from tests.client_report_helpers import deliverable_with_run, written_prose
@@ -33,6 +33,17 @@ def _write_prose(client, alice: SeededConsultant, deliverable: str, sections: di
         json={"sections": sections if sections is not None else written_prose()},
         headers=auth_header(alice),
     )
+
+
+def _approve_report(client, founder: SeededConsultant, deliverable: str):
+    """Since GRS-0245 a production report is not releasable until the founder signs off its PROSE,
+    so every test here that expects a PDF or a link has to clear that gate first. Tests that assert
+    the gate itself live in `test_report_founder_gate.py`."""
+    response = client.post(
+        f"/deliverables/{deliverable}/report-approval", headers=auth_header(founder)
+    )
+    assert response.status_code == 201, response.text
+    return response
 
 
 class TestTheProseTheAdvisorWrites:
@@ -84,9 +95,10 @@ class TestTheProseTheAdvisorWrites:
 
 class TestTheDownloadableReport:
     def test_a_written_report_downloads_as_a_pdf(
-        self, client, alice: SeededConsultant, deliverable: str
+        self, client, alice: SeededConsultant, deliverable: str, founder: SeededConsultant
     ) -> None:
         _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
         response = client.get(
             f"/deliverables/{deliverable}/client-report.pdf", headers=auth_header(alice)
         )
@@ -96,9 +108,10 @@ class TestTheDownloadableReport:
         assert "attachment" in response.headers["content-disposition"]
 
     def test_the_pdf_carries_the_advisors_words(
-        self, client, alice: SeededConsultant, deliverable: str
+        self, client, alice: SeededConsultant, deliverable: str, founder: SeededConsultant
     ) -> None:
         _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
         pdf = client.get(
             f"/deliverables/{deliverable}/client-report.pdf", headers=auth_header(alice)
         ).content
@@ -144,15 +157,24 @@ class TestTheDownloadableReport:
         )
         assert response.status_code == 422
         detail = response.json()["detail"]
-        assert "without declaring it" in detail
+        # GRS-0230: the sentence is now in the product voice and names the section by its
+        # on-screen title. The assertions widen accordingly — and gain the leak checks, because the
+        # whole point of the rewrite was that an advisor should never see an internal name.
+        assert "not among the figures" in detail
+        # Named by a title a reader sees, and by no raw section key. Asserted against the contract's
+        # own map rather than a guessed title, so this keeps working if the fixture's section moves.
+        assert any(title in detail for title in SECTION_TITLES.values())
+        assert not any(f"'{kind.value}'" in detail for kind in SECTION_TITLES)
+        assert "DeclaredFigure" not in detail
         assert "Value error" not in detail, "pydantic's wrapping should not reach the advisor"
 
     def test_an_internal_draft_downloads_watermarked(
-        self, client, alice: SeededConsultant, deliverable: str
+        self, client, alice: SeededConsultant, deliverable: str, founder: SeededConsultant
     ) -> None:
         # The generated deliverable is DRAFT_INTERNAL (client_facing=False), and the watermark
         # follows the deliverable's own mode rather than anything the caller chooses (ADR-0029).
         _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
         pdf = client.get(
             f"/deliverables/{deliverable}/client-report.pdf", headers=auth_header(alice)
         ).content
@@ -180,7 +202,12 @@ class TestTheApprovalGateIsActuallyWired:
     """
 
     def test_the_download_path_calls_the_gate(
-        self, client, alice: SeededConsultant, deliverable: str, monkeypatch: pytest.MonkeyPatch
+        self,
+        client,
+        alice: SeededConsultant,
+        deliverable: str,
+        founder: SeededConsultant,
+        monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         called: list[set] = []
         import grassmarket.web.routers.client_report as module
@@ -193,11 +220,63 @@ class TestTheApprovalGateIsActuallyWired:
 
         monkeypatch.setattr(module, "assert_client_ready", spy)
         _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
         response = client.get(
             f"/deliverables/{deliverable}/client-report.pdf", headers=auth_header(alice)
         )
         assert response.status_code == 200
         assert called, "the client-facing download did not consult the approval gate"
+
+    def test_both_release_paths_call_the_founder_gate(
+        self,
+        client,
+        alice: SeededConsultant,
+        founder: SeededConsultant,
+        deliverable: str,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """GRS-0245 test-plan item 2: the same spy discipline, extended to the founder gate.
+
+        A gate is only a gate while something fails when it is removed. This one is spied on BOTH
+        release paths rather than one, because gating a single route of two equivalent ones is
+        precisely how the gap this closes came about — the docx pack consulted founder approval and
+        the client report did not.
+        """
+        import grassmarket.web.routers.client_report as module
+
+        called: list[str] = []
+        real = module.assert_report_releasable
+
+        def spy(repo, principal, deliverable_id, provenance):
+            called.append(str(deliverable_id))
+            return real(repo, principal, deliverable_id, provenance)
+
+        monkeypatch.setattr(module, "assert_report_releasable", spy)
+        import grassmarket.web.routers.report_links as links_module
+
+        monkeypatch.setattr(links_module, "assert_report_releasable", spy)
+
+        _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
+
+        assert (
+            client.get(
+                f"/deliverables/{deliverable}/client-report.pdf", headers=auth_header(alice)
+            ).status_code
+            == 200
+        )
+        assert called, "the PDF download did not consult the founder gate"
+
+        called.clear()
+        assert (
+            client.post(
+                f"/deliverables/{deliverable}/links",
+                json={"recipient_label": "CFO"},
+                headers=auth_header(alice),
+            ).status_code
+            == 201
+        )
+        assert called, "issuing a share link did not consult the founder gate"
 
     def test_an_unapproved_ai_section_is_refused(
         self, client, alice: SeededConsultant, deliverable: str, monkeypatch: pytest.MonkeyPatch
@@ -239,10 +318,11 @@ class TestTheApprovalGateIsActuallyWired:
 
 class TestTheLoopIsClosed:
     def test_write_share_and_read_end_to_end(
-        self, client, alice: SeededConsultant, deliverable: str
+        self, client, alice: SeededConsultant, deliverable: str, founder: SeededConsultant
     ) -> None:
         """The founder's acceptance test, as far as an API can carry it."""
         _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
 
         created = client.post(
             f"/deliverables/{deliverable}/links",
@@ -276,10 +356,11 @@ class TestTheLoopIsClosed:
         assert opened == {"business", "value"}
 
     def test_the_pdf_and_the_web_page_say_the_same_thing(
-        self, client, alice: SeededConsultant, deliverable: str
+        self, client, alice: SeededConsultant, deliverable: str, founder: SeededConsultant
     ) -> None:
         """Content parity: one model, two renditions, or they disagree in front of a client."""
         _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
         created = client.post(
             f"/deliverables/{deliverable}/links",
             json={"recipient_label": "cfo@client.example"},
@@ -299,12 +380,62 @@ class TestTheLoopIsClosed:
                     f"the web page says something the PDF does not: {paragraph}"
                 )
 
+    def test_the_two_renditions_agree_on_figure_order(
+        self, client, alice: SeededConsultant, deliverable: str, founder: SeededConsultant
+    ) -> None:
+        """GRS-0233 scope 3: parity ASSERTED, not hoped.
+
+        The web page used to sort every figure ascending client-side, so the value build-up rendered
+        Powers -> Platform Value -> Infrastructure -> Business under a caption promising a
+        composition, while the PDF kept the build-up order. Two renditions of one figure disagreeing
+        is exactly the drift GRS-0211 exists to prevent, and nothing was checking it.
+
+        The payload now carries the order AND whether that order is significant, so the web renderer
+        has no reason to invent one. This asserts the contract between them; the renderer's own
+        behaviour is asserted in `SharedReport.test.tsx`.
+        """
+        _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
+        created = client.post(
+            f"/deliverables/{deliverable}/links",
+            json={"recipient_label": "cfo@client.example"},
+            headers=auth_header(alice),
+        )
+        served = client.get(f"/shared/report/{created.json()['token']}").json()
+
+        buildup = served["figures"]["value_buildup"]
+        assert buildup["labels"] == ["Business", "Powers", "Infrastructure", "Platform Value"]
+        assert buildup["ordered"] is True, "the composition figure must declare its order binding"
+
+        # The ranked figures do NOT claim a binding order — weakest-first is applied at render, and
+        # saying otherwise would freeze them in registry order instead.
+        assert served["figures"]["maturity"]["ordered"] is False
+        assert served["figures"]["module_breakdown"]["ordered"] is False
+
+    def test_every_figure_entry_carries_a_label(
+        self, client, alice: SeededConsultant, deliverable: str, founder: SeededConsultant
+    ) -> None:
+        """GRS-0233 scope 1. Nine solid bars with no labels was the defect; a payload that ships
+        values without matching labels would put it straight back."""
+        _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
+        created = client.post(
+            f"/deliverables/{deliverable}/links",
+            json={"recipient_label": "cfo@client.example"},
+            headers=auth_header(alice),
+        )
+        served = client.get(f"/shared/report/{created.json()['token']}").json()
+        for name, figure in served["figures"].items():
+            assert len(figure["labels"]) == len(figure["values"]), f"{name}: unlabelled bars"
+            assert all(label.strip() for label in figure["labels"]), f"{name}: a blank label"
+
     def test_the_snapshot_does_not_move_when_the_prose_is_edited_later(
-        self, client, alice: SeededConsultant, deliverable: str
+        self, client, alice: SeededConsultant, deliverable: str, founder: SeededConsultant
     ) -> None:
         # A client who read this last week and quotes it back must be quoting something that still
         # exists. Editing the prose changes the NEXT link, not one already sent.
         _write_prose(client, alice, deliverable)
+        _approve_report(client, founder, deliverable)
         created = client.post(
             f"/deliverables/{deliverable}/links",
             json={"recipient_label": "cfo@client.example"},

@@ -106,8 +106,11 @@ export default async function SharedReportPage({
     );
   }
 
+  // The fixed mark overlays the top of the viewport, so the shell reserves room for it. Driven
+  // off the same payload flags the banner is, rather than a second source that could disagree.
+  const marked = Boolean(outcome.payload.non_production || outcome.payload.draft);
   return (
-    <main className="shared-report-shell">
+    <main className={`shared-report-shell${marked ? " has-mark" : ""}`}>
       <SharedReport payload={outcome.payload} token={token} />
     </main>
   );

@@ -48,6 +48,7 @@ function session(over: Partial<Session> = {}): Session {
     role: "consultant",
     assessorLevel: "trained",
     isAdmin: false,
+    actingAsConsultantId: null,
     isCommittee: false,
     isCertifiedLead: false,
     ...over,
@@ -72,7 +73,7 @@ describe("WorkbenchClient — tabs and gating (GRS-0027, ADR-0041)", () => {
     expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual([
       "Bench",
       "Certification",
-      "Learning & Drills",
+      "Academy",
       "Practice Arena",
     ]);
     expect(screen.queryByRole("tab", { name: "Founder review" })).toBeNull();

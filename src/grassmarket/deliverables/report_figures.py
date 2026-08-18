@@ -22,10 +22,22 @@ class Series:
 
     labels: tuple[str, ...]
     values: tuple[float, ...]
+    #: One line explaining what each entry MEANS, for the web page's hover (GRS-0233 scope 4). The
+    #: cheap version of hover-to-explain, without waiting on GRS-0206's motion system. Empty when
+    #: the series has no per-entry meaning to give — a composition figure's parts are explained by
+    #: the caption, not one at a time.
+    notes: tuple[str, ...] = ()
+    #: Whether this series' ORDER carries meaning (GRS-0233 scope 2). A composition figure must
+    #: render as given — sorting Business/Powers/Infrastructure/Platform Value by value destroys
+    #: the build-up its caption promises. A ranked figure may be sorted weakest-first, because
+    #: weakest-first is what its caption says it is.
+    ordered: bool = False
 
     def __post_init__(self) -> None:
         if len(self.labels) != len(self.values):
             raise ValueError("labels and values must be the same length.")
+        if self.notes and len(self.notes) != len(self.labels):
+            raise ValueError("notes, when present, must be one per label.")
 
 
 @dataclass(frozen=True)
@@ -44,13 +56,16 @@ def figure_data_from_context(context: DeliverableContext) -> ReportFigureData:
     """Derive all three figures from one finalised run."""
     result = context.result
 
-    scored = [(m.name, to_display(m.q_m)) for m in result.modules if m.q_m is not None]
-    module_labels = tuple(name for name, _ in scored)
-    module_values = tuple(value for _, value in scored)
+    scored = [
+        (m.name, to_display(m.q_m), _module_note(m)) for m in result.modules if m.q_m is not None
+    ]
+    module_labels = tuple(name for name, _, _ in scored)
+    module_values = tuple(value for _, value, _ in scored)
+    module_notes = tuple(note for _, _, note in scored)
 
     composite = result.composite
     return ReportFigureData(
-        maturity=Series(labels=module_labels, values=module_values),
+        maturity=Series(labels=module_labels, values=module_values, notes=module_notes),
         value_buildup=Series(
             labels=("Business", "Powers", "Infrastructure", "Platform Value"),
             values=(
@@ -59,6 +74,23 @@ def figure_data_from_context(context: DeliverableContext) -> ReportFigureData:
                 to_display(composite.l_index),
                 to_display(composite.v_index),
             ),
+            # The build-up IS the order. Rendering it by value would show four numbers and no
+            # composition, which is the opposite of what its caption claims.
+            ordered=True,
         ),
-        module_breakdown=Series(labels=module_labels, values=module_values),
+        module_breakdown=Series(labels=module_labels, values=module_values, notes=module_notes),
+    )
+
+
+def _module_note(module) -> str:  # noqa: ANN001 - ModuleResult, imported for typing only in callers
+    """One line about what a module's score means, for the web page's hover.
+
+    Coverage rather than a registry lookup: the score alone does not tell a reader how much of the
+    module was actually assessed, and that is the question a client asks first when a number looks
+    low. A module scored on two subcomponents of nine is a different claim from one scored on all
+    nine, and the bar looks identical either way.
+    """
+    return (
+        f"{module.name}: scored on {module.n_assessed} of {module.n_applicable} applicable "
+        f"subcomponents."
     )

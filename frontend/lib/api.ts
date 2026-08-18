@@ -11,6 +11,8 @@
 
 import type {
   ClientReportLink,
+  Consultant,
+  DeclaredFigure,
   ReportProseSection,
   ReportReadReport,
   FounderApproval,
@@ -493,6 +495,49 @@ export const api = {
       signal,
     });
   },
+  /** Sign off a client report's prose (GRS-0245). Separate from the assessment approval because it
+      is bound to a different hash — the words, not the scored document. */
+  /** Who this session currently is. While acting-as (GRS-0208) it answers as the SUBJECT, which
+      is what makes the banner's name the right one to show. */
+  me(signal?: AbortSignal): Promise<{ id: string; full_name: string; email: string }> {
+    return request(`/auth/me`, { headers: authHeaders(), signal });
+  },
+  /** Who this admin could act as (GRS-0208). 403 for anyone else. */
+  actAsCandidates(signal?: AbortSignal): Promise<Consultant[]> {
+    return request<Consultant[]>(`/auth/act-as/candidates`, { headers: authHeaders(), signal });
+  },
+  startActingAs(
+    consultantId: string,
+    signal?: AbortSignal,
+  ): Promise<{
+    access_token: string;
+    subject_consultant_id: string;
+    subject_name: string;
+    subject_email: string;
+  }> {
+    return request(`/auth/act-as/${consultantId}`, {
+      method: "POST",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+  stopActingAs(signal?: AbortSignal): Promise<{ access_token: string }> {
+    return request(`/auth/act-as`, { method: "DELETE", headers: authHeaders(), signal });
+  },
+  approveReport(deliverableId: string, signal?: AbortSignal): Promise<FounderApproval> {
+    return request<FounderApproval>(`/deliverables/${deliverableId}/report-approval`, {
+      method: "POST",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+  submitReportForReview(deliverableId: string, signal?: AbortSignal): Promise<void> {
+    return request<void>(`/deliverables/${deliverableId}/submit-report-for-review`, {
+      method: "POST",
+      headers: authHeaders(),
+      signal,
+    });
+  },
 
   currentFounderApproval(id: string, signal?: AbortSignal): Promise<FounderApproval | null> {
     return request<FounderApproval | null>(`/assessments/${id}/founder-approval`, {
@@ -873,7 +918,17 @@ export const api = {
   getReportProse(
     deliverableId: string,
     signal?: AbortSignal,
-  ): Promise<{ sections: Record<string, ReportProseSection>; written: boolean }> {
+  ): Promise<{
+    sections: Record<string, ReportProseSection>;
+    written: boolean;
+    /** Per section key: the figures the run declares (GRS-0230 scope 3). */
+    available_figures?: Record<string, DeclaredFigure[]>;
+    /** Whose report this is (GRS-0231) — the identity the PDF cover prints. */
+    subject?: string | null;
+    engagement_title?: string | null;
+    provenance?: string | null;
+    operating_model?: string | null;
+  }> {
     return request(`/deliverables/${deliverableId}/report-prose`, {
       method: "GET",
       headers: authHeaders(),
@@ -885,7 +940,17 @@ export const api = {
     deliverableId: string,
     sections: Record<string, ReportProseSection>,
     signal?: AbortSignal,
-  ): Promise<{ sections: Record<string, ReportProseSection>; written: boolean }> {
+  ): Promise<{
+    sections: Record<string, ReportProseSection>;
+    written: boolean;
+    /** Per section key: the figures the run declares (GRS-0230 scope 3). */
+    available_figures?: Record<string, DeclaredFigure[]>;
+    /** Whose report this is (GRS-0231) — the identity the PDF cover prints. */
+    subject?: string | null;
+    engagement_title?: string | null;
+    provenance?: string | null;
+    operating_model?: string | null;
+  }> {
     return request(`/deliverables/${deliverableId}/report-prose`, {
       method: "PUT",
       headers: { ...authHeaders(), "Content-Type": "application/json" },

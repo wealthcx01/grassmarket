@@ -49,7 +49,8 @@ test.describe("GRS-0027 — Workbench", () => {
     await expect(page.getByRole("tab")).toHaveText([
       "Bench",
       "Certification",
-      "Learning & Drills",
+      // Renamed under GRS-0243 scope 2: the founder asked for "just the Academy" on 23/07.
+      "Academy",
       "Practice Arena",
     ]);
     for (const gone of ["Committee", "Calibration", "Rating requests", "Founder review"]) {

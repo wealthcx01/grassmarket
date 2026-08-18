@@ -69,6 +69,22 @@ describe("DeliverablesPage (GRS-0186)", () => {
   it("shows the empty state when there are no deliverables", async () => {
     mocked.listAllDeliverables.mockResolvedValue([]);
     render(<DeliverablesPage />);
-    expect(await screen.findByText(/no deliverables generated yet/i)).toBeTruthy();
+    expect(await screen.findByTestId("deliverables-empty")).toBeTruthy();
+  });
+
+  it("teaches the chain rather than restating that the table is empty (GRS-0243)", async () => {
+    // A first-time user is looking at an empty table precisely because they do not know what fills
+    // it, so "No deliverables generated yet" tells them only what they can already see. Every link
+    // of the chain is a prerequisite, so every link gets named.
+    mocked.listAllDeliverables.mockResolvedValue([]);
+    render(<DeliverablesPage />);
+    const empty = await screen.findByTestId("deliverables-empty");
+    const text = empty.textContent ?? "";
+    for (const step of ["assessment", "finalise", "engagement", "deliverable", "client report"]) {
+      expect(text).toContain(step);
+    }
+    // And it offers the two ways forward: build one, or read a finished one.
+    expect(text).toMatch(/worked example/i);
+    expect(empty.querySelector('a[href="/assessments"]')).toBeTruthy();
   });
 });

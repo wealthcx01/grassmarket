@@ -732,6 +732,16 @@ export type NarrativeSection = "interpretation" | "commentary" | "recommendation
 export type NarrativeStatus = "proposed" | "approved" | "rejected";
 export type ConsultantTier = "venture_associate" | "advisor" | "consultant";
 
+/** A consultant as the API returns them — no password material (GRS-0208 act-as picker). */
+export interface Consultant {
+  id: string;
+  email: string;
+  full_name: string;
+  role: "consultant" | "committee_member" | "admin";
+  tier: ConsultantTier;
+  is_active: boolean;
+}
+
 export interface AINarrative {
   id: string;
   owner_consultant_id: string;
@@ -1211,6 +1221,10 @@ export interface FounderReviewQueueEntry {
   document_hash: string;
   /** True when this was signed off and then edited: the founder is re-reading, not reading. */
   previously_approved: boolean;
+  /** Set when this row is a CLIENT REPORT awaiting sign-off rather than an assessment (GRS-0245). */
+  deliverable_id?: string | null;
+  /** On a re-review of a client report: which of the six sections differ from the approved version. */
+  changed_sections?: string[];
   created_at: string;
   updated_at: string;
 }
@@ -1246,6 +1260,14 @@ export interface RatingRequestSummary {
 // --- The client report (GRS-0211/0219/0220) ---------------------------------------------------
 
 /** One section of the advisor's report prose, as stored and edited. */
+/** One figure the run declares, which a section is allowed to state (GRS-0230). */
+export type DeclaredFigure = {
+  key: string;
+  label: string;
+  rendered: string;
+  source: string;
+};
+
 export type ReportProseSection = {
   heading: string;
   body: string[];

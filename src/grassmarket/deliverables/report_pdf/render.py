@@ -13,11 +13,18 @@ so no flowable can cover it and no caller can forget it.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from datetime import date
 from io import BytesIO
 
-from bcap_contracts.client_report import ClientReport, ReportSection, ReportSectionKind
+from bcap_contracts.client_report import SECTION_TITLES as CONTRACT_SECTION_TITLES
+from bcap_contracts.client_report import (
+    ClientReport,
+    ReportSection,
+    ReportSectionKind,
+    coefficient_status_sentence,
+)
 from bcap_contracts.deliverables import DeliverableMode
 from reportlab.lib.colors import Color
 from reportlab.lib.enums import TA_LEFT
@@ -49,14 +56,9 @@ WORDMARK = "BRUNTSFIELD"
 WORDMARK_SUB = "ADVISORY NETWORK"
 
 #: Reader-facing section titles. The content model carries kinds; a client sees words.
-SECTION_TITLES: dict[ReportSectionKind, str] = {
-    ReportSectionKind.BUSINESS: "The business",
-    ReportSectionKind.ADVANTAGE: "Where the advantage sits",
-    ReportSectionKind.CONSTRAINT: "What is holding it back",
-    ReportSectionKind.ACTIONS: "What to do about it",
-    ReportSectionKind.VALUE: "What that is worth",
-    ReportSectionKind.APPENDIX: "Technical appendix",
-}
+# Re-exported from the contract, which is where the reader-facing names now live (GRS-0230). Kept
+# as a module-level name so existing imports from here keep working.
+SECTION_TITLES = CONTRACT_SECTION_TITLES
 
 
 @dataclass(frozen=True)
@@ -69,6 +71,10 @@ class ReportMeta:
     mode: DeliverableMode
     #: Stamped alongside the draft watermark when the underlying record is demo/sandbox data.
     non_production: bool = False
+    #: Whether the coefficient set that priced this report is client-usable (GRS-0234 scope 3).
+    #: Feeds the footer's plain-English provenance sentence; the identifier itself stays in the
+    #: appendix's version table, where identifiers belong.
+    coefficients_client_usable: bool = False
 
 
 def _styles() -> dict[str, ParagraphStyle]:
@@ -328,7 +334,13 @@ class _ReportDoc(BaseDocTemplate):
             f"Confidential — prepared for {self._report.subject} by {self._meta.prepared_by} · "
             f"{self._meta.generated_on.isoformat()} · "
             f"methodology {self._report.methodology_version} · "
-            f"coefficients {self._report.coefficient_version}"
+            # Plain English, not the config identifier. GRS-0219's provenance honesty is the point
+            # and it stays; `coefficients v1-draft-pending-elicitation` was that fact written in a
+            # vocabulary the reader does not share.
+            + coefficient_status_sentence(
+                version=self._report.coefficient_version,
+                client_usable=self._meta.coefficients_client_usable,
+            )
         )
         canvas.drawString(tk.MARGIN_L, tk.MARGIN_B - 9, line)
         canvas.restoreState()
@@ -433,6 +445,24 @@ def _rendered_figures(figure_data: ReportFigureData) -> dict[str, bytes]:
     return rendered
 
 
+def client_report_filename(*, subject: str, generated_on: date) -> str:
+    """What the client's copy is called on disk (GRS-0234 scope 1).
+
+    An advisor forwards this file to a CFO. It arrived named `f6312cfe-4310-...pdf`, which is a
+    database identifier in someone's inbox — and the cause was not this string but CORS: the browser
+    could not read `Content-Disposition` because it was never exposed, so the client fell back to
+    the deliverable id. Both halves are fixed; this is the half that decides what it says.
+
+    ASCII-folded and punctuation-stripped rather than merely space-replaced: the name crosses a
+    filesystem, an email client and whatever the recipient uses, and a slash or a colon in it is a
+    broken attachment somewhere. The em-dashes are deliberate and safe — they are separators in the
+    house style, and `Content-Disposition` carries them via RFC 5987.
+    """
+    cleaned = re.sub(r"[^\w\s-]", "", subject, flags=re.UNICODE).strip()
+    cleaned = re.sub(r"\s+", " ", cleaned) or "Client"
+    return f"Bruntsfield — Platform assessment — {cleaned} — {generated_on:%Y-%m}.pdf"
+
+
 def render_client_report_pdf(
     report: ClientReport,
     *,
@@ -534,7 +564,9 @@ def _build_document(
     story.append(_Rule(46, tk.ACCENT, 1.6))
     story.append(Spacer(1, 12))
     story.append(Paragraph("Platform assessment", styles["cover_sub"]))
-    story.append(Paragraph(meta.engagement_title, styles["cover_sub"]))
+    # GRS-0234 scope 2: the engagement title used to print here — "WeBull — delivery", an internal
+    # filing key under an otherwise good cover. Dropped rather than humanised: the title above IS
+    # the client and the line above IS the document, so a third line would only repeat one of them.
     story.append(Spacer(1, 10))
     story.append(
         Paragraph(
@@ -570,6 +602,12 @@ def _build_document(
                 )
             )
         if section.kind is ReportSectionKind.VALUE:
+            # NOTE (GRS-0234 scope 4): narrowing this to 0.72 was tried as a cheap fix for the
+            # sparse page and MEASURED NOT TO HELP — the page stayed at ~300 chars plus the chart
+            # across all three samples. Reverted rather than kept, because the change had no effect
+            # and its comment would have claimed one. The sparse page is the VALUE section's own
+            # length plus a figure, not the figure's width; a real fix is a reportlab keep-with rule
+            # binding the figure to its preceding paragraph, which is not done here.
             story.extend(
                 _figure(
                     rendered["value_buildup"],
