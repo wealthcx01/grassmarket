@@ -159,3 +159,18 @@ in Helmer's strict sense, only Powers is durable advantage. For the per-power tr
 Economies, Network Economies, Counter-Positioning, Switching Costs, Branding, Cornered Resource, and
 Process Power) and the full mapping of Business, Infrastructure, Powers, and Customer to Helmer's
 framework, see the adaptation document.
+
+---
+
+## Where to go deeper
+
+This document explains the maths to an advisor. Two others go further, for different readers:
+
+- **`ATLAS-White-Paper-v1.md`** — the technical white paper, written for a **client's CTO or a
+  diligence team**. It carries the formal model, the behavioural properties with their proofs, the
+  validation evidence with test counts and file references, and a limitations register that states
+  what is not yet proven — including the fact that no expert elicitation panel has yet met and that
+  most coefficients in production are provisional. **This is the document to hand a sceptical
+  reader**, and it is written expecting them to check it.
+- **`ATLAS-Methodology-v1.6.md`** — the normative specification. Where any explanation and the
+  methodology disagree, the methodology wins.

@@ -1,6 +1,6 @@
 # GRS-0237 — The engine white paper: one document that answers "is this up to scratch?"
 
-**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, founder: "I am not sure if the engine calculator behind the._
+**Status:** DONE (2026-08-19). _Previously recorded as: Planned (2026-07-31, founder: "I am not sure if the engine calculator behind the._
 assessment wizard is up to scratch — need a white paper on this"). **Priority:** HIGH.
 **Loop:** first-time-user coherence. **Relates to:** GRS-0179, GRS-0180, GRS-0150, GRS-0223, ADR-0046.
 
@@ -79,4 +79,79 @@ claim the repo cannot back.
 
 ## Status reconciliation — 2026-08-01
 
-**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).
+**DONE** — shipped 2026-08-19, all five scopes.
+
+## What shipped
+
+**1 — `docs/ATLAS-White-Paper-v1.md`.** One document for an external technical reader: the formal
+model with the actual formulas, the behavioural properties P1–P7, the C-index and critical-control
+cap as conditional-by-construction amendments, uncertainty, the value bridge, a validation-evidence
+table where every row names a file, a limitations register, and a closure roadmap mapping each gap
+to what closes it.
+
+**2 — The Methodology Guide is RETIRED, not re-baselined.** Decision stated in §12 of the paper and
+in the stub that replaces the Guide. It was an informative companion pinned to v1.1 that had
+drifted past v1.4/v1.5/v1.6, still described the Rating Committee as operative governance, and
+never mentioned C, the cap or the one-number rule. Its audience was the white paper's audience;
+maintaining two documents for one reader is what produced the drift. The stub is kept rather than
+deleted so existing links resolve to an explanation.
+
+**3 — Provenance corrected, and the ticket's premise was partly wrong.** See below.
+
+**4 — `docs/analysis/weight-sensitivity-2026-08.md` + `tools/weight_sensitivity.py`.** Seeded,
+offline, re-runnable. Headline: the module ranking survives λ perturbation until **±110%**, and the
+ordering of the three showcase firms by V did not change in any of 160 runs.
+
+**5 — Surfaced** from the Advisor Guide, the scoring explainer, the in-app Guide page, the wizard
+("Is it up to scratch?" beside "How the maths works"), and the PDF appendix.
+
+## Where the ticket — and my own founder-decision write-up — were wrong
+
+The ticket says `elicited_coefficients.py` stamps its records with a panel name, and
+`FOUNDER-DECISIONS-2026-08.md` (which I wrote) said it stamps **every weight family** that way.
+Measuring it first:
+
+| Set | Active? | Record said | Verdict |
+|---|---|---|---|
+| retail `v1-elicited-2026` | **No** — built and client-usable, but not the active set | `bruntsfield-elicitation-panel-2026`, "elicited by the Bruntsfield weight panel" | false claim, now corrected |
+| wealth / exchange starters | **Yes**, since 2026-07-20 (ADR-0037) | `engineering-starter-research-validated-2026-07`, "panel ratification scheduled" | already honest |
+
+So the false claim sat in a **dormant** set. Still worth fixing — that is the set which activates
+when the panel signs off, so the lie was queued rather than live — but less severe than both
+documents claimed. The D1 section has been corrected to say so.
+
+**No coefficient value changed.** Golden master byte-identical, 56 golden tests pass.
+
+## Two things measured that the ticket did not anticipate
+
+**The default profile cannot produce a client deliverable.** Retail scores on
+`v1-draft-pending-elicitation` with `client_usable=False`, so the deliverable gate refuses it. Only
+wealth and exchange can go to a client today. That is the fail-loud design working exactly as
+specified, and it is almost certainly not what the founder expects the product to do. Recorded in
+the white paper §10.1 and in D1.
+
+**Two coefficient version strings still read `...-elicited-starter-...`.** Deliberately NOT renamed:
+a coefficient version is stamped onto every immutable scoring run, and rewriting it would falsify
+runs already recorded (non-negotiable #6). The provenance record beside them is the authoritative
+statement, and the white paper says so.
+
+## Two defects this ticket's own work caught in itself
+
+1. **τ = 1.000 across all four families was three-quarters tautology.** δ, W_g and the strength
+   encoding are downstream of q_m and cannot move a module score, so their rank stability is a
+   property of the model's structure, not a measurement. The table now reports `n/a` for them.
+   Publishing the first version would have been evidence-laundering in a document whose whole
+   purpose is not doing that.
+2. **The committed numbers did not reproduce.** Three consecutive runs of the same seeded sweep gave
+   0.55, 0.53 and 0.47. Cause: weight families built from set comprehensions upstream + per-process
+   string-hash randomisation + RNG consumed in dict order. `perturbed()` now sorts keys. The guard
+   that missed it asserted `sweep() == sweep()` — true in one interpreter and therefore worthless;
+   it now runs two subprocesses under different `PYTHONHASHSEED` values.
+
+## Not done
+
+- **Scope 3 is complete for the record, not for the values.** Whether these numbers survive is
+  founder decision **D1**; nothing here invents or ratifies a value.
+- The sweep does **not** cover θ, α (existing variant grid), κ, or the C-index families. Stated in
+  the analysis document's closing section rather than left implied.
+- ADR-0046 remains **Proposed**; the Helmer review is D7.

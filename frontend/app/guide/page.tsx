@@ -938,6 +938,16 @@ export default function GuidePage() {
             uncertainty model, and how Hamilton Helmer&rsquo;s framework maps onto it, is in{" "}
             <code>docs/ATLAS-Scoring-Explained.md</code>.
           </p>
+          {/* GRS-0237 scope 5. The explainer answers "how does this work?"; a client's CTO asks the
+              harder question, "is it any good?" — and that one has its own document now. Named here
+              rather than only in the explainer because the advisor who needs it is usually the one
+              who has just been asked, and will not think to go via a second hop. */}
+          <p style={{ margin: 0, color: "var(--color-ink-muted)", lineHeight: 1.6 }}>
+            When a client puts a CTO or a diligence team across the table, the document to hand them
+            is the technical white paper, <code>docs/ATLAS-White-Paper-v1.md</code>. It carries the
+            formal model, the validation evidence, and a limitations register that states what is
+            not yet proven — written expecting the other side to check it.
+          </p>
         </div>
       </section>
 

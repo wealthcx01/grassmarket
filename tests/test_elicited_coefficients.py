@@ -15,7 +15,7 @@ from __future__ import annotations
 import pytest
 from bcap_contracts.assessments import CoefficientSet
 from bcap_contracts.common import WeightMethod
-from bcap_contracts.registry import load_registry
+from bcap_contracts.registry import load_profile, load_registry
 from pydantic import ValidationError
 
 from grassmarket.atlas.draft_coefficients import draft_v1_coefficient_set
@@ -51,12 +51,55 @@ def test_elicited_set_is_client_usable(registry) -> None:
 
 
 def test_every_populated_family_carries_provenance(registry) -> None:
-    # The construction-time guarantee: 'every elicited weight traces to a provenance record'.
+    # The construction-time guarantee: 'every weight traces to a provenance record'.
     cs = elicited_v1_coefficient_set(registry)
     assert set(cs.provenance) == _EXPECTED_PROVENANCE_FAMILIES
     for family, record in cs.provenance.items():
-        assert record.set_by == "bruntsfield-elicitation-panel-2026", family
+        assert record.set_by == "bruntsfield-engineering-provisional-2026-07", family
         assert record.review_due > record.set_on, family
+
+
+def test_no_provenance_record_claims_a_panel_that_has_not_met(registry) -> None:
+    """GRS-0237 scope 3. The record must not assert evidence that does not exist.
+
+    Until 2026-08-19 every family in this set was stamped
+    ``set_by="bruntsfield-elicitation-panel-2026"`` with a note reading "elicited by the Bruntsfield
+    weight panel". No such panel has met. The methods appendix prints this record for a client to
+    check, so it is a claim about evidence, not an internal label.
+
+    Asserted as a **property** rather than as the new literal alone: a future edit that reintroduces
+    a panel claim under any wording fails here. When the panel does meet, this test is the thing to
+    delete — deliberately, in the same commit that records the session.
+    """
+    # All three CLIENT-USABLE sets, not just retail. The wealth and exchange sets are the ones
+    # actually ACTIVE today (ADR-0037), so a false claim in their records reaches a real client
+    # first. Their wording was already honest when this was written; the guard keeps it that way.
+    from grassmarket.atlas.elicited_coefficients import (
+        elicited_exchange_coefficient_set,
+        elicited_wealth_coefficient_set,
+    )
+
+    view = load_registry()
+    sets = {
+        "retail": elicited_v1_coefficient_set(registry),
+        "wealth": elicited_wealth_coefficient_set(view.for_profile(load_profile("wealth"))),
+        "exchange": elicited_exchange_coefficient_set(view.for_profile(load_profile("exchange"))),
+    }
+    for label, cs in sets.items():
+        for family, record in cs.provenance.items():
+            blob = f"{record.set_by} {record.notes or ''}".lower()
+            assert "elicitation-panel" not in blob, (
+                f"{label}/{family}: provenance names an elicitation panel as the setter. No panel "
+                f"has met (founder decision D1). Say what actually set these values."
+            )
+            # The word "panel" may legitimately appear while saying the panel is PENDING, so the
+            # check is on the claim, not the word: a record may not assert the panel did the work.
+            # Note this also forbids DENYING it in those words — "not panel-elicited" contains the
+            # assertion as a substring, and a client skims phrases rather than parsing logic.
+            assert not any(
+                phrase in blob
+                for phrase in ("elicited by the", "panel-elicited", "expert-elicited")
+            ), f"{label}/{family}: provenance claims the weights were elicited. They were not, yet."
 
 
 def test_theta_is_non_uniform_and_sums_to_one(registry) -> None:
