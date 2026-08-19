@@ -98,7 +98,12 @@ def openbb_course(carrot: ProductCommissionCarrot) -> CourseTree:
         ),
     )
     base = build_product_course(
-        spec, carrot, _TEMPLATE_CHECKS
+        spec,
+        carrot,
+        _TEMPLATE_CHECKS,
+        # GRS-0239 scope 4: these two tail paragraphs are retired because this course's rebuilt
+        # sections cover them at depth — `who-buys-and-why` and `how-and-when-to-sell`.
+        covered_by_rebuilt=frozenset({"relevance", "sell-motion"}),
     )  # 1 module (4 canonical sections incl. live commission)
 
     # The GRS-0216 rebuild. These sections are written to the GRS-0215 depth standard: a lesson of

@@ -64,7 +64,9 @@ export function SlideView({ slide }: { slide: Slide }) {
           {slide.checkpoint_prompt}
         </p>
       ) : null}
-      <LessonReferences references={slide.references} />
+      {/* GRS-0239 scope 2: a footnote, not a card strip. Every claim stays sourced — that is
+          doctrine — but a slide should read as teaching, not as a set of links. */}
+      <LessonReferences references={slide.references} variant="footnote" />
     </div>
   );
 }
