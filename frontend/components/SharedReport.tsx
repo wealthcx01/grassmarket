@@ -20,6 +20,11 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+// GRS-0235: the titles and the dwell ceiling come from one place each, mirrored from the contract
+// and drift-tested against it. This file used to carry its own copy of both.
+import { MAX_DWELL_MS as CONTRACT_MAX_DWELL_MS } from "@/lib/readTracking";
+import { SECTION_TITLES } from "@/lib/reportSections";
+
 export type Figure = {
   labels: string[];
   values: number[];
@@ -73,18 +78,8 @@ export function reportMarkText(payload: {
   return `${marks.join("  \u00b7  ")} \u2014 this report does not describe a live platform`;
 }
 
-/** Reader-facing titles. Kept in step with `report_pdf.render.SECTION_TITLES`. */
-const SECTION_TITLES: Record<string, string> = {
-  business: "The business",
-  advantage: "Where the advantage sits",
-  constraint: "What is holding it back",
-  actions: "What to do about it",
-  value: "What that is worth",
-  appendix: "Technical appendix",
-};
-
 /** A tab left open overnight is not reading — the API refuses more, so don't send it. */
-const MAX_DWELL_MS = 6 * 60 * 60 * 1000;
+const MAX_DWELL_MS = CONTRACT_MAX_DWELL_MS;
 
 /**
  * Report one section's dwell time when it leaves the screen.

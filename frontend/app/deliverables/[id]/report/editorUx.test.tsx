@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 /**
@@ -11,14 +11,9 @@ import { describe, expect, it } from "vitest";
 
 // Mirrors of the page's local helpers. Kept here deliberately narrow: if these drift from the page
 // the E2E catches it, and testing them directly is what makes the wording reviewable at all.
-const SECTION_TITLES: Record<string, string> = {
-  business: "The business",
-  advantage: "Where the advantage sits",
-  constraint: "What is holding it back",
-  actions: "What to do about it",
-  value: "What that is worth",
-  appendix: "Technical appendix",
-};
+// GRS-0235: the titles are imported rather than re-declared — this file used to hold its own copy,
+// which made the assertions below a copy-against-a-copy check.
+import { SECTION_TITLES } from "@/lib/reportSections";
 
 function listSections(keys: string[]): string {
   const names = keys.map((k) => SECTION_TITLES[k] ?? k);
