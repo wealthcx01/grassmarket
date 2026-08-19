@@ -11,8 +11,8 @@ then brought forward on 2026-08-18 when this index finally landed on `main`.
 
 | State | Count | Meaning |
 |---|---|---|
-| **DONE** | 198 | An implementing commit is on `main`, named in the ticket |
-| **OPEN** | 30 | Genuinely unbuilt and schedulable — **3 of them partly built** (GRS-0208, 0234, 0243) |
+| **DONE** | 199 | An implementing commit is on `main`, named in the ticket |
+| **OPEN** | 29 | Genuinely unbuilt and schedulable — **3 of them partly built** (GRS-0208, 0234, 0243) |
 | **BLOCKED** | 7 | Waiting on a founder decision (D1–D7) |
 | **SUPERSEDED** | 8 | Replaced by a later ticket, named in the stamp |
 | **Total** | 243 | |
@@ -45,7 +45,7 @@ first.
 ### Phase 2 — the GRS-0229–0245 wave (2026-07-31 first-time-user review)
 
 Build order below is the wave's own priority: client-trust breaches, then first-run, then the
-report workflow, then the rest. **Ten of seventeen have landed**; the status column is the ticket's
+report workflow, then the rest. **Eleven of seventeen have landed**; the status column is the ticket's
 own reconciled stamp, not a summary of it.
 
 | # | Ticket | Title | Group | Status |
@@ -59,8 +59,8 @@ own reconciled stamp, not a summary of it.
 | 7 | GRS-0233 | Web report figures: label the bars, keep the story's order | report workflow | **DONE** (#245) |
 | 8 | GRS-0232 | The appendix must not contradict the run | report workflow | **DONE** (#246) |
 | 9 | GRS-0234 | PDF furniture: the filename, the subtitle, the footer, the precision | report polish | **MOSTLY DONE** (#248) — scope 4's sparse-page fix measured not to work and was reverted |
-| 10 | GRS-0235 | Read tracking an advisor can read | report polish | OPEN — **next** |
-| 11 | GRS-0237 | The engine white paper: one document that answers "is this up to scratch?" | legibility & truthfulness | OPEN — scope 3 needs D1 |
+| 10 | GRS-0235 | Read tracking an advisor can read | report polish | **DONE** (#249) |
+| 11 | GRS-0237 | The engine white paper: one document that answers "is this up to scratch?" | legibility & truthfulness | OPEN — **next**; scope 3 needs D1 |
 | 12 | GRS-0238 | A Prospecting surface: browse the registry we imported | legibility & truthfulness | OPEN |
 | 13 | GRS-0239 | Lessons that teach before they test | legibility & truthfulness | OPEN — scope 5 resolved by GRS-0218 |
 | 14 | GRS-0240 | The earnings page explains how you get paid | legibility & truthfulness | OPEN |

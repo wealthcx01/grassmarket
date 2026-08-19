@@ -11,14 +11,9 @@ import { describe, expect, it } from "vitest";
  * that decide what an advisor SEES. The full render is covered by the E2E.
  */
 
-const SECTION_TITLES: Record<string, string> = {
-  business: "The business",
-  advantage: "Where the advantage sits",
-  constraint: "What is holding it back",
-  actions: "What to do about it",
-  value: "What that is worth",
-  appendix: "Technical appendix",
-};
+// GRS-0235: imported, not re-declared. This file used to carry its own copy of the six titles, so
+// it asserted a copy against a copy — it would have gone on passing after the product drifted.
+import { SECTION_TITLES } from "@/lib/reportSections";
 
 function humanModel(key: string): string {
   // The REAL keys, from `bcap_contracts.registry.RETAIL_PROFILE_KEY`. The first version of this

@@ -16,37 +16,25 @@
 
 "use client";
 
-import { use, useCallback, useEffect, useState } from "react";
+import { Fragment, use, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { ApiError, api, getToken } from "@/lib/api";
+import {
+  ReportReadDetail,
+  readCoverageLabel,
+  readWindowLabel,
+} from "@/components/ReportReadDetail";
+// GRS-0235: one registry, mirrored from the contract and drift-tested against it. This page used to
+// carry its own hand-copy of the same six titles.
+import { SECTION_ORDER, SECTION_TITLES } from "@/lib/reportSections";
 import type {
   ClientReportLink,
   DeclaredFigure,
   ReportProseSection,
   ReportReadReport,
 } from "@/lib/types";
-
-const SECTION_ORDER = [
-  "business",
-  "advantage",
-  "constraint",
-  "actions",
-  "value",
-  "appendix",
-] as const;
-
-/** Reader-facing names, matching `bcap_contracts.client_report.SECTION_TITLES`. Used for the
- *  empty-section hint so it names sections the way the page and the report do, never by key. */
-const SECTION_TITLES: Record<string, string> = {
-  business: "The business",
-  advantage: "Where the advantage sits",
-  constraint: "What is holding it back",
-  actions: "What to do about it",
-  value: "What that is worth",
-  appendix: "Technical appendix",
-};
 
 /** Operating-model keys are stored; a reader should not have to decode one. */
 function humanModel(key: string): string {
@@ -562,6 +550,9 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
                   State
                 </th>
                 <th scope="col" style={{ textAlign: "left" }}>
+                  Opened
+                </th>
+                <th scope="col" style={{ textAlign: "left" }}>
                   Read
                 </th>
                 <th scope="col" />
@@ -570,29 +561,39 @@ export default function ClientReportPage({ params }: { params: Promise<{ id: str
             <tbody>
               {links.map((link) => {
                 const summary = reads[link.id];
-                const opened = summary?.sections.filter((s) => s.views > 0) ?? [];
+                const sections = summary?.sections ?? [];
+                const everOpened = sections.some((s) => s.views > 0);
                 return (
-                  <tr key={link.id} style={{ borderTop: "1px solid var(--color-border)" }}>
-                    <td>{link.recipient_label}</td>
-                    <td>{summary?.state ?? (link.revoked_at ? "revoked" : "active")}</td>
-                    <td>
-                      {opened.length
-                        ? opened.map((s) => s.section).join(", ")
-                        : "not opened yet"}
-                    </td>
-                    <td style={{ textAlign: "right" }}>
-                      {link.revoked_at ? null : (
-                        <button
-                          type="button"
-                          className="btn btn-ghost"
-                          onClick={() => revoke(link.id)}
-                          disabled={busy}
-                        >
-                          Revoke
-                        </button>
-                      )}
-                    </td>
-                  </tr>
+                  // GRS-0235. Two rows per link: the scan line, then the breakdown. The breakdown
+                  // is rendered only once something has been read — six "not read" rows against a
+                  // link nobody opened is noise, and "not opened yet" already says it.
+                  <Fragment key={link.id}>
+                    <tr style={{ borderTop: "1px solid var(--color-border)" }}>
+                      <td>{link.recipient_label}</td>
+                      <td>{summary?.state ?? (link.revoked_at ? "revoked" : "active")}</td>
+                      <td>{everOpened ? readWindowLabel(sections) : "—"}</td>
+                      <td>{readCoverageLabel(sections)}</td>
+                      <td style={{ textAlign: "right" }}>
+                        {link.revoked_at ? null : (
+                          <button
+                            type="button"
+                            className="btn btn-ghost"
+                            onClick={() => revoke(link.id)}
+                            disabled={busy}
+                          >
+                            Revoke
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                    {everOpened ? (
+                      <tr>
+                        <td colSpan={5} style={{ paddingTop: 0 }}>
+                          <ReportReadDetail sections={sections} />
+                        </td>
+                      </tr>
+                    ) : null}
+                  </Fragment>
                 );
               })}
             </tbody>
