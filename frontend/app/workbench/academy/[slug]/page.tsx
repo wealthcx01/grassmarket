@@ -11,7 +11,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
-import { LessonBody } from "@/components/workbench/LessonBody";
+import { LessonBody, LessonObjective } from "@/components/workbench/LessonBody";
+import { LessonReferences } from "@/components/workbench/LessonReferences";
 import { SectionTestCard } from "@/components/workbench/SectionTestCard";
 import { SlideDeck } from "@/components/workbench/SlideDeck";
 import { ApiError, api, clearToken, getToken } from "@/lib/api";
@@ -40,6 +41,9 @@ function LessonCard({
       ? "Before you complete this — in your own words, how will you know you’ve applied it?"
       : "Recall the key idea of this lesson in your own words.");
   const modelAnswer = lesson.check_answer ?? lesson.measurement ?? "";
+  // A rebuilt lesson teaches through its deck; a legacy one has only `body`. The layout difference
+  // between them is the whole of GRS-0239 scope 1.
+  const hasSlides = (lesson.slides ?? []).length > 0;
   return (
     <article
       style={{
@@ -59,15 +63,34 @@ function LessonCard({
         ) : null}
       </div>
       <div style={{ marginTop: "0.5rem", color: "var(--color-ink)" }}>
-        {/* `body` is the lesson's opening — what it is for. Since GRS-0215 the teaching lives in
-            the slides, so both render; a legacy lesson has no slides and reads exactly as before. */}
-        <LessonBody
-          body={lesson.body}
-          videoRef={lesson.video_ref}
-          references={lesson.references}
-          assets={lesson.assets}
-        />
-        <SlideDeck slides={lesson.slides ?? []} label={lesson.title} />
+        {/* GRS-0239 scope 1. The DECK LEADS. Until now the objective paragraph and the lesson's
+            reference cards rendered above it, so the first screen of every rebuilt lesson was
+            "what you should learn" plus a list of links, with slide 1 below the fold. That is the
+            founder's complaint almost verbatim, and it was a layout problem rather than a content
+            one — the teaching was always there, just second.
+
+            A legacy lesson has no slides: `SlideDeck` renders nothing, `LessonObjective` carries
+            the whole lesson, and it reads exactly as it did before. */}
+        {hasSlides ? (
+          <>
+            <SlideDeck slides={lesson.slides ?? []} label={lesson.title} />
+            <LessonObjective
+              body={lesson.body}
+              videoRef={lesson.video_ref}
+              assets={lesson.assets}
+            />
+            {/* Sources at the END, where a reader who has finished is looking for what to read
+                next — not at the start, where they read as the content. */}
+            <LessonReferences references={lesson.references} />
+          </>
+        ) : (
+          <LessonBody
+            body={lesson.body}
+            videoRef={lesson.video_ref}
+            references={lesson.references}
+            assets={lesson.assets}
+          />
+        )}
       </div>
       {lesson.measurement ? (
         <p style={{ margin: "0.6rem 0 0", fontSize: "0.78rem", color: "var(--color-ink-muted)", borderLeft: "2px solid var(--color-border)", paddingLeft: "0.6rem" }}>

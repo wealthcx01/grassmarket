@@ -1,6 +1,6 @@
 # GRS-0239 — Lessons that teach before they test
 
-**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, founder: "the lessons are horrible and just tell me what I should._
+**Status:** MOSTLY DONE (2026-08-19) — scope 3 not built. _Previously recorded as: Planned (2026-07-31, founder: "the lessons are horrible and just tell me what I should._
 learn as opposed to actually being lessons? It just reference links").
 **Priority:** MED-HIGH. **Loop:** first-time-user coherence. **Extends GRS-0215.**
 **Relates to:** GRS-0218, GRS-0190, GRS-0226.
@@ -79,4 +79,81 @@ its checkpoints, not scrolled past them.
 
 ## Status reconciliation — 2026-08-01
 
-**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).
+**MOSTLY DONE** — scopes 1, 2, 4 and 5 shipped 2026-08-19. **Scope 3 is not built**, stated below
+rather than glossed.
+
+## Two of the ticket's five findings were already fixed
+
+Verified in source before building:
+
+- **Finding 1 — "Sales Egoist is still 8 paragraph-lessons, zero slides"** — no longer true.
+  GRS-0218 shipped it on 2026-08-01 as eight sections and 177 slides, and it is no longer blocked on
+  source material (the material landed in `data/reference/sales-egoist/`).
+- **Scope 5 — "stop pointing Start here at the old format"** — resolved by the same change.
+  `mandatory_first=True` on `sales-egoist` is now the right answer, and `depth.LEGACY_COURSES` is
+  **empty**: every Academy course is rebuilt.
+
+Nothing was needed for either. The remaining three findings were all confirmed live.
+
+## What shipped
+
+**Scope 1 — the deck leads.** The renderer put the objective paragraph *and* the lesson's reference
+cards above the slide deck, so the first screen of every rebuilt lesson was "what you should learn"
+followed by a list of links, with slide 1 below the fold. That is the founder's sentence almost
+verbatim, and it was a **layout** problem rather than a content one — the teaching was always there,
+just second. The deck now renders first; the objective becomes a compact "What you'll be able to do"
+panel after it; lesson references move to the end.
+
+A legacy lesson (no slides) takes the original path unchanged, so nothing regresses for content the
+rebuild has not reached.
+
+**Scope 2 — references became citations.** `LessonReferences` gains a `footnote` variant: one line
+("2 sources: docs.openbb.co") expanding on demand, used on slides. The card strip stays where
+sources genuinely are the point — the end of a lesson. 139 of OpenBB's 196 slides carry references,
+and a card strip under each made every slide look like a pointer elsewhere. **The depth rule is
+untouched**: every claim still carries its source. This is display, not doctrine.
+
+**Scope 4 — the four-paragraph tail, retired per course.** Retirement is now opt-in via
+`covered_by_rebuilt`, declared by each course:
+
+| Course | Retired | Kept | Why |
+|---|---|---|---|
+| OpenBB | relevance, sell-motion | white-label, commission | rebuilt `who-buys-and-why` and `how-and-when-to-sell` cover them |
+| Brandfetch | relevance, sell-motion | white-label, commission | same |
+| **Benzinga** | **none** | all four | its rebuilt slides do not cover this material — see below |
+
+`commission` can never be retired by any course, and the builder raises if one tries: it carries
+**live** Earnings v7 data that exists nowhere else and would go stale as authored slides.
+
+## The mistake this scope made, and what caught it
+
+The first implementation retired `relevance` and `sell-motion` **globally**, reasoning that every
+course has a `who-buys-and-why` and a `how-and-when-to-sell` section.
+`tests/test_benzinga_course.py::test_content_covers_the_key_facts_and_caveats` failed immediately:
+Benzinga's rebuilt slides never mention **WIIM**, which its `relevance` paragraph teaches.
+
+The generalisation was wrong, and shipping it would have been a silent content loss dressed as a
+cleanup — the exact failure the depth register exists to prevent. Retirement is now a per-course
+claim that each course has to make about itself.
+
+(White-label was kept everywhere on the same principle: a grep found it in OpenBB's and
+Brandfetch's rebuilt slides and **zero times** in Benzinga's.)
+
+## Not done — scope 3, checkpoint confirmation
+
+CHECKPOINT slides still render "Do this now:" as a callout with no interaction, exactly as the
+ticket describes. The contract promises "the advisor produces something and confirms they did", and
+it still does not.
+
+This needs per-advisor persistence (a new table, a migration, an endpoint, and a change to how
+lesson completion is counted) — a backend feature, not a renderer change like scopes 1 and 2. It is
+the largest item in the ticket and I did not build it. **The ticket stays open on scope 3 alone.**
+
+Its acceptance line — "ticking through a lesson means having *done* its checkpoints, not scrolled
+past them" — is therefore **not met**. The first two-thirds of that sentence now is.
+
+## Also not done
+
+- **No before/after screenshot** (test-plan item 4). The Academy needs a seeded database and a
+  signed-in advisor; the change is asserted by `lessonLayout.test.tsx` instead, which pins the
+  ordering and the citation form directly.

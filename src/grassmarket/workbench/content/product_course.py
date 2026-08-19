@@ -65,10 +65,17 @@ def _commission_body(carrot: ProductCommissionCarrot) -> str:
     )
 
 
+#: The tail's four canonical sections, in order. A course names which of these its REBUILT
+#: sections already cover, and those are dropped; anything unnamed is kept.
+TAIL_SECTIONS: tuple[str, ...] = ("relevance", "white-label", "sell-motion", "commission")
+
+
 def build_product_course(
     spec: ProductCourseSpec,
     carrot: ProductCommissionCarrot,
     checks: dict[str, tuple[str, str]] | None = None,
+    *,
+    covered_by_rebuilt: frozenset[str] = frozenset(),
 ) -> CourseTree:
     """Assemble a product course from its spec + the live commission carrot. The `carrot.product_id`
     must match the spec (the caller resolves the carrot for this product) — the four sections come
@@ -80,12 +87,33 @@ def build_product_course(
         )
 
     checks = checks or {}
-    sections = (
+    # GRS-0239 scope 4. This tail used to be four single-paragraph lessons appended AFTER ~190
+    # slides of rebuilt content — the course's thinnest part, shipping as its ending.
+    #
+    # A section is retired ONLY where that course's rebuilt sections demonstrably cover it, named
+    # per course by `covered_by_rebuilt`. The first attempt at this retired "relevance" and
+    # "sell-motion" globally on the reasoning that every course has a `who-buys-and-why` and a
+    # `how-and-when-to-sell` section. `tests/test_benzinga_course.py` caught it: Benzinga's rebuilt
+    # slides never mention WIIM, which its tail paragraph teaches. The generalisation was wrong, and
+    # a silent content loss dressed as a cleanup is exactly what the depth register exists to stop.
+    #
+    # "commission" is never retired by any course: it carries LIVE data from the Earnings v7
+    # schedule, exists nowhere else, and cannot be authored into static slides without going stale.
+    unknown = covered_by_rebuilt - set(TAIL_SECTIONS)
+    if unknown:
+        raise ValueError(f"{spec.slug}: unknown tail section(s) {sorted(unknown)}")
+    if "commission" in covered_by_rebuilt:
+        raise ValueError(
+            f"{spec.slug}: the commission section carries live Earnings v7 data and cannot be "
+            f"replaced by authored slides — it would go stale silently."
+        )
+    all_sections = (
         ("relevance", "Why it's relevant", spec.relevance),
         ("white-label", "What white-labelling is", spec.white_label),
         ("sell-motion", "The sell motion", spec.sell_motion),
         ("commission", "How much you earn", _commission_body(carrot)),
     )
+    sections = tuple(s for s in all_sections if s[0] not in covered_by_rebuilt)
     lessons = tuple(
         Lesson(
             id=_id(spec.slug, "lesson", key),

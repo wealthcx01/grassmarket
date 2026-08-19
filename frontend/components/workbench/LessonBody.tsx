@@ -132,3 +132,54 @@ export function LessonBody({
     </div>
   );
 }
+
+/**
+ * The lesson's objective, as a compact panel that no longer occupies the first screen (GRS-0239).
+ *
+ * Every rebuilt lesson's `body` opens "By the end of this lesson you can…". That is useful and it
+ * is not teaching — and the renderer put it, plus the lesson's reference cards, ABOVE the slide
+ * deck, so the first thing an advisor saw was a statement of what they were about to learn followed
+ * by a list of links. The founder's words were "the lessons ... just tell me what I should learn as
+ * opposed to actually being lessons". That was a fair description of the layout.
+ *
+ * The deck now leads. This renders after it, quietly.
+ */
+export function LessonObjective({
+  body,
+  videoRef,
+  assets = [],
+}: {
+  body: string;
+  videoRef?: string | null;
+  assets?: readonly LessonAsset[];
+}) {
+  if (!body.trim() && !videoRef && assets.length === 0) return null;
+  return (
+    <section
+      data-testid="lesson-objective"
+      style={{
+        marginTop: "1rem",
+        paddingTop: "0.7rem",
+        borderTop: "1px dashed var(--color-border)",
+      }}
+    >
+      <p
+        className="mono"
+        style={{
+          margin: "0 0 0.4rem",
+          fontSize: "0.66rem",
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          color: "var(--color-ink-faint)",
+        }}
+      >
+        What you&rsquo;ll be able to do
+      </p>
+      {renderMarkdown(body)}
+      {videoRef ? <Video videoRef={videoRef} /> : null}
+      {assets.map((asset, i) => (
+        <LessonAssetFigure key={`${i}:${asset.caption}`} asset={asset} />
+      ))}
+    </section>
+  );
+}

@@ -45,7 +45,7 @@ first.
 ### Phase 2 — the GRS-0229–0245 wave (2026-07-31 first-time-user review)
 
 Build order below is the wave's own priority: client-trust breaches, then first-run, then the
-report workflow, then the rest. **Thirteen of seventeen have landed**; the status column is the ticket's
+report workflow, then the rest. **Fourteen of seventeen have landed**; the status column is the ticket's
 own reconciled stamp, not a summary of it.
 
 | # | Ticket | Title | Group | Status |
@@ -62,8 +62,8 @@ own reconciled stamp, not a summary of it.
 | 10 | GRS-0235 | Read tracking an advisor can read | report polish | **DONE** (#249) |
 | 11 | GRS-0237 | The engine white paper: one document that answers "is this up to scratch?" | legibility & truthfulness | **DONE** (#250) — scope 3 corrected the record; the VALUES still need D1 |
 | 12 | GRS-0238 | A Prospecting surface: browse the registry we imported | legibility & truthfulness | **DONE** (#251) |
-| 13 | GRS-0239 | Lessons that teach before they test | legibility & truthfulness | OPEN — **next**; scope 5 resolved by GRS-0218 |
-| 14 | GRS-0240 | The earnings page explains how you get paid | legibility & truthfulness | OPEN |
+| 13 | GRS-0239 | Lessons that teach before they test | legibility & truthfulness | **MOSTLY DONE** (#252) — scope 3 (checkpoint confirm) still open |
+| 14 | GRS-0240 | The earnings page explains how you get paid | legibility & truthfulness | OPEN — **next** |
 | 15 | GRS-0241 | Engagements: a list you can read, a link you cannot cross-wire | legibility & truthfulness | OPEN |
 | 16 | GRS-0242 | The Workbench stops leaking internals and contradicting itself | legibility & truthfulness | OPEN |
 | 17 | GRS-0244 | The Guide must describe the product that exists | legibility & truthfulness | OPEN |

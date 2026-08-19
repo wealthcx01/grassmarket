@@ -133,7 +133,12 @@ def brandfetch_course(
         ),
     )
     base = build_product_course(
-        spec, dist_carrot, _TEMPLATE_CHECKS
+        spec,
+        dist_carrot,
+        _TEMPLATE_CHECKS,
+        # GRS-0239 scope 4: covered at depth by the rebuilt `who-buys-and-why` and
+        # `how-and-when-to-sell` sections.
+        covered_by_rebuilt=frozenset({"relevance", "sell-motion"}),
     )  # spine incl. the live distribution commission
     # The GRS-0217 rebuild. Eight sections to the GRS-0215 depth standard: 192 slides, 48 test
     # questions, one diagram per section, organised around the distribution/redistribution boundary
