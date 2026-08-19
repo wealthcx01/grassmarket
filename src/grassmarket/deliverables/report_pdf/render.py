@@ -654,6 +654,20 @@ def _build_document(
         story.append(Spacer(1, 4))
         story.append(_figures_table(appendix, styles, width))
 
+    # GRS-0237 scope 5. A reader who has got this far is the reader who wants the method itself, and
+    # until now the appendix named a methodology version without saying that a document explaining
+    # and defending it exists. Phrased as "on request" rather than as a URL because this is a PDF a
+    # client may read on paper, and because the white paper is not published at a public address.
+    story.append(Spacer(1, 8))
+    story.append(
+        Paragraph(
+            "The full technical white paper for this method — the formal model, its behavioural "
+            "properties, the validation evidence, and a register of what is not yet proven — is "
+            "available on request.",
+            styles["caption"],
+        )
+    )
+
     doc.build(story)
     return _BuildResult(
         output=buffer.getvalue(),

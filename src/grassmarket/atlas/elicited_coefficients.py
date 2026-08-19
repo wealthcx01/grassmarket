@@ -1,10 +1,17 @@
-"""The v1 ELICITED coefficient set — client-usable, panel-provenanced (GRS-0033, Methodology §6).
+"""The v1 provisional coefficient sets — client-usable, provenance-carrying (GRS-0033, §6).
 
-Unlike the draft set (uniform placeholders, ``client_usable=False``), this set is
-**client-usable**: every family carries a Weight Provenance Record naming the elicitation panel,
-method, dispersion, and review-due date, so the methods appendix can state "weights expert-elicited
-[date], review due [date]" for every figure. Constructing it is what the GRS-0015 gate keys on — a
-client pack may only be priced from a ``client_usable=True`` set.
+**Naming, corrected 2026-08-19 (GRS-0237 scope 3).** This module was called "the ELICITED set" and
+its records named an elicitation panel as the setter. No panel has met. The values are provisional
+ones set by engineering to the v1 protocol's shape; the function names are kept (`elicited_*`)
+because they are imported across the codebase and a rename is a separate, mechanical change, but
+every provenance record now says what actually happened. Where this docstring says "elicited",
+read "the family the elicitation will replace".
+
+Unlike the draft set (uniform placeholders, ``client_usable=False``), these sets are
+**client-usable**: every family carries a Weight Provenance Record with setter, method, dispersion,
+and review-due date, so the methods appendix can state the provenance of every figure — including,
+now, the fact that it is provisional. Constructing one is what the GRS-0015 gate keys on: a client
+pack may only be priced from a ``client_usable=True`` set.
 
 IMPORTANT — the launch bottleneck (ticket GRS-0033): the ratified panel VALUES are a hard external
 dependency (the weight-elicitation panel running). Until they land, the numbers here are the
@@ -37,13 +44,39 @@ _PANEL_REVIEW_DUE = date(2027, 7, 10)  # §6: reviewed annually
 
 
 def _prov(method: WeightMethod, dispersion: str) -> WeightProvenanceRecord:
+    """Provenance for the retail v1 set — corrected 2026-08-19 (GRS-0237 scope 3).
+
+    This record used to read ``set_by="bruntsfield-elicitation-panel-2026"``, with a note saying the
+    values were "elicited by the Bruntsfield weight panel". **That panel has not met.** The `method`
+    and `dispersion` fields describe the protocol the panel *will* follow, and naming the panel as
+    the setter turned a plan into a claim about evidence that does not exist.
+
+    A provenance record that overstates its evidence is the D-class defect this codebase refuses to
+    ship in the product (non-negotiable #3), and it is worse here than in a UI string: the methods
+    appendix prints this record for a client to check.
+
+    So `set_by` now names who actually set the values, and the note says plainly that the panel is
+    pending. `method` is retained because it is not a claim of having *run* the method — it is the
+    protocol this family is scheduled for, and `review_due` is when.
+
+    Which of these numbers survives the real panel is founder decision **D1**
+    (`docs/FOUNDER-DECISIONS-2026-08.md`); this changes the record, never a value.
+    """
     return WeightProvenanceRecord(
-        set_by="bruntsfield-elicitation-panel-2026",
+        set_by="bruntsfield-engineering-provisional-2026-07",
         set_on=_PANEL_SET_ON,
         method=method,
         dispersion=dispersion,
         review_due=_PANEL_REVIEW_DUE,
-        notes="Elicited by the Bruntsfield weight panel; values provisional pending sign-off.",
+        # Worded to survive the guard in `test_no_provenance_record_claims_a_panel_that_has_not_met`
+        # WITHOUT stating a negative that reads like the claim it denies. A note saying "these are
+        # not panel-elicited weights" contains the assertion as a substring, and a client skimming
+        # the methods appendix reads phrases, not logic.
+        notes=(
+            "Provisional values set by engineering to the shape of the v1 protocol. No expert "
+            "panel has convened; the method and review date above are the schedule, not a record "
+            "of work done. Ratification pending (founder decision D1)."
+        ),
     )
 
 

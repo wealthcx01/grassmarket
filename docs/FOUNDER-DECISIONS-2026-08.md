@@ -40,13 +40,32 @@ wires them into `elicited_{wealth,exchange}_coefficient_set` and activates in on
 are, but their provenance is rewritten to say what actually happened: founder-directed starter values,
 panel pending. Re-elicitation becomes a scheduled future ADR.
 
-### Why this is urgent independently of which you pick
+### The provenance half is DONE — and this section overstated it
 
-`src/grassmarket/atlas/elicited_coefficients.py` currently stamps every weight family with
-`set_by="bruntsfield-elicitation-panel-2026"` and a method string — **naming a panel that has not
-run.** Whichever option you choose, that record has to change, because a provenance record that
-overstates its evidence is exactly the D-class defect we refuse to ship in the product. GRS-0237
-scope 3 does that correction; it is written and waiting so the two land together.
+**Corrected 2026-08-19 (GRS-0237 scope 3).** This section previously said that
+`elicited_coefficients.py` "stamps **every** weight family" with
+`set_by="bruntsfield-elicitation-panel-2026"`. That was wrong, and measuring it before fixing it is
+what found the error. What was actually true:
+
+| Set | In production? | Provenance said | Status |
+|---|---|---|---|
+| retail `v1-elicited-2026` | **No** — built, client-usable, but not active | `bruntsfield-elicitation-panel-2026`, "elicited by the Bruntsfield weight panel" | **was false; now corrected** |
+| wealth / exchange starters | **Yes** — active since 2026-07-20 (ADR-0037) | `engineering-starter-research-validated-2026-07`, "founder-activated, panel ratification scheduled" | was already honest |
+
+So the false claim sat in a **dormant** set, not in the records reaching clients today. It was still
+worth fixing — that set is the one that activates when the panel signs off, so the lie was queued
+rather than live — but it was less severe than this file claimed.
+
+The correction has shipped: the retail record now names
+`bruntsfield-engineering-provisional-2026-07` and says plainly that no panel has convened, and
+`test_no_provenance_record_claims_a_panel_that_has_not_met` fails if any of the three sets
+reintroduces the claim under any wording. **No coefficient value changed.**
+
+**What still needs your decision is the values themselves**, not the record — Option A or Option B
+below. Note the related fact the white paper now states: because retail scores on
+`v1-draft-pending-elicitation` with `client_usable=False`, **the default profile cannot produce a
+client-facing deliverable at all.** Only wealth and exchange can. That is the fail-loud design
+working, but it is probably not what you expect the product to do.
 
 ### Recommendation
 

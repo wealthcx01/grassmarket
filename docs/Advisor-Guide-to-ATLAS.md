@@ -143,6 +143,6 @@ Alongside this, the **Upgrade Priority Index** ranks interventions by how much t
 
 ## 12. Where to go deeper
 
-- `ATLAS-Methodology-v1.1.md` — the normative rulebook (certification exam material).
-- `ATLAS-Methodology-Guide.md` — the formal foundations: the mathematics, the properties, the literature, the limitations. Read it before your Certified Lead assessment — and before any engagement where the client will put a CTO or a PE diligence team across the table.
+- `ATLAS-Methodology-v1.6.md` — the normative rulebook (certification exam material).
+- `ATLAS-White-Paper-v1.md` — the formal foundations: the mathematics, the properties, the validation evidence, and a limitations register that says plainly what is not yet proven. Read it before your Certified Lead assessment — and before any engagement where the client will put a CTO or a PE diligence team across the table. **It is also the document to hand them**, which is why its limitations section is written to be read by the other side.
 - The Workbench — rubric library, practice vignettes, drills, and your certification progress.

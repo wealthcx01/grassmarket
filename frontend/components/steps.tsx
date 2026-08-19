@@ -1526,13 +1526,22 @@ export function SummaryStep(props: StepProps) {
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem", maxWidth: "42rem" }}>
       {/* One source of truth for the maths (GRS-0179): link to the explainer, never duplicate it.
           The app has no docs server, so this points at the published doc in the repository. */}
-      <p style={{ margin: 0, fontSize: "0.78rem" }}>
+      {/* GRS-0237 scope 5. Two links, because they answer two different questions and an advisor
+          being challenged in a meeting needs the second one directly rather than via a hop. */}
+      <p style={{ margin: 0, fontSize: "0.78rem", display: "flex", gap: "1rem" }}>
         <a
           href="https://github.com/wealthcx01/grassmarket/blob/main/docs/ATLAS-Scoring-Explained.md"
           target="_blank"
           rel="noreferrer"
         >
           How the maths works
+        </a>
+        <a
+          href="https://github.com/wealthcx01/grassmarket/blob/main/docs/ATLAS-White-Paper-v1.md"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Is it up to scratch? (white paper)
         </a>
       </p>
       {/* A finalised assessment can preview its real deliverable here — no engagement needed
