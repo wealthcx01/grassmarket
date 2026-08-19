@@ -1302,3 +1302,39 @@ export type ReportReadReport = {
   state: "active" | "expired" | "revoked";
   sections: SectionReadSummary[];
 };
+
+/** GRS-0238 — one row of the Prospecting list. Mirrors `bcap_contracts.prospecting`. */
+export type ProspectingTarget = {
+  target_id: string;
+  name: string;
+  domain: string | null;
+  country: string | null;
+  segment: string | null;
+  segment_label: string;
+  segment_kind: "firm_type" | "content_type" | "unknown";
+  source: string;
+  imported_on: string;
+  contact_count: number;
+  already_in_my_pipeline: boolean;
+  /** The name is a domain stem from the import, not a verified company name. */
+  name_unverified: boolean;
+};
+
+export type ProspectingPage = {
+  targets: ProspectingTarget[];
+  total: number;
+  offset: number;
+  limit: number;
+};
+
+export type SegmentFacet = {
+  value: string;
+  count: number;
+  label: string;
+  kind: "firm_type" | "content_type" | "unknown";
+};
+
+export type RegistryFacets = {
+  segments: SegmentFacet[];
+  countries: { value: string; count: number }[];
+};

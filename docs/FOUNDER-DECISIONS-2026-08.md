@@ -18,6 +18,7 @@ impossible (CLAUDE.md non-negotiable #3).
 | **D5** | Certification teeth, doctrine naming, independence disclosure | GRS-0148 residue | "Certified" means self-assessed recall; no conflict record |
 | **D6** | Google Workspace OAuth scopes | GRS-0197 | No Gmail/Calendar integration |
 | **D7** | Schedule the Helmer review | GRS-0201, ADR-0046 | Permission grant's condition unmet |
+| **D8** | Curate 120 institution names the LSEG roster stored as domain stems | GRS-0238 residue | Prospecting lists `gs`, `db`, `uk` — real firms an advisor cannot recognise |
 
 ---
 
@@ -243,3 +244,49 @@ For the avoidance of doubt, these are engineering's to do and are not waiting on
 wave (client-trust, report workflow, first-run experience), GRS-0218 (the Sales Egoist course — source
 material landed 2026-07-31), and the legacy open queue in `docs/BACKLOG.md`. If any of those turns out
 to need a decision, it comes here rather than being guessed at.
+
+
+---
+
+## D8 — 120 institutions in the registry are named `gs`, `db`, `citi`
+
+**Ticket:** GRS-0238 residue · **Raised:** 2026-08-19 while building the Prospecting page
+
+### What the measurement found
+
+`data/gtm/lseg/contributor_institution_map.csv` has an `inferred_institution` column that holds
+**the stem of each firm's domain**, not its name — `barclays`, `gs`, `jefferies`, `db`. 124 of 129
+are all-lowercase. So 128 of the registry's 576 institutions are listed under a string no advisor
+would recognise, and a handful (`uk`, `us`, `hk`) come from source rows that are simply broken.
+
+Eight of them matched a properly-named bank-list row and have been **merged automatically**. The
+other **120 have no counterpart**, and nothing engineering can do resolves them: turning `gs` into
+"Goldman Sachs" is a guess, and a guess written into the database is indistinguishable from a fact
+afterwards. They currently render with a `name unverified` badge, which is honest but not useful.
+
+### The exact question
+
+Who curates the 120? It needs someone who knows the market to confirm `htsc` is Huatai Securities
+and `zkb` is Zürcher Kantonalbank. Three options:
+
+**Option A — you curate the list.** I export the 120 stems with their domains and analyst counts as
+a CSV; you fill in the names; I load it as a curated override with its own provenance record.
+Probably an hour of your time, and it makes the Prospecting page fully usable.
+
+**Option B — curate only what matters.** The 120 are not equal: some carry 50 analyst contacts,
+others carry one. Curate the top 20 by contact count and leave the tail marked.
+
+**Option C — leave them marked.** The page is honest as it stands; the rows are just less useful
+than they could be.
+
+### Recommendation
+
+**Option B.** The value is concentrated in the firms with real contact coverage, and it converts a
+1-hour task into a 15-minute one without pretending the tail is solved. I can produce the ranked
+export whenever you want it.
+
+### Note
+
+Whatever you choose, the fix is a **curated override table with its own provenance**, never an edit
+to the imported rows. Re-running the importer must not silently undo a human's curation, and a
+curated name must be distinguishable from an imported one.

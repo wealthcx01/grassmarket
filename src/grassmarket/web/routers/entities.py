@@ -16,6 +16,7 @@ from datetime import UTC, datetime
 
 from bcap_contracts.entities import CompanyEntity, RegistryContact
 from bcap_contracts.influencer import InfluencerMap
+from bcap_contracts.prospecting import ProspectingPage, SegmentKind, segment_label
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -51,8 +52,79 @@ def search_entities(
     return active_entity_registry(repo).search(q, limit=limit)
 
 
-# Declared BEFORE `/{entity_id}` so the literal `contacts` segment is matched by this route rather
+class RegistryFacets(BaseModel):
+    """What the Prospecting filters can offer, derived from the data rather than from a constant."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    segments: list[SegmentFacet]
+    countries: list[Facet]
+
+
+class Facet(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    value: str
+    count: int = Field(ge=0)
+
+
+class SegmentFacet(Facet):
+    """A segment option, carrying the label and the KIND so the UI can group honestly.
+
+    The kind matters because the stored column mixes firm types with supplier content types
+    (GRS-0238). Presenting "Supplies: indices" in the same flat list as "Bank" would tell an advisor
+    they are alternatives of one kind, which they are not.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    label: str
+    kind: SegmentKind
+
+
+# Declared BEFORE `/{entity_id}` so these literal segments are matched by their own routes rather
 # than being swallowed as an entity id by the single-segment route below.
+@router.get("", response_model=ProspectingPage)
+def list_registry_targets(
+    segment: str | None = Query(default=None),
+    country: str | None = Query(default=None),
+    q: str | None = Query(default=None),
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=50, ge=1, le=200),
+    repo: Repository = Depends(get_repository),
+    principal: Principal = Depends(get_current_principal),
+) -> ProspectingPage:
+    """Browse the imported universe (GRS-0238) — the founder's "I can't see prospective clients".
+
+    Network-shared read, exactly like `/entities/search`: the registry is reference data, so there
+    is no owner filter on the targets. The one owner-scoped field is `already_in_my_pipeline`,
+    computed against this principal in the repository layer.
+    """
+    return repo.list_registry_targets(
+        principal, segment=segment, country=country, q=q, offset=offset, limit=limit
+    )
+
+
+@router.get("/facets", response_model=RegistryFacets)
+def registry_facets(
+    repo: Repository = Depends(get_repository),
+    _principal: Principal = Depends(get_current_principal),
+) -> RegistryFacets:
+    """The filter options that actually exist in the data, with counts."""
+    return RegistryFacets(
+        segments=[
+            SegmentFacet(
+                value=value,
+                count=count,
+                label=segment_label(value)[0],
+                kind=segment_label(value)[1],
+            )
+            for value, count in repo.registry_segments()
+        ],
+        countries=[Facet(value=value, count=count) for value, count in repo.registry_countries()],
+    )
+
+
 @router.get("/{target_id}/contacts", response_model=list[RegistryContact])
 def list_registry_contacts(
     target_id: str,

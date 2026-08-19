@@ -49,6 +49,9 @@ class CreateProspectRequest(BaseModel):
     primary_contact_name: str | None = None
     primary_contact_email: str | None = None
     notes: str | None = None
+    #: Set when the prospect was CLAIMED from the shared registry (GRS-0238), so Prospecting
+    #: can tell an advisor what they already work without matching on names. Never inferred.
+    registry_target_id: str | None = None
 
 
 class UpdateProspectRequest(BaseModel):
@@ -96,6 +99,7 @@ def create_prospect(
         primary_contact_name=payload.primary_contact_name,
         primary_contact_email=payload.primary_contact_email,
         notes=payload.notes,
+        registry_target_id=payload.registry_target_id,
     )
 
 
