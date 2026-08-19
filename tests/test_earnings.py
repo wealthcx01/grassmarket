@@ -263,6 +263,12 @@ def test_the_statement_states_how_consulting_pays_even_with_no_consultancy_lines
 
     with zipfile.ZipFile(BytesIO(response.content)) as bundle:
         xml = bundle.read("word/document.xml").decode("utf-8")
-    assert "Consulting commissions (Stream B)" in xml
+    # GRS-0240 aligned this heading with the earnings page, which now names both streams in
+    # words. Asserted as two claims rather than one literal: the section must SAY it is about
+    # delivering consulting, and must carry the stream letter the page also shows — so an
+    # advisor can match document to page. A single pinned sentence is what made this red on a
+    # copy edit, which is the GRS-0228 failure mode.
+    assert "Delivering consulting" in xml
+    assert "Stream B" in xml
     assert "Consultant-led" in xml
     assert "65% first year" in xml
