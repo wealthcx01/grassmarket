@@ -15,6 +15,8 @@ import type {
   DeclaredFigure,
   ReportProseSection,
   ReportReadReport,
+  ProspectingPage,
+  RegistryFacets,
   FounderApproval,
   FounderReviewQueueEntry,
   AINarrative,
@@ -349,6 +351,26 @@ export const api = {
     );
   },
 
+  // Browse the imported universe (GRS-0238). Network-shared read; the one per-advisor field in
+  // the response is `already_in_my_pipeline`, joined server-side against the caller's own book.
+  listRegistryTargets(
+    params: { segment?: string; country?: string; q?: string; offset?: number; limit?: number },
+    signal?: AbortSignal,
+  ): Promise<ProspectingPage> {
+    const qs = new URLSearchParams();
+    if (params.segment) qs.set("segment", params.segment);
+    if (params.country) qs.set("country", params.country);
+    if (params.q) qs.set("q", params.q);
+    if (params.offset) qs.set("offset", String(params.offset));
+    if (params.limit) qs.set("limit", String(params.limit));
+    const suffix = qs.toString() ? `?${qs}` : "";
+    return request<ProspectingPage>(`/entities${suffix}`, { method: "GET", headers: authHeaders(), signal });
+  },
+
+  registryFacets(signal?: AbortSignal): Promise<RegistryFacets> {
+    return request<RegistryFacets>("/entities/facets", { method: "GET", headers: authHeaders(), signal });
+  },
+
   assessmentsForEntity(entityId: string, signal?: AbortSignal): Promise<Assessment[]> {
     return request<Assessment[]>(`/assessments/for-entity/${encodeURIComponent(entityId)}`, {
       method: "GET",
@@ -641,7 +663,14 @@ export const api = {
   },
 
   createProspect(
-    body: { company_name: string; sector?: string | null; website?: string | null },
+    body: {
+      company_name: string;
+      sector?: string | null;
+      website?: string | null;
+      // GRS-0238: set when claimed from Prospecting, so the registry row and the pipeline card
+      // are linked by id rather than by name.
+      registry_target_id?: string | null;
+    },
     signal?: AbortSignal,
   ): Promise<Prospect> {
     return request<Prospect>("/prospects", {

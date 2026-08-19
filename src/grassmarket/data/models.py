@@ -145,6 +145,10 @@ class ProspectORM(Base):
     primary_contact_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
     primary_contact_email: Mapped[str | None] = mapped_column(String(320), nullable=True)
     notes: Mapped[str | None] = mapped_column(String(2000), nullable=True)
+    # The registry target this prospect was claimed from (GRS-0238). NULLABLE by necessity:
+    # prospects typed by hand were never claimed from the registry, and back-filling a link
+    # by name-matching would assert an identity nobody verified.
+    registry_target_id: Mapped[str | None] = mapped_column(String(160), index=True, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_now, onupdate=_now

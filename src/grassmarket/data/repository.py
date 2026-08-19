@@ -151,6 +151,12 @@ from bcap_contracts.predictions import (
     Prediction,
     PredictionOutcome,
 )
+from bcap_contracts.prospecting import (
+    ProspectingPage,
+    ProspectingTarget,
+    looks_like_a_domain_stem,
+    segment_label,
+)
 from bcap_contracts.report_links import (
     ClientReportLink,
     ReportReadEvent,
@@ -613,9 +619,15 @@ class Repository:
         primary_contact_name: str | None = None,
         primary_contact_email: str | None = None,
         notes: str | None = None,
+        registry_target_id: str | None = None,
     ) -> Prospect:
         """Create a prospect owned by the principal. A consultant can only create for themselves —
-        the owner is taken from the principal, never from caller-supplied input."""
+        the owner is taken from the principal, never from caller-supplied input.
+
+        `registry_target_id` records that this prospect was CLAIMED from the shared registry
+        (GRS-0238), so the Prospecting page can tell an advisor what they are already working
+        without matching on names. Optional, because a prospect typed by hand has no such origin
+        and inventing one would be a fabricated link."""
         row = ProspectORM(
             owner_consultant_id=principal.consultant_id,
             company_name=company_name,
@@ -625,6 +637,7 @@ class Repository:
             primary_contact_name=primary_contact_name,
             primary_contact_email=primary_contact_email,
             notes=notes,
+            registry_target_id=registry_target_id,
         )
         self._session.add(row)
         self._session.flush()
@@ -931,6 +944,130 @@ class Repository:
                 ranked.append((rank, row.name, row))
         ranked.sort(key=lambda t: (t[0], t[1]))
         return [self._to_registry_target(row) for _, _, row in ranked[:limit]]
+
+    def list_registry_targets(
+        self,
+        principal: Principal,
+        *,
+        segment: str | None = None,
+        country: str | None = None,
+        q: str | None = None,
+        offset: int = 0,
+        limit: int = 50,
+    ) -> ProspectingPage:
+        """A page of the shared registry, with this advisor's pipeline state joined on (GRS-0238).
+
+        **Two different scoping rules meet here, and keeping them apart is the whole point.** The
+        targets are network-shared reference data (ADR-0045 §2) — every advisor browses the same
+        imported universe, so there is deliberately no owner filter on them. The
+        `already_in_my_pipeline` flag is the opposite: a prospect is one advisor's claim, owner-
+        scoped like everything else (#9), so that half is computed against `principal` alone and is
+        never cached across principals. `tests/test_prospecting.py` asserts both directions.
+
+        The claim check matches on the registry link first and falls back to an exact,
+        case-insensitive company-name match. The fallback exists because every prospect created
+        before this ticket has no link, and without it an advisor would be invited to re-add firms
+        they are already working. It is an exact match, never fuzzy: the cost of a false positive
+        (a real but differently-named firm reads as claimed) is worse than the cost of a false
+        negative (a duplicate the advisor can see and delete).
+        """
+        conditions = []
+        if segment:
+            conditions.append(RegistryTargetORM.segment == segment)
+        if country:
+            conditions.append(RegistryTargetORM.country == country)
+        if q and q.strip():
+            like = f"%{q.strip().lower()}%"
+            conditions.append(func.lower(RegistryTargetORM.name).like(like))
+
+        total = int(
+            self._session.execute(
+                select(func.count(RegistryTargetORM.target_id)).where(*conditions)
+            ).scalar_one()
+        )
+        rows = list(
+            self._session.execute(
+                select(RegistryTargetORM)
+                .where(*conditions)
+                .order_by(RegistryTargetORM.name)
+                .offset(max(offset, 0))
+                .limit(limit)
+            ).scalars()
+        )
+        target_ids = [r.target_id for r in rows]
+
+        counts: dict[str, int] = {}
+        if target_ids:
+            counts = {
+                tid: int(n)
+                for tid, n in self._session.execute(
+                    select(RegistryContactORM.target_id, func.count(RegistryContactORM.contact_id))
+                    .where(RegistryContactORM.target_id.in_(target_ids))
+                    .group_by(RegistryContactORM.target_id)
+                )
+            }
+
+        # Owner-scoped half. Filtered by the principal's own consultant id, so the answer is
+        # "already in YOUR pipeline" and cannot leak another advisor's book.
+        claimed_ids: set[str] = set()
+        claimed_names: set[str] = set()
+        if target_ids:
+            mine = self._session.execute(
+                select(ProspectORM.registry_target_id, ProspectORM.company_name).where(
+                    ProspectORM.owner_consultant_id == principal.consultant_id
+                )
+            )
+            for linked_id, company_name in mine:
+                if linked_id:
+                    claimed_ids.add(linked_id)
+                if company_name:
+                    claimed_names.add(company_name.strip().lower())
+
+        targets = [
+            ProspectingTarget(
+                target_id=row.target_id,
+                name=row.name,
+                domain=row.domain,
+                country=row.country,
+                segment=row.segment,
+                segment_label=segment_label(row.segment)[0],
+                segment_kind=segment_label(row.segment)[1],
+                source=row.source,
+                imported_on=row.imported_on.isoformat(),
+                contact_count=counts.get(row.target_id, 0),
+                already_in_my_pipeline=(
+                    row.target_id in claimed_ids or row.name.strip().lower() in claimed_names
+                ),
+                name_unverified=looks_like_a_domain_stem(row.name),
+            )
+            for row in rows
+        ]
+        return ProspectingPage(targets=targets, total=total, offset=max(offset, 0), limit=limit)
+
+    def registry_segments(self) -> list[tuple[str, int]]:
+        """Every segment value present, with its row count — so the filter offers what exists.
+
+        Built from the data rather than from the label map: a source that arrives with a new value
+        must show up in the filter as an unlabelled option, not vanish because nobody has written a
+        label for it yet.
+        """
+        rows = self._session.execute(
+            select(RegistryTargetORM.segment, func.count(RegistryTargetORM.target_id))
+            .where(RegistryTargetORM.segment.is_not(None))
+            .group_by(RegistryTargetORM.segment)
+            .order_by(func.count(RegistryTargetORM.target_id).desc())
+        )
+        return [(str(value), int(count)) for value, count in rows]
+
+    def registry_countries(self) -> list[tuple[str, int]]:
+        """Every country present, with its row count. Same reasoning as `registry_segments`."""
+        rows = self._session.execute(
+            select(RegistryTargetORM.country, func.count(RegistryTargetORM.target_id))
+            .where(RegistryTargetORM.country.is_not(None))
+            .group_by(RegistryTargetORM.country)
+            .order_by(RegistryTargetORM.country)
+        )
+        return [(str(value), int(count)) for value, count in rows]
 
     def get_registry_target(self, target_id: str) -> RegistryTarget | None:
         row = self._session.get(RegistryTargetORM, target_id)
