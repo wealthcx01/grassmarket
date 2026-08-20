@@ -18,6 +18,8 @@ from __future__ import annotations
 import calendar
 import hashlib
 import json
+import re
+import unicodedata
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
@@ -418,9 +420,36 @@ class AttributionWindowExpired(RepositoryError):
     never a silently-recorded (and unearned) fee."""
 
 
+def _loose_name(value: str) -> str:
+    """A company name reduced for comparison: lower-case, alphanumerics only (GRS-0241).
+
+    Punctuation, spacing and ACCENTS are where the same firm is written two ways ("Deutsche
+    Borse" vs "Deutsche Börse AG"), and none of it distinguishes one firm from another.
+
+    The NFKD decomposition is load-bearing and was added after the first version got it wrong:
+    stripping non-ASCII directly turns "Börse" into "brse", so "Deutsche Börse" and "Deutsche
+    Borse" compared as DIFFERENT firms and the guard would have refused a correct link. Decomposing
+    first splits "ö" into "o" + combining diaeresis, and only the mark is dropped.
+
+    Deliberately NOT a fuzzy/edit-distance match: a near-miss score would make the guard
+    unpredictable exactly where it matters, and this check refuses rather than merely warns.
+    """
+    decomposed = unicodedata.normalize("NFKD", value.casefold())
+    return re.sub(r"[^a-z0-9]", "", decomposed)
+
+
 class EngagementLinkError(RepositoryError):
     """An engagement was asked to link something it may not — a prospect that isn't contracted, or
     an assessment that isn't the owner's or isn't finalised. Fail loud rather than link loosely."""
+
+
+class EngagementSubjectMismatchError(EngagementLinkError):
+    """The assessment is about a different firm than the engagement is for (GRS-0241).
+
+    A subclass rather than a flag so a caller can catch *this* case and offer the confirm path,
+    while every existing `except EngagementLinkError` keeps refusing as before — the safe direction
+    for code written before this check existed.
+    """
 
 
 @dataclass(frozen=True)
@@ -2674,7 +2703,12 @@ class Repository:
         return self._to_comms_entry(row)
 
     def link_assessment_to_engagement(
-        self, principal: Principal, engagement_id: UUID, assessment_id: UUID
+        self,
+        principal: Principal,
+        engagement_id: UUID,
+        assessment_id: UUID,
+        *,
+        confirm_subject_mismatch: bool = False,
     ) -> Engagement:
         """Link a finalised assessment to one of the principal's OWN engagements (GRS-0039).
 
@@ -2695,10 +2729,58 @@ class Repository:
             raise EngagementLinkError(
                 f"Assessment {assessment_id} is already linked to this engagement."
             )
+
+        # GRS-0241 scope 4. Until now this method checked ownership, finalisation and duplication —
+        # and never that the assessment is ABOUT the engagement's client. The detail page offered a
+        # dropdown of every finalised assessment the advisor owns, so one click linked Deutsche
+        # Börse's scores to the WeBull engagement and nothing anywhere said otherwise. The
+        # deliverable generated from that link would carry one firm's name over another firm's
+        # numbers, which is the worst output this system can produce.
+        #
+        # Refused by default, overridable EXPLICITLY. The override exists because the match is on a
+        # typed subject string and legitimate mismatches are real — a group entity assessed under
+        # its parent's name, a rename mid-engagement. But it cannot happen by accident, and the
+        # caller has to have been told what it is about to do.
+        mismatch = self._subject_mismatch(row, assessment)
+        if mismatch is not None and not confirm_subject_mismatch:
+            engagement_client, assessment_subject = mismatch
+            raise EngagementSubjectMismatchError(
+                f"This engagement is for {engagement_client!r} but that assessment is about "
+                f"{assessment_subject!r}. Linking it would put one firm's scores under another "
+                f"firm's name on every deliverable. Confirm explicitly if the two really are the "
+                f"same client."
+            )
+
         linked.append(str(assessment_id))
         row.assessment_ids_json = json.dumps(linked)
         self._session.flush()
         return self._to_engagement(row)
+
+    def _subject_mismatch(
+        self, engagement: EngagementORM, assessment: Assessment
+    ) -> tuple[str, str] | None:
+        """(engagement client, assessment subject) when they disagree, else None.
+
+        Compared case- and punctuation-insensitively, and an EMPTY subject is never a mismatch: a
+        blank is an absence of evidence, and refusing on it would block a legitimate link with a
+        message that names nothing. The comparison is deliberately loose in the safe direction —
+        it exists to catch "Deutsche Börse vs WeBull", not to police "Ltd" against "Limited".
+        """
+        subject = (assessment.subject or "").strip()
+        if not subject:
+            return None
+        prospect = self._session.get(ProspectORM, engagement.prospect_id)
+        client = (prospect.company_name if prospect else "").strip()
+        if not client:
+            return None
+        if _loose_name(client) == _loose_name(subject):
+            return None
+        # A containment match keeps "WeBull" and "WeBull Financial LLC" together, which is the
+        # common honest case, without letting two unrelated firms through.
+        a, b = _loose_name(client), _loose_name(subject)
+        if a in b or b in a:
+            return None
+        return (client, subject)
 
     def _require_engagement(self, principal: Principal, engagement_id: UUID) -> EngagementORM:
         row = self._session.get(EngagementORM, engagement_id)

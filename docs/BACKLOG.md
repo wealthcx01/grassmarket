@@ -64,9 +64,9 @@ own reconciled stamp, not a summary of it.
 | 12 | GRS-0238 | A Prospecting surface: browse the registry we imported | legibility & truthfulness | **DONE** (#251) |
 | 13 | GRS-0239 | Lessons that teach before they test | legibility & truthfulness | **MOSTLY DONE** (#252) — scope 3 (checkpoint confirm) still open |
 | 14 | GRS-0240 | The earnings page explains how you get paid | legibility & truthfulness | **DONE** (#253) |
-| 15 | GRS-0241 | Engagements: a list you can read, a link you cannot cross-wire | legibility & truthfulness | OPEN — **next** |
+| 15 | GRS-0241 | Engagements: a list you can read, a link you cannot cross-wire | legibility & truthfulness | **PARTIAL** (#254) — scopes 4, 5 done; 1, 2, 3 open |
 | 16 | GRS-0242 | The Workbench stops leaking internals and contradicting itself | legibility & truthfulness | OPEN |
-| 17 | GRS-0244 | The Guide must describe the product that exists | legibility & truthfulness | OPEN |
+| 17 | GRS-0244 | The Guide must describe the product that exists | legibility & truthfulness | OPEN — **next** |
 
 **Carried out of Phase 2, still open:** GRS-0208 scopes 3 and 4 (the demo tenancy proper, and the
 account surfaces) — scopes 1 and 2 shipped in #239/#240/#242.

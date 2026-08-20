@@ -49,15 +49,30 @@ def _contracted_prospect_http(client, owner: SeededConsultant) -> str:
     return pid
 
 
-def _finalised_assessment_http(client, owner: SeededConsultant, founder: SeededConsultant) -> str:
+def _finalised_assessment_http(
+    client, owner: SeededConsultant, founder: SeededConsultant, subject: str = "Acme"
+) -> str:
     """A finalised assessment via the API. A production record needs the founder's sign-off on the
     current document before it can finalise (ADR-0041, GRS-0188); this replaces the dual-rating and
-    committee steps that used to stand here."""
-    aid = client.post("/assessments", json={"subject": "S"}, headers=auth_header(owner)).json()[
+    committee steps that used to stand here.
+
+    The subject defaults to "Acme" — the company `_contracted_prospect_*` creates — because
+    GRS-0241 made linking an assessment about a DIFFERENT firm a refusal. These fixtures previously
+    finalised an assessment about "S", whose saved document then set the subject to
+    "Meridian (partial)", and linked it to an "Acme" engagement without anything objecting. The new
+    guard caught exactly that, in the suite, on its first run: the fixture had been quietly
+    cross-wiring two firms for as long as it existed.
+    """
+    aid = client.post("/assessments", json={"subject": subject}, headers=auth_header(owner)).json()[
         "id"
     ]
+    # `save_assessment` rewrites `subject` from the DOCUMENT, so the document has to carry it too
+    # — setting only the create-time subject would be silently discarded here.
+    document = _scoreable_partial_doc()
     client.put(
-        f"/assessments/{aid}", json=_body(_scoreable_partial_doc()), headers=auth_header(owner)
+        f"/assessments/{aid}",
+        json=_body(document.model_copy(update={"subject": subject})),
+        headers=auth_header(owner),
     )
     submit_and_approve(client, aid, owner, founder)
     resp = client.post(f"/assessments/{aid}/finalise", headers=auth_header(owner))

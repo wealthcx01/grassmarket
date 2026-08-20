@@ -9,6 +9,7 @@
  * engagement is not the advisor's and the caller has already been redirected.
  */
 
+import Link from "next/link";
 import { Fragment, useCallback, useEffect, useState } from "react";
 
 import { ApiError, api } from "@/lib/api";
@@ -312,19 +313,34 @@ export function DeliverablesPanel({
                   <td className="mono" style={{ ...tdStyle, textAlign: "right", fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
                     {formatWhen(d.generated_at)}
                   </td>
-                  <td style={{ ...tdStyle, textAlign: "right", whiteSpace: "nowrap" }}>
-                    <button
-                      type="button"
-                      onClick={() => setReviewing((cur) => (cur === d.id ? null : d.id))}
-                      style={linkButtonStyle}
-                      aria-expanded={reviewing === d.id}
+                  {/* GRS-0241 scope 5. The client report — the flagship surface of GRS-0219/0220
+                      — was not reachable from the page that owns the deliverable, only from the
+                      /deliverables index. Two actions crammed into one cell with a pipe between
+                      them also read as one control; they are spaced and labelled now. */}
+                  <td style={{ ...tdStyle, textAlign: "right" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "0.9rem",
+                        justifyContent: "flex-end",
+                        flexWrap: "wrap",
+                      }}
                     >
-                      {reviewing === d.id ? "Hide AI" : "Review AI"}
-                    </button>
-                    <span style={{ color: "var(--color-border)", margin: "0 0.5rem" }}>|</span>
-                    <button type="button" onClick={() => void download(d)} style={linkButtonStyle}>
-                      Download
-                    </button>
+                      <Link href={`/deliverables/${d.id}/report`} style={linkButtonStyle}>
+                        Client report
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => setReviewing((cur) => (cur === d.id ? null : d.id))}
+                        style={linkButtonStyle}
+                        aria-expanded={reviewing === d.id}
+                      >
+                        {reviewing === d.id ? "Hide AI draft" : "Review AI draft"}
+                      </button>
+                      <button type="button" onClick={() => void download(d)} style={linkButtonStyle}>
+                        Download .docx
+                      </button>
+                    </div>
                   </td>
                 </tr>
                 {reviewing === d.id && (
