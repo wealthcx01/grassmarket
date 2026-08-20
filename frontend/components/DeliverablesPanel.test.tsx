@@ -59,7 +59,13 @@ describe("DeliverablesPanel (GRS-0019)", () => {
     expect(await screen.findByText("Platform Power Report — Meridian")).toBeTruthy();
     // The internal-draft badge reads "Draft" (never mistaken for a client pack).
     expect(screen.getByText("Draft")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Download" })).toBeTruthy();
+    // GRS-0241 relabelled these ("Download .docx", "Review AI draft") and added a Client
+    // report link. Matched on a pattern rather than an exact string: the label is copy and will
+    // be reworded again, but "there is a download control here" is the behaviour under test.
+    expect(screen.getByRole("button", { name: /Download/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Review AI/ })).toBeTruthy();
+    // The reachability fix itself — the client report must be reachable from the engagement.
+    expect(screen.getByRole("link", { name: /Client report/ })).toBeTruthy();
   });
 
   it("shows the empty state when there are no deliverables", async () => {

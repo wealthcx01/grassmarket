@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field
 
 from grassmarket.data.repository import (
     EngagementLinkError,
+    EngagementSubjectMismatchError,
     NotFoundError,
     Principal,
     Repository,
@@ -44,6 +45,10 @@ class CommsEntryRequest(BaseModel):
 
 class LinkAssessmentRequest(BaseModel):
     assessment_id: UUID
+    #: Deliberate override for a subject mismatch (GRS-0241). Defaults False, which is the
+    #: safe direction: a caller written before this field existed cannot link the wrong firm's
+    #: scores by omission.
+    confirm_subject_mismatch: bool = False
 
 
 @router.post("", response_model=Engagement, status_code=status.HTTP_201_CREATED)
@@ -96,11 +101,28 @@ def link_assessment(
     repo: Repository = Depends(get_repository),
 ) -> Engagement:
     """Link a finalised assessment to an existing engagement (closes the contract → assessment →
-    deliverable loop). Cross-owner/missing → 404; unfinalised or already-linked → 409."""
+    deliverable loop). Cross-owner/missing → 404; unfinalised or already-linked → 409.
+
+    A **subject mismatch** — the assessment is about a different firm than the engagement is for —
+    is also a 409, but a distinguishable one: the response carries
+    `subject_mismatch: true` so the client can offer the confirm path rather than presenting the
+    refusal as a dead end (GRS-0241 scope 4). Confirming requires re-sending with
+    `confirm_subject_mismatch`, which is what makes the override deliberate rather than a retry.
+    """
     try:
-        return repo.link_assessment_to_engagement(principal, engagement_id, payload.assessment_id)
+        return repo.link_assessment_to_engagement(
+            principal,
+            engagement_id,
+            payload.assessment_id,
+            confirm_subject_mismatch=payload.confirm_subject_mismatch,
+        )
     except (NotFoundError, ScopeViolationError) as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found.") from exc
+    except EngagementSubjectMismatchError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={"message": str(exc), "subject_mismatch": True},
+        ) from exc
     except EngagementLinkError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
 
