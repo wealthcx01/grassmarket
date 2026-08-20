@@ -1,6 +1,6 @@
 # GRS-0240 — The earnings page explains how you get paid
 
-**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, founder: "the earnings page is so confusing")._
+**Status:** DONE (2026-08-19). _Previously recorded as: Planned (2026-07-31, founder: "the earnings page is so confusing")._
 **Priority:** MED-HIGH. **Loop:** first-time-user coherence. **Extends GRS-0187.**
 **Relates to:** GRS-0067, ADR-0026.
 
@@ -71,4 +71,57 @@ mean when it stops being zero.
 
 ## Status reconciliation — 2026-08-01
 
-**OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).
+**DONE** — shipped 2026-08-19, all five scopes. No rate, and no earnings maths, was touched.
+
+## What shipped
+
+**1 — "How you get paid" opens the page**, above every number: the two streams named in words, the
+three states a commission line moves through in order, and the definitions of *Earned YTD* and
+*Projected unpaid* — the latter of which existed **only in a contract docstring** an advisor will
+never read. It also says a line is created by the system and never entered by the advisor, which
+the page had never stated.
+
+The states render as an ordered list rather than a diagram: the sequence *is* the explanation, it
+reads on a phone, and a screen reader gets it in the right order for free.
+
+**2 — Both streams named, and the letters KEPT.** Decision, as the ticket asks: *keep them, explain
+them once.* Not a style preference — `earnings/statement.py` prints "Stream B" as a heading in the
+statement an advisor downloads, so page and document have to agree or someone comparing the two is
+lost. The defect was labelling one stream and not the other, which made a lone "B" read as leftover
+internals. The headings are now "Selling products · Stream A" and "Delivering consulting · Stream
+B", and the statement's heading was aligned to match.
+
+**3 — One vocabulary, and a real 2×2.** Products said "yr1 · yr2" while consulting said "first year
+· thereafter" for the same concept; it is now "first year / thereafter" everywhere. The four
+look-alike consultancy cards became an actual grid with **delivered-by** on the rows and
+**sourced-by** on the columns, each defined in the caption. Four undefined terms presented as four
+unrelated products are now two questions with an answer at their intersection.
+
+The grid is built from the carrots the API returns, never a hardcoded 2×2, so a rate change in
+`commissions.yaml` reflows with no frontend edit (GRS-0187's property, now covered by a test that
+renames an axis label and asserts the grid follows). A cell the schedule does not supply says **"Not
+in the schedule"** rather than rendering blank — a blank box in a rate table reads as 0%.
+
+**4 — Every stat card carries its definition**, so a £0.00 still says what it is.
+
+**5 — Illustrative money looks illustrative.** Example figures are italic and prefixed
+"Illustrative:" — the word is part of the number's presentation rather than a parenthesis after it.
+On a money page an example styled like a balance invites exactly the wrong trust.
+
+## A stale test this change exposed
+
+`app/earnings/page.test.tsx` asserted the literal heading `"Consulting (Stream B)"` and went red the
+moment the copy changed. That is the same failure as GRS-0228 — an assertion pinned to a sentence
+rather than to a behaviour, which stays green until a copy edit and then reads as a regression.
+
+It is rewritten against **structure**: a heading matching `/Delivering consulting/`, a row header,
+and a rate cell, queried by role inside the matrix. And it asserts "Stream B" appears **exactly
+twice** — once where the explainer defines it, once where the heading uses it — so losing either
+fails rather than passing quietly.
+
+## Not done
+
+- **No screenshots** (test-plan item 3). The zero-state and seeded-state comparison needs a running
+  app with a signed-in advisor; the assertions cover the zero state directly instead, which is the
+  state the founder actually walked.
+- Rates and the v7 audit remain **GRS-0067 / D2**, untouched and still gated.

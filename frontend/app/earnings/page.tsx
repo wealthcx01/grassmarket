@@ -12,6 +12,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { MoneyAmount } from "@/components/MoneyAmount";
+import { HowYouGetPaid, STAT_DEFINITIONS } from "@/components/earnings/HowYouGetPaid";
+import { ConsultingRateMatrix } from "@/components/earnings/ConsultingRateMatrix";
 import { ApiError, api, getToken } from "@/lib/api";
 import { EarningsProgress } from "@/components/EarningsProgress";
 import type {
@@ -168,6 +170,8 @@ export default function EarningsPage() {
         </p>
       ) : null}
 
+      <HowYouGetPaid />
+
       {summary ? (
         <ul
           style={{
@@ -206,6 +210,13 @@ export default function EarningsPage() {
               <p style={{ margin: "0.35rem 0 0", fontSize: "1.25rem" }}>
                 <MoneyAmount money={stat.money} />
               </p>
+              {/* GRS-0240 scope 4. A bare £0.00 under an unexplained label tells a new advisor
+                  nothing — and "Projected unpaid" was defined only in a contract docstring. */}
+              <p
+                style={{ margin: "0.3rem 0 0", fontSize: "0.72rem", color: "var(--color-ink-muted)", lineHeight: 1.35 }}
+              >
+                {STAT_DEFINITIONS[stat.label]}
+              </p>
             </li>
           ))}
         </ul>
@@ -217,11 +228,13 @@ export default function EarningsPage() {
 
       {carrots.length > 0 ? (
         <section>
-          <h2 style={{ fontSize: "1rem", margin: "0 0 0.6rem" }}>Product commissions</h2>
+          <h2 style={{ fontSize: "1rem", margin: "0 0 0.6rem" }}>
+            Selling products <span className="mono" style={{ fontSize: "0.7rem", color: "var(--color-ink-faint)" }}>Stream A</span>
+          </h2>
           <p style={{ margin: "0 0 0.75rem", color: "var(--color-ink-muted)", fontSize: "0.82rem", maxWidth: "42rem" }}>
             What you earn for selling each represented product. These rates are read live from the
             commission schedule, never typed in by hand. The pound figures price an illustrative
-            first-year deal.
+            first-year deal and are shown in italics — they are examples, not money you have earned.
           </p>
           <ul
             style={{
@@ -240,10 +253,11 @@ export default function EarningsPage() {
               >
                 <p style={{ margin: 0, fontWeight: 600, fontSize: "0.92rem" }}>{c.name}</p>
                 <p className="mono" style={{ margin: "0.35rem 0 0", fontSize: "0.78rem", color: "var(--color-accent)" }}>
-                  {c.yr1_bps / 100}% yr1 · {c.yr2_bps / 100}% yr2
+                  {c.yr1_bps / 100}% first year · {c.yr2_bps / 100}% thereafter
                 </p>
-                <p style={{ margin: "0.35rem 0 0", fontSize: "0.8rem", color: "var(--color-ink-muted)" }}>
-                  e.g. <MoneyAmount money={c.yr1_commission} /> then <MoneyAmount money={c.yr2_commission} />
+                <p style={{ margin: "0.35rem 0 0", fontSize: "0.8rem", color: "var(--color-ink-muted)", fontStyle: "italic" }}>
+                  Illustrative: <MoneyAmount money={c.yr1_commission} /> then{" "}
+                  <MoneyAmount money={c.yr2_commission} />
                 </p>
               </li>
             ))}
@@ -256,41 +270,16 @@ export default function EarningsPage() {
           earned nothing yet" or "this is not a thing you earn on". */}
       {consultancyCarrots.length > 0 ? (
         <section>
-          <h2 style={{ fontSize: "1rem", margin: "0 0 0.6rem" }}>Consulting (Stream B)</h2>
+          <h2 style={{ fontSize: "1rem", margin: "0 0 0.6rem" }}>
+            Delivering consulting <span className="mono" style={{ fontSize: "0.7rem", color: "var(--color-ink-faint)" }}>Stream B</span>
+          </h2>
           <p style={{ margin: "0 0 0.75rem", color: "var(--color-ink-muted)", fontSize: "0.82rem", maxWidth: "42rem" }}>
             What you earn on direct consulting work. What you take depends on two things: who
             delivers the engagement, and who brought it in. These rates are read live from the
             commission schedule, never typed in by hand. The first-year rate applies for twelve
             months and the ongoing rate applies after that, uncapped.
           </p>
-          <ul
-            style={{
-              listStyle: "none",
-              margin: 0,
-              padding: 0,
-              display: "grid",
-              gap: "0.75rem",
-              gridTemplateColumns: "repeat(auto-fill, minmax(14rem, 1fr))",
-            }}
-          >
-            {consultancyCarrots.map((c) => (
-              <li
-                key={`${c.delivery_type}:${c.sourcing}`}
-                style={{ padding: "0.9rem 1rem", background: "var(--color-paper-raised)", border: "1px solid var(--color-border)", borderRadius: "var(--radius)" }}
-              >
-                <p style={{ margin: 0, fontWeight: 600, fontSize: "0.92rem" }}>
-                  {c.delivery_label} · {c.sourcing_label}
-                </p>
-                <p className="mono" style={{ margin: "0.35rem 0 0", fontSize: "0.78rem", color: "var(--color-accent)" }}>
-                  {c.yr1_bps / 100}% first year · {c.thereafter_bps / 100}% thereafter
-                </p>
-                <p style={{ margin: "0.35rem 0 0", fontSize: "0.8rem", color: "var(--color-ink-muted)" }}>
-                  e.g. <MoneyAmount money={c.yr1_commission} /> then{" "}
-                  <MoneyAmount money={c.thereafter_commission} />
-                </p>
-              </li>
-            ))}
-          </ul>
+          <ConsultingRateMatrix carrots={consultancyCarrots} />
         </section>
       ) : null}
 

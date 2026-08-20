@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import EarningsPage from "@/app/earnings/page";
@@ -136,7 +136,7 @@ describe("EarningsPage (GRS-0035)", () => {
     expect(alert.textContent).not.toContain("409");
   });
 
-  describe("Consulting (Stream B) — GRS-0187", () => {
+  describe("Delivering consulting (Stream B) — GRS-0187, restyled GRS-0240", () => {
     const CARROTS = [
       {
         delivery_type: "consultant_led",
@@ -157,9 +157,19 @@ describe("EarningsPage (GRS-0035)", () => {
     mocked.listCommissions.mockResolvedValue([]);
     mocked.consultancyCommissions.mockResolvedValue(CARROTS);
       render(<EarningsPage />);
-      expect(await screen.findByText("Consulting (Stream B)")).toBeTruthy();
-      expect(screen.getByText("Consultant-led · Self-sourced")).toBeTruthy();
-      expect(screen.getByText(/65% first year · 55% thereafter/)).toBeTruthy();
+      // GRS-0240 rewrote this section: the heading names the stream in words with the letter
+      // beside it, and the four look-alike cards became a 2x2 whose axes are separate cells. The
+      // assertions follow the shipped copy — and are written against the STRUCTURE (a row header
+      // and a rate cell) rather than one concatenated string, so the next wording change fails
+      // loudly here instead of going quietly red like the deliverables E2E did (GRS-0228).
+      const matrix = await screen.findByTestId("consulting-rate-matrix");
+      expect(screen.getByRole("heading", { name: /Delivering consulting/ })).toBeTruthy();
+      // Twice, and that is right: the "How you get paid" block defines the letter, the section
+      // heading uses it. One occurrence would mean the explainer or the label went missing.
+      expect(screen.getAllByText("Stream B")).toHaveLength(2);
+      expect(within(matrix).getByRole("rowheader", { name: "Consultant-led" })).toBeTruthy();
+      expect(within(matrix).getByText(/65% first year/)).toBeTruthy();
+      expect(within(matrix).getByText(/55% thereafter/)).toBeTruthy();
     });
 
     it("says the rates are read live rather than typed in", async () => {

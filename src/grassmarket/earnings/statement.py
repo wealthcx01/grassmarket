@@ -63,7 +63,10 @@ def build_earnings_statement(
     # The rate card, not a total: a statement with no consultancy lines should still tell an
     # advisor how consulting pays, which is what the earnings page failed to do (GRS-0187).
     if consultancy_carrots:
-        doc.add_heading("Consulting commissions (Stream B)", level=1)
+        # GRS-0240 scope 2. The page and this document must use one vocabulary: an advisor comparing
+        # the two should not have to guess whether "Stream B" here is the same thing as the
+        # consulting section there. The page now names both streams; so does this.
+        doc.add_heading("Delivering consulting (Stream B)", level=1)
         doc.add_paragraph(
             f"Read live from the {consultancy_carrots[0].schedule_version} schedule. The Year-1 "
             f"rate applies for the first twelve months; the ongoing rate applies after that and "
