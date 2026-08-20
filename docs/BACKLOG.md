@@ -45,7 +45,7 @@ first.
 ### Phase 2 — the GRS-0229–0245 wave (2026-07-31 first-time-user review)
 
 Build order below is the wave's own priority: client-trust breaches, then first-run, then the
-report workflow, then the rest. **Fifteen of seventeen have landed**; the status column is the ticket's
+report workflow, then the rest. **All seventeen have landed or are in review**; the status column is the ticket's
 own reconciled stamp, not a summary of it.
 
 | # | Ticket | Title | Group | Status |
@@ -66,7 +66,7 @@ own reconciled stamp, not a summary of it.
 | 14 | GRS-0240 | The earnings page explains how you get paid | legibility & truthfulness | **DONE** (#253) |
 | 15 | GRS-0241 | Engagements: a list you can read, a link you cannot cross-wire | legibility & truthfulness | **PARTIAL** (#254) — scopes 4, 5 done; 1, 2, 3 open |
 | 16 | GRS-0242 | The Workbench stops leaking internals and contradicting itself | legibility & truthfulness | OPEN |
-| 17 | GRS-0244 | The Guide must describe the product that exists | legibility & truthfulness | OPEN — **next** |
+| 17 | GRS-0244 | The Guide must describe the product that exists | legibility & truthfulness | **DONE** (#255) |
 
 **Carried out of Phase 2, still open:** GRS-0208 scopes 3 and 4 (the demo tenancy proper, and the
 account surfaces) — scopes 1 and 2 shipped in #239/#240/#242.

@@ -255,9 +255,14 @@ const WALKTHROUGHS: ReadonlyArray<Walkthrough> = [
         do: "When the assessment is ready, finalise it. Finalising locks the inputs and produces an immutable, versioned scoring run.",
       },
     ],
+    // GRS-0244 scope 1. This note described dual rating and Rating Committee sign-off — the peer
+    // governance ADR-0041 and Methodology v1.6 made DORMANT. Two sections later the Guide
+    // correctly describes the founder gate, so a new advisor read both and could not tell which
+    // was true. A page that contradicts itself about who approves their work makes every other
+    // claim on it suspect, which is why this counted as a bug rather than stale copy.
     note: {
       tone: "warn",
-      text: "Finalising is gated on governance. Every rated subcomponent needs a second independent rater and a resolved consensus, and any high-stakes rating needs Rating Committee sign-off. The Summary step lists what is still outstanding and lets you resolve it, which is the next walkthrough.",
+      text: "Finalising is gated: nothing is finalised until John has read and signed off the assessment as it currently stands. The Summary step shows where that stands and is the next walkthrough. (References elsewhere to a second independent rater and a Rating Committee describe peer governance that is specified, built, and dormant by design — the network is not yet large enough for it to be genuine peer challenge, so the founder holds sign-off instead. Methodology v1.6, ADR-0041.)",
     },
   },
   {
@@ -313,10 +318,43 @@ const WALKTHROUGHS: ReadonlyArray<Walkthrough> = [
     ],
   },
   {
+    id: "client-report",
+    kicker: "The client report",
+    title: "Write the report the client actually reads",
+    lead: "The client report is the document that represents the firm. You write six sections in your own words, the score fills in the arithmetic, and the client reads it as a branded PDF or a web page you send them a link to. It is the newest surface in the studio and the one worth learning first.",
+    href: { label: "Open engagements", to: "/engagements" },
+    steps: [
+      {
+        do: "From the engagement, open a deliverable and press Client report.",
+        then: "The editor opens, headed with the client's name so you always know whose report you are writing.",
+      },
+      {
+        do: "Write the six sections: the business, where the advantage sits, what is holding it back, what to do about it, what that is worth, and the technical appendix.",
+        then: "Each section saves as you go. The report cannot be produced while any of them is empty, and the refusal names the ones still blank.",
+      },
+      {
+        do: "Quote a figure only after declaring it. Any number in your prose has to come from the run.",
+        then: "If you type a number the assessment did not produce, the editor refuses and says which one — that guard is what stops a report claiming something the score does not support.",
+      },
+      {
+        do: "Send it to John if the record is client-facing, exactly as with the assessment.",
+        then: "The words a client reads are approved separately from the scores. An edit after approval withdraws it, same rule as before.",
+      },
+      {
+        do: "Download the branded PDF, or create a share link for a client who would rather read it in a browser.",
+        then: "The PDF is named for the client and the month. The link shows the same content, and you can revoke it at any time.",
+      },
+    ],
+    note: {
+      tone: "info",
+      text: "Share links record which sections were opened and roughly how long for, and the page tells the reader so in plain words before anything is recorded. You see it back as section titles with coarse times. Treat it as soft evidence: a client who prints the PDF and reads that instead shows as having read nothing.",
+    },
+  },
+  {
     id: "deliver",
     kicker: "Deliverables",
-    title: "Turn a score into a client document",
-    lead: "From an engagement, a finalised assessment generates client documents, including a Platform Power Report, an Executive Summary, and a Heatmap. The prose is drafted by AI and approved by you, and nothing AI-written reaches a client without your sign-off.",
+    title: "The document packs",
+    lead: "Alongside the client report, an engagement generates .docx packs — a Platform Power Report, an Executive Summary, a Heatmap. These are the internal and technical path: fuller, denser, and drafted by AI for you to approve. Nothing AI-written reaches a client without your sign-off. If you are sending something to a client to read, start with the client report above.",
     href: { label: "Open engagements", to: "/engagements" },
     steps: [
       {
