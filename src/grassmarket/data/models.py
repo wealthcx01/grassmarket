@@ -534,6 +534,12 @@ class EngagementORM(Base):
         ForeignKey("prospects.id"), index=True, nullable=False
     )
     title: Mapped[str] = mapped_column(String(200), nullable=False)
+    # Record provenance (ADR-0029, added GRS-0241): production (default) vs demo/sandbox,
+    # set at creation and immutable thereafter. Engagements were the one owned record without
+    # it, which is why nothing could badge a demo engagement or safely delete a duplicate one.
+    provenance: Mapped[str] = mapped_column(
+        String(16), default="production", server_default="production", index=True, nullable=False
+    )
     status: Mapped[EngagementStatus] = mapped_column(
         String(16), default=EngagementStatus.CONTRACTED, nullable=False
     )

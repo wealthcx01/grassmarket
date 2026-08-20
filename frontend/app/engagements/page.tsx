@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+import { ProvenanceBadge } from "@/components/ProvenanceBadge";
+
 import { NotFoundNotice } from "@/components/NotFoundNotice";
 import { ApiError, api, getToken } from "@/lib/api";
 import type { Engagement } from "@/lib/types";
@@ -61,9 +63,20 @@ export default function EngagementsPage() {
                 href={`/engagements/${e.id}`}
                 style={{ display: "flex", justifyContent: "space-between", padding: "0.7rem 0.9rem", border: "1px solid var(--color-border)", borderRadius: "var(--radius)", background: "var(--color-paper-raised)", textDecoration: "none", color: "inherit" }}
               >
-                <span style={{ fontFamily: "var(--font-serif)", fontWeight: 600 }}>{e.title}</span>
+                {/* GRS-0241 scopes 1 and 3. The badge is the portfolio's own component, so a demo
+                    engagement is labelled the same way a demo assessment is — the founder saw
+                    duplicate demo rows here twice and nothing distinguished them from real work.
+                    "comms" was internal shorthand, and a count of zero communications on every row
+                    is metadata with no information in it, so it is spelled out and hidden at 0. */}
+                <span style={{ fontFamily: "var(--font-serif)", fontWeight: 600, display: "flex", gap: "0.5rem", alignItems: "baseline", flexWrap: "wrap" }}>
+                  {e.title}
+                  <ProvenanceBadge provenance={e.provenance} />
+                </span>
                 <span className="mono" style={{ fontSize: "0.72rem", color: "var(--color-ink-muted)" }}>
-                  {e.status} · {e.comms_log.length} comms
+                  {e.status}
+                  {e.comms_log.length
+                    ? ` · ${e.comms_log.length} ${e.comms_log.length === 1 ? "communication" : "communications"}`
+                    : ""}
                 </span>
               </Link>
             </li>
