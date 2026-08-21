@@ -824,6 +824,35 @@ class CourseVersionORM(Base):
     __table_args__ = (UniqueConstraint("course_id", "version", name="uq_course_version"),)
 
 
+class CheckpointConfirmationORM(Base):
+    """One advisor confirming they did one checkpoint (GRS-0239 scope 3).
+
+    Keyed on (advisor, lesson, slide order). Slides carry no id — `Slide` has `order` and nothing
+    else stable — so position is the only key the content model offers. Re-ordering a lesson's
+    slides therefore moves a confirmation to whichever slide now holds that position; see the
+    migration for why the alternatives were worse. Scoped by ``owner_consultant_id``.
+    """
+
+    __tablename__ = "checkpoint_confirmations"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    course_id: Mapped[UUID] = mapped_column(ForeignKey("courses.id"), index=True, nullable=False)
+    lesson_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    slide_order: Mapped[int] = mapped_column(Integer, nullable=False)
+    confirmed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+    __table_args__ = (
+        UniqueConstraint(
+            "owner_consultant_id", "lesson_id", "slide_order", name="uq_checkpoint_confirmation"
+        ),
+        Index("ix_checkpoint_confirmations_lesson", "owner_consultant_id", "lesson_id"),
+    )
+
+
 class LessonCompletionORM(Base):
     """One advisor's completion of a single lesson (GRS-0121) — feeds coursework credit. Unique per
     (advisor, lesson). Scoped by ``owner_consultant_id`` (the advisor)."""

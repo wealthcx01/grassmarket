@@ -417,6 +417,57 @@ def complete_lesson(
         raise _conflict(exc) from exc
 
 
+class CheckpointProgress(BaseModel):
+    """How many of a lesson's checkpoints THIS advisor has confirmed (GRS-0239 scope 3)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    confirmed: int = Field(ge=0)
+    total: int = Field(ge=0)
+
+
+@router.post(
+    "/courses/{slug}/lessons/{lesson_id}/checkpoints/{slide_order}",
+    response_model=CheckpointProgress,
+)
+def confirm_checkpoint(
+    slug: str,
+    lesson_id: UUID,
+    slide_order: int,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> CheckpointProgress:
+    """Confirm the caller did one checkpoint, and return the lesson's progress.
+
+    Idempotent — re-confirming is a no-op, not a 409. A checkpoint is a self-reported "I did the
+    thing"; re-ticking one is not a mistake worth an error, which is the opposite of completing a
+    lesson twice. Returning the progress saves the client a second round trip to render the count.
+    """
+    try:
+        repo.confirm_checkpoint(principal, slug, lesson_id, slide_order, now=datetime.now(UTC))
+        confirmed, total = repo.checkpoint_progress(principal, slug, lesson_id)
+    except NotFoundError as exc:
+        raise _not_found("Lesson") from exc
+    except ConflictError as exc:
+        raise _conflict(exc) from exc
+    return CheckpointProgress(confirmed=confirmed, total=total)
+
+
+@router.get("/courses/{slug}/lessons/{lesson_id}/checkpoints", response_model=CheckpointProgress)
+def get_checkpoint_progress(
+    slug: str,
+    lesson_id: UUID,
+    principal: Principal = Depends(get_current_principal),
+    repo: Repository = Depends(get_repository),
+) -> CheckpointProgress:
+    """This advisor's checkpoint progress for one lesson."""
+    try:
+        confirmed, total = repo.checkpoint_progress(principal, slug, lesson_id)
+    except NotFoundError as exc:
+        raise _not_found("Lesson") from exc
+    return CheckpointProgress(confirmed=confirmed, total=total)
+
+
 @router.get("/courses/{slug}/completions", response_model=list[LessonCompletion])
 def list_lesson_completions(
     slug: str,
