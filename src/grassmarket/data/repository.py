@@ -2713,6 +2713,60 @@ class Repository:
         self._session.delete(row)
         self._session.flush()
 
+    def delete_orphaned_engagement(
+        self, principal: Principal, engagement_id: UUID, *, founder_authorised: bool = False
+    ) -> None:
+        """Remove an engagement whose linked assessments no longer exist (ADR-0048).
+
+        A separate, narrower path from `delete_engagement`, keyed on **orphan-hood rather than on
+        provenance**. ADR-0047 §1 is untouched: a production record is still never deletable for
+        being suspected of being demo data. What this permits is different — an engagement whose
+        every linked assessment has been deleted is broken by a referential fact the database can
+        answer, not by an inference about what the record was for.
+
+        The alternative was to mark such rows non-production so the ordinary tool would take them.
+        That would be fabricating a provenance record to obtain a deletion, which is the defect
+        class the codebase refuses (#3) and would poison the one field ADR-0029 keeps trustworthy.
+
+        Every condition is checked here and none is relaxable by an argument:
+        """
+        if not founder_authorised:
+            raise ScopeViolationError(
+                "Removing an orphaned engagement requires explicit founder authorisation "
+                "(ADR-0048). This path exists for a specific, recorded clean-up, not for general "
+                "deletion."
+            )
+        row = self._require_engagement(principal, engagement_id)  # scoped; cross-owner is not-found
+
+        linked = [UUID(a) for a in json.loads(row.assessment_ids_json or "[]")]
+        if not linked:
+            # Not orphaned — just new. Deleting it would remove work in progress.
+            raise EngagementLinkError(
+                f"Engagement {engagement_id} links no assessments, so it is not orphaned. "
+                f"An engagement that never linked anything is new work, not broken data."
+            )
+        live = [a for a in linked if self._session.get(AssessmentORM, a) is not None]
+        if live:
+            # Some links resolve: a broken link to REPAIR, not an orphan to delete.
+            raise EngagementLinkError(
+                f"Engagement {engagement_id} still links {len(live)} live assessment(s) of "
+                f"{len(linked)}. A partly-dangling engagement is a link to repair, not an orphan."
+            )
+        if json.loads(row.deliverables_json or "[]"):
+            # A deliverable is output that may have reached a client.
+            raise EngagementLinkError(
+                f"Engagement {engagement_id} has deliverables. Whatever its links now say, it "
+                f"produced something, and produced output is not orphaned data."
+            )
+        if self._comms_for(engagement_id):
+            raise EngagementLinkError(
+                f"Engagement {engagement_id} has a communication log. A recorded conversation is "
+                f"evidence of real work."
+            )
+
+        self._session.delete(row)
+        self._session.flush()
+
     def list_engagements(self, principal: Principal) -> list[Engagement]:
         stmt = select(EngagementORM)
         if not principal.is_admin:

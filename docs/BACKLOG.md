@@ -91,6 +91,7 @@ account surfaces) — scopes 1 and 2 shipped in #239/#240/#242.
 
 | Ticket | Title |
 |---|---|
+| GRS-0246 | Deleting an assessment leaves engagements pointing at nothing (found 2026-08-21; production clean, staging had 5) |
 | GRS-0041 | Expose gated module rating words in the live-score contract |
 | GRS-0049 | 2026-07-14 audit follow-up backlog |
 | GRS-0192 | Content freshness watcher |
