@@ -10,6 +10,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { TeachingEmptyState } from "@/components/TeachingEmptyState";
 
 import { MoneyAmount } from "@/components/MoneyAmount";
 import { HowYouGetPaid, STAT_DEFINITIONS } from "@/components/earnings/HowYouGetPaid";
@@ -286,10 +287,22 @@ export default function EarningsPage() {
       {lines === null ? (
         <p>Loading…</p>
       ) : lines.length === 0 ? (
-        <p style={{ color: "var(--color-ink-muted)", fontSize: "0.9rem" }}>
-          No commission lines yet — they appear here as engagements and workshop recovery fees are
-          recorded.
-        </p>
+        <TeachingEmptyState
+          testId="earnings-empty"
+          headline="Nothing here yet — commission lines are created for you, never entered."
+          explanation={
+            <>
+              A line appears when work is recorded against you: a consulting engagement, a product
+              sale, or a workshop recovery fee. You do not add one yourself, which is why this list
+              stays empty until a deal lands rather than because something is missing here.
+            </>
+          }
+          action={{
+            href: "/pipeline",
+            label: "Open the pipeline",
+            rest: <> — the rates above already show what each kind of work will pay.</>,
+          }}
+        />
       ) : (
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.88rem" }}>

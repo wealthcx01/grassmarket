@@ -26,6 +26,34 @@ export type RetiredPhrase = {
 };
 
 export const RETIRED_COPY: RetiredPhrase[] = [
+  // GRS-0243 scope 4. Four empty states that stated their own emptiness. Registered together
+  // because they share one fault, not four: each told a first-time user the fact they could
+  // already see, and none said what the section was for or what would put something in it.
+  {
+    phrase: "No engagements yet. Open one from a contracted prospect.",
+    where: "Engagements, empty state",
+    why:
+      "States the emptiness the reader can already see. It also names the fix backwards — you do " +
+      "not 'open' an engagement as an action, it opens when a prospect reaches Contracted, and an " +
+      "advisor sent looking for a button will not find one.",
+  },
+  {
+    phrase: "No assessments yet. Create one above to begin.",
+    where: "Portfolio, empty state",
+    why:
+      "Says nothing about what a portfolio IS — the page an advisor returns to, holding every " +
+      "scored firm with its value and coverage. 'Create one above' also mislabels the page as a " +
+      "form rather than a record of work that happens in the wizard.",
+  },
+  {
+    phrase: "No commission lines yet",
+    where: "Earnings, empty state",
+    why:
+      "A first-time user reads this as 'something is missing here' rather than the truth, which " +
+      "is that lines are created for you when work is recorded and are never entered by hand. " +
+      "The zero is correct and the page has to say why.",
+  },
+
   {
     phrase:
       "Your home for the Bruntsfield Advisory Network — manage your pipeline, run Platform Power " +

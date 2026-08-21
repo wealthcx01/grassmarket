@@ -1,6 +1,6 @@
 # GRS-0243 — First-run orientation: every section says what it is for, and the home page finally gets reworded
 
-**Status:** PARTIAL — scope 1 shipped; 2-5 open (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, founder: "I have tried to use each section of the studio … and._
+**Status:** PARTIAL (2026-08-21) — scopes 1 and 4 shipped; 3 and 5 open; 2 largely moot. _Previously recorded as: Planned (2026-07-31, founder: "I have tried to use each section of the studio … and._
 none of it makes sense. Not in my account or the demo account.").
 **Priority:** HIGH. **Loop:** first-time-user coherence. **Relates to:** GRS-0175, GRS-0205, GRS-0208.
 
@@ -118,3 +118,61 @@ read a worked example (GRS-0236). Tested against the real page rather than a cop
 
 Those three are the larger half of this ticket and they are genuinely unbuilt. The ticket stays
 open.
+
+
+---
+
+## Second pass — 2026-08-21 (scope 4, and a finding on scope 2)
+
+### Scope 2 is largely already satisfied — measured, not assumed
+
+The ticket asks to settle "Portfolio vs Assessments" and rename "Learning & Drills" to Academy.
+Checked against the shipped UI:
+
+- **"Learning & Drills" does not exist anywhere in the frontend.** That rename already happened.
+- **The visible label is already "Portfolio" everywhere** — primary nav, page heading, breadcrumbs.
+  The only inconsistency left is the **route** (`/assessments`), which an advisor rarely reads.
+
+So the founder-visible half of scope 2 is done. The residue is a URL rename plus redirect, which
+carries real link-breakage risk for a benefit nobody sees on screen. **Not done, and deliberately
+deprioritised** rather than skipped silently — if the URL matters, it is a small ticket of its own.
+
+### Scope 4 — empty states that teach
+
+Four sections restated their own emptiness: *"No engagements yet."*, *"No assessments yet."*, *"No
+commission lines yet"*. A first-time user is looking at an empty page **precisely because they do
+not know what fills it**, so the fact they can already see is the least useful thing to tell them.
+
+Every empty state now says three things in the order the questions arrive:
+
+1. **What the section is** — never "you have no X".
+2. **Where its contents come from** — the chain or upstream action, named, because the reason the
+   page is empty is almost always a step that has not happened somewhere else.
+3. **One next step** — a single link. Two competing calls to action is a choice offered to someone
+   with no basis for making it.
+
+The Deliverables state (written under scope 1) was **extracted into `TeachingEmptyState`** rather
+than copy-pasted into three more pages, where it would have drifted.
+
+The engagements copy also fixed a small lie: *"Open one from a contracted prospect"* names the fix
+backwards. You do not *open* an engagement as an action — it opens when a prospect reaches
+Contracted, and an advisor sent looking for a button will not find one.
+
+### The retired-copy register earned its keep, on me
+
+All three retired sentences were added to `lib/retiredCopy.ts` — the mechanism scope 1 built for
+exactly this. It then **failed**, because I had written the retired phrase into a negative
+assertion in the earnings test, which put the sentence straight back into the source it scans.
+
+The check belongs in one place. The test now asserts the new state teaches, and the register alone
+owns the guarantee that the old wording cannot return.
+
+This was also the **fifth** copy-pinned test in this programme to go red on a deliberate rewrite
+(GRS-0228, twice in GRS-0240, GRS-0241, now here). The register is the durable answer for
+*deliberately retired* copy; it does not help with the general case, which is still GRS-0205.
+
+### Not done
+
+- **Scope 3 (home shows state).** Live one-liners per card. Not attempted.
+- **Scope 5 (ten-minute first-run checklist).** Not attempted.
+- **Scope 2's route rename.** See above.
