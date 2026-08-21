@@ -153,3 +153,92 @@ class TestDeletionCannotTouchProduction:
         )
         with pytest.raises((NotFoundError, ScopeViolationError)):
             repo.delete_engagement(bob.principal, engagement.id)
+
+
+class TestOrphanedEngagementRemoval:
+    """ADR-0048. Every condition, asserted — this path must never become a general escape hatch."""
+
+    def _orphaned(self, repo: Repository, alice, title: str = "Orphan"):
+        """An engagement whose only linked assessment is then deleted out from under it."""
+        prospect = _contracted(repo, alice, title)
+        assessment = _finalised(repo, alice, title, RecordProvenance.DEMO)
+        engagement = repo.create_engagement(
+            alice.principal,
+            prospect_id=prospect.id,
+            title=title,
+            assessment_ids=(assessment.id,),
+        )
+        repo._session.delete(repo._session.get(AssessmentORM, assessment.id))
+        repo._session.flush()
+        return engagement
+
+    def test_it_removes_a_genuine_orphan(self, repo: Repository, alice) -> None:
+        from grassmarket.data.repository import NotFoundError
+
+        engagement = self._orphaned(repo, alice)
+        repo.delete_orphaned_engagement(alice.principal, engagement.id, founder_authorised=True)
+        with pytest.raises(NotFoundError):
+            repo.get_engagement(alice.principal, engagement.id)
+
+    def test_it_refuses_without_authorisation(self, repo: Repository, alice) -> None:
+        """Named so it cannot be set absent-mindedly, and defaulting to refuse."""
+        from grassmarket.data.repository import ScopeViolationError
+
+        engagement = self._orphaned(repo, alice)
+        with pytest.raises(ScopeViolationError):
+            repo.delete_orphaned_engagement(alice.principal, engagement.id)
+
+    def test_it_refuses_an_engagement_that_links_nothing(self, repo: Repository, alice) -> None:
+        """Not orphaned — just new. Deleting it would remove work in progress."""
+        from grassmarket.data.repository import EngagementLinkError
+
+        prospect = _contracted(repo, alice)
+        engagement = repo.create_engagement(alice.principal, prospect_id=prospect.id, title="New")
+        with pytest.raises(EngagementLinkError):
+            repo.delete_orphaned_engagement(alice.principal, engagement.id, founder_authorised=True)
+
+    def test_it_refuses_when_any_link_still_resolves(self, repo: Repository, alice) -> None:
+        """A partly-dangling engagement is a link to REPAIR, not an orphan to delete."""
+        from grassmarket.data.repository import EngagementLinkError
+
+        prospect = _contracted(repo, alice)
+        dead = _finalised(repo, alice, "Acme", RecordProvenance.DEMO)
+        live = _finalised(repo, alice, "Acme", RecordProvenance.DEMO)
+        engagement = repo.create_engagement(
+            alice.principal,
+            prospect_id=prospect.id,
+            title="Half",
+            assessment_ids=(dead.id, live.id),
+        )
+        repo._session.delete(repo._session.get(AssessmentORM, dead.id))
+        repo._session.flush()
+        with pytest.raises(EngagementLinkError):
+            repo.delete_orphaned_engagement(alice.principal, engagement.id, founder_authorised=True)
+
+    def test_it_refuses_an_orphan_that_produced_deliverables(self, repo: Repository, alice) -> None:
+        """Produced output may have reached a client, whatever the links now say."""
+        from bcap_contracts.engagements import DeliverableSlot
+
+        from grassmarket.data.repository import EngagementLinkError
+
+        prospect = _contracted(repo, alice)
+        assessment = _finalised(repo, alice, "Acme", RecordProvenance.DEMO)
+        engagement = repo.create_engagement(
+            alice.principal,
+            prospect_id=prospect.id,
+            title="Produced",
+            assessment_ids=(assessment.id,),
+            deliverables=(DeliverableSlot(key="roadmap"),),
+        )
+        repo._session.delete(repo._session.get(AssessmentORM, assessment.id))
+        repo._session.flush()
+        with pytest.raises(EngagementLinkError):
+            repo.delete_orphaned_engagement(alice.principal, engagement.id, founder_authorised=True)
+
+    def test_another_advisors_orphan_is_not_reachable(self, repo: Repository, alice, bob) -> None:
+        """Scoping is still first. Founder authorisation is not a cross-owner key."""
+        from grassmarket.data.repository import NotFoundError, ScopeViolationError
+
+        engagement = self._orphaned(repo, alice)
+        with pytest.raises((NotFoundError, ScopeViolationError)):
+            repo.delete_orphaned_engagement(bob.principal, engagement.id, founder_authorised=True)
