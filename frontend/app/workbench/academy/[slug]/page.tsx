@@ -24,12 +24,19 @@ function LessonCard({
   done,
   busy,
   onComplete,
+  onConfirmCheckpoint,
+  confirmedOrders,
 }: {
   lesson: Lesson;
   index: number;
   done: boolean;
   busy: boolean;
   onComplete: () => void;
+  /** GRS-0239 scope 3. Resolves once the confirmation is persisted, so the tick reflects the
+   *  server rather than optimism — a checkpoint that says "done" without a record is the same
+   *  empty gesture the callout was before. */
+  onConfirmCheckpoint: (slideOrder: number) => Promise<void>;
+  confirmedOrders: ReadonlySet<number>;
 }) {
   // Active-recall gate (GRS-0139): you complete a lesson by trying to recall its point, then
   // revealing the model answer — retrieval practice, not a click-through.
@@ -73,7 +80,12 @@ function LessonCard({
             the whole lesson, and it reads exactly as it did before. */}
         {hasSlides ? (
           <>
-            <SlideDeck slides={lesson.slides ?? []} label={lesson.title} />
+            <SlideDeck
+              slides={lesson.slides ?? []}
+              label={lesson.title}
+              onConfirmCheckpoint={onConfirmCheckpoint}
+              confirmedOrders={confirmedOrders}
+            />
             <LessonObjective
               body={lesson.body}
               videoRef={lesson.video_ref}
@@ -173,9 +185,15 @@ function LessonCard({
   );
 }
 
+const EMPTY_ORDERS: ReadonlySet<number> = new Set();
+
 export default function AcademyReaderPage() {
   const router = useRouter();
   const slug = useParams<{ slug: string }>().slug;
+  // GRS-0239 scope 3. Which checkpoint positions this advisor has confirmed, per lesson. Held in
+  // the page rather than the card so a confirmation survives the card re-rendering, and seeded
+  // from the server so it survives a reload — the point of the control is that it is a RECORD.
+  const [checkpoints, setCheckpoints] = useState<Record<string, ReadonlySet<number>>>({});
   const [course, setCourse] = useState<CourseVersion | null>(null);
   const [progress, setProgress] = useState<SectionProgress[]>([]);
   const [completed, setCompleted] = useState<Set<string>>(new Set());
@@ -235,6 +253,18 @@ export default function AcademyReaderPage() {
   const sectionsPassed = progress.filter((p) => p.has_test && p.passed).length;
   const gated = gatedSections > 0;
   const headlinePct = gated ? Math.round((sectionsPassed / gatedSections) * 100) : pct;
+
+  async function confirmCheckpoint(lessonId: string, slideOrder: number) {
+    // The server is idempotent, so a double click costs a request and nothing else. The tick is
+    // set only AFTER it persists — a checkpoint that says "done" without a record would be the
+    // same empty gesture the callout was before this ticket.
+    await api.confirmCheckpoint(slug, lessonId, slideOrder);
+    setCheckpoints((current) => {
+      const next = new Set(current[lessonId] ?? []);
+      next.add(slideOrder);
+      return { ...current, [lessonId]: next };
+    });
+  }
 
   async function complete(lessonId: string) {
     setBusyId(lessonId);
@@ -338,6 +368,8 @@ export default function AcademyReaderPage() {
                       done={completed.has(lesson.id)}
                       busy={busyId === lesson.id}
                       onComplete={() => complete(lesson.id)}
+                      onConfirmCheckpoint={(order) => confirmCheckpoint(lesson.id, order)}
+                      confirmedOrders={checkpoints[lesson.id] ?? EMPTY_ORDERS}
                     />
                   ))
                 ) : (

@@ -367,6 +367,31 @@ export const api = {
     return request<ProspectingPage>(`/entities${suffix}`, { method: "GET", headers: authHeaders(), signal });
   },
 
+  // GRS-0239 scope 3. Idempotent by design on the server: re-confirming is a no-op, not a 409,
+  // so the client never has to distinguish "already done" from "just done".
+  confirmCheckpoint(
+    slug: string,
+    lessonId: string,
+    slideOrder: number,
+    signal?: AbortSignal,
+  ): Promise<{ confirmed: number; total: number }> {
+    return request<{ confirmed: number; total: number }>(
+      `/workbench/courses/${encodeURIComponent(slug)}/lessons/${lessonId}/checkpoints/${slideOrder}`,
+      { method: "POST", headers: authHeaders(), signal },
+    );
+  },
+
+  checkpointProgress(
+    slug: string,
+    lessonId: string,
+    signal?: AbortSignal,
+  ): Promise<{ confirmed: number; total: number }> {
+    return request<{ confirmed: number; total: number }>(
+      `/workbench/courses/${encodeURIComponent(slug)}/lessons/${lessonId}/checkpoints`,
+      { method: "GET", headers: authHeaders(), signal },
+    );
+  },
+
   registryFacets(signal?: AbortSignal): Promise<RegistryFacets> {
     return request<RegistryFacets>("/entities/facets", { method: "GET", headers: authHeaders(), signal });
   },

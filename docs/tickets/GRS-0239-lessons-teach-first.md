@@ -1,6 +1,6 @@
 # GRS-0239 — Lessons that teach before they test
 
-**Status:** MOSTLY DONE (2026-08-19) — scope 3 not built. _Previously recorded as: Planned (2026-07-31, founder: "the lessons are horrible and just tell me what I should._
+**Status:** DONE (2026-08-21). _Previously recorded as: Planned (2026-07-31, founder: "the lessons are horrible and just tell me what I should._
 learn as opposed to actually being lessons? It just reference links").
 **Priority:** MED-HIGH. **Loop:** first-time-user coherence. **Extends GRS-0215.**
 **Relates to:** GRS-0218, GRS-0190, GRS-0226.
@@ -157,3 +157,59 @@ past them" — is therefore **not met**. The first two-thirds of that sentence n
 - **No before/after screenshot** (test-plan item 4). The Academy needs a seeded database and a
   signed-in advisor; the change is asserted by `lessonLayout.test.tsx` instead, which pins the
   ordering and the citation form directly.
+
+
+---
+
+## Scope 3 — shipped 2026-08-21
+
+The ticket is now complete. CHECKPOINT slides have the interaction the content contract always
+promised.
+
+**What was there:** a callout reading "Do this now:" with no control, no state and no record, while
+`Slide` has required a `checkpoint_prompt` on every checkpoint since GRS-0215 — the contract made
+"the advisor produces something" enforceable, and the renderer then offered nothing to produce it
+with. An instruction with no way to acknowledge it teaches an advisor that the instruction is
+decorative, which is the complaint the whole ticket is about.
+
+**What shipped:** an "I did this" control, persisted per advisor in `checkpoint_confirmations`
+(migration `0041`), with `confirm_checkpoint` and `checkpoint_progress` on the repository and two
+routes on the Workbench API.
+
+Four decisions worth their reasons:
+
+1. **Confirming twice is a no-op, not a 409** — deliberately the opposite of `complete_lesson`,
+   which raises on a duplicate. Completing a lesson twice is a real mistake; re-ticking a
+   self-reported checkpoint is not, and conflating them would teach advisors to ignore the error.
+2. **Only a real CHECKPOINT slide can be confirmed.** Otherwise a client could invent progress the
+   content model never offered, and the denominator in `checkpoint_progress` would mean nothing.
+3. **The denominator comes from the published content**, so "0 of 2" is distinguishable from "no
+   checkpoints here" — a bare zero says both.
+4. **There is no un-confirm.** A checkpoint records that you *did* something; un-ticking it would
+   be editing that record rather than correcting it. The state to be in if you redo the exercise is
+   "done it twice".
+
+The tick is set only **after** the write persists, and a failed save says so and restores the
+button. A control that says "done" without a record would be the same empty gesture the callout
+already was.
+
+### The limitation, stated rather than buried
+
+The key is `(advisor, lesson_id, slide_order)`. Lesson ids are deterministic and survive a
+re-publish; **slide positions do not**. Re-ordering a lesson's slides carries a confirmation to
+whichever slide now sits at that position.
+
+The alternatives were worse: adding an id to `Slide` changes a frozen contract every course
+validates against, and hashing the body would drop every confirmation the moment an author fixed a
+typo. Position is the only key the content model offers today.
+
+What *is* guaranteed: a stale confirmation can never inflate the count. `checkpoint_progress`
+intersects the confirmed set with the **current** checkpoint positions, so progress cannot exceed
+its own denominator — the part that would actually mislead someone. There is a test for exactly
+that.
+
+### Acceptance
+
+The ticket's line — *"ticking through a lesson means having **done** its checkpoints, not scrolled
+past them"* — is now met, with the honest caveat that "done" is self-reported. Nothing can verify
+an advisor really opened the wizard; what changed is that the claim is explicit and recorded.

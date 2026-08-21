@@ -62,7 +62,7 @@ own reconciled stamp, not a summary of it.
 | 10 | GRS-0235 | Read tracking an advisor can read | report polish | **DONE** (#249) |
 | 11 | GRS-0237 | The engine white paper: one document that answers "is this up to scratch?" | legibility & truthfulness | **DONE** (#250) — scope 3 corrected the record; the VALUES still need D1 |
 | 12 | GRS-0238 | A Prospecting surface: browse the registry we imported | legibility & truthfulness | **DONE** (#251) |
-| 13 | GRS-0239 | Lessons that teach before they test | legibility & truthfulness | **MOSTLY DONE** (#252) — scope 3 (checkpoint confirm) still open |
+| 13 | GRS-0239 | Lessons that teach before they test | legibility & truthfulness | **DONE** (#252, #258) |
 | 14 | GRS-0240 | The earnings page explains how you get paid | legibility & truthfulness | **DONE** (#253) |
 | 15 | GRS-0241 | Engagements: a list you can read, a link you cannot cross-wire | legibility & truthfulness | **PARTIAL** (#254) — scopes 4, 5 done; 1, 2, 3 open |
 | 16 | GRS-0242 | The Workbench stops leaking internals and contradicting itself | legibility & truthfulness | OPEN |

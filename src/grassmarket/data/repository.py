@@ -141,6 +141,7 @@ from bcap_contracts.learning import (
     QuizStatus,
     SectionProgress,
     SectionTestAttempt,
+    SlideKind,
 )
 from bcap_contracts.meetings import MediaKind, MeetingTranscript
 from bcap_contracts.money import Currency, Money
@@ -183,6 +184,7 @@ from grassmarket.data.models import (
     CBenchmarkRowORM,
     CertificationEventORM,
     CertificationRecordORM,
+    CheckpointConfirmationORM,
     ClientReportLinkORM,
     ClientReportProseORM,
     CommissionLineORM,
@@ -5391,6 +5393,102 @@ class Repository:
             .order_by(CourseVersionORM.version)
         ).scalars()
         return [self._to_course_version(v) for v in versions]
+
+    def confirm_checkpoint(
+        self, principal: Principal, slug: str, lesson_id: UUID, slide_order: int, *, now: datetime
+    ) -> None:
+        """The caller confirms they did one CHECKPOINT slide (GRS-0239 scope 3).
+
+        Idempotent: confirming twice is a no-op rather than a conflict. A checkpoint is a
+        self-reported "I did the thing", and re-ticking one is not an error worth an error message.
+        That is the opposite of `complete_lesson`, which raises on a duplicate — completing a lesson
+        twice is a real mistake, and the two should not be conflated.
+
+        **The slide must actually BE a checkpoint.** Confirming an arbitrary slide would let a
+        client invent progress the content model never offered, and would make the denominator in
+        `checkpoint_progress` meaningless.
+
+        Known limitation, stated because a caller can be misled by it: the key is the slide's
+        POSITION, since `Slide` carries no id. Re-ordering a lesson's slides carries a confirmation
+        to whichever slide now sits at that position. A confirmation is a training signal, not an
+        approval record and nothing a client sees, so the cost is a re-tick.
+        """
+        published = self.get_published_course(principal, slug)  # 404 if never published
+        course = self._get_course_row(slug)
+        lesson = next(
+            (
+                lesson
+                for module in published.tree.modules
+                for lesson in module.lessons
+                if lesson.id == lesson_id
+            ),
+            None,
+        )
+        if lesson is None:
+            raise NotFoundError(f"Lesson {lesson_id} is not in the published course '{slug}'.")
+        slide = next((s for s in (lesson.slides or ()) if s.order == slide_order), None)
+        if slide is None:
+            raise NotFoundError(f"Lesson {lesson_id} has no slide at position {slide_order}.")
+        if slide.kind is not SlideKind.CHECKPOINT:
+            raise ConflictError(
+                f"Slide {slide_order} of this lesson is a {slide.kind.value} slide, not a "
+                f"checkpoint. Only a checkpoint can be confirmed."
+            )
+
+        existing = self._session.execute(
+            select(CheckpointConfirmationORM).where(
+                CheckpointConfirmationORM.owner_consultant_id == principal.consultant_id,
+                CheckpointConfirmationORM.lesson_id == lesson_id,
+                CheckpointConfirmationORM.slide_order == slide_order,
+            )
+        ).scalar_one_or_none()
+        if existing is not None:
+            return
+
+        self._session.add(
+            CheckpointConfirmationORM(
+                owner_consultant_id=principal.consultant_id,
+                course_id=course.id,
+                lesson_id=lesson_id,
+                slide_order=slide_order,
+                confirmed_at=now,
+            )
+        )
+        self._session.flush()
+
+    def checkpoint_progress(
+        self, principal: Principal, slug: str, lesson_id: UUID
+    ) -> tuple[int, int]:
+        """(confirmed, total) checkpoints for one lesson, for THIS advisor.
+
+        The denominator comes from the published content, not from the confirmation rows, so a
+        lesson with three checkpoints and none done reads 0 of 3 rather than a bare zero that could
+        equally mean "no checkpoints here".
+        """
+        published = self.get_published_course(principal, slug)
+        lesson = next(
+            (
+                lesson
+                for module in published.tree.modules
+                for lesson in module.lessons
+                if lesson.id == lesson_id
+            ),
+            None,
+        )
+        if lesson is None:
+            raise NotFoundError(f"Lesson {lesson_id} is not in the published course '{slug}'.")
+        checkpoints = {s.order for s in (lesson.slides or ()) if s.kind is SlideKind.CHECKPOINT}
+        if not checkpoints:
+            return (0, 0)
+        confirmed = self._session.execute(
+            select(CheckpointConfirmationORM.slide_order).where(
+                CheckpointConfirmationORM.owner_consultant_id == principal.consultant_id,
+                CheckpointConfirmationORM.lesson_id == lesson_id,
+            )
+        ).scalars()
+        # Intersected with the CURRENT checkpoint positions: a confirmation left behind by a
+        # re-ordered lesson must not inflate the count past the denominator.
+        return (len(checkpoints & set(confirmed)), len(checkpoints))
 
     def complete_lesson(
         self, principal: Principal, slug: str, lesson_id: UUID, *, now: datetime
