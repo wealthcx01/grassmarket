@@ -1,6 +1,6 @@
 # GRS-0241 — Engagements: a list you can read, a link you cannot cross-wire
 
-**Status:** PARTIAL (2026-08-20) — scopes 4 and 5 shipped; 1, 2, 3 open. _Previously recorded as: Planned (2026-07-31, first-time-user review). **Priority:** MED-HIGH._
+**Status:** PARTIAL (2026-08-20) — scopes 1, 3, 4, 5 shipped; scope 2 open. _Previously recorded as: Planned (2026-07-31, first-time-user review). **Priority:** MED-HIGH._
 **Loop:** first-time-user coherence. **Relates to:** GRS-0177, GRS-0198, GRS-0208.
 
 ## Why
@@ -151,3 +151,64 @@ and each looks like a regression until someone reads it.
 
 The rule that keeps working: **assert the behaviour, match the copy loosely.** `name: /Download/`
 survives a rewording; `name: "Download"` does not. Worth a lint rule; not one I have written.
+
+
+---
+
+## Second pass — 2026-08-20 (scopes 1 and 3)
+
+### Why scope 1 was never done: an engagement had no provenance
+
+The founder asked for the duplicate demo rows on 23/07 and again on 31/07, and both times it did
+not happen. The reason is structural rather than neglect.
+
+Assessments and deliverables carry `RecordProvenance` (ADR-0029) — set at creation, immutable —
+which is how every surface knows to badge a record as demo or sandbox, and how ADR-0047 knows what
+may be deleted. **Engagements were the one owned record without it.** So nothing could badge a demo
+engagement, and nothing could safely delete a duplicate: ADR-0047 forbids deleting a production
+record, and without provenance no engagement could be *shown* to be anything else.
+
+Every previous attempt at this scope would have had to guess which rows were demo data. That guess
+is exactly what ADR-0047 exists to prevent, which is presumably why it kept stalling.
+
+### What shipped
+
+**Migration `0039` adds the column**, defaulting to `production` — the safe direction, matching
+every other table. Existing rows are therefore production and remain undeletable, which is correct:
+nothing can retroactively prove a historical row was demo data.
+
+**Provenance is DERIVED, not merely accepted.** An engagement drawing on a non-production assessment
+is itself non-production. This matters because the demo seed creates its engagements over HTTP and
+ADR-0029's rule is that a DEMO marker is *never* accepted from a request — deriving it from the
+linked assessments gives the seed the right answer without opening a field a client could forge,
+since assessment provenance is already immutable and already unforgeable.
+
+The derivation is **one-directional**: a marker can be strengthened by what the record draws on,
+never weakened. A test pins that, because if it ever inverted, linking a real assessment would
+quietly *un-badge* a demo engagement.
+
+**`Repository.delete_engagement`** enforces ADR-0047 in the repository, not in the script. A
+production engagement refuses deletion and no argument relaxes it — a guard a caller can forget to
+apply is not a guard.
+
+**`scripts/staging_cleanup_grs0241.py`** finds duplicate non-production engagements (same owner,
+prospect and title), prints them, and deletes only with `--execute`. The survivor of each group is
+the row with the most attached work — deliverables, then assessments, then comms — rather than the
+oldest: two rows that look identical in the list may not be, and keeping the oldest would sometimes
+delete the one carrying real output.
+
+**Scope 3 (partly): the badge and the "comms" wording.** The list uses the portfolio's own
+`ProvenanceBadge`, so a demo engagement is labelled exactly as a demo assessment is. "comms" is now
+"communication(s)" and **hidden at zero** — a count of zero on every row is metadata with no
+information in it.
+
+### Still open
+
+- **Scope 2 (one naming convention).** Needs a display-derivation rule plus a migration normalising
+  existing titles. Not attempted.
+- **Scope 3's remaining metadata** — linked-assessment state (none/in-progress/finalised),
+  deliverable count and last-activity date are not on the row yet.
+- **The staging cleanup has NOT been run.** The tool exists and is tested; running it needs the demo
+  seed re-run first (so the rows are stamped `demo`), and I have not done either on staging. Until
+  then the duplicate rows the founder sees are still there — they are `production` by default and
+  the script will correctly refuse to touch them.

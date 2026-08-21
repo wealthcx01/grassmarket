@@ -774,6 +774,8 @@ export interface Engagement {
   owner_consultant_id: string;
   prospect_id: string;
   title: string;
+  /** ADR-0029, extended to engagements by GRS-0241. Derived from the linked assessments. */
+  provenance: RecordProvenance;
   status: EngagementStatus;
   started_on?: string | null;
   assessment_ids: string[];

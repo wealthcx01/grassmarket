@@ -2631,11 +2631,23 @@ class Repository:
         started_on: date | None = None,
         assessment_ids: tuple[UUID, ...] = (),
         deliverables: tuple[DeliverableSlot, ...] = (),
+        provenance: RecordProvenance = RecordProvenance.PRODUCTION,
     ) -> Engagement:
         """Open an engagement against one of the principal's OWN contracted prospects, optionally
         linking finalised assessments. A cross-owner prospect/assessment is refused as not-found
         (no existence leak); an own-but-not-contracted prospect or an unfinalised assessment is an
-        `EngagementLinkError`. The owner is the principal, never caller-supplied."""
+        `EngagementLinkError`. The owner is the principal, never caller-supplied.
+
+        `provenance` is set HERE and is immutable thereafter (ADR-0029, extended to engagements by
+        GRS-0241). It defaults to PRODUCTION — the safe direction, so an engagement nobody marked is
+        treated as real client work and can never be removed by the cleanup script.
+
+        It is also **DERIVED**, not merely accepted: an engagement drawing on a non-production
+        assessment is itself non-production, and the derivation wins over a weaker argument. That
+        matters because the demo seed creates its engagements over HTTP, and ADR-0029's rule is that
+        a DEMO marker is never accepted from a request. Deriving it from the linked assessments
+        gives the seed the right answer without opening a field a client could forge — assessment
+        provenance is already immutable and already unforgeable."""
         prospect = self.get_prospect(principal, prospect_id)  # raises NotFound/Scope on cross-owner
         if prospect.stage not in _ENGAGEABLE_STAGES:
             raise EngagementLinkError(
@@ -2651,10 +2663,20 @@ class Repository:
                     f"Assessment {assessment_id} is not finalised; only finalised assessments link."
                 )
 
+        # Derivation. PRODUCTION is the weakest claim, so any non-production assessment pulls the
+        # engagement with it; a caller-supplied marker can only ever make the record MORE marked,
+        # never less. An engagement with no assessments keeps whatever the caller asked for.
+        derived = provenance
+        for assessment_id in assessment_ids:
+            linked_provenance = self.get_assessment(principal, assessment_id).provenance
+            if linked_provenance is not RecordProvenance.PRODUCTION:
+                derived = linked_provenance
+
         row = EngagementORM(
             owner_consultant_id=principal.consultant_id,
             prospect_id=prospect_id,
             title=title,
+            provenance=derived.value,
             status=EngagementStatus.CONTRACTED,
             started_on=started_on,
             assessment_ids_json=json.dumps([str(a) for a in assessment_ids]),
@@ -2666,6 +2688,30 @@ class Repository:
 
     def get_engagement(self, principal: Principal, engagement_id: UUID) -> Engagement:
         return self._to_engagement(self._require_engagement(principal, engagement_id))
+
+    def delete_engagement(self, principal: Principal, engagement_id: UUID) -> None:
+        """Delete one of the principal's own NON-PRODUCTION engagements (GRS-0241, ADR-0047).
+
+        **A production engagement is never deletable through this method, and no argument relaxes
+        that.** The rule lives here rather than in the cleanup script because a guard a caller can
+        forget to apply is not a guard — ADR-0047 states it for assessments in exactly these terms,
+        and an engagement is now provenance-carrying for the same reason.
+
+        Rows created before the provenance column existed are `production` and are therefore
+        untouchable. That is correct rather than inconvenient: nothing can retroactively prove a
+        historical row was demo data, and guessing is the failure ADR-0047 exists to prevent.
+        """
+        row = self._require_engagement(principal, engagement_id)  # scoped; cross-owner is not-found
+        if RecordProvenance(row.provenance) is RecordProvenance.PRODUCTION:
+            raise ScopeViolationError(
+                f"Engagement {engagement_id} is a production record. Production records are never "
+                f"deleted (ADR-0047); only demo and sandbox records can be removed."
+            )
+        # The comms log is a separate table with a foreign key, so it goes first.
+        for entry in self._comms_for(engagement_id):
+            self._session.delete(entry)
+        self._session.delete(row)
+        self._session.flush()
 
     def list_engagements(self, principal: Principal) -> list[Engagement]:
         stmt = select(EngagementORM)
@@ -6099,6 +6145,7 @@ class Repository:
             owner_consultant_id=row.owner_consultant_id,
             prospect_id=row.prospect_id,
             title=row.title,
+            provenance=RecordProvenance(row.provenance),
             status=EngagementStatus(row.status),
             started_on=row.started_on,
             assessment_ids=assessment_ids,

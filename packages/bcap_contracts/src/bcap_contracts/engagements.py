@@ -8,6 +8,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from bcap_contracts.assessments import RecordProvenance
 from bcap_contracts.base import OwnedResource
 
 
@@ -68,6 +69,10 @@ class Engagement(OwnedResource):
 
     prospect_id: UUID
     title: str = Field(min_length=1)
+    #: Whether this record describes real client work (ADR-0029). Set at creation and
+    #: immutable. Defaults to PRODUCTION, which is the safe direction: an unmarked record is
+    #: treated as real, never as demo data that may be badged or deleted.
+    provenance: RecordProvenance = RecordProvenance.PRODUCTION
     status: EngagementStatus = EngagementStatus.SCOPED
     started_on: date | None = None
     assessment_ids: tuple[UUID, ...] = Field(
