@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+import { TeachingEmptyState } from "@/components/TeachingEmptyState";
+
 import { ProvenanceBadge } from "@/components/ProvenanceBadge";
 
 import { NotFoundNotice } from "@/components/NotFoundNotice";
@@ -52,9 +54,23 @@ export default function EngagementsPage() {
       {items === null ? (
         <p style={{ color: "var(--color-ink-muted)" }}>Loading…</p>
       ) : items.length === 0 ? (
-        <p style={{ color: "var(--color-ink-muted)" }}>
-          No engagements yet. Open one from a contracted prospect.
-        </p>
+        <TeachingEmptyState
+          testId="engagements-empty"
+          headline="Nothing here yet — an engagement is a contract, not a record you create."
+          explanation={
+            <>
+              An engagement opens when a prospect reaches <strong>Contracted</strong> on the
+              pipeline. It is where a finalised assessment is attached, deliverables are produced,
+              and the client report is written — so this page stays empty until a deal is actually
+              signed, which is the honest reason rather than a missing button.
+            </>
+          }
+          action={{
+            href: "/pipeline",
+            label: "Open the pipeline",
+            rest: <> and move a prospect to Contracted to open its engagement.</>,
+          }}
+        />
       ) : (
         <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
           {items.map((e) => (
