@@ -10,6 +10,8 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+import { TeachingEmptyState } from "@/components/TeachingEmptyState";
+
 import { FIELD_CONTROL_CLASS, FormField } from "@/components/FormField";
 import { toDisplay } from "@/lib/band";
 import { ApiError, api, getToken } from "@/lib/api";
@@ -323,9 +325,29 @@ export default function BrokeragesPage() {
         {items === null ? (
           <p style={{ color: "var(--color-ink-muted)" }}>Loading…</p>
         ) : items.length === 0 ? (
-          <p style={{ color: "var(--color-ink-muted)" }}>
-            No assessments yet. Create one above to begin.
-          </p>
+          <TeachingEmptyState
+            testId="portfolio-empty"
+            headline="Nothing here yet — this is your portfolio of scored firms."
+            explanation={
+              <>
+                Every firm you assess appears here with its Platform Value, its coverage, and
+                whether it is still a draft or finalised. It is the page you come back to, rather
+                than one you fill in: an assessment starts in the wizard and lands here as soon as
+                it has a score, however partial.
+              </>
+            }
+            action={{
+              href: "/assessments/new",
+              label: "Start an assessment",
+              rest: (
+                <>
+                  {" "}
+                  — or open one of the demo brokerages above to see a finished one before you build
+                  your own.
+                </>
+              ),
+            }}
+          />
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.88rem" }}>

@@ -105,7 +105,14 @@ describe("EarningsPage (GRS-0035)", () => {
     mocked.earningsSummary.mockResolvedValue(summary({ line_count: 0 }));
     mocked.listCommissions.mockResolvedValue([]);
     render(<EarningsPage />);
-    expect(await screen.findByText(/No commission lines yet/i)).toBeTruthy();
+    // GRS-0243 scope 4 replaced this with an empty state that TEACHES. Asserted on the
+      // behaviour — the block exists, and it explains rather than restating the emptiness —
+      // because the sentence itself is now in the retired-copy register and must not come back.
+      const empty = await screen.findByTestId("earnings-empty");
+      expect(empty.textContent).toMatch(/created for you|never entered/i);
+      // The old wording is NOT asserted against here: it lives in `lib/retiredCopy.ts`, and
+      // repeating it as a negative would put the retired sentence back into the source the
+      // register scans — which is exactly what it caught when this test first ran.
   });
 
   it("downloads the statement on demand", async () => {
