@@ -80,6 +80,27 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("GM_FOUNDER_REVIEWER_EMAIL", "FOUNDER_REVIEWER_EMAIL"),
     )
 
+    # Admin by configuration (GRS-0208 scope 3). Comma-separated emails treated as ADMIN,
+    # derived PER REQUEST from the token's email exactly like `founder_reviewer_email` above —
+    # never minted into a token, so rotation is immediate and there is no new forgeable claim.
+    #
+    # This exists because scope 3 asks for john@bruntsfield.capital to be an admin provisioned
+    # "through the domain SSO path, not as a hand-seeded row", and Google auto-provisioning ALWAYS
+    # creates `Role.CONSULTANT` — deliberately, so that signing in can never mint an elevated role
+    # (GRS-0042). Rather than weaken that rule for one address, the SSO path creates the account as
+    # it creates every account, and this grants the elevation separately and visibly.
+    #
+    # Empty by default: no environment gets an admin it did not configure.
+    admin_emails: str = Field(default="", validation_alias="GM_ADMIN_EMAILS")
+
+    @property
+    def admin_email_set(self) -> frozenset[str]:
+        """The configured admin emails, normalised. Case-insensitive: local-part case is not
+        identity, and a rotation typed with different capitalisation must still work."""
+        return frozenset(
+            part.strip().lower() for part in self.admin_emails.split(",") if part.strip()
+        )
+
     invite_ttl_hours: int = Field(default=168, validation_alias="GM_INVITE_TTL_HOURS")
     # The canonical advisory-app origin — the OAuth callback redirects here, and it is always CORS-
     # allowed. Back-compat: GM_FRONTEND_ORIGIN still works unchanged.

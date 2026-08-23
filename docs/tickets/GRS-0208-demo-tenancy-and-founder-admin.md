@@ -1,6 +1,6 @@
 # GRS-0208 — One clean demo account, and a founder admin who can act as any advisor
 
-**Status:** PARTIAL — scopes 1 and 2 shipped; 3 and 4 open (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-26, staging review item 6). **Priority:** HIGH._
+**Status:** PARTIAL (2026-08-23) — scopes 1, 2, 3 shipped; scope 4 is FOUNDER-GATED. _Previously recorded as: Planned (2026-07-26, staging review item 6). **Priority:** HIGH._
 **Loop:** founder-feedback remediation, Wave 1.
 
 ## Why
@@ -173,3 +173,60 @@ One routing detail worth keeping: `/act-as/candidates` is declared **before** `/
 so the literal path wins the match. Without that ordering "candidates" is parsed as a UUID and every
 request 422s — a routing bug that presents as a permissions bug. There is a test for it.
 
+
+
+---
+
+## Third pass — 2026-08-23 (scope 3; scope 4 is not mine to finish)
+
+### Scope 3 asked for something the codebase deliberately forbids
+
+The ticket wants `john@bruntsfield.capital` to be an admin **"provisioned through the domain SSO
+path, not as a hand-seeded row"**. That runs straight into GRS-0042: Google auto-provisioning always
+creates `Role.CONSULTANT` and never anything higher, so that signing in can never mint an elevated
+role.
+
+The obvious shortcut — special-case that address in the auto-provisioning path — is the wrong one.
+It would mean anyone able to present that email gets an **admin account created for them**, which is
+the difference between a configured grant and an open door.
+
+### What shipped instead
+
+The SSO path creates the account exactly as it creates every account, and the elevation is granted
+**separately, by configuration** — `GM_ADMIN_EMAILS`, derived per request from the signed token's
+email, in the same way and for the same reasons as the founder claim (ADR-0041):
+
+- no migration and no stored role change,
+- no new claim in the token, so nothing to forge and nothing to go stale,
+- a rotation takes effect on the **next request** rather than when everyone's tokens expire.
+
+Three properties are pinned by tests because each is a way this could go wrong:
+
+1. **It only ever elevates.** A stored ADMIN absent from the list is *not* demoted — demoting on
+   absence would silently strip an admin the moment someone edited an environment variable, and
+   nobody would attribute the outage to that edit.
+2. **Auto-provisioning still cannot mint an elevated role.** Asserted directly against the OAuth
+   module's source, so the rule survives someone "helpfully" adding a special case later.
+3. **It cannot widen an act-as session.** The act-as branch uses the subject's *stored* role, so
+   acting as a configured admin still gives a consultant's session. Act-as narrows, never widens.
+
+Empty by default: no environment gets an admin it did not configure. **Set on staging**
+(`GM_ADMIN_EMAILS=john@bruntsfield.capital`); **deliberately NOT set on production** — that grants
+live admin access and is the founder's call to make, not a change to slip into a PR.
+
+### Scope 4 — half done, half not mine
+
+**"Staging seeded to match":** staging's engagement duplicates were cleaned on 2026-08-21 under
+ADR-0048 (12 rows → 7, zero duplicate groups, each correctly badged). The demo advisor account
+itself is *not* rebuilt to scope 1's single coherent story; the records there are the accumulated
+seed runs, deduplicated.
+
+**The two production strays — `Revolut` (draft, 0%) and `Meridian Securities` (finalised, 2%) — are
+NOT resolved, and cannot be by me.** The ticket says so itself: the cleanup tool will not remove
+production records (ADR-0047), and the decision is the founder's. It has been outstanding since
+2026-07-31. Nothing in this pass changes that, and inventing a criterion to sweep them up would be
+the exact failure ADR-0047 exists to prevent — the same reasoning that produced ADR-0048 for the
+orphaned engagements, which at least had a referential fact to stand on. These two have nothing
+comparable: they are production records that merely look untidy.
+
+**The ticket stays open on scope 4.**

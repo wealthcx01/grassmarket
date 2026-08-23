@@ -9,6 +9,7 @@ from __future__ import annotations
 from collections.abc import Iterator
 from uuid import UUID
 
+from bcap_contracts.common import Role
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
@@ -92,9 +93,13 @@ def get_current_principal(
     # new claim that could be forged or go stale. Compared case-insensitively because email
     # local-part case is not identity.
     is_founder = claims.email.strip().lower() == settings.founder_reviewer_email.strip().lower()
-    authenticated = Principal(
-        consultant_id=UUID(claims.sub), role=claims.role, is_founder=is_founder
-    )
+    # Admin by configuration (GRS-0208 scope 3), derived the same way and for the same reason: a
+    # configured address is an admin from the next request, without a migration, without a stored
+    # role change, and without a claim anyone could forge. It can only ever ELEVATE — a stored
+    # ADMIN is not demoted by being absent from the list, because that would silently strip an
+    # admin the moment someone edited an environment variable.
+    role = Role.ADMIN if claims.email.strip().lower() in settings.admin_email_set else claims.role
+    authenticated = Principal(consultant_id=UUID(claims.sub), role=role, is_founder=is_founder)
     if claims.act_as is None:
         return authenticated
 
@@ -117,6 +122,9 @@ def get_current_principal(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="The consultant this session was acting as no longer exists.",
         )
+    # NOTE the subject's STORED role is used, never the configured elevation. Acting as someone
+    # must narrow, never widen: if the subject is a consultant, the session is a consultant's, even
+    # when the subject's own email is in the admin list.
     return Principal(
         consultant_id=subject.id,
         role=subject.role,
