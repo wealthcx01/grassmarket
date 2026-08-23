@@ -1,6 +1,6 @@
 # GRS-0243 — First-run orientation: every section says what it is for, and the home page finally gets reworded
 
-**Status:** PARTIAL (2026-08-21) — scopes 1 and 4 shipped; 3 and 5 open; 2 largely moot. _Previously recorded as: Planned (2026-07-31, founder: "I have tried to use each section of the studio … and._
+**Status:** DONE (2026-08-23) — scopes 1, 3, 4, 5 shipped; 2 measured largely moot. _Previously recorded as: Planned (2026-07-31, founder: "I have tried to use each section of the studio … and._
 none of it makes sense. Not in my account or the demo account.").
 **Priority:** HIGH. **Loop:** first-time-user coherence. **Relates to:** GRS-0175, GRS-0205, GRS-0208.
 
@@ -176,3 +176,71 @@ This was also the **fifth** copy-pinned test in this programme to go red on a de
 - **Scope 3 (home shows state).** Live one-liners per card. Not attempted.
 - **Scope 5 (ten-minute first-run checklist).** Not attempted.
 - **Scope 2's route rename.** See above.
+
+---
+
+## Third pass — 2026-08-23 (scopes 3 and 5). Ticket closed.
+
+### Scope 3 — the home page says what is waiting
+
+The five card blurbs were written once and true forever — identical for an advisor with forty
+prospects and one with none. Nothing on the first screen after sign-in said what was actually
+waiting for them.
+
+Each card now carries a live one-liner, under two rules:
+
+1. **A count only appears when it means something.** "0 drafts in progress" is noise. The empty case
+   says what would *put* a number there — the same discipline scope 4 applied to the section empty
+   states.
+2. **A failed fetch renders NOTHING.** Not "—", not "0". This is the first screen after sign-in, and
+   an advisor who reads "no deliverables awaiting prose" during an outage will act on it. Silence is
+   the only honest output when we do not know, and there is a test for it.
+
+The Workbench line is deliberately **not** a count. A number of courses is exactly the decorative
+metadata this ticket objects to; what the Workbench owes an advisor is what to do next.
+
+Each line fetches independently, so one slow section cannot blank the others.
+
+### Scope 5 — a checklist, explicitly not a modal
+
+The ticket says "not a modal tour; a checklist card on home", and that is a rejection of something
+that already existed: `FirstRunWalkthrough` (GRS-0065) is four slides, shown once, gone forever. It
+tells a new advisor what the product is and then leaves them on the home page they did not
+understand — which is the state described in the complaint that opened this ticket.
+
+The checklist is a different instrument: **resumable** (read the primer on Monday, three items still
+waiting on Tuesday), it sends them to four *real places* rather than describing them, and it
+disappears when finished rather than when dismissed.
+
+A step ticks on **the click that navigates**. Asking an advisor to go somewhere and come back to
+tick a box is how a checklist stops being used, and the tick is a bookmark, not a claim they read
+carefully.
+
+### The collision this created, and the fix
+
+Adding the checklist put **two orientation devices on one screen** — worse than either alone, and
+precisely the incoherence this ticket exists to remove.
+
+So `FirstRunWalkthrough` now auto-opens only once the checklist is **finished**. The `?tour=1`
+replay from the Guide still always works, because that is someone deliberately asking for it. Three
+of its existing tests failed on that change; they encode the new rule now, with the precondition
+named rather than pasted, so a test that forgets it is asserting the behaviour we deliberately
+removed.
+
+Retiring the walkthrough outright was the alternative. It stays because the Guide links it and it is
+still the right thing for someone who wants a ninety-second overview on demand — just not the thing
+a brand-new advisor should meet first.
+
+### Scope 2, restated
+
+Measured on 2026-08-21 and unchanged: "Learning & Drills" no longer exists, and the visible label is
+already "Portfolio" in nav, heading and breadcrumbs. Only the `/assessments` **route** differs, which
+an advisor rarely reads, and renaming it risks breaking links for no on-screen benefit. Deliberately
+deprioritised; a small ticket of its own if the URL matters.
+
+### Acceptance
+
+The founder opens the studio and the first screen tells them what is waiting in each section and
+offers a four-step path through the product. The one thing it still does not do is explain the
+sections to someone who never clicks the checklist — that is what the blurbs are for, and they are
+unchanged.

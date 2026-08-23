@@ -53,7 +53,7 @@ own reconciled stamp, not a summary of it.
 | 1 | GRS-0229 | The shared web report must carry the non-production mark | client trust | **DONE** (#233) |
 | 2 | GRS-0245 | Founder sign-off covers everything that reaches a client | client trust | **DONE** (#234) |
 | 3 | GRS-0236 | Demo deliverables ship with worked example reports | first run | **DONE** (#235, #237) |
-| 4 | GRS-0243 | First-run orientation: every section says what it is for, and the home page finally gets reworded | first run | **PARTIAL** (#236, #259) — scopes 1, 4 done; 3, 5 open; 2 largely moot |
+| 4 | GRS-0243 | First-run orientation: every section says what it is for, and the home page finally gets reworded | first run | **DONE** (#236, #259, #260) — scope 2 measured moot |
 | 5 | GRS-0230 | The report editor: feedback where you can see it, figures you can actually declare | report workflow | **DONE** (#243) |
 | 6 | GRS-0231 | The report editor must name the client | report workflow | **DONE** (#244, #247) |
 | 7 | GRS-0233 | Web report figures: label the bars, keep the story's order | report workflow | **DONE** (#245) |

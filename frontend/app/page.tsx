@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { FirstRunChecklist } from "@/components/FirstRunChecklist";
 import { FirstRunWalkthrough } from "@/components/FirstRunWalkthrough";
+import { HomeSectionState, type SectionKey } from "@/components/HomeSectionState";
 import { WelcomeBanner } from "@/components/WelcomeBanner";
 
 // The advisor's sections, grouped by an intentional IA (GRS-0091): the client-delivery FLOW first
@@ -11,12 +13,15 @@ type Section = {
   blurb: string;
   kicker: string;
   step?: number;
+  /** Which live one-liner this card shows (GRS-0243 scope 3). */
+  state: SectionKey;
 };
 
 const CLIENT_WORK: ReadonlyArray<Section> = [
   {
     step: 1,
     title: "Pipeline",
+    state: "pipeline",
     href: "/pipeline",
     kicker: "Prospects & workshops",
     blurb: "Prospects, workshops, and kanban stages with time-in-stage flags and a weighted forecast.",
@@ -24,6 +29,7 @@ const CLIENT_WORK: ReadonlyArray<Section> = [
   {
     step: 2,
     title: "Your Portfolio",
+    state: "portfolio",
     href: "/assessments",
     // One name per concept (GRS-0243 scope 2). The kicker used to introduce a third
     // spelling of the same thing on the first screen the user sees.
@@ -33,6 +39,7 @@ const CLIENT_WORK: ReadonlyArray<Section> = [
   {
     step: 3,
     title: "Deliverables",
+    state: "deliverables",
     href: "/engagements",
     kicker: "Per engagement",
     blurb: "Diagnostic packs, heatmaps, and the modernisation roadmap — generated from a finalised assessment.",
@@ -42,12 +49,14 @@ const CLIENT_WORK: ReadonlyArray<Section> = [
 const GROW: ReadonlyArray<Section> = [
   {
     title: "Workbench",
+    state: "workbench",
     href: "/workbench",
     kicker: "Certification & practice",
     blurb: "Certification ladder, practice arena, power drills, and the bench queue.",
   },
   {
     title: "My Earnings",
+    state: "earnings",
     href: "/earnings",
     kicker: "Commission & fees",
     blurb: "Commission breakdown, workshop recovery fees, YTD and projections — with a downloadable statement.",
@@ -97,6 +106,7 @@ function SectionCard({ section }: { section: Section }) {
       <p style={{ margin: "0.5rem 0 0", fontSize: "0.88rem", color: "var(--color-ink-muted)", lineHeight: 1.5 }}>
         {section.blurb}
       </p>
+      <HomeSectionState section={section.state} />
     </Link>
   );
 }
@@ -105,6 +115,7 @@ export default function DashboardPage() {
   return (
     <div className="stack" style={{ gap: "2.75rem" }}>
       <FirstRunWalkthrough />
+      <FirstRunChecklist />
       {/* Welcome + context (GRS-0089) */}
       <section>
         <WelcomeBanner />

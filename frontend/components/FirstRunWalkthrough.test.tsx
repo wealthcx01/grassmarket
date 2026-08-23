@@ -17,14 +17,41 @@ vi.mock("@/lib/api", async (importActual) => {
 });
 const mockedToken = getToken as unknown as ReturnType<typeof vi.fn>;
 
-describe("FirstRunWalkthrough (GRS-0065)", () => {
+/**
+ * GRS-0243 scope 5 changed this component's opening rule. The checklist is now the first-run
+ * device, and two orientation instruments competing on one screen is worse than either alone —
+ * so the modal auto-opens only once the checklist is FINISHED. A `?tour=1` replay from the Guide
+ * still always works, because that is someone deliberately asking for it.
+ *
+ * The helper below is therefore not boilerplate: it encodes the new precondition, and a test that
+ * forgets it is asserting the behaviour we deliberately removed.
+ */
+function checklistFinished() {
+  window.localStorage.setItem(
+    "bas.first_run_checklist",
+    JSON.stringify(["primer", "report", "summary", "earnings"]),
+  );
+}
+
+describe("FirstRunWalkthrough (GRS-0065, opening rule amended by GRS-0243)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
     mockedToken.mockReturnValue("a-token");
+    // The default precondition for every test that expects the modal to open on its own.
+    checklistFinished();
   });
 
-  it("shows on a signed-in advisor's first visit", () => {
+  it("stays shut while the first-run checklist is unfinished (GRS-0243 scope 5)", () => {
+    // The new rule, and the reason the others need `checklistFinished()`. A new advisor gets the
+    // checklist — a resumable path through four real places — not a modal describing them.
+    localStorage.clear();
+    mockedToken.mockReturnValue("a-token");
+    render(<FirstRunWalkthrough />);
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("shows once the checklist is done and the tour has not been seen", () => {
     render(<FirstRunWalkthrough />);
     expect(screen.getByRole("dialog")).toBeTruthy();
     expect(screen.getByText("Welcome to the Advisor Studio")).toBeTruthy();
