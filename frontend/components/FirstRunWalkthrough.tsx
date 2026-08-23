@@ -11,6 +11,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { getToken } from "@/lib/api";
+import { firstRunChecklistComplete } from "@/components/FirstRunChecklist";
 
 const SEEN_KEY = "bas.onboarding_seen";
 
@@ -93,7 +94,11 @@ export function FirstRunWalkthrough() {
         return false;
       }
     })();
-    if (forced || !seen) setOpen(true);
+    // GRS-0243 scope 5. The checklist is now the first-run device, and two orientation
+    // instruments competing on one screen is worse than either alone. So this opens on its own
+    // only once the checklist is finished — a `?tour=1` replay from the Guide still always works,
+    // because that is someone deliberately asking for it.
+    if (forced || (!seen && firstRunChecklistComplete())) setOpen(true);
   }, []);
 
   const dismiss = useCallback(() => {
