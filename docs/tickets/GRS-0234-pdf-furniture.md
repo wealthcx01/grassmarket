@@ -127,3 +127,54 @@ plainly in the test's own docstring so nobody reads it as covering more than it 
 Re-baselined once. The diff is exactly three things and nothing else: the cover subtitle removed,
 five footer lines rewritten, and `48` → `47.9`. **Engine golden master untouched** — 56 golden tests
 pass unchanged.
+
+
+---
+
+## Scope 4, third attempt — 2026-08-24. Still not fixed, and now bounded.
+
+Attempted again with the "real fix" the previous note proposed. **It made the document worse**, so
+nothing shipped except the record.
+
+### What was measured
+
+The golden-master report, rendered from the same fixture with each change in isolation:
+
+| Change | Pages | Sparsest interior page |
+|---|---|---|
+| unchanged | 5 | 199 chars |
+| widow/orphan control alone | 5 | 199 chars — **no effect** |
+| widow control + figure bound to its paragraph | **6** | **180 chars — worse** |
+
+`KeepTogether` cannot make a pair fit. When the paragraph-plus-figure does not fit the remaining
+space it moves the *whole pair* to a fresh page, which lengthens the document and leaves the
+previous page shorter still. That is the opposite of the intent.
+
+The widow theory was also wrong. The three words beside the chart ("on inspection.") looked like a
+classic widow; `allowWidows=0` changed nothing, because it is not a broken-off line — it is the
+genuine end of the section's last paragraph.
+
+### What the three attempts add up to
+
+1. Narrow the figure → no effect.
+2. Widow/orphan control → no effect.
+3. Bind figure to paragraph → measurably worse.
+
+**The diagnosis has changed.** This is not a typesetting problem. The VALUE section's prose is
+short, and a short section followed by a full-width chart produces a thin page under *any* keep-with
+rule. It is a content-length problem wearing a typesetting costume.
+
+### What would actually fix it
+
+One of three, none of them a layout change:
+
+- a **shorter figure** for the value build-up (half-height rather than full-width),
+- a **denser VALUE section** — the prose is the shortest of the six, which is arguably its own
+  problem given it is the section a client reads for the number,
+- or **accept the page**: a chart with a caption and a short lead-in is not a defect, and three
+  attempts suggest the cost of removing it exceeds the cost of having it.
+
+My recommendation is the third, with the second raised separately as a content question for
+GRS-0211. Scope 4's regression guard (no *blank* interior page) stands and is unaffected.
+
+**The scope stays open, now with a bounded answer rather than an untried idea.**

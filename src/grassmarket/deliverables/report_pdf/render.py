@@ -602,12 +602,27 @@ def _build_document(
                 )
             )
         if section.kind is ReportSectionKind.VALUE:
-            # NOTE (GRS-0234 scope 4): narrowing this to 0.72 was tried as a cheap fix for the
-            # sparse page and MEASURED NOT TO HELP — the page stayed at ~300 chars plus the chart
-            # across all three samples. Reverted rather than kept, because the change had no effect
-            # and its comment would have claimed one. The sparse page is the VALUE section's own
-            # length plus a figure, not the figure's width; a real fix is a reportlab keep-with rule
-            # binding the figure to its preceding paragraph, which is not done here.
+            # GRS-0234 scope 4 — THREE attempts, all measured, none kept. Recorded in full so
+            # the next person does not repeat them:
+            #
+            # 1. Narrowing this figure to 0.72 of the frame. NO EFFECT: the page stayed at ~300
+            #    characters plus the chart across all three samples. The sparse page is not caused
+            #    by the figure's width.
+            # 2. Widow/orphan control on the body style (`allowWidows=0, allowOrphans=0`). NO
+            #    EFFECT on page count or on the sparsest page. The three-word tail that appears
+            #    beside the chart ("on inspection.") is not a reportlab widow — it is the genuine
+            #    end of the section's last paragraph.
+            # 3. Binding the figure to its preceding paragraph with KeepTogether — the "real fix"
+            #    the previous note proposed. MEASURABLY WORSE: on the golden-master fixture it
+            #    turned a 5-page report into a 6-page one and took the sparsest interior page from
+            #    199 characters down to 180. KeepTogether cannot make a pair fit; when it does not,
+            #    it moves the whole pair to a fresh page and leaves the previous one shorter still.
+            #
+            # What the measurements actually say: the VALUE section's prose is short, and a short
+            # section followed by a full-width chart will always produce a thin page under any
+            # keep-with rule. This is a CONTENT-LENGTH problem wearing a typesetting costume, and
+            # the fix is either a shorter figure, a denser VALUE section, or accepting the page.
+            # None of those is a layout change, which is why this scope stays open.
             story.extend(
                 _figure(
                     rendered["value_buildup"],
