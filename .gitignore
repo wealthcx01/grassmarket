@@ -57,3 +57,6 @@ local.db
 # Throwaway probe scripts, run artefacts and screenshots. These were committed once
 # (GRS-0177) and cost the repo 75MB and every ruff run; the reusable parts now live in tools/.
 scratch/
+
+# Local gbrain workspace marker — machine-specific, never committed.
+.gbrain-source
