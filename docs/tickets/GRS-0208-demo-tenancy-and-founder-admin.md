@@ -230,3 +230,32 @@ orphaned engagements, which at least had a referential fact to stand on. These t
 comparable: they are production records that merely look untidy.
 
 **The ticket stays open on scope 4.**
+## A correction to the scope-1 claim, found by looking at staging
+
+The scope-1 PR justified walking each card through its stage path like this: *a card teleported into
+`delivered` carries no transition history, so the board's time-in-stage flags — its most useful
+signal — would show nothing.*
+
+Half of that is true and half is not, and the staging screenshot shows which half.
+
+**True:** the walk produces real transition history — 88 rows on staging, one card with 8
+transitions behind it. That is the record, and it is right.
+
+**Not true:** the *flags* still show nothing. Every transition is timestamped server-side at the
+moment the seed runs, so all nine story cards read `0d in stage` and the board's **Stale** counter
+reads `0`. The ageing signal I said the walk would restore is not restored by it.
+
+Fixing it needs one of two things, and neither is free:
+
+1. **Backdating support** on the stage-transition path — an endpoint or repository seam that accepts
+   an `occurred_at`. That is production code changed to serve a seed, and it would create a way to
+   write false history into a real pipeline. It would need to be admin-only and audited, which is a
+   ticket, not a tweak.
+2. **Direct ORM writes in the seed**, bypassing the endpoints. Cheap, and it abandons the discipline
+   that everything in the showcase goes through the same paths an advisor uses — which is what makes
+   the seed evidence that those paths work.
+
+Neither is obviously worth it for a demo board, so it is recorded rather than done. The board shows
+the right **shape** — every stage populated, win-probabilities, a loss and a nurture — and does not
+show ageing. Anyone reading the scope-1 PR should read this alongside it.
+
