@@ -233,6 +233,10 @@ def main() -> int:
                 # of "delete this record but keep its runs" that leaves anything coherent.
                 discard_scoring_runs=args.discard_scoring_runs or is_production,
                 delete_production_record=is_production,
+                # GRS-0246. This tool exists to remove records the founder has looked at and
+                # decided are junk; leaving an engagement pointing at the hole afterwards is
+                # exactly the damage it is meant to clean up.
+                unlink_from_engagements=True,
             )
         session.commit()
         print(f"\nDeleted {len(deletable)} record(s); left {len(needs_decision)} for a decision.")

@@ -1,6 +1,6 @@
 # GRS-0246 — Deleting an assessment leaves engagements pointing at nothing
 
-**Status:** OPEN (2026-08-21). **Priority:** MED-HIGH. **Type:** Bug (data integrity).
+**Status:** MOSTLY DONE (2026-08-27) — scopes 2 and 4 shipped; 1 and 3 deliberately not. **Priority:** MED-HIGH. **Type:** Bug (data integrity).
 **Loop:** post-wave hardening. **Relates to:** ADR-0047, ADR-0048, GRS-0177, GRS-0241.
 
 ## Why
@@ -76,3 +76,40 @@ cycles that only ever ran there.
 
 That lowers the urgency and does not change the scope: the reference is still unenforced, and the
 next `delete_assessment` against a linked engagement will do the same thing wherever it runs.
+
+
+---
+
+## Shipped 2026-08-27 — the hole is closed
+
+**Scope 2 — the decision, and it is REFUSE.** `delete_assessment` now refuses while any engagement
+links the assessment, naming the engagements in the message. Silently unlinking was the alternative
+and it is worse: it leaves an engagement whose history quietly changed, which is the same dishonesty
+moved somewhere harder to notice. The link is a record of what the engagement drew on, so removing
+it is a decision, not a side effect.
+
+The check is **deliberately not owner-scoped**. The question is referential — *would deleting this
+break something?* — and an engagement belonging to another advisor is exactly the one whose breakage
+nobody would notice. The caller's own access to the assessment has already been checked.
+
+It parses the JSON rather than matching a substring, because a `LIKE` against a raw JSON blob
+matches a partial UUID. There is a test for that.
+
+**Scope 4 — the standing check.** `dangling_assessment_references()` reports every engagement
+holding a dead link. Read-only and unscoped: it **reports rather than repairs**, because what to do
+about a dangling reference is a decision (ADR-0048), not something a health check should take. A
+test asserts calling it twice still reports the same breakage — nothing is quietly cleaned up.
+
+## What is deliberately NOT done
+
+**Scope 1 — the join table.** Replacing `assessment_ids_json` with `engagement_assessments` and a
+real foreign key is the only change that makes this class of bug *impossible* rather than *guarded*,
+and it remains the better answer. It needs a migration that moves existing links without loss and
+reports rather than silently drops any dangling entries — a contained piece of work, but a schema
+change to a live relationship, which is not something to bundle into a housekeeping pass.
+
+**Scope 3 — the repair.** Staging was already repaired on 2026-08-21 under ADR-0048, and production
+was measured clean the same day (1 engagement, zero dangling references). There is nothing left to
+repair, so the guard and the check are what matter.
+
+The ticket stays open on scope 1.
