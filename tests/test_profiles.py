@@ -192,13 +192,27 @@ def test_profiles_declare_retail() -> None:
     assert "retail" in load_profiles()
 
 
-def test_profile_scoring_context_defaults_to_retail_and_reproduces_golden() -> None:
+def test_profile_scoring_context_defaults_to_retail_and_its_view_is_unchanged() -> None:
+    """The retail VIEW is byte-identical to the full registry (ADR-0025).
+
+    This used to assert the golden-master V through `profile_scoring_context`, which quietly made
+    it a test of whichever coefficient set happened to be active. When retail was activated on the
+    considered weights (D1, 2026-08-27) it failed — correctly, because the score moved by design.
+
+    The property it was really guarding is the VIEW, so that is what it asserts now: scoring the
+    golden-master inputs through the retail view, with the draft set named explicitly, still
+    reproduces the oracle. The engine's own golden master
+    (`test_atlas_engine_golden_master.py`) is unaffected and unchanged — it always pinned the
+    draft set directly.
+    """
     from grassmarket.atlas.active import profile_scoring_context
 
     gm = json.loads(_FIXTURE.read_text())
-    view, coeffs = profile_scoring_context()  # default = retail
-    result = score(_inputs_from_fixture(gm), coeffs, view)
+    view, active = profile_scoring_context()  # default = retail
+    result = score(_inputs_from_fixture(gm), draft_v1_coefficient_set(view), view)
     assert result.composite.v_index == 0.478565
+    # And the active set for retail is now the client-usable one — the point of D1.
+    assert active.client_usable is True
     # An unknown profile fails loud.
     with pytest.raises(UnknownKeyError):
         profile_scoring_context("no_such_profile")

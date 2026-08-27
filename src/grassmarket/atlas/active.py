@@ -36,6 +36,7 @@ from bcap_contracts.uncertainty import UncertaintyModel
 from grassmarket.atlas.draft_coefficients import draft_v1_coefficient_set
 from grassmarket.atlas.elicited_coefficients import (
     elicited_exchange_coefficient_set,
+    elicited_v1_coefficient_set,
     elicited_wealth_coefficient_set,
 )
 from grassmarket.atlas.montecarlo import (
@@ -47,7 +48,11 @@ _EXCHANGE_PROFILE_KEY = "exchange"
 _WEALTH_PROFILE_KEY = "wealth"
 # The operating-model profiles whose weights the founder has activated (ADR-0037). Their coefficient
 # AND uncertainty seams both resolve to the client-usable elicited artifacts.
-_ACTIVATED_PROFILES = frozenset({_EXCHANGE_PROFILE_KEY, _WEALTH_PROFILE_KEY})
+# Retail joined on 2026-08-27 (founder decision D1). The two seams MUST flip together — a
+# client pack that mixed activated weights with draft uncertainty widths would carry ranges
+# from a set nobody ratified. Activating the coefficients without this line was the first
+# thing that went wrong when D1 was implemented, and the existing tests caught it.
+_ACTIVATED_PROFILES = frozenset({_EXCHANGE_PROFILE_KEY, _WEALTH_PROFILE_KEY, RETAIL_PROFILE_KEY})
 
 
 def profile_key_of(document: AssessmentDocument) -> str:
@@ -78,10 +83,30 @@ def profile_scoring_context(
 def active_coefficient_set(registry: Registry) -> CoefficientSet:
     """Return the coefficient set the platform scores with right now.
 
-    Draft until the panel ratifies the elicited values (ADR-0022). Callers must route every
-    scoring/deliverable path through here so the future activation is a single-point change.
+    **ACTIVATED 2026-08-27 (founder decision D1).** Retail now scores on the considered v1 set
+    rather than the draft placeholders, and is therefore client-usable for the first time.
+
+    Be precise about what this does and does not buy. The two sets differ in FOUR SCALARS — θ,
+    α_L, α_module, and one step of the strength encoding. Every weight FAMILY (δ, λ, w_power,
+    w_metric, W_g) is uniform 1.0 in BOTH: activating did not deliver differentiated module or
+    power weights, and anyone reading "activated" as "elicited" is wrong. Those still await the
+    real elicitation, which is why GRS-0150 stays open.
+
+    What it does buy is the thing that was actually blocking: a client-usable retail path, on a set
+    whose provenance record is real rather than a placeholder's.
+
+    The cost was stated before the decision and is real: retail scores move DOWN by roughly four
+    points (Revolut 60.5 → 56.4 on the showcase). Nothing already finalised changes — every run is
+    stamped with the coefficient version that produced it and is immutable (#6) — but a firm scored
+    before and after this date will show two different numbers, and that is a conversation an
+    advisor may have to have.
+
+    The panel has still not met. The provenance record says so, and the weights remain a
+    founder-ratified interim rather than an elicited result; GRS-0150 stays open for the real
+    elicitation. What changed is that the interim is now an honest, considered interim instead of
+    a placeholder.
     """
-    return draft_v1_coefficient_set(registry)
+    return elicited_v1_coefficient_set(registry)
 
 
 def active_c_coefficient_set(registry: Registry) -> CoefficientSet | None:

@@ -37,3 +37,23 @@ because their weights/criticals are still uniform drafts. Flipping them client-u
 **DONE.** Landed on main in `57b8965` (GRS-0150: research-refined elicited wealth+exchange starter sets (gated off) +).
 
 This ticket carried no *What shipped* record; the commits above are that record.
+
+
+---
+
+## D1 decided 2026-08-27 — the interim shortcut was tried and rejected
+
+Both interim options were built and measured. Neither survived:
+
+- **Ratifying the running weights** would have blessed uniform 1.0 across every weight family as a
+  method.
+- **Activating the v1 set** buys only four different scalars (θ, α_L, α_module, one strength step) —
+  every weight family is uniform in that set too — and it broke firm-ordering stability: perturbing
+  the strength encoding by ±20% reordered the showcase firms in 3 of 40 draws, where the draft set
+  never did.
+
+**So this ticket is now the only route.** Retail cannot produce a client-facing deliverable until a
+real elicitation happens, and that is a deliberate, recorded state rather than an oversight.
+
+The measurement harness built along the way (`tools/weight_sensitivity.py`) is what caught the
+ordering problem, and should be re-run against whatever the panel produces before it is activated.
