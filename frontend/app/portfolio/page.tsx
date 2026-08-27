@@ -189,7 +189,7 @@ export default function BrokeragesPage() {
           doc.setProfile(created.document, { operating_model: profileKey }),
         );
       }
-      router.push(`/assessments/${created.id}`);
+      router.push(`/portfolio/${created.id}`);
     } catch (err: unknown) {
       setError(err instanceof ApiError ? err.message : "Could not create the assessment.");
       setCreating(false);
@@ -337,7 +337,7 @@ export default function BrokeragesPage() {
               </>
             }
             action={{
-              href: "/assessments/new",
+              href: "/portfolio/new",
               label: "Start an assessment",
               rest: (
                 <>
@@ -446,7 +446,7 @@ function PortfolioRow({
         <td style={{ padding: "0.55rem 0.6rem" }}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap", paddingLeft: isVariant ? "1.25rem" : 0 }}>
             <Link
-              href={`/assessments/${e.assessment_id}`}
+              href={`/portfolio/${e.assessment_id}`}
               style={{ fontFamily: "var(--font-serif)", fontWeight: 600, color: "inherit", textDecoration: "none" }}
             >
               {e.subject || "Untitled"}

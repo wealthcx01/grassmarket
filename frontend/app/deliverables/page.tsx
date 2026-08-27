@@ -100,7 +100,7 @@ export default function DeliverablesPage() {
             </>
           }
           action={{
-            href: "/assessments",
+            href: "/portfolio",
             label: "Start an assessment",
             rest: (
               <>

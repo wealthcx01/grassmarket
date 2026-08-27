@@ -1,6 +1,6 @@
 # GRS-0241 — Engagements: a list you can read, a link you cannot cross-wire
 
-**Status:** PARTIAL (2026-08-20) — scopes 1, 3, 4, 5 shipped; scope 2 open. _Previously recorded as: Planned (2026-07-31, first-time-user review). **Priority:** MED-HIGH._
+**Status:** DONE (2026-08-27) — all five scopes. _Previously recorded as: Planned (2026-07-31, first-time-user review). **Priority:** MED-HIGH._
 **Loop:** first-time-user coherence. **Relates to:** GRS-0177, GRS-0198, GRS-0208.
 
 ## Why
@@ -212,3 +212,27 @@ information in it.
   seed re-run first (so the rows are stamped `demo`), and I have not done either on staging. Until
   then the duplicate rows the founder sees are still there — they are `production` by default and
   the script will correctly refuse to touch them.
+
+---
+
+## Scope 2 — done 2026-08-27
+
+The founder-visible half was already true: "Learning & Drills" no longer exists, and the nav,
+headings and breadcrumbs have said "Portfolio" for a while. **The one place the old word survived
+was the address bar**, which is why this was deprioritised twice.
+
+Done now that everything else is: `/assessments` → `/portfolio`, with **permanent redirects** for
+`/assessments` and `/assessments/:path*`. The redirects are the point — advisors bookmark pages, and
+a rename that breaks a bookmark is a worse bug than the inconsistency it fixes.
+
+**The backend route is unchanged.** `lib/api.ts` still calls `/assessments` because that is the API,
+not the page, and renaming it would be a contract change wearing a UI change's clothes.
+
+Two things the move surfaced, both fixed:
+
+- `WizardLayout.test.ts` reads its component off disk by path and still pointed at
+  `app/assessments/...`. It failed to LOAD rather than failing an assertion, so the suite reported
+  "410 passed" instead of 419 — nine tests silently not running. A test file that cannot load is
+  worse than a failing one, because the count still looks plausible.
+- Stale generated types under `.next/` referenced the old directory and broke `tsc` until the
+  build cache was cleared. Not a code problem, but worth knowing before someone debugs it.

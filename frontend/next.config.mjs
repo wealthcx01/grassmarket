@@ -15,6 +15,12 @@ const nextConfig = {
       // GRS-0175: /help merged into /guide (one canonical Guide). Section ids are preserved, so
       // /help#anchor deep links resolve to the same content under /guide.
       { source: "/help", destination: "/guide", permanent: true },
+      // GRS-0241 scope 2: one name per concept. The nav, headings and breadcrumbs have said
+      // "Portfolio" for a while; the URL still said /assessments, so the one place the old word
+      // survived was the address bar. Permanent redirects, because advisors bookmark pages and a
+      // rename that breaks a bookmark is a worse bug than the inconsistency it fixes.
+      { source: "/assessments", destination: "/portfolio", permanent: true },
+      { source: "/assessments/:path*", destination: "/portfolio/:path*", permanent: true },
     ];
   },
 };

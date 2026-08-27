@@ -55,7 +55,7 @@ const STEPS: Step[] = [
     id: "summary",
     label: "Step through one demo assessment's Summary",
     why: "Where the score comes from, on a firm already assessed for you.",
-    href: "/assessments",
+    href: "/portfolio",
   },
   {
     id: "earnings",

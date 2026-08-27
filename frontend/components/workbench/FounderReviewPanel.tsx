@@ -117,7 +117,7 @@ export function FounderReviewPanel() {
                   href={
                     entry.deliverable_id
                       ? `/deliverables/${entry.deliverable_id}/report`
-                      : `/assessments/${entry.assessment_id}`
+                      : `/portfolio/${entry.assessment_id}`
                   }
                   style={{ fontWeight: 600 }}
                 >

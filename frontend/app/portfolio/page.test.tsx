@@ -24,7 +24,7 @@ vi.mock("@/lib/api", async (importOriginal) => {
   };
 });
 
-import PortfolioPage from "@/app/assessments/page";
+import PortfolioPage from "@/app/portfolio/page";
 
 function entry(
   id: string,
@@ -77,7 +77,7 @@ describe("Portfolio page (GRS-0177)", () => {
       await waitFor(() => expect(container.querySelectorAll("tbody tr").length).toBe(1));
       const link = screen.getByRole("link", { name: "Revolut" });
       // The production record, even though the demo row is the most recently updated.
-      expect(link.getAttribute("href")).toBe("/assessments/prod");
+      expect(link.getAttribute("href")).toBe("/portfolio/prod");
     });
 
     it("reveals the other records on demand, each with its own badge and link", async () => {
@@ -85,10 +85,10 @@ describe("Portfolio page (GRS-0177)", () => {
       await waitFor(() => expect(screen.getByRole("button", { name: /2 variants/ })).toBeTruthy());
       fireEvent.click(screen.getByRole("button", { name: /2 variants/ }));
       await waitFor(() => expect(container.querySelectorAll("tbody tr").length).toBe(3));
-      const hrefs = Array.from(container.querySelectorAll('tbody a[href^="/assessments/"]')).map(
+      const hrefs = Array.from(container.querySelectorAll('tbody a[href^="/portfolio/"]')).map(
         (a) => a.getAttribute("href"),
       );
-      expect(hrefs).toEqual(["/assessments/prod", "/assessments/sandbox", "/assessments/demo"]);
+      expect(hrefs).toEqual(["/portfolio/prod", "/portfolio/sandbox", "/portfolio/demo"]);
       expect(screen.getByText(/Sandbox: non-production/)).toBeTruthy();
       expect(screen.getByText(/Demo: illustrative only/)).toBeTruthy();
     });

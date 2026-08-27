@@ -125,7 +125,7 @@ export function WizardClient({ id }: { id: string }) {
         // 404 (no such assessment) or 422 (malformed id in the URL) → not a real record; bounce to
         // the portfolio rather than leak a raw "Request failed (422)" (GRS-0143).
         if (err instanceof ApiError && (err.status === 404 || err.status === 422))
-          return router.replace("/assessments?notfound=1");
+          return router.replace("/portfolio?notfound=1");
         setLoadError(err instanceof ApiError ? err.message : "Could not load the assessment.");
       });
     return () => ctrl.abort();
@@ -311,7 +311,7 @@ export function WizardClient({ id }: { id: string }) {
         assessment.entity_id ?? null,
       );
       await api.saveAssessment(copy.id, document);
-      router.push(`/assessments/${copy.id}`);
+      router.push(`/portfolio/${copy.id}`);
     } catch (err: unknown) {
       if (handleAuth(err)) return;
       setLiveError(err instanceof ApiError ? err.message : "Could not create the sandbox preview.");
@@ -353,7 +353,7 @@ export function WizardClient({ id }: { id: string }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.5rem" }}>
         <div>
           <Breadcrumb
-            trail={[{ label: "Your Portfolio", href: "/assessments" }]}
+            trail={[{ label: "Your Portfolio", href: "/portfolio" }]}
             current={assessment.subject || "Untitled assessment"}
           />
           <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap", margin: "0.35rem 0 0" }}>
