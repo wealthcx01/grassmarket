@@ -307,8 +307,12 @@ def test_a_finalised_record_is_refused_because_its_scoring_run_is_immutable(
         finalised = next(
             a for a in repo.list_assessments(principal) if a.state is AssessmentState.FINALISED
         )
+        # GRS-0246 added an engagement-link guard that runs BEFORE the scoring-run one, so this
+        # test has to clear it to still be testing what it was written to test: that a finalised
+        # record is refused for carrying immutable runs. Passing the unlink flag here asserts the
+        # ordering as much as the refusal.
         with pytest.raises(ConflictError, match="finalised or carries"):
-            repo.delete_assessment(principal, finalised.id)
+            repo.delete_assessment(principal, finalised.id, unlink_from_engagements=True)
     finally:
         session.close()
 
@@ -431,7 +435,13 @@ def test_a_finalised_demo_record_goes_with_its_runs_and_leaves_no_orphans(
         ]
         assert run_ids, "fixture must give the record at least one run for this test to mean much"
 
-        repo.delete_assessment(principal, target.id, discard_scoring_runs=True)
+        # GRS-0246. This test's name promises "leaves no orphans" and, before the guard, it
+        # left one: the showcase assessment is linked by its engagement, and deleting it pointed
+        # that engagement at nothing. The flag removes the link in the same transaction, which is
+        # what makes the promise in the name true.
+        repo.delete_assessment(
+            principal, target.id, discard_scoring_runs=True, unlink_from_engagements=True
+        )
         session.commit()
 
         assert all(a.id != target.id for a in repo.list_assessments(principal))

@@ -2884,6 +2884,45 @@ class Repository:
             return None
         return (client, subject)
 
+    def _engagements_referencing(self, assessment_id: UUID) -> list[EngagementORM]:
+        """Every engagement whose `assessment_ids_json` names this assessment (GRS-0246).
+
+        Deliberately NOT owner-scoped. The question is referential ("would deleting this break
+        something?"), not "what may this principal see" — and an engagement belonging to another
+        advisor is exactly the one whose breakage nobody would notice. The caller has already had
+        its own access to the assessment checked.
+
+        Parsed rather than LIKE-matched: a substring match on raw JSON matches a partial UUID.
+        """
+        needle = str(assessment_id)
+        found: list[EngagementORM] = []
+        for row in self._session.execute(select(EngagementORM)).scalars():
+            try:
+                linked = json.loads(row.assessment_ids_json or "[]")
+            except (TypeError, ValueError):
+                continue
+            if any(str(a) == needle for a in linked):
+                found.append(row)
+        return found
+
+    def dangling_assessment_references(self) -> list[tuple[UUID, str, list[str]]]:
+        """(engagement id, title, dead assessment ids) for every broken link (GRS-0246).
+
+        The standing check. Read-only, unscoped, and reports rather than repairs — what to do about
+        a dangling reference is a decision (ADR-0048), not something a health check should take.
+        """
+        live = {str(r[0]) for r in self._session.execute(select(AssessmentORM.id))}
+        broken: list[tuple[UUID, str, list[str]]] = []
+        for row in self._session.execute(select(EngagementORM)).scalars():
+            try:
+                linked = [str(a) for a in json.loads(row.assessment_ids_json or "[]")]
+            except (TypeError, ValueError):
+                continue
+            dead = [a for a in linked if a not in live]
+            if dead:
+                broken.append((row.id, row.title, dead))
+        return broken
+
     def _require_engagement(self, principal: Principal, engagement_id: UUID) -> EngagementORM:
         row = self._session.get(EngagementORM, engagement_id)
         if row is None:
@@ -3267,6 +3306,7 @@ class Repository:
         *,
         discard_scoring_runs: bool = False,
         delete_production_record: bool = False,
+        unlink_from_engagements: bool = False,
     ) -> None:
         """Remove ONE assessment the caller owns, named by id (GRS-0177 staging cleanup).
 
@@ -3278,6 +3318,12 @@ class Repository:
         than work. No criteria-based caller can reach it, because the flag is per call and the
         method takes one id. Every such deletion writes an audit event naming the record. See the
         2026-07-29 amendment to ADR-0047.
+
+        An assessment **linked by an engagement** is refused by default (GRS-0246). The cascade
+        below is careful about every foreign key, but an engagement references its assessments
+        through a JSON column, so the cascade never saw them — five staging engagements pointed at
+        deleted assessments for a month. `unlink_from_engagements=True` removes the link in the
+        same transaction; there is deliberately no path that drops it silently.
 
         A record carrying a **scoring run** is refused by default, because runs are immutable and
         append-only (#6) — deleting the assessment would either orphan the run or destroy it.
@@ -3315,6 +3361,40 @@ class Repository:
                 f"sandbox record whose runs are seeded illustration — call with "
                 f"discard_scoring_runs=True."
             )
+
+        # GRS-0246. An engagement references its assessments through `assessment_ids_json`, a
+        # JSON text column — NOT a foreign key. So the cascade below, which is careful and correct
+        # about every FK, never saw them: assessments were deleted in July and five staging
+        # engagements went on pointing at nothing for a month, which is how the founder's duplicate
+        # rows became undeletable (they defaulted to `production` because nothing could be derived
+        # from a missing assessment).
+        #
+        # ADR-0047 §4 already states the intent — "orphaned references are the silent inconsistency
+        # non-negotiable #3 exists to prevent" — and the guarantee simply did not reach the one
+        # relationship not expressed as a key. It does now.
+        #
+        # REFUSED rather than silently unlinked. Unlinking would leave an engagement whose history
+        # quietly changed, which is the same dishonesty moved somewhere harder to notice.
+        referencing = self._engagements_referencing(assessment_id)
+        if referencing and not unlink_from_engagements:
+            titles = ", ".join(sorted(e.title for e in referencing)[:3])
+            raise ConflictError(
+                f"Assessment {assessment_id} is linked by {len(referencing)} engagement(s) "
+                f"({titles}). Deleting it would leave them pointing at nothing. Pass "
+                f"unlink_from_engagements=True to remove the link as part of this deletion — the "
+                f"link is a record of what the engagement drew on, so dropping it is a decision, "
+                f"not a side effect."
+            )
+        for engagement in referencing:
+            # Unlink IN THE SAME TRANSACTION as the deletion. Doing it separately would leave a
+            # window where the link is gone and the assessment is not, which is the inverse
+            # inconsistency and just as silent.
+            remaining = [
+                a
+                for a in json.loads(engagement.assessment_ids_json or "[]")
+                if str(a) != str(assessment_id)
+            ]
+            engagement.assessment_ids_json = json.dumps(remaining)
 
         # Children first, so no FK is left dangling.
         self._session.execute(
