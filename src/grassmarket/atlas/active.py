@@ -48,11 +48,9 @@ _EXCHANGE_PROFILE_KEY = "exchange"
 _WEALTH_PROFILE_KEY = "wealth"
 # The operating-model profiles whose weights the founder has activated (ADR-0037). Their coefficient
 # AND uncertainty seams both resolve to the client-usable elicited artifacts.
-# Retail joined on 2026-08-27 (founder decision D1). The two seams MUST flip together — a
-# client pack that mixed activated weights with draft uncertainty widths would carry ranges
-# from a set nobody ratified. Activating the coefficients without this line was the first
-# thing that went wrong when D1 was implemented, and the existing tests caught it.
-_ACTIVATED_PROFILES = frozenset({_EXCHANGE_PROFILE_KEY, _WEALTH_PROFILE_KEY, RETAIL_PROFILE_KEY})
+# Retail is NOT here — D1, 2026-08-27. The two seams flip together, so retail's absence from
+# this set is the same decision as `active_coefficient_set` returning the draft set.
+_ACTIVATED_PROFILES = frozenset({_EXCHANGE_PROFILE_KEY, _WEALTH_PROFILE_KEY})
 
 
 def profile_key_of(document: AssessmentDocument) -> str:
@@ -83,30 +81,20 @@ def profile_scoring_context(
 def active_coefficient_set(registry: Registry) -> CoefficientSet:
     """Return the coefficient set the platform scores with right now.
 
-    **ACTIVATED 2026-08-27 (founder decision D1).** Retail now scores on the considered v1 set
-    rather than the draft placeholders, and is therefore client-usable for the first time.
+    **DRAFT. Retail is deliberately NOT activated** — founder decision D1, 2026-08-27, recorded in
+    `docs/FOUNDER-DECISIONS-2026-08.md`. Activating the v1 set was built and measured, and rejected
+    on two findings: it buys only four different scalars (every weight family is uniform 1.0 in
+    both sets), and it broke firm-ordering stability — perturbing the strength encoding by ±20%
+    reordered the showcase firms in 3 of 40 draws, where the draft set never did.
 
-    Be precise about what this does and does not buy. The two sets differ in FOUR SCALARS — θ,
-    α_L, α_module, and one step of the strength encoding. Every weight FAMILY (δ, λ, w_power,
-    w_metric, W_g) is uniform 1.0 in BOTH: activating did not deliver differentiated module or
-    power weights, and anyone reading "activated" as "elicited" is wrong. Those still await the
-    real elicitation, which is why GRS-0150 stays open.
+    The consequence is accepted: a retail assessment cannot produce a client-facing deliverable.
+    GRS-0150, the real elicitation, is the only route that changes that.
 
-    What it does buy is the thing that was actually blocking: a client-usable retail path, on a set
-    whose provenance record is real rather than a placeholder's.
-
-    The cost was stated before the decision and is real: retail scores move DOWN by roughly four
-    points (Revolut 60.5 → 56.4 on the showcase). Nothing already finalised changes — every run is
-    stamped with the coefficient version that produced it and is immutable (#6) — but a firm scored
-    before and after this date will show two different numbers, and that is a conversation an
-    advisor may have to have.
-
-    The panel has still not met. The provenance record says so, and the weights remain a
-    founder-ratified interim rather than an elicited result; GRS-0150 stays open for the real
-    elicitation. What changed is that the interim is now an honest, considered interim instead of
-    a placeholder.
+    This function was briefly switched to the elicited set in error and reverted; see
+    `tests/test_elicited_coefficients.py::test_retail_is_not_activated`, which exists so the flip
+    cannot happen again without someone deleting a test that says why.
     """
-    return elicited_v1_coefficient_set(registry)
+    return draft_v1_coefficient_set(registry)
 
 
 def active_c_coefficient_set(registry: Registry) -> CoefficientSet | None:
