@@ -214,6 +214,7 @@ from grassmarket.data.models import (
     RecoveryFeeAttributionORM,
     RefreshTokenORM,
     RegistryContactORM,
+    RegistryTargetNameOverrideORM,
     RegistryTargetORM,
     ReportReadEventORM,
     ScoringRunORM,
@@ -1027,6 +1028,20 @@ class Repository:
         )
         target_ids = [r.target_id for r in rows]
 
+        # Curated display names (GRS-0238 / D8). Joined at READ time rather than written onto the
+        # target, so a re-import cannot silently undo the curation and the imported value stays
+        # visible beneath it.
+        overrides: dict[str, RegistryTargetNameOverrideORM] = {}
+        if target_ids:
+            overrides = {
+                row.target_id: row
+                for row in self._session.execute(
+                    select(RegistryTargetNameOverrideORM).where(
+                        RegistryTargetNameOverrideORM.target_id.in_(target_ids)
+                    )
+                ).scalars()
+            }
+
         counts: dict[str, int] = {}
         if target_ids:
             counts = {
@@ -1057,7 +1072,12 @@ class Repository:
         targets = [
             ProspectingTarget(
                 target_id=row.target_id,
-                name=row.name,
+                name=(
+                    overrides[row.target_id].display_name
+                    if row.target_id in overrides
+                    else row.name
+                ),
+                imported_name=row.name,
                 domain=row.domain,
                 country=row.country,
                 segment=row.segment,
@@ -1069,7 +1089,14 @@ class Repository:
                 already_in_my_pipeline=(
                     row.target_id in claimed_ids or row.name.strip().lower() in claimed_names
                 ),
-                name_unverified=looks_like_a_domain_stem(row.name),
+                # A curated name IS verified — that is the point of curating it. Without this
+                # the badge would sit next to "Goldman Sachs" and say the name is unverified,
+                # which is both wrong and exactly the kind of contradiction the surface exists to
+                # remove.
+                name_unverified=(
+                    row.target_id not in overrides and looks_like_a_domain_stem(row.name)
+                ),
+                curated=row.target_id in overrides,
             )
             for row in rows
         ]
