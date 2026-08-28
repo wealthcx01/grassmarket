@@ -68,9 +68,38 @@ below. Note the related fact the white paper now states: because retail scores o
 client-facing deliverable at all.** Only wealth and exchange can. That is the fail-loud design
 working, but it is probably not what you expect the product to do.
 
-### Recommendation
+### DECIDED 2026-08-27: neither. Retail stays OFF until the panel runs.
 
-**Option B now, Option A scheduled.** The numbers are not obviously wrong, and B is honest, immediate,
+Both options were built and measured before the decision, and the measuring changed the answer.
+
+**Option B (ratify what is running) was withdrawn.** The live retail set is uniform: δ, λ, w_power,
+w_metric and W_g are all **1.0** — "every module, every power and every metric matters equally".
+That is a placeholder, not a judgement, and ratifying it would have shipped a non-judgement to
+clients under a methodology's name.
+
+**Option A-lite (activate the v1 set) was built, then abandoned.** Two findings killed it:
+
+1. **It buys less than it appears to.** The two sets differ in **four scalars** — θ, α_L,
+   α_module, and one step of the strength encoding. Every weight *family* is uniform 1.0 in **both**.
+   Activating would not have delivered differentiated module or power weights; the earlier framing
+   of this decision (and my description of it to the founder) overstated that, and is corrected here.
+2. **It cost a property the product relies on.** With the v1 set active, the weight-sensitivity
+   guard fails: perturbing the power-strength encoding by ±20% **reorders the three showcase firms
+   in 3 of 40 draws**. Under the draft set that never happened. "This firm scores above that one"
+   would have become sensitive to a weight nobody has ratified — on a client-facing document.
+
+Retail scores would also have moved down ~4 points (Revolut 60.5 → 56.4).
+
+**Consequence, accepted deliberately: a retail assessment still cannot produce a client-facing
+deliverable.** Wealth and exchange can. That is the fail-loud design working, and it now has a
+recorded reason rather than an unexamined default.
+
+**What actually unblocks this is the real elicitation — Option A. GRS-0150 stays open and is now the
+only route.** The interim shortcut has been tried and measured, and it does not hold.
+
+### Original recommendation (superseded 2026-08-27)
+
+~~**Option B now, Option A scheduled.**~~ The numbers are not obviously wrong, and B is honest, immediate,
 and unblocks the white paper. A real panel is worth doing, but making it a precondition has already
 cost weeks; ratifying an interim converts a blocker into a dated commitment.
 

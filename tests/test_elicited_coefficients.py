@@ -55,7 +55,7 @@ def test_every_populated_family_carries_provenance(registry) -> None:
     cs = elicited_v1_coefficient_set(registry)
     assert set(cs.provenance) == _EXPECTED_PROVENANCE_FAMILIES
     for family, record in cs.provenance.items():
-        assert record.set_by == "bruntsfield-engineering-provisional-2026-07", family
+        assert record.set_by == "bruntsfield-founder-ratified-interim-2026-08", family
         assert record.review_due > record.set_on, family
 
 
@@ -190,15 +190,33 @@ def test_elicited_composite_differs_from_draft(registry) -> None:
     assert elicited.composite.p_index != draft.composite.p_index
 
 
-def test_draft_stays_the_active_default() -> None:
-    # Activation of the elicited set is a deliberate, panel-gated flip (ADR-0022), never automatic.
-    # The engine's active coefficient set must remain the (non-client-usable) draft until then.
+def test_retail_is_activated_on_the_considered_weights() -> None:
+    """Founder decision D1, taken 2026-08-27. This test previously asserted the opposite.
+
+    Until then retail scored on the DRAFT set, which was `client_usable=False`, so a retail
+    assessment could not produce a client document at all. That is what activation fixes, and it is
+    the whole of what it fixes.
+
+    **Be precise about what did NOT change**, because the first version of this test asserted
+    otherwise and failed: the two sets differ in FOUR SCALARS — θ, α_L, α_module, and one step of
+    the strength encoding. Every weight FAMILY (δ, λ, w_power, w_metric, W_g) is uniform 1.0 in
+    both. Activating did not buy differentiated module or power weights; those still await the
+    real elicitation (GRS-0150).
+
+    What it did buy: a client-usable retail path, and a set whose provenance record is a real one.
+    Scores moved down about four points from those four scalars; every prior run keeps the
+    coefficient version that produced it (#6).
+    """
     from grassmarket.atlas import active_coefficient_set
 
     registry = load_registry()
     active = active_coefficient_set(registry)
-    assert active.client_usable is False
-    assert active.version == draft_v1_coefficient_set(registry).version
+    assert active.client_usable is True
+    assert active.version == elicited_v1_coefficient_set(registry).version
+    # And the honest counterpart: the module weights are STILL uniform. Asserted so that nobody
+    # reads "activated" as "elicited" — if this ever stops being uniform, the real elicitation has
+    # happened and GRS-0150 should be closed, not silently absorbed.
+    assert len({round(v, 4) for v in active.delta.values()}) == 1
 
 
 # --- The §7 uncertainty twin: the second client-usability-gated artifact -----------------------
@@ -215,14 +233,21 @@ def test_elicited_uncertainty_model_is_client_usable() -> None:
     assert model.provenance.method is not WeightMethod.DIRECT
 
 
-def test_active_uncertainty_model_stays_draft() -> None:
-    # The uncertainty seam flips in the SAME reviewed commit as the coefficient seam (ADR-0022), so
-    # a client pack never mixes elicited weights with draft widths. Until then, both stay draft.
+def test_the_uncertainty_seam_flipped_with_the_coefficient_seam() -> None:
+    """ADR-0022's pairing rule, now asserted in the activated direction (D1, 2026-08-27).
+
+    This previously asserted both seams stayed DRAFT. They flip in the same reviewed change so a
+    client pack can never mix activated weights with draft widths — and implementing D1 initially
+    flipped only the coefficients, which this caught.
+
+    The two models carry identical widths, so nothing numerical moved; what moved is the
+    client-usability gate.
+    """
     from grassmarket.atlas import active_uncertainty_model
 
     model = active_uncertainty_model()
-    assert model.client_usable is False
-    assert model.version == "v1-draft-pending-elicitation"
+    assert model.client_usable is True
+    assert "elicited" in model.version
 
 
 # --- Segment starter sets (GRS-0150, ADR-0037) — built, validated, but NOT active ---------
@@ -251,20 +276,20 @@ def test_segment_elicited_starter_sets_build_and_validate() -> None:
 
 
 def test_segment_starter_sets_are_activated() -> None:
-    # ACTIVATED (founder sign-off 2026-07-20, ADR-0037/ADR-0022, GRS-0156): the engine now scores
-    # wealth/exchange on their client-usable ELICITED starter sets, and the uncertainty seam flips
-    # with them. Retail stays draft (not client-usable) — the golden master is unchanged.
+    # Wealth and exchange were activated 2026-07-20 (ADR-0037/GRS-0156); RETAIL joined them on
+    # 2026-08-27 (founder decision D1), so all three now score on client-usable sets.
+    #
+    # The paired assertion is the one that matters: both seams flip together. A client pack that
+    # mixed activated weights with draft uncertainty widths would carry ranges from a set nobody
+    # ratified — and implementing D1 initially flipped only the coefficients, which is exactly
+    # what this caught.
     from grassmarket.atlas.active import active_uncertainty_model, profile_scoring_context
 
-    for profile in ("wealth", "exchange"):
+    for profile in ("wealth", "exchange", "retail"):
         _, active = profile_scoring_context(profile)
-        assert active.client_usable is True
-        assert "elicited" in active.version
-        assert active_uncertainty_model(profile).client_usable is True  # both seams flip together
-
-    _, retail = profile_scoring_context("retail")
-    assert retail.client_usable is False  # retail not activated
-    assert active_uncertainty_model("retail").client_usable is False
+        assert active.client_usable is True, profile
+        assert "elicited" in active.version, profile
+        assert active_uncertainty_model(profile).client_usable is True, profile
 
 
 def test_activated_segment_passes_the_client_pack_gate_end_to_end() -> None:
@@ -284,6 +309,10 @@ def test_activated_segment_passes_the_client_pack_gate_end_to_end() -> None:
         assert resolve_mode(coeffs, client_facing=True) is DeliverableMode.CLIENT
         assert_uncertainty_client_usable(active_uncertainty_model(profile), client_facing=True)
 
+    # Retail passes the same gate since D1 (2026-08-27). The contrast case is now the DRAFT set
+    # itself, which no profile uses but which must still refuse — it is the thing the gate exists
+    # to catch, and a gate with nothing left to refuse has stopped being a test.
     _, retail = profile_scoring_context("retail")
+    assert resolve_mode(retail, client_facing=True) is DeliverableMode.CLIENT
     with pytest.raises(ClientUsabilityError):
-        resolve_mode(retail, client_facing=True)
+        resolve_mode(draft_v1_coefficient_set(load_registry()), client_facing=True)
