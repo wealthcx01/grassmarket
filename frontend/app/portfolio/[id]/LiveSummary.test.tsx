@@ -7,7 +7,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { LiveSummary } from "@/app/assessments/[id]/WizardClient";
+import { LiveSummary } from "@/app/portfolio/[id]/WizardClient";
 import type { LiveScore } from "@/lib/types";
 
 function liveScore(over: Partial<LiveScore> = {}): LiveScore {

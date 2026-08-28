@@ -35,7 +35,7 @@ function LinkedAssessment({ id, index, entry }: { id: string; index: number; ent
   const coverage = entry?.coverage != null ? Math.round(entry.coverage * 100) : null;
   const updated = entry ? new Date(entry.updated_at).toLocaleDateString() : null;
   return (
-    <Link href={`/assessments/${id}`} className="card-link" style={{ padding: "0.9rem 1.1rem", display: "block" }}>
+    <Link href={`/portfolio/${id}`} className="card-link" style={{ padding: "0.9rem 1.1rem", display: "block" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: "0.75rem", flexWrap: "wrap" }}>
         <span style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", fontWeight: 600 }}>
           {subject}
@@ -144,7 +144,7 @@ export default function EngagementDetailPage() {
               already have a finalised assessment, link it just below instead of starting over.
             </p>
             <Link
-              href={`/assessments?subject=${encodeURIComponent(engagement.title)}`}
+              href={`/portfolio?subject=${encodeURIComponent(engagement.title)}`}
               className="btn btn-primary"
             >
               Start an assessment →

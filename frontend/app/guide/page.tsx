@@ -237,7 +237,7 @@ const WALKTHROUGHS: ReadonlyArray<Walkthrough> = [
     kicker: "Assessment",
     title: "Run a Platform Power assessment",
     lead: "The seven-step wizard scores a company across the seven Powers, Platform Value, and the nine infrastructure modules. It saves every edit as you make it, so a partial assessment is always safe to leave and resume.",
-    href: { label: "Open assessments", to: "/assessments" },
+    href: { label: "Open assessments", to: "/portfolio" },
     steps: [
       {
         do: "Start an assessment for the subject company, then work the steps from left to right: Business Metrics, Powers, then the Infrastructure Deep Dive.",
@@ -270,7 +270,7 @@ const WALKTHROUGHS: ReadonlyArray<Walkthrough> = [
     kicker: "Review and sign-off",
     title: "Send it to John, then finalise",
     lead: "One gate stands between a scored assessment and a finalised one. Nothing goes to a client that John has not read and signed off. You handle this from the Summary step, and it usually takes one message and a day.",
-    href: { label: "Open assessments", to: "/assessments" },
+    href: { label: "Open assessments", to: "/portfolio" },
     steps: [
       {
         do: "When you are happy with the assessment, press Send to John for review on the Summary step.",
@@ -1039,7 +1039,7 @@ export default function GuidePage() {
       </section>
 
       <footer style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", paddingTop: "0.5rem" }}>
-        <Link href="/assessments" className="btn btn-primary">
+        <Link href="/portfolio" className="btn btn-primary">
           Start an assessment
         </Link>
         <Link href="/" className="btn btn-secondary">

@@ -64,11 +64,11 @@ export function WelcomeBanner() {
       </p>
       <p style={{ margin: "0.9rem 0 0", fontSize: "0.95rem", lineHeight: 1.55 }}>
         Starting fresh? Begin your{" "}
-        <Link href="/assessments" style={{ fontWeight: 600 }}>
+        <Link href="/portfolio" style={{ fontWeight: 600 }}>
           first assessment
         </Link>
         . Picking up where you left off? Your{" "}
-        <Link href="/assessments" style={{ fontWeight: 600 }}>
+        <Link href="/portfolio" style={{ fontWeight: 600 }}>
           portfolio
         </Link>{" "}
         and{" "}

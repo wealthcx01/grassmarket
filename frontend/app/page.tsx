@@ -30,7 +30,7 @@ const CLIENT_WORK: ReadonlyArray<Section> = [
     step: 2,
     title: "Your Portfolio",
     state: "portfolio",
-    href: "/assessments",
+    href: "/portfolio",
     // One name per concept (GRS-0243 scope 2). The kicker used to introduce a third
     // spelling of the same thing on the first screen the user sees.
     kicker: "Portfolio · assessments and the scoring wizard",

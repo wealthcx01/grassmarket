@@ -85,6 +85,6 @@ describe("DeliverablesPage (GRS-0186)", () => {
     }
     // And it offers the two ways forward: build one, or read a finished one.
     expect(text).toMatch(/worked example/i);
-    expect(empty.querySelector('a[href="/assessments"]')).toBeTruthy();
+    expect(empty.querySelector('a[href="/portfolio"]')).toBeTruthy();
   });
 });

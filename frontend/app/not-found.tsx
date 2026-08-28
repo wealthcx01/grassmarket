@@ -9,7 +9,7 @@ import Link from "next/link";
 const LINKS: { href: string; label: string; hint: string }[] = [
   { href: "/", label: "Dashboard", hint: "Your home for the advisor studio" },
   { href: "/pipeline", label: "Pipeline", hint: "Prospects, workshops, and stages" },
-  { href: "/assessments", label: "Your Portfolio", hint: "Assessments and the Platform Power wizard" },
+  { href: "/portfolio", label: "Your Portfolio", hint: "Assessments and the Platform Power wizard" },
   { href: "/engagements", label: "Engagements", hint: "Client work and deliverables" },
   { href: "/workbench", label: "Workbench", hint: "Certification, Academy, and practice" },
 ];

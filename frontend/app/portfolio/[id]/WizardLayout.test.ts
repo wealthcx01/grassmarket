@@ -18,7 +18,7 @@ const ROOT = join(__dirname, "..", "..", "..");
 const read = (...parts: string[]) => readFileSync(join(ROOT, ...parts), "utf8");
 
 describe("wizard two-column layout (GRS-0182)", () => {
-  const component = read("app", "assessments", "[id]", "WizardClient.tsx");
+  const component = read("app", "portfolio", "[id]", "WizardClient.tsx");
   const css = read("app", "globals.css");
 
   it("applies the breakpoint class to the grid wrapper", () => {
@@ -57,7 +57,7 @@ describe("wizard two-column layout (GRS-0182)", () => {
  * declaration going back, which is the regression that would silently undo the measured fix.
  */
 describe("wizard rail stickiness (GRS-0221)", () => {
-  const component = read("app", "assessments", "[id]", "WizardClient.tsx");
+  const component = read("app", "portfolio", "[id]", "WizardClient.tsx");
   const css = read("app", "globals.css");
 
   it("gives no panel its own stickiness — only the rail container is pinned", () => {

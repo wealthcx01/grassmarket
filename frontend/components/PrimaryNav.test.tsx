@@ -35,7 +35,7 @@ describe("PrimaryNav (GRS-0186)", () => {
     render(<PrimaryNav />);
     const expected: [string, string][] = [
       ["Pipeline", "/pipeline"],
-      ["Portfolio", "/assessments"],
+      ["Portfolio", "/portfolio"],
       ["Engagements", "/engagements"],
       ["Deliverables", "/deliverables"],
       ["Workbench", "/workbench"],
@@ -47,7 +47,7 @@ describe("PrimaryNav (GRS-0186)", () => {
   });
 
   it("marks the active section with aria-current", () => {
-    pathname.value = "/assessments/abc"; // a sub-path of Portfolio
+    pathname.value = "/portfolio/abc"; // a sub-path of Portfolio
     setViewport(false);
     render(<PrimaryNav />);
     expect(screen.getByRole("link", { name: "Portfolio" }).getAttribute("aria-current")).toBe("page");
