@@ -105,7 +105,11 @@ class ProspectingTarget(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     target_id: str = Field(min_length=1)
+    #: What to SHOW. The curated name when one exists, otherwise whatever the import stored.
     name: str = Field(min_length=1)
+    #: What the import actually stored. Kept beside `name` so a curated row never hides its own
+    #: provenance — an advisor can still see the source said `gs`.
+    imported_name: str = Field(min_length=1)
     domain: str | None = None
     country: str | None = None
     segment: str | None = None
@@ -118,6 +122,8 @@ class ProspectingTarget(BaseModel):
     #: True when `name` is a domain stem from the import rather than a verified company name. The
     #: UI must say so beside the row; it must not substitute a guessed name.
     name_unverified: bool
+    #: True when a human has curated this name (GRS-0238 / D8).
+    curated: bool = False
 
 
 class ProspectingPage(BaseModel):

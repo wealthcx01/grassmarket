@@ -208,3 +208,98 @@ class TestUnverifiedNames:
     )
     def test_stem_detection(self, name: str, expected: bool) -> None:
         assert looks_like_a_domain_stem(name) is expected
+
+
+class TestCuratedNames:
+    """Curated display names (GRS-0238 residue / founder decision D8).
+
+    128 institutions imported as domain stems — `gs`, `db`, and from regional subdomains `uk`,
+    `us`, `hk`. An advisor cannot act on those, and LSEG has no domain→company lookup, so the names
+    were resolved by hand and stored as overrides.
+
+    The design point these tests hold: the override lives in its OWN table and is joined at read
+    time. A curated name written onto `registry_targets` would be wiped by the next import, which
+    is how curation work gets lost.
+    """
+
+    def _curate(self, repo: Repository, target_id: str, name: str) -> None:
+        from datetime import UTC, datetime
+
+        from grassmarket.data.models import RegistryTargetNameOverrideORM
+
+        repo._session.add(
+            RegistryTargetNameOverrideORM(
+                target_id=target_id,
+                display_name=name,
+                confidence="high",
+                basis="domain",
+                set_by="test",
+                set_on=datetime.now(UTC),
+            )
+        )
+        repo._session.flush()
+
+    def test_the_curated_name_is_what_is_shown(self, registry: Repository, alice) -> None:
+        self._curate(registry, "lseg-gs", "Goldman Sachs")
+        row = next(
+            t
+            for t in registry.list_registry_targets(alice.principal).targets
+            if t.target_id == "lseg-gs"
+        )
+        assert row.name == "Goldman Sachs"
+
+    def test_the_imported_name_is_still_visible(self, registry: Repository, alice) -> None:
+        """A curated row must not hide its own provenance — the source still said `gs`."""
+        self._curate(registry, "lseg-gs", "Goldman Sachs")
+        row = next(
+            t
+            for t in registry.list_registry_targets(alice.principal).targets
+            if t.target_id == "lseg-gs"
+        )
+        assert row.imported_name == "gs"
+        assert row.curated is True
+
+    def test_a_curated_row_is_no_longer_flagged_unverified(
+        self, registry: Repository, alice
+    ) -> None:
+        """Otherwise the badge would sit beside "Goldman Sachs" saying the name is unverified —
+        both wrong, and exactly the contradiction this surface exists to remove."""
+        self._curate(registry, "lseg-gs", "Goldman Sachs")
+        row = next(
+            t
+            for t in registry.list_registry_targets(alice.principal).targets
+            if t.target_id == "lseg-gs"
+        )
+        assert row.name_unverified is False
+
+    def test_an_uncurated_stem_is_untouched(self, registry: Repository, alice) -> None:
+        rows = {t.target_id: t for t in registry.list_registry_targets(alice.principal).targets}
+        assert rows["lseg-gs"].name == "gs"
+        assert rows["lseg-gs"].name_unverified is True
+        assert rows["lseg-gs"].curated is False
+
+    def test_re_importing_does_not_undo_curation(self, registry: Repository, alice) -> None:
+        """The reason the override is a separate table at all.
+
+        `upsert_registry_target` rewrites the row by id. If the curated name lived on that row it
+        would be gone after this call, and nobody would notice until an advisor saw `gs` again.
+        """
+        from datetime import date
+
+        self._curate(registry, "lseg-gs", "Goldman Sachs")
+        registry.upsert_registry_target(
+            RegistryTarget(
+                target_id="lseg-gs",
+                name="gs",
+                segment="Sell-side research",
+                source="lseg-roster",
+                imported_on=date(2026, 9, 1),
+            )
+        )
+        row = next(
+            t
+            for t in registry.list_registry_targets(alice.principal).targets
+            if t.target_id == "lseg-gs"
+        )
+        assert row.name == "Goldman Sachs"
+        assert row.imported_name == "gs"

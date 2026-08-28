@@ -208,6 +208,27 @@ class RegistryTargetORM(Base):
     )
 
 
+class RegistryTargetNameOverrideORM(Base):
+    """A human-curated display name for a target the import named badly (GRS-0238, D8).
+
+    Deliberately a SEPARATE table from `registry_targets`: an importer upserts targets by
+    `target_id`, so a curated name stored on the row itself would be wiped by the next import.
+    Keeping it beside the imported value also means the provenance chain from source file to row is
+    never rewritten — what a human decided sits alongside what the file said.
+    """
+
+    __tablename__ = "registry_target_name_overrides"
+
+    target_id: Mapped[str] = mapped_column(
+        ForeignKey("registry_targets.target_id", ondelete="CASCADE"), primary_key=True
+    )
+    display_name: Mapped[str] = mapped_column(String(300), nullable=False)
+    confidence: Mapped[str] = mapped_column(String(16), nullable=False)
+    basis: Mapped[str] = mapped_column(String(300), nullable=False)
+    set_by: Mapped[str] = mapped_column(String(160), nullable=False)
+    set_on: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
 class RegistryContactORM(Base):
     """A named person at a registry target (GRS-0193, ADR-0045).
 
