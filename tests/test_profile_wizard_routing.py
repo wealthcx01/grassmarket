@@ -75,8 +75,8 @@ def test_live_score_uses_the_profiles_coefficient_set(
     client: TestClient, alice: SeededConsultant
 ) -> None:
     # The profile round-trips: document.operating_model → live-score's coefficient_version.
-    assert _live_score_version(client, alice, None) == "v1-elicited-2026"
-    assert _live_score_version(client, alice, "retail") == "v1-elicited-2026"
+    assert _live_score_version(client, alice, None) == "v1-draft-pending-elicitation"
+    assert _live_score_version(client, alice, "retail") == "v1-draft-pending-elicitation"
     # Wealth/exchange ACTIVATED (ADR-0037/GRS-0156): they score on the client-usable elicited set.
     assert _live_score_version(client, alice, "exchange") == "exchange-v1-elicited-starter-2026"
     assert _live_score_version(client, alice, "wealth") == "wealth-v1-elicited-starter-2026"

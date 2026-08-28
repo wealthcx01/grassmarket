@@ -211,8 +211,8 @@ def test_profile_scoring_context_defaults_to_retail_and_its_view_is_unchanged() 
     view, active = profile_scoring_context()  # default = retail
     result = score(_inputs_from_fixture(gm), draft_v1_coefficient_set(view), view)
     assert result.composite.v_index == 0.478565
-    # And the active set for retail is now the client-usable one — the point of D1.
-    assert active.client_usable is True
+    # And retail is NOT client-usable — D1 declined to activate it (2026-08-27).
+    assert active.client_usable is False
     # An unknown profile fails loud.
     with pytest.raises(UnknownKeyError):
         profile_scoring_context("no_such_profile")

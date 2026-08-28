@@ -63,7 +63,7 @@ def _prov(method: WeightMethod, dispersion: str) -> WeightProvenanceRecord:
     (`docs/FOUNDER-DECISIONS-2026-08.md`); this changes the record, never a value.
     """
     return WeightProvenanceRecord(
-        set_by="bruntsfield-founder-ratified-interim-2026-08",
+        set_by="bruntsfield-engineering-provisional-2026-07",
         set_on=_PANEL_SET_ON,
         method=method,
         dispersion=dispersion,
@@ -73,10 +73,10 @@ def _prov(method: WeightMethod, dispersion: str) -> WeightProvenanceRecord:
         # not panel-elicited weights" contains the assertion as a substring, and a client skimming
         # the methods appendix reads phrases, not logic.
         notes=(
-            "Founder-ratified interim, 2026-08-27 (decision D1). Values were set by engineering to "
-            "the shape of the v1 protocol and are ratified for client use as an interim. No expert "
-            "panel has convened: the method and review date above are the schedule, not a record "
-            "of work done, and the real elicitation remains outstanding (GRS-0150)."
+            "Provisional values set by engineering to the shape of the v1 protocol. No expert "
+            "panel has convened; the method and review date above are the schedule, not a record "
+            "of work done. Ratification pending (founder decision D1, which declined to ratify "
+            "these as an interim on 2026-08-27 — see docs/FOUNDER-DECISIONS-2026-08.md)."
         ),
     )
 
