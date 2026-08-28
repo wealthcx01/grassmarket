@@ -36,7 +36,6 @@ from bcap_contracts.uncertainty import UncertaintyModel
 from grassmarket.atlas.draft_coefficients import draft_v1_coefficient_set
 from grassmarket.atlas.elicited_coefficients import (
     elicited_exchange_coefficient_set,
-    elicited_v1_coefficient_set,
     elicited_wealth_coefficient_set,
 )
 from grassmarket.atlas.montecarlo import (
