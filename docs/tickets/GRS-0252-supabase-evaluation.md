@@ -67,7 +67,31 @@ projects, say, which is a legitimate reason this ticket cannot weigh — then:
 The CLI is connected to the founder's `wealthcx` GitHub account, so step 1 is available whenever
 wanted.
 
+## Decision (2026-09-02)
+
+**Founder: keep Railway Postgres for now.** This ticket stays open as the record of *when to
+revisit*, not as work.
+
+## When to graduate — the triggers
+
+Revisit Supabase (or an equivalent) when **any one** of these becomes true. Until then, the answer
+stays no and this ticket should not be reopened on general principle.
+
+| Trigger | Threshold | Why it is the line |
+|---|---|---|
+| **Stored document bytes** | GRS-0247's `documents` table passes **~2 GB** | Past that, blobs in Postgres make backup and restore times painful and a real object store earns its keep. Measure with `SELECT pg_total_relation_size('documents')`. |
+| **Backup/restore time** | A restore takes **> 15 minutes** | The point at which a bad deploy stops being recoverable inside a working session. |
+| **A second Bruntsfield product** needs the same auth | Two or more apps sharing one identity | One identity provider across products is a genuine reason our bespoke JWT stops being the cheaper option — though Holy Corner may be the answer instead, so weigh both. |
+| **Realtime becomes a requirement** | Any feature needing server-pushed updates (live committee review, multi-advisor presence) | We have no mechanism for this at all; building one is worse than adopting one. |
+| **Row-level security is wanted in the database** | A compliance ask that scoping be enforced below the application | Today non-negotiable #9 is enforced in the repository layer and tested. A regulator asking for defence in depth changes that calculus. |
+| **The build box grows** | ≥ 8 GB RAM | Removes the decisive practical objection below — the local Docker stack becomes runnable. |
+
+**Explicit non-triggers.** None of these should reopen it: wanting a nicer dashboard, wanting
+generated REST endpoints (we have 173 hand-written, contract-typed ones), or Supabase appearing in
+an unrelated recommendation.
+
 ## Done when
 
-The founder says yes or no. **Recommendation: no** — keep Railway Postgres, and give GRS-0247 a
-`documents` table rather than a new vendor.
+The triggers above are recorded and the founder's "not yet" is the standing answer.
+**Recommendation stands: keep Railway Postgres, and give GRS-0247 a `documents` table rather than
+a new vendor.**

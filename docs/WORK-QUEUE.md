@@ -100,6 +100,16 @@ terms and client packs must stay out of the repo.
 
 ---
 
+## Part 2b — Standing infrastructure answers
+
+- **Supabase: not yet.** Founder decision 2026-09-02. Keep Railway Postgres.
+  **GRS-0252 records six triggers for when to revisit** — the load-bearing ones are stored document
+  bytes past ~2 GB, a restore taking over 15 minutes, or a second Bruntsfield product needing the
+  same identity. Until one fires, the answer stays no.
+- **Transcription: OpenAI Whisper**, founder-directed 2026-09-02, behind the existing `Transcriber`
+  port (GRS-0251). Client speech leaves our infrastructure, so it needs a UI line and a compliance
+  note.
+
 ## Part 3 — Front-end refinement
 
 The founder's stated next step. Two notes so the work is not wasted:
