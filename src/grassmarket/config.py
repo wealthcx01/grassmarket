@@ -70,6 +70,27 @@ class Settings(BaseSettings):
     # Upload guard (GRS-0029): reject media larger than this before scanning/transcribing.
     max_upload_bytes: int = Field(default=25 * 1024 * 1024, validation_alias="GM_MAX_UPLOAD_BYTES")
 
+    # Transcription + media scanning providers (GRS-0251). Both default to the offline test
+    # doubles, which is right for tests and local work and REFUSED in production — see
+    # `_refuse_insecure_production` below and `pathb.transcription.build_transcriber`. Before
+    # GRS-0251 there was no setting at all: the echo transcriber was wired unconditionally, so
+    # production "transcribed" audio by decoding it as UTF-8 and stored the result.
+    transcriber_provider: str = Field(
+        default="echo",
+        validation_alias=AliasChoices("GM_TRANSCRIBER_PROVIDER", "TRANSCRIBER_PROVIDER"),
+    )
+    media_scanner_provider: str = Field(
+        default="allow-all",
+        validation_alias=AliasChoices("GM_MEDIA_SCANNER_PROVIDER", "MEDIA_SCANNER_PROVIDER"),
+    )
+    # Credential for the hosted transcription provider. Operator-provisioned; never committed.
+    # Empty is valid — it only has to be present when `transcriber_provider` needs it, and
+    # `build_transcriber` refuses loudly at that point rather than at import.
+    # GM_-prefixed ONLY, deliberately. A bare `OPENAI_API_KEY` alias would let whatever key happens
+    # to be in a developer's or CI runner's environment become the one the app bills and sends
+    # client audio to, without anyone choosing it. The provider must be named explicitly.
+    openai_api_key: str = Field(default="", validation_alias="GM_OPENAI_API_KEY")
+
     # The founder review gate (ADR-0041). Every client-facing draft is approved by this person;
     # peer rating, committee sign-off and calibration are dormant. Config rather than a role or a
     # DB column, so rotating the reviewer is an env change with no migration. The claim is derived
@@ -202,6 +223,18 @@ class Settings(BaseSettings):
                     "Refusing to run in production with the placeholder transcript key."
                     " Generate one with Fernet.generate_key()."
                 )
+            # GRS-0251 note — deliberately NOT guarded here.
+            #
+            # The obvious move is to refuse to boot production with the test-double transcriber
+            # or scanner, alongside the secret checks above. That is the wrong enforcement point:
+            # it would take all 173 endpoints down over one feature that has no UI and that no
+            # advisor can reach, and it would have crashed the running production service on the
+            # very deploy that introduced these settings.
+            #
+            # The guarantee is enforced instead where the harm would occur — `build_transcriber`
+            # and `build_scanner` refuse a test double in production, so `POST /transcripts/media`
+            # returns a readable 503 and nothing is ever transcribed or stored. Failing loud means
+            # the fabrication is impossible, not that the whole app stops.
         return self
 
 

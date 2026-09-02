@@ -180,3 +180,51 @@ def test_media_upload_rejects_invalid_base64(client, alice: SeededConsultant) ->
 def test_transcript_endpoints_require_authentication(client) -> None:
     assert client.get("/transcripts").status_code == 401
     assert client.post("/transcripts/text", json={}).status_code == 401
+
+
+# --- GRS-0251: production never transcribes with a test double -----------------------------------
+
+
+def test_media_upload_is_503_in_production_with_the_default_providers(
+    client, alice: SeededConsultant
+) -> None:
+    """The end-to-end guarantee. Before GRS-0251 this request returned 201 and stored the audio
+    decoded as UTF-8 — replacement characters, encrypted and served as the meeting's transcript.
+
+    `env` is flipped on the running app rather than rebuilding it, because the point is the
+    request-time resolution: the app boots fine (deliberately), and the endpoint refuses."""
+    client.app.state.settings.env = "production"
+    try:
+        resp = client.post(
+            "/transcripts/media",
+            json={
+                "media_base64": base64.b64encode(b"\xff\xfb\x90\x64not-text").decode(),
+                "source_filename": "board-meeting.mp3",
+                "content_type": "audio/mpeg",
+                "source_kind": "audio",
+            },
+            headers=auth_header(alice),
+        )
+    finally:
+        client.app.state.settings.env = "ci"
+    assert resp.status_code == 503
+    assert "test double" in resp.json()["detail"]
+
+
+def test_media_upload_refuses_undecodable_bytes_rather_than_inventing_a_transcript(
+    client, alice: SeededConsultant
+) -> None:
+    """Outside production the echo transcriber still runs, but it now raises on bytes that are not
+    text instead of returning a string of U+FFFD."""
+    resp = client.post(
+        "/transcripts/media",
+        json={
+            "media_base64": base64.b64encode(b"\xff\xfb\x90\x64\x00\x00").decode(),
+            "source_filename": "board-meeting.mp3",
+            "content_type": "audio/mpeg",
+            "source_kind": "audio",
+        },
+        headers=auth_header(alice),
+    )
+    assert resp.status_code == 422
+    assert "not UTF-8" in resp.json()["detail"]
