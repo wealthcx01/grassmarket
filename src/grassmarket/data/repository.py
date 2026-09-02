@@ -1800,7 +1800,14 @@ class Repository:
         # transcriber is injected (a provider without its own empty-guard cannot store a blank).
         if not media:
             raise TranscriptionError(f"Refusing to ingest empty media ({source_filename}).")
-        scanner.scan(media, filename=source_filename)  # raises MediaThreatError to refuse
+        # Raises MediaThreatError to refuse. A scanner that can also check the bytes against the
+        # declared content type is given the chance to — the `MediaScanner` protocol only requires
+        # `scan`, so this stays optional rather than forcing every provider to implement it.
+        declared_check = getattr(scanner, "scan_declared", None)
+        if callable(declared_check):
+            declared_check(media, filename=source_filename, content_type=content_type)
+        else:
+            scanner.scan(media, filename=source_filename)
         text = transcriber.transcribe(media, filename=source_filename, content_type=content_type)
         return self._store_transcript(
             principal,

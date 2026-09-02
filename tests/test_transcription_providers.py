@@ -124,3 +124,74 @@ def test_openai_transcriber_carries_its_version_for_traceability() -> None:
 def test_ci_default_is_the_offline_double() -> None:
     assert isinstance(build_transcriber(_settings()), EchoTranscriber)
     assert isinstance(build_scanner(_settings()), AllowAllScanner)
+
+
+# --- the real scanner ---------------------------------------------------------------------------
+
+
+class TestContentTypeScanner:
+    """The control that was missing entirely: nothing looked at uploaded bytes at all."""
+
+    def _scanner(self):
+        from grassmarket.pathb.scanning import ContentTypeScanner
+
+        return ContentTypeScanner()
+
+    def test_it_refuses_an_executable_however_it_is_named(self) -> None:
+        from grassmarket.pathb.scanning import MediaThreatError
+
+        with pytest.raises(MediaThreatError, match="Windows executable"):
+            self._scanner().scan(b"MZ\x90\x00\x03", filename="quarterly-report.pdf")
+
+    def test_it_refuses_a_script_and_an_elf_binary(self) -> None:
+        from grassmarket.pathb.scanning import MediaThreatError
+
+        with pytest.raises(MediaThreatError, match="script"):
+            self._scanner().scan(b"#!/bin/sh\nrm -rf /", filename="notes.txt")
+        with pytest.raises(MediaThreatError, match="Linux executable"):
+            self._scanner().scan(b"\x7fELF\x02\x01", filename="deck.pdf")
+
+    def test_it_refuses_html_renamed_as_a_pdf(self) -> None:
+        """The phishing-page-in-a-report case."""
+        from grassmarket.pathb.scanning import MediaThreatError
+
+        with pytest.raises(MediaThreatError, match="HTML"):
+            self._scanner().scan(b"<!DOCTYPE HTML><html>", filename="board-pack.pdf")
+
+    def test_it_refuses_bytes_that_contradict_the_declared_type(self) -> None:
+        from grassmarket.pathb.scanning import MediaThreatError
+
+        with pytest.raises(MediaThreatError, match="does not begin like one"):
+            self._scanner().scan_declared(
+                b"just some text", filename="x.pdf", content_type="application/pdf"
+            )
+
+    def test_it_refuses_an_unrecognised_type_rather_than_waving_it_through(self) -> None:
+        """An allowlist. 'Never seen this, probably fine' is the reasoning #3 forbids."""
+        from grassmarket.pathb.scanning import MediaThreatError
+
+        with pytest.raises(MediaThreatError, match="unsupported type"):
+            self._scanner().scan_declared(
+                b"\x00\x01\x02", filename="x.bin", content_type="application/x-mystery"
+            )
+
+    def test_it_accepts_the_real_thing(self) -> None:
+        scanner = self._scanner()
+        scanner.scan_declared(
+            b"%PDF-1.7\n%\xe2\xe3", filename="deck.pdf", content_type="application/pdf"
+        )
+        scanner.scan_declared(b"ID3\x03\x00", filename="m.mp3", content_type="audio/mpeg")
+        scanner.scan_declared(b"RIFF....WAVE", filename="m.wav", content_type="audio/wav")
+        # A text format with no signature to check.
+        scanner.scan_declared(b"a,b,c\n1,2,3", filename="d.csv", content_type="text/csv")
+
+    def test_it_is_selectable_by_config_and_allowed_in_production(self) -> None:
+        from grassmarket.pathb.scanning import ContentTypeScanner
+
+        prod = _settings(
+            env="production",
+            database_url="postgresql+psycopg://u:p@h/db",
+            transcript_encryption_key=_REAL_KEY,
+            media_scanner_provider="content-type",
+        )
+        assert isinstance(build_scanner(prod), ContentTypeScanner)
