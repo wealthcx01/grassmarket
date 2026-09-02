@@ -69,10 +69,25 @@ the transcriber or the scanner, so the two test doubles walk straight past it.
    plausible-looking output. Let it raise; the fixtures it serves are valid UTF-8 anyway.
 3. **Add a provider setting** — `GM_TRANSCRIBER_PROVIDER` — resolved at the composition root, with
    an unknown value refused at load time (the registry pattern from ADR-0001).
-4. **Build the real adapter.** Local `faster-whisper` in the Railway image (no third party sees
-   client audio; costs image size and CPU) or a hosted STT API (smaller image, but client speech
-   leaves our infrastructure and needs a data-processing note). **This is the same decision GRS-0249
-   scope 3 must make — make it once, here.** Record it as an ADR.
+4. **Build the real adapter. FOUNDER DIRECTION 2026-09-02: use their OpenAI API key for
+   Whisper.** So the shipped adapter is `OpenAIWhisperTranscriber` calling the hosted
+   `whisper-1` transcription endpoint, behind the existing `Transcriber` port. Notes:
+   - **The key is an operator secret.** `GM_OPENAI_API_KEY`, set as a Railway variable on the
+     production and staging API services and in local `.env`. It is **never committed** and never
+     pasted into a transcript, log or chat. `.env` is already gitignored; add the placeholder to
+     `.env.example` only.
+   - **Client speech leaves our infrastructure.** This is the substantive change from the local
+     Whisper the docstrings assumed. OpenAI does not train on API data by default, but the audio
+     is still processed by a third party, so it needs (a) a line in the advisor-facing UI saying
+     so, and (b) a note in the compliance surface. Flag for the founder alongside D4's UK
+     regulatory framing — a recorded client conversation is not the same as a pasted note.
+   - **Cost** is roughly $0.006/minute of audio — negligible at advisor volumes, but meter it.
+   - **Keep the port.** Local `faster-whisper` stays viable later if the data-processing question
+     hardens; that is exactly what the `Transcriber` protocol is for.
+   - **Fail loud on API errors** — a 429, a timeout or a refusal raises `TranscriptionError`. It
+     must never fall back to the echo transcriber, which is the bug this ticket exists to fix.
+   Record the third-party-processing decision as an ADR. **This is the same decision GRS-0249
+   scope 3 must make — it is made here, once.**
 5. **Same treatment for the scanner:** a provider setting, and a production guard that refuses
    `AllowAllScanner`.
 6. **Regression test:** constructing the production app with the echo transcriber or the
