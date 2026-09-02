@@ -55,6 +55,7 @@ from bcap_contracts.commissions import (
 )
 from bcap_contracts.committee import CommitteeDecision, CommitteeItem, CommitteeQueueEntry
 from bcap_contracts.deliverables import Deliverable, DeliverableIndexRow
+from bcap_contracts.documents import Document, UploadDocumentRequest
 from bcap_contracts.engagements import CommsLogEntry, Engagement, Workshop
 from bcap_contracts.entities import (
     CompanyEntity,
@@ -214,6 +215,9 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "AcceptInvitationRequest": AcceptInvitationRequest,
     "AuditEvent": AuditEvent,
     "PersonalDataExport": PersonalDataExport,
+    # Uploaded documents (GRS-0247).
+    "Document": Document,
+    "UploadDocumentRequest": UploadDocumentRequest,
     # Foundry Studio entities (FB-002) — rendered by fountainbridge.
     "Venture": Venture,
     "Lane": Lane,

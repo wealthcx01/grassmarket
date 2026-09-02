@@ -1,0 +1,82 @@
+{
+  "additionalProperties": false,
+  "description": "The upload body: base64 content plus where it belongs.\n\nBase64-in-JSON matches the existing media ingest rather than introducing multipart for one\nendpoint. It costs ~33% on the wire, which the size cap already accounts for.",
+  "properties": {
+    "content_base64": {
+      "minLength": 1,
+      "title": "Content Base64",
+      "type": "string"
+    },
+    "content_type": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Content Type",
+      "type": "string"
+    },
+    "engagement_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Engagement Id"
+    },
+    "filename": {
+      "maxLength": 255,
+      "minLength": 1,
+      "title": "Filename",
+      "type": "string"
+    },
+    "prospect_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Prospect Id"
+    },
+    "retention_until": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Retention Until"
+    },
+    "workshop_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Workshop Id"
+    }
+  },
+  "required": [
+    "content_base64",
+    "filename",
+    "content_type"
+  ],
+  "title": "UploadDocumentRequest",
+  "type": "object"
+}
