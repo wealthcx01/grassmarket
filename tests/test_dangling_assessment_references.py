@@ -15,7 +15,7 @@ from __future__ import annotations
 import json
 
 import pytest
-from bcap_contracts.assessments import AssessmentState, RecordProvenance
+from bcap_contracts.assessments import RecordProvenance
 from bcap_contracts.entities import PipelineStage
 
 from grassmarket.data.models import AssessmentORM, EngagementORM

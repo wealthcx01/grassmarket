@@ -29,7 +29,10 @@ TEST_JWT_SECRET = "test-secret-that-is-more-than-thirty-two-characters-long-xxxx
 
 @pytest.fixture
 def settings() -> Settings:
+    # _env_file=None keeps the suite hermetic: a developer's local .env (real Google credentials,
+    # say) must not leak in and flip an "unconfigured" assertion (GRS-0073).
     return Settings(
+        _env_file=None,
         env="ci",
         jwt_secret=TEST_JWT_SECRET,
         database_url="sqlite+pysqlite:///:memory:",
