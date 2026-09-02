@@ -197,6 +197,7 @@ from grassmarket.data.models import (
     CourseVersionORM,
     DeliverableORM,
     DrillCardORM,
+    EngagementAssessmentORM,
     EngagementORM,
     ExtractionORM,
     FieldProvenanceORM,
@@ -2708,10 +2709,16 @@ class Repository:
             provenance=derived.value,
             status=EngagementStatus.CONTRACTED,
             started_on=started_on,
-            assessment_ids_json=json.dumps([str(a) for a in assessment_ids]),
             deliverables_json=json.dumps([d.model_dump(mode="json") for d in deliverables]),
         )
         self._session.add(row)
+        self._session.flush()  # the join rows need the engagement id
+        for position, assessment_id in enumerate(assessment_ids):
+            self._session.add(
+                EngagementAssessmentORM(
+                    engagement_id=row.id, assessment_id=assessment_id, position=position
+                )
+            )
         self._session.flush()
         return self._to_engagement(row)
 
@@ -2767,7 +2774,7 @@ class Repository:
             )
         row = self._require_engagement(principal, engagement_id)  # scoped; cross-owner is not-found
 
-        linked = [UUID(a) for a in json.loads(row.assessment_ids_json or "[]")]
+        linked = self._linked_assessment_ids(row.id)
         if not linked:
             # Not orphaned — just new. Deleting it would remove work in progress.
             raise EngagementLinkError(
@@ -2853,7 +2860,7 @@ class Repository:
             raise EngagementLinkError(
                 f"Assessment {assessment_id} is not finalised; only finalised assessments link."
             )
-        linked = json.loads(row.assessment_ids_json)
+        linked = [str(a) for a in self._linked_assessment_ids(row.id)]
         if str(assessment_id) in linked:
             raise EngagementLinkError(
                 f"Assessment {assessment_id} is already linked to this engagement."
@@ -2880,8 +2887,11 @@ class Repository:
                 f"same client."
             )
 
-        linked.append(str(assessment_id))
-        row.assessment_ids_json = json.dumps(linked)
+        self._session.add(
+            EngagementAssessmentORM(
+                engagement_id=row.id, assessment_id=assessment_id, position=len(linked)
+            )
+        )
         self._session.flush()
         return self._to_engagement(row)
 
@@ -2911,25 +2921,44 @@ class Repository:
             return None
         return (client, subject)
 
+    def _linked_assessment_ids(self, engagement_id: UUID) -> list[UUID]:
+        """The assessment ids an engagement draws on, in the order they were linked (GRS-0246).
+
+        Ordered by `position` rather than insertion, because the JSON list this replaced carried
+        order implicitly and the deliverable builder reads it.
+        """
+        return list(
+            self._session.execute(
+                select(EngagementAssessmentORM.assessment_id)
+                .where(EngagementAssessmentORM.engagement_id == engagement_id)
+                .order_by(EngagementAssessmentORM.position)
+            )
+            .scalars()
+            .all()
+        )
+
     def _engagements_referencing(self, assessment_id: UUID) -> list[EngagementORM]:
-        """Every engagement whose `assessment_ids_json` names this assessment (GRS-0246).
+        """Every engagement linked to this assessment (GRS-0246).
 
         Deliberately NOT owner-scoped. The question is referential ("would deleting this break
         something?"), not "what may this principal see" — and an engagement belonging to another
         advisor is exactly the one whose breakage nobody would notice. The caller has already had
         its own access to the assessment checked.
 
-        Parsed rather than LIKE-matched: a substring match on raw JSON matches a partial UUID.
+        Since GRS-0246 this is a join, not a scan-and-parse over every engagement's JSON.
         """
-        needle = str(assessment_id)
-        found: list[EngagementORM] = []
-        for row in self._session.execute(select(EngagementORM)).scalars():
-            try:
-                linked = json.loads(row.assessment_ids_json or "[]")
-            except (TypeError, ValueError):
-                continue
-            if any(str(a) == needle for a in linked):
-                found.append(row)
+        found: list[EngagementORM] = list(
+            self._session.execute(
+                select(EngagementORM)
+                .join(
+                    EngagementAssessmentORM,
+                    EngagementAssessmentORM.engagement_id == EngagementORM.id,
+                )
+                .where(EngagementAssessmentORM.assessment_id == assessment_id)
+            )
+            .scalars()
+            .all()
+        )
         return found
 
     def dangling_assessment_references(self) -> list[tuple[UUID, str, list[str]]]:
@@ -2940,14 +2969,20 @@ class Repository:
         """
         live = {str(r[0]) for r in self._session.execute(select(AssessmentORM.id))}
         broken: list[tuple[UUID, str, list[str]]] = []
-        for row in self._session.execute(select(EngagementORM)).scalars():
-            try:
-                linked = [str(a) for a in json.loads(row.assessment_ids_json or "[]")]
-            except (TypeError, ValueError):
+        rows = self._session.execute(
+            select(EngagementORM, EngagementAssessmentORM.assessment_id).join(
+                EngagementAssessmentORM,
+                EngagementAssessmentORM.engagement_id == EngagementORM.id,
+            )
+        ).all()
+        by_engagement: dict[UUID, tuple[str, list[str]]] = {}
+        for engagement, assessment_id in rows:
+            if str(assessment_id) in live:
                 continue
-            dead = [a for a in linked if a not in live]
-            if dead:
-                broken.append((row.id, row.title, dead))
+            title, dead = by_engagement.setdefault(engagement.id, (engagement.title, []))
+            dead.append(str(assessment_id))
+        for engagement_id, (title, dead) in by_engagement.items():
+            broken.append((engagement_id, title, dead))
         return broken
 
     def _require_engagement(self, principal: Principal, engagement_id: UUID) -> EngagementORM:
@@ -3389,12 +3424,12 @@ class Repository:
                 f"discard_scoring_runs=True."
             )
 
-        # GRS-0246. An engagement references its assessments through `assessment_ids_json`, a
-        # JSON text column — NOT a foreign key. So the cascade below, which is careful and correct
-        # about every FK, never saw them: assessments were deleted in July and five staging
-        # engagements went on pointing at nothing for a month, which is how the founder's duplicate
-        # rows became undeletable (they defaulted to `production` because nothing could be derived
-        # from a missing assessment).
+        # GRS-0246. An engagement used to reference its assessments through `assessment_ids_json`,
+        # a JSON text column — NOT a foreign key. So the cascade below, which is careful and
+        # correct about every FK, never saw them: assessments were deleted in July and five
+        # staging engagements went on pointing at nothing for a month, which is how the founder's
+        # duplicate rows became undeletable (they defaulted to `production` because nothing could
+        # be derived from a missing assessment). The links are now rows in a keyed table.
         #
         # ADR-0047 §4 already states the intent — "orphaned references are the silent inconsistency
         # non-negotiable #3 exists to prevent" — and the guarantee simply did not reach the one
@@ -3412,16 +3447,18 @@ class Repository:
                 f"link is a record of what the engagement drew on, so dropping it is a decision, "
                 f"not a side effect."
             )
-        for engagement in referencing:
+        if referencing:
             # Unlink IN THE SAME TRANSACTION as the deletion. Doing it separately would leave a
             # window where the link is gone and the assessment is not, which is the inverse
-            # inconsistency and just as silent.
-            remaining = [
-                a
-                for a in json.loads(engagement.assessment_ids_json or "[]")
-                if str(a) != str(assessment_id)
-            ]
-            engagement.assessment_ids_json = json.dumps(remaining)
+            # inconsistency and just as silent. Since GRS-0246 the database would refuse the
+            # deletion anyway (the join carries ON DELETE RESTRICT), so this is now the only way
+            # the link can go — which is the point.
+            self._session.execute(
+                delete(EngagementAssessmentORM).where(
+                    EngagementAssessmentORM.assessment_id == assessment_id
+                )
+            )
+            self._session.flush()
 
         # Children first, so no FK is left dangling.
         self._session.execute(
@@ -3436,6 +3473,54 @@ class Repository:
         # in the same transaction.
         run_ids = [run.id for run in runs]
         if run_ids:
+            # GRS-0246. Four tables point at a DELIVERABLE, and until foreign keys were actually
+            # enforced in tests this cascade deleted the deliverables straight out from under them.
+            # On SQLite that silently orphaned four kinds of row; on Postgres, which has always
+            # enforced its keys, `delete_assessment(discard_scoring_runs=True)` on a record that
+            # had produced a deliverable would have raised an IntegrityError. The ordering below is
+            # deepest-first: read events, then the links they belong to, then everything else that
+            # names a deliverable, then the deliverables.
+            deliverable_ids = list(
+                self._session.execute(
+                    select(DeliverableORM.id).where(DeliverableORM.scoring_run_id.in_(run_ids))
+                )
+                .scalars()
+                .all()
+            )
+            if deliverable_ids:
+                link_ids = list(
+                    self._session.execute(
+                        select(ClientReportLinkORM.id).where(
+                            ClientReportLinkORM.deliverable_id.in_(deliverable_ids)
+                        )
+                    )
+                    .scalars()
+                    .all()
+                )
+                if link_ids:
+                    self._session.execute(
+                        delete(ReportReadEventORM).where(ReportReadEventORM.link_id.in_(link_ids))
+                    )
+                self._session.execute(
+                    delete(ClientReportLinkORM).where(
+                        ClientReportLinkORM.deliverable_id.in_(deliverable_ids)
+                    )
+                )
+                self._session.execute(
+                    delete(ClientReportProseORM).where(
+                        ClientReportProseORM.deliverable_id.in_(deliverable_ids)
+                    )
+                )
+                self._session.execute(
+                    delete(FounderApprovalORM).where(
+                        FounderApprovalORM.deliverable_id.in_(deliverable_ids)
+                    )
+                )
+                # Narratives are removed by scoring run below, but one may name a deliverable
+                # without naming these runs; both routes have to be closed.
+                self._session.execute(
+                    delete(AINarrativeORM).where(AINarrativeORM.deliverable_id.in_(deliverable_ids))
+                )
             self._session.execute(
                 delete(AINarrativeORM).where(AINarrativeORM.scoring_run_id.in_(run_ids))
             )
@@ -3493,7 +3578,6 @@ class Repository:
         # assessment_id -> prospect_id for the caller's engagements (GRS-0186), built once so the
         # portfolio row can link to the client record. A link is recorded only where it genuinely
         # exists; an unlinked assessment stays None (never a fabricated link).
-        import json as _json
 
         linked_prospect: dict[UUID, UUID] = {}
         eng_rows = (
@@ -3506,8 +3590,8 @@ class Repository:
             .all()
         )
         for eng in eng_rows:
-            for aid in _json.loads(eng.assessment_ids_json or "[]"):
-                linked_prospect.setdefault(UUID(str(aid)), eng.prospect_id)
+            for aid in self._linked_assessment_ids(eng.id):
+                linked_prospect.setdefault(aid, eng.prospect_id)
         entries: list[BrokeragePortfolioEntry] = []
         for a in self.list_assessments(principal):
             v_index = None
@@ -6394,7 +6478,7 @@ class Repository:
         )
 
     def _to_engagement(self, row: EngagementORM) -> Engagement:
-        assessment_ids = tuple(UUID(a) for a in json.loads(row.assessment_ids_json))
+        assessment_ids = tuple(self._linked_assessment_ids(row.id))
         deliverables = tuple(
             DeliverableSlot.model_validate(d) for d in json.loads(row.deliverables_json)
         )

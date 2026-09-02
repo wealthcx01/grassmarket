@@ -10,7 +10,7 @@ from uuid import uuid4
 
 from sqlalchemy.orm import Session, sessionmaker
 
-from grassmarket.data.models import RecoveryFeeAttributionORM
+from grassmarket.data.models import ProspectORM, RecoveryFeeAttributionORM, WorkshopORM
 from tests.conftest import SeededConsultant, auth_header
 
 
@@ -201,10 +201,20 @@ def test_an_advisor_downloads_their_statement(
 def _seed_recovery_fee(session_factory: sessionmaker[Session], owner_id) -> str:
     session = session_factory()
     try:
+        # GRS-0246 turned on SQLite foreign-key enforcement, which had been inert in tests while
+        # Postgres enforced it in production. This fixture used to invent workshop_id and
+        # prospect_id as bare uuid4()s — a row that could never exist in a real database. Seed the
+        # parents it actually references.
+        prospect = ProspectORM(owner_consultant_id=owner_id, company_name="Recovery Fee Co")
+        session.add(prospect)
+        session.flush()
+        workshop = WorkshopORM(owner_consultant_id=owner_id, prospect_id=prospect.id)
+        session.add(workshop)
+        session.flush()
         row = RecoveryFeeAttributionORM(
             owner_consultant_id=owner_id,
-            workshop_id=uuid4(),
-            prospect_id=uuid4(),
+            workshop_id=workshop.id,
+            prospect_id=prospect.id,
             delivered_on=date(2026, 1, 1),
             contracted_on=date(2026, 6, 1),
             window_days=365,

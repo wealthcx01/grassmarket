@@ -565,13 +565,42 @@ class EngagementORM(Base):
         String(16), default=EngagementStatus.CONTRACTED, nullable=False
     )
     started_on: Mapped[date | None] = mapped_column(Date, nullable=True)
-    # JSON: a list of finalised assessment ids, and the deliverables progress shell (Loop 4 fills).
-    assessment_ids_json: Mapped[str] = mapped_column(Text, default="[]", nullable=False)
+    # GRS-0246. `assessment_ids_json` used to live here — a JSON list of assessment ids with no
+    # foreign key, so deleting an assessment left engagements pointing at nothing and nothing
+    # noticed for a month. The links are now rows in `engagement_assessments` with a real key.
     deliverables_json: Mapped[str] = mapped_column(Text, default="[]", nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_now, onupdate=_now
     )
+
+
+class EngagementAssessmentORM(Base):
+    """Which finalised assessments an engagement draws on (GRS-0246).
+
+    This replaces `engagements.assessment_ids_json`. The difference that matters is the foreign
+    key: an id that names no assessment cannot be written, and an assessment with a live link
+    cannot be deleted out from under it. The old JSON column expressed the same relationship with
+    neither guarantee, which is why five staging engagements referenced deleted assessments for a
+    month with every FK cascade in the repository behaving perfectly.
+
+    `position` preserves the order the advisor linked them in, which the JSON list carried
+    implicitly and which the deliverable builder reads.
+    """
+
+    __tablename__ = "engagement_assessments"
+
+    engagement_id: Mapped[UUID] = mapped_column(
+        ForeignKey("engagements.id", ondelete="CASCADE"), primary_key=True
+    )
+    # RESTRICT, not CASCADE: deleting an assessment that an engagement draws on is a decision the
+    # repository refuses and makes the caller take explicitly. The database agrees rather than
+    # quietly tidying the link away (ADR-0047 §4).
+    assessment_id: Mapped[UUID] = mapped_column(
+        ForeignKey("assessments.id", ondelete="RESTRICT"), primary_key=True, index=True
+    )
+    position: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
 
 class CommsLogEntryORM(Base):
