@@ -25,8 +25,18 @@ from grassmarket.data.repository import (
     ScopeViolationError,
 )
 from grassmarket.pathb.cipher import FernetTranscriptCipher, TranscriptCipher
-from grassmarket.pathb.scanning import AllowAllScanner, MediaScanner, MediaThreatError
-from grassmarket.pathb.transcription import EchoTranscriber, Transcriber, TranscriptionError
+from grassmarket.pathb.scanning import (
+    MediaScanner,
+    MediaThreatError,
+    ScannerNotConfiguredError,
+    build_scanner,
+)
+from grassmarket.pathb.transcription import (
+    Transcriber,
+    TranscriberNotConfiguredError,
+    TranscriptionError,
+    build_transcriber,
+)
 from grassmarket.web.dependencies import (
     get_app_settings,
     get_current_principal,
@@ -43,16 +53,29 @@ def _cipher(settings: Settings = Depends(get_app_settings)) -> TranscriptCipher:
     return FernetTranscriptCipher(settings.transcript_encryption_key)
 
 
-def _transcriber() -> Transcriber:
-    """The transcription provider. The offline echo transcriber is the default; the real Whisper
-    adapter is wired here (or by overriding this dependency) at the composition root — a config/DI
-    swap, never a change to the route handler."""
-    return EchoTranscriber()
+def _transcriber(settings: Settings = Depends(get_app_settings)) -> Transcriber:
+    """The configured transcription provider (GRS-0251).
+
+    Resolved from config on every request rather than hardcoded, and a misconfiguration is a 503
+    the operator can read — never a quiet downgrade to the offline test double, which is the bug
+    this dependency used to be."""
+    try:
+        return build_transcriber(settings)
+    except TranscriberNotConfiguredError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)
+        ) from exc
 
 
-def _scanner() -> MediaScanner:
-    """The media scanner. The permissive default; a real AV scanner swaps in by overriding this."""
-    return AllowAllScanner()
+def _scanner(settings: Settings = Depends(get_app_settings)) -> MediaScanner:
+    """The configured media scanner (GRS-0251). Same contract as `_transcriber`: configured, or a
+    readable 503. Never a no-op standing in for a scan."""
+    try:
+        return build_scanner(settings)
+    except ScannerNotConfiguredError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)
+        ) from exc
 
 
 class PasteTranscriptRequest(BaseModel):
