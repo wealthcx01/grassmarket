@@ -46,6 +46,19 @@ class Prospect(OwnedResource):
     primary_contact_name: str | None = None
     primary_contact_email: str | None = None
     notes: str | None = None
+    #: The one thing that has to happen next, and when (GRS-0249 scope 4). A deal with no dated
+    #: next action is drifting, which is the judgement the Sales Ops course teaches and the
+    #: pipeline had no field to record. Free text on purpose: "send the revised fee schedule" is
+    #: the useful form, not an enum.
+    next_action: str | None = Field(
+        default=None, max_length=280, description="The single next thing to do for this prospect."
+    )
+    #: Nullable independently of `next_action`. An action with no date is honest — the advisor
+    #: knows what to do and not yet when — and inventing a date to fill the column would be
+    #: the fabrication non-negotiable #3 exists to prevent.
+    next_action_on: date | None = Field(
+        default=None, description="When the next action is due, if the advisor set a date."
+    )
 
 
 class Contact(OwnedResource):

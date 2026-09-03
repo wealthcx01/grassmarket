@@ -2744,22 +2744,6 @@
         "title": "CompleteRequest",
         "type": "object"
       },
-      "ConfirmRequest": {
-        "properties": {
-          "corrected_document": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/AssessmentDocument"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        },
-        "title": "ConfirmRequest",
-        "type": "object"
-      },
       "ConsensusRequest": {
         "description": "The lead's resolved (agreed) ratings for a module's assessed subcomponents. `rater_ids` and\n`consensus` are computed server-side from the submitted drafts \u2014 anything sent is ignored.",
         "properties": {
@@ -2773,6 +2757,21 @@
           }
         },
         "title": "ConsensusRequest",
+        "type": "object"
+      },
+      "ConsentLine": {
+        "description": "What the recorder must show before a session may be recorded.\n\nServed rather than hardcoded in the frontend so there is exactly one copy of the wording in the\nsystem. A client that shows its own text will have the upload refused, which is the point.",
+        "properties": {
+          "wording": {
+            "description": "The exact text to read to the client, shown verbatim.",
+            "title": "Wording",
+            "type": "string"
+          }
+        },
+        "required": [
+          "wording"
+        ],
+        "title": "ConsentLine",
         "type": "object"
       },
       "ConsultancyCommissionCarrot": {
@@ -6124,6 +6123,31 @@
         "additionalProperties": false,
         "description": "A stored meeting transcript owned by the consultant who ingested it. The text is sensitive:\nit is stored encrypted at rest and only ever returned to its owner. `transcriber_ref` records\nwhich adapter produced it ('pasted' for text) so a re-transcription is traceable.",
         "properties": {
+          "consent_confirmed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When the advisor confirmed the client agreed. Required for a recorded session.",
+            "title": "Consent Confirmed At"
+          },
+          "consent_wording": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The exact text the client agreed to, stored in full rather than referenced \u2014 wording changes over time and a record that cannot say what was agreed is not a record.",
+            "title": "Consent Wording"
+          },
           "created_at": {
             "format": "date-time",
             "title": "Created At",
@@ -6152,6 +6176,37 @@
             "format": "uuid",
             "title": "Owner Consultant Id",
             "type": "string"
+          },
+          "prospect_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The prospect this meeting belongs to, if any.",
+            "title": "Prospect Id"
+          },
+          "recording_document_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The stored audio this transcript was produced from, if kept.",
+            "title": "Recording Document Id"
+          },
+          "recording_kind": {
+            "$ref": "#/components/schemas/RecordingKind",
+            "default": "not_recorded",
+            "description": "Who was in the room \u2014 which decides whether the consent gate applies."
           },
           "retention_until": {
             "anyOf": [
@@ -6189,6 +6244,19 @@
             "format": "date-time",
             "title": "Updated At",
             "type": "string"
+          },
+          "workshop_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The workshop this meeting belongs to, if any.",
+            "title": "Workshop Id"
           }
         },
         "required": [
@@ -6668,6 +6736,18 @@
             ],
             "title": "Engagement Id"
           },
+          "prospect_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prospect Id"
+          },
           "retention_until": {
             "anyOf": [
               {
@@ -6689,6 +6769,18 @@
             "minLength": 1,
             "title": "Text",
             "type": "string"
+          },
+          "workshop_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workshop Id"
           }
         },
         "required": [
@@ -6895,6 +6987,17 @@
         ],
         "title": "PipelineBoardEntry",
         "type": "object"
+      },
+      "PipelineField": {
+        "description": "The fields a voice note may propose. Deliberately a closed set (ADR-0001): an extractor\ncannot invent a field name, and every one of these maps to an existing write path.",
+        "enum": [
+          "stage",
+          "next_action",
+          "next_action_on",
+          "comms_note"
+        ],
+        "title": "PipelineField",
+        "type": "string"
       },
       "PipelineForecast": {
         "additionalProperties": false,
@@ -7301,6 +7404,16 @@
         "title": "ProfileSummary",
         "type": "object"
       },
+      "ProposalStatus": {
+        "description": "A proposal is PROPOSED until a human does something about it. There is no expiry and no\nautomatic application: an unanswered proposal stays unanswered, visibly.",
+        "enum": [
+          "proposed",
+          "confirmed",
+          "discarded"
+        ],
+        "title": "ProposalStatus",
+        "type": "string"
+      },
       "ProposeNarrativesRequest": {
         "properties": {
           "sections": {
@@ -7342,24 +7455,101 @@
         "title": "ProposeQuizRequest",
         "type": "object"
       },
-      "ProposeRequest": {
+      "ProposedField": {
+        "additionalProperties": false,
+        "description": "One field a voice note proposed, what the advisor did with it, and where it came from.",
         "properties": {
-          "assessment_id": {
-            "format": "uuid",
-            "title": "Assessment Id",
+          "accepted": {
+            "default": false,
+            "description": "True once the advisor confirmed this field specifically.",
+            "title": "Accepted",
+            "type": "boolean"
+          },
+          "confidence": {
+            "$ref": "#/components/schemas/ExtractionConfidence"
+          },
+          "confirmed_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmed Value"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
             "type": "string"
+          },
+          "field": {
+            "$ref": "#/components/schemas/PipelineField"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "owner_consultant_id": {
+            "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+            "format": "uuid",
+            "title": "Owner Consultant Id",
+            "type": "string"
+          },
+          "proposal_id": {
+            "format": "uuid",
+            "title": "Proposal Id",
+            "type": "string"
+          },
+          "proposed_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The extractor's suggestion, or null where it found nothing.",
+            "title": "Proposed Value"
+          },
+          "span_end": {
+            "minimum": 0.0,
+            "title": "Span End",
+            "type": "integer"
+          },
+          "span_start": {
+            "description": "Character offset of the supporting span.",
+            "minimum": 0.0,
+            "title": "Span Start",
+            "type": "integer"
           },
           "transcript_id": {
             "format": "uuid",
             "title": "Transcript Id",
             "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
           }
         },
         "required": [
-          "assessment_id",
-          "transcript_id"
+          "id",
+          "created_at",
+          "updated_at",
+          "owner_consultant_id",
+          "proposal_id",
+          "transcript_id",
+          "field",
+          "confidence",
+          "span_start",
+          "span_end"
         ],
-        "title": "ProposeRequest",
+        "title": "ProposedField",
         "type": "object"
       },
       "Prospect": {
@@ -7380,6 +7570,32 @@
             "format": "uuid",
             "title": "Id",
             "type": "string"
+          },
+          "next_action": {
+            "anyOf": [
+              {
+                "maxLength": 280,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The single next thing to do for this prospect.",
+            "title": "Next Action"
+          },
+          "next_action_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When the next action is due, if the advisor set a date.",
+            "title": "Next Action On"
           },
           "notes": {
             "anyOf": [
@@ -7942,6 +8158,16 @@
           "sandbox"
         ],
         "title": "RecordProvenance",
+        "type": "string"
+      },
+      "RecordingKind": {
+        "description": "Who was in the room when this was recorded \u2014 which decides whether consent applies.\n\nThe distinction is not bureaucracy. An advisor dictating a note alone in a car park has nobody\nto ask for consent; a session with a client in the room has somebody who must be asked. One\nflow cannot serve both honestly, so the advisor states which it is and the record keeps the\nanswer (GRS-0249 scope 1, GRS-0255).",
+        "enum": [
+          "voice_note",
+          "recorded_session",
+          "not_recorded"
+        ],
+        "title": "RecordingKind",
         "type": "string"
       },
       "RecoveryFeeAttribution": {
@@ -9660,6 +9886,30 @@
             ],
             "title": "Company Name"
           },
+          "next_action": {
+            "anyOf": [
+              {
+                "maxLength": 280,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action"
+          },
+          "next_action_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action On"
+          },
           "notes": {
             "anyOf": [
               {
@@ -9837,6 +10087,31 @@
       },
       "UploadMediaRequest": {
         "properties": {
+          "consent_confirmed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When the advisor confirmed the client agreed.",
+            "title": "Consent Confirmed At"
+          },
+          "consent_wording": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The exact text shown to the client. Must be the founder-approved wording.",
+            "title": "Consent Wording"
+          },
           "content_type": {
             "minLength": 1,
             "title": "Content Type",
@@ -9854,11 +10129,34 @@
             ],
             "title": "Engagement Id"
           },
+          "keep_recording": {
+            "default": false,
+            "description": "Store the audio alongside the transcript (needs a parent to file it under).",
+            "title": "Keep Recording",
+            "type": "boolean"
+          },
           "media_base64": {
             "description": "The media file, base64-encoded.",
             "minLength": 1,
             "title": "Media Base64",
             "type": "string"
+          },
+          "prospect_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prospect Id"
+          },
+          "recording_kind": {
+            "$ref": "#/components/schemas/RecordingKind",
+            "default": "not_recorded",
+            "description": "Who was in the room. A recorded session must carry consent; nothing else may."
           },
           "retention_until": {
             "anyOf": [
@@ -9879,6 +10177,18 @@
           },
           "source_kind": {
             "$ref": "#/components/schemas/MediaKind"
+          },
+          "workshop_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workshop Id"
           }
         },
         "required": [
@@ -9948,6 +10258,104 @@
           "reference_level"
         ],
         "title": "VignetteAnchor",
+        "type": "object"
+      },
+      "VoiceNoteProposal": {
+        "additionalProperties": false,
+        "description": "A gated pipeline proposal drawn from one voice note, against one prospect.",
+        "properties": {
+          "confirmed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmed At"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "discarded_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discarded At"
+          },
+          "extractor_version": {
+            "minLength": 1,
+            "title": "Extractor Version",
+            "type": "string"
+          },
+          "fields": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ProposedField"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "gaps": {
+            "default": [],
+            "description": "Fields the extractor looked for and did not find \u2014 stated, not left blank.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Gaps",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "owner_consultant_id": {
+            "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+            "format": "uuid",
+            "title": "Owner Consultant Id",
+            "type": "string"
+          },
+          "prospect_id": {
+            "format": "uuid",
+            "title": "Prospect Id",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ProposalStatus",
+            "default": "proposed"
+          },
+          "transcript_id": {
+            "format": "uuid",
+            "title": "Transcript Id",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "created_at",
+          "updated_at",
+          "owner_consultant_id",
+          "prospect_id",
+          "transcript_id",
+          "extractor_version"
+        ],
+        "title": "VoiceNoteProposal",
         "type": "object"
       },
       "WidgetDef": {
@@ -10330,6 +10738,86 @@
         ],
         "title": "WorkshopState",
         "type": "string"
+      },
+      "grassmarket__web__routers__extraction__ConfirmRequest": {
+        "properties": {
+          "corrected_document": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AssessmentDocument"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "ConfirmRequest",
+        "type": "object"
+      },
+      "grassmarket__web__routers__extraction__ProposeRequest": {
+        "properties": {
+          "assessment_id": {
+            "format": "uuid",
+            "title": "Assessment Id",
+            "type": "string"
+          },
+          "transcript_id": {
+            "format": "uuid",
+            "title": "Transcript Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "assessment_id",
+          "transcript_id"
+        ],
+        "title": "ProposeRequest",
+        "type": "object"
+      },
+      "grassmarket__web__routers__voice_notes__ConfirmRequest": {
+        "description": "The advisor's final answer, per field.\n\nA field that is present is applied with the value given \u2014 their correction, or the proposal's\nown suggestion where they accepted it unchanged. A field that is **absent or null is not\napplied**, whatever was proposed. There is no \"accept everything\" shortcut on purpose: the\napproval has to name what it approves, or it is not an approval.",
+        "properties": {
+          "fields": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/PipelineField"
+            },
+            "title": "Fields",
+            "type": "object"
+          }
+        },
+        "title": "ConfirmRequest",
+        "type": "object"
+      },
+      "grassmarket__web__routers__voice_notes__ProposeRequest": {
+        "properties": {
+          "prospect_id": {
+            "format": "uuid",
+            "title": "Prospect Id",
+            "type": "string"
+          },
+          "transcript_id": {
+            "format": "uuid",
+            "title": "Transcript Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prospect_id",
+          "transcript_id"
+        ],
+        "title": "ProposeRequest",
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -15604,7 +16092,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ProposeRequest"
+                "$ref": "#/components/schemas/grassmarket__web__routers__extraction__ProposeRequest"
               }
             }
           },
@@ -15710,7 +16198,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ConfirmRequest"
+                "$ref": "#/components/schemas/grassmarket__web__routers__extraction__ConfirmRequest"
               }
             }
           },
@@ -17051,6 +17539,28 @@
         ]
       }
     },
+    "/transcripts/consent-line": {
+      "get": {
+        "description": "The founder-approved consent wording (GRS-0255).\n\nUnauthenticated-safe in content \u2014 it is a script an advisor reads aloud, not client data \u2014 but\nit sits behind the same router so a client fetches it the same way it fetches everything else.",
+        "operationId": "get_consent_line_transcripts_consent_line_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentLine"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Consent Line",
+        "tags": [
+          "path-b"
+        ]
+      }
+    },
     "/transcripts/media": {
       "post": {
         "operationId": "ingest_media_transcripts_media_post",
@@ -17188,6 +17698,265 @@
         "summary": "Get Transcript",
         "tags": [
           "path-b"
+        ]
+      }
+    },
+    "/voice-notes": {
+      "get": {
+        "operationId": "list_proposals_voice_notes_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "prospect_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Prospect Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/VoiceNoteProposal"
+                  },
+                  "title": "Response List Proposals Voice Notes Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Proposals",
+        "tags": [
+          "voice-notes"
+        ]
+      },
+      "post": {
+        "operationId": "propose_voice_notes_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/grassmarket__web__routers__voice_notes__ProposeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoiceNoteProposal"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Propose",
+        "tags": [
+          "voice-notes"
+        ]
+      }
+    },
+    "/voice-notes/{proposal_id}": {
+      "get": {
+        "operationId": "get_proposal_voice_notes__proposal_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "proposal_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Proposal Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoiceNoteProposal"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Proposal",
+        "tags": [
+          "voice-notes"
+        ]
+      }
+    },
+    "/voice-notes/{proposal_id}/confirm": {
+      "post": {
+        "description": "Apply what the advisor confirmed. This is the gate; nothing before it wrote anything.",
+        "operationId": "confirm_voice_notes__proposal_id__confirm_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "proposal_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Proposal Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/grassmarket__web__routers__voice_notes__ConfirmRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoiceNoteProposal"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Confirm",
+        "tags": [
+          "voice-notes"
+        ]
+      }
+    },
+    "/voice-notes/{proposal_id}/discard": {
+      "post": {
+        "description": "The advisor read it and said no. Recorded, not deleted.",
+        "operationId": "discard_voice_notes__proposal_id__discard_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "proposal_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Proposal Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoiceNoteProposal"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Discard",
+        "tags": [
+          "voice-notes"
         ]
       }
     },

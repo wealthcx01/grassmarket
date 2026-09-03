@@ -436,6 +436,10 @@ export interface Prospect {
   primary_contact_name?: string | null;
   primary_contact_email?: string | null;
   notes?: string | null;
+  /** The one thing that has to happen next (GRS-0249). A deal without one is drifting. */
+  next_action?: string | null;
+  /** Independently nullable: an action with no date yet is a real state, not a missing value. */
+  next_action_on?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -1339,4 +1343,127 @@ export type SegmentFacet = {
 export type RegistryFacets = {
   segments: SegmentFacet[];
   countries: { value: string; count: number }[];
+};
+
+/* ---------------------------------------------------------------- Voice notes (GRS-0249) */
+
+/**
+ * Who was in the room. This decides whether the consent gate applies, so it is stated by the
+ * advisor rather than inferred: an advisor dictating alone in a car park has nobody to ask for
+ * consent, and a session with a client in the room has somebody who must be asked.
+ * Mirrors `bcap_contracts.meetings.RecordingKind`.
+ */
+export type RecordingKind = "voice_note" | "recorded_session" | "not_recorded";
+
+export type MediaKind = "transcript_text" | "audio" | "video";
+
+/** Mirrors `bcap_contracts.meetings.MeetingTranscript`. */
+export type MeetingTranscript = {
+  id: string;
+  owner_consultant_id: string;
+  prospect_id: string | null;
+  workshop_id: string | null;
+  engagement_id: string | null;
+  source_kind: MediaKind;
+  source_filename: string;
+  text: string;
+  transcriber_ref: string;
+  recording_kind: RecordingKind;
+  /** Set only on a recorded session. Null on a voice note — nobody was there to agree. */
+  consent_confirmed_at: string | null;
+  /** The exact wording agreed to, stored in full rather than referenced. */
+  consent_wording: string | null;
+  /** The kept audio this transcript came from, so a disputed correction can be re-checked. */
+  recording_document_id: string | null;
+  retention_until: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+/**
+ * The founder-approved consent line, fetched rather than hardcoded so there is exactly one copy
+ * of the wording in the system. Showing different text and uploading anyway is refused by the API.
+ */
+export type ConsentLine = { wording: string };
+
+/**
+ * The upload body for `POST /transcripts/media`.
+ *
+ * Consent is either complete or absent — there is no half state. `recording_kind:
+ * "recorded_session"` requires both consent fields and the wording must be the one the API served;
+ * `"voice_note"` requires both to be absent, because the advisor was alone. The API refuses either
+ * mistake and stores nothing.
+ */
+export type UploadRecordingRequest = {
+  media_base64: string;
+  source_filename: string;
+  content_type: string;
+  source_kind: "audio" | "video";
+  prospect_id?: string | null;
+  workshop_id?: string | null;
+  engagement_id?: string | null;
+  recording_kind: RecordingKind;
+  consent_confirmed_at?: string | null;
+  consent_wording?: string | null;
+  /** Keep the audio beside the transcript. Needs one of the parent ids to file it under. */
+  keep_recording?: boolean;
+};
+
+/* ------------------------------------------- Voice note → pipeline proposal (GRS-0249 scope 4) */
+
+/**
+ * The fields a voice note may propose. A closed set, mirroring
+ * `bcap_contracts.voice_notes.PipelineField`: an extractor cannot invent a field name, and every
+ * one of these maps to a write path that already exists.
+ */
+export type PipelineField = "stage" | "next_action" | "next_action_on" | "comms_note";
+
+export type ExtractionConfidence = "high" | "medium" | "low";
+
+export type ProposalStatus = "proposed" | "confirmed" | "discarded";
+
+/** One field a voice note proposed, and what the advisor did with it. */
+export type ProposedField = {
+  id: string;
+  owner_consultant_id: string;
+  proposal_id: string;
+  transcript_id: string;
+  field: PipelineField;
+  /** What the machine suggested. Kept even after a correction. */
+  proposed_value: string | null;
+  confidence: ExtractionConfidence;
+  span_start: number;
+  span_end: number;
+  /** True once this field specifically was applied — not merely that the proposal was answered. */
+  accepted: boolean;
+  /** What the advisor actually agreed to. Null where they left the field out. */
+  confirmed_value: string | null;
+};
+
+/**
+ * A gated pipeline proposal drawn from one voice note. Nothing here has touched the prospect:
+ * the values are applied only by confirming, and only the ones the advisor confirms.
+ */
+export type VoiceNoteProposal = {
+  id: string;
+  owner_consultant_id: string;
+  prospect_id: string;
+  transcript_id: string;
+  status: ProposalStatus;
+  extractor_version: string;
+  /** Fields the extractor looked for and did not find — stated, so silence is never ambiguous. */
+  gaps: string[];
+  fields: ProposedField[];
+  confirmed_at: string | null;
+  discarded_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+/** Human labels for the proposed fields. British English, sentence case, no jargon. */
+export const PIPELINE_FIELD_LABEL: Record<PipelineField, string> = {
+  stage: "Move to stage",
+  next_action: "Next action",
+  next_action_on: "Due",
+  comms_note: "Communication log note",
 };

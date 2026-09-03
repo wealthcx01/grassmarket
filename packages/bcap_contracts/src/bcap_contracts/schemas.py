@@ -114,6 +114,7 @@ from bcap_contracts.report_links import (
 )
 from bcap_contracts.rubric import RubricAnchor
 from bcap_contracts.value import ScenarioComparison
+from bcap_contracts.voice_notes import ProposedField, VoiceNoteProposal
 from bcap_contracts.wizard import WizardSuggestion, WizardSuggestions
 
 # The exported surface. Adding a resource means adding it here and regenerating — deliberate
@@ -171,6 +172,8 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "MeetingTranscript": MeetingTranscript,
     "Extraction": Extraction,
     "FieldProvenance": FieldProvenance,
+    "VoiceNoteProposal": VoiceNoteProposal,
+    "ProposedField": ProposedField,
     "Prediction": Prediction,
     "BenchmarkRow": BenchmarkRow,
     "CBenchmarkRow": CBenchmarkRow,

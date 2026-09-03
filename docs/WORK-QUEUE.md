@@ -27,7 +27,7 @@ Ordered. Each row says what it is and why it sits where it does.
 | 4 | **GRS-0242** — Workbench stops leaking internals | Contradictory, internal-facing copy in a surface advisors use weekly. |
 | 5 | **GRS-0210** — smart search knows the firms advisors type | Search that misses the obvious firm is the fastest way to lose trust in the data. |
 | 6 | **GRS-0198** — assessment & deliverable milestones on the pipeline | Pipeline and assessment are two halves of one story and currently do not reference each other. |
-| 7 | **GRS-0249** — voice notes | Founder request. Half the plumbing exists; gated on 0251 and 0247. |
+| 7 | ~~**GRS-0249** — voice notes~~ | **Done 2026-09-03.** Record → consent gate → transcript → proposed pipeline update the advisor ticks and confirms. Blockers 0251 and 0247 merged first. |
 | 8 | **GRS-0214** — what the client gets free vs on engagement | Shapes what a deliverable *is*; touches many surfaces, so earlier is cheaper. |
 
 ### Then — depth

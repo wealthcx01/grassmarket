@@ -58,7 +58,10 @@ def main() -> None:
             out.append(f"| `{method}` | `{path}` | {summary} |")
 
     (_ROOT / "docs" / "API-SURFACE.md").write_text("\n".join(out) + "\n")
-    (_ROOT / "docs" / "openapi.json").write_text(json.dumps(spec, indent=2, sort_keys=True))
+    # Trailing newline like its sibling above: without one the end-of-file-fixer hook
+    # rewrites this file on every commit that regenerates it, and the commit has to be
+    # staged twice for no reason.
+    (_ROOT / "docs" / "openapi.json").write_text(json.dumps(spec, indent=2, sort_keys=True) + "\n")
     print(f"wrote docs/API-SURFACE.md and docs/openapi.json — {total} endpoints")
 
 

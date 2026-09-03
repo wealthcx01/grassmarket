@@ -4,9 +4,11 @@
 
 ## One line
 
-The product is functionally complete and deployed. A four-ticket backend wave is **in review as a
-stack of three PRs**; after they merge, the next work is GRS-0249 (voice notes) and then the
-front-end redesign, which now has a full design handoff and a generated API contract to build on.
+The product is functionally complete and deployed. The four-ticket backend wave **has merged**.
+GRS-0249 (voice notes) is **built end to end**: an advisor records, consent is gated, the audio and
+transcript are kept, and the note comes back as a proposed pipeline update they tick, correct and
+confirm. Next is the front-end redesign, which has a full design handoff and a generated API
+contract to build on.
 
 ## Read these before touching anything
 
@@ -18,18 +20,17 @@ front-end redesign, which now has a full design handoff and a generated API cont
 | `docs/REDESIGN-PROGRAMME.md` | The Advisor Studio redesign: ticket allocation 0253–0278, build order, what is contractual |
 | `docs/tickets/GRS-02*.md` | 0247–0252 are the current wave; 0253–0264 are the design's backend requests |
 
-## THE STACK — merge order matters
+## THE STACK — merged 2026-09-03
 
 ```
 main → #272 (GRS-0246) → #271 (GRS-0251) → #273 (GRS-0247)
 ```
 
-**Merge #272 first, then #271, then #273.** Migration `0044` (documents) follows `0043`
-(engagement_assessments); out of order it breaks. Each PR's diff shows the ones beneath it until
-they land — normal for a stack, not a mistake.
+All three are on `main`, in that order. Migration `0044` (documents) follows `0043`
+(engagement_assessments), and `0045` (voice notes) follows `0044`.
 
-Nothing was merged to `main` to unblock the work. A `main` push auto-deploys **both** production
-services and runs migrations at app import, so that stays a deliberate act.
+A `main` push auto-deploys **both** production services and runs migrations at app import, so it
+stays a deliberate act.
 
 | PR | Ticket | What it is |
 |---|---|---|
@@ -45,9 +46,9 @@ Set on **staging and production**, `grassmarket-api`, with `--skip-deploys`:
 - `GM_MEDIA_SCANNER_PROVIDER=content-type`
 - `GM_OPENAI_API_KEY` (the founder's key, piped via stdin — never echoed)
 
-These are inert until #271 merges (pydantic ignores unknown env). **After it merges, media
-ingestion works in production.** Before it merges, that endpoint returns 503 — which is correct,
-not broken.
+#271 has merged, so **media ingestion works in production now.** Any advisor voice note is
+transcribed by hosted OpenAI Whisper — see the consent note under GRS-0249 below, which is a live
+founder question, not a settled one.
 
 `GM_OPENAI_API_KEY` is GM-prefixed **only**, deliberately: a bare `OPENAI_API_KEY` alias would let
 whatever key sits in a developer's or CI runner's environment become the one billed and sent client
@@ -73,27 +74,65 @@ Also fixed: migrations no longer replace the process's logging configuration. `e
 `fileConfig` unconditionally and `run_migrations` runs at app import, so every production boot had
 been handing the running service `alembic.ini`'s logging setup.
 
-## Next: GRS-0249 (voice notes)
+## GRS-0249 (voice notes) — built, on `grs-0249-voice-notes`
 
-Most of it is now built. What remains:
+**What works now.** An advisor opens a prospect on their phone, presses record, sees a level meter
+and a timer, presses stop, and the note comes back transcribed with a **proposed pipeline update**
+beside it: a stage, a next action, a date. They tick what they agree with, change anything wrong,
+and confirm. The audio is kept. A failed upload stays on the device, because the car park has one
+bar.
 
-1. **Browser `MediaRecorder`** in the advisor UI, working on a phone — that is where the car park is.
-2. **Consent gate.** The design is explicit: *no consent, no recording kept.* Store
-   `consent_confirmed_at` **and `consent_wording`** — the exact text shown, not a reference to it.
+**The consent gate, and the decision inside it.** The advisor says who is in the room *before*
+anything records, and this is not a formality:
 
-   **Founder-approved wording, 2026-09-03:**
+- **A voice note** is the advisor alone. No consent line, because there is nobody to ask.
+- **A recorded session** has somebody else present. The founder-approved wording from GRS-0255 is
+  shown verbatim and both `consent_confirmed_at` and `consent_wording` are stored, or the recording
+  is refused outright. *No consent, no recording kept* — never stored-and-flagged.
 
-   > *"I'd like to record this session so I can write it up accurately. The recording stays in the
-   > Bruntsfield advisor system, is transcribed for my notes, and isn't shared outside the
-   > engagement team. Are you happy for me to record?"*
+Both directions are refused: a session without consent, and a voice note claiming consent nobody
+gave. The rule lives in the contract, the repository and a table CHECK, so no future caller can
+route around it. The wording is served by `GET /transcripts/consent-line` — one copy in the system
+— and an upload carrying different text is refused.
 
-   Any change to this is a founder decision, not an engineering one. See GRS-0255.
-3. **Extraction to a proposal, never straight to state.** Reuse Path B exactly: per-field
-   confidence, advisor corrects, then confirms. Non-negotiable #8 — a voice note must never move a
-   prospect stage on its own.
-4. **v1 is record → stop → upload → "transcribing…" → review.** Streaming, speaker labels and
-   moment marks are R3, deliberately deferred: the hosted Whisper API takes a whole file, and this
-   is the ship order the requests document specifies.
+**The approval gate is real, not decorative.** A voice note proposes; it never acts.
+
+- The proposed values live on a proposal record and never touch the prospect until somebody
+  confirms. The offline extractor proposes **nothing**, because a keyword match on "move them to
+  qualified" would be a fabrication wearing a confidence score.
+- Each field has its own tick. There is no "accept all": an approval that does not name what it
+  approves is not an approval.
+- What the machine suggested and what the human agreed to are **both** stored. Afterwards you can
+  always tell a corrected field from an accepted one.
+- Every write goes through the door a typed update uses, so the stage-history row is written the
+  same way and an illegal move is refused by the same lifecycle graph.
+
+**Two founder questions this opened, neither of them engineering calls:**
+
+1. **The approved wording tells the client "the recording … isn't shared outside the engagement
+   team". The transcriber is hosted OpenAI Whisper, so the audio does leave our infrastructure.**
+   The wording is used verbatim and unchanged, as instructed. The advisor-facing UI says plainly
+   where the audio goes, so whoever presses record is not misled — but the client hears the
+   approved line. Reconciling those two sentences is a founder decision.
+2. Whether a solo voice note should show the client-consent line anyway. Today it does not.
+
+**Two model gaps this work found and handled:**
+
+- **There was no next-action field anywhere**, though the Sales Ops course already teaches that a
+  deal without a dated one is drifting. Added, independently nullable, and shown on the prospect
+  header — where its absence is stated in words rather than left blank.
+- **The communication log belongs to an engagement, not a prospect.** So a car-park note has
+  nowhere to file a comms line until an engagement exists. Refused in words the advisor can act on,
+  never guessed at. Filing it against a prospect properly is GRS-0254-shaped and is not done.
+
+**Absorbed on the way:** GRS-0254 build 1 and 2. Transcripts hang off a prospect or workshop, not
+only an engagement. `engagement_id` became a real foreign key at the same time. GRS-0254's
+re-parent path (build 3) is still open.
+
+**Deliberately deferred:** streaming, speaker labels and moment marks stay in GRS-0255 for R3 — the
+hosted Whisper API takes a whole file, so v1 cannot stream and does not pretend to. One honest gap
+remains in the offline handling: a recording is held on the device from the moment the advisor
+presses **stop**, so a tab that dies *during* a recording still loses it.
 
 ## The design handoff (2026-09-02/03)
 
@@ -121,7 +160,7 @@ consequences. Pixel values are indicative; rebuild spacing in rem.
 | Item | Unblocks |
 |---|---|
 | **GRS-0150 elicitation panel** | Retail client deliverables. Still the only real blocker |
-| **Consent wording** | GRS-0249 |
+| **Consent vs. OpenAI Whisper** | The approved wording says the recording is not shared outside the engagement team; the transcriber is a third party. GRS-0249/0255 |
 | **GRS-0207** outreach build-vs-buy | Gates 0202/0203/0204 |
 | **GRS-0248** ActiveGraph: adopt or amend the docs | Doing neither is the only wrong answer |
 | D4 multi-currency · D5–D7 | Deferred by the founder |

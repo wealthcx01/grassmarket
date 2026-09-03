@@ -11,6 +11,11 @@
 
 import type {
   ClientReportLink,
+  ConsentLine,
+  MeetingTranscript,
+  PipelineField,
+  UploadRecordingRequest,
+  VoiceNoteProposal,
   Consultant,
   DeclaredFigure,
   ReportProseSection,
@@ -1485,5 +1490,80 @@ export const api = {
     const disposition = res.headers.get("content-disposition") ?? "";
     const match = /filename="?([^"]+)"?/.exec(disposition);
     return { blob, filename: match?.[1] ?? "earnings-statement.docx" };
+  },
+
+  /* -------------------------------------------------------- Voice notes (GRS-0249) */
+
+  /**
+   * The founder-approved consent line. Fetched, never hardcoded here: there is one copy of this
+   * wording in the system and it lives in the contracts package. A recorder that showed its own
+   * text and uploaded anyway would be refused by the API, which is the point of fetching it.
+   */
+  consentLine(signal?: AbortSignal): Promise<ConsentLine> {
+    return request<ConsentLine>("/transcripts/consent-line", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  /**
+   * Upload a recording and get back the transcript.
+   *
+   * `media_base64` rather than multipart, matching the existing ingest. The caller must keep the
+   * original blob until this resolves — a rejected upload stores nothing at all, and the recording
+   * of a conversation that already happened is the one thing here that cannot be made again.
+   */
+  uploadRecording(payload: UploadRecordingRequest, signal?: AbortSignal): Promise<MeetingTranscript> {
+    return request<MeetingTranscript>("/transcripts/media", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+      signal,
+    });
+  },
+
+  /**
+   * Ask what this voice note suggests for the pipeline. Writes nothing: the proposal is a
+   * proposal until `confirmVoiceNoteProposal` is called with the advisor's own answers.
+   */
+  proposePipelineUpdate(
+    prospectId: string,
+    transcriptId: string,
+    signal?: AbortSignal,
+  ): Promise<VoiceNoteProposal> {
+    return request<VoiceNoteProposal>("/voice-notes", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ prospect_id: prospectId, transcript_id: transcriptId }),
+      signal,
+    });
+  },
+
+  /**
+   * Apply what the advisor confirmed. `fields` carries their final answers — a correction, or the
+   * proposal's own value where they accepted it. A field left out is not applied, whatever was
+   * suggested: this is the approval, so it has to name what it approves.
+   */
+  confirmVoiceNoteProposal(
+    proposalId: string,
+    fields: Partial<Record<PipelineField, string | null>>,
+    signal?: AbortSignal,
+  ): Promise<VoiceNoteProposal> {
+    return request<VoiceNoteProposal>(`/voice-notes/${proposalId}/confirm`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ fields }),
+      signal,
+    });
+  },
+
+  /** The advisor read it and said no. Recorded, not deleted. */
+  discardVoiceNoteProposal(proposalId: string, signal?: AbortSignal): Promise<VoiceNoteProposal> {
+    return request<VoiceNoteProposal>(`/voice-notes/${proposalId}/discard`, {
+      method: "POST",
+      headers: authHeaders(),
+      signal,
+    });
   },
 };

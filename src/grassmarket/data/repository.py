@@ -20,7 +20,7 @@ import hashlib
 import json
 import re
 import unicodedata
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from uuid import UUID
@@ -144,7 +144,12 @@ from bcap_contracts.learning import (
     SectionTestAttempt,
     SlideKind,
 )
-from bcap_contracts.meetings import MediaKind, MeetingTranscript
+from bcap_contracts.meetings import (
+    FOUNDER_APPROVED_CONSENT_WORDING,
+    MediaKind,
+    MeetingTranscript,
+    RecordingKind,
+)
 from bcap_contracts.money import Currency, Money
 from bcap_contracts.narratives import AINarrative, NarrativeSection, NarrativeStatus
 from bcap_contracts.pipeline import StageHistoryEntry, assert_legal_transition
@@ -166,6 +171,12 @@ from bcap_contracts.report_links import (
     ReportReadEvent,
     ReportReadReport,
     SectionReadSummary,
+)
+from bcap_contracts.voice_notes import (
+    PipelineField,
+    ProposalStatus,
+    ProposedField,
+    VoiceNoteProposal,
 )
 from sqlalchemy import Text, delete, func, select
 from sqlalchemy.exc import IntegrityError
@@ -222,6 +233,8 @@ from grassmarket.data.models import (
     ReportReadEventORM,
     ScoringRunORM,
     SectionTestAttemptORM,
+    VoiceNoteProposalORM,
+    VoiceNoteProposedFieldORM,
     WorkshopORM,
 )
 from grassmarket.earnings.commission import (
@@ -232,6 +245,7 @@ from grassmarket.earnings.commission import (
 from grassmarket.entities.registry import rank_name
 from grassmarket.pathb.cipher import TranscriptCipher
 from grassmarket.pathb.extraction import Extractor
+from grassmarket.pathb.pipeline_extraction import PipelineExtractor
 from grassmarket.pathb.scanning import MediaScanner
 from grassmarket.pathb.transcription import Transcriber, TranscriptionError
 from grassmarket.pipeline.fees import attribution_content_hash, is_within_attribution_window
@@ -414,6 +428,40 @@ class DocumentError(Exception):
 
 class DocumentTooLargeError(DocumentError):
     """The upload exceeds the configured limit — refused before anything is scanned or stored."""
+
+
+@dataclass(frozen=True)
+class ConfirmedFields:
+    """What a voice-note confirmation will actually write (GRS-0249 scope 4).
+
+    One record drives both the writing and the per-field ``accepted`` flags, so the audit trail
+    cannot drift from what happened. A field marked accepted while nothing was written would be
+    the record lying about the one thing it exists to record.
+    """
+
+    stage: PipelineStage | None = None
+    next_action: str | None = None
+    next_action_on: date | None = None
+    comms_note: str | None = None
+
+    def value_for(self, field: PipelineField) -> str | None:
+        """The value stored as ``confirmed_value``, or None where the field was not applied."""
+        if field is PipelineField.STAGE:
+            return self.stage.value if self.stage else None
+        if field is PipelineField.NEXT_ACTION:
+            return self.next_action
+        if field is PipelineField.NEXT_ACTION_ON:
+            return self.next_action_on.isoformat() if self.next_action_on else None
+        return self.comms_note
+
+
+class ConsentRequiredError(RepositoryError):
+    """A recording that the consent gate refuses to keep (GRS-0255).
+
+    Raised in both directions: a recorded session with no consent, and a voice note claiming
+    consent nobody was there to give. Never a warning flag on a stored row — *no consent, no
+    recording kept* means the row does not exist.
+    """
 
 
 class ScopeViolationError(RepositoryError):
@@ -787,10 +835,15 @@ class Repository:
         primary_contact_name: str | None = None,
         primary_contact_email: str | None = None,
         notes: str | None = None,
+        next_action: str | None = None,
+        next_action_on: date | None = None,
     ) -> Prospect:
         """Patch a prospect's editable fields (GRS-0111) — owner-scoped. Only the fields passed (not
         None) are changed; stage moves stay on the dedicated choke-point `update_prospect_stage`.
-        An empty-string `company_name` is refused (it is required)."""
+        An empty-string `company_name` is refused (it is required).
+
+        This is also the path a confirmed voice-note proposal writes the next action through
+        (GRS-0249), so a spoken update lands exactly where a typed one does."""
         row = self._session.get(ProspectORM, prospect_id)
         if row is None:
             raise NotFoundError(f"Prospect {prospect_id} not found.")
@@ -809,6 +862,10 @@ class Repository:
             row.primary_contact_email = primary_contact_email or None
         if notes is not None:
             row.notes = notes or None
+        if next_action is not None:
+            row.next_action = next_action.strip() or None
+        if next_action_on is not None:
+            row.next_action_on = next_action_on
         self._session.add(row)
         self._session.flush()
         return self._to_prospect(row)
@@ -1774,11 +1831,16 @@ class Repository:
         text: str,
         source_filename: str,
         cipher: TranscriptCipher,
+        prospect_id: UUID | None = None,
+        workshop_id: UUID | None = None,
         engagement_id: UUID | None = None,
         retention_until: date | None = None,
     ) -> MeetingTranscript:
         """Store a pasted transcript — no transcription needed. Encrypted at rest (plaintext never
-        hits the DB); owned by the caller."""
+        hits the DB); owned by the caller.
+
+        Pasted text was not recorded by us, so it carries no recording kind and no consent claim.
+        """
         return self._store_transcript(
             principal,
             text=text,
@@ -1786,6 +1848,8 @@ class Repository:
             source_filename=source_filename,
             transcriber_ref="pasted",
             cipher=cipher,
+            prospect_id=prospect_id,
+            workshop_id=workshop_id,
             engagement_id=engagement_id,
             retention_until=retention_until,
         )
@@ -1962,16 +2026,41 @@ class Repository:
         transcriber: Transcriber,
         scanner: MediaScanner,
         cipher: TranscriptCipher,
+        prospect_id: UUID | None = None,
+        workshop_id: UUID | None = None,
         engagement_id: UUID | None = None,
         retention_until: date | None = None,
+        recording_kind: RecordingKind = RecordingKind.NOT_RECORDED,
+        consent_confirmed_at: datetime | None = None,
+        consent_wording: str | None = None,
+        keep_recording: bool = False,
+        max_bytes: int | None = None,
     ) -> MeetingTranscript:
-        """Scan → transcribe → store an uploaded audio/video file. The scanner runs FIRST,
-        by raising (nothing is transcribed or stored on a refusal); the transcript is then encrypted
-        at rest. The transcriber and scanner are injected ports (swappable by config)."""
+        """Consent → scan → transcribe → keep the audio → store an uploaded audio/video file.
+
+        The order is the whole design. **Consent is checked first**, before the bytes are scanned or
+        written anywhere, so a recording nobody agreed to is never held even briefly. The scanner
+        then refuses by raising, so nothing is transcribed or stored on a threat. The transcriber
+        and scanner are injected ports (swappable by config).
+
+        `keep_recording` stores the audio as a document (GRS-0247) and links it to the transcript.
+        Media used to be discarded here, which left a disputed extraction with nothing to check the
+        correction against — and disputes are the whole reason to keep provenance (GRS-0249 scope
+        2). It needs a parent to hang the document off, so it is only available when one is given.
+        """
         # Empty media is refused at the ingest boundary, so the guarantee holds regardless of which
         # transcriber is injected (a provider without its own empty-guard cannot store a blank).
         if not media:
             raise TranscriptionError(f"Refusing to ingest empty media ({source_filename}).")
+        # Before anything else: if this recording is not allowed to be kept, it is not kept. The
+        # same check runs again inside _store_transcript; running it here as well is deliberate,
+        # because between the two the bytes would otherwise be scanned, sent to a third-party
+        # transcriber, and written to the documents table.
+        self._checked_consent(
+            recording_kind,
+            consent_confirmed_at=consent_confirmed_at,
+            consent_wording=consent_wording,
+        )
         # Raises MediaThreatError to refuse. A scanner that can also check the bytes against the
         # declared content type is given the chance to — the `MediaScanner` protocol only requires
         # `scan`, so this stays optional rather than forcing every provider to implement it.
@@ -1980,7 +2069,35 @@ class Repository:
             declared_check(media, filename=source_filename, content_type=content_type)
         else:
             scanner.scan(media, filename=source_filename)
+
+        if keep_recording and prospect_id is None and workshop_id is None and engagement_id is None:
+            raise DocumentError(
+                "Keeping the recording needs a prospect, workshop or engagement to file it under. "
+                "A stored recording with no parent could never be found again."
+            )
+
         text = transcriber.transcribe(media, filename=source_filename, content_type=content_type)
+
+        recording_document_id: UUID | None = None
+        if keep_recording:
+            # Audio and transcript are one transaction: a failure anywhere rolls both back, so the
+            # advisor never ends up with a stored recording and no note, or a note whose recording
+            # is missing. That makes the browser the thing that must not let go — it keeps the
+            # blob until the server answers 201 and re-uploads otherwise (GRS-0249 scope 6), which
+            # is also what makes a car park with one bar survivable.
+            recording_document_id = self.store_document(
+                principal,
+                content=media,
+                filename=source_filename,
+                content_type=content_type,
+                cipher=cipher,
+                scanner=scanner,
+                prospect_id=prospect_id,
+                workshop_id=workshop_id,
+                engagement_id=engagement_id,
+                retention_until=retention_until,
+                max_bytes=max_bytes if max_bytes is not None else len(media),
+            ).id
         return self._store_transcript(
             principal,
             text=text,
@@ -1988,8 +2105,14 @@ class Repository:
             source_filename=source_filename,
             transcriber_ref=transcriber.version,
             cipher=cipher,
+            prospect_id=prospect_id,
+            workshop_id=workshop_id,
             engagement_id=engagement_id,
             retention_until=retention_until,
+            recording_kind=recording_kind,
+            consent_confirmed_at=consent_confirmed_at,
+            consent_wording=consent_wording,
+            recording_document_id=recording_document_id,
         )
 
     def _store_transcript(
@@ -2001,26 +2124,93 @@ class Repository:
         source_filename: str,
         transcriber_ref: str,
         cipher: TranscriptCipher,
+        prospect_id: UUID | None = None,
+        workshop_id: UUID | None = None,
         engagement_id: UUID | None,
         retention_until: date | None,
+        recording_kind: RecordingKind = RecordingKind.NOT_RECORDED,
+        consent_confirmed_at: datetime | None = None,
+        consent_wording: str | None = None,
+        recording_document_id: UUID | None = None,
     ) -> MeetingTranscript:
-        # A supplied engagement must exist and belong to the caller — otherwise a transcript could
-        # be attached to another consultant's (or a non-existent) engagement, a dangling/foreign
+        # The consent gate runs BEFORE anything is written, so a recorded session without consent
+        # never becomes a row that has to be cleaned up afterwards. No consent, no recording kept.
+        consent_confirmed_at, consent_wording = self._checked_consent(
+            recording_kind,
+            consent_confirmed_at=consent_confirmed_at,
+            consent_wording=consent_wording,
+        )
+        # Each supplied parent must exist and belong to the caller — otherwise a transcript could
+        # be attached to another consultant's (or a non-existent) record, a dangling/foreign
         # reference. Cross-owner or missing → refused (NotFound/Scope → 404), like every other link.
+        if prospect_id is not None:
+            self.get_prospect(principal, prospect_id)
+        if workshop_id is not None:
+            self._require_workshop(principal, workshop_id)
         if engagement_id is not None:
             self._require_engagement(principal, engagement_id)
+        if recording_document_id is not None:
+            self._require_document(principal, recording_document_id)
         row = MeetingTranscriptORM(
             owner_consultant_id=principal.consultant_id,
+            prospect_id=prospect_id,
+            workshop_id=workshop_id,
             engagement_id=engagement_id,
             source_kind=source_kind.value,
             source_filename=source_filename,
             text_ciphertext=cipher.encrypt(text),
             transcriber_ref=transcriber_ref,
+            recording_kind=recording_kind.value,
+            consent_confirmed_at=consent_confirmed_at,
+            consent_wording=consent_wording,
+            recording_document_id=recording_document_id,
             retention_until=retention_until,
         )
         self._session.add(row)
         self._session.flush()
         return self._to_meeting_transcript(row, cipher)
+
+    @staticmethod
+    def _checked_consent(
+        recording_kind: RecordingKind,
+        *,
+        consent_confirmed_at: datetime | None,
+        consent_wording: str | None,
+    ) -> tuple[datetime | None, str | None]:
+        """The consent gate (GRS-0255). Returns the values to store, or refuses.
+
+        Three rules, all of them refusals rather than corrections:
+
+        1. **A recorded session without consent is not stored.** The design says *no consent, no
+           recording kept* — the gate refuses rather than storing and flagging, because a flagged
+           recording is still a recording somebody did not agree to.
+        2. **The wording must be the founder-approved wording.** Storing whatever text a client
+           sent would make `consent_wording` a field an API caller controls, and the record would
+           no longer prove what was actually shown. Changing the approved text is a founder
+           decision (GRS-0255), so a mismatch is refused here rather than accepted and stored.
+        3. **Anything that is not a recorded session carries no consent at all.** A voice note
+           dictated alone has nobody to agree to anything; a consent timestamp on one would be a
+           claim that somebody did.
+        """
+        if recording_kind is RecordingKind.RECORDED_SESSION:
+            if consent_confirmed_at is None or consent_wording is None:
+                raise ConsentRequiredError(
+                    "A recorded session must record when the client agreed and the exact wording "
+                    "they agreed to. No consent, no recording kept."
+                )
+            if consent_wording != FOUNDER_APPROVED_CONSENT_WORDING:
+                raise ConsentRequiredError(
+                    "The consent wording does not match the founder-approved text. The recorder "
+                    "shows one wording and only that wording may be stored; changing it is a "
+                    "founder decision, not an engineering one (GRS-0255)."
+                )
+            return consent_confirmed_at, consent_wording
+        if consent_confirmed_at is not None or consent_wording is not None:
+            raise ConsentRequiredError(
+                f"A {recording_kind.value} carries no consent: the advisor was the only person "
+                f"present, so there was nobody to agree. Only a recorded session may set it."
+            )
+        return None, None
 
     def list_transcripts(
         self, principal: Principal, *, cipher: TranscriptCipher
@@ -2050,11 +2240,17 @@ class Repository:
         return MeetingTranscript(
             id=row.id,
             owner_consultant_id=row.owner_consultant_id,
+            prospect_id=row.prospect_id,
+            workshop_id=row.workshop_id,
             engagement_id=row.engagement_id,
             source_kind=MediaKind(row.source_kind),
             source_filename=row.source_filename,
             text=cipher.decrypt(row.text_ciphertext),
             transcriber_ref=row.transcriber_ref,
+            recording_kind=RecordingKind(row.recording_kind),
+            consent_confirmed_at=row.consent_confirmed_at,
+            consent_wording=row.consent_wording,
+            recording_document_id=row.recording_document_id,
             retention_until=row.retention_until,
             created_at=row.created_at,
             updated_at=row.updated_at,
@@ -2104,6 +2300,280 @@ class Repository:
             )
         self._session.flush()
         return self._to_extraction(row)
+
+    # --- Voice note → pipeline proposal (GRS-0249 scope 4, SCOPED, #8) ----------------------
+
+    def propose_pipeline_update(
+        self,
+        principal: Principal,
+        *,
+        prospect_id: UUID,
+        transcript_id: UUID,
+        extractor: PipelineExtractor,
+        cipher: TranscriptCipher,
+    ) -> VoiceNoteProposal:
+        """Turn one of the caller's voice notes into a PROPOSED pipeline update.
+
+        Nothing is applied. The proposed values live on the proposal, so an extractor that
+        misheard "we should move them to proposal" cannot move anybody (non-negotiable #8). The
+        prospect and the transcript are both checked against the caller first, so a proposal can
+        never join two records the caller does not own.
+        """
+        prospect = self.get_prospect(principal, prospect_id)  # own + exists
+        transcript = self.get_transcript(principal, transcript_id, cipher=cipher)  # own + decrypts
+        result = extractor.extract(transcript.text, company_name=prospect.company_name)
+
+        row = VoiceNoteProposalORM(
+            owner_consultant_id=principal.consultant_id,
+            prospect_id=prospect_id,
+            transcript_id=transcript_id,
+            status=ProposalStatus.PROPOSED.value,
+            extractor_version=extractor.version,
+            gaps_json=json.dumps(list(result.gaps)),
+        )
+        self._session.add(row)
+        self._session.flush()
+        for value in result.values:
+            self._session.add(
+                VoiceNoteProposedFieldORM(
+                    owner_consultant_id=principal.consultant_id,
+                    proposal_id=row.id,
+                    transcript_id=transcript_id,
+                    field=value.field.value,
+                    proposed_value=value.value,
+                    confidence=value.confidence.value,
+                    span_start=value.span_start,
+                    span_end=value.span_end,
+                    accepted=False,
+                )
+            )
+        self._session.flush()
+        return self._to_voice_note_proposal(row)
+
+    def confirm_pipeline_update(
+        self,
+        principal: Principal,
+        proposal_id: UUID,
+        *,
+        now: datetime,
+        confirmed: Mapping[PipelineField, str | None],
+    ) -> VoiceNoteProposal:
+        """Apply what the advisor confirmed — and only that.
+
+        `confirmed` is the advisor's final answer per field: their correction, the proposal's own
+        value where they accepted it, or absent where they left it out. A field the advisor did not
+        confirm is not written, whatever the extractor suggested, because the recorded approval is
+        the gate and an unanswered field was not approved.
+
+        **Every value goes through the same write path a typed one does.** The stage moves through
+        `update_prospect_stage`, so the lifecycle graph refuses an illegal jump exactly as it would
+        by hand and the stage-history row is written the same way; the next action goes through
+        `update_prospect`; the note goes through `append_comms_entry`. There is no second, quieter
+        way in — which is what makes a confirmed voice note indistinguishable from typing, and is
+        the same convergence Path B has with `update_assessment`.
+
+        Refused once the proposal has been answered, in either direction (ConflictError).
+        """
+        row = self._require_voice_note_proposal(principal, proposal_id)
+        if row.status != ProposalStatus.PROPOSED.value:
+            raise ConflictError(
+                f"Voice note proposal {proposal_id} was already {row.status}. A proposal is "
+                f"answered once."
+            )
+        # Parse everything BEFORE writing anything. A confirmation that applied the stage and then
+        # choked on a malformed date would leave the prospect half-updated from a single click.
+        applied = self._parsed_confirmation(confirmed)
+        stage = applied.stage
+        next_action = applied.next_action
+        next_action_on = applied.next_action_on
+        comms_note = applied.comms_note
+
+        if stage is not None:
+            self.update_prospect_stage(principal, row.prospect_id, stage)
+        if next_action is not None or next_action_on is not None:
+            self.update_prospect(
+                principal,
+                row.prospect_id,
+                next_action=next_action,
+                next_action_on=next_action_on,
+            )
+        if comms_note is not None:
+            engagement_id = self._sole_engagement_for(principal, row.prospect_id)
+            self.append_comms_entry(
+                principal, engagement_id, channel=CommsChannel.NOTE, body=comms_note, at=now
+            )
+
+        for prov in self._session.execute(
+            select(VoiceNoteProposedFieldORM).where(
+                VoiceNoteProposedFieldORM.proposal_id == proposal_id
+            )
+        ).scalars():
+            # `accepted` means this field was APPLIED, not merely that the proposal was confirmed
+            # — and not merely that a key was present in the request. A blank string is not an
+            # answer, and a field recorded as accepted while nothing was written would be the
+            # audit trail lying about the one thing it exists to record.
+            value = applied.value_for(PipelineField(prov.field))
+            prov.accepted = value is not None
+            prov.confirmed_value = value
+            self._session.add(prov)
+
+        row.status = ProposalStatus.CONFIRMED.value
+        row.confirmed_at = now
+        self._session.add(row)
+        self._session.flush()
+        return self._to_voice_note_proposal(row)
+
+    def discard_pipeline_update(
+        self, principal: Principal, proposal_id: UUID, *, now: datetime
+    ) -> VoiceNoteProposal:
+        """The advisor read the proposal and said no.
+
+        Recorded rather than deleted. "The machine suggested this and a person rejected it" is the
+        only evidence that the gate does anything, and it is worth as much as an acceptance.
+        """
+        row = self._require_voice_note_proposal(principal, proposal_id)
+        if row.status != ProposalStatus.PROPOSED.value:
+            raise ConflictError(
+                f"Voice note proposal {proposal_id} was already {row.status}. A proposal is "
+                f"answered once."
+            )
+        row.status = ProposalStatus.DISCARDED.value
+        row.discarded_at = now
+        self._session.add(row)
+        self._session.flush()
+        return self._to_voice_note_proposal(row)
+
+    @staticmethod
+    def _parsed_confirmation(confirmed: Mapping[PipelineField, str | None]) -> ConfirmedFields:
+        """Turn the advisor's text answers into real types, refusing anything that is not one.
+
+        Values arrive as text because one table holds all four fields. They are validated here,
+        loudly: an unknown stage or an unparseable date is refused rather than dropped, because a
+        confirmation that silently ignored a field the advisor filled in would be the quiet
+        data-loss this codebase refuses everywhere else (non-negotiable #3). A blank string is not
+        a refusal to parse — it is simply not an answer, and is left out.
+        """
+        raw_stage = (confirmed.get(PipelineField.STAGE) or "").strip()
+        stage: PipelineStage | None = None
+        if raw_stage:
+            try:
+                stage = PipelineStage(raw_stage)
+            except ValueError as exc:
+                known = ", ".join(s.value for s in PipelineStage)
+                raise ConflictError(
+                    f"{raw_stage!r} is not a pipeline stage. Known stages: {known}."
+                ) from exc
+
+        raw_due = (confirmed.get(PipelineField.NEXT_ACTION_ON) or "").strip()
+        next_action_on: date | None = None
+        if raw_due:
+            try:
+                next_action_on = date.fromisoformat(raw_due)
+            except ValueError as exc:
+                raise ConflictError(
+                    f"{raw_due!r} is not a date. Give the next action's due date as YYYY-MM-DD."
+                ) from exc
+
+        return ConfirmedFields(
+            stage=stage,
+            next_action=(confirmed.get(PipelineField.NEXT_ACTION) or "").strip() or None,
+            next_action_on=next_action_on,
+            comms_note=(confirmed.get(PipelineField.COMMS_NOTE) or "").strip() or None,
+        )
+
+    def _sole_engagement_for(self, principal: Principal, prospect_id: UUID) -> UUID:
+        """The engagement a comms-log note goes to, or a readable refusal.
+
+        The communication log hangs off an engagement, not a prospect. A voice note recorded after a
+        first pitch therefore has nowhere to put a note, and a prospect running two engagements has
+        no single obvious place either. Both are refused in words rather than guessed at, so the
+        advisor's line is never filed somewhere they did not choose.
+        """
+        engagements = [e for e in self.list_engagements(principal) if e.prospect_id == prospect_id]
+        if not engagements:
+            raise ConflictError(
+                "There is no engagement to file this note against yet. The communication log "
+                "belongs to an engagement, and this prospect does not have one — open the "
+                "engagement first, or confirm the rest of the note without it."
+            )
+        if len(engagements) > 1:
+            raise ConflictError(
+                f"This prospect has {len(engagements)} engagements, so there is no single "
+                f"communication log to file the note in. Add it to the one you mean from the "
+                f"engagement itself."
+            )
+        return engagements[0].id
+
+    def _require_voice_note_proposal(
+        self, principal: Principal, proposal_id: UUID
+    ) -> VoiceNoteProposalORM:
+        row = self._session.get(VoiceNoteProposalORM, proposal_id)
+        if row is None:
+            raise NotFoundError(f"Voice note proposal {proposal_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        return row
+
+    def get_pipeline_proposal(self, principal: Principal, proposal_id: UUID) -> VoiceNoteProposal:
+        row = self._require_voice_note_proposal(principal, proposal_id)
+        return self._to_voice_note_proposal(row)
+
+    def list_pipeline_proposals(
+        self, principal: Principal, *, prospect_id: UUID | None = None
+    ) -> list[VoiceNoteProposal]:
+        """The caller's proposals, newest first, optionally narrowed to one prospect."""
+        stmt = select(VoiceNoteProposalORM)
+        if not principal.is_admin:
+            stmt = stmt.where(VoiceNoteProposalORM.owner_consultant_id == principal.consultant_id)
+        if prospect_id is not None:
+            stmt = stmt.where(VoiceNoteProposalORM.prospect_id == prospect_id)
+        rows = (
+            self._session.execute(stmt.order_by(VoiceNoteProposalORM.created_at.desc()))
+            .scalars()
+            .all()
+        )
+        return [self._to_voice_note_proposal(r) for r in rows]
+
+    def _to_voice_note_proposal(self, row: VoiceNoteProposalORM) -> VoiceNoteProposal:
+        fields = (
+            self._session.execute(
+                select(VoiceNoteProposedFieldORM)
+                .where(VoiceNoteProposedFieldORM.proposal_id == row.id)
+                .order_by(VoiceNoteProposedFieldORM.created_at)
+            )
+            .scalars()
+            .all()
+        )
+        return VoiceNoteProposal(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            prospect_id=row.prospect_id,
+            transcript_id=row.transcript_id,
+            status=ProposalStatus(row.status),
+            extractor_version=row.extractor_version,
+            gaps=tuple(json.loads(row.gaps_json)),
+            fields=tuple(
+                ProposedField(
+                    id=f.id,
+                    owner_consultant_id=f.owner_consultant_id,
+                    proposal_id=f.proposal_id,
+                    transcript_id=f.transcript_id,
+                    field=PipelineField(f.field),
+                    proposed_value=f.proposed_value,
+                    confidence=ExtractionConfidence(f.confidence),
+                    span_start=f.span_start,
+                    span_end=f.span_end,
+                    accepted=f.accepted,
+                    confirmed_value=f.confirmed_value,
+                    created_at=f.created_at,
+                    updated_at=f.updated_at,
+                )
+                for f in fields
+            ),
+            confirmed_at=row.confirmed_at,
+            discarded_at=row.discarded_at,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
 
     def confirm_extraction(
         self,
@@ -6614,6 +7084,8 @@ class Repository:
             primary_contact_name=row.primary_contact_name,
             primary_contact_email=row.primary_contact_email,
             notes=row.notes,
+            next_action=row.next_action,
+            next_action_on=row.next_action_on,
             created_at=row.created_at,
             updated_at=row.updated_at,
         )

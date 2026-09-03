@@ -1,6 +1,6 @@
 # Grassmarket API surface
 
-**Generated 2026-09-02 from the live FastAPI app** (`create_app().openapi()`). **178 endpoints** across 25 tags.
+**Generated 2026-09-03 from the live FastAPI app** (`create_app().openapi()`). **184 endpoints** across 26 tags.
 
 This is the contract the front end is built against. Regenerate with `uv run python scripts/dump_api_surface.py`; the machine-readable spec is `docs/openapi.json`.
 
@@ -26,12 +26,13 @@ Every route except `/health*`, `/auth/*` and the shared-report links requires a 
 - [guidance](#guidance) — 1
 - [health](#health) — 2
 - [narratives](#narratives) — 3
-- [path-b](#pathb) — 8
+- [path-b](#pathb) — 9
 - [pipeline](#pipeline) — 23
 - [registry](#registry) — 2
 - [report-links](#reportlinks) — 4
 - [shared-report](#sharedreport) — 2
 - [validation](#validation) — 6
+- [voice-notes](#voicenotes) — 5
 - [workbench](#workbench) — 29
 
 
@@ -238,6 +239,7 @@ Every route except `/health*`, `/auth/*` and the shared-report links requires a 
 | `POST` | `/extractions/{extraction_id}/confirm` | Confirm Extraction |
 | `GET` | `/extractions/{extraction_id}/provenance` | List Provenance |
 | `GET` | `/transcripts` | List Transcripts |
+| `GET` | `/transcripts/consent-line` | Get Consent Line |
 | `POST` | `/transcripts/media` | Ingest Media |
 | `POST` | `/transcripts/text` | Ingest Text |
 | `GET` | `/transcripts/{transcript_id}` | Get Transcript |
@@ -303,6 +305,16 @@ Every route except `/health*`, `/auth/*` and the shared-report links requires a 
 | `POST` | `/predictions` | Register |
 | `GET` | `/predictions/follow-ups/due` | Due Follow Ups |
 | `POST` | `/predictions/{prediction_id}/realise` | Realise |
+
+## voice-notes
+
+| Method | Path | What it does |
+|---|---|---|
+| `GET` | `/voice-notes` | List Proposals |
+| `POST` | `/voice-notes` | Propose |
+| `GET` | `/voice-notes/{proposal_id}` | Get Proposal |
+| `POST` | `/voice-notes/{proposal_id}/confirm` | Confirm |
+| `POST` | `/voice-notes/{proposal_id}/discard` | Discard |
 
 ## workbench
 

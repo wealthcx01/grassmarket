@@ -10,6 +10,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { RegistryContactsPanel } from "@/components/RegistryContactsPanel";
+import { VoiceNoteRecorder } from "@/components/VoiceNoteRecorder";
 import { StageMoveControl } from "@/components/StageMoveControl";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ApiError, api, getToken } from "@/lib/api";
@@ -92,10 +93,39 @@ export default function ProspectDetailPage() {
           Stage <strong>{STAGE_LABEL[prospect.stage]}</strong> · entered{" "}
           {new Date(prospect.stage_entered_at).toLocaleDateString()}
         </p>
+        {/* A deal with no dated next action is drifting, so the absence is stated rather than
+            left blank — a blank line reads as "nothing to do here", which is the opposite. */}
+        <p style={{ margin: "0.25rem 0 0", fontSize: "0.85rem" }}>
+          {prospect.next_action ? (
+            <>
+              Next: <strong>{prospect.next_action}</strong>
+              {prospect.next_action_on ? (
+                <span className="mono" style={{ fontSize: "0.75rem", color: "var(--color-ink-muted)" }}>
+                  {" "}
+                  · due {prospect.next_action_on}
+                </span>
+              ) : (
+                <span style={{ color: "var(--color-ink-muted)" }}> · no date set</span>
+              )}
+            </>
+          ) : (
+            <span style={{ color: "var(--color-ink-muted)" }}>No next action recorded.</span>
+          )}
+        </p>
         <div style={{ maxWidth: "16rem", marginTop: "0.5rem" }}>
           <StageMoveControl prospectId={prospect.id} currentStage={prospect.stage} onMove={onMove} />
         </div>
       </div>
+
+      {/* Above the rest of the record on purpose: this is the thing an advisor opens the page for
+          on a phone, standing outside a client's office, and it should not need a scroll. */}
+      <VoiceNoteRecorder
+        prospectId={id}
+        prospectName={prospect.company_name}
+        // A confirmed proposal changes the stage and the next action, so the record above has to
+        // be re-read — otherwise the page still shows what was true before the advisor confirmed.
+        onApply={() => void reload()}
+      />
 
       <RegistryContactsPanel companyName={prospect.company_name} />
       <WorkshopsSection prospectId={id} workshops={workshops} onChanged={reload} />

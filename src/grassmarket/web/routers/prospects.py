@@ -8,6 +8,7 @@ that a resource it won't show you exists at all.
 
 from __future__ import annotations
 
+from datetime import date
 from uuid import UUID
 
 from bcap_contracts.entities import Contact, PipelineStage, Prospect
@@ -63,6 +64,8 @@ class UpdateProspectRequest(BaseModel):
     primary_contact_name: str | None = None
     primary_contact_email: str | None = None
     notes: str | None = None
+    next_action: str | None = Field(default=None, max_length=280)
+    next_action_on: date | None = None
 
 
 class UpdateStageRequest(BaseModel):
@@ -160,6 +163,8 @@ def update_prospect(
             primary_contact_name=payload.primary_contact_name,
             primary_contact_email=payload.primary_contact_email,
             notes=payload.notes,
+            next_action=payload.next_action,
+            next_action_on=payload.next_action_on,
         )
     except (NotFoundError, ScopeViolationError) as exc:
         raise _not_found() from exc
