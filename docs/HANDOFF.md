@@ -4,10 +4,11 @@
 
 ## One line
 
-The product is functionally complete and deployed. The four-ticket backend wave **has merged**;
-GRS-0249 (voice notes) is **half built** — an advisor can record, consent is gated, the audio and
-transcript are kept — and the remaining half is turning a transcript into a pipeline proposal.
-After that, the front-end redesign, which has a full design handoff and a generated API contract.
+The product is functionally complete and deployed. The four-ticket backend wave **has merged**.
+GRS-0249 (voice notes) is **built end to end**: an advisor records, consent is gated, the audio and
+transcript are kept, and the note comes back as a proposed pipeline update they tick, correct and
+confirm. Next is the front-end redesign, which has a full design handoff and a generated API
+contract to build on.
 
 ## Read these before touching anything
 
@@ -73,11 +74,13 @@ Also fixed: migrations no longer replace the process's logging configuration. `e
 `fileConfig` unconditionally and `run_migrations` runs at app import, so every production boot had
 been handing the running service `alembic.ini`'s logging setup.
 
-## GRS-0249 (voice notes) — half built, on `grs-0249-voice-notes`
+## GRS-0249 (voice notes) — built, on `grs-0249-voice-notes`
 
 **What works now.** An advisor opens a prospect on their phone, presses record, sees a level meter
-and a timer, presses stop, and gets a transcript back. The audio is kept beside it. A failed upload
-stays on the device and can be sent later, because the car park has one bar.
+and a timer, presses stop, and the note comes back transcribed with a **proposed pipeline update**
+beside it: a stage, a next action, a date. They tick what they agree with, change anything wrong,
+and confirm. The audio is kept. A failed upload stays on the device, because the car park has one
+bar.
 
 **The consent gate, and the decision inside it.** The advisor says who is in the room *before*
 anything records, and this is not a formality:
@@ -89,8 +92,20 @@ anything records, and this is not a formality:
 
 Both directions are refused: a session without consent, and a voice note claiming consent nobody
 gave. The rule lives in the contract, the repository and a table CHECK, so no future caller can
-route around it. The wording itself is served by `GET /transcripts/consent-line` — one copy in the
-system — and an upload carrying different text is refused.
+route around it. The wording is served by `GET /transcripts/consent-line` — one copy in the system
+— and an upload carrying different text is refused.
+
+**The approval gate is real, not decorative.** A voice note proposes; it never acts.
+
+- The proposed values live on a proposal record and never touch the prospect until somebody
+  confirms. The offline extractor proposes **nothing**, because a keyword match on "move them to
+  qualified" would be a fabrication wearing a confidence score.
+- Each field has its own tick. There is no "accept all": an approval that does not name what it
+  approves is not an approval.
+- What the machine suggested and what the human agreed to are **both** stored. Afterwards you can
+  always tell a corrected field from an accepted one.
+- Every write goes through the door a typed update uses, so the stage-history row is written the
+  same way and an illegal move is refused by the same lifecycle graph.
 
 **Two founder questions this opened, neither of them engineering calls:**
 
@@ -101,18 +116,23 @@ system — and an upload carrying different text is refused.
    approved line. Reconciling those two sentences is a founder decision.
 2. Whether a solo voice note should show the client-consent line anyway. Today it does not.
 
-**What is left: scope 4, the second half.** The transcript comes back to be read; it does not yet
-propose a stage change, a next action and date, a comms-log entry or an engagement note for the
-advisor to correct and confirm. Path A maps a transcript to an `AssessmentDocument`; a pipeline
-equivalent does not exist yet. Until it does, non-negotiable #8 holds trivially — a voice note
-proposes nothing, so it changes nothing.
+**Two model gaps this work found and handled:**
 
-**Absorbed on the way:** GRS-0254 build 1 and 2. Transcripts now hang off a prospect or workshop,
-not only an engagement, because a car-park note has no engagement. `engagement_id` became a real
-foreign key at the same time. GRS-0254's re-parent path (build 3) is still open.
+- **There was no next-action field anywhere**, though the Sales Ops course already teaches that a
+  deal without a dated one is drifting. Added, independently nullable, and shown on the prospect
+  header — where its absence is stated in words rather than left blank.
+- **The communication log belongs to an engagement, not a prospect.** So a car-park note has
+  nowhere to file a comms line until an engagement exists. Refused in words the advisor can act on,
+  never guessed at. Filing it against a prospect properly is GRS-0254-shaped and is not done.
 
-**Also deliberately deferred:** streaming, speaker labels and moment marks stay in GRS-0255 for R3.
-The hosted Whisper API takes a whole file, so v1 cannot stream and does not pretend to.
+**Absorbed on the way:** GRS-0254 build 1 and 2. Transcripts hang off a prospect or workshop, not
+only an engagement. `engagement_id` became a real foreign key at the same time. GRS-0254's
+re-parent path (build 3) is still open.
+
+**Deliberately deferred:** streaming, speaker labels and moment marks stay in GRS-0255 for R3 — the
+hosted Whisper API takes a whole file, so v1 cannot stream and does not pretend to. One honest gap
+remains in the offline handling: a recording is held on the device from the moment the advisor
+presses **stop**, so a tab that dies *during* a recording still loses it.
 
 ## The design handoff (2026-09-02/03)
 

@@ -18,14 +18,16 @@
  * the first upload attempt and released only on a 201. A failed upload leaves it on the phone to
  * retry, because the car park has one bar and the conversation cannot be had again.
  *
- * **A voice note proposes; it never acts.** This component's last step is a transcript for review.
- * Nothing here moves a prospect's stage — non-negotiable #8.
+ * **A voice note proposes; it never acts.** The transcript comes back with a proposed pipeline
+ * update beside it — a stage, a next action, a date — and not one of them is applied until the
+ * advisor ticks it and confirms. Non-negotiable #8.
  */
 
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { ProposalReview } from "@/components/ProposalReview";
 import { ApiError, api } from "@/lib/api";
 import {
   NO_MICROPHONE_MESSAGE,
@@ -39,7 +41,12 @@ import {
   type PendingRecording,
   type RecorderHandle,
 } from "@/lib/recording";
-import type { MeetingTranscript, RecordingKind } from "@/lib/types";
+import {
+  PIPELINE_FIELD_LABEL,
+  type MeetingTranscript,
+  type RecordingKind,
+  type VoiceNoteProposal,
+} from "@/lib/types";
 
 type Phase = "idle" | "choosing" | "consent" | "recording" | "uploading" | "done" | "failed";
 
@@ -55,10 +62,13 @@ export function VoiceNoteRecorder({
   prospectId,
   prospectName,
   onTranscript,
+  onApply,
 }: {
   prospectId: string;
   prospectName: string;
   onTranscript?: (transcript: MeetingTranscript) => void;
+  /** Called after a confirmation actually changed the prospect, so the page can reload it. */
+  onApply?: () => void;
 }) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [kind, setKind] = useState<RecordingKind>("voice_note");
@@ -68,6 +78,8 @@ export function VoiceNoteRecorder({
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [transcript, setTranscript] = useState<MeetingTranscript | null>(null);
+  const [proposal, setProposal] = useState<VoiceNoteProposal | null>(null);
+  const [applied, setApplied] = useState<VoiceNoteProposal | null>(null);
   const [pending, setPending] = useState<PendingRecording[]>([]);
   const handle = useRef<RecorderHandle | null>(null);
 
@@ -182,6 +194,13 @@ export function VoiceNoteRecorder({
         setTranscript(created);
         setPhase("done");
         onTranscript?.(created);
+        // Asking what the note suggests is a separate, failable step. If it does not answer, the
+        // advisor still has their transcript and their audio — the note is not lost because the
+        // extractor was unavailable, so this failure is quiet on purpose.
+        api
+          .proposePipelineUpdate(entry.prospectId, created.id)
+          .then(setProposal)
+          .catch(() => setProposal(null));
       } catch (err: unknown) {
         if (held) await recordFailedAttempt(entry).catch(() => undefined);
         const reason =
@@ -292,8 +311,17 @@ export function VoiceNoteRecorder({
       {phase === "done" && transcript ? (
         <TranscriptReview
           transcript={transcript}
+          proposal={proposal}
+          applied={applied}
+          onApplied={(result) => {
+            setApplied(result);
+            setProposal(null);
+            onApply?.();
+          }}
           onAnother={() => {
             setTranscript(null);
+            setProposal(null);
+            setApplied(null);
             setPhase("idle");
           }}
         />
@@ -425,14 +453,33 @@ function RecordingView({
 
 function TranscriptReview({
   transcript,
+  proposal,
+  applied,
+  onApplied,
   onAnother,
 }: {
   transcript: MeetingTranscript;
+  proposal: VoiceNoteProposal | null;
+  applied: VoiceNoteProposal | null;
+  onApplied: (result: VoiceNoteProposal) => void;
   onAnother: () => void;
 }) {
   return (
     <div style={{ ...notice, borderColor: "var(--color-accent-tint-border)" }}>
-      <strong style={{ fontSize: "0.85rem" }}>Transcribed. Read it before you use it.</strong>
+      {/* The proposal comes FIRST, deliberately. The transcript is reference; the suggestion is
+          what the advisor is here to act on, and a long transcript above it pushed the only
+          interactive part of the screen below the fold. */}
+      {applied ? (
+        <AppliedSummary applied={applied} />
+      ) : proposal ? (
+        <div style={{ marginBottom: "0.9rem" }}>
+          {/* Keyed on the proposal, so a second note's suggestions never inherit the first
+              note's ticks — the review state is built once from the proposal it is reviewing. */}
+          <ProposalReview key={proposal.id} proposal={proposal} onDone={onApplied} />
+        </div>
+      ) : null}
+
+      <strong style={{ fontSize: "0.85rem" }}>What was said</strong>
       {/* Two limits, both learned by rendering a real one.
           `overflowWrap: anywhere` because a transcript is machine output: one long unbroken run —
           a URL, a spelled-out reference, a provider glitch — otherwise widens the whole page
@@ -462,9 +509,47 @@ function TranscriptReview({
           ? " Consent was recorded with the exact wording the client agreed to."
           : ""}
       </p>
+
       <button type="button" className="btn" onClick={onAnother}>
         Record another
       </button>
+    </div>
+  );
+}
+
+function AppliedSummary({ applied }: { applied: VoiceNoteProposal }) {
+  const changed = applied.fields.filter((f) => f.accepted);
+  if (applied.status === "discarded") {
+    return (
+      <p style={{ ...caption, marginTop: 0 }}>
+        Nothing was applied. The suggestion is kept with the note, marked as one you rejected.
+      </p>
+    );
+  }
+  return (
+    <div style={{ marginBottom: "0.7rem" }}>
+      <p style={{ fontSize: "0.85rem", margin: "0 0 0.3rem" }}>
+        <strong>
+          {changed.length === 0
+            ? "Confirmed, and nothing was changed."
+            : changed.length === 1
+              ? "One change applied."
+              : `${changed.length} changes applied.`}
+        </strong>
+      </p>
+      {changed.length > 0 ? (
+        <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "0.82rem", lineHeight: 1.6 }}>
+          {changed.map((f) => (
+            <li key={f.id}>
+              {PIPELINE_FIELD_LABEL[f.field]}:{" "}
+              <span className="mono" style={{ fontSize: "0.75rem" }}>
+                {f.confirmed_value}
+              </span>
+              {f.confirmed_value !== f.proposed_value ? " (your wording, not the suggestion)" : ""}
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 }

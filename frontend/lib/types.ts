@@ -436,6 +436,10 @@ export interface Prospect {
   primary_contact_name?: string | null;
   primary_contact_email?: string | null;
   notes?: string | null;
+  /** The one thing that has to happen next (GRS-0249). A deal without one is drifting. */
+  next_action?: string | null;
+  /** Independently nullable: an action with no date yet is a real state, not a missing value. */
+  next_action_on?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -1403,4 +1407,63 @@ export type UploadRecordingRequest = {
   consent_wording?: string | null;
   /** Keep the audio beside the transcript. Needs one of the parent ids to file it under. */
   keep_recording?: boolean;
+};
+
+/* ------------------------------------------- Voice note → pipeline proposal (GRS-0249 scope 4) */
+
+/**
+ * The fields a voice note may propose. A closed set, mirroring
+ * `bcap_contracts.voice_notes.PipelineField`: an extractor cannot invent a field name, and every
+ * one of these maps to a write path that already exists.
+ */
+export type PipelineField = "stage" | "next_action" | "next_action_on" | "comms_note";
+
+export type ExtractionConfidence = "high" | "medium" | "low";
+
+export type ProposalStatus = "proposed" | "confirmed" | "discarded";
+
+/** One field a voice note proposed, and what the advisor did with it. */
+export type ProposedField = {
+  id: string;
+  owner_consultant_id: string;
+  proposal_id: string;
+  transcript_id: string;
+  field: PipelineField;
+  /** What the machine suggested. Kept even after a correction. */
+  proposed_value: string | null;
+  confidence: ExtractionConfidence;
+  span_start: number;
+  span_end: number;
+  /** True once this field specifically was applied — not merely that the proposal was answered. */
+  accepted: boolean;
+  /** What the advisor actually agreed to. Null where they left the field out. */
+  confirmed_value: string | null;
+};
+
+/**
+ * A gated pipeline proposal drawn from one voice note. Nothing here has touched the prospect:
+ * the values are applied only by confirming, and only the ones the advisor confirms.
+ */
+export type VoiceNoteProposal = {
+  id: string;
+  owner_consultant_id: string;
+  prospect_id: string;
+  transcript_id: string;
+  status: ProposalStatus;
+  extractor_version: string;
+  /** Fields the extractor looked for and did not find — stated, so silence is never ambiguous. */
+  gaps: string[];
+  fields: ProposedField[];
+  confirmed_at: string | null;
+  discarded_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+/** Human labels for the proposed fields. British English, sentence case, no jargon. */
+export const PIPELINE_FIELD_LABEL: Record<PipelineField, string> = {
+  stage: "Move to stage",
+  next_action: "Next action",
+  next_action_on: "Due",
+  comms_note: "Communication log note",
 };

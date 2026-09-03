@@ -52,6 +52,7 @@ from grassmarket.web.routers import (
     registry,
     report_links,
     transcripts,
+    voice_notes,
     workbench,
     workshops,
 )
@@ -121,6 +122,7 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
     app.include_router(earnings.router)
     app.include_router(transcripts.router)
     app.include_router(extraction.router)
+    app.include_router(voice_notes.router)
     app.include_router(predictions.router)
     app.include_router(predictions.benchmark_router)
     app.include_router(compliance.router)

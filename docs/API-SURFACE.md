@@ -1,6 +1,6 @@
 # Grassmarket API surface
 
-**Generated 2026-09-03 from the live FastAPI app** (`create_app().openapi()`). **179 endpoints** across 25 tags.
+**Generated 2026-09-03 from the live FastAPI app** (`create_app().openapi()`). **184 endpoints** across 26 tags.
 
 This is the contract the front end is built against. Regenerate with `uv run python scripts/dump_api_surface.py`; the machine-readable spec is `docs/openapi.json`.
 
@@ -32,6 +32,7 @@ Every route except `/health*`, `/auth/*` and the shared-report links requires a 
 - [report-links](#reportlinks) — 4
 - [shared-report](#sharedreport) — 2
 - [validation](#validation) — 6
+- [voice-notes](#voicenotes) — 5
 - [workbench](#workbench) — 29
 
 
@@ -304,6 +305,16 @@ Every route except `/health*`, `/auth/*` and the shared-report links requires a 
 | `POST` | `/predictions` | Register |
 | `GET` | `/predictions/follow-ups/due` | Due Follow Ups |
 | `POST` | `/predictions/{prediction_id}/realise` | Realise |
+
+## voice-notes
+
+| Method | Path | What it does |
+|---|---|---|
+| `GET` | `/voice-notes` | List Proposals |
+| `POST` | `/voice-notes` | Propose |
+| `GET` | `/voice-notes/{proposal_id}` | Get Proposal |
+| `POST` | `/voice-notes/{proposal_id}/confirm` | Confirm |
+| `POST` | `/voice-notes/{proposal_id}/discard` | Discard |
 
 ## workbench
 

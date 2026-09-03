@@ -2744,22 +2744,6 @@
         "title": "CompleteRequest",
         "type": "object"
       },
-      "ConfirmRequest": {
-        "properties": {
-          "corrected_document": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/AssessmentDocument"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        },
-        "title": "ConfirmRequest",
-        "type": "object"
-      },
       "ConsensusRequest": {
         "description": "The lead's resolved (agreed) ratings for a module's assessed subcomponents. `rater_ids` and\n`consensus` are computed server-side from the submitted drafts \u2014 anything sent is ignored.",
         "properties": {
@@ -7004,6 +6988,17 @@
         "title": "PipelineBoardEntry",
         "type": "object"
       },
+      "PipelineField": {
+        "description": "The fields a voice note may propose. Deliberately a closed set (ADR-0001): an extractor\ncannot invent a field name, and every one of these maps to an existing write path.",
+        "enum": [
+          "stage",
+          "next_action",
+          "next_action_on",
+          "comms_note"
+        ],
+        "title": "PipelineField",
+        "type": "string"
+      },
       "PipelineForecast": {
         "additionalProperties": false,
         "description": "A currency-free pipeline forecast: deal *volume*, probability-weighted by stage.\n\nThe \u00a3 value forecast is a GRS-0012 concern (Money enters there); this stays in deal-count units\nso score/volume and currency never mix (ADR-0002).",
@@ -7409,6 +7404,16 @@
         "title": "ProfileSummary",
         "type": "object"
       },
+      "ProposalStatus": {
+        "description": "A proposal is PROPOSED until a human does something about it. There is no expiry and no\nautomatic application: an unanswered proposal stays unanswered, visibly.",
+        "enum": [
+          "proposed",
+          "confirmed",
+          "discarded"
+        ],
+        "title": "ProposalStatus",
+        "type": "string"
+      },
       "ProposeNarrativesRequest": {
         "properties": {
           "sections": {
@@ -7450,24 +7455,101 @@
         "title": "ProposeQuizRequest",
         "type": "object"
       },
-      "ProposeRequest": {
+      "ProposedField": {
+        "additionalProperties": false,
+        "description": "One field a voice note proposed, what the advisor did with it, and where it came from.",
         "properties": {
-          "assessment_id": {
-            "format": "uuid",
-            "title": "Assessment Id",
+          "accepted": {
+            "default": false,
+            "description": "True once the advisor confirmed this field specifically.",
+            "title": "Accepted",
+            "type": "boolean"
+          },
+          "confidence": {
+            "$ref": "#/components/schemas/ExtractionConfidence"
+          },
+          "confirmed_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmed Value"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
             "type": "string"
+          },
+          "field": {
+            "$ref": "#/components/schemas/PipelineField"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "owner_consultant_id": {
+            "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+            "format": "uuid",
+            "title": "Owner Consultant Id",
+            "type": "string"
+          },
+          "proposal_id": {
+            "format": "uuid",
+            "title": "Proposal Id",
+            "type": "string"
+          },
+          "proposed_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The extractor's suggestion, or null where it found nothing.",
+            "title": "Proposed Value"
+          },
+          "span_end": {
+            "minimum": 0.0,
+            "title": "Span End",
+            "type": "integer"
+          },
+          "span_start": {
+            "description": "Character offset of the supporting span.",
+            "minimum": 0.0,
+            "title": "Span Start",
+            "type": "integer"
           },
           "transcript_id": {
             "format": "uuid",
             "title": "Transcript Id",
             "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
           }
         },
         "required": [
-          "assessment_id",
-          "transcript_id"
+          "id",
+          "created_at",
+          "updated_at",
+          "owner_consultant_id",
+          "proposal_id",
+          "transcript_id",
+          "field",
+          "confidence",
+          "span_start",
+          "span_end"
         ],
-        "title": "ProposeRequest",
+        "title": "ProposedField",
         "type": "object"
       },
       "Prospect": {
@@ -7488,6 +7570,32 @@
             "format": "uuid",
             "title": "Id",
             "type": "string"
+          },
+          "next_action": {
+            "anyOf": [
+              {
+                "maxLength": 280,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The single next thing to do for this prospect.",
+            "title": "Next Action"
+          },
+          "next_action_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When the next action is due, if the advisor set a date.",
+            "title": "Next Action On"
           },
           "notes": {
             "anyOf": [
@@ -9778,6 +9886,30 @@
             ],
             "title": "Company Name"
           },
+          "next_action": {
+            "anyOf": [
+              {
+                "maxLength": 280,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action"
+          },
+          "next_action_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action On"
+          },
           "notes": {
             "anyOf": [
               {
@@ -10126,6 +10258,104 @@
           "reference_level"
         ],
         "title": "VignetteAnchor",
+        "type": "object"
+      },
+      "VoiceNoteProposal": {
+        "additionalProperties": false,
+        "description": "A gated pipeline proposal drawn from one voice note, against one prospect.",
+        "properties": {
+          "confirmed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirmed At"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "discarded_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discarded At"
+          },
+          "extractor_version": {
+            "minLength": 1,
+            "title": "Extractor Version",
+            "type": "string"
+          },
+          "fields": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ProposedField"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "gaps": {
+            "default": [],
+            "description": "Fields the extractor looked for and did not find \u2014 stated, not left blank.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Gaps",
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "owner_consultant_id": {
+            "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+            "format": "uuid",
+            "title": "Owner Consultant Id",
+            "type": "string"
+          },
+          "prospect_id": {
+            "format": "uuid",
+            "title": "Prospect Id",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ProposalStatus",
+            "default": "proposed"
+          },
+          "transcript_id": {
+            "format": "uuid",
+            "title": "Transcript Id",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "created_at",
+          "updated_at",
+          "owner_consultant_id",
+          "prospect_id",
+          "transcript_id",
+          "extractor_version"
+        ],
+        "title": "VoiceNoteProposal",
         "type": "object"
       },
       "WidgetDef": {
@@ -10508,6 +10738,86 @@
         ],
         "title": "WorkshopState",
         "type": "string"
+      },
+      "grassmarket__web__routers__extraction__ConfirmRequest": {
+        "properties": {
+          "corrected_document": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AssessmentDocument"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "ConfirmRequest",
+        "type": "object"
+      },
+      "grassmarket__web__routers__extraction__ProposeRequest": {
+        "properties": {
+          "assessment_id": {
+            "format": "uuid",
+            "title": "Assessment Id",
+            "type": "string"
+          },
+          "transcript_id": {
+            "format": "uuid",
+            "title": "Transcript Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "assessment_id",
+          "transcript_id"
+        ],
+        "title": "ProposeRequest",
+        "type": "object"
+      },
+      "grassmarket__web__routers__voice_notes__ConfirmRequest": {
+        "description": "The advisor's final answer, per field.\n\nA field that is present is applied with the value given \u2014 their correction, or the proposal's\nown suggestion where they accepted it unchanged. A field that is **absent or null is not\napplied**, whatever was proposed. There is no \"accept everything\" shortcut on purpose: the\napproval has to name what it approves, or it is not an approval.",
+        "properties": {
+          "fields": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/PipelineField"
+            },
+            "title": "Fields",
+            "type": "object"
+          }
+        },
+        "title": "ConfirmRequest",
+        "type": "object"
+      },
+      "grassmarket__web__routers__voice_notes__ProposeRequest": {
+        "properties": {
+          "prospect_id": {
+            "format": "uuid",
+            "title": "Prospect Id",
+            "type": "string"
+          },
+          "transcript_id": {
+            "format": "uuid",
+            "title": "Transcript Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prospect_id",
+          "transcript_id"
+        ],
+        "title": "ProposeRequest",
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -15782,7 +16092,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ProposeRequest"
+                "$ref": "#/components/schemas/grassmarket__web__routers__extraction__ProposeRequest"
               }
             }
           },
@@ -15888,7 +16198,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ConfirmRequest"
+                "$ref": "#/components/schemas/grassmarket__web__routers__extraction__ConfirmRequest"
               }
             }
           },
@@ -17388,6 +17698,265 @@
         "summary": "Get Transcript",
         "tags": [
           "path-b"
+        ]
+      }
+    },
+    "/voice-notes": {
+      "get": {
+        "operationId": "list_proposals_voice_notes_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "prospect_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Prospect Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/VoiceNoteProposal"
+                  },
+                  "title": "Response List Proposals Voice Notes Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Proposals",
+        "tags": [
+          "voice-notes"
+        ]
+      },
+      "post": {
+        "operationId": "propose_voice_notes_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/grassmarket__web__routers__voice_notes__ProposeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoiceNoteProposal"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Propose",
+        "tags": [
+          "voice-notes"
+        ]
+      }
+    },
+    "/voice-notes/{proposal_id}": {
+      "get": {
+        "operationId": "get_proposal_voice_notes__proposal_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "proposal_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Proposal Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoiceNoteProposal"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Proposal",
+        "tags": [
+          "voice-notes"
+        ]
+      }
+    },
+    "/voice-notes/{proposal_id}/confirm": {
+      "post": {
+        "description": "Apply what the advisor confirmed. This is the gate; nothing before it wrote anything.",
+        "operationId": "confirm_voice_notes__proposal_id__confirm_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "proposal_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Proposal Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/grassmarket__web__routers__voice_notes__ConfirmRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoiceNoteProposal"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Confirm",
+        "tags": [
+          "voice-notes"
+        ]
+      }
+    },
+    "/voice-notes/{proposal_id}/discard": {
+      "post": {
+        "description": "The advisor read it and said no. Recorded, not deleted.",
+        "operationId": "discard_voice_notes__proposal_id__discard_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "proposal_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Proposal Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoiceNoteProposal"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Discard",
+        "tags": [
+          "voice-notes"
         ]
       }
     },

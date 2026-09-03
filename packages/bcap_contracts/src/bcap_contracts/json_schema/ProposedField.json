@@ -1,0 +1,122 @@
+{
+  "$defs": {
+    "ExtractionConfidence": {
+      "description": "The model's confidence in an extracted field (PRD §3.3).",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ],
+      "title": "ExtractionConfidence",
+      "type": "string"
+    },
+    "PipelineField": {
+      "description": "The fields a voice note may propose. Deliberately a closed set (ADR-0001): an extractor\ncannot invent a field name, and every one of these maps to an existing write path.",
+      "enum": [
+        "stage",
+        "next_action",
+        "next_action_on",
+        "comms_note"
+      ],
+      "title": "PipelineField",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One field a voice note proposed, what the advisor did with it, and where it came from.",
+  "properties": {
+    "accepted": {
+      "default": false,
+      "description": "True once the advisor confirmed this field specifically.",
+      "title": "Accepted",
+      "type": "boolean"
+    },
+    "confidence": {
+      "$ref": "#/$defs/ExtractionConfidence"
+    },
+    "confirmed_value": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Confirmed Value"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "field": {
+      "$ref": "#/$defs/PipelineField"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "proposal_id": {
+      "format": "uuid",
+      "title": "Proposal Id",
+      "type": "string"
+    },
+    "proposed_value": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The extractor's suggestion, or null where it found nothing.",
+      "title": "Proposed Value"
+    },
+    "span_end": {
+      "minimum": 0,
+      "title": "Span End",
+      "type": "integer"
+    },
+    "span_start": {
+      "description": "Character offset of the supporting span.",
+      "minimum": 0,
+      "title": "Span Start",
+      "type": "integer"
+    },
+    "transcript_id": {
+      "format": "uuid",
+      "title": "Transcript Id",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "proposal_id",
+    "transcript_id",
+    "field",
+    "confidence",
+    "span_start",
+    "span_end"
+  ],
+  "title": "ProposedField",
+  "type": "object"
+}

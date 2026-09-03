@@ -20,7 +20,7 @@ import hashlib
 import json
 import re
 import unicodedata
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 from uuid import UUID
@@ -172,6 +172,12 @@ from bcap_contracts.report_links import (
     ReportReadReport,
     SectionReadSummary,
 )
+from bcap_contracts.voice_notes import (
+    PipelineField,
+    ProposalStatus,
+    ProposedField,
+    VoiceNoteProposal,
+)
 from sqlalchemy import Text, delete, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -227,6 +233,8 @@ from grassmarket.data.models import (
     ReportReadEventORM,
     ScoringRunORM,
     SectionTestAttemptORM,
+    VoiceNoteProposalORM,
+    VoiceNoteProposedFieldORM,
     WorkshopORM,
 )
 from grassmarket.earnings.commission import (
@@ -237,6 +245,7 @@ from grassmarket.earnings.commission import (
 from grassmarket.entities.registry import rank_name
 from grassmarket.pathb.cipher import TranscriptCipher
 from grassmarket.pathb.extraction import Extractor
+from grassmarket.pathb.pipeline_extraction import PipelineExtractor
 from grassmarket.pathb.scanning import MediaScanner
 from grassmarket.pathb.transcription import Transcriber, TranscriptionError
 from grassmarket.pipeline.fees import attribution_content_hash, is_within_attribution_window
@@ -419,6 +428,31 @@ class DocumentError(Exception):
 
 class DocumentTooLargeError(DocumentError):
     """The upload exceeds the configured limit — refused before anything is scanned or stored."""
+
+
+@dataclass(frozen=True)
+class ConfirmedFields:
+    """What a voice-note confirmation will actually write (GRS-0249 scope 4).
+
+    One record drives both the writing and the per-field ``accepted`` flags, so the audit trail
+    cannot drift from what happened. A field marked accepted while nothing was written would be
+    the record lying about the one thing it exists to record.
+    """
+
+    stage: PipelineStage | None = None
+    next_action: str | None = None
+    next_action_on: date | None = None
+    comms_note: str | None = None
+
+    def value_for(self, field: PipelineField) -> str | None:
+        """The value stored as ``confirmed_value``, or None where the field was not applied."""
+        if field is PipelineField.STAGE:
+            return self.stage.value if self.stage else None
+        if field is PipelineField.NEXT_ACTION:
+            return self.next_action
+        if field is PipelineField.NEXT_ACTION_ON:
+            return self.next_action_on.isoformat() if self.next_action_on else None
+        return self.comms_note
 
 
 class ConsentRequiredError(RepositoryError):
@@ -801,10 +835,15 @@ class Repository:
         primary_contact_name: str | None = None,
         primary_contact_email: str | None = None,
         notes: str | None = None,
+        next_action: str | None = None,
+        next_action_on: date | None = None,
     ) -> Prospect:
         """Patch a prospect's editable fields (GRS-0111) — owner-scoped. Only the fields passed (not
         None) are changed; stage moves stay on the dedicated choke-point `update_prospect_stage`.
-        An empty-string `company_name` is refused (it is required)."""
+        An empty-string `company_name` is refused (it is required).
+
+        This is also the path a confirmed voice-note proposal writes the next action through
+        (GRS-0249), so a spoken update lands exactly where a typed one does."""
         row = self._session.get(ProspectORM, prospect_id)
         if row is None:
             raise NotFoundError(f"Prospect {prospect_id} not found.")
@@ -823,6 +862,10 @@ class Repository:
             row.primary_contact_email = primary_contact_email or None
         if notes is not None:
             row.notes = notes or None
+        if next_action is not None:
+            row.next_action = next_action.strip() or None
+        if next_action_on is not None:
+            row.next_action_on = next_action_on
         self._session.add(row)
         self._session.flush()
         return self._to_prospect(row)
@@ -2257,6 +2300,280 @@ class Repository:
             )
         self._session.flush()
         return self._to_extraction(row)
+
+    # --- Voice note → pipeline proposal (GRS-0249 scope 4, SCOPED, #8) ----------------------
+
+    def propose_pipeline_update(
+        self,
+        principal: Principal,
+        *,
+        prospect_id: UUID,
+        transcript_id: UUID,
+        extractor: PipelineExtractor,
+        cipher: TranscriptCipher,
+    ) -> VoiceNoteProposal:
+        """Turn one of the caller's voice notes into a PROPOSED pipeline update.
+
+        Nothing is applied. The proposed values live on the proposal, so an extractor that
+        misheard "we should move them to proposal" cannot move anybody (non-negotiable #8). The
+        prospect and the transcript are both checked against the caller first, so a proposal can
+        never join two records the caller does not own.
+        """
+        prospect = self.get_prospect(principal, prospect_id)  # own + exists
+        transcript = self.get_transcript(principal, transcript_id, cipher=cipher)  # own + decrypts
+        result = extractor.extract(transcript.text, company_name=prospect.company_name)
+
+        row = VoiceNoteProposalORM(
+            owner_consultant_id=principal.consultant_id,
+            prospect_id=prospect_id,
+            transcript_id=transcript_id,
+            status=ProposalStatus.PROPOSED.value,
+            extractor_version=extractor.version,
+            gaps_json=json.dumps(list(result.gaps)),
+        )
+        self._session.add(row)
+        self._session.flush()
+        for value in result.values:
+            self._session.add(
+                VoiceNoteProposedFieldORM(
+                    owner_consultant_id=principal.consultant_id,
+                    proposal_id=row.id,
+                    transcript_id=transcript_id,
+                    field=value.field.value,
+                    proposed_value=value.value,
+                    confidence=value.confidence.value,
+                    span_start=value.span_start,
+                    span_end=value.span_end,
+                    accepted=False,
+                )
+            )
+        self._session.flush()
+        return self._to_voice_note_proposal(row)
+
+    def confirm_pipeline_update(
+        self,
+        principal: Principal,
+        proposal_id: UUID,
+        *,
+        now: datetime,
+        confirmed: Mapping[PipelineField, str | None],
+    ) -> VoiceNoteProposal:
+        """Apply what the advisor confirmed — and only that.
+
+        `confirmed` is the advisor's final answer per field: their correction, the proposal's own
+        value where they accepted it, or absent where they left it out. A field the advisor did not
+        confirm is not written, whatever the extractor suggested, because the recorded approval is
+        the gate and an unanswered field was not approved.
+
+        **Every value goes through the same write path a typed one does.** The stage moves through
+        `update_prospect_stage`, so the lifecycle graph refuses an illegal jump exactly as it would
+        by hand and the stage-history row is written the same way; the next action goes through
+        `update_prospect`; the note goes through `append_comms_entry`. There is no second, quieter
+        way in — which is what makes a confirmed voice note indistinguishable from typing, and is
+        the same convergence Path B has with `update_assessment`.
+
+        Refused once the proposal has been answered, in either direction (ConflictError).
+        """
+        row = self._require_voice_note_proposal(principal, proposal_id)
+        if row.status != ProposalStatus.PROPOSED.value:
+            raise ConflictError(
+                f"Voice note proposal {proposal_id} was already {row.status}. A proposal is "
+                f"answered once."
+            )
+        # Parse everything BEFORE writing anything. A confirmation that applied the stage and then
+        # choked on a malformed date would leave the prospect half-updated from a single click.
+        applied = self._parsed_confirmation(confirmed)
+        stage = applied.stage
+        next_action = applied.next_action
+        next_action_on = applied.next_action_on
+        comms_note = applied.comms_note
+
+        if stage is not None:
+            self.update_prospect_stage(principal, row.prospect_id, stage)
+        if next_action is not None or next_action_on is not None:
+            self.update_prospect(
+                principal,
+                row.prospect_id,
+                next_action=next_action,
+                next_action_on=next_action_on,
+            )
+        if comms_note is not None:
+            engagement_id = self._sole_engagement_for(principal, row.prospect_id)
+            self.append_comms_entry(
+                principal, engagement_id, channel=CommsChannel.NOTE, body=comms_note, at=now
+            )
+
+        for prov in self._session.execute(
+            select(VoiceNoteProposedFieldORM).where(
+                VoiceNoteProposedFieldORM.proposal_id == proposal_id
+            )
+        ).scalars():
+            # `accepted` means this field was APPLIED, not merely that the proposal was confirmed
+            # — and not merely that a key was present in the request. A blank string is not an
+            # answer, and a field recorded as accepted while nothing was written would be the
+            # audit trail lying about the one thing it exists to record.
+            value = applied.value_for(PipelineField(prov.field))
+            prov.accepted = value is not None
+            prov.confirmed_value = value
+            self._session.add(prov)
+
+        row.status = ProposalStatus.CONFIRMED.value
+        row.confirmed_at = now
+        self._session.add(row)
+        self._session.flush()
+        return self._to_voice_note_proposal(row)
+
+    def discard_pipeline_update(
+        self, principal: Principal, proposal_id: UUID, *, now: datetime
+    ) -> VoiceNoteProposal:
+        """The advisor read the proposal and said no.
+
+        Recorded rather than deleted. "The machine suggested this and a person rejected it" is the
+        only evidence that the gate does anything, and it is worth as much as an acceptance.
+        """
+        row = self._require_voice_note_proposal(principal, proposal_id)
+        if row.status != ProposalStatus.PROPOSED.value:
+            raise ConflictError(
+                f"Voice note proposal {proposal_id} was already {row.status}. A proposal is "
+                f"answered once."
+            )
+        row.status = ProposalStatus.DISCARDED.value
+        row.discarded_at = now
+        self._session.add(row)
+        self._session.flush()
+        return self._to_voice_note_proposal(row)
+
+    @staticmethod
+    def _parsed_confirmation(confirmed: Mapping[PipelineField, str | None]) -> ConfirmedFields:
+        """Turn the advisor's text answers into real types, refusing anything that is not one.
+
+        Values arrive as text because one table holds all four fields. They are validated here,
+        loudly: an unknown stage or an unparseable date is refused rather than dropped, because a
+        confirmation that silently ignored a field the advisor filled in would be the quiet
+        data-loss this codebase refuses everywhere else (non-negotiable #3). A blank string is not
+        a refusal to parse — it is simply not an answer, and is left out.
+        """
+        raw_stage = (confirmed.get(PipelineField.STAGE) or "").strip()
+        stage: PipelineStage | None = None
+        if raw_stage:
+            try:
+                stage = PipelineStage(raw_stage)
+            except ValueError as exc:
+                known = ", ".join(s.value for s in PipelineStage)
+                raise ConflictError(
+                    f"{raw_stage!r} is not a pipeline stage. Known stages: {known}."
+                ) from exc
+
+        raw_due = (confirmed.get(PipelineField.NEXT_ACTION_ON) or "").strip()
+        next_action_on: date | None = None
+        if raw_due:
+            try:
+                next_action_on = date.fromisoformat(raw_due)
+            except ValueError as exc:
+                raise ConflictError(
+                    f"{raw_due!r} is not a date. Give the next action's due date as YYYY-MM-DD."
+                ) from exc
+
+        return ConfirmedFields(
+            stage=stage,
+            next_action=(confirmed.get(PipelineField.NEXT_ACTION) or "").strip() or None,
+            next_action_on=next_action_on,
+            comms_note=(confirmed.get(PipelineField.COMMS_NOTE) or "").strip() or None,
+        )
+
+    def _sole_engagement_for(self, principal: Principal, prospect_id: UUID) -> UUID:
+        """The engagement a comms-log note goes to, or a readable refusal.
+
+        The communication log hangs off an engagement, not a prospect. A voice note recorded after a
+        first pitch therefore has nowhere to put a note, and a prospect running two engagements has
+        no single obvious place either. Both are refused in words rather than guessed at, so the
+        advisor's line is never filed somewhere they did not choose.
+        """
+        engagements = [e for e in self.list_engagements(principal) if e.prospect_id == prospect_id]
+        if not engagements:
+            raise ConflictError(
+                "There is no engagement to file this note against yet. The communication log "
+                "belongs to an engagement, and this prospect does not have one — open the "
+                "engagement first, or confirm the rest of the note without it."
+            )
+        if len(engagements) > 1:
+            raise ConflictError(
+                f"This prospect has {len(engagements)} engagements, so there is no single "
+                f"communication log to file the note in. Add it to the one you mean from the "
+                f"engagement itself."
+            )
+        return engagements[0].id
+
+    def _require_voice_note_proposal(
+        self, principal: Principal, proposal_id: UUID
+    ) -> VoiceNoteProposalORM:
+        row = self._session.get(VoiceNoteProposalORM, proposal_id)
+        if row is None:
+            raise NotFoundError(f"Voice note proposal {proposal_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        return row
+
+    def get_pipeline_proposal(self, principal: Principal, proposal_id: UUID) -> VoiceNoteProposal:
+        row = self._require_voice_note_proposal(principal, proposal_id)
+        return self._to_voice_note_proposal(row)
+
+    def list_pipeline_proposals(
+        self, principal: Principal, *, prospect_id: UUID | None = None
+    ) -> list[VoiceNoteProposal]:
+        """The caller's proposals, newest first, optionally narrowed to one prospect."""
+        stmt = select(VoiceNoteProposalORM)
+        if not principal.is_admin:
+            stmt = stmt.where(VoiceNoteProposalORM.owner_consultant_id == principal.consultant_id)
+        if prospect_id is not None:
+            stmt = stmt.where(VoiceNoteProposalORM.prospect_id == prospect_id)
+        rows = (
+            self._session.execute(stmt.order_by(VoiceNoteProposalORM.created_at.desc()))
+            .scalars()
+            .all()
+        )
+        return [self._to_voice_note_proposal(r) for r in rows]
+
+    def _to_voice_note_proposal(self, row: VoiceNoteProposalORM) -> VoiceNoteProposal:
+        fields = (
+            self._session.execute(
+                select(VoiceNoteProposedFieldORM)
+                .where(VoiceNoteProposedFieldORM.proposal_id == row.id)
+                .order_by(VoiceNoteProposedFieldORM.created_at)
+            )
+            .scalars()
+            .all()
+        )
+        return VoiceNoteProposal(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            prospect_id=row.prospect_id,
+            transcript_id=row.transcript_id,
+            status=ProposalStatus(row.status),
+            extractor_version=row.extractor_version,
+            gaps=tuple(json.loads(row.gaps_json)),
+            fields=tuple(
+                ProposedField(
+                    id=f.id,
+                    owner_consultant_id=f.owner_consultant_id,
+                    proposal_id=f.proposal_id,
+                    transcript_id=f.transcript_id,
+                    field=PipelineField(f.field),
+                    proposed_value=f.proposed_value,
+                    confidence=ExtractionConfidence(f.confidence),
+                    span_start=f.span_start,
+                    span_end=f.span_end,
+                    accepted=f.accepted,
+                    confirmed_value=f.confirmed_value,
+                    created_at=f.created_at,
+                    updated_at=f.updated_at,
+                )
+                for f in fields
+            ),
+            confirmed_at=row.confirmed_at,
+            discarded_at=row.discarded_at,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+        )
 
     def confirm_extraction(
         self,
@@ -6767,6 +7084,8 @@ class Repository:
             primary_contact_name=row.primary_contact_name,
             primary_contact_email=row.primary_contact_email,
             notes=row.notes,
+            next_action=row.next_action,
+            next_action_on=row.next_action_on,
             created_at=row.created_at,
             updated_at=row.updated_at,
         )

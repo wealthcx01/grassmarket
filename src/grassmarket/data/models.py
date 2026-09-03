@@ -146,6 +146,10 @@ class ProspectORM(Base):
     primary_contact_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
     primary_contact_email: Mapped[str | None] = mapped_column(String(320), nullable=True)
     notes: Mapped[str | None] = mapped_column(String(2000), nullable=True)
+    # The one thing that has to happen next, and when (GRS-0249 scope 4). The two are independently
+    # nullable: an action with no date is honest, and a date is never invented to fill the column.
+    next_action: Mapped[str | None] = mapped_column(String(280), nullable=True)
+    next_action_on: Mapped[date | None] = mapped_column(Date, index=True, nullable=True)
     # The registry target this prospect was claimed from (GRS-0238). NULLABLE by necessity:
     # prospects typed by hand were never claimed from the registry, and back-filling a link
     # by name-matching would assert an identity nobody verified.
@@ -532,6 +536,77 @@ class FieldProvenanceORM(Base):
     span_start: Mapped[int] = mapped_column(Integer, nullable=False)
     span_end: Mapped[int] = mapped_column(Integer, nullable=False)
     accepted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
+class VoiceNoteProposalORM(Base):
+    """A gated pipeline proposal drawn from one voice note (GRS-0249 scope 4).
+
+    The sibling of ``ExtractionORM``, one level down: that one proposes an assessment, this one
+    proposes a pipeline update. The proposed values live HERE and on ``voice_note_proposed_fields``,
+    never on the prospect, until an advisor confirms — so a voice note can never move a stage on its
+    own (non-negotiable #8).
+
+    Both parents are real keys. A proposal pointing at a prospect or transcript that is not there
+    could not be reviewed, and is the dangling reference GRS-0246 made structurally impossible.
+    """
+
+    __tablename__ = "voice_note_proposals"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    prospect_id: Mapped[UUID] = mapped_column(
+        ForeignKey("prospects.id", ondelete="RESTRICT"), index=True, nullable=False
+    )
+    transcript_id: Mapped[UUID] = mapped_column(
+        ForeignKey("meeting_transcripts.id", ondelete="RESTRICT"), index=True, nullable=False
+    )
+    status: Mapped[str] = mapped_column(String(16), nullable=False)
+    extractor_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    gaps_json: Mapped[str] = mapped_column(Text, default="[]", nullable=False)
+    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    discarded_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
+class VoiceNoteProposedFieldORM(Base):
+    """One field a voice note proposed, and what the advisor did with it (GRS-0249 scope 4).
+
+    ``proposed_value`` is what the machine said; ``confirmed_value`` is what a person agreed to.
+    Both are kept. Overwriting the first with the second would destroy the only evidence that the
+    approval gate did anything — afterwards nobody could tell a corrected field from an accepted
+    one, which is the question an audit of "AI proposes, humans approve" actually asks.
+
+    Every value is stored as text, whatever its real type. One table then holds all four fields, and
+    the parsing happens at confirmation where a bad value can be refused loudly rather than coerced
+    into something that looks fine.
+    """
+
+    __tablename__ = "voice_note_proposed_fields"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    proposal_id: Mapped[UUID] = mapped_column(
+        ForeignKey("voice_note_proposals.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    transcript_id: Mapped[UUID] = mapped_column(Uuid, nullable=False)
+    field: Mapped[str] = mapped_column(String(32), nullable=False)
+    proposed_value: Mapped[str | None] = mapped_column(Text, nullable=True)
+    confidence: Mapped[str] = mapped_column(String(8), nullable=False)
+    span_start: Mapped[int] = mapped_column(Integer, nullable=False)
+    span_end: Mapped[int] = mapped_column(Integer, nullable=False)
+    accepted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    confirmed_value: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_now, onupdate=_now

@@ -71,6 +71,34 @@
           "title": "Id",
           "type": "string"
         },
+        "next_action": {
+          "anyOf": [
+            {
+              "maxLength": 280,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The single next thing to do for this prospect.",
+          "title": "Next Action"
+        },
+        "next_action_on": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "When the next action is due, if the advisor set a date.",
+          "title": "Next Action On"
+        },
         "notes": {
           "anyOf": [
             {
