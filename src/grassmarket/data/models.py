@@ -17,6 +17,7 @@ from bcap_contracts.entities import PipelineStage
 from sqlalchemy import (
     JSON,
     Boolean,
+    CheckConstraint,
     Date,
     DateTime,
     Float,
@@ -1250,6 +1251,73 @@ class AssessmentORM(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+
+class DocumentORM(Base):
+    """A file an advisor uploaded — a board pack, an org chart, a signed engagement letter
+    (GRS-0247).
+
+    Until now the product had nowhere to put one. The only inbound path was
+    ``POST /transcripts/media``, which accepts audio or video, keeps the transcript and throws the
+    file away, so a client's annual report lived in the advisor's email.
+
+    **Parented flexibly and deliberately.** A document may hang off a prospect, a workshop or an
+    engagement, and at least one must be set. The design work of 2026-09-02 (Backend Requests R2)
+    makes the reason concrete: a workshop is recorded while the client is still a prospect, before
+    any engagement exists, so requiring ``engagement_id`` would rule out the case the feature is
+    for. ``attach_to_engagement`` re-parents later without losing the original link.
+
+    Bytes are stored here rather than in object storage — see GRS-0247 scope 1 and GRS-0252 for the
+    trigger at which that stops being the right answer (~2 GB stored, or a restore over 15 minutes).
+    Ciphertext only: a client document is at least as sensitive as a meeting transcript, which has
+    been encrypted at rest since GRS-0029.
+    """
+
+    __tablename__ = "documents"
+
+    id: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
+    # THE scoping column — every read/list/write is filtered by this in the repository layer.
+    owner_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), index=True, nullable=False
+    )
+    # At least one parent, enforced in the repository and by a table-level CHECK below. All three
+    # are keys, so GRS-0246's class of bug cannot recur here.
+    prospect_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("prospects.id", ondelete="RESTRICT"), index=True, nullable=True
+    )
+    workshop_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("workshops.id", ondelete="RESTRICT"), index=True, nullable=True
+    )
+    engagement_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("engagements.id", ondelete="RESTRICT"), index=True, nullable=True
+    )
+
+    filename: Mapped[str] = mapped_column(String(255), nullable=False)
+    content_type: Mapped[str] = mapped_column(String(128), nullable=False)
+    byte_size: Mapped[int] = mapped_column(Integer, nullable=False)
+    # Of the PLAINTEXT, so an integrity check does not require the key, and a re-upload of the same
+    # file is recognisable even though its ciphertext differs every time.
+    sha256: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
+    content_ciphertext: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
+
+    provenance: Mapped[str] = mapped_column(String(16), default="production", nullable=False)
+    scanner_ref: Mapped[str] = mapped_column(String(64), nullable=False)
+    uploaded_by_consultant_id: Mapped[UUID] = mapped_column(
+        ForeignKey("consultants.id"), nullable=False
+    )
+    # Carried across from meeting transcripts, which have had it since GRS-0029.
+    retention_until: Mapped[date | None] = mapped_column(Date, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+    __table_args__ = (
+        CheckConstraint(
+            "prospect_id IS NOT NULL OR workshop_id IS NOT NULL OR engagement_id IS NOT NULL",
+            name="ck_documents_has_a_parent",
+        ),
     )
 
 

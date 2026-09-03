@@ -1,0 +1,149 @@
+{
+  "$defs": {
+    "RecordProvenance": {
+      "description": "Where a record sits relative to production (ADR-0029). Set at creation, IMMUTABLE, and\ncarried on the assessment so non-production records are segregated at the data layer.\n\nA non-production (`demo`/`sandbox`) record may finalise and run the REAL deliverable generation\nWITHOUT the dual-rating + committee gate — so a solo tester/salesperson can walk the flow — but\nis permanently watermarked, never counted as ratified, never enters the benchmark/prediction\npopulations, and can never be promoted to production. The AI-approval non-negotiable (#8)\nis intact: these outputs are non-client-facing by construction, not a bypass of approval for\nreal work.",
+      "enum": [
+        "production",
+        "demo",
+        "sandbox"
+      ],
+      "title": "RecordProvenance",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One uploaded file, owned by the advisor who uploaded it and scoped to them absolutely.",
+  "properties": {
+    "byte_size": {
+      "maximum": 26214400,
+      "minimum": 1,
+      "title": "Byte Size",
+      "type": "integer"
+    },
+    "content_type": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Content Type",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "engagement_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The engagement this document belongs to, if any.",
+      "title": "Engagement Id"
+    },
+    "filename": {
+      "maxLength": 255,
+      "minLength": 1,
+      "title": "Filename",
+      "type": "string"
+    },
+    "id": {
+      "format": "uuid",
+      "title": "Id",
+      "type": "string"
+    },
+    "owner_consultant_id": {
+      "description": "The consultant who owns this resource. Data scoping is by this field, enforced in the repository layer and tested from day one.",
+      "format": "uuid",
+      "title": "Owner Consultant Id",
+      "type": "string"
+    },
+    "prospect_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The prospect this document belongs to, if any.",
+      "title": "Prospect Id"
+    },
+    "provenance": {
+      "$ref": "#/$defs/RecordProvenance",
+      "default": "production"
+    },
+    "retention_until": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Retention Until"
+    },
+    "scanner_ref": {
+      "description": "Which scanner passed this file, so a later change of provider is traceable.",
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Scanner Ref",
+      "type": "string"
+    },
+    "sha256": {
+      "description": "SHA-256 of the PLAINTEXT, so an integrity check needs no key and a re-upload of the same file is recognisable although its ciphertext differs each time.",
+      "maxLength": 64,
+      "minLength": 64,
+      "title": "Sha256",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    },
+    "uploaded_by_consultant_id": {
+      "format": "uuid",
+      "title": "Uploaded By Consultant Id",
+      "type": "string"
+    },
+    "workshop_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The workshop this document belongs to, if any.",
+      "title": "Workshop Id"
+    }
+  },
+  "required": [
+    "id",
+    "created_at",
+    "updated_at",
+    "owner_consultant_id",
+    "filename",
+    "content_type",
+    "byte_size",
+    "sha256",
+    "scanner_ref",
+    "uploaded_by_consultant_id"
+  ],
+  "title": "Document",
+  "type": "object"
+}

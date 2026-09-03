@@ -37,6 +37,7 @@ from grassmarket.web.routers import (
     compliance,
     consultants,
     deliverables,
+    documents,
     earnings,
     engagements,
     entities,
@@ -104,6 +105,7 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
     app.include_router(engagements.router)
     app.include_router(entities.router)
     app.include_router(deliverables.router)
+    app.include_router(documents.router)
     app.include_router(narratives.router)
     app.include_router(assessments.router)
     app.include_router(committee.router)

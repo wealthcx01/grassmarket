@@ -94,6 +94,7 @@ from bcap_contracts.deliverables import (
     DeliverableMode,
     DeliverableType,
 )
+from bcap_contracts.documents import Document
 from bcap_contracts.engagements import (
     CommsChannel,
     CommsLogEntry,
@@ -196,6 +197,7 @@ from grassmarket.data.models import (
     CourseORM,
     CourseVersionORM,
     DeliverableORM,
+    DocumentORM,
     DrillCardORM,
     EngagementAssessmentORM,
     EngagementORM,
@@ -404,6 +406,14 @@ class RepositoryError(Exception):
 
 class NotFoundError(RepositoryError):
     """A requested resource does not exist."""
+
+
+class DocumentError(Exception):
+    """An upload or read that cannot proceed: no parent, empty, corrupt, or already re-parented."""
+
+
+class DocumentTooLargeError(DocumentError):
+    """The upload exceeds the configured limit — refused before anything is scanned or stored."""
 
 
 class ScopeViolationError(RepositoryError):
@@ -1778,6 +1788,167 @@ class Repository:
             cipher=cipher,
             engagement_id=engagement_id,
             retention_until=retention_until,
+        )
+
+    # --- Documents (GRS-0247) --------------------------------------------------------------
+
+    def store_document(
+        self,
+        principal: Principal,
+        *,
+        content: bytes,
+        filename: str,
+        content_type: str,
+        cipher: TranscriptCipher,
+        scanner: MediaScanner,
+        prospect_id: UUID | None = None,
+        workshop_id: UUID | None = None,
+        engagement_id: UUID | None = None,
+        retention_until: date | None = None,
+        max_bytes: int,
+    ) -> Document:
+        """Scan → encrypt → store an uploaded document (GRS-0247).
+
+        The order matters and mirrors `ingest_media`: nothing is written if the scan refuses.
+        Every parent is checked against the principal first, so a cross-owner reference is a
+        not-found rather than a stored document pointing at someone else's client.
+        """
+        if not content:
+            raise DocumentError(f"Refusing to store an empty file ({filename}).")
+        if len(content) > max_bytes:
+            raise DocumentTooLargeError(
+                f"{filename} is {len(content)} bytes; the limit is {max_bytes}."
+            )
+        if prospect_id is None and workshop_id is None and engagement_id is None:
+            raise DocumentError(
+                "A document must belong to a prospect, a workshop or an engagement. One with no "
+                "parent could never be found again."
+            )
+
+        # Scoped parent checks. Each raises NotFoundError for a missing OR cross-owner id, so the
+        # existence of another advisor's record is never revealed (non-negotiable #9).
+        provenance = RecordProvenance.PRODUCTION
+        if prospect_id is not None:
+            self.get_prospect(principal, prospect_id)
+        if workshop_id is not None:
+            self._require_workshop(principal, workshop_id)
+        if engagement_id is not None:
+            engagement = self._require_engagement(principal, engagement_id)
+            # A document on a demo or sandbox engagement is demo or sandbox itself; it must not
+            # look like production evidence (ADR-0029).
+            provenance = RecordProvenance(engagement.provenance)
+
+        declared_check = getattr(scanner, "scan_declared", None)
+        if callable(declared_check):
+            declared_check(content, filename=filename, content_type=content_type)
+        else:
+            scanner.scan(content, filename=filename)
+
+        row = DocumentORM(
+            owner_consultant_id=principal.consultant_id,
+            prospect_id=prospect_id,
+            workshop_id=workshop_id,
+            engagement_id=engagement_id,
+            filename=filename,
+            content_type=content_type,
+            byte_size=len(content),
+            sha256=hashlib.sha256(content).hexdigest(),
+            content_ciphertext=cipher.encrypt_bytes(content),
+            provenance=provenance.value,
+            scanner_ref=getattr(scanner, "version", type(scanner).__name__),
+            uploaded_by_consultant_id=principal.consultant_id,
+            retention_until=retention_until,
+        )
+        self._session.add(row)
+        self._session.flush()
+        return self._to_document(row)
+
+    def list_documents(
+        self,
+        principal: Principal,
+        *,
+        prospect_id: UUID | None = None,
+        workshop_id: UUID | None = None,
+        engagement_id: UUID | None = None,
+    ) -> list[Document]:
+        """The principal's own documents, newest first, optionally narrowed to one parent."""
+        stmt = select(DocumentORM).where(DocumentORM.owner_consultant_id == principal.consultant_id)
+        if prospect_id is not None:
+            stmt = stmt.where(DocumentORM.prospect_id == prospect_id)
+        if workshop_id is not None:
+            stmt = stmt.where(DocumentORM.workshop_id == workshop_id)
+        if engagement_id is not None:
+            stmt = stmt.where(DocumentORM.engagement_id == engagement_id)
+        stmt = stmt.order_by(DocumentORM.created_at.desc())
+        return [self._to_document(row) for row in self._session.execute(stmt).scalars()]
+
+    def get_document(self, principal: Principal, document_id: UUID) -> Document:
+        return self._to_document(self._require_document(principal, document_id))
+
+    def read_document_content(
+        self, principal: Principal, document_id: UUID, *, cipher: TranscriptCipher
+    ) -> tuple[bytes, Document]:
+        """The plaintext bytes and the metadata. Verifies the hash before returning.
+
+        A mismatch means the stored bytes are not the bytes that were uploaded, which is corruption
+        or tampering; either way it raises rather than handing back something the advisor would
+        reasonably assume is their file.
+        """
+        row = self._require_document(principal, document_id)
+        content = cipher.decrypt_bytes(row.content_ciphertext)
+        if hashlib.sha256(content).hexdigest() != row.sha256:
+            raise DocumentError(
+                f"Document {document_id} does not match the hash recorded when it was uploaded. "
+                f"Refusing to return it."
+            )
+        return content, self._to_document(row)
+
+    def attach_document_to_engagement(
+        self, principal: Principal, document_id: UUID, engagement_id: UUID
+    ) -> Document:
+        """Re-parent a document onto an engagement once one exists (Backend Requests R2).
+
+        The original prospect or workshop link is KEPT. A document collected during pitching did
+        belong to that prospect, and rewriting history to say otherwise is the sort of quiet edit
+        this codebase refuses elsewhere.
+        """
+        row = self._require_document(principal, document_id)
+        engagement = self._require_engagement(principal, engagement_id)
+        if row.engagement_id is not None and row.engagement_id != engagement_id:
+            raise DocumentError(
+                f"Document {document_id} already belongs to a different engagement. Moving it "
+                f"would change what that engagement is recorded as having drawn on."
+            )
+        row.engagement_id = engagement_id
+        row.provenance = engagement.provenance
+        self._session.flush()
+        return self._to_document(row)
+
+    def _require_document(self, principal: Principal, document_id: UUID) -> DocumentORM:
+        row = self._session.get(DocumentORM, document_id)
+        if row is None:
+            raise NotFoundError(f"Document {document_id} not found.")
+        self._assert_can_access(principal, row.owner_consultant_id)
+        return row
+
+    @staticmethod
+    def _to_document(row: DocumentORM) -> Document:
+        return Document(
+            id=row.id,
+            owner_consultant_id=row.owner_consultant_id,
+            created_at=row.created_at,
+            updated_at=row.updated_at,
+            prospect_id=row.prospect_id,
+            workshop_id=row.workshop_id,
+            engagement_id=row.engagement_id,
+            filename=row.filename,
+            content_type=row.content_type,
+            byte_size=row.byte_size,
+            sha256=row.sha256,
+            provenance=RecordProvenance(row.provenance),
+            scanner_ref=row.scanner_ref,
+            uploaded_by_consultant_id=row.uploaded_by_consultant_id,
+            retention_until=row.retention_until,
         )
 
     def ingest_media(

@@ -1,8 +1,8 @@
 # Grassmarket API surface
 
-**Generated 2026-09-02 from the live FastAPI app** (`create_app().openapi()`). **173 endpoints** across 24 tags.
+**Generated 2026-09-02 from the live FastAPI app** (`create_app().openapi()`). **178 endpoints** across 25 tags.
 
-This is the contract the front end is built against. Regenerate with `scripts/dump_api_surface.py`; the machine-readable spec is `docs/openapi.json`.
+This is the contract the front end is built against. Regenerate with `uv run python scripts/dump_api_surface.py`; the machine-readable spec is `docs/openapi.json`.
 
 Every route except `/health*`, `/auth/*` and the shared-report links requires a bearer JWT, and every owned resource is filtered by `owner_consultant_id` in the repository layer (non-negotiable #9). A cross-owner read returns **404, never 403** — the existence of another advisor's record is never revealed.
 
@@ -19,6 +19,7 @@ Every route except `/health*`, `/auth/*` and the shared-report links requires a 
 - [compliance](#compliance) — 3
 - [consultants](#consultants) — 1
 - [deliverables](#deliverables) — 5
+- [documents](#documents) — 5
 - [earnings](#earnings) — 11
 - [entities](#entities) — 6
 - [founder-review](#founderreview) — 7
@@ -157,6 +158,16 @@ Every route except `/health*`, `/auth/*` and the shared-report links requires a 
 | `GET` | `/deliverables/{deliverable_id}/download` | Download Deliverable |
 | `GET` | `/engagements/{engagement_id}/deliverables` | List Deliverables |
 | `POST` | `/engagements/{engagement_id}/deliverables` | Generate Deliverable |
+
+## documents
+
+| Method | Path | What it does |
+|---|---|---|
+| `GET` | `/documents` | List Documents |
+| `POST` | `/documents` | Upload Document |
+| `GET` | `/documents/{document_id}` | Get Document |
+| `GET` | `/documents/{document_id}/content` | Download Document |
+| `POST` | `/documents/{document_id}/engagement/{engagement_id}` | Attach To Engagement |
 
 ## earnings
 
