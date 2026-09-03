@@ -1,6 +1,7 @@
 # GRS-0255 — Recorder: consent, moment marks, speaker labels, streaming
 
-**Status:** OPEN (2026-09-03). **Priority:** MED-HIGH. **Type:** Feature.
+**Status:** PARTLY DONE (2026-09-03) — the consent gate shipped with GRS-0249; marks, speaker
+labels and streaming are still open. **Priority:** MED-HIGH. **Type:** Feature.
 **Source:** Backend Requests **R3**. Replaces gap **G12**. **Depends on:** GRS-0249, GRS-0254.
 
 ## Why
@@ -24,12 +25,35 @@ record. **No consent, no recording kept**; the gate refuses rather than storing 
 UK rules make participant consent the safe rule for confidential business meetings, and rules vary
 by jurisdiction. Treat any change to this as a founder decision, not an engineering one.
 
+**Open founder question, raised 2026-09-03 and not answered.** This wording tells the client the
+recording "isn't shared outside the engagement team". The transcription provider is hosted OpenAI
+Whisper (GRS-0251), so the audio *does* leave our infrastructure. The wording is used verbatim and
+unchanged, and the advisor-facing screen says plainly where the audio goes — so whoever presses
+record is not misled. But the client hears the approved line. Reconciling those two sentences is a
+founder decision, and it is live in production as of PR #274.
+
 ## Build
 
-- `consent_confirmed_at` + `consent_wording` on the transcript, required for a kept recording.
-- `marks[]` — timestamps the advisor flagged live.
-- `speaker` on segments.
-- Chunked or streaming ingest returning partial segments.
+- ~~`consent_confirmed_at` + `consent_wording` on the transcript, required for a kept recording.~~
+  **Done 2026-09-03 in GRS-0249** (migration `0045`, PR #274). It could not wait: the recorder
+  shipped in that ticket, and shipping a record button with no gate in front of it was not an
+  option. What landed goes further than this line asked:
+
+  - The advisor states **who was in the room** before anything records. A *voice note* is the
+    advisor alone and carries no consent, because there was nobody to ask; a *recorded session*
+    has somebody present and cannot be stored without both fields. Applying this client-facing
+    wording to a solo car-park note would have made the advisor attest to a conversation that
+    never happened.
+  - **Both directions are refused** — a session with no consent, and a voice note claiming consent
+    nobody gave. Enforced in the contract, the repository, and a table CHECK, so it holds with the
+    application bypassed entirely.
+  - The wording is served by `GET /transcripts/consent-line`, so exactly one copy exists in the
+    system, and an upload carrying different text is refused. A test compares the constant to this
+    ticket file byte for byte: editing the string in code fails the suite.
+
+- **Still open:** `marks[]` — timestamps the advisor flagged live.
+- **Still open:** `speaker` on segments.
+- **Still open:** chunked or streaming ingest returning partial segments.
 
 **Ship order:** v1 is record → stop → upload → "transcribing…" → review (GRS-0249). The live view
 switches on when streaming exists. The hosted Whisper API takes a whole file, so v1 cannot stream
