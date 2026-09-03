@@ -155,11 +155,46 @@ class TestDeletionCannotTouchProduction:
             repo.delete_engagement(bob.principal, engagement.id)
 
 
+def _delete_assessment_bypassing_the_key(repo: Repository, assessment_id) -> None:
+    """Delete an assessment while leaving an engagement's link to it behind.
+
+    Impossible through any application path since GRS-0246 — `delete_assessment` refuses, and the
+    foreign key on `engagement_assessments` refuses beneath it. Reproducing the historical state
+    therefore means turning the key off for one statement, on the raw DBAPI connection and outside
+    a transaction (SQLite ignores `PRAGMA foreign_keys` inside one).
+
+    If this helper ever stops being necessary, the guarantee has regressed.
+    """
+    repo._session.commit()
+    raw = repo._session.connection().connection.dbapi_connection
+    repo._session.commit()
+    cursor = raw.cursor()
+    try:
+        cursor.execute("PRAGMA foreign_keys=OFF")
+        cursor.execute("DELETE FROM assessments WHERE id = ?", (assessment_id.hex,))
+        raw.commit()
+    finally:
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+    repo._session.expire_all()
+
+
 class TestOrphanedEngagementRemoval:
     """ADR-0048. Every condition, asserted — this path must never become a general escape hatch."""
 
     def _orphaned(self, repo: Repository, alice, title: str = "Orphan"):
-        """An engagement whose only linked assessment is then deleted out from under it."""
+        """An engagement whose only linked assessment is then deleted out from under it.
+
+        **Since GRS-0246 this state cannot be created by any means the database allows.** The link
+        is a foreign key with ON DELETE RESTRICT, so the assessment deletion below is refused
+        unless the key is switched off for the statement — which is exactly what this helper does,
+        and exactly why ADR-0048's removal path is now legacy-only: it can only ever apply to rows
+        written before migration 0043.
+
+        Keeping these tests green matters because that legacy data exists (five such engagements
+        were found on staging), and the authorisation and refusal rules around removing it still
+        have to hold.
+        """
         prospect = _contracted(repo, alice, title)
         assessment = _finalised(repo, alice, title, RecordProvenance.DEMO)
         engagement = repo.create_engagement(
@@ -168,8 +203,7 @@ class TestOrphanedEngagementRemoval:
             title=title,
             assessment_ids=(assessment.id,),
         )
-        repo._session.delete(repo._session.get(AssessmentORM, assessment.id))
-        repo._session.flush()
+        _delete_assessment_bypassing_the_key(repo, assessment.id)
         return engagement
 
     def test_it_removes_a_genuine_orphan(self, repo: Repository, alice) -> None:
@@ -210,8 +244,7 @@ class TestOrphanedEngagementRemoval:
             title="Half",
             assessment_ids=(dead.id, live.id),
         )
-        repo._session.delete(repo._session.get(AssessmentORM, dead.id))
-        repo._session.flush()
+        _delete_assessment_bypassing_the_key(repo, dead.id)
         with pytest.raises(EngagementLinkError):
             repo.delete_orphaned_engagement(alice.principal, engagement.id, founder_authorised=True)
 
@@ -230,8 +263,7 @@ class TestOrphanedEngagementRemoval:
             assessment_ids=(assessment.id,),
             deliverables=(DeliverableSlot(key="roadmap"),),
         )
-        repo._session.delete(repo._session.get(AssessmentORM, assessment.id))
-        repo._session.flush()
+        _delete_assessment_bypassing_the_key(repo, assessment.id)
         with pytest.raises(EngagementLinkError):
             repo.delete_orphaned_engagement(alice.principal, engagement.id, founder_authorised=True)
 

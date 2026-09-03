@@ -23,7 +23,12 @@ from grassmarket.data import models  # noqa: F401  (register the ORM models on B
 from grassmarket.data.database import Base
 
 config = context.config
-if config.config_file_name is not None:
+# `fileConfig` REPLACES the process's logging configuration. That is right for `alembic upgrade` on
+# a terminal and wrong everywhere else: `run_migrations` is called at app import, so a boot would
+# hand the running service alembic.ini's logging setup, and a caller that attached its own handler
+# (a test asserting a migration reported something) would silently lose it. Opt out with
+# `config.attributes["configure_logger"] = False`; the default is unchanged.
+if config.config_file_name is not None and config.attributes.get("configure_logger", True):
     fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata

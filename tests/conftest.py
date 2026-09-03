@@ -20,7 +20,7 @@ from sqlalchemy.pool import StaticPool
 
 from grassmarket.auth.security import create_access_token, hash_password
 from grassmarket.config import Settings
-from grassmarket.data.database import run_migrations
+from grassmarket.data.database import enforce_sqlite_foreign_keys, run_migrations
 from grassmarket.data.repository import Principal, Repository, StoredConsultant
 from grassmarket.web.app import create_app
 
@@ -48,6 +48,10 @@ def engine() -> Iterator[Engine]:
         poolclass=StaticPool,
         future=True,
     )
+    # The fixtures build their own engine rather than calling make_engine, so the foreign-key
+    # pragma has to be applied here too — otherwise every referential constraint in the schema is
+    # inert in tests while being enforced in production (GRS-0246).
+    enforce_sqlite_foreign_keys(eng)
     run_migrations(eng)  # schema via Alembic — the same path the app uses (GRS-0006)
     yield eng
     eng.dispose()

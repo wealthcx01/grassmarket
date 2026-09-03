@@ -15,7 +15,7 @@ from pathlib import Path
 
 from alembic import command
 from alembic.config import Config
-from sqlalchemy import Engine, create_engine
+from sqlalchemy import Engine, create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 _ALEMBIC_INI = Path(__file__).resolve().parents[3] / "alembic.ini"
@@ -31,7 +31,29 @@ def make_engine(database_url: str) -> Engine:
     connect_args = {}
     if database_url.startswith("sqlite"):
         connect_args = {"check_same_thread": False}
-    return create_engine(database_url, future=True, connect_args=connect_args)
+    engine = create_engine(database_url, future=True, connect_args=connect_args)
+    if database_url.startswith("sqlite"):
+        enforce_sqlite_foreign_keys(engine)
+    return engine
+
+
+def enforce_sqlite_foreign_keys(engine: Engine) -> None:
+    """Turn on SQLite's foreign-key enforcement for every connection this engine opens.
+
+    SQLite ignores foreign keys unless asked, per connection; Postgres enforces them always. Without
+    this, tests are weaker than production in exactly the place GRS-0246 is about — a referential
+    constraint that holds on Railway and silently does nothing in CI would let the next
+    dangling-reference bug through the entire suite.
+
+    Exported because the test fixtures build their own engine (shared in-memory + StaticPool) and
+    must not quietly opt out of the guarantee they are meant to be proving.
+    """
+
+    @event.listens_for(engine, "connect")
+    def _enable(dbapi_connection, _record):  # pragma: no cover - trivial
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
 
 def make_session_factory(engine: Engine) -> sessionmaker[Session]:
