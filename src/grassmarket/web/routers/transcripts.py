@@ -10,15 +10,22 @@ from __future__ import annotations
 
 import base64
 import binascii
-from datetime import date
+from datetime import date, datetime
 from uuid import UUID
 
-from bcap_contracts.meetings import MediaKind, MeetingTranscript
+from bcap_contracts.meetings import (
+    FOUNDER_APPROVED_CONSENT_WORDING,
+    MediaKind,
+    MeetingTranscript,
+    RecordingKind,
+)
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
 from grassmarket.config import Settings
 from grassmarket.data.repository import (
+    ConsentRequiredError,
+    DocumentError,
     NotFoundError,
     Principal,
     Repository,
@@ -81,6 +88,10 @@ def _scanner(settings: Settings = Depends(get_app_settings)) -> MediaScanner:
 class PasteTranscriptRequest(BaseModel):
     text: str = Field(min_length=1)
     source_filename: str = Field(min_length=1)
+    # Any of the three parents, or none — a workshop is recorded while the client is still a
+    # prospect, before an engagement exists (GRS-0254 build 2).
+    prospect_id: UUID | None = None
+    workshop_id: UUID | None = None
     engagement_id: UUID | None = None
     retention_until: date | None = None
 
@@ -90,12 +101,49 @@ class UploadMediaRequest(BaseModel):
     source_filename: str = Field(min_length=1)
     content_type: str = Field(min_length=1)
     source_kind: MediaKind
+    prospect_id: UUID | None = None
+    workshop_id: UUID | None = None
     engagement_id: UUID | None = None
     retention_until: date | None = None
+    recording_kind: RecordingKind = Field(
+        default=RecordingKind.NOT_RECORDED,
+        description="Who was in the room. A recorded session must carry consent; nothing else may.",
+    )
+    consent_confirmed_at: datetime | None = Field(
+        default=None, description="When the advisor confirmed the client agreed."
+    )
+    consent_wording: str | None = Field(
+        default=None,
+        description="The exact text shown to the client. Must be the founder-approved wording.",
+    )
+    keep_recording: bool = Field(
+        default=False,
+        description="Store the audio alongside the transcript (needs a parent to file it under).",
+    )
+
+
+class ConsentLine(BaseModel):
+    """What the recorder must show before a session may be recorded.
+
+    Served rather than hardcoded in the frontend so there is exactly one copy of the wording in the
+    system. A client that shows its own text will have the upload refused, which is the point.
+    """
+
+    wording: str = Field(description="The exact text to read to the client, shown verbatim.")
 
 
 def _not_found() -> HTTPException:
     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transcript not found.")
+
+
+@router.get("/consent-line", response_model=ConsentLine)
+def get_consent_line() -> ConsentLine:
+    """The founder-approved consent wording (GRS-0255).
+
+    Unauthenticated-safe in content — it is a script an advisor reads aloud, not client data — but
+    it sits behind the same router so a client fetches it the same way it fetches everything else.
+    """
+    return ConsentLine(wording=FOUNDER_APPROVED_CONSENT_WORDING)
 
 
 @router.post("/text", response_model=MeetingTranscript, status_code=status.HTTP_201_CREATED)
@@ -111,6 +159,8 @@ def ingest_text(
             text=payload.text,
             source_filename=payload.source_filename,
             cipher=cipher,
+            prospect_id=payload.prospect_id,
+            workshop_id=payload.workshop_id,
             engagement_id=payload.engagement_id,
             retention_until=payload.retention_until,
         )
@@ -162,13 +212,31 @@ def ingest_media(
             transcriber=transcriber,
             scanner=scanner,
             cipher=cipher,
+            prospect_id=payload.prospect_id,
+            workshop_id=payload.workshop_id,
             engagement_id=payload.engagement_id,
             retention_until=payload.retention_until,
+            recording_kind=payload.recording_kind,
+            consent_confirmed_at=payload.consent_confirmed_at,
+            consent_wording=payload.consent_wording,
+            keep_recording=payload.keep_recording,
+            max_bytes=settings.max_upload_bytes,
         )
     except (NotFoundError, ScopeViolationError) as exc:
-        # A cross-owner / missing engagement link is refused, never revealed.
+        # A cross-owner / missing parent link is refused, never revealed.
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Engagement not found."
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Prospect, workshop or engagement not found.",
+        ) from exc
+    except ConsentRequiredError as exc:
+        # 422, not 403: the request is well-formed and the caller is allowed here — what is wrong
+        # is the recording it describes. Nothing was stored.
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
+        ) from exc
+    except DocumentError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
         ) from exc
     except MediaThreatError as exc:
         raise HTTPException(

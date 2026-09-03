@@ -1,6 +1,7 @@
 # GRS-0249 — Advisors update status by voice note
 
-**Status:** OPEN (2026-09-02). **Priority:** MED-HIGH. **Type:** Feature.
+**Status:** PARTLY DONE (2026-09-03) — capture, consent and storage shipped; extraction to a
+pipeline proposal (scope 4) is not built. **Priority:** MED-HIGH. **Type:** Feature.
 **Loop:** post-wave. **Founder request:** 2026-09-02, citing Wispr Flow as the reference experience.
 **Depends on:** **GRS-0251** (production transcription is a test double — hard blocker) and
 **GRS-0247** (nowhere to keep the recording).
@@ -75,6 +76,51 @@ and disputes are the whole reason to keep provenance.
 
 Real-time transcription, speaker diarisation, and recording live client meetings — that last is
 Path B's territory and carries consent obligations this ticket does not address.
+
+## Where this got to (2026-09-03)
+
+Both blockers cleared first: GRS-0251 and GRS-0247 merged to `main` as PRs #271 and #273.
+
+**Built.** Scope 1, 2, 3, 5 and 6, plus the consent gate that GRS-0255 owns.
+
+- `MediaRecorder` in the advisor UI on the prospect page, working at phone width, with a live level
+  meter and elapsed time. Screenshotted at 1440×1000 and 393×851.
+- **The consent gate, and the decision behind it.** The advisor states who was in the room before
+  anything records. *A voice note* is the advisor alone — no consent, because there is nobody to
+  ask. *A recorded session* has somebody else present, shows the founder-approved wording from
+  GRS-0255 verbatim, and cannot be stored without `consent_confirmed_at` + `consent_wording`.
+  Both directions are refused: a session without consent, and a voice note claiming consent nobody
+  gave. Enforced in the contract, the repository and a table CHECK.
+- The wording is served by `GET /transcripts/consent-line` so exactly one copy of it exists, and an
+  upload carrying different text is refused rather than stored.
+- **The audio is kept** as a GRS-0247 document, linked by `recording_document_id`. It used to be
+  discarded after transcription, which left a disputed correction with nothing to check against.
+- Transcripts gained `prospect_id` and `workshop_id` — **GRS-0254 build 1 and 2**, absorbed because
+  a car-park note has no engagement to hang off and the ticket cannot work without it.
+- **Offline tolerance: v1 does it.** The recording is written to IndexedDB before the first upload
+  attempt and released only on a 201; a failed upload stays on the device with a retry.
+  **The gap that remains:** the hold starts when the advisor presses stop. A tab that dies *during*
+  a recording still loses it, because the chunks are in memory until then. Closing that would mean
+  writing each chunk to IndexedDB as it arrives — worth doing, not done here.
+- Tests: 14 backend (`tests/test_voice_notes.py`), 8 frontend
+  (`frontend/components/VoiceNoteRecorder.test.tsx`).
+
+**Not built — scope 4, the second half.** Extraction to a *pipeline* proposal. The transcript comes
+back for the advisor to read; it does not yet propose a stage change, a next action and date, a
+comms-log entry or an engagement note for them to correct and confirm. Path A's extraction port
+maps a transcript to an `AssessmentDocument`; a pipeline equivalent does not exist. Until it does,
+non-negotiable #8 holds trivially — a voice note changes nothing on its own because it proposes
+nothing.
+
+**Two things the founder should look at, neither an engineering call.**
+
+1. **The consent wording says the recording is not shared outside the engagement team. The
+   transcription provider is hosted OpenAI Whisper, so the audio does leave our infrastructure.**
+   The wording is founder-approved and is used verbatim, unchanged. The advisor-facing UI says
+   plainly where the audio goes, so the person pressing record is not misled — but the client
+   hears the approved line. Reconciling the two is a founder decision (GRS-0255).
+2. Whether a solo voice note should show the client-consent line anyway. It does not, because the
+   advisor is alone; see the recording-kind split above.
 
 ## Done when
 

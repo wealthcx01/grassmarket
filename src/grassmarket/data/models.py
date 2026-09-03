@@ -336,7 +336,17 @@ class RecoveryFeeAttributionORM(Base):
 class MeetingTranscriptORM(Base):
     """A stored Path B meeting transcript (GRS-0029). The transcript text is held ONLY as ciphertext
     (`text_ciphertext`) — plaintext never lands in the database (encrypted at rest). Scoped by
-    owner_consultant_id; carries a retention date for the GDPR groundwork."""
+    owner_consultant_id; carries a retention date for the GDPR groundwork.
+
+    **Parented like a document** (GRS-0249, GRS-0254 build 1). A voice note recorded after a pitch
+    belongs to a prospect, because no engagement exists yet — and that is the one moment the
+    recorder is for. `attach_transcript_to_engagement` re-parents later without clearing the
+    original link, matching `DocumentORM`.
+
+    **The consent gate lives here as a CHECK, not only in the service layer** (GRS-0255). A recorded
+    session with no consent must be impossible to store, not merely refused on the way in; and a
+    voice note must not be able to claim consent nobody gave.
+    """
 
     __tablename__ = "meeting_transcripts"
 
@@ -344,15 +354,49 @@ class MeetingTranscriptORM(Base):
     owner_consultant_id: Mapped[UUID] = mapped_column(
         ForeignKey("consultants.id"), index=True, nullable=False
     )
-    engagement_id: Mapped[UUID | None] = mapped_column(Uuid, index=True, nullable=True)
+    prospect_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("prospects.id", ondelete="RESTRICT"), index=True, nullable=True
+    )
+    workshop_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("workshops.id", ondelete="RESTRICT"), index=True, nullable=True
+    )
+    # A key, like its two siblings. It was a bare Uuid until GRS-0249 added the other two: leaving
+    # one of three parents unenforced is exactly the dangling reference GRS-0246 made structural.
+    engagement_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("engagements.id", ondelete="RESTRICT"), index=True, nullable=True
+    )
     source_kind: Mapped[str] = mapped_column(String(24), nullable=False)
     source_filename: Mapped[str] = mapped_column(String(255), nullable=False)
     text_ciphertext: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
     transcriber_ref: Mapped[str] = mapped_column(String(64), nullable=False)
+    recording_kind: Mapped[str] = mapped_column(
+        String(24), nullable=False, server_default="not_recorded"
+    )
+    consent_confirmed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    # The wording in full, never a version key: a record that cannot say what was agreed is not a
+    # record. Text rather than String(n) so a founder rewrite is never silently truncated.
+    consent_wording: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # The kept audio. RESTRICT, so deleting the recording out from under the transcript that cites
+    # it as provenance is refused rather than quietly leaving a dangling id.
+    recording_document_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("documents.id", ondelete="RESTRICT"), index=True, nullable=True
+    )
     retention_until: Mapped[date | None] = mapped_column(Date, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_now, onupdate=_now
+    )
+
+    __table_args__ = (
+        CheckConstraint(
+            "(recording_kind = 'recorded_session' "
+            " AND consent_confirmed_at IS NOT NULL AND consent_wording IS NOT NULL) "
+            "OR (recording_kind <> 'recorded_session' "
+            " AND consent_confirmed_at IS NULL AND consent_wording IS NULL)",
+            name="ck_meeting_transcripts_consent_matches_recording_kind",
+        ),
     )
 
 

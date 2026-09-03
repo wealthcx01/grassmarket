@@ -144,7 +144,12 @@ from bcap_contracts.learning import (
     SectionTestAttempt,
     SlideKind,
 )
-from bcap_contracts.meetings import MediaKind, MeetingTranscript
+from bcap_contracts.meetings import (
+    FOUNDER_APPROVED_CONSENT_WORDING,
+    MediaKind,
+    MeetingTranscript,
+    RecordingKind,
+)
 from bcap_contracts.money import Currency, Money
 from bcap_contracts.narratives import AINarrative, NarrativeSection, NarrativeStatus
 from bcap_contracts.pipeline import StageHistoryEntry, assert_legal_transition
@@ -414,6 +419,15 @@ class DocumentError(Exception):
 
 class DocumentTooLargeError(DocumentError):
     """The upload exceeds the configured limit — refused before anything is scanned or stored."""
+
+
+class ConsentRequiredError(RepositoryError):
+    """A recording that the consent gate refuses to keep (GRS-0255).
+
+    Raised in both directions: a recorded session with no consent, and a voice note claiming
+    consent nobody was there to give. Never a warning flag on a stored row — *no consent, no
+    recording kept* means the row does not exist.
+    """
 
 
 class ScopeViolationError(RepositoryError):
@@ -1774,11 +1788,16 @@ class Repository:
         text: str,
         source_filename: str,
         cipher: TranscriptCipher,
+        prospect_id: UUID | None = None,
+        workshop_id: UUID | None = None,
         engagement_id: UUID | None = None,
         retention_until: date | None = None,
     ) -> MeetingTranscript:
         """Store a pasted transcript — no transcription needed. Encrypted at rest (plaintext never
-        hits the DB); owned by the caller."""
+        hits the DB); owned by the caller.
+
+        Pasted text was not recorded by us, so it carries no recording kind and no consent claim.
+        """
         return self._store_transcript(
             principal,
             text=text,
@@ -1786,6 +1805,8 @@ class Repository:
             source_filename=source_filename,
             transcriber_ref="pasted",
             cipher=cipher,
+            prospect_id=prospect_id,
+            workshop_id=workshop_id,
             engagement_id=engagement_id,
             retention_until=retention_until,
         )
@@ -1962,16 +1983,41 @@ class Repository:
         transcriber: Transcriber,
         scanner: MediaScanner,
         cipher: TranscriptCipher,
+        prospect_id: UUID | None = None,
+        workshop_id: UUID | None = None,
         engagement_id: UUID | None = None,
         retention_until: date | None = None,
+        recording_kind: RecordingKind = RecordingKind.NOT_RECORDED,
+        consent_confirmed_at: datetime | None = None,
+        consent_wording: str | None = None,
+        keep_recording: bool = False,
+        max_bytes: int | None = None,
     ) -> MeetingTranscript:
-        """Scan → transcribe → store an uploaded audio/video file. The scanner runs FIRST,
-        by raising (nothing is transcribed or stored on a refusal); the transcript is then encrypted
-        at rest. The transcriber and scanner are injected ports (swappable by config)."""
+        """Consent → scan → transcribe → keep the audio → store an uploaded audio/video file.
+
+        The order is the whole design. **Consent is checked first**, before the bytes are scanned or
+        written anywhere, so a recording nobody agreed to is never held even briefly. The scanner
+        then refuses by raising, so nothing is transcribed or stored on a threat. The transcriber
+        and scanner are injected ports (swappable by config).
+
+        `keep_recording` stores the audio as a document (GRS-0247) and links it to the transcript.
+        Media used to be discarded here, which left a disputed extraction with nothing to check the
+        correction against — and disputes are the whole reason to keep provenance (GRS-0249 scope
+        2). It needs a parent to hang the document off, so it is only available when one is given.
+        """
         # Empty media is refused at the ingest boundary, so the guarantee holds regardless of which
         # transcriber is injected (a provider without its own empty-guard cannot store a blank).
         if not media:
             raise TranscriptionError(f"Refusing to ingest empty media ({source_filename}).")
+        # Before anything else: if this recording is not allowed to be kept, it is not kept. The
+        # same check runs again inside _store_transcript; running it here as well is deliberate,
+        # because between the two the bytes would otherwise be scanned, sent to a third-party
+        # transcriber, and written to the documents table.
+        self._checked_consent(
+            recording_kind,
+            consent_confirmed_at=consent_confirmed_at,
+            consent_wording=consent_wording,
+        )
         # Raises MediaThreatError to refuse. A scanner that can also check the bytes against the
         # declared content type is given the chance to — the `MediaScanner` protocol only requires
         # `scan`, so this stays optional rather than forcing every provider to implement it.
@@ -1980,7 +2026,35 @@ class Repository:
             declared_check(media, filename=source_filename, content_type=content_type)
         else:
             scanner.scan(media, filename=source_filename)
+
+        if keep_recording and prospect_id is None and workshop_id is None and engagement_id is None:
+            raise DocumentError(
+                "Keeping the recording needs a prospect, workshop or engagement to file it under. "
+                "A stored recording with no parent could never be found again."
+            )
+
         text = transcriber.transcribe(media, filename=source_filename, content_type=content_type)
+
+        recording_document_id: UUID | None = None
+        if keep_recording:
+            # Audio and transcript are one transaction: a failure anywhere rolls both back, so the
+            # advisor never ends up with a stored recording and no note, or a note whose recording
+            # is missing. That makes the browser the thing that must not let go — it keeps the
+            # blob until the server answers 201 and re-uploads otherwise (GRS-0249 scope 6), which
+            # is also what makes a car park with one bar survivable.
+            recording_document_id = self.store_document(
+                principal,
+                content=media,
+                filename=source_filename,
+                content_type=content_type,
+                cipher=cipher,
+                scanner=scanner,
+                prospect_id=prospect_id,
+                workshop_id=workshop_id,
+                engagement_id=engagement_id,
+                retention_until=retention_until,
+                max_bytes=max_bytes if max_bytes is not None else len(media),
+            ).id
         return self._store_transcript(
             principal,
             text=text,
@@ -1988,8 +2062,14 @@ class Repository:
             source_filename=source_filename,
             transcriber_ref=transcriber.version,
             cipher=cipher,
+            prospect_id=prospect_id,
+            workshop_id=workshop_id,
             engagement_id=engagement_id,
             retention_until=retention_until,
+            recording_kind=recording_kind,
+            consent_confirmed_at=consent_confirmed_at,
+            consent_wording=consent_wording,
+            recording_document_id=recording_document_id,
         )
 
     def _store_transcript(
@@ -2001,26 +2081,93 @@ class Repository:
         source_filename: str,
         transcriber_ref: str,
         cipher: TranscriptCipher,
+        prospect_id: UUID | None = None,
+        workshop_id: UUID | None = None,
         engagement_id: UUID | None,
         retention_until: date | None,
+        recording_kind: RecordingKind = RecordingKind.NOT_RECORDED,
+        consent_confirmed_at: datetime | None = None,
+        consent_wording: str | None = None,
+        recording_document_id: UUID | None = None,
     ) -> MeetingTranscript:
-        # A supplied engagement must exist and belong to the caller — otherwise a transcript could
-        # be attached to another consultant's (or a non-existent) engagement, a dangling/foreign
+        # The consent gate runs BEFORE anything is written, so a recorded session without consent
+        # never becomes a row that has to be cleaned up afterwards. No consent, no recording kept.
+        consent_confirmed_at, consent_wording = self._checked_consent(
+            recording_kind,
+            consent_confirmed_at=consent_confirmed_at,
+            consent_wording=consent_wording,
+        )
+        # Each supplied parent must exist and belong to the caller — otherwise a transcript could
+        # be attached to another consultant's (or a non-existent) record, a dangling/foreign
         # reference. Cross-owner or missing → refused (NotFound/Scope → 404), like every other link.
+        if prospect_id is not None:
+            self.get_prospect(principal, prospect_id)
+        if workshop_id is not None:
+            self._require_workshop(principal, workshop_id)
         if engagement_id is not None:
             self._require_engagement(principal, engagement_id)
+        if recording_document_id is not None:
+            self._require_document(principal, recording_document_id)
         row = MeetingTranscriptORM(
             owner_consultant_id=principal.consultant_id,
+            prospect_id=prospect_id,
+            workshop_id=workshop_id,
             engagement_id=engagement_id,
             source_kind=source_kind.value,
             source_filename=source_filename,
             text_ciphertext=cipher.encrypt(text),
             transcriber_ref=transcriber_ref,
+            recording_kind=recording_kind.value,
+            consent_confirmed_at=consent_confirmed_at,
+            consent_wording=consent_wording,
+            recording_document_id=recording_document_id,
             retention_until=retention_until,
         )
         self._session.add(row)
         self._session.flush()
         return self._to_meeting_transcript(row, cipher)
+
+    @staticmethod
+    def _checked_consent(
+        recording_kind: RecordingKind,
+        *,
+        consent_confirmed_at: datetime | None,
+        consent_wording: str | None,
+    ) -> tuple[datetime | None, str | None]:
+        """The consent gate (GRS-0255). Returns the values to store, or refuses.
+
+        Three rules, all of them refusals rather than corrections:
+
+        1. **A recorded session without consent is not stored.** The design says *no consent, no
+           recording kept* — the gate refuses rather than storing and flagging, because a flagged
+           recording is still a recording somebody did not agree to.
+        2. **The wording must be the founder-approved wording.** Storing whatever text a client
+           sent would make `consent_wording` a field an API caller controls, and the record would
+           no longer prove what was actually shown. Changing the approved text is a founder
+           decision (GRS-0255), so a mismatch is refused here rather than accepted and stored.
+        3. **Anything that is not a recorded session carries no consent at all.** A voice note
+           dictated alone has nobody to agree to anything; a consent timestamp on one would be a
+           claim that somebody did.
+        """
+        if recording_kind is RecordingKind.RECORDED_SESSION:
+            if consent_confirmed_at is None or consent_wording is None:
+                raise ConsentRequiredError(
+                    "A recorded session must record when the client agreed and the exact wording "
+                    "they agreed to. No consent, no recording kept."
+                )
+            if consent_wording != FOUNDER_APPROVED_CONSENT_WORDING:
+                raise ConsentRequiredError(
+                    "The consent wording does not match the founder-approved text. The recorder "
+                    "shows one wording and only that wording may be stored; changing it is a "
+                    "founder decision, not an engineering one (GRS-0255)."
+                )
+            return consent_confirmed_at, consent_wording
+        if consent_confirmed_at is not None or consent_wording is not None:
+            raise ConsentRequiredError(
+                f"A {recording_kind.value} carries no consent: the advisor was the only person "
+                f"present, so there was nobody to agree. Only a recorded session may set it."
+            )
+        return None, None
 
     def list_transcripts(
         self, principal: Principal, *, cipher: TranscriptCipher
@@ -2050,11 +2197,17 @@ class Repository:
         return MeetingTranscript(
             id=row.id,
             owner_consultant_id=row.owner_consultant_id,
+            prospect_id=row.prospect_id,
+            workshop_id=row.workshop_id,
             engagement_id=row.engagement_id,
             source_kind=MediaKind(row.source_kind),
             source_filename=row.source_filename,
             text=cipher.decrypt(row.text_ciphertext),
             transcriber_ref=row.transcriber_ref,
+            recording_kind=RecordingKind(row.recording_kind),
+            consent_confirmed_at=row.consent_confirmed_at,
+            consent_wording=row.consent_wording,
+            recording_document_id=row.recording_document_id,
             retention_until=row.retention_until,
             created_at=row.created_at,
             updated_at=row.updated_at,

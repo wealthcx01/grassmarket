@@ -10,6 +10,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { RegistryContactsPanel } from "@/components/RegistryContactsPanel";
+import { VoiceNoteRecorder } from "@/components/VoiceNoteRecorder";
 import { StageMoveControl } from "@/components/StageMoveControl";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ApiError, api, getToken } from "@/lib/api";
@@ -96,6 +97,10 @@ export default function ProspectDetailPage() {
           <StageMoveControl prospectId={prospect.id} currentStage={prospect.stage} onMove={onMove} />
         </div>
       </div>
+
+      {/* Above the rest of the record on purpose: this is the thing an advisor opens the page for
+          on a phone, standing outside a client's office, and it should not need a scroll. */}
+      <VoiceNoteRecorder prospectId={id} prospectName={prospect.company_name} />
 
       <RegistryContactsPanel companyName={prospect.company_name} />
       <WorkshopsSection prospectId={id} workshops={workshops} onChanged={reload} />

@@ -2775,6 +2775,21 @@
         "title": "ConsensusRequest",
         "type": "object"
       },
+      "ConsentLine": {
+        "description": "What the recorder must show before a session may be recorded.\n\nServed rather than hardcoded in the frontend so there is exactly one copy of the wording in the\nsystem. A client that shows its own text will have the upload refused, which is the point.",
+        "properties": {
+          "wording": {
+            "description": "The exact text to read to the client, shown verbatim.",
+            "title": "Wording",
+            "type": "string"
+          }
+        },
+        "required": [
+          "wording"
+        ],
+        "title": "ConsentLine",
+        "type": "object"
+      },
       "ConsultancyCommissionCarrot": {
         "additionalProperties": false,
         "description": "The live \"how much you earn\" figure for one Stream-B matrix cell (GRS-0187).\n\nThe earnings page explained product commissions and said nothing about direct consulting,\nshowing only \"Consultancy (Stream B) \u00a30.00\" with no account of the matrix behind it. The\ncomputation already existed; this is the shape that surfaces it.\n\nMirrors `ProductCommissionCarrot`: rates read from the live schedule, never re-typed, with a\nworked example so an advisor sees a pound figure beside a percentage, and `schedule_version`\nstamped so the figure is never bare.",
@@ -6124,6 +6139,31 @@
         "additionalProperties": false,
         "description": "A stored meeting transcript owned by the consultant who ingested it. The text is sensitive:\nit is stored encrypted at rest and only ever returned to its owner. `transcriber_ref` records\nwhich adapter produced it ('pasted' for text) so a re-transcription is traceable.",
         "properties": {
+          "consent_confirmed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When the advisor confirmed the client agreed. Required for a recorded session.",
+            "title": "Consent Confirmed At"
+          },
+          "consent_wording": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The exact text the client agreed to, stored in full rather than referenced \u2014 wording changes over time and a record that cannot say what was agreed is not a record.",
+            "title": "Consent Wording"
+          },
           "created_at": {
             "format": "date-time",
             "title": "Created At",
@@ -6152,6 +6192,37 @@
             "format": "uuid",
             "title": "Owner Consultant Id",
             "type": "string"
+          },
+          "prospect_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The prospect this meeting belongs to, if any.",
+            "title": "Prospect Id"
+          },
+          "recording_document_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The stored audio this transcript was produced from, if kept.",
+            "title": "Recording Document Id"
+          },
+          "recording_kind": {
+            "$ref": "#/components/schemas/RecordingKind",
+            "default": "not_recorded",
+            "description": "Who was in the room \u2014 which decides whether the consent gate applies."
           },
           "retention_until": {
             "anyOf": [
@@ -6189,6 +6260,19 @@
             "format": "date-time",
             "title": "Updated At",
             "type": "string"
+          },
+          "workshop_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The workshop this meeting belongs to, if any.",
+            "title": "Workshop Id"
           }
         },
         "required": [
@@ -6668,6 +6752,18 @@
             ],
             "title": "Engagement Id"
           },
+          "prospect_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prospect Id"
+          },
           "retention_until": {
             "anyOf": [
               {
@@ -6689,6 +6785,18 @@
             "minLength": 1,
             "title": "Text",
             "type": "string"
+          },
+          "workshop_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workshop Id"
           }
         },
         "required": [
@@ -7942,6 +8050,16 @@
           "sandbox"
         ],
         "title": "RecordProvenance",
+        "type": "string"
+      },
+      "RecordingKind": {
+        "description": "Who was in the room when this was recorded \u2014 which decides whether consent applies.\n\nThe distinction is not bureaucracy. An advisor dictating a note alone in a car park has nobody\nto ask for consent; a session with a client in the room has somebody who must be asked. One\nflow cannot serve both honestly, so the advisor states which it is and the record keeps the\nanswer (GRS-0249 scope 1, GRS-0255).",
+        "enum": [
+          "voice_note",
+          "recorded_session",
+          "not_recorded"
+        ],
+        "title": "RecordingKind",
         "type": "string"
       },
       "RecoveryFeeAttribution": {
@@ -9837,6 +9955,31 @@
       },
       "UploadMediaRequest": {
         "properties": {
+          "consent_confirmed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When the advisor confirmed the client agreed.",
+            "title": "Consent Confirmed At"
+          },
+          "consent_wording": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The exact text shown to the client. Must be the founder-approved wording.",
+            "title": "Consent Wording"
+          },
           "content_type": {
             "minLength": 1,
             "title": "Content Type",
@@ -9854,11 +9997,34 @@
             ],
             "title": "Engagement Id"
           },
+          "keep_recording": {
+            "default": false,
+            "description": "Store the audio alongside the transcript (needs a parent to file it under).",
+            "title": "Keep Recording",
+            "type": "boolean"
+          },
           "media_base64": {
             "description": "The media file, base64-encoded.",
             "minLength": 1,
             "title": "Media Base64",
             "type": "string"
+          },
+          "prospect_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prospect Id"
+          },
+          "recording_kind": {
+            "$ref": "#/components/schemas/RecordingKind",
+            "default": "not_recorded",
+            "description": "Who was in the room. A recorded session must carry consent; nothing else may."
           },
           "retention_until": {
             "anyOf": [
@@ -9879,6 +10045,18 @@
           },
           "source_kind": {
             "$ref": "#/components/schemas/MediaKind"
+          },
+          "workshop_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workshop Id"
           }
         },
         "required": [
@@ -17046,6 +17224,28 @@
           }
         ],
         "summary": "List Transcripts",
+        "tags": [
+          "path-b"
+        ]
+      }
+    },
+    "/transcripts/consent-line": {
+      "get": {
+        "description": "The founder-approved consent wording (GRS-0255).\n\nUnauthenticated-safe in content \u2014 it is a script an advisor reads aloud, not client data \u2014 but\nit sits behind the same router so a client fetches it the same way it fetches everything else.",
+        "operationId": "get_consent_line_transcripts_consent_line_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentLine"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Consent Line",
         "tags": [
           "path-b"
         ]

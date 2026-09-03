@@ -11,6 +11,9 @@
 
 import type {
   ClientReportLink,
+  ConsentLine,
+  MeetingTranscript,
+  UploadRecordingRequest,
   Consultant,
   DeclaredFigure,
   ReportProseSection,
@@ -1485,5 +1488,36 @@ export const api = {
     const disposition = res.headers.get("content-disposition") ?? "";
     const match = /filename="?([^"]+)"?/.exec(disposition);
     return { blob, filename: match?.[1] ?? "earnings-statement.docx" };
+  },
+
+  /* -------------------------------------------------------- Voice notes (GRS-0249) */
+
+  /**
+   * The founder-approved consent line. Fetched, never hardcoded here: there is one copy of this
+   * wording in the system and it lives in the contracts package. A recorder that showed its own
+   * text and uploaded anyway would be refused by the API, which is the point of fetching it.
+   */
+  consentLine(signal?: AbortSignal): Promise<ConsentLine> {
+    return request<ConsentLine>("/transcripts/consent-line", {
+      method: "GET",
+      headers: authHeaders(),
+      signal,
+    });
+  },
+
+  /**
+   * Upload a recording and get back the transcript.
+   *
+   * `media_base64` rather than multipart, matching the existing ingest. The caller must keep the
+   * original blob until this resolves — a rejected upload stores nothing at all, and the recording
+   * of a conversation that already happened is the one thing here that cannot be made again.
+   */
+  uploadRecording(payload: UploadRecordingRequest, signal?: AbortSignal): Promise<MeetingTranscript> {
+    return request<MeetingTranscript>("/transcripts/media", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+      signal,
+    });
   },
 };

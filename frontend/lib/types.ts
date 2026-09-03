@@ -1340,3 +1340,67 @@ export type RegistryFacets = {
   segments: SegmentFacet[];
   countries: { value: string; count: number }[];
 };
+
+/* ---------------------------------------------------------------- Voice notes (GRS-0249) */
+
+/**
+ * Who was in the room. This decides whether the consent gate applies, so it is stated by the
+ * advisor rather than inferred: an advisor dictating alone in a car park has nobody to ask for
+ * consent, and a session with a client in the room has somebody who must be asked.
+ * Mirrors `bcap_contracts.meetings.RecordingKind`.
+ */
+export type RecordingKind = "voice_note" | "recorded_session" | "not_recorded";
+
+export type MediaKind = "transcript_text" | "audio" | "video";
+
+/** Mirrors `bcap_contracts.meetings.MeetingTranscript`. */
+export type MeetingTranscript = {
+  id: string;
+  owner_consultant_id: string;
+  prospect_id: string | null;
+  workshop_id: string | null;
+  engagement_id: string | null;
+  source_kind: MediaKind;
+  source_filename: string;
+  text: string;
+  transcriber_ref: string;
+  recording_kind: RecordingKind;
+  /** Set only on a recorded session. Null on a voice note — nobody was there to agree. */
+  consent_confirmed_at: string | null;
+  /** The exact wording agreed to, stored in full rather than referenced. */
+  consent_wording: string | null;
+  /** The kept audio this transcript came from, so a disputed correction can be re-checked. */
+  recording_document_id: string | null;
+  retention_until: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+/**
+ * The founder-approved consent line, fetched rather than hardcoded so there is exactly one copy
+ * of the wording in the system. Showing different text and uploading anyway is refused by the API.
+ */
+export type ConsentLine = { wording: string };
+
+/**
+ * The upload body for `POST /transcripts/media`.
+ *
+ * Consent is either complete or absent — there is no half state. `recording_kind:
+ * "recorded_session"` requires both consent fields and the wording must be the one the API served;
+ * `"voice_note"` requires both to be absent, because the advisor was alone. The API refuses either
+ * mistake and stores nothing.
+ */
+export type UploadRecordingRequest = {
+  media_base64: string;
+  source_filename: string;
+  content_type: string;
+  source_kind: "audio" | "video";
+  prospect_id?: string | null;
+  workshop_id?: string | null;
+  engagement_id?: string | null;
+  recording_kind: RecordingKind;
+  consent_confirmed_at?: string | null;
+  consent_wording?: string | null;
+  /** Keep the audio beside the transcript. Needs one of the parent ids to file it under. */
+  keep_recording?: boolean;
+};

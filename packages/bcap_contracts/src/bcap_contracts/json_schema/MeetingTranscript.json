@@ -9,11 +9,48 @@
       ],
       "title": "MediaKind",
       "type": "string"
+    },
+    "RecordingKind": {
+      "description": "Who was in the room when this was recorded — which decides whether consent applies.\n\nThe distinction is not bureaucracy. An advisor dictating a note alone in a car park has nobody\nto ask for consent; a session with a client in the room has somebody who must be asked. One\nflow cannot serve both honestly, so the advisor states which it is and the record keeps the\nanswer (GRS-0249 scope 1, GRS-0255).",
+      "enum": [
+        "voice_note",
+        "recorded_session",
+        "not_recorded"
+      ],
+      "title": "RecordingKind",
+      "type": "string"
     }
   },
   "additionalProperties": false,
   "description": "A stored meeting transcript owned by the consultant who ingested it. The text is sensitive:\nit is stored encrypted at rest and only ever returned to its owner. `transcriber_ref` records\nwhich adapter produced it ('pasted' for text) so a re-transcription is traceable.",
   "properties": {
+    "consent_confirmed_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "When the advisor confirmed the client agreed. Required for a recorded session.",
+      "title": "Consent Confirmed At"
+    },
+    "consent_wording": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The exact text the client agreed to, stored in full rather than referenced — wording changes over time and a record that cannot say what was agreed is not a record.",
+      "title": "Consent Wording"
+    },
     "created_at": {
       "format": "date-time",
       "title": "Created At",
@@ -43,6 +80,39 @@
       "format": "uuid",
       "title": "Owner Consultant Id",
       "type": "string"
+    },
+    "prospect_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The prospect this meeting belongs to, if any.",
+      "title": "Prospect Id"
+    },
+    "recording_document_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The stored audio this transcript was produced from, if kept.",
+      "title": "Recording Document Id"
+    },
+    "recording_kind": {
+      "$ref": "#/$defs/RecordingKind",
+      "default": "not_recorded",
+      "description": "Who was in the room — which decides whether the consent gate applies."
     },
     "retention_until": {
       "anyOf": [
@@ -81,6 +151,20 @@
       "format": "date-time",
       "title": "Updated At",
       "type": "string"
+    },
+    "workshop_id": {
+      "anyOf": [
+        {
+          "format": "uuid",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The workshop this meeting belongs to, if any.",
+      "title": "Workshop Id"
     }
   },
   "required": [
