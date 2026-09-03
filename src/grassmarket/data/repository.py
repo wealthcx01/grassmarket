@@ -152,6 +152,13 @@ from bcap_contracts.meetings import (
 )
 from bcap_contracts.money import Currency, Money
 from bcap_contracts.narratives import AINarrative, NarrativeSection, NarrativeStatus
+from bcap_contracts.needs_you import (
+    DormantSource,
+    NeedsYouItem,
+    NeedsYouKind,
+    NeedsYouQueue,
+    NeedsYouTarget,
+)
 from bcap_contracts.pipeline import StageHistoryEntry, assert_legal_transition
 from bcap_contracts.predictions import (
     BenchmarkRow,
@@ -4687,6 +4694,166 @@ class Repository:
             return ()
         keys = sorted(set(before) | set(after))
         return tuple(k for k in keys if before.get(k) != after.get(k))
+
+    # --- The one needs-you queue (GRS-0253, SCOPED) -----------------------------------------
+
+    def get_needs_you_queue(self, principal: Principal, *, now: datetime) -> NeedsYouQueue:
+        """Everything waiting on the caller, oldest first — one read model, four surfaces.
+
+        Derived on every read, never stored, so it cannot go stale and there is no second copy of
+        the truth to reconcile. The desk, the needs-you screen, the rail badge and the pocket all
+        read this, which is what stops the badge disagreeing with the page it links to.
+
+        **Each source contributes what it can and nothing more.** A caller with no founder role
+        gets no approve items — not a 403. "What is waiting on you" is a question every advisor may
+        ask; the answer is simply shorter for most of them, and failing the whole queue because one
+        of its sources is not the caller's business would make it unusable for everybody else.
+        """
+        items: list[NeedsYouItem] = [
+            *self._send_items(principal),
+            *self._approve_items(principal),
+        ]
+        # Oldest first. The longest-waiting thing is the one most likely to have been forgotten.
+        items.sort(key=lambda i: i.became_actionable_at)
+        return NeedsYouQueue(generated_at=now, items=tuple(items), dormant=self._dormant_sources())
+
+    @staticmethod
+    def _dormant_sources() -> tuple[DormantSource, ...]:
+        """What this queue cannot currently show, said in words.
+
+        Peer rating requests and committee sign-off are retired under ADR-0041 — their routes
+        answer 410 Gone. Omitting them silently would make "your sources are switched off" look
+        identical to "you are up to date", and only one of those means the advisor can stop
+        looking (the design contract's no-dead-UI rule).
+        """
+        return (
+            DormantSource(
+                kind=NeedsYouKind.RATE,
+                reason=(
+                    "Peer rating is dormant under ADR-0041 — the founder signs what goes out "
+                    "instead of a second rater. Nothing is waiting on you to rate."
+                ),
+            ),
+        )
+
+    def _send_items(self, principal: Principal) -> list[NeedsYouItem]:
+        """Client reports cleared to go out that have not gone.
+
+        This is the kind nothing covered before GRS-0253, and it is the only one most advisors will
+        ever see. A report the founder signed and nobody sent is the quietest way for work to stall:
+        it looks finished everywhere it appears, because it *is* finished — it just never left.
+
+        "Cleared" means an approval matching the prose's **current** hash. An approval at an older
+        hash means the report was signed and then edited, which puts it back in the founder's queue,
+        not the advisor's outbox.
+        """
+        out: list[NeedsYouItem] = []
+        stmt = select(ClientReportProseORM)
+        if not principal.is_admin:
+            stmt = stmt.where(ClientReportProseORM.owner_consultant_id == principal.consultant_id)
+        for prose in self._session.execute(stmt).scalars().all():
+            deliverable = self._session.get(DeliverableORM, prose.deliverable_id)
+            if deliverable is None:  # pragma: no cover - FK guarantees it
+                continue
+            record = self._session.get(ScoringRunORM, deliverable.scoring_run_id)
+            if record is None:  # pragma: no cover - a deliverable always has its run
+                continue
+            assessment = self._session.get(AssessmentORM, record.assessment_id)
+            # A demo or sandbox report has no client on the other end, so it is not waiting to be
+            # sent to one (ADR-0029) — the same filter the founder's queue applies.
+            if assessment is None or assessment.provenance != RecordProvenance.PRODUCTION.value:
+                continue
+            current = self._prose_hash(prose.sections_json)
+            approval = next(
+                (
+                    a
+                    for a in self._session.execute(
+                        select(FounderApprovalORM)
+                        .where(FounderApprovalORM.deliverable_id == prose.deliverable_id)
+                        .order_by(FounderApprovalORM.approved_at.desc())
+                    )
+                    .scalars()
+                    .all()
+                    if a.document_hash == current
+                ),
+                None,
+            )
+            if approval is None:
+                continue  # not signed at this version — waiting on the founder, not the advisor
+            if self._has_live_report_link(prose.deliverable_id):
+                continue  # already sent
+            out.append(
+                NeedsYouItem(
+                    kind=NeedsYouKind.SEND,
+                    target=NeedsYouTarget.CLIENT_REPORT,
+                    target_id=prose.deliverable_id,
+                    subject=assessment.subject,
+                    # The clock starts when the founder signed, not when the report was written.
+                    # Waited-time is how long it has been *sendable*.
+                    became_actionable_at=approval.approved_at,
+                    reason=(
+                        f"{assessment.subject}: the client report is signed off and has not been "
+                        f"sent. Share it to start the clock on their reply."
+                    ),
+                )
+            )
+        return out
+
+    def _has_live_report_link(self, deliverable_id: UUID) -> bool:
+        """Whether this report has a link that a client could open right now.
+
+        Revoked and expired links do not count. An advisor who revoked a link has un-sent the
+        report, and it is waiting on them again — which is exactly what the advisor believes, so
+        the queue should agree with them.
+        """
+        for link in (
+            self._session.execute(
+                select(ClientReportLinkORM).where(
+                    ClientReportLinkORM.deliverable_id == deliverable_id
+                )
+            )
+            .scalars()
+            .all()
+        ):
+            if link.revoked_at is None:
+                return True
+        return False
+
+    def _approve_items(self, principal: Principal) -> list[NeedsYouItem]:
+        """Whatever is awaiting the caller's sign-off.
+
+        Only the founder reviewer has anything here today, and the underlying queue refuses anyone
+        else. That refusal is caught rather than propagated: a plain advisor asking what is waiting
+        on them should be told "nothing to approve", not handed a 403 for the whole queue.
+        """
+        try:
+            entries = self.list_founder_review_queue(principal)
+        except ScopeViolationError:
+            return []
+        out: list[NeedsYouItem] = []
+        for entry in entries:
+            # Bound to a local so the type narrows: an entry is a report review exactly when it
+            # names a deliverable, and that id is then the thing to open.
+            deliverable_id = entry.deliverable_id
+            is_report = deliverable_id is not None
+            again = "again" if entry.previously_approved else ""
+            out.append(
+                NeedsYouItem(
+                    kind=NeedsYouKind.APPROVE,
+                    target=(
+                        NeedsYouTarget.CLIENT_REPORT if is_report else NeedsYouTarget.ASSESSMENT
+                    ),
+                    target_id=deliverable_id if deliverable_id is not None else entry.assessment_id,
+                    subject=entry.subject,
+                    became_actionable_at=entry.requested_at,
+                    reason=(
+                        f"{entry.subject}: {entry.advisor_name} needs the "
+                        f"{'client report' if is_report else 'assessment'} signed off"
+                        f"{' ' + again if again else ''}. Nothing goes to the client until it is."
+                    ),
+                )
+            )
+        return out
 
     def list_founder_review_queue(self, principal: Principal) -> list[FounderReviewQueueEntry]:
         """Everything waiting on the founder, oldest request first.

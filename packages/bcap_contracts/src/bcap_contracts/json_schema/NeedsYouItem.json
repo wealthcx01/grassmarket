@@ -1,0 +1,68 @@
+{
+  "$defs": {
+    "NeedsYouKind": {
+      "description": "What the advisor has to *do*, which is the only grouping they think in.",
+      "enum": [
+        "send",
+        "rate",
+        "approve"
+      ],
+      "title": "NeedsYouKind",
+      "type": "string"
+    },
+    "NeedsYouTarget": {
+      "description": "What the item points at, so the UI can route without parsing the reason.",
+      "enum": [
+        "assessment",
+        "client_report",
+        "module_rating"
+      ],
+      "title": "NeedsYouTarget",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One thing waiting on the caller.",
+  "properties": {
+    "became_actionable_at": {
+      "description": "When this started waiting on the caller (UTC).",
+      "format": "date-time",
+      "title": "Became Actionable At",
+      "type": "string"
+    },
+    "kind": {
+      "$ref": "#/$defs/NeedsYouKind"
+    },
+    "reason": {
+      "description": "One line in the product's voice: what is waiting, and what happens next.",
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "subject": {
+      "description": "The company, so the row reads as a thing.",
+      "minLength": 1,
+      "title": "Subject",
+      "type": "string"
+    },
+    "target": {
+      "$ref": "#/$defs/NeedsYouTarget"
+    },
+    "target_id": {
+      "description": "The record to open — an assessment or a deliverable.",
+      "format": "uuid",
+      "title": "Target Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "kind",
+    "target",
+    "target_id",
+    "subject",
+    "became_actionable_at",
+    "reason"
+  ],
+  "title": "NeedsYouItem",
+  "type": "object"
+}

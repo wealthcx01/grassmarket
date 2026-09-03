@@ -101,6 +101,7 @@ from bcap_contracts.learning import (
 from bcap_contracts.meetings import MeetingTranscript
 from bcap_contracts.money import Money
 from bcap_contracts.narratives import AINarrative
+from bcap_contracts.needs_you import DormantSource, NeedsYouItem, NeedsYouQueue
 from bcap_contracts.pipeline import PipelineBoard, PipelineForecast, StageHistoryEntry
 from bcap_contracts.predictions import BenchmarkRow, CBenchmarkRow, Prediction
 from bcap_contracts.product_fit import ProductFitMap, SellOpportunities, SellOpportunity
@@ -170,6 +171,9 @@ EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "SellOpportunity": SellOpportunity,
     "SellOpportunities": SellOpportunities,
     "MeetingTranscript": MeetingTranscript,
+    "NeedsYouQueue": NeedsYouQueue,
+    "NeedsYouItem": NeedsYouItem,
+    "DormantSource": DormantSource,
     "Extraction": Extraction,
     "FieldProvenance": FieldProvenance,
     "VoiceNoteProposal": VoiceNoteProposal,

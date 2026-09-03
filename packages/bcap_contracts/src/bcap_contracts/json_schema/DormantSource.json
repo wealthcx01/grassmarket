@@ -1,0 +1,33 @@
+{
+  "$defs": {
+    "NeedsYouKind": {
+      "description": "What the advisor has to *do*, which is the only grouping they think in.",
+      "enum": [
+        "send",
+        "rate",
+        "approve"
+      ],
+      "title": "NeedsYouKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A kind of work this queue cannot currently show, and why.\n\nCarried rather than omitted. An empty queue and a queue whose sources are switched off look\nthe same on screen, and only one of them means \"you are up to date\".",
+  "properties": {
+    "kind": {
+      "$ref": "#/$defs/NeedsYouKind"
+    },
+    "reason": {
+      "description": "Why it is dormant, in words, with the ADR.",
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    }
+  },
+  "required": [
+    "kind",
+    "reason"
+  ],
+  "title": "DormantSource",
+  "type": "object"
+}

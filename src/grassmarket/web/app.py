@@ -49,6 +49,7 @@ from grassmarket.web.routers import (
     pipeline,
     predictions,
     prospects,
+    queue,
     registry,
     report_links,
     transcripts,
@@ -101,6 +102,7 @@ def create_app(settings: Settings | None = None, *, engine: Engine | None = None
     app.include_router(auth.router)
     app.include_router(prospects.router)
     app.include_router(pipeline.router)
+    app.include_router(queue.router)
     app.include_router(workshops.router)
     app.include_router(workshops.fees_router)
     app.include_router(engagements.router)

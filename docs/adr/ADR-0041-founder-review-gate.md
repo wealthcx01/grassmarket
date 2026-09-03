@@ -43,3 +43,20 @@ goes out.
 - The Bench queue loses its two governance priorities (re-prioritised in GRS-0199).
 - Single-reviewer risk (availability, self-review of founder-led work) is accepted explicitly
   by the founder; the dormant machinery is the mitigation path.
+
+## Reaffirmed 2026-09-03
+
+The Advisor Studio redesign's frontend cut (GRS-0271) listed **blind rating** among the Workbench
+surfaces, which would have required un-retiring the peer machinery. The founder confirmed the
+opposite: **it stays off.** There is no blind/peer rating surface, no committee queue and no
+calibration session to design or build.
+
+Two consequences recorded so this does not have to be rediscovered:
+
+- `GET /queue` (GRS-0253) reports `rate` as a **dormant kind, in words**, rather than showing an
+  empty category. An empty queue and a queue whose source is switched off look identical on
+  screen, and only one of them means the advisor can stop looking.
+- `docs/API-SURFACE.md` now names every retired route at the top and marks each one inline. The
+  15 retired routes still appear in the OpenAPI spec, so a designer or a generated client would
+  otherwise find them and assume they work. The marking is derived from the app's own dependency
+  graph, so it cannot go stale in either direction.
