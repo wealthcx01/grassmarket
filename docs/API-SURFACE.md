@@ -1,10 +1,38 @@
 # Grassmarket API surface
 
-**Generated 2026-09-03 from the live FastAPI app** (`create_app().openapi()`). **184 endpoints** across 26 tags.
+**Generated 2026-09-03 from the live FastAPI app** (`create_app().openapi()`). **185 endpoints** across 27 tags.
 
 This is the contract the front end is built against. Regenerate with `uv run python scripts/dump_api_surface.py`; the machine-readable spec is `docs/openapi.json`.
 
 Every route except `/health*`, `/auth/*` and the shared-report links requires a bearer JWT, and every owned resource is filtered by `owner_consultant_id` in the repository layer (non-negotiable #9). A cross-owner read returns **404, never 403** — the existence of another advisor's record is never revealed.
+
+## Retired routes — do not design against these
+
+**15 of the routes below answer `410 Gone`.** They are listed because they still appear in the OpenAPI spec, so a design or a generated client will find them and assume they work. They do not.
+
+Peer rating, Rating Committee sign-off and calibration were built for a network larger than this one. **The founder signs what goes out instead** (ADR-0041, GRS-0188). The machinery behind them — repository sections, tables, the kappa/AC1 stats engine — is intact and still unit-tested, so reversing this is re-mounting routers, not rebuilding the feature. **Confirmed staying off, 2026-09-03.**
+
+What this means for a design: there is no blind/peer rating surface, no committee queue and no calibration session to build. `GET /queue` reports `rate` as a dormant kind, in words, for exactly this reason — see GRS-0253.
+
+Each is marked **RETIRED** in the tables below.
+
+| Method | Path |
+|---|---|
+| `GET` | `/assessments/rating-requests` |
+| `GET` | `/assessments/{assessment_id}/committee` |
+| `POST` | `/assessments/{assessment_id}/committee/decide` |
+| `POST` | `/assessments/{assessment_id}/modules/{module_key}/consensus` |
+| `GET` | `/assessments/{assessment_id}/modules/{module_key}/my-rating` |
+| `PUT` | `/assessments/{assessment_id}/modules/{module_key}/my-rating` |
+| `GET` | `/assessments/{assessment_id}/modules/{module_key}/ratings` |
+| `GET` | `/calibration/sessions` |
+| `POST` | `/calibration/sessions` |
+| `GET` | `/calibration/sessions/{session_id}` |
+| `POST` | `/calibration/sessions/{session_id}/close` |
+| `GET` | `/calibration/sessions/{session_id}/my-rating` |
+| `POST` | `/calibration/sessions/{session_id}/ratings` |
+| `GET` | `/calibration/sessions/{session_id}/results` |
+| `GET` | `/committee/queue` |
 
 ## Contents
 
@@ -28,6 +56,7 @@ Every route except `/health*`, `/auth/*` and the shared-report links requires a 
 - [narratives](#narratives) — 3
 - [path-b](#pathb) — 9
 - [pipeline](#pipeline) — 23
+- [queue](#queue) — 1
 - [registry](#registry) — 2
 - [report-links](#reportlinks) — 4
 - [shared-report](#sharedreport) — 2
@@ -56,17 +85,17 @@ Every route except `/health*`, `/auth/*` and the shared-report links requires a 
 | `POST` | `/assessments` | Create Assessment |
 | `GET` | `/assessments/for-entity/{entity_id}` | List Assessments For Entity |
 | `GET` | `/assessments/portfolio` | Brokerage Portfolio |
-| `GET` | `/assessments/rating-requests` | My Rating Requests |
+| `GET` | `/assessments/rating-requests` | **RETIRED (410 Gone)** — My Rating Requests |
 | `GET` | `/assessments/{assessment_id}` | Get Assessment |
 | `PUT` | `/assessments/{assessment_id}` | Update Assessment |
 | `POST` | `/assessments/{assessment_id}/finalise` | Finalise Assessment |
 | `GET` | `/assessments/{assessment_id}/live-score` | Get Live Score |
-| `POST` | `/assessments/{assessment_id}/modules/{module_key}/consensus` | Resolve Module Consensus |
-| `GET` | `/assessments/{assessment_id}/modules/{module_key}/my-rating` | Get My Module Rating |
-| `PUT` | `/assessments/{assessment_id}/modules/{module_key}/my-rating` | Update My Module Rating |
+| `POST` | `/assessments/{assessment_id}/modules/{module_key}/consensus` | **RETIRED (410 Gone)** — Resolve Module Consensus |
+| `GET` | `/assessments/{assessment_id}/modules/{module_key}/my-rating` | **RETIRED (410 Gone)** — Get My Module Rating |
+| `PUT` | `/assessments/{assessment_id}/modules/{module_key}/my-rating` | **RETIRED (410 Gone)** — Update My Module Rating |
 | `POST` | `/assessments/{assessment_id}/modules/{module_key}/my-rating/submit` | Submit My Module Rating |
 | `POST` | `/assessments/{assessment_id}/modules/{module_key}/raters` | Assign Rater |
-| `GET` | `/assessments/{assessment_id}/modules/{module_key}/ratings` | List Module Ratings |
+| `GET` | `/assessments/{assessment_id}/modules/{module_key}/ratings` | **RETIRED (410 Gone)** — List Module Ratings |
 | `POST` | `/assessments/{assessment_id}/scenarios` | Evaluate Assessment Scenarios |
 | `GET` | `/assessments/{assessment_id}/sell-opportunities` | Get Sell Opportunities |
 | `GET` | `/assessments/{assessment_id}/suggestions` | Get Wizard Suggestions |
@@ -99,13 +128,13 @@ Every route except `/health*`, `/auth/*` and the shared-report links requires a 
 
 | Method | Path | What it does |
 |---|---|---|
-| `GET` | `/calibration/sessions` | List Sessions |
-| `POST` | `/calibration/sessions` | Create Session |
-| `GET` | `/calibration/sessions/{session_id}` | Get Session |
-| `POST` | `/calibration/sessions/{session_id}/close` | Close Session |
-| `GET` | `/calibration/sessions/{session_id}/my-rating` | Get My Rating |
-| `POST` | `/calibration/sessions/{session_id}/ratings` | Submit Rating |
-| `GET` | `/calibration/sessions/{session_id}/results` | Get Results |
+| `GET` | `/calibration/sessions` | **RETIRED (410 Gone)** — List Sessions |
+| `POST` | `/calibration/sessions` | **RETIRED (410 Gone)** — Create Session |
+| `GET` | `/calibration/sessions/{session_id}` | **RETIRED (410 Gone)** — Get Session |
+| `POST` | `/calibration/sessions/{session_id}/close` | **RETIRED (410 Gone)** — Close Session |
+| `GET` | `/calibration/sessions/{session_id}/my-rating` | **RETIRED (410 Gone)** — Get My Rating |
+| `POST` | `/calibration/sessions/{session_id}/ratings` | **RETIRED (410 Gone)** — Submit Rating |
+| `GET` | `/calibration/sessions/{session_id}/results` | **RETIRED (410 Gone)** — Get Results |
 
 ## certification
 
@@ -132,9 +161,9 @@ Every route except `/health*`, `/auth/*` and the shared-report links requires a 
 
 | Method | Path | What it does |
 |---|---|---|
-| `GET` | `/assessments/{assessment_id}/committee` | Committee Queue |
-| `POST` | `/assessments/{assessment_id}/committee/decide` | Decide Committee Item |
-| `GET` | `/committee/queue` | Committee Work Queue |
+| `GET` | `/assessments/{assessment_id}/committee` | **RETIRED (410 Gone)** — Committee Queue |
+| `POST` | `/assessments/{assessment_id}/committee/decide` | **RETIRED (410 Gone)** — Decide Committee Item |
+| `GET` | `/committee/queue` | **RETIRED (410 Gone)** — Committee Work Queue |
 
 ## compliance
 
@@ -271,6 +300,12 @@ Every route except `/health*`, `/auth/*` and the shared-report links requires a 
 | `GET` | `/workshops/{workshop_id}` | Get Workshop |
 | `POST` | `/workshops/{workshop_id}/deliver` | Deliver Workshop |
 | `POST` | `/workshops/{workshop_id}/recovery-fee` | Attribute Recovery Fee |
+
+## queue
+
+| Method | Path | What it does |
+|---|---|---|
+| `GET` | `/queue` | Needs You Queue |
 
 ## registry
 

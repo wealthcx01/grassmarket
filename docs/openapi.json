@@ -4194,6 +4194,27 @@
         "title": "Document",
         "type": "object"
       },
+      "DormantSource": {
+        "additionalProperties": false,
+        "description": "A kind of work this queue cannot currently show, and why.\n\nCarried rather than omitted. An empty queue and a queue whose sources are switched off look\nthe same on screen, and only one of them means \"you are up to date\".",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/NeedsYouKind"
+          },
+          "reason": {
+            "description": "Why it is dormant, in words, with the ADR.",
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "reason"
+        ],
+        "title": "DormantSource",
+        "type": "object"
+      },
       "DrillCard": {
         "additionalProperties": false,
         "description": "One advisor's spaced-repetition state for a drill TOPIC (a power / triad / module / anchor).\nThe SM-2 fields (`repetitions`, `easiness`, `interval_days`) update on every review; `due_at` is\nwhen it next surfaces; `streak` is consecutive passes.",
@@ -6606,6 +6627,104 @@
           "rejected"
         ],
         "title": "NarrativeStatus",
+        "type": "string"
+      },
+      "NeedsYouItem": {
+        "additionalProperties": false,
+        "description": "One thing waiting on the caller.",
+        "properties": {
+          "became_actionable_at": {
+            "description": "When this started waiting on the caller (UTC).",
+            "format": "date-time",
+            "title": "Became Actionable At",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/NeedsYouKind"
+          },
+          "reason": {
+            "description": "One line in the product's voice: what is waiting, and what happens next.",
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "subject": {
+            "description": "The company, so the row reads as a thing.",
+            "minLength": 1,
+            "title": "Subject",
+            "type": "string"
+          },
+          "target": {
+            "$ref": "#/components/schemas/NeedsYouTarget"
+          },
+          "target_id": {
+            "description": "The record to open \u2014 an assessment or a deliverable.",
+            "format": "uuid",
+            "title": "Target Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "target",
+          "target_id",
+          "subject",
+          "became_actionable_at",
+          "reason"
+        ],
+        "title": "NeedsYouItem",
+        "type": "object"
+      },
+      "NeedsYouKind": {
+        "description": "What the advisor has to *do*, which is the only grouping they think in.",
+        "enum": [
+          "send",
+          "rate",
+          "approve"
+        ],
+        "title": "NeedsYouKind",
+        "type": "string"
+      },
+      "NeedsYouQueue": {
+        "additionalProperties": false,
+        "description": "Everything waiting on one advisor, oldest first.",
+        "properties": {
+          "dormant": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/DormantSource"
+            },
+            "title": "Dormant",
+            "type": "array"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "items": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/NeedsYouItem"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "generated_at"
+        ],
+        "title": "NeedsYouQueue",
+        "type": "object"
+      },
+      "NeedsYouTarget": {
+        "description": "What the item points at, so the UI can route without parsing the reason.",
+        "enum": [
+          "assessment",
+          "client_report",
+          "module_rating"
+        ],
+        "title": "NeedsYouTarget",
         "type": "string"
       },
       "NonScoreState": {
@@ -17209,6 +17328,33 @@
         "summary": "Update Stage",
         "tags": [
           "pipeline"
+        ]
+      }
+    },
+    "/queue": {
+      "get": {
+        "description": "Everything waiting on the caller, oldest first, plus what this queue cannot currently see.\n\n`dormant` is not padding. Peer rating is retired under ADR-0041, and a queue that silently\nomitted it would make \"that source is switched off\" look identical to \"you are up to date\".",
+        "operationId": "needs_you_queue_queue_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NeedsYouQueue"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Needs You Queue",
+        "tags": [
+          "queue"
         ]
       }
     },
