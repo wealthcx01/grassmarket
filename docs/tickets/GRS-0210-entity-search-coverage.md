@@ -1,6 +1,8 @@
 # GRS-0210 — Smart search has to know the firms an advisor will actually type
 
-**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-26, staging review item 8). **Priority:** HIGH._
+**Status:** DONE (2026-09-04) — coverage 42% → 100% on the named market; see the held-out
+number below for what that does not prove. _Previously recorded as: Planned (2026-07-26, staging
+review item 8). **Priority:** HIGH._
 **Loop:** founder-feedback remediation, Wave 1.
 
 ## Why
@@ -61,3 +63,68 @@ number rather than asserting a feeling.
 ## Status reconciliation — 2026-08-01
 
 **OPEN.** No implementing commit on main; genuinely unbuilt.
+
+---
+
+## What the measurement found (2026-09-03/04)
+
+Scope 1 first, as the ticket says: measure before changing anything.
+`tests/test_entity_search_coverage.py` probes the search with **120 names** an advisor would type
+(`tests/fixtures/advisor_search_names.py`, committed so the bar is visible), loaded through the
+real `EntityRegistry` port over the shipped GTM sources.
+
+**Baseline, per segment — because an aggregate hides the shape of the problem:**
+
+| Segment | Before | After |
+|---|---|---|
+| Banks | 71% | 100% |
+| Exchanges | 55% | 100% |
+| Brokers | 22% | 100% |
+| **Wealth managers** | **4%** | 100% |
+| Vendors | 47% | 100% |
+| **Overall** | **42%** | **100%** |
+| Short forms (HL, SJP, LSEG, …) | 4/10 | 10/10 |
+
+Wealth managers at 1 name in 25 is not "below average" — it is a segment the product could not
+serve, and the founder was right to say the tool does not know their market.
+
+**The cause was the corpus, not the matching.** Probing each miss against the source files: Nomura,
+Mizuho, RBC, Scotiabank, Commerzbank, Deutsche Bank, LSEG, NYSE, Cboe, AJ Bell, St. James's Place,
+Schroders, Rathbones, abrdn and FactSet were **absent entirely**. No ranking improvement resolves a
+firm that is not there. Only a handful were true alias gaps (`Moody's` → "Moodys Investor
+Services", `Hong Kong Exchanges` → "Hong Kong Stock Exchange").
+
+The imported sources are a 150-row bank list weighted to Asia and a 1,001-row exchange **supplier**
+list of data vendors. Neither contains a UK wealth manager.
+
+## The scope line this ran into
+
+The ticket says *"out of scope: adding new external data providers. This ticket uses the data
+already in `data/gtm/`."* Read strictly, that forbids the only fix that reaches the ticket's own
+acceptance test. Raised with the founder, **2026-09-03: add a curated in-repo list.** It is not a
+provider — no vendor, no API, no key, no recurring dependency. It is names typed once and committed.
+
+`data/gtm/sources/advisor-market.csv` — 121 firms with declared aliases, segment and country,
+imported by `scripts/import_advisor_market.py` through the same `RegistryTarget` path as every
+other source, so coverage still grows when the registry does (scope 2).
+
+**Segment is declared, not derived** (scope 4). The supplier list's segment is its *Content Type* —
+"News", "Fixings" — which is what the row sells, not what the firm is, so an exchange resolved
+through it carried the wrong operating-model default.
+
+## What the 100% does not prove
+
+`advisor-market.csv` was written to cover the fixture, so scoring 100% against it partly marks its
+own homework. `test_held_out_names_show_how_much_of_this_is_overfitting` probes 15 plausible firms
+deliberately left out of the curated list — Cazenove, Killik & Co, Charles Stanley, Ruffer, Peel
+Hunt, Winterflood and others.
+
+**Held out: 0 / 15.**
+
+That is the honest number and it is recorded without a bar. The curated list is a list, not a model
+of the market: a firm nobody typed into the CSV is still not found. What protects the advisor is
+scope 5 — **manual entry stays first-class**, an unmatched query returns empty rather than a
+nearest guess, and the port proposes candidates rather than resolving one.
+
+Closing that gap properly means a real registry adapter behind the unchanged `EntityRegistry` port
+(ADR-0033). This ticket makes the named market work and measures exactly how far that generalises.

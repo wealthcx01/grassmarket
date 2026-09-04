@@ -1,0 +1,122 @@
+name,aliases,segment,country,domain
+St. James's Place,SJP|St James's Place|St. James's Place plc,Wealth manager,United Kingdom,sjp.co.uk
+Schroders,Schroders plc|Schroder Investment Management,Wealth manager,United Kingdom,schroders.com
+Rathbones,Rathbones Group|Rathbone Brothers,Wealth manager,United Kingdom,rathbones.com
+Quilter,Quilter plc|Quilter Cheviot,Wealth manager,United Kingdom,quilter.com
+abrdn,Aberdeen|Aberdeen Standard|Standard Life Aberdeen,Wealth manager,United Kingdom,abrdn.com
+Brewin Dolphin,RBC Brewin Dolphin,Wealth manager,United Kingdom,brewin.co.uk
+Evelyn Partners,Tilney Smith & Williamson|Smith & Williamson,Wealth manager,United Kingdom,evelyn.com
+Brooks Macdonald,Brooks Macdonald Group,Wealth manager,United Kingdom,brooksmacdonald.com
+Investec Wealth,Investec Wealth & Investment|Rathbones Investec,Wealth manager,United Kingdom,investec.com
+Canaccord Genuity,Canaccord|Canaccord Genuity Wealth,Wealth manager,United Kingdom,canaccordgenuity.com
+Tilney,Tilney Group,Wealth manager,United Kingdom,tilney.co.uk
+Close Brothers,Close Brothers Group|Close Brothers Asset Management,Wealth manager,United Kingdom,closebrothers.com
+M&G,M&G plc|M&G Investments|Prudential M&G,Wealth manager,United Kingdom,mandg.com
+Jupiter Asset Management,Jupiter|Jupiter Fund Management,Wealth manager,United Kingdom,jupiteram.com
+Liontrust,Liontrust Asset Management,Wealth manager,United Kingdom,liontrust.co.uk
+Man Group,Man Group plc|AHL|Man AHL,Wealth manager,United Kingdom,man.com
+Ninety One,Investec Asset Management,Wealth manager,United Kingdom,ninetyone.com
+Baillie Gifford,Baillie Gifford & Co,Wealth manager,United Kingdom,bailliegifford.com
+Legal & General,L&G|Legal and General|LGIM,Wealth manager,United Kingdom,legalandgeneral.com
+Aviva Investors,Aviva,Wealth manager,United Kingdom,avivainvestors.com
+BlackRock,BlackRock Inc|iShares,Wealth manager,USA,blackrock.com
+Amundi,Amundi Asset Management,Wealth manager,France,amundi.com
+Allianz Global Investors,AllianzGI|AGI,Wealth manager,Germany,allianzgi.com
+Pictet,Pictet Group|Banque Pictet,Wealth manager,Switzerland,pictet.com
+Lombard Odier,Bank Lombard Odier,Wealth manager,Switzerland,lombardodier.com
+Fidelity International,Fidelity|FIL|Fidelity Investments,Wealth manager,United Kingdom,fidelity.co.uk
+Vanguard,The Vanguard Group,Wealth manager,USA,vanguard.com
+Royal London,Royal London Asset Management|RLAM,Wealth manager,United Kingdom,royallondon.com
+Columbia Threadneedle,Threadneedle|Columbia Threadneedle Investments,Wealth manager,United Kingdom,columbiathreadneedle.com
+Janus Henderson,Henderson|Janus Henderson Investors,Wealth manager,United Kingdom,janushenderson.com
+Hargreaves Lansdown,HL|Hargreaves Lansdown plc,Broker,United Kingdom,hl.co.uk
+AJ Bell,AJ Bell Youinvest|AJBell,Broker,United Kingdom,ajbell.co.uk
+interactive investor,ii|Interactive Investor,Broker,United Kingdom,ii.co.uk
+IG Group,IG|IG Index|IG Markets,Broker,United Kingdom,ig.com
+CMC Markets,CMC,Broker,United Kingdom,cmcmarkets.com
+Plus500,Plus 500,Broker,Israel,plus500.com
+Saxo Bank,Saxo|Saxo Markets,Broker,Denmark,home.saxo
+Freetrade,Freetrade Ltd,Broker,United Kingdom,freetrade.io
+Trading 212,Trading212,Broker,United Kingdom,trading212.com
+DEGIRO,Degiro|flatexDEGIRO,Broker,Netherlands,degiro.com
+Webull,Webull Financial,Broker,USA,webull.com
+Tastytrade,tastyworks|Tastytrade Inc,Broker,USA,tastytrade.com
+Swissquote,Swissquote Group,Broker,Switzerland,swissquote.com
+Flatex,flatexDEGIRO AG,Broker,Germany,flatex.de
+Lightyear,Lightyear Financial,Broker,Estonia,lightyear.com
+Wealthify,Wealthify Ltd,Broker,United Kingdom,wealthify.com
+Nutmeg,Nutmeg Saving and Investment|JPMorgan Nutmeg,Broker,United Kingdom,nutmeg.com
+Moneyfarm,MoneyFarm,Broker,United Kingdom,moneyfarm.com
+Vanguard Investor UK,Vanguard UK,Broker,United Kingdom,vanguardinvestor.co.uk
+Halifax Share Dealing,Halifax Sharedealing,Broker,United Kingdom,halifax.co.uk
+London Stock Exchange Group,LSEG|LSE|London Stock Exchange,Exchange,United Kingdom,lseg.com
+New York Stock Exchange,NYSE|NYSE Group|ICE NYSE,Exchange,USA,nyse.com
+Cboe Global Markets,Cboe|CBOE|Chicago Board Options Exchange,Exchange,USA,cboe.com
+Japan Exchange Group,JPX|Tokyo Stock Exchange|TSE,Exchange,Japan,jpx.co.jp
+Hong Kong Exchanges and Clearing,HKEX|Hong Kong Stock Exchange|HKEx,Exchange,Hong Kong,hkex.com.hk
+Borsa Italiana,Italian Stock Exchange,Exchange,Italy,borsaitaliana.it
+Bolsa de Madrid,BME|Bolsas y Mercados Espanoles,Exchange,Spain,bolsamadrid.es
+Nasdaq Nordic,OMX|Nasdaq OMX|Nasdaq Stockholm,Exchange,Sweden,nasdaqomxnordic.com
+Warsaw Stock Exchange,GPW|Gielda Papierow Wartosciowych,Exchange,Poland,gpw.pl
+MIAX,Miami International Holdings|MIAX Exchange,Exchange,USA,miaxglobal.com
+SIX Swiss Exchange,SIX|SIX Group|Swiss Exchange,Exchange,Switzerland,six-group.com
+Singapore Exchange,SGX,Exchange,Singapore,sgx.com
+TMX Group,Toronto Stock Exchange|TSX,Exchange,Canada,tmx.com
+B3,B3 Brasil Bolsa Balcao|BM&FBovespa,Exchange,Brazil,b3.com.br
+Euronext,Euronext NV|Euronext Paris|Euronext Amsterdam,Exchange,Netherlands,euronext.com
+Deutsche Boerse,Deutsche Borse|Deutsche Börse|Xetra|Frankfurt Stock Exchange,Exchange,Germany,deutsche-boerse.com
+CME Group,CME|Chicago Mercantile Exchange,Exchange,USA,cmegroup.com
+Intercontinental Exchange,ICE|ICE Futures,Exchange,USA,ice.com
+Nasdaq,NASDAQ|Nasdaq Inc,Exchange,USA,nasdaq.com
+Deutsche Bank,DB|Deutsche Bank AG,Bank,Germany,db.com
+Standard Chartered,StanChart|Standard Chartered Bank,Bank,United Kingdom,sc.com
+Nomura,Nomura Holdings|Nomura Securities,Bank,Japan,nomura.com
+Mizuho,Mizuho Financial Group|Mizuho Bank,Bank,Japan,mizuho-fg.com
+RBC,Royal Bank of Canada|RBC Capital Markets,Bank,Canada,rbc.com
+Scotiabank,Bank of Nova Scotia|Scotia,Bank,Canada,scotiabank.com
+Commerzbank,Commerzbank AG,Bank,Germany,commerzbank.com
+Bank of China,BOC|Bank of China Limited,Bank,China,boc.cn
+Mitsubishi UFJ,MUFG|Mitsubishi UFJ Financial Group,Bank,Japan,mufg.jp
+Handelsbanken,Svenska Handelsbanken,Bank,Sweden,handelsbanken.com
+KBC,KBC Group|KBC Bank,Bank,Belgium,kbc.com
+Erste Group,Erste Bank|Erste Group Bank AG,Bank,Austria,erstegroup.com
+Danske Bank,Danske,Bank,Denmark,danskebank.com
+Nordea,Nordea Bank,Bank,Finland,nordea.com
+Credit Agricole,Credit Agricole CIB|Crédit Agricole,Bank,France,credit-agricole.com
+Societe Generale,SocGen|Société Générale|SG CIB,Bank,France,societegenerale.com
+UniCredit,UniCredit Bank,Bank,Italy,unicredit.eu
+Intesa Sanpaolo,Intesa,Bank,Italy,intesasanpaolo.com
+BBVA,Banco Bilbao Vizcaya Argentaria,Bank,Spain,bbva.com
+Julius Baer,Julius Bär|Bank Julius Baer,Bank,Switzerland,juliusbaer.com
+Rabobank,Rabo,Bank,Netherlands,rabobank.com
+ING,ING Group|ING Bank,Bank,Netherlands,ing.com
+Bank of America,BofA|BAML|Merrill Lynch,Bank,USA,bankofamerica.com
+Wells Fargo,Wells Fargo & Co,Bank,USA,wellsfargo.com
+Goldman Sachs,GS|Goldman|Goldman Sachs Group,Bank,USA,goldmansachs.com
+JPMorgan,JPM|JP Morgan|JPMorgan Chase|J.P. Morgan,Bank,USA,jpmorgan.com
+Morgan Stanley,MS|Morgan Stanley & Co,Bank,USA,morganstanley.com
+HSBC,HSBC Holdings|HSBC UK|HSBC Bank,Bank,United Kingdom,hsbc.com
+Barclays,Barclays plc|Barclays Bank|BarCap,Bank,United Kingdom,barclays.com
+Lloyds,Lloyds Banking Group|Lloyds Bank|LBG,Bank,United Kingdom,lloydsbank.com
+NatWest,NatWest Group|Royal Bank of Scotland|RBS,Bank,United Kingdom,natwest.com
+Santander,Banco Santander|Santander UK,Bank,Spain,santander.com
+UBS,UBS Group|Union Bank of Switzerland,Bank,Switzerland,ubs.com
+BNP Paribas,BNP|BNPP,Bank,France,bnpparibas.com
+Citibank,Citi|Citigroup|Citibank NA,Bank,USA,citigroup.com
+FactSet,FactSet Research Systems,Information vendor,USA,factset.com
+S&P Global,Standard & Poor's|S&P|SPGI|S&P Global Market Intelligence,Information vendor,USA,spglobal.com
+Moody's,Moodys|Moody's Investors Service|Moodys Investor Services,Information vendor,USA,moodys.com
+MSCI,MSCI Inc|Morgan Stanley Capital International,Information vendor,USA,msci.com
+Morningstar,Morningstar Inc,Information vendor,USA,morningstar.com
+Bloomberg,Bloomberg LP|Bloomberg Terminal,Information vendor,USA,bloomberg.com
+Refinitiv,Thomson Reuters|Refinitiv Eikon,Information vendor,United Kingdom,refinitiv.com
+SIX Financial Information,Six Financial Information|SIX Telekurs,Information vendor,Switzerland,six-group.com
+Quandl,Nasdaq Data Link,Information vendor,Canada,data.nasdaq.com
+Benzinga,Benzinga Pro,Information vendor,USA,benzinga.com
+Edgar Online,EDGAR Online|Donnelley Financial,Information vendor,USA,dfinsolutions.com
+Interactive Data,Interactive Data Corporation|IDC,Information vendor,USA,intercontinentalexchange.com
+Markit,IHS Markit|Markit Group,Information vendor,United Kingdom,ihsmarkit.com
+Tradeweb,Tradeweb Markets,Information vendor,USA,tradeweb.com
+MarketAxess,MarketAxess Holdings,Information vendor,USA,marketaxess.com
+OpenBB,OpenBB Terminal|OpenBB Finance,Information vendor,USA,openbb.co
+Brandfetch,Brandfetch API,Information vendor,Germany,brandfetch.com
