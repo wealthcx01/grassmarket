@@ -191,6 +191,44 @@ def parse_bank_row(
     )
 
 
+def parse_advisor_market_row(
+    row: Mapping[str, object], *, imported_on: date, source: str = "advisor-market"
+) -> RegistryTarget:
+    """One row of the curated advisor-market list (GRS-0210).
+
+    The imported sources are a bank list and an exchange-supplier list. Measured against 120 names
+    an advisor would actually type, they covered 42% — and **4% of wealth managers**, which is a
+    segment the product could not serve at all. Almost every miss was a name absent from the corpus
+    rather than a matching failure, and no amount of ranking cleverness resolves a firm that is not
+    there.
+
+    So this list is typed by hand, once, and committed. It is not a new data provider: no vendor,
+    no API, no key. `aliases` is pipe-separated because how people type is **declared data**,
+    never inferred at query time (scope 3) — "SJP" resolves to St. James's Place because
+    somebody wrote that down, not because an algorithm guessed at initials.
+    """
+    name = null_if_unset(row.get("name"))
+    if name is None:
+        raise RowError("Advisor-market row has no 'name'.")
+    raw_aliases = null_if_unset(row.get("aliases")) or ""
+    aliases = tuple(a.strip() for a in raw_aliases.split("|") if a.strip())
+    return RegistryTarget(
+        target_id=slugify(name, prefix="am-"),
+        name=name,
+        aliases=aliases,
+        domain=null_if_unset(row.get("domain")),
+        # Segment is declared, not derived. The supplier list's segment is its "Content Type"
+        # (News, Fixings), which is what the row *sells*, not what the firm *is* — so an exchange
+        # resolved through it carried the wrong operating-model default (scope 4).
+        segment=null_if_unset(row.get("segment")) or "Unknown",
+        country=null_if_unset(row.get("country")),
+        ric=None,
+        ctb_id=None,
+        source=source,
+        imported_on=imported_on,
+    )
+
+
 # ------------------------------------------------------------------------------------- LSEG rosters
 
 
