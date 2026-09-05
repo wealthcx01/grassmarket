@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 // Matches scripts/seed_dev.py.
 const EMAIL = "advisor@bruntsfieldcapital.com";
-const PASSWORD = "grassmarket-demo";
+const PASSWORD = "grassmarket-demo"; // pragma: allowlist secret  (local dev seed only)
 
 async function login(page: Page): Promise<void> {
   await page.goto("/login");
