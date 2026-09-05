@@ -25,12 +25,13 @@ def main() -> None:
     on = import_date()
 
     def build(repo: Repository) -> ImportSummary:
-        targets = 0
+        summary = ImportSummary(source="advisor-market")
         with path.open(newline="", encoding="utf-8") as handle:
             for row in csv.DictReader(handle):
+                summary.rows_read += 1
                 repo.upsert_registry_target(parse_advisor_market_row(row, imported_on=on))
-                targets += 1
-        return ImportSummary(source="advisor-market", targets=targets, contacts=0)
+                summary.targets_upserted += 1
+        return summary
 
     run(build)
 

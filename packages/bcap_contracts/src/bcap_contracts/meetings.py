@@ -51,10 +51,17 @@ class RecordingKind(StrEnum):
 #:
 #: **Changing this string is a founder decision, not an engineering one.** UK rules make participant
 #: consent the safe rule for confidential business meetings, and rules vary by jurisdiction.
+#:
+#: **Revised 2026-09-04 (founder).** The first version told the client the recording "stays in the
+#: Bruntsfield advisor system" and "isn't shared outside the engagement team". Both were untrue:
+#: the transcriber is hosted OpenAI Whisper (GRS-0251), so the audio leaves our infrastructure.
+#: Changing it does **not** rewrite consents already given — a stored `consent_wording` is the text
+#: that was actually shown to that client, and editing history to match a new promise would destroy
+#: the only thing the field is for.
 FOUNDER_APPROVED_CONSENT_WORDING = (
-    "I'd like to record this session so I can write it up accurately. The recording stays in the "
-    "Bruntsfield advisor system, is transcribed for my notes, and isn't shared outside the "
-    "engagement team. Are you happy for me to record?"
+    "I'd like to record this session so I can write it up accurately. The recording is stored in "
+    "the Bruntsfield advisor system and sent to OpenAI to be transcribed. Beyond that it isn't "
+    "shared outside the engagement team. Are you happy for me to record?"
 )
 
 
