@@ -825,6 +825,10 @@ export interface ArenaTrendPoint {
 export interface PerformanceSummary {
   owner_consultant_id: string;
   level: AssessorLevelValue;
+  /** The highest rung this advisor's evidence supports. Derived on read, never stored. */
+  earned_level: AssessorLevelValue;
+  /** False when `level` sits above `earned_level` — granted outside the ladder, not earned. */
+  level_is_evidenced: boolean;
   engagements_active: number;
   engagements_completed: number;
   prospects_total: number;
@@ -842,6 +846,10 @@ export interface CertificationRecord {
   id: string;
   owner_consultant_id: string;
   level: AssessorLevelValue;
+  /** The highest rung this advisor's evidence supports. Derived on read, never stored. */
+  earned_level: AssessorLevelValue;
+  /** False when `level` sits above `earned_level` — granted outside the ladder, not earned. */
+  level_is_evidenced: boolean;
   coursework_complete: boolean;
   exam_score?: number | null;
   shadow_count: number;

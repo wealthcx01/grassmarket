@@ -25,6 +25,10 @@
       "title": "Created At",
       "type": "string"
     },
+    "earned_level": {
+      "$ref": "#/$defs/AssessorLevel",
+      "default": "trained"
+    },
     "exam_score": {
       "anyOf": [
         {
@@ -47,6 +51,11 @@
     "level": {
       "$ref": "#/$defs/AssessorLevel",
       "default": "trained"
+    },
+    "level_is_evidenced": {
+      "default": true,
+      "title": "Level Is Evidenced",
+      "type": "boolean"
     },
     "observed_lead_logged": {
       "default": false,

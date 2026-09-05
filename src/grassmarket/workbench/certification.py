@@ -36,20 +36,16 @@ def is_at_least(level: AssessorLevel, floor: AssessorLevel) -> bool:
     return _RANK[level] >= _RANK[floor]
 
 
-def promotion_blockers(record: CertificationRecord, target: AssessorLevel) -> list[str]:
-    """Why `record`'s advisor may NOT yet be promoted to `target`. Empty ⟹ the evidence is in.
+def evidence_blockers(record: CertificationRecord, target: AssessorLevel) -> list[str]:
+    """The evidence `target` requires that this record does not have. Empty ⟹ the rung is earned.
 
-    Promotion is one rung at a time (the current level must be exactly the one below `target`), and
-    each rung requires its evidence to be recorded first (Methodology §9)."""
+    Deliberately ignores the advisor's *current* level: this answers "does the evidence support this
+    rung", which is a different question from "may they be promoted to it now". `promotion_blockers`
+    adds the one-rung-at-a-time rule on top; `earned_level` walks the ladder with it. One
+    implementation of each rung's requirements, so the gate and the display cannot drift apart
+    (GRS-0242 scope 3).
+    """
     blockers: list[str] = []
-    current = record.level
-    if _RANK.get(target) is None:
-        return [f"{target} is not a ladder level."]
-    if _RANK[target] != _RANK[current] + 1:
-        return [
-            f"Promotion is one rung at a time: cannot go from {current.value} to {target.value}."
-        ]
-
     if target is AssessorLevel.SHADOW:
         # To leave Trained: the Trained credentials (coursework + passed exam) AND two shadows (§9).
         if not record.coursework_complete:
@@ -66,8 +62,53 @@ def promotion_blockers(record: CertificationRecord, target: AssessorLevel) -> li
     elif target is AssessorLevel.CERTIFIED_LEAD:
         if record.observed_lead_signoff_by is None:
             blockers.append("No sign-off recorded from a Certified Lead.")
-
     return blockers
+
+
+def earned_level(record: CertificationRecord) -> AssessorLevel:
+    """The highest rung this advisor's **evidence** supports, ignoring the level they are marked at.
+
+    The ladder is cumulative, so this walks up from Trained and stops at the first rung whose
+    evidence is missing. Trained is the floor: it is the rung an advisor starts on and needs no
+    evidence to hold.
+
+    This exists because a level and its evidence are stored in two different places. The level lives
+    on the consultant record (and the JWT), where an invite, a seed or an admin can set it
+    directly; the evidence lives on the certification record and is only written by the ladder.
+    Nothing reconciled them, so the Workbench could show "Certified Lead" beside a ladder with
+    no coursework, no exam and no shadow assessments — both true, contradicting each other on
+    one screen (GRS-0242).
+    """
+    earned = AssessorLevel.TRAINED
+    for rung in _LADDER[1:]:
+        if evidence_blockers(record, rung):
+            break
+        earned = rung
+    return earned
+
+
+def level_is_evidenced(record: CertificationRecord) -> bool:
+    """Whether the advisor's marked level is one their evidence actually supports.
+
+    False means the level was set outside the ladder. That is not necessarily wrong — an
+    administrator may legitimately grant one — but it must never render as though it were earned.
+    """
+    return _RANK[record.level] <= _RANK[earned_level(record)]
+
+
+def promotion_blockers(record: CertificationRecord, target: AssessorLevel) -> list[str]:
+    """Why `record`'s advisor may NOT yet be promoted to `target`. Empty ⟹ the evidence is in.
+
+    Promotion is one rung at a time (the current level must be exactly the one below `target`), and
+    each rung requires its evidence to be recorded first (Methodology §9)."""
+    current = record.level
+    if _RANK.get(target) is None:
+        return [f"{target} is not a ladder level."]
+    if _RANK[target] != _RANK[current] + 1:
+        return [
+            f"Promotion is one rung at a time: cannot go from {current.value} to {target.value}."
+        ]
+    return evidence_blockers(record, target)
 
 
 def requires_certified_lead(result: AtlasResult) -> list[str]:

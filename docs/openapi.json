@@ -1879,6 +1879,10 @@
             "title": "Created At",
             "type": "string"
           },
+          "earned_level": {
+            "$ref": "#/components/schemas/AssessorLevel",
+            "default": "trained"
+          },
           "exam_score": {
             "anyOf": [
               {
@@ -1900,6 +1904,11 @@
           "level": {
             "$ref": "#/components/schemas/AssessorLevel",
             "default": "trained"
+          },
+          "level_is_evidenced": {
+            "default": true,
+            "title": "Level Is Evidenced",
+            "type": "boolean"
           },
           "observed_lead_logged": {
             "default": false,
@@ -6963,6 +6972,10 @@
             "title": "Drills Due",
             "type": "integer"
           },
+          "earned_level": {
+            "$ref": "#/components/schemas/AssessorLevel",
+            "default": "trained"
+          },
           "engagements_active": {
             "minimum": 0.0,
             "title": "Engagements Active",
@@ -6979,6 +6992,11 @@
           },
           "level": {
             "$ref": "#/components/schemas/AssessorLevel"
+          },
+          "level_is_evidenced": {
+            "default": true,
+            "title": "Level Is Evidenced",
+            "type": "boolean"
           },
           "owner_consultant_id": {
             "format": "uuid",

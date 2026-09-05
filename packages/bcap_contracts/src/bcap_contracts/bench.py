@@ -75,6 +75,11 @@ class PerformanceSummary(BaseModel):
 
     owner_consultant_id: UUID
     level: AssessorLevel
+    #: Carried here so Bench and the Certification ladder describe the same person the same way.
+    #: Both read one derivation; before GRS-0242 Bench stated the level as bare fact while the
+    #: ladder beside it showed none of the evidence that level requires.
+    earned_level: AssessorLevel = AssessorLevel.TRAINED
+    level_is_evidenced: bool = True
     engagements_active: int = Field(ge=0)
     engagements_completed: int = Field(ge=0)
     prospects_total: int = Field(ge=0)

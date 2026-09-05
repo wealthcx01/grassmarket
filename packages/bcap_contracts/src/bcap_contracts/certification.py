@@ -54,6 +54,15 @@ class CertificationRecord(OwnedResource):
         default=None, description="The Certified Lead who signed off the observed lead."
     )
 
+    #: The highest rung this advisor's **evidence** supports, derived on read and never stored.
+    #: Equal to `level` when the level was earned through the ladder; lower when it was set outside
+    #: it — by an invite, a seed, or an administrator.
+    earned_level: AssessorLevel = AssessorLevel.TRAINED
+    #: False when `level` is above `earned_level`. Not an accusation: an administrator may
+    #: legitimately grant a level. It must simply never render as though it were earned, which is
+    #: what let the Workbench show "Certified Lead" beside an empty ladder (GRS-0242 scope 3).
+    level_is_evidenced: bool = True
+
     @property
     def exam_passed(self) -> bool:
         return self.exam_score is not None and self.exam_score >= EXAM_PASS_MARK

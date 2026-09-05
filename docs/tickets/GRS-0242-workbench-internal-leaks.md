@@ -1,6 +1,8 @@
 # GRS-0242 — The Workbench stops leaking internals and contradicting itself
 
-**Status:** OPEN (reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review). **Priority:** MED. **Type:** Bug._
+**Status:** PARTLY DONE (2026-09-05) — scope 3 (the contradiction) fixed; scopes 1, 2 and 4 are
+display and routing on surfaces the redesign replaces, deliberately held. _Previously:_ OPEN
+(reconciled 2026-08-01). _Previously recorded as: Planned (2026-07-31, first-time-user review). **Priority:** MED. **Type:** Bug._
 **Loop:** first-time-user coherence. **Relates to:** GRS-0196, GRS-0205.
 
 ## Why
@@ -63,3 +65,55 @@ tabs disagreeing about their level, and can send someone a link to a specific ta
 ## Status reconciliation — 2026-08-01
 
 **OPEN.** Scheduled in the GRS-0229–0245 wave (see docs/BACKLOG.md for the build order).
+
+---
+
+## Scope 3 — the cause, and the rule chosen (2026-09-05)
+
+**It was not two sources disagreeing.** Both tabs already read the level from the same place:
+`ConsultantORM.assessor_level`, which is also what the JWT carries. `_to_certification_record`
+populates the contract's `level` from it, and `summarise_performance` passes that straight through.
+They could not have shown different values.
+
+**The actual cause: a level and its evidence live in two different stores, and nothing ever
+compared them.** The level sits on the consultant record, where an invite, a seed or an
+administrator can set it directly. The evidence — coursework, exam, shadow count, observed lead,
+sign-off — sits on `certification_records` and is only ever written by the ladder. A level granted
+outside the ladder therefore rendered identically to one climbed through it.
+
+The dev seed reproduces it exactly: all three consultants marked `certified_lead`, **zero
+certification records**. That is what the founder walked into.
+
+### The rule
+
+Derive the highest rung the **evidence** supports, and carry it everywhere the level appears:
+
+- `earned_level` — the ladder walked upward from Trained, stopping at the first rung whose evidence
+  is missing. Cumulative, so a sign-off cannot carry someone past a missing exam.
+- `level_is_evidenced` — false when the marked level sits above `earned_level`.
+
+Both are derived on read and never stored. `CertificationRecord` and `PerformanceSummary` both
+carry them, so Bench and the Certification ladder describe the same person the same way.
+
+**The level is never hidden or silently reduced.** An administrator may legitimately grant one, and
+quietly demoting it on screen would contradict the JWT the rest of the product enforces against.
+What changes is that a level the evidence does not support *says so*.
+
+### One implementation of the rung rules
+
+`promotion_blockers` (the gate) and `earned_level` (the display) now both call `evidence_blockers`.
+Two copies of the ladder rules is precisely how this class of bug arises, and a test asserts the
+two cannot diverge.
+
+### What rendering caught that the tests did not
+
+The explanatory note went in first. Screenshotting showed **the ladder still filled every rung
+solid green** — the sentence said "granted" while the picture said "earned", and a reader trusts
+the picture. Earned rungs are now filled; rungs held but not evidenced are outlined and dashed.
+
+## Still open — deliberately
+
+Scopes **1** (catalogue display names), **2** (arena history) and **4** (addressable tabs) are
+display and routing on Workbench surfaces the redesign replaces (GRS-0271). Fixing copy on a screen
+about to change means fixing it twice — the same reasoning `docs/WORK-QUEUE.md` already gives for
+holding GRS-0205. The snake_case course names are still on screen and still wrong.
