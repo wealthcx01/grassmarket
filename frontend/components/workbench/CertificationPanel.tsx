@@ -7,6 +7,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { LevelProvenanceNote } from "@/components/workbench/LevelBadge";
+import { LEVEL_LABEL } from "@/lib/levels";
 import { ApiError, api } from "@/lib/api";
 import type {
   AssessorLevelValue,
@@ -28,12 +30,6 @@ const COURSE_CERT_COLOR: Record<CourseCertificationStatus, string> = {
 };
 
 const LADDER: AssessorLevelValue[] = ["trained", "shadow", "observed_lead", "certified_lead"];
-const LEVEL_LABEL: Record<AssessorLevelValue, string> = {
-  trained: "Trained",
-  shadow: "Shadow",
-  observed_lead: "Observed Lead",
-  certified_lead: "Certified Lead",
-};
 
 export function CertificationPanel({ advisorId }: { advisorId: string }) {
   const [record, setRecord] = useState<CertificationRecord | null>(null);
@@ -74,26 +70,49 @@ export function CertificationPanel({ advisorId }: { advisorId: string }) {
   }
 
   const currentIndex = LADDER.indexOf(record.level);
+  // Rungs the EVIDENCE supports, which is not the same as rungs the advisor is marked at. Filling
+  // the ladder to `currentIndex` drew every rung as achieved, so the picture still said "earned"
+  // while the note underneath said "granted" — the contradiction this ticket exists to remove.
+  const earnedIndex = LADDER.indexOf(record.earned_level);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
       <section>
         <h3 style={{ fontSize: "1rem", margin: "0 0 0.6rem" }}>The ladder</h3>
-        <ol style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+        <ol
+          data-testid="certification-ladder"
+          style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", gap: "0.5rem", flexWrap: "wrap" }}
+        >
           {LADDER.map((level, i) => {
-            const reached = i <= currentIndex;
+            const earned = i <= earnedIndex;
+            // Held but not earned: at or below the marked level, above what the evidence supports.
+            const granted = !earned && i <= currentIndex;
             return (
               <li
                 key={level}
                 aria-current={level === record.level ? "step" : undefined}
+                data-state={earned ? "earned" : granted ? "granted" : "unreached"}
+                title={
+                  granted
+                    ? "Held, but the ladder evidence on record does not support it."
+                    : undefined
+                }
                 style={{
                   padding: "0.4rem 0.8rem",
                   borderRadius: "999px",
                   fontSize: "0.8rem",
                   fontWeight: level === record.level ? 600 : 400,
-                  border: "1px solid var(--color-border)",
-                  background: reached ? "var(--color-accent)" : "var(--color-paper-raised)",
-                  color: reached ? "var(--color-accent-contrast)" : "var(--color-ink-muted)",
+                  // A granted rung is outlined in amber rather than filled: visibly held, visibly
+                  // not the same thing as a rung that was climbed.
+                  border: `1px ${granted ? "dashed" : "solid"} ${
+                    granted ? "var(--color-warn)" : "var(--color-border)"
+                  }`,
+                  background: earned ? "var(--color-accent)" : "var(--color-paper-raised)",
+                  color: earned
+                    ? "var(--color-accent-contrast)"
+                    : granted
+                      ? "var(--color-warn)"
+                      : "var(--color-ink-muted)",
                 }}
               >
                 {LEVEL_LABEL[level]}
@@ -101,6 +120,14 @@ export function CertificationPanel({ advisorId }: { advisorId: string }) {
             );
           })}
         </ol>
+        {/* The reconciliation, said in words directly under the ladder it contradicts. Without it
+            the reader sees a level highlighted on a ladder whose rungs are all empty and has to
+            guess which screen is lying (GRS-0242 scope 3). */}
+        <LevelProvenanceNote
+          level={record.level}
+          earnedLevel={record.earned_level}
+          isEvidenced={record.level_is_evidenced}
+        />
       </section>
 
       {courseCerts.length > 0 ? (

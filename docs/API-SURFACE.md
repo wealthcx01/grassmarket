@@ -1,6 +1,6 @@
 # Grassmarket API surface
 
-**Generated 2026-09-03 from the live FastAPI app** (`create_app().openapi()`). **185 endpoints** across 27 tags.
+**Generated 2026-09-05 from the live FastAPI app** (`create_app().openapi()`). **185 endpoints** across 27 tags.
 
 This is the contract the front end is built against. Regenerate with `uv run python scripts/dump_api_surface.py`; the machine-readable spec is `docs/openapi.json`.
 

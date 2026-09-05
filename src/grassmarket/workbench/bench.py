@@ -236,6 +236,10 @@ def summarise_performance(
     return PerformanceSummary(
         owner_consultant_id=owner_consultant_id,
         level=cert_record.level,
+        # Carried through from the same record the Certification ladder renders, rather than
+        # recomputed here. Two derivations of one fact is how the two tabs came to disagree.
+        earned_level=cert_record.earned_level,
+        level_is_evidenced=cert_record.level_is_evidenced,
         engagements_active=active,
         engagements_completed=completed,
         prospects_total=total_prospects,

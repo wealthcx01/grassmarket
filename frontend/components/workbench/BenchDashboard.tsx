@@ -9,6 +9,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 
+import { LevelBadge } from "@/components/workbench/LevelBadge";
 import { ApiError, api } from "@/lib/api";
 import type { BenchQueue, PerformanceSummary } from "@/lib/types";
 
@@ -119,7 +120,19 @@ export function BenchDashboard({ advisorId }: { advisorId: string }) {
           <p style={{ color: "var(--color-ink-muted)", fontSize: "0.85rem" }}>Loading…</p>
         ) : (
           <dl style={{ margin: 0, display: "grid", gridTemplateColumns: "1fr auto", gap: "0.35rem 1rem", fontSize: "0.85rem" }}>
-            <Metric label="Level" value={perf.level.replace(/_/g, " ")} />
+            {/* Was `perf.level.replace(/_/g, " ")` — the wire value with underscores swapped,
+                rendered as bare fact. It read "certified lead" beside a Certification tab showing
+                an empty ladder, and nothing on either screen explained how both could be true. */}
+            <Metric
+              label="Level"
+              value={
+                <LevelBadge
+                  level={perf.level}
+                  earnedLevel={perf.earned_level}
+                  isEvidenced={perf.level_is_evidenced}
+                />
+              }
+            />
             <Metric label="Engagements active" value={String(perf.engagements_active)} />
             <Metric label="Engagements completed" value={String(perf.engagements_completed)} />
             <Metric label="Pipeline conversion" value={`${Math.round(perf.pipeline_conversion_rate * 100)}%`} />
@@ -143,7 +156,7 @@ export function BenchDashboard({ advisorId }: { advisorId: string }) {
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
+function Metric({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <>
       <dt style={{ color: "var(--color-ink-muted)" }}>{label}</dt>

@@ -266,7 +266,12 @@ from grassmarket.workbench.bench import (
     summarise_performance,
 )
 from grassmarket.workbench.calibration import compute_calibration_result
-from grassmarket.workbench.certification import next_level, promotion_blockers
+from grassmarket.workbench.certification import (
+    earned_level,
+    level_is_evidenced,
+    next_level,
+    promotion_blockers,
+)
 from grassmarket.workbench.course_certs import (
     CourseCertSubject,
     course_cert_status,
@@ -5852,7 +5857,7 @@ class Repository:
         return [self._to_certification_event(r) for r in rows]
 
     def _to_certification_record(self, row: CertificationRecordORM) -> CertificationRecord:
-        return CertificationRecord(
+        record = CertificationRecord(
             id=row.id,
             owner_consultant_id=row.owner_consultant_id,
             level=self._consultant_level(row.owner_consultant_id),
@@ -5863,6 +5868,15 @@ class Repository:
             observed_lead_signoff_by=row.observed_lead_signoff_by,
             created_at=row.created_at,
             updated_at=row.updated_at,
+        )
+        # Derived on read from the evidence on this row, never stored. The level itself lives on the
+        # consultant record where an invite, a seed or an admin can set it; deriving what the
+        # evidence supports is the only way the two can be compared at all (GRS-0242 scope 3).
+        return record.model_copy(
+            update={
+                "earned_level": earned_level(record),
+                "level_is_evidenced": level_is_evidenced(record),
+            }
         )
 
     @staticmethod

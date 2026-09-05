@@ -79,6 +79,10 @@
       "title": "Drills Due",
       "type": "integer"
     },
+    "earned_level": {
+      "$ref": "#/$defs/AssessorLevel",
+      "default": "trained"
+    },
     "engagements_active": {
       "minimum": 0,
       "title": "Engagements Active",
@@ -95,6 +99,11 @@
     },
     "level": {
       "$ref": "#/$defs/AssessorLevel"
+    },
+    "level_is_evidenced": {
+      "default": true,
+      "title": "Level Is Evidenced",
+      "type": "boolean"
     },
     "owner_consultant_id": {
       "format": "uuid",
