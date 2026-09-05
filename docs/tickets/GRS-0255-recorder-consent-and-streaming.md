@@ -14,9 +14,9 @@ later.
 
 **Founder-approved wording, 2026-09-03:**
 
-> *"I'd like to record this session so I can write it up accurately. The recording stays in the
-> Bruntsfield advisor system, is transcribed for my notes, and isn't shared outside the engagement
-> team. Are you happy for me to record?"*
+> *"I'd like to record this session so I can write it up accurately. The recording is stored in the
+> Bruntsfield advisor system and sent to OpenAI to be transcribed. Beyond that it isn't shared
+> outside the engagement team. Are you happy for me to record?"*
 
 Store `consent_confirmed_at` **and `consent_wording`** — the exact text shown, not a reference to
 it. Wording changes over time and a record that cannot say what was actually agreed is not a
@@ -25,12 +25,21 @@ record. **No consent, no recording kept**; the gate refuses rather than storing 
 UK rules make participant consent the safe rule for confidential business meetings, and rules vary
 by jurisdiction. Treat any change to this as a founder decision, not an engineering one.
 
-**Open founder question, raised 2026-09-03 and not answered.** This wording tells the client the
-recording "isn't shared outside the engagement team". The transcription provider is hosted OpenAI
-Whisper (GRS-0251), so the audio *does* leave our infrastructure. The wording is used verbatim and
-unchanged, and the advisor-facing screen says plainly where the audio goes — so whoever presses
-record is not misled. But the client hears the approved line. Reconciling those two sentences is a
-founder decision, and it is live in production as of PR #274.
+**Settled 2026-09-04 (founder): the wording now names OpenAI.**
+
+The first version told the client the recording "stays in the Bruntsfield advisor system" and
+"isn't shared outside the engagement team". Both were untrue — the transcriber is hosted OpenAI
+Whisper (GRS-0251), so the audio leaves our infrastructure. The advisor-facing screen had said so
+since GRS-0249, so whoever pressed record was not misled; the client was.
+
+The revision changes only the false part: it states that the recording is sent to OpenAI to be
+transcribed, and narrows the sharing promise to "beyond that", which is true.
+
+**Consents already given are untouched.** A stored `consent_wording` is the text that was actually
+read to *that* client. Migrating old rows to match a newer promise would destroy the only thing the
+field exists for — the record could then say what we would tell someone today, not what that person
+agreed to. `tests/test_voice_notes.py::TestChangingTheWordingDoesNotRewriteHistory` pins both
+halves: an old wording still reads back, and it can no longer be used for a *new* recording.
 
 ## Build
 

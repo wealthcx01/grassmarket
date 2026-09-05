@@ -19,6 +19,7 @@ from __future__ import annotations
 import base64
 import re
 from pathlib import Path
+from uuid import UUID
 
 import pytest
 from bcap_contracts.meetings import FOUNDER_APPROVED_CONSENT_WORDING
@@ -67,6 +68,82 @@ class TestTheConsentWordingIsTheFounderApprovedWording:
         resp = client.get("/transcripts/consent-line", headers=auth_header(alice))
         assert resp.status_code == 200, resp.text
         assert resp.json()["wording"] == FOUNDER_APPROVED_CONSENT_WORDING
+
+
+class TestChangingTheWordingDoesNotRewriteHistory:
+    """The founder revised the wording on 2026-09-04 to name OpenAI. That must not touch consents
+    already given.
+
+    A stored `consent_wording` is the text that was actually read to *that* client. Migrating it to
+    match a newer promise would destroy the only thing the field exists for — the record could no
+    longer say what was agreed, only what we would say today. This is the difference between a
+    record and a setting.
+    """
+
+    def test_a_transcript_stored_under_the_old_wording_still_reads_back(
+        self, client, alice: SeededConsultant, session_factory: sessionmaker[Session]
+    ) -> None:
+        prospect_id = _prospect(client, alice)
+        created = _upload(
+            client,
+            alice,
+            prospect_id=prospect_id,
+            recording_kind="recorded_session",
+            consent_confirmed_at="2026-09-03T14:00:00Z",
+            consent_wording=FOUNDER_APPROVED_CONSENT_WORDING,
+        ).json()
+
+        # Rewrite the row to a superseded wording, as a record taken before the revision would be.
+        superseded = (
+            "I'd like to record this session so I can write it up accurately. The recording stays "
+            "in the Bruntsfield advisor system, is transcribed for my notes, and isn't shared "
+            "outside the engagement team. Are you happy for me to record?"
+        )
+        with session_factory() as session:
+            row = session.get(MeetingTranscriptORM, UUID(created["id"]))
+            assert row is not None
+            row.consent_wording = superseded
+            session.add(row)
+            session.commit()
+
+        # It reads back unchanged. Validation happens at the gate, on the way in — never again on
+        # the way out, or every past consent would be rewritten by the next revision.
+        fetched = client.get(f"/transcripts/{created['id']}", headers=auth_header(alice)).json()
+        assert fetched["consent_wording"] == superseded
+        assert fetched["consent_wording"] != FOUNDER_APPROVED_CONSENT_WORDING
+
+    def test_the_superseded_wording_can_no_longer_be_used_for_a_new_recording(
+        self, client, alice: SeededConsultant
+    ) -> None:
+        """Old consents are honoured; they are not accepted again. A recorder still showing the
+        superseded text would be telling a client something we now know to be untrue."""
+        prospect_id = _prospect(client, alice)
+        resp = _upload(
+            client,
+            alice,
+            prospect_id=prospect_id,
+            recording_kind="recorded_session",
+            consent_confirmed_at="2026-09-04T14:00:00Z",
+            consent_wording=(
+                "I'd like to record this session so I can write it up accurately. The recording "
+                "stays in the Bruntsfield advisor system, is transcribed for my notes, and isn't "
+                "shared outside the engagement team. Are you happy for me to record?"
+            ),
+        )
+        assert resp.status_code == 422
+        assert "founder-approved" in resp.json()["detail"]
+
+
+class TestTheWordingIsTrueAboutWhereTheAudioGoes:
+    def test_it_names_the_third_party_the_audio_is_sent_to(self) -> None:
+        """The revision's whole point. The transcriber is hosted OpenAI Whisper, so the audio
+        leaves our infrastructure; the previous wording told the client the opposite."""
+        assert "OpenAI" in FOUNDER_APPROVED_CONSENT_WORDING
+
+    def test_it_no_longer_claims_the_recording_stays_with_us(self) -> None:
+        """Guards the specific false promise rather than the whole sentence, so a future rewrite
+        is free to change the phrasing but not to reinstate the untruth."""
+        assert "stays in the Bruntsfield advisor system" not in FOUNDER_APPROVED_CONSENT_WORDING
 
 
 class TestNoConsentNoRecordingKept:

@@ -47,8 +47,8 @@ Set on **staging and production**, `grassmarket-api`, with `--skip-deploys`:
 - `GM_OPENAI_API_KEY` (the founder's key, piped via stdin — never echoed)
 
 #271 has merged, so **media ingestion works in production now.** Any advisor voice note is
-transcribed by hosted OpenAI Whisper — see the consent note under GRS-0249 below, which is a live
-founder question, not a settled one.
+transcribed by hosted OpenAI Whisper. The consent wording names that provider as of 2026-09-04 —
+see GRS-0255.
 
 `GM_OPENAI_API_KEY` is GM-prefixed **only**, deliberately: a bare `OPENAI_API_KEY` alias would let
 whatever key sits in a developer's or CI runner's environment become the one billed and sent client
@@ -109,11 +109,11 @@ route around it. The wording is served by `GET /transcripts/consent-line` — on
 
 **Two founder questions this opened, neither of them engineering calls:**
 
-1. **The approved wording tells the client "the recording … isn't shared outside the engagement
-   team". The transcriber is hosted OpenAI Whisper, so the audio does leave our infrastructure.**
-   The wording is used verbatim and unchanged, as instructed. The advisor-facing UI says plainly
-   where the audio goes, so whoever presses record is not misled — but the client hears the
-   approved line. Reconciling those two sentences is a founder decision.
+1. ~~The approved wording contradicted where the audio actually goes.~~ **Settled 2026-09-04:** the
+   wording now names OpenAI. It says the recording is stored in the Bruntsfield advisor system and
+   sent to OpenAI to be transcribed, and that beyond that it is not shared outside the engagement
+   team. Consents already given keep their original text — a stored wording records what that
+   client was actually told, and rewriting it would destroy the only thing the field is for.
 2. Whether a solo voice note should show the client-consent line anyway. Today it does not.
 
 **Two model gaps this work found and handled:**
@@ -160,7 +160,6 @@ consequences. Pixel values are indicative; rebuild spacing in rem.
 | Item | Unblocks |
 |---|---|
 | **GRS-0150 elicitation panel** | Retail client deliverables. Still the only real blocker |
-| **Consent vs. OpenAI Whisper** | The approved wording says the recording is not shared outside the engagement team; the transcriber is a third party. GRS-0249/0255 |
 | **GRS-0207** outreach build-vs-buy | Gates 0202/0203/0204 |
 | **GRS-0248** ActiveGraph: adopt or amend the docs | Doing neither is the only wrong answer |
 | D4 multi-currency · D5–D7 | Deferred by the founder |
