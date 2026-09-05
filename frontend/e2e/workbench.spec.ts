@@ -36,7 +36,15 @@ test.describe("GRS-0027 — Workbench", () => {
     // Switching tabs works and the certification ladder renders its rungs.
     await page.getByRole("tab", { name: "Certification" }).click();
     await expect(page.getByRole("heading", { name: "The ladder" })).toBeVisible();
-    await expect(page.getByText("Trained")).toBeVisible();
+    // Scoped to the ladder: since GRS-0242 a level name also appears in the provenance note
+    // underneath ("the evidence recorded here supports Trained"), so a bare text match is
+    // ambiguous. The assertion was always about the rung, and now says so.
+    const ladder = page.getByTestId("certification-ladder");
+    await expect(ladder.getByText("Trained")).toBeVisible();
+    // The seeded advisor is marked Certified Lead with an empty ladder, so the rungs above what
+    // the evidence supports render as held-not-earned rather than achieved (GRS-0242 scope 3).
+    await expect(ladder.locator('li[data-state="earned"]')).toHaveText("Trained");
+    await expect(ladder.locator('li[data-state="granted"]')).toHaveCount(3);
   });
 
   test("the advisor gets the four tabs, and no retired governance tab", async ({ page }) => {
