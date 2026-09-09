@@ -1,0 +1,20 @@
+# Railway config for the Advisor Studio front end (GRS-0242 follow-up).
+#
+# This exists because the repository root's `railway.toml` is the **API's**: it starts uvicorn and
+# health-checks `/health`. Railway auto-detects the config at the root of the build context, so the
+# web service was being told to boot the Python backend, never answered the healthcheck, and every
+# deploy since 2026-08-21 failed. The service's `configFile` now points here instead.
+#
+# No `startCommand`: the builder detects Next.js and runs it. Naming one would be a second place to
+# keep in step with `package.json`.
+
+[build]
+builder = "RAILPACK"
+
+[deploy]
+# `/login` rather than `/`: the root path redirects to it when signed out, and a healthcheck that
+# follows a redirect is testing one more thing than it needs to.
+healthcheckPath = "/login"
+healthcheckTimeout = 120
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
