@@ -111,11 +111,12 @@ The explanatory note went in first. Screenshotting showed **the ladder still fil
 solid green** — the sentence said "granted" while the picture said "earned", and a reader trusts
 the picture. Earned rungs are now filled; rungs held but not evidenced are outlined and dashed.
 
-### Verified on screen before landing (2026-09-09)
+### Verified on screen (2026-09-09, after landing)
 
-Both changed screens rendered at 1440×1000 and 393×851 and looked at, saved in
-`reports/screenshots/grs-0242/`. Desktop fits the viewport on both tabs; the phone captures are
-1173px (Bench) and 1165px (Certification) tall.
+Scope 3 merged in #278 on 2026-09-05 without the screenshots the test plan asked for. They were
+taken afterwards and are saved in `reports/screenshots/grs-0242/`, at 1440×1000 and 393×851.
+Desktop fits the viewport on both tabs; the phone captures are 1173px (Bench) and 1165px
+(Certification) tall.
 
 The two tabs now say the same thing. Bench reads "Certified Lead · set outside the ladder" — a
 proper title where it used to print the wire value — and the Certification ladder shows Trained
