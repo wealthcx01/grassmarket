@@ -4,7 +4,9 @@
       "enum": [
         "GBP",
         "USD",
-        "EUR"
+        "EUR",
+        "CHF",
+        "HKD"
       ],
       "title": "Currency",
       "type": "string"

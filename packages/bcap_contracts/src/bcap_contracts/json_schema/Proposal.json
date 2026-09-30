@@ -1,0 +1,152 @@
+{
+  "$defs": {
+    "Actor": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Who, precisely enough to ask them about it later: a person's email, an agent's name, the executor's identifier.",
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ActorKind"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "title": "Actor",
+      "type": "object"
+    },
+    "ActorKind": {
+      "description": "Who did this.\n\nThe distinction is load-bearing and is the reason this is an enum rather than a string. Only a\n`HUMAN` may grant. An `AGENT` proposes; an `EXECUTOR` is the one code path that performs an\nexternal action, and it acts only on a grant it has verified.",
+      "enum": [
+        "human",
+        "agent",
+        "executor"
+      ],
+      "title": "ActorKind",
+      "type": "string"
+    },
+    "ProposalStatus": {
+      "description": "The projection of a log, for a screen. Derived, never stored as the truth.",
+      "enum": [
+        "proposed",
+        "granted",
+        "rejected",
+        "executing",
+        "executed",
+        "failed",
+        "unverified"
+      ],
+      "title": "ProposalStatus",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "What a screen shows: one proposal, its state, and who decided it.",
+  "properties": {
+    "content_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Content Hash"
+    },
+    "decided_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Decided At"
+    },
+    "decided_by": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Actor"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "executed_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Executed At"
+    },
+    "id": {
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "kind": {
+      "description": "What is being proposed, e.g. 'invoice.send' or 'payment.record'. The executor registry keys off this.",
+      "minLength": 1,
+      "title": "Kind",
+      "type": "string"
+    },
+    "proposed_at": {
+      "format": "date-time",
+      "title": "Proposed At",
+      "type": "string"
+    },
+    "proposed_by": {
+      "$ref": "#/$defs/Actor"
+    },
+    "refused_events": {
+      "default": 0,
+      "description": "How many events in this proposal's log failed to verify. Shown, not hidden.",
+      "minimum": 0,
+      "title": "Refused Events",
+      "type": "integer"
+    },
+    "scope": {
+      "minLength": 1,
+      "title": "Scope",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/ProposalStatus"
+    },
+    "subject": {
+      "description": "What it is about, e.g. an invoice number.",
+      "minLength": 1,
+      "title": "Subject",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "scope",
+    "kind",
+    "subject",
+    "status",
+    "proposed_at",
+    "proposed_by"
+  ],
+  "title": "Proposal",
+  "type": "object"
+}

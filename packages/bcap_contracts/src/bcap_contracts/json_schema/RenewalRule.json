@@ -1,0 +1,49 @@
+{
+  "additionalProperties": false,
+  "description": "What happens when the counterparty's own customer renews.",
+  "properties": {
+    "kind": {
+      "const": "renewal_rule",
+      "default": "renewal_rule",
+      "title": "Kind",
+      "type": "string"
+    },
+    "material_contribution_presumed_months": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Where the contract presumes material contribution from any documented contact within N months before renewal, N goes here. Absent means it must be argued.",
+      "title": "Material Contribution Presumed Months"
+    },
+    "notice_days": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notice Days"
+    },
+    "restarts_at_year_one": {
+      "description": "True where a renewal we materially contributed to restarts the window at year-one rates rather than continuing at year two.",
+      "title": "Restarts At Year One",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "restarts_at_year_one"
+  ],
+  "title": "RenewalRule",
+  "type": "object"
+}

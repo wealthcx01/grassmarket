@@ -1,0 +1,53 @@
+{
+  "$defs": {
+    "RelationshipKind": {
+      "description": "A typed edge between two organisations. Directional: `source` does this to `target`.",
+      "enum": [
+        "uses",
+        "owns",
+        "supplies",
+        "competes_with",
+        "partners_with",
+        "parent_of"
+      ],
+      "title": "RelationshipKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "\"A uses B\", \"A is the parent of B\". Typed, so it can be asked about rather than read.",
+  "properties": {
+    "kind": {
+      "$ref": "#/$defs/RelationshipKind"
+    },
+    "note": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Note"
+    },
+    "source_organisation_id": {
+      "minLength": 1,
+      "title": "Source Organisation Id",
+      "type": "string"
+    },
+    "target_organisation_id": {
+      "minLength": 1,
+      "title": "Target Organisation Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "source_organisation_id",
+    "target_organisation_id",
+    "kind"
+  ],
+  "title": "OrganisationRelationship",
+  "type": "object"
+}

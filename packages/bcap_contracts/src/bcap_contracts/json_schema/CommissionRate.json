@@ -1,0 +1,46 @@
+{
+  "additionalProperties": false,
+  "description": "What we earn on a deal, in basis points, per contract year.\n\nBASIS POINTS AND NOT A PERCENTAGE FLOAT. The Advisory Studio's own commission config is already\nin bps, the contracts are written in whole and half percents, and 7.5% is 750 - exact - where a\nfloat is 0.075 and is not. A rate that arrives as an integer and stays one cannot drift.",
+  "properties": {
+    "engagement_type": {
+      "description": "Which kind of deal this rate applies to, in the contract's own words, e.g. 'white_label_exchange' or 'distribution_direct_acv'.",
+      "minLength": 1,
+      "title": "Engagement Type",
+      "type": "string"
+    },
+    "kind": {
+      "const": "commission_rate",
+      "default": "commission_rate",
+      "title": "Kind",
+      "type": "string"
+    },
+    "window_months": {
+      "description": "How long commission runs from first cash received on the engagement.",
+      "exclusiveMinimum": 0,
+      "title": "Window Months",
+      "type": "integer"
+    },
+    "yr1_bps": {
+      "description": "Year-one rate in basis points. 3000 is 30%.",
+      "maximum": 10000,
+      "minimum": 0,
+      "title": "Yr1 Bps",
+      "type": "integer"
+    },
+    "yr2_bps": {
+      "description": "Year-two rate. 0 where year two earns nothing.",
+      "maximum": 10000,
+      "minimum": 0,
+      "title": "Yr2 Bps",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "engagement_type",
+    "yr1_bps",
+    "yr2_bps",
+    "window_months"
+  ],
+  "title": "CommissionRate",
+  "type": "object"
+}

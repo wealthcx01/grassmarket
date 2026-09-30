@@ -1,0 +1,40 @@
+{
+  "additionalProperties": false,
+  "description": "The date by which something must have happened, or a stated remedy applies.",
+  "properties": {
+    "kind": {
+      "const": "long_stop",
+      "default": "long_stop",
+      "title": "Kind",
+      "type": "string"
+    },
+    "months": {
+      "exclusiveMinimum": 0,
+      "title": "Months",
+      "type": "integer"
+    },
+    "provisional": {
+      "default": false,
+      "title": "Provisional",
+      "type": "boolean"
+    },
+    "remedy": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "What the counterparty may require if the date passes.",
+      "title": "Remedy"
+    }
+  },
+  "required": [
+    "months"
+  ],
+  "title": "LongStop",
+  "type": "object"
+}

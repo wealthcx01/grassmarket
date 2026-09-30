@@ -1,0 +1,44 @@
+{
+  "additionalProperties": false,
+  "description": "A file that IS the contract, or a version of it.",
+  "properties": {
+    "document_kind": {
+      "description": "'executed', 'draft', 'signed_counterparty' or 'countersigned'.",
+      "minLength": 1,
+      "title": "Document Kind",
+      "type": "string"
+    },
+    "md5": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "For refusing a duplicate upload.",
+      "title": "Md5"
+    },
+    "storage_key": {
+      "description": "Where the file lives. Never the file.",
+      "minLength": 1,
+      "title": "Storage Key",
+      "type": "string"
+    },
+    "version": {
+      "description": "The version on the document, e.g. 'v6'.",
+      "minLength": 1,
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "version",
+    "document_kind",
+    "storage_key"
+  ],
+  "title": "ContractDocument",
+  "type": "object"
+}
