@@ -1,0 +1,66 @@
+{
+  "$defs": {
+    "Pillar": {
+      "description": "A Bruntsfield vertical. Three are live or building; three are names with a plan.",
+      "enum": [
+        "advisory",
+        "foundry",
+        "clients",
+        "briefing",
+        "equity",
+        "cohort"
+      ],
+      "title": "Pillar",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Where money goes, grouped so a pillar can have a profit and loss.",
+  "properties": {
+    "contract_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Contract Id"
+    },
+    "id": {
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "organisation_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The venture or client this centre exists for, where there is one.",
+      "title": "Organisation Id"
+    },
+    "pillar": {
+      "$ref": "#/$defs/Pillar"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "pillar"
+  ],
+  "title": "CostCentre",
+  "type": "object"
+}

@@ -1,0 +1,89 @@
+{
+  "$defs": {
+    "Currency": {
+      "enum": [
+        "GBP",
+        "USD",
+        "EUR",
+        "CHF",
+        "HKD"
+      ],
+      "title": "Currency",
+      "type": "string"
+    },
+    "RecordedAmount": {
+      "additionalProperties": false,
+      "description": "An amount that is a FACT on a document, not a figure under assumptions (HC-005).\n\n``Money`` above cannot be constructed without an ``assumption_register_ref``, and that is\ncorrect for what it is for: a lever NPV or a remediation cost is only meaningful under stated\nassumptions, and ADR-0002 exists because the prototype subtracted pounds from score-points.\n\nHoly Corner needs the other kind. ``USD 5,000`` on invoice INV-001 is not modelled, not\nuncertain and not an assumption. It is written on a document somebody signed. Putting it in a\nfield named ``assumption_register_ref`` would say the opposite of what is true, and a field used\nagainst its own name is how a wrong number survives review: the next reader believes the name.\n\nSo the two types are distinguished by WHERE THE NUMBER CAME FROM, which is the thing that\nactually differs:\n\n* ``Money`` cites the assumptions that justify a modelled figure.\n* ``RecordedAmount`` cites the source it was read from - a contract clause, an invoice, a\n  partner's cash report, a bank statement line.\n\nBoth are integer minor units with an explicit currency, and neither can exist without\nprovenance. Neither converts to the other, and this package defines no function that takes one\nand returns the other: a modelled figure and an observed one are not interchangeable just\nbecause both are denominated in pounds.",
+      "properties": {
+        "amount_minor": {
+          "description": "Amount in integer minor units (e.g. cents). Never a float: a float cannot hold 0.1 exactly, and a commission recomputed on one drifts every time.",
+          "title": "Amount Minor",
+          "type": "integer"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "source_ref": {
+          "description": "Where this amount was read from, precisely enough for somebody to check it against the document: a contract clause, an invoice number, a statement line. Mandatory, for the same reason Money's assumption reference is: an amount with no provenance is a claim, and this record exists to hold facts.",
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount_minor",
+        "currency",
+        "source_ref"
+      ],
+      "title": "RecordedAmount",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contract_term_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The term this line is charging for, where there is one.",
+      "title": "Contract Term Ref"
+    },
+    "description": {
+      "minLength": 1,
+      "title": "Description",
+      "type": "string"
+    },
+    "quantity": {
+      "default": 1,
+      "exclusiveMinimum": 0,
+      "title": "Quantity",
+      "type": "integer"
+    },
+    "tax_amount": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RecordedAmount"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "unit_amount": {
+      "$ref": "#/$defs/RecordedAmount"
+    }
+  },
+  "required": [
+    "description",
+    "unit_amount"
+  ],
+  "title": "InvoiceLine",
+  "type": "object"
+}

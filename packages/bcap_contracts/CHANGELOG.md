@@ -4,6 +4,58 @@ All notable changes to the shared contracts package. This package is the type sy
 Bruntsfield studios meet Holy Corner; keep it additive so consumers (grassmarket, fountainbridge)
 never break on an upgrade.
 
+## [0.3.0] — 2026-09-30
+
+### Added (HC-005 — the group-level record, for Holy Corner)
+
+Holy Corner is the hub across the Advisory Studio, the Foundry Studio and the future client portal.
+It owns the record neither studio holds: organisations, contracts, invoices, payments, receivable
+commission and cost centres. These are the shapes for it. Additive throughout; nothing existing
+changed behaviour.
+
+- **`organisations.py`** — `Organisation`, `OrganisationRelationship`, `Person`, and the `Pillar`
+  enum. Deliberately NOT merged with `entities.py`'s `CompanyEntity`, which is the reference data an
+  assessment subject resolves to. A counterparty we invoice may never be assessed, and an assessed
+  company may have no contract; merging would give each of them fields the other needs and they do
+  not. The two registers are linked where both exist.
+- **`contracts.py`** — `Contract` and nine typed term kinds as a discriminated union:
+  `CommissionRate`, `CommitmentPayment`, `RenewalRule`, `RunOffPeriod`, `Milestone`, `EquitySplit`,
+  `LongStop`, `Restraint`, `PaymentTerms`. Terms are ROWS, not columns: one agreement carries two
+  commission structures with different windows, another carries no commission and a milestone, an
+  equity split and a long-stop instead. Columns would be mostly null and a fourth contract shape
+  would mean a migration.
+- **`invoices.py`** — `Invoice`, `InvoiceLine`, `Payment`, `CommissionReceivable`, `CostCentre`,
+  `Expense`. No field anywhere sums across currencies, because there is no total that could.
+- **`approvals.py`** — `ApprovalEvent`, `Actor`, `Proposal`, in the **same shape as the Foundry
+  Studio's own event log**, so the two are one type rather than two that resemble each other. Only
+  a `human` may grant and only an `executor` may execute, enforced by validators rather than by the
+  code that writes them; a grant must carry the content hash of what it approved.
+
+### Added — `RecordedAmount`, beside `Money` and distinct from it
+
+`Money` cannot be constructed without an `assumption_register_ref`, and that is right for what it is
+for: a lever NPV is only meaningful under stated assumptions, and ADR-0002 exists because the
+prototype subtracted pounds from score-points.
+
+Holy Corner needs the other kind. **USD 5,000 on an issued invoice is not modelled**, not uncertain
+and not an assumption. Putting it in a field named `assumption_register_ref` would say the opposite
+of what is true, and a field used against its own name is how a wrong number survives review: the
+next reader believes the name.
+
+So the two are distinguished by where the number came from, which is what actually differs. `Money`
+cites the assumptions that justify a modelled figure; `RecordedAmount` cites the source it was read
+from. Both are integer minor units with an explicit currency, neither can exist without provenance,
+and this package defines no function that converts one to the other.
+
+**Nothing in grassmarket changes.** Every existing use of `Money` is a modelled figure and stays one.
+
+### Added — `Currency` gains `CHF` and `HKD`
+
+Bruntsfield Capital Limited is incorporated in Hong Kong and one advisory counterparty is a Swiss
+company. Both invoice in USD today, so nothing needs these yet. They are here because a closed enum
+means a code change and a release to raise an invoice in a currency somebody has already agreed to,
+and that is a bad moment to discover the constraint.
+
 ## [0.2.0] — 2026-07-31
 
 ### Added (FB-059 — the run outcomes a founder is actually shown)

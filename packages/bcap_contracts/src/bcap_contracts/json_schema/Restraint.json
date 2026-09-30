@@ -1,0 +1,46 @@
+{
+  "additionalProperties": false,
+  "description": "A non-compete or non-solicit, with its carve-outs.",
+  "properties": {
+    "carve_out": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Carve Out"
+    },
+    "kind": {
+      "const": "restraint",
+      "default": "restraint",
+      "title": "Kind",
+      "type": "string"
+    },
+    "months": {
+      "exclusiveMinimum": 0,
+      "title": "Months",
+      "type": "integer"
+    },
+    "provisional": {
+      "default": false,
+      "title": "Provisional",
+      "type": "boolean"
+    },
+    "restraint_type": {
+      "description": "'non_compete' or 'non_solicit'.",
+      "minLength": 1,
+      "title": "Restraint Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "restraint_type",
+    "months"
+  ],
+  "title": "Restraint",
+  "type": "object"
+}

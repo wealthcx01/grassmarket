@@ -1,0 +1,22 @@
+{
+  "additionalProperties": false,
+  "description": "How long commission keeps running after the agreement itself ends.",
+  "properties": {
+    "kind": {
+      "const": "run_off_period",
+      "default": "run_off_period",
+      "title": "Kind",
+      "type": "string"
+    },
+    "months": {
+      "exclusiveMinimum": 0,
+      "title": "Months",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "months"
+  ],
+  "title": "RunOffPeriod",
+  "type": "object"
+}

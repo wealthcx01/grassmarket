@@ -1,0 +1,74 @@
+{
+  "$defs": {
+    "PersonKind": {
+      "description": "What this person is to Bruntsfield. One person can only be one of these at a time here.",
+      "enum": [
+        "staff",
+        "consultant",
+        "founder",
+        "client_contact",
+        "cohort"
+      ],
+      "title": "PersonKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One person, with every address that is them.\n\n`emails` is a tuple and not a single field because one person genuinely has several: the\nManaging Partner signs contracts from one address and is an administrator under another, and\n\"who is this\" must not depend on which one they happened to use.",
+  "properties": {
+    "emails": {
+      "default": [],
+      "description": "Every address that is this same person, lower-cased.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Emails",
+      "type": "array"
+    },
+    "id": {
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "kind": {
+      "$ref": "#/$defs/PersonKind"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "organisation_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The organisation they belong to, where they belong to one.",
+      "title": "Organisation Id"
+    },
+    "title": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Title"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "kind"
+  ],
+  "title": "Person",
+  "type": "object"
+}

@@ -22,6 +22,13 @@ class Currency(StrEnum):
     GBP = "GBP"
     USD = "USD"
     EUR = "EUR"
+    # HC-005: the hub's record reaches counterparties these three do not cover. Bruntsfield Capital
+    # Limited is incorporated in Hong Kong, and one advisory counterparty is a Swiss company. Both
+    # invoice in USD today, so nothing needs these yet - they are here because a closed enum means
+    # a code change and a release to raise an invoice in a currency somebody has already agreed to,
+    # and that is a bad moment to discover the constraint.
+    CHF = "CHF"
+    HKD = "HKD"
 
 
 class Money(BaseModel):
@@ -64,3 +71,53 @@ class Money(BaseModel):
             currency=self.currency,
             assumption_register_ref=f"{self.assumption_register_ref}+{other.assumption_register_ref}",
         )
+
+
+class RecordedAmount(BaseModel):
+    """An amount that is a FACT on a document, not a figure under assumptions (HC-005).
+
+    ``Money`` above cannot be constructed without an ``assumption_register_ref``, and that is
+    correct for what it is for: a lever NPV or a remediation cost is only meaningful under stated
+    assumptions, and ADR-0002 exists because the prototype subtracted pounds from score-points.
+
+    Holy Corner needs the other kind. ``USD 5,000`` on invoice INV-001 is not modelled, not
+    uncertain and not an assumption. It is written on a document somebody signed. Putting it in a
+    field named ``assumption_register_ref`` would say the opposite of what is true, and a field used
+    against its own name is how a wrong number survives review: the next reader believes the name.
+
+    So the two types are distinguished by WHERE THE NUMBER CAME FROM, which is the thing that
+    actually differs:
+
+    * ``Money`` cites the assumptions that justify a modelled figure.
+    * ``RecordedAmount`` cites the source it was read from - a contract clause, an invoice, a
+      partner's cash report, a bank statement line.
+
+    Both are integer minor units with an explicit currency, and neither can exist without
+    provenance. Neither converts to the other, and this package defines no function that takes one
+    and returns the other: a modelled figure and an observed one are not interchangeable just
+    because both are denominated in pounds.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    amount_minor: int = Field(
+        description="Amount in integer minor units (e.g. cents). Never a float: a float cannot "
+        "hold 0.1 exactly, and a commission recomputed on one drifts every time."
+    )
+    currency: Currency
+    source_ref: str = Field(
+        min_length=1,
+        description="Where this amount was read from, precisely enough for somebody to check it "
+        "against the document: a contract clause, an invoice number, a statement line. Mandatory, "
+        "for the same reason Money's assumption reference is: an amount with no provenance is a "
+        "claim, and this record exists to hold facts.",
+    )
+
+    @model_validator(mode="after")
+    def _require_source(self) -> RecordedAmount:
+        if not self.source_ref.strip():
+            raise ValueError(
+                "RecordedAmount requires a source_ref naming where the figure was read from. "
+                "An amount nobody can trace back to a document is not a record of anything."
+            )
+        return self

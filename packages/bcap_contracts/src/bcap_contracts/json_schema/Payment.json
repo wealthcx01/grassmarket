@@ -1,0 +1,137 @@
+{
+  "$defs": {
+    "Currency": {
+      "enum": [
+        "GBP",
+        "USD",
+        "EUR",
+        "CHF",
+        "HKD"
+      ],
+      "title": "Currency",
+      "type": "string"
+    },
+    "MatchedBy": {
+      "description": "Who decided this payment pays that invoice.",
+      "enum": [
+        "auto",
+        "human"
+      ],
+      "title": "MatchedBy",
+      "type": "string"
+    },
+    "RecordedAmount": {
+      "additionalProperties": false,
+      "description": "An amount that is a FACT on a document, not a figure under assumptions (HC-005).\n\n``Money`` above cannot be constructed without an ``assumption_register_ref``, and that is\ncorrect for what it is for: a lever NPV or a remediation cost is only meaningful under stated\nassumptions, and ADR-0002 exists because the prototype subtracted pounds from score-points.\n\nHoly Corner needs the other kind. ``USD 5,000`` on invoice INV-001 is not modelled, not\nuncertain and not an assumption. It is written on a document somebody signed. Putting it in a\nfield named ``assumption_register_ref`` would say the opposite of what is true, and a field used\nagainst its own name is how a wrong number survives review: the next reader believes the name.\n\nSo the two types are distinguished by WHERE THE NUMBER CAME FROM, which is the thing that\nactually differs:\n\n* ``Money`` cites the assumptions that justify a modelled figure.\n* ``RecordedAmount`` cites the source it was read from - a contract clause, an invoice, a\n  partner's cash report, a bank statement line.\n\nBoth are integer minor units with an explicit currency, and neither can exist without\nprovenance. Neither converts to the other, and this package defines no function that takes one\nand returns the other: a modelled figure and an observed one are not interchangeable just\nbecause both are denominated in pounds.",
+      "properties": {
+        "amount_minor": {
+          "description": "Amount in integer minor units (e.g. cents). Never a float: a float cannot hold 0.1 exactly, and a commission recomputed on one drifts every time.",
+          "title": "Amount Minor",
+          "type": "integer"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "source_ref": {
+          "description": "Where this amount was read from, precisely enough for somebody to check it against the document: a contract clause, an invoice number, a statement line. Mandatory, for the same reason Money's assumption reference is: an amount with no provenance is a claim, and this record exists to hold facts.",
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount_minor",
+        "currency",
+        "source_ref"
+      ],
+      "title": "RecordedAmount",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Money that arrived. Recorded after the fact; Holy Corner never moves any (plan D6).",
+  "properties": {
+    "amount": {
+      "$ref": "#/$defs/RecordedAmount"
+    },
+    "external_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "External Ref"
+    },
+    "fx_rate": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The rate as a decimal string, where a conversion happened. A string and not a float: a rate is a recorded fact and must round-trip exactly (plan D5).",
+      "title": "Fx Rate"
+    },
+    "fx_source": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Who published the rate, and when.",
+      "title": "Fx Source"
+    },
+    "id": {
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "invoice_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Absent for a receipt nobody has matched to an invoice yet.",
+      "title": "Invoice Id"
+    },
+    "matched_by": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MatchedBy"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "received_on": {
+      "format": "date",
+      "title": "Received On",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "received_on",
+    "amount"
+  ],
+  "title": "Payment",
+  "type": "object"
+}

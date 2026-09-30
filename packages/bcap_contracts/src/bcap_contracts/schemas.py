@@ -11,6 +11,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
+from bcap_contracts.approvals import ApprovalEvent, Proposal
 from bcap_contracts.arena import ArenaScenario, ArenaSession
 from bcap_contracts.assessments import (
     Assessment,
@@ -54,6 +55,19 @@ from bcap_contracts.commissions import (
     ProductCommissionCarrot,
 )
 from bcap_contracts.committee import CommitteeDecision, CommitteeItem, CommitteeQueueEntry
+from bcap_contracts.contracts import (
+    CommissionRate,
+    CommitmentPayment,
+    Contract,
+    ContractDocument,
+    EquitySplit,
+    LongStop,
+    Milestone,
+    PaymentTerms,
+    RenewalRule,
+    Restraint,
+    RunOffPeriod,
+)
 from bcap_contracts.deliverables import Deliverable, DeliverableIndexRow
 from bcap_contracts.documents import Document, UploadDocumentRequest
 from bcap_contracts.engagements import CommsLogEntry, Engagement, Workshop
@@ -81,6 +95,14 @@ from bcap_contracts.influencer import (
     InfluencerOwner,
     InfluencerRank,
 )
+from bcap_contracts.invoices import (
+    CommissionReceivable,
+    CostCentre,
+    Expense,
+    Invoice,
+    InvoiceLine,
+    Payment,
+)
 from bcap_contracts.learning import (
     CertificationProgress,
     ContentCompletion,
@@ -99,9 +121,14 @@ from bcap_contracts.learning import (
     SourceRef,
 )
 from bcap_contracts.meetings import MeetingTranscript
-from bcap_contracts.money import Money
+from bcap_contracts.money import Money, RecordedAmount
 from bcap_contracts.narratives import AINarrative
 from bcap_contracts.needs_you import DormantSource, NeedsYouItem, NeedsYouQueue
+from bcap_contracts.organisations import (
+    Organisation,
+    OrganisationRelationship,
+    Person,
+)
 from bcap_contracts.pipeline import PipelineBoard, PipelineForecast, StageHistoryEntry
 from bcap_contracts.predictions import BenchmarkRow, CBenchmarkRow, Prediction
 from bcap_contracts.product_fit import ProductFitMap, SellOpportunities, SellOpportunity
@@ -122,6 +149,30 @@ from bcap_contracts.wizard import WizardSuggestion, WizardSuggestions
 # friction so the contract surface is always explicit and mirrored.
 EXPORTED_MODELS: dict[str, type[BaseModel]] = {
     "Money": Money,
+    # HC-005 — the group-level record. Holy Corner owns these; the studios point at them.
+    "RecordedAmount": RecordedAmount,
+    "Organisation": Organisation,
+    "OrganisationRelationship": OrganisationRelationship,
+    "Person": Person,
+    "Contract": Contract,
+    "ContractDocument": ContractDocument,
+    "CommissionRate": CommissionRate,
+    "CommitmentPayment": CommitmentPayment,
+    "RenewalRule": RenewalRule,
+    "RunOffPeriod": RunOffPeriod,
+    "Milestone": Milestone,
+    "EquitySplit": EquitySplit,
+    "LongStop": LongStop,
+    "Restraint": Restraint,
+    "PaymentTerms": PaymentTerms,
+    "Invoice": Invoice,
+    "InvoiceLine": InvoiceLine,
+    "Payment": Payment,
+    "CommissionReceivable": CommissionReceivable,
+    "CostCentre": CostCentre,
+    "Expense": Expense,
+    "ApprovalEvent": ApprovalEvent,
+    "Proposal": Proposal,
     "WeightProvenanceRecord": WeightProvenanceRecord,
     "CoefficientSet": CoefficientSet,
     "SubcomponentRating": SubcomponentRating,
