@@ -4,6 +4,29 @@ All notable changes to the shared contracts package. This package is the type sy
 Bruntsfield studios meet Holy Corner; keep it additive so consumers (grassmarket, fountainbridge)
 never break on an upgrade.
 
+## [0.4.0] — 2026-10-01
+
+### Added (GRS-0265 — which skills a worker used, for the Foundry Studio)
+
+- **`RunReport.skills_used`** — the names of the skills a worker used on a run, as a list of
+  strings. Defaults to empty.
+
+John asked of the Foundry's office: *"we should be able to see what skills each worker used."*
+Nothing carried the fact. The office record holds eight fields per character and the run report held
+nine; neither had room for it, so it was not hidden — it was **never written down**.
+
+Additive and optional, because this package's own rule is that consumers never break on an upgrade:
+every run report already written to a venture's state ref omits this field, and making it required
+would render the entire history of every venture unreadable on upgrade.
+
+**Empty does not mean "this worker used no skills."** It means none were used *or* that the run
+predates the field, and the two cannot be told apart. The description says so because the reader is
+in another repository, and a studio that rendered empty as a fact about the run would be making a
+claim about every run in history that nobody ever measured.
+
+Consumed by fountainbridge in FB-231, which is what unblocks FB-239 (one machine per ticket, with
+the skills it used on the record).
+
 ## [0.3.0] — 2026-09-30
 
 ### Added (HC-005 — the group-level record, for Holy Corner)
