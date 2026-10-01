@@ -84,6 +84,14 @@
       "description": "The pull request this run opened, when outcome is 'opened-pr'.",
       "title": "Pr Url"
     },
+    "skills_used": {
+      "description": "Which skills the worker used on this run, by name — 'write-tests', 'compare-screenshots'. Empty means none were used OR that the run predates this field; it is never a claim that the worker used nothing.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Skills Used",
+      "type": "array"
+    },
     "started_at": {
       "format": "date-time",
       "title": "Started At",

@@ -284,3 +284,54 @@ def test_a_run_cannot_have_an_outcome_without_having_ended() -> None:
 def test_in_flight_report_round_trips_both_ways() -> None:
     report = RunReport(lane_id="sell", started_at=_now(), trigger=RunTrigger.SCHEDULED)
     assert RunReport.model_validate(report.model_dump(mode="json")) == report
+
+
+# ---------------------------------------------------------------------------
+# GRS-0265 — which skills a worker used (for fountainbridge FB-231/FB-239)
+#
+# John, on the Foundry's office: *"we should be able to see what skills each worker used."* Nothing
+# carried the fact. The office record holds eight fields per character and the run report held nine;
+# neither had room, so it was not hidden — it was never written down.
+# ---------------------------------------------------------------------------
+
+
+def test_a_run_can_record_the_skills_its_worker_used() -> None:
+    """The fact now has somewhere to live, by name rather than as prose in the summary."""
+    report = _report(skills_used=["write-tests", "compare-screenshots"])
+    assert report.skills_used == ["write-tests", "compare-screenshots"]
+
+
+def test_skills_default_to_empty_so_every_existing_report_still_validates() -> None:
+    """Additive, because consumers must never break on an upgrade (this package's own rule).
+
+    Every report already written to a venture's state ref omits this field. If it were required,
+    upgrading the contracts package would make the entire history of every venture unreadable.
+    """
+    assert _report().skills_used == []
+
+
+def test_empty_is_not_a_claim_that_nothing_was_used() -> None:
+    """Cannot tell "used none" from "written before this existed", and must not pretend to.
+
+    Recorded here because the reader is in another repository and the distinction is the whole
+    reason the description says so: a studio that rendered empty as "this worker used no skills"
+    would be stating a fact about every run in history that nobody ever measured.
+    """
+    old_report_shape = {
+        "lane_id": "sell",
+        "started_at": _now(),
+        "ended_at": _now(),
+        "trigger": RunTrigger.SCHEDULED,
+        "outcome": RunOutcome.PROGRESS,
+    }
+    assert "skills_used" not in old_report_shape
+    assert RunReport(**old_report_shape).skills_used == []  # type: ignore[arg-type]
+
+
+def test_the_json_schema_carries_the_field_for_the_typescript_consumers() -> None:
+    """fountainbridge reads the JSON Schema, not the Python model. A field only in Pydantic is a
+    field the Foundry Studio cannot see."""
+    schema = RunReport.model_json_schema()
+    assert "skills_used" in schema["properties"]
+    assert schema["properties"]["skills_used"]["type"] == "array"
+    assert "skills_used" not in schema.get("required", [])

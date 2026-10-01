@@ -347,6 +347,14 @@ class RunReport(BaseModel):
             "'blocked'. None otherwise."
         ),
     )
+    skills_used: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Which skills the worker used on this run, by name — 'write-tests', "
+            "'compare-screenshots'. Empty means none were used OR that the run predates this "
+            "field; it is never a claim that the worker used nothing."
+        ),
+    )
     pr_url: str | None = Field(
         default=None,
         description="The pull request this run opened, when outcome is 'opened-pr'.",
