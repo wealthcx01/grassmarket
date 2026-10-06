@@ -1,0 +1,138 @@
+{
+  "$defs": {
+    "OrganisationStatus": {
+      "enum": [
+        "prospect",
+        "active",
+        "dormant",
+        "closed"
+      ],
+      "title": "OrganisationStatus",
+      "type": "string"
+    },
+    "OrganisationType": {
+      "description": "What kind of organisation this is, from Holy Corner's point of view.",
+      "enum": [
+        "brokerage_platform",
+        "infrastructure_vendor",
+        "data_provider",
+        "investment_firm",
+        "regulator",
+        "association",
+        "partner",
+        "client",
+        "founder_venture",
+        "other"
+      ],
+      "title": "OrganisationType",
+      "type": "string"
+    },
+    "Pillar": {
+      "description": "A Bruntsfield vertical. Three are live or building; three are names with a plan.",
+      "enum": [
+        "advisory",
+        "foundry",
+        "clients",
+        "briefing",
+        "equity",
+        "cohort"
+      ],
+      "title": "Pillar",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One organisation, whichever pillar met it first.\n\n`pillar_flags` is a set rather than a single pillar deliberately: an Advisory partner today may\nbe a Briefing subject tomorrow and an Equity target after that, and the register has to hold\nthat without the record being duplicated once per pillar.",
+  "properties": {
+    "aliases": {
+      "default": [],
+      "description": "Other names the same organisation is known by.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Aliases",
+      "type": "array"
+    },
+    "canonical_name": {
+      "description": "The name as it appears on a contract.",
+      "minLength": 1,
+      "title": "Canonical Name",
+      "type": "string"
+    },
+    "countries": {
+      "default": [],
+      "description": "ISO 3166-1 alpha-2 codes where this organisation operates or is registered.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Countries",
+      "type": "array"
+    },
+    "domain": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Domain"
+    },
+    "id": {
+      "description": "Stable slug, e.g. 'openbb'.",
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "notes": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Notes"
+    },
+    "pillar_flags": {
+      "default": [],
+      "description": "Which Bruntsfield pillars have a relationship with this one.",
+      "items": {
+        "$ref": "#/$defs/Pillar"
+      },
+      "title": "Pillar Flags",
+      "type": "array"
+    },
+    "segment": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Coarse sector hint, e.g. 'Neobank' or 'Data infrastructure'.",
+      "title": "Segment"
+    },
+    "status": {
+      "$ref": "#/$defs/OrganisationStatus",
+      "default": "active"
+    },
+    "type": {
+      "$ref": "#/$defs/OrganisationType"
+    }
+  },
+  "required": [
+    "id",
+    "canonical_name",
+    "type"
+  ],
+  "title": "Organisation",
+  "type": "object"
+}

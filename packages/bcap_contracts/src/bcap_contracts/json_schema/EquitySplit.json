@@ -1,0 +1,63 @@
+{
+  "additionalProperties": false,
+  "description": "Who holds what at spin-out, in basis points.\n\n`provisional` exists because the signed document has the figures in square brackets. Recording a\nbracketed placeholder as though it were agreed is how a negotiating position becomes a fact\nnobody remembers agreeing to.",
+  "properties": {
+    "bps": {
+      "description": "Basis points of the fully diluted total.",
+      "maximum": 10000,
+      "minimum": 0,
+      "title": "Bps",
+      "type": "integer"
+    },
+    "cliff_months": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Cliff Months"
+    },
+    "holder": {
+      "description": "'founder', 'bruntsfield', 'option_pool'.",
+      "minLength": 1,
+      "title": "Holder",
+      "type": "string"
+    },
+    "kind": {
+      "const": "equity_split",
+      "default": "equity_split",
+      "title": "Kind",
+      "type": "string"
+    },
+    "provisional": {
+      "default": false,
+      "description": "True where the signed document carries this figure in square brackets.",
+      "title": "Provisional",
+      "type": "boolean"
+    },
+    "vesting_months": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Vesting Months"
+    }
+  },
+  "required": [
+    "holder",
+    "bps"
+  ],
+  "title": "EquitySplit",
+  "type": "object"
+}

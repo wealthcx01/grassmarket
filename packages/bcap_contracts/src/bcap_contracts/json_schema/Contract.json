@@ -1,0 +1,691 @@
+{
+  "$defs": {
+    "CommissionRate": {
+      "additionalProperties": false,
+      "description": "What we earn on a deal, in basis points, per contract year.\n\nBASIS POINTS AND NOT A PERCENTAGE FLOAT. The Advisory Studio's own commission config is already\nin bps, the contracts are written in whole and half percents, and 7.5% is 750 - exact - where a\nfloat is 0.075 and is not. A rate that arrives as an integer and stays one cannot drift.",
+      "properties": {
+        "engagement_type": {
+          "description": "Which kind of deal this rate applies to, in the contract's own words, e.g. 'white_label_exchange' or 'distribution_direct_acv'.",
+          "minLength": 1,
+          "title": "Engagement Type",
+          "type": "string"
+        },
+        "kind": {
+          "const": "commission_rate",
+          "default": "commission_rate",
+          "title": "Kind",
+          "type": "string"
+        },
+        "window_months": {
+          "description": "How long commission runs from first cash received on the engagement.",
+          "exclusiveMinimum": 0,
+          "title": "Window Months",
+          "type": "integer"
+        },
+        "yr1_bps": {
+          "description": "Year-one rate in basis points. 3000 is 30%.",
+          "maximum": 10000,
+          "minimum": 0,
+          "title": "Yr1 Bps",
+          "type": "integer"
+        },
+        "yr2_bps": {
+          "description": "Year-two rate. 0 where year two earns nothing.",
+          "maximum": 10000,
+          "minimum": 0,
+          "title": "Yr2 Bps",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "engagement_type",
+        "yr1_bps",
+        "yr2_bps",
+        "window_months"
+      ],
+      "title": "CommissionRate",
+      "type": "object"
+    },
+    "CommitmentPayment": {
+      "additionalProperties": false,
+      "description": "A payment due on signature.\n\n`creditable` is the whole reason this is a field rather than an invoice line. Two counterparties\neach pay the same amount on signature and the two payments behave differently: one is\nnon-refundable and NOT creditable against future commission, the other draws down against\ncommission dollar for dollar until it is consumed. Getting that backwards overstates what we are\nowed by the whole amount, on a screen, to the person deciding whether to chase it.",
+      "properties": {
+        "amount": {
+          "$ref": "#/$defs/RecordedAmount"
+        },
+        "creditable": {
+          "description": "True when the payment draws down against commission as it accrues; false when it is kept and commission is earned on top of it.",
+          "title": "Creditable",
+          "type": "boolean"
+        },
+        "due_on_signature": {
+          "default": true,
+          "title": "Due On Signature",
+          "type": "boolean"
+        },
+        "kind": {
+          "const": "commitment_payment",
+          "default": "commitment_payment",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "creditable"
+      ],
+      "title": "CommitmentPayment",
+      "type": "object"
+    },
+    "ContractDocument": {
+      "additionalProperties": false,
+      "description": "A file that IS the contract, or a version of it.",
+      "properties": {
+        "document_kind": {
+          "description": "'executed', 'draft', 'signed_counterparty' or 'countersigned'.",
+          "minLength": 1,
+          "title": "Document Kind",
+          "type": "string"
+        },
+        "md5": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "For refusing a duplicate upload.",
+          "title": "Md5"
+        },
+        "storage_key": {
+          "description": "Where the file lives. Never the file.",
+          "minLength": 1,
+          "title": "Storage Key",
+          "type": "string"
+        },
+        "version": {
+          "description": "The version on the document, e.g. 'v6'.",
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "document_kind",
+        "storage_key"
+      ],
+      "title": "ContractDocument",
+      "type": "object"
+    },
+    "ContractStatus": {
+      "description": "Forward only. A contract does not go back to draft once it has been signed.",
+      "enum": [
+        "draft",
+        "sent",
+        "signed",
+        "active",
+        "expired",
+        "terminated"
+      ],
+      "title": "ContractStatus",
+      "type": "string"
+    },
+    "ContractType": {
+      "description": "The document kinds Bruntsfield actually signs. Every one of these exists on paper today.",
+      "enum": [
+        "msa",
+        "engagement_schedule",
+        "collaboration_agreement",
+        "term_sheet",
+        "service_schedule",
+        "consultant_agreement",
+        "founders_service_agreement",
+        "other"
+      ],
+      "title": "ContractType",
+      "type": "string"
+    },
+    "Currency": {
+      "enum": [
+        "GBP",
+        "USD",
+        "EUR",
+        "CHF",
+        "HKD"
+      ],
+      "title": "Currency",
+      "type": "string"
+    },
+    "EquitySplit": {
+      "additionalProperties": false,
+      "description": "Who holds what at spin-out, in basis points.\n\n`provisional` exists because the signed document has the figures in square brackets. Recording a\nbracketed placeholder as though it were agreed is how a negotiating position becomes a fact\nnobody remembers agreeing to.",
+      "properties": {
+        "bps": {
+          "description": "Basis points of the fully diluted total.",
+          "maximum": 10000,
+          "minimum": 0,
+          "title": "Bps",
+          "type": "integer"
+        },
+        "cliff_months": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cliff Months"
+        },
+        "holder": {
+          "description": "'founder', 'bruntsfield', 'option_pool'.",
+          "minLength": 1,
+          "title": "Holder",
+          "type": "string"
+        },
+        "kind": {
+          "const": "equity_split",
+          "default": "equity_split",
+          "title": "Kind",
+          "type": "string"
+        },
+        "provisional": {
+          "default": false,
+          "description": "True where the signed document carries this figure in square brackets.",
+          "title": "Provisional",
+          "type": "boolean"
+        },
+        "vesting_months": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Vesting Months"
+        }
+      },
+      "required": [
+        "holder",
+        "bps"
+      ],
+      "title": "EquitySplit",
+      "type": "object"
+    },
+    "LongStop": {
+      "additionalProperties": false,
+      "description": "The date by which something must have happened, or a stated remedy applies.",
+      "properties": {
+        "kind": {
+          "const": "long_stop",
+          "default": "long_stop",
+          "title": "Kind",
+          "type": "string"
+        },
+        "months": {
+          "exclusiveMinimum": 0,
+          "title": "Months",
+          "type": "integer"
+        },
+        "provisional": {
+          "default": false,
+          "title": "Provisional",
+          "type": "boolean"
+        },
+        "remedy": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "What the counterparty may require if the date passes.",
+          "title": "Remedy"
+        }
+      },
+      "required": [
+        "months"
+      ],
+      "title": "LongStop",
+      "type": "object"
+    },
+    "Milestone": {
+      "additionalProperties": false,
+      "description": "A thing that has to be true, not a payment.\n\nA Foundry venture earns nothing and is measured by whether it can support its founder. The\nthreshold is a `RecordedAmount` when the measure is money and absent when it is not.",
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "kind": {
+          "const": "milestone",
+          "default": "milestone",
+          "title": "Kind",
+          "type": "string"
+        },
+        "measure": {
+          "description": "What is measured, e.g. 'net_revenue_per_month'.",
+          "minLength": 1,
+          "title": "Measure",
+          "type": "string"
+        },
+        "sustained_months": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "How many consecutive periods the threshold must hold. A revenue figure hit once is not the same as one sustained, and the contract says which.",
+          "title": "Sustained Months"
+        },
+        "threshold": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RecordedAmount"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "description",
+        "measure"
+      ],
+      "title": "Milestone",
+      "type": "object"
+    },
+    "PaymentTerms": {
+      "additionalProperties": false,
+      "description": "How long the counterparty has to pay, and in what.",
+      "properties": {
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "days": {
+          "exclusiveMinimum": 0,
+          "title": "Days",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "payment_terms",
+          "default": "payment_terms",
+          "title": "Kind",
+          "type": "string"
+        },
+        "method": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "e.g. 'electronic_transfer'.",
+          "title": "Method"
+        }
+      },
+      "required": [
+        "days",
+        "currency"
+      ],
+      "title": "PaymentTerms",
+      "type": "object"
+    },
+    "Pillar": {
+      "description": "A Bruntsfield vertical. Three are live or building; three are names with a plan.",
+      "enum": [
+        "advisory",
+        "foundry",
+        "clients",
+        "briefing",
+        "equity",
+        "cohort"
+      ],
+      "title": "Pillar",
+      "type": "string"
+    },
+    "RecordedAmount": {
+      "additionalProperties": false,
+      "description": "An amount that is a FACT on a document, not a figure under assumptions (HC-005).\n\n``Money`` above cannot be constructed without an ``assumption_register_ref``, and that is\ncorrect for what it is for: a lever NPV or a remediation cost is only meaningful under stated\nassumptions, and ADR-0002 exists because the prototype subtracted pounds from score-points.\n\nHoly Corner needs the other kind. ``USD 5,000`` on invoice INV-001 is not modelled, not\nuncertain and not an assumption. It is written on a document somebody signed. Putting it in a\nfield named ``assumption_register_ref`` would say the opposite of what is true, and a field used\nagainst its own name is how a wrong number survives review: the next reader believes the name.\n\nSo the two types are distinguished by WHERE THE NUMBER CAME FROM, which is the thing that\nactually differs:\n\n* ``Money`` cites the assumptions that justify a modelled figure.\n* ``RecordedAmount`` cites the source it was read from - a contract clause, an invoice, a\n  partner's cash report, a bank statement line.\n\nBoth are integer minor units with an explicit currency, and neither can exist without\nprovenance. Neither converts to the other, and this package defines no function that takes one\nand returns the other: a modelled figure and an observed one are not interchangeable just\nbecause both are denominated in pounds.",
+      "properties": {
+        "amount_minor": {
+          "description": "Amount in integer minor units (e.g. cents). Never a float: a float cannot hold 0.1 exactly, and a commission recomputed on one drifts every time.",
+          "title": "Amount Minor",
+          "type": "integer"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "source_ref": {
+          "description": "Where this amount was read from, precisely enough for somebody to check it against the document: a contract clause, an invoice number, a statement line. Mandatory, for the same reason Money's assumption reference is: an amount with no provenance is a claim, and this record exists to hold facts.",
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount_minor",
+        "currency",
+        "source_ref"
+      ],
+      "title": "RecordedAmount",
+      "type": "object"
+    },
+    "RenewalRule": {
+      "additionalProperties": false,
+      "description": "What happens when the counterparty's own customer renews.",
+      "properties": {
+        "kind": {
+          "const": "renewal_rule",
+          "default": "renewal_rule",
+          "title": "Kind",
+          "type": "string"
+        },
+        "material_contribution_presumed_months": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Where the contract presumes material contribution from any documented contact within N months before renewal, N goes here. Absent means it must be argued.",
+          "title": "Material Contribution Presumed Months"
+        },
+        "notice_days": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Notice Days"
+        },
+        "restarts_at_year_one": {
+          "description": "True where a renewal we materially contributed to restarts the window at year-one rates rather than continuing at year two.",
+          "title": "Restarts At Year One",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "restarts_at_year_one"
+      ],
+      "title": "RenewalRule",
+      "type": "object"
+    },
+    "Restraint": {
+      "additionalProperties": false,
+      "description": "A non-compete or non-solicit, with its carve-outs.",
+      "properties": {
+        "carve_out": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Carve Out"
+        },
+        "kind": {
+          "const": "restraint",
+          "default": "restraint",
+          "title": "Kind",
+          "type": "string"
+        },
+        "months": {
+          "exclusiveMinimum": 0,
+          "title": "Months",
+          "type": "integer"
+        },
+        "provisional": {
+          "default": false,
+          "title": "Provisional",
+          "type": "boolean"
+        },
+        "restraint_type": {
+          "description": "'non_compete' or 'non_solicit'.",
+          "minLength": 1,
+          "title": "Restraint Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "restraint_type",
+        "months"
+      ],
+      "title": "Restraint",
+      "type": "object"
+    },
+    "RunOffPeriod": {
+      "additionalProperties": false,
+      "description": "How long commission keeps running after the agreement itself ends.",
+      "properties": {
+        "kind": {
+          "const": "run_off_period",
+          "default": "run_off_period",
+          "title": "Kind",
+          "type": "string"
+        },
+        "months": {
+          "exclusiveMinimum": 0,
+          "title": "Months",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "months"
+      ],
+      "title": "RunOffPeriod",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One signed (or unsigned) agreement.\n\n`dated_on` and `effective_on` are SEPARATE FIELDS AND BOTH ARE KEPT. One agreement in the record\nhas a Master Services Agreement dated one day and a schedule stating it was entered into five\nweeks earlier. Collapsing them to a single date loses a discrepancy that is on the face of the\ndocuments and that somebody has to decide about; keeping both makes it visible every time the\ncontract is read.",
+  "properties": {
+    "counterparty_organisation_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Counterparty Organisation Id"
+    },
+    "counterparty_person_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "For the agreements whose counterparty is a person rather than a company: a consultant agreement, a founders service agreement.",
+      "title": "Counterparty Person Id"
+    },
+    "dated_on": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Dated On"
+    },
+    "documents": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ContractDocument"
+      },
+      "title": "Documents",
+      "type": "array"
+    },
+    "effective_on": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Effective On"
+    },
+    "governing_law": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "e.g. 'State of New York' or 'Switzerland'.",
+      "title": "Governing Law"
+    },
+    "id": {
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "parent_contract_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The MSA a schedule belongs to.",
+      "title": "Parent Contract Id"
+    },
+    "pillar": {
+      "$ref": "#/$defs/Pillar"
+    },
+    "signed_on": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Signed On"
+    },
+    "status": {
+      "$ref": "#/$defs/ContractStatus",
+      "default": "draft"
+    },
+    "terms": {
+      "default": [],
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "commission_rate": "#/$defs/CommissionRate",
+            "commitment_payment": "#/$defs/CommitmentPayment",
+            "equity_split": "#/$defs/EquitySplit",
+            "long_stop": "#/$defs/LongStop",
+            "milestone": "#/$defs/Milestone",
+            "payment_terms": "#/$defs/PaymentTerms",
+            "renewal_rule": "#/$defs/RenewalRule",
+            "restraint": "#/$defs/Restraint",
+            "run_off_period": "#/$defs/RunOffPeriod"
+          },
+          "propertyName": "kind"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/CommissionRate"
+          },
+          {
+            "$ref": "#/$defs/CommitmentPayment"
+          },
+          {
+            "$ref": "#/$defs/RenewalRule"
+          },
+          {
+            "$ref": "#/$defs/RunOffPeriod"
+          },
+          {
+            "$ref": "#/$defs/Milestone"
+          },
+          {
+            "$ref": "#/$defs/EquitySplit"
+          },
+          {
+            "$ref": "#/$defs/LongStop"
+          },
+          {
+            "$ref": "#/$defs/Restraint"
+          },
+          {
+            "$ref": "#/$defs/PaymentTerms"
+          }
+        ]
+      },
+      "title": "Terms",
+      "type": "array"
+    },
+    "type": {
+      "$ref": "#/$defs/ContractType"
+    }
+  },
+  "required": [
+    "id",
+    "type",
+    "pillar"
+  ],
+  "title": "Contract",
+  "type": "object"
+}

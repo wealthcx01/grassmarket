@@ -1,0 +1,130 @@
+{
+  "$defs": {
+    "Actor": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Who, precisely enough to ask them about it later: a person's email, an agent's name, the executor's identifier.",
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ActorKind"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "title": "Actor",
+      "type": "object"
+    },
+    "ActorKind": {
+      "description": "Who did this.\n\nThe distinction is load-bearing and is the reason this is an enum rather than a string. Only a\n`HUMAN` may grant. An `AGENT` proposes; an `EXECUTOR` is the one code path that performs an\nexternal action, and it acts only on a grant it has verified.",
+      "enum": [
+        "human",
+        "agent",
+        "executor"
+      ],
+      "title": "ActorKind",
+      "type": "string"
+    },
+    "ApprovalEventType": {
+      "description": "The whole lifecycle. A proposal ends granted-then-executed, rejected, or failed.",
+      "enum": [
+        "approval.proposed",
+        "approval.granted",
+        "approval.rejected",
+        "action.executing",
+        "action.executed",
+        "action.failed"
+      ],
+      "title": "ApprovalEventType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One event in the log. Immutable by construction: `frozen=True`.",
+  "properties": {
+    "actor": {
+      "$ref": "#/$defs/Actor"
+    },
+    "at": {
+      "description": "When, for a reader. Not the ordering (see `seq`).",
+      "format": "date-time",
+      "title": "At",
+      "type": "string"
+    },
+    "attestation": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "HMAC over the event's canonical form. Absent only on an event that has not been signed yet; a stored event without one does not verify and is refused.",
+      "title": "Attestation"
+    },
+    "content_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "A hash of the proposal's payload. Carried on the proposal and on the grant, so an executor can prove the thing approved is the thing it is about to do.",
+      "title": "Content Hash"
+    },
+    "data": {
+      "additionalProperties": true,
+      "description": "What this event is about, in the kind's own terms.",
+      "title": "Data",
+      "type": "object"
+    },
+    "id": {
+      "description": "The proposal this event concerns. Stable across its life.",
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "scope": {
+      "description": "Which log this belongs to. The Foundry Studio scopes by venture; Holy Corner scopes by the subject the approval is about.",
+      "minLength": 1,
+      "title": "Scope",
+      "type": "string"
+    },
+    "seq": {
+      "description": "Monotonic within a scope. THE ORDER OF THE LOG. Never sort these by `at`: two events a millisecond apart have an unarguable order by integer and an arguable one by clock.",
+      "minimum": 1,
+      "title": "Seq",
+      "type": "integer"
+    },
+    "type": {
+      "$ref": "#/$defs/ApprovalEventType"
+    },
+    "v": {
+      "default": 1,
+      "description": "Shape version, so a reader can tell old from new.",
+      "minimum": 1,
+      "title": "V",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "seq",
+    "scope",
+    "id",
+    "type",
+    "at",
+    "actor"
+  ],
+  "title": "ApprovalEvent",
+  "type": "object"
+}

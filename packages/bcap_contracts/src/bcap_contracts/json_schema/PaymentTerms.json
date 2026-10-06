@@ -1,0 +1,52 @@
+{
+  "$defs": {
+    "Currency": {
+      "enum": [
+        "GBP",
+        "USD",
+        "EUR",
+        "CHF",
+        "HKD"
+      ],
+      "title": "Currency",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "How long the counterparty has to pay, and in what.",
+  "properties": {
+    "currency": {
+      "$ref": "#/$defs/Currency"
+    },
+    "days": {
+      "exclusiveMinimum": 0,
+      "title": "Days",
+      "type": "integer"
+    },
+    "kind": {
+      "const": "payment_terms",
+      "default": "payment_terms",
+      "title": "Kind",
+      "type": "string"
+    },
+    "method": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "e.g. 'electronic_transfer'.",
+      "title": "Method"
+    }
+  },
+  "required": [
+    "days",
+    "currency"
+  ],
+  "title": "PaymentTerms",
+  "type": "object"
+}
