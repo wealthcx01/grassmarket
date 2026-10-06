@@ -1,6 +1,6 @@
 # Grassmarket — where the build stands
 
-**Last updated 2026-09-03.** Read this first in a new session; it is the state of play, not history.
+**Last updated 2026-10-06.** Read this first in a new session; it is the state of play, not history.
 
 ## One line
 
@@ -9,6 +9,49 @@ GRS-0249 (voice notes) is **built end to end**: an advisor records, consent is g
 transcript are kept, and the note comes back as a proposed pipeline update they tick, correct and
 confirm. Next is the front-end redesign, which has a full design handoff and a generated API
 contract to build on.
+
+## Since this file was last written (2026-09-03 → 2026-10-06)
+
+Everything below is **merged and on `main`**. `main` is the production line: a push deploys both
+services and runs migrations at app import.
+
+| PR | Date | What |
+|---|---|---|
+| **#275** | 09-04 | GRS-0253 — one needs-you queue; retired routes say so |
+| **#276** | 09-04 | GRS-0210 — search knows the market advisors sell into |
+| **#277** | 09-05 | GRS-0255 — the consent line names where the recording goes |
+| **#278** | 09-05 | GRS-0242 scope 3 — a level says whether it was earned |
+| **#280** | 09-30 | HC-005 — Holy Corner group record: organisations, contracts, invoices, approvals (v0.3.0) |
+| **#281** | 10-01 | GRS-0265 — a run report records which skills its worker used |
+
+**One pull request is open and is the only work not on `main`: [#279]** — the GRS-0242
+verification screenshots and the GRS-0279 bug they found. Documentation and images only, no code.
+See the two sections below.
+
+### GRS-0242 was merged without the screenshots its test plan asked for
+
+#278 landed scope 3 — the Bench tab and the Certification ladder now derive an `earned_level` from
+the evidence, so a level granted outside the ladder renders as granted rather than earned. The
+ticket's test plan asked for the changed screens to be rendered and looked at. That did not happen
+before the merge. It has now, on #279: `reports/screenshots/grs-0242/`, desktop and phone. The fix
+is correct on screen — the two tabs finally describe the same person the same way.
+
+### Looking at the screens found a bug nobody had seen
+
+**GRS-0279.** At 393px every signed-in page is **590px wide and scrolls sideways**. The header
+account button prints the advisor's whole email address, untruncated, 258px of it. The knock-on
+matters more than the scroll: the body lays out 590px wide, so the Bench "My performance" values
+all sit at x=471 — off the right of a phone screen. An advisor cannot see their own level,
+pipeline conversion or exam result. `main` reproduces it identically; it is old, not new.
+
+### Ticket numbers: read this before filing one
+
+**`GRS-0265 … GRS-0278` are reserved for the redesign frontend cut** (see
+`docs/REDESIGN-PROGRAMME.md`). That reservation has already been broken once: #281 took **0265**,
+which the programme allocates to "Tokens + rail shell". Whoever builds the redesign must either
+renumber that row or accept the gap — it is a live inconsistency, not a typo.
+
+**File anything new at GRS-0280 or above.**
 
 ## Read these before touching anything
 
