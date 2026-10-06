@@ -124,7 +124,7 @@ filled, the three rungs above outlined and dashed, with the provenance note unde
 
 **One thing the pictures caught that is not this ticket's:** at 393px the page is 590px wide and
 scrolls sideways, because the header account button prints the whole email address. `main`
-reproduces it identically, so this change did not cause it. It is now **GRS-0265**, because the
+reproduces it identically, so this change did not cause it. It is now **GRS-0279**, because the
 same overflow pushes the Bench performance values off the right of a phone screen.
 
 ## Still open — deliberately

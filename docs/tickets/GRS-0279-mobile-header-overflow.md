@@ -1,7 +1,12 @@
-# GRS-0265 — Every page scrolls sideways on a phone, because the header prints a full email address
+# GRS-0279 — Every page scrolls sideways on a phone, because the header prints a full email address
 
 **Status:** OPEN (found 2026-09-09). **Priority:** MED. **Type:** Bug.
 **Loop:** first-time-user coherence. **Found by:** the GRS-0242 screenshot pass.
+
+**On the number:** first drafted as GRS-0265, then 0266. Both were wrong. `docs/HANDOFF.md`
+reserves **GRS-0265 … GRS-0278** for the redesign frontend cut (0265 is "Tokens + rail shell",
+0266 is "The desk" — see `docs/REDESIGN-PROGRAMME.md`), so this took the first number clear of
+that block. Anything new filed outside the redesign should start at **GRS-0280**.
 
 ## Why
 
