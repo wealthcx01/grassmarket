@@ -13,7 +13,7 @@
 //   {"do":"read"}                       // dump current page text
 //   {"do":"shot","name":"pipeline"}     // screenshot
 // target resolvers: text:  role:<role>:<name>  label:  placeholder:  #id  or a raw CSS selector.
-import { chromium } from "/home/dev/projects/grassmarket/frontend/node_modules/playwright-core/index.js";
+import { chromium } from "../../frontend/node_modules/playwright-core/index.js";
 import { readFileSync } from "node:fs";
 
 const [email, password, stepsPath, outdir] = process.argv.slice(2);

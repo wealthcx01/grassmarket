@@ -72,3 +72,5 @@ Grassmarket/
 
 Prototype harvest sources (reference only, read-only):
 `C:\Users\John\OneDrive\BruntsfieldCapital\Business\Advisory\Technology\Assessment Wizard\codespaces-blank` (most complete copy) and `...\bruntsfield_advisory_assessment_wizard_v2` (git repo, behind). The dpn/jcj/oqh/ryv variant folders are superseded — ignore.
+
+**Factory log:** when you start a ticket, open its PR, or come back after a crash, run `factory-log firm ticket.started|pr.opened|lane.recovered grassmarket <ticket-id> [note]` (e.g. `factory-log firm ticket.started grassmarket GRS-0250`); the manual is OPS.md in wealthcx01/cowgate.

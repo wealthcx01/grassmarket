@@ -1,7 +1,7 @@
 // Staging UX-audit driver. Same transcript format as agent_drive.mjs but points at a configurable
 // BASE (default = Railway staging web) and drives the DEPLOYED product so I can observe real UX.
 // Usage: bun stage_drive.mjs <email> <password> <steps.json> <outdir> [baseUrl]
-import { chromium } from "/home/dev/projects/grassmarket/frontend/node_modules/playwright-core/index.js";
+import { chromium } from "../../frontend/node_modules/playwright-core/index.js";
 import { readFileSync } from "node:fs";
 
 const [email, password, stepsPath, outdir, baseArg] = process.argv.slice(2);
