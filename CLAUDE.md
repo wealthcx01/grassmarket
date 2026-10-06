@@ -60,6 +60,29 @@ Grassmarket/
 - **Property tests:** raising any subcomponent never lowers V (monotonicity); raising the min subcomponent raises q_m at least as much as raising the max (bottleneck behaviour); N/A removal renormalises weights; Not Assessed never contributes to any score.
 - **Registry tests:** an unknown or missing key in any CoefficientSet is a load-time error.
 
+## Checks
+
+The commands the factory's house workflow (`bruntsfield-ticket`) runs, in this order,
+from the repo root, before anything is pushed. One command per line. Keep this list
+true: the workflow runs exactly these and never guesses.
+
+```bash
+uv sync --all-extras --frozen
+uv run ruff check .
+uv run ruff format --check .
+uv run python scripts/generate_schemas.py && git diff --exit-code -- packages/bcap_contracts/src/bcap_contracts/json_schema
+uv run pyright
+GM_JWT_SECRET=ci-secret-that-is-more-than-thirty-two-characters-long GM_ENV=ci uv run pytest -q
+cd frontend && bun install --frozen-lockfile
+cd frontend && npm run type-check
+cd frontend && npm run lint
+cd frontend && npm test
+```
+
+The browser tests (`npm run e2e` and the visual UI gate) are left out: Chromium can't run on the planning box. CI still runs them.
+The pytest line sets the same dummy `GM_JWT_SECRET` and `GM_ENV` that CI sets; it is a placeholder, not a real secret.
+The frontend installs from `frontend/bun.lock`, the lock file kept up to date. `frontend/package-lock.json` is out of date (it lacks `@dnd-kit`), so `npm ci` fails.
+
 ## Build sequence (PIV loops — see PRD §9)
 
 0. Scaffold, CI, auth + scoping, contracts, Railway skeleton, ADR-0001/0002 →
