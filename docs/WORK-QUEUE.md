@@ -1,10 +1,19 @@
 # Grassmarket — the work queue
 
-**Written 2026-09-02.** What I work through, in order, and what I need the founder for.
-Companion to `docs/HANDOFF.md` (state of play) and `docs/FOUNDER-DECISIONS-2026-08.md`.
+**Written 2026-09-02. Status refreshed 2026-10-06.** What I work through, in order, and what I need
+the founder for. Companion to `docs/HANDOFF.md` (state of play) and
+`docs/FOUNDER-DECISIONS-2026-08.md`.
 
 The build is functionally complete and deployed. 205 of 251 tickets are done. What follows is
 everything that is not.
+
+> **Read first (2026-10-06).** The whole "Now — correctness first" block below is **finished and on
+> `main`**, and so are items 5 and 7. The real next item is **GRS-0198**, then **GRS-0214**, unless
+> the founder wants the redesign started — `docs/REDESIGN-PROGRAMME.md` is ready to build and
+> nothing in it waits on a backend ticket. Newly filed: **GRS-0279** (every page scrolls sideways
+> on a phone), small and worth taking early because it is on every signed-in screen.
+>
+> **File new tickets at GRS-0280 or above** — `GRS-0265 … GRS-0278` are reserved for the redesign.
 
 ---
 
@@ -16,17 +25,17 @@ Ordered. Each row says what it is and why it sits where it does.
 
 | # | Ticket | Why it is first |
 |---|---|---|
-| 1 | **GRS-0251** — production transcription is a test double | Production "transcribes" audio by decoding it as UTF-8 with `errors="replace"` and returns 201. It cannot fail, so it fabricates. **A live non-negotiable #3 violation.** Zero exposure today only because no UI reaches it. Blocks GRS-0249. |
-| 2 | **GRS-0246** — dangling assessment references (scopes 1, 3) | The join table that makes the whole class of bug impossible rather than merely detected. Scopes 2 and 4 shipped; this is the structural half. |
-| 3 | **GRS-0247** — document storage | Advisors have nowhere to put a client document. Needs an ADR on where bytes live. Blocks GRS-0249. |
+| 1 | ~~**GRS-0251** — production transcription is a test double~~ **Done 2026-09-03 (#271).** | Production "transcribes" audio by decoding it as UTF-8 with `errors="replace"` and returns 201. It cannot fail, so it fabricates. **A live non-negotiable #3 violation.** Zero exposure today only because no UI reaches it. Blocks GRS-0249. |
+| 2 | ~~**GRS-0246** — dangling assessment references (scopes 1, 3)~~ **Done 2026-09-03 (#272).** | The join table that makes the whole class of bug impossible rather than merely detected. Scopes 2 and 4 shipped; this is the structural half. |
+| 3 | ~~**GRS-0247** — document storage~~ **Done 2026-09-03 (#273).** | Advisors have nowhere to put a client document. Needs an ADR on where bytes live. Blocks GRS-0249. |
 
 ### Next — the things advisors will actually notice
 
 | # | Ticket | Why |
 |---|---|---|
-| 4 | **GRS-0242** — Workbench stops leaking internals | Contradictory, internal-facing copy in a surface advisors use weekly. |
-| 5 | **GRS-0210** — smart search knows the firms advisors type | Search that misses the obvious firm is the fastest way to lose trust in the data. |
-| 6 | **GRS-0198** — assessment & deliverable milestones on the pipeline | Pipeline and assessment are two halves of one story and currently do not reference each other. |
+| 4 | **GRS-0242** — Workbench stops leaking internals. **Scope 3 done 2026-09-05 (#278)**; scopes 1, 2, 4 held for the redesign. | Contradictory, internal-facing copy in a surface advisors use weekly. |
+| 5 | ~~**GRS-0210** — smart search knows the firms advisors type~~ **Done 2026-09-04 (#276).** | Search that misses the obvious firm is the fastest way to lose trust in the data. |
+| 6 | **GRS-0198** — assessment & deliverable milestones on the pipeline. **← the real next item** | Pipeline and assessment are two halves of one story and currently do not reference each other. |
 | 7 | ~~**GRS-0249** — voice notes~~ | **Done 2026-09-03.** Record → consent gate → transcript → proposed pipeline update the advisor ticks and confirms. Blockers 0251 and 0247 merged first. |
 | 8 | **GRS-0214** — what the client gets free vs on engagement | Shapes what a deliverable *is*; touches many surfaces, so earlier is cheaper. |
 
@@ -39,6 +48,13 @@ Ordered. Each row says what it is and why it sits where it does.
 | 11 | **GRS-0222** — narrative assistant on real scored data | Large. Pairs with 0213. |
 | 12 | **GRS-0196** — Practice Arena v2 | Workbench depth; no dependencies. |
 | 13 | **GRS-0205** — rewrite every string in the app | **Explicitly worth holding** until the founder's front-end refinement lands, so the copy pass runs over the final layouts, not the current ones. |
+
+### Small and worth doing early
+
+**GRS-0279** — every signed-in page scrolls sideways on a phone, because the header prints the
+advisor's whole email address. It also pushes the Bench performance values off the right edge, so
+an advisor cannot see their own level on a phone. Contained fix, on every screen. Found 2026-09-09
+by rendering GRS-0242; `main` has always had it.
 
 ### Lower
 
