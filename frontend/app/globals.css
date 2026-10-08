@@ -983,3 +983,19 @@ body:has(.acting-as-banner) header {
     display: none;
   }
 }
+
+/* ---------- Workbench Bench columns on a phone (GRS-0280) ----------
+   "Your next actions" and "My performance" sit side by side. On a 393px phone the performance
+   column was about 150px wide, its values spilled out, and the page was 471px wide. Below 40rem the
+   two sections stack, next actions first. */
+.bench-dashboard {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+}
+
+@media (max-width: 40rem) {
+  .bench-dashboard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
