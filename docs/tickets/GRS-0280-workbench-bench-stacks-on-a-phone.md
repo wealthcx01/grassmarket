@@ -67,3 +67,39 @@ one is 471px, with the performance values at x=334–471.
   conversion and exam result are all on screen.
 - On a desktop, the Bench looks the same as before.
 - `main`'s CI is green again: the "E2E (Playwright)" job passes on this ticket's PR and after merge.
+
+## What shipped
+
+**The change.** The Bench's two-column grid moved out of an inline style in
+`frontend/components/workbench/BenchDashboard.tsx` and into a `.bench-dashboard` class in
+`frontend/app/globals.css`, next to GRS-0279's phone rule. The desktop values are exactly the old
+ones. Below `40rem` the grid drops to one column, so "Your next actions" comes first and "My
+performance" sits underneath it at full width. No other change was needed: once the columns stack,
+nothing inside the Bench is wider than the screen. The phone test was not changed.
+
+**Measured locally** (signed in as the seed advisor, on the CI-style sqlite database, Chromium):
+
+| Bench tab | Before: width × height | After: width × height |
+| --- | --- | --- |
+| Phone, 393×851 | **471px** × 1,127px | **393px** × 1,201px |
+| Desktop, 1440×1000 | 1,440px × 1,000px | 1,440px × 1,000px |
+
+- On the phone, "before" reproduces the CI failure exactly: the performance values (level, pipeline
+  conversion, exam result and the rest) ended at x=471. "After", every element ends inside the
+  screen, and the level line ("Certified Lead · set outside the ladder") fits on one row.
+- The phone page is 74px taller because the two sections now sit one above the other.
+- On the desktop, the before and after screenshots are byte-for-byte the same file.
+
+**The five pages the phone test had never reached.** `frontend/e2e/mobile-overflow.spec.ts` was run
+locally against this change and passes on all thirteen pages. The five newly reached pages, at 393px:
+
+- `/workbench/academy`: 393px wide, 1,454px tall.
+- `/workbench/courses`: 393px wide, 856px tall.
+- `/guide`: 393px wide, 26,579px tall. One table (the operating-model weights) is 442px wide, but it
+  sits in its own sideways-scrolling box, so the page itself does not scroll sideways. That is the
+  intended design, not a fault.
+- `/profile`: 393px wide, 885px tall.
+- `/settings`: 393px wide, 851px tall.
+
+So no follow-up ticket is needed for phone width. The remaining proof is the pull request's own CI
+"E2E (Playwright)" job, which has to be green before this ticket is done.

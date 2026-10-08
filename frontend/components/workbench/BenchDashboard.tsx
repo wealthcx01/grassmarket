@@ -65,7 +65,7 @@ export function BenchDashboard({ advisorId }: { advisorId: string }) {
   }
 
   return (
-    <div style={{ display: "grid", gap: "1.5rem", gridTemplateColumns: "minmax(0, 1.3fr) minmax(0, 1fr)" }}>
+    <div className="bench-dashboard">
       <section>
         <h3 style={{ fontSize: "1rem", margin: "0 0 0.6rem" }}>Your next actions</h3>
         {queue === null ? (
