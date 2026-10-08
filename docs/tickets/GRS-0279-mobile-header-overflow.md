@@ -1,6 +1,6 @@
 # GRS-0279 — Every page scrolls sideways on a phone, because the header prints a full email address
 
-**Status:** OPEN (found 2026-09-09). **Priority:** MED. **Type:** Bug.
+**Status:** HEADER FIXED; ONE PAGE STILL OVERFLOWS — see "What shipped" (found 2026-09-09). **Priority:** MED. **Type:** Bug.
 **Loop:** first-time-user coherence. **Found by:** the GRS-0242 screenshot pass.
 
 **On the number:** first drafted as GRS-0265, then 0266. Both were wrong. `docs/HANDOFF.md`
@@ -57,3 +57,29 @@ introduce it. It has simply never been looked at on a phone.
 
 The founder opens any page on a phone and cannot scroll it sideways, and the Bench performance
 values are all on screen.
+
+## What shipped (2026-10-08)
+
+**The header is fixed.** Below 40rem the account button hides the email and shows only the initial
+and the ▼ (`.account-menu-email` in `globals.css`). The full address is still in the opened menu,
+under "Signed in as". Desktop is unchanged: the email still shows, cut off with an ellipsis.
+
+Measured locally at 393×851 against the seeded app:
+
+- Before: the account button ran from x=332 to x=590, and every signed-in page was 590px wide.
+- After: the button runs from x=332 to x=390. Twelve of the thirteen top-level pages are exactly
+  393px wide. The wide tables on Portfolio, Earnings and Guide scroll inside their own box, so they
+  do not widen the page.
+- Desktop (1440×1000): the page width and height are the same before and after (home 1548px tall,
+  Workbench 1000px).
+
+**`/workbench` still overflows, for a different reason: 471px wide on a 393px screen.** The Bench
+tab lays out its two columns with a fixed inline grid
+(`components/workbench/BenchDashboard.tsx`, `gridTemplateColumns: "minmax(0, 1.3fr) minmax(0, 1fr)"`)
+that has no phone breakpoint. So the columns never stack, and the "My performance" values (Level,
+pipeline conversion, exam result) still sit at x=334–471, partly off the right edge. The header was
+not the cause of that part. Fixing it means changing `BenchDashboard.tsx`, which this ticket's plan
+did not cover, so it needs its own ticket (numbered from GRS-0280).
+
+The new browser test `frontend/e2e/mobile-overflow.spec.ts` checks all thirteen pages. It fails today
+on `/workbench` only, and will pass once the Bench layout stacks on a phone.
