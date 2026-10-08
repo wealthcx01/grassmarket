@@ -107,7 +107,10 @@ export function AccountMenu() {
         >
           {initial}
         </span>
+        {/* Hidden below 40rem (globals.css, GRS-0279): on a phone the address pushed the header
+            past the screen edge. The opened menu still shows it under "Signed in as". */}
         <span
+          className="account-menu-email"
           style={{
             maxWidth: "12rem",
             overflow: "hidden",

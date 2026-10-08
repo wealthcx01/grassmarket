@@ -973,3 +973,13 @@ body:has(.acting-as-banner) header {
   line-height: 1.45;
   color: var(--color-ink-muted);
 }
+
+/* ---------- Header account button on a phone (GRS-0279) ----------
+   The signed-in email made the header about 590px wide on a 393px phone, so every signed-in page
+   scrolled sideways. Below 40rem the button shows only the initial and the arrow. The full address
+   is still in the opened menu, under "Signed in as". */
+@media (max-width: 40rem) {
+  .account-menu-email {
+    display: none;
+  }
+}

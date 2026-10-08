@@ -43,6 +43,22 @@ describe("AccountMenu (GRS-0087)", () => {
     expect(screen.getByRole("menuitem", { name: /log out/i })).toBeTruthy();
   });
 
+  it("marks the email so it can be hidden on a phone, and keeps the full address in the menu (GRS-0279)", async () => {
+    mockedGetSession.mockReturnValue(SESSION);
+    render(<AccountMenu />);
+    const trigger = await screen.findByRole("button", { name: /account menu/i });
+    // globals.css hides .account-menu-email below 40rem, so the header fits a 393px screen.
+    const email = trigger.querySelector(".account-menu-email");
+    expect(email?.textContent).toBe(SESSION.email);
+    fireEvent.click(trigger);
+    const menu = screen.getByRole("menu");
+    const shown = Array.from(menu.querySelectorAll("div")).find(
+      (d) => d.textContent === SESSION.email,
+    );
+    expect(shown).toBeTruthy();
+    expect(shown?.classList.contains("account-menu-email")).toBe(false);
+  });
+
   it("logs out from the menu — clears the session (the old footer behaviour)", async () => {
     mockedGetSession.mockReturnValue(SESSION);
     render(<AccountMenu />);
