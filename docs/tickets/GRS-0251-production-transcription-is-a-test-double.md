@@ -1,6 +1,6 @@
 # GRS-0251 — Production transcribes audio by decoding it as UTF-8, and stores the result as a transcript
 
-**Status:** OPEN (2026-09-02). **Priority:** HIGH. **Type:** Bug (silent fallback).
+**Status:** DONE (2026-09-03, PR #271). Opened 2026-09-02. **Priority:** HIGH. **Type:** Bug (silent fallback).
 **Loop:** post-wave hardening. **Relates to:** GRS-0029, GRS-0030, GRS-0247, GRS-0249, ADR-0009.
 **Non-negotiable violated:** **#3 — fail loud, never silently fall back. Nothing is fabricated.**
 
@@ -103,3 +103,51 @@ would become one the moment GRS-0249 ships a record button, which is why this ti
 
 Production refuses to transcribe rather than inventing a transcript; a real provider is selected by
 config and produces real text; and a test proves the doubles cannot reach production.
+
+## Where this got to
+
+**Closed 2026-10-21.** The code fix merged as **PR #271** on 2026-09-03 and is in production. Only
+this status line had not caught up. The record of the third-party-processing decision is
+**ADR-0050**, written at closing time.
+
+What was built, item by item:
+
+- **Scope 1 — the stand-in refuses in production.** Done. `build_transcriber`
+  (`src/grassmarket/pathb/transcription.py`) refuses the `echo` provider when the app runs in
+  production. The route's `_transcriber` dependency turns that refusal into a readable 503.
+- **Scope 2 — no `errors="replace"`.** Done. `EchoTranscriber` raises `TranscriptionError` on
+  bytes that are not text, and on empty input.
+- **Scope 3 — `GM_TRANSCRIBER_PROVIDER`.** Done. An unknown value raises
+  `TranscriberNotConfiguredError`.
+- **Scope 4 — the real adapter.** Built. `OpenAIWhisperTranscriber` calls hosted `whisper-1`,
+  needs `GM_OPENAI_API_KEY`, and raises on every failure with no fallback. `.env.example` holds an
+  empty placeholder only. The variables are set on the staging and production API services. The
+  recorder (`frontend/components/VoiceNoteRecorder.tsx`) tells the advisor the audio goes to
+  OpenAI Whisper. The ADR is ADR-0050.
+- **Scope 5 — the scanner.** Done. `src/grassmarket/pathb/scanning.py` adds a `content-type`
+  scanner, and production refuses `allow-all`.
+- **Scope 6 — the regression test.** Done, with one deliberate difference, below.
+  `tests/test_transcription_providers.py` holds
+  `test_production_refuses_the_test_doubles_where_the_harm_is`.
+
+### The deliberate difference from scope 6
+
+Scope 6 asked that *constructing the production app* raise. The shipped code does not stop the
+app from booting. It refuses at the transcription endpoint instead, which returns a 503.
+
+The reason is written in `config.py`, in `_refuse_insecure_production`. Refusing at boot would take
+down every endpoint over one feature. It would also have crashed production on the very deploy that
+added the new settings, before anyone could set them. Refusing where the harm happens still makes a
+fabricated transcript impossible, which is what this ticket exists for.
+`test_production_still_boots_with_the_default_providers` pins this choice. Making the app refuse to
+boot instead would be a code change and a separate ticket.
+
+### Not built: follow-ups, gated on the founder
+
+These two parts of scope 4 were **not built**. They are left open on purpose.
+
+1. **Cost metering.** Nothing counts audio minutes or spend. At about $0.006 a minute the cost is
+   small, but scope 4 asked for it to be metered. This is a small separate ticket if wanted, for
+   example logging the audio seconds of each request.
+2. **A note on the compliance surface.** Only the recorder's consent line names OpenAI. A note on
+   the compliance page waits on the founder's D4 decision (UK regulatory framing).

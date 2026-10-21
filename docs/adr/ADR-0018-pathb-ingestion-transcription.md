@@ -16,6 +16,11 @@ enters and is transcribed, how the stored transcript is protected, and where the
 
 ### 1. Transcription is a swappable adapter; the production default is local Whisper
 
+> **Amended 2026-09-03 (recorded 2026-10-21), by ADR-0050.** The production default is now
+> **hosted OpenAI Whisper** (`whisper-1`, `GM_TRANSCRIBER_PROVIDER=openai-whisper`), not local
+> Whisper. The local adapter described below was never built. The "local Whisper" text in this
+> section is kept as history. The port, the swap test and the rest of this ADR still stand.
+
 A `Transcriber` **port** turns uploaded audio/video bytes into text; the provider is a **build-time,
 config-selected choice**, never a code change in the ingestion path. The recorded production default
 is **local Whisper** (`whisper-local-v1`, openai-whisper / faster-whisper), wired at the composition
