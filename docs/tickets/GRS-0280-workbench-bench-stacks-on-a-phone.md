@@ -1,6 +1,7 @@
 # GRS-0280 — The Workbench still scrolls sideways on a phone: the Bench's two columns never stack
 
-**Status:** OPEN (filed 2026-10-08). **Priority:** HIGH — `main`'s CI is red until this is fixed.
+**Status:** DONE (merged in #288 on 2026-10-08; status recorded 2026-10-21). **Priority:** HIGH —
+`main`'s CI was red until this was fixed. It has been green since #288 merged.
 **Type:** Bug. **Follows:** GRS-0279. **Found by:** GRS-0279's phone test.
 
 ## Why
@@ -103,3 +104,7 @@ locally against this change and passes on all thirteen pages. The five newly rea
 
 So no follow-up ticket is needed for phone width. The remaining proof is the pull request's own CI
 "E2E (Playwright)" job, which has to be green before this ticket is done.
+
+**Done, 21 October 2026.** #288 merged on 8 October at 21:32 UTC. Its CI run on `main`, including
+the "E2E (Playwright)" job, passed, and so did the frontend deploy. The status line had not been
+updated since; nothing else changed.
